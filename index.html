@@ -38,8 +38,6 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 
   <!-- i18n / styles -->
   <link rel="stylesheet" href="assets/css/00-tokens.css" />
@@ -176,7 +174,22 @@
       <h2 data-i18n="contact.title"></h2>
       <p class="subtitle" data-i18n="contact.subtitle"></p>
 
-      <form class="form" action="#" method="post" aria-label="Contact form">
+      <form
+        class="form"
+        name="contact"
+        method="post"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/?lead=ok#contact"
+        aria-label="Contact form"
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
+          <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <p id="contact-status" class="muted small" role="status" aria-live="polite" hidden data-i18n="contact.statusSent"></p>
+
         <label for="contact-name" class="visually-hidden" data-i18n="contact.name"></label>
         <input
           id="contact-name"
@@ -256,5 +269,24 @@
   </footer>
 
   <script src="assets/js/i18n.js"></script>
+
+  <script>
+    (function () {
+      try {
+        var params = new URLSearchParams(window.location.search || "");
+        if (params.get("lead") === "ok") {
+          var el = document.getElementById("contact-status");
+          if (el) el.hidden = false;
+
+          params.delete("lead");
+          var cleanQuery = params.toString();
+          var cleanUrl = window.location.pathname + (cleanQuery ? ("?" + cleanQuery) : "") + window.location.hash;
+          window.history.replaceState({}, "", cleanUrl);
+        }
+      } catch (e) {
+        // no-op
+      }
+    })();
+  </script>
 </body>
 </html>
