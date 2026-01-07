@@ -32,7 +32,8 @@
     "phone": "Teléfono",
     "msg": "Ej. evento en 2026, traslado planificado…",
     "submit": "Enviar solicitud",
-    "footer": "Servicio no operativo aún · Solo avisos relevantes"
+    "footer": "Servicio no operativo aún · Solo avisos relevantes",
+    "statusSent": "Solicitud enviada correctamente. Te contactaremos cuando el servicio esté disponible."
   },
   "legal": {
     "tagline": "Movilidad privada con conductor, sin concesiones.",
