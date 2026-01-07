@@ -262,3 +262,33 @@
   padding:12px 14px;
   border-radius:8px;
 }
+
+/* ---------------------------------------------
+   FORM — SUCCESS STATUS (post-submit)
+   --------------------------------------------- */
+
+#contact-status{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:10px;
+
+  background:rgba(31,122,109,.12);
+  border:1px solid rgba(31,122,109,.35);
+
+  color:var(--fg);
+  font-size:14px;
+  line-height:1.4;
+
+  animation: fadeInStatus .25s ease-out both;
+}
+
+@keyframes fadeInStatus{
+  from{
+    opacity:0;
+    transform: translateY(-2px);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
