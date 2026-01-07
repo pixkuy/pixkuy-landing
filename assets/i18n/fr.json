@@ -1,0 +1,84 @@
+{
+  "ui": {
+    "language": "Langue"
+  },
+  "hero": {
+    "title": "Mobilité privée, avec discernement.",
+    "subtitle": "Chauffeurs sélectionnés. Véhicules électriques premium. Service à Mexico.",
+    "cta": "Demander un accès"
+  },
+  "local": {
+    "title": "Mexico, sans friction.",
+    "body": "Des trajets fluides, des temps maîtrisés et un standard constant. Pensé pour le travail, les voyages et les occasions spéciales."
+  },
+  "standard": {
+    "title": "Un standard pensé pour le silence.",
+    "subtitle": "Mobilité électrique haut de gamme.<br>Espace. Calme. Continuité."
+  },
+  "services": {
+    "title": "Tous les besoins ne se valent pas.",
+    "item1": "Transferts privés.",
+    "item2": "Services à l’heure ou à la journée.",
+    "item3": "Événements et occasions spéciales.",
+    "item4": "Escapades à proximité.",
+    "bridge": "Si l’un de ces scénarios vous concerne, dites-nous lequel."
+  },
+  "contact": {
+    "title": "Restez informé.",
+    "subtitle": "Lancement prévu en mars 2026.",
+    "name": "Nom",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "msg": "Ex. événement en 2026, transfert planifié…",
+    "submit": "Envoyer la demande",
+    "footer": "Service pas encore opérationnel · Avis importants uniquement"
+  },
+  "legal": {
+    "tagline": "Mobilité privée, avec discernement.",
+    "location": "Mexico, Mexique.",
+    "contact": "Contact : uniquement via le formulaire de ce site.",
+    "links": {
+      "notice": "Mentions légales",
+      "privacy": "Confidentialité",
+      "cookies": "Cookies"
+    },
+    "notice": {
+      "title": "Mentions légales",
+      "provider": "Éditeur : Pixkuy Mobility S.A. de C.V.",
+      "purposeTitle": "Objet",
+      "purposeBody": "Ce site a pour finalité d’informer sur Pixkuy Mobility et de permettre aux personnes intéressées de demander à être recontactées via le formulaire.",
+      "conditionsTitle": "Conditions d’utilisation",
+      "conditionsBody": "L’accès et l’utilisation de ce site impliquent l’acceptation des présentes conditions. L’éditeur peut mettre à jour les contenus et conditions lorsque nécessaire.",
+      "ipTitle": "Propriété intellectuelle et industrielle",
+      "ipBody": "Les contenus, marques, design et identité visuelle de ce site sont protégés. Toute reproduction ou diffusion sans autorisation est interdite.",
+      "liabilityTitle": "Responsabilité",
+      "liabilityBody": "L’éditeur ne saurait être tenu responsable des interruptions temporaires du service ni des dommages résultant d’une utilisation inappropriée du site.",
+      "back": "Retour à la landing"
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "controllerTitle": "Responsable du traitement",
+      "controllerBody": "Responsable : Pixkuy Mobility S.A. de C.V.",
+      "dataTitle": "Données collectées",
+      "dataBody": "Via le formulaire, nous collectons les données saisies par la personne (p. ex. nom, e-mail, téléphone et message).",
+      "purposeTitle": "Finalité",
+      "purposeBody": "Gérer les demandes de contact, tenir informées les personnes intéressées et traiter les communications liées au service.",
+      "legalBasisTitle": "Base légale",
+      "legalBasisBody": "Le consentement de la personne concernée lors de l’envoi du formulaire.",
+      "retentionTitle": "Conservation",
+      "retentionBody": "Les données sont conservées le temps nécessaire pour traiter la demande et, le cas échéant, pour les communications associées, sauf obligation légale différente.",
+      "rightsTitle": "Droits",
+      "rightsBody": "Vous pouvez demander l’accès, la rectification ou la suppression, ainsi que d’autres droits applicables selon la réglementation en vigueur. Pour les exercer, utilisez le formulaire de ce site en indiquant votre demande.",
+      "securityTitle": "Sécurité",
+      "securityBody": "Des mesures raisonnables sont mises en œuvre pour protéger les données contre les accès non autorisés.",
+      "back": "Retour à la landing"
+    },
+    "cookies": {
+      "title": "Politique de cookies",
+      "body1": "Ce site n’utilise pas de cookies à des fins publicitaires ni de suivi.",
+      "body2": "Si des cookies étaient ajoutés à l’avenir, vous en seriez informé et, le cas échéant, votre consentement serait demandé.",
+      "body3": "La préférence de langue peut être enregistrée localement dans le navigateur afin d’améliorer l’expérience.",
+      "back": "Retour à la landing"
+    }
+  }
+}

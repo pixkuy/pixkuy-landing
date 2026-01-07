@@ -1,0 +1,84 @@
+{
+  "ui": {
+    "language": "Sprache"
+  },
+  "hero": {
+    "title": "Private Mobilität, mit Anspruch.",
+    "subtitle": "Ausgewählte Fahrer. Premium-Elektrofahrzeuge. Service in Mexiko-Stadt.",
+    "cta": "Zugang anfragen"
+  },
+  "local": {
+    "title": "Mexiko-Stadt, ohne Reibung.",
+    "body": "Reibungslose Fahrten, kontrollierte Zeiten und ein konstanter Standard. Konzipiert für Arbeit, Reisen und besondere Anlässe."
+  },
+  "standard": {
+    "title": "Ein Standard, der für Stille entwickelt wurde.",
+    "subtitle": "Premium-Elektromobilität.<br>Raum. Ruhe. Kontinuität."
+  },
+  "services": {
+    "title": "Nicht alle Bedürfnisse sind gleich.",
+    "item1": "Private Transfers.",
+    "item2": "Stunden- oder Tagesservices.",
+    "item3": "Events und besondere Anlässe.",
+    "item4": "Kurztrips in die Umgebung.",
+    "bridge": "Wenn eines dieser Szenarien auf Sie zutrifft, teilen Sie uns mit welches."
+  },
+  "contact": {
+    "title": "Bleiben Sie informiert.",
+    "subtitle": "Geplanter Start im März 2026.",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "msg": "Z. B. Event im Jahr 2026, geplanter Transfer …",
+    "submit": "Anfrage senden",
+    "footer": "Service noch nicht aktiv · Nur relevante Mitteilungen"
+  },
+  "legal": {
+    "tagline": "Private Mobilität, mit Anspruch.",
+    "location": "Mexiko-Stadt, Mexiko.",
+    "contact": "Kontakt: ausschließlich über das Formular dieser Website.",
+    "links": {
+      "notice": "Impressum",
+      "privacy": "Datenschutz",
+      "cookies": "Cookies"
+    },
+    "notice": {
+      "title": "Impressum",
+      "provider": "Herausgeber: Pixkuy Mobility S.A. de C.V.",
+      "purposeTitle": "Zweck",
+      "purposeBody": "Diese Website dient der Information über Pixkuy Mobility und ermöglicht interessierten Personen, über das Formular eine Kontaktaufnahme anzufragen.",
+      "conditionsTitle": "Nutzungsbedingungen",
+      "conditionsBody": "Der Zugriff auf und die Nutzung dieser Website setzen die Akzeptanz dieser Bedingungen voraus. Der Herausgeber kann Inhalte und Bedingungen bei Bedarf aktualisieren.",
+      "ipTitle": "Geistiges und gewerbliches Eigentum",
+      "ipBody": "Inhalte, Marken, Design und visuelle Identität dieser Website sind geschützt. Jede Vervielfältigung oder Verbreitung ohne Genehmigung ist untersagt.",
+      "liabilityTitle": "Haftung",
+      "liabilityBody": "Der Herausgeber haftet nicht für vorübergehende Unterbrechungen des Dienstes oder für Schäden, die aus einer unsachgemäßen Nutzung der Website entstehen.",
+      "back": "Zurück zur Landing"
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "controllerTitle": "Verantwortlicher",
+      "controllerBody": "Verantwortlich: Pixkuy Mobility S.A. de C.V.",
+      "dataTitle": "Erhobene Daten",
+      "dataBody": "Über das Formular erfassen wir die von der Person eingegebenen Daten (z. B. Name, E-Mail, Telefonnummer und Nachricht).",
+      "purposeTitle": "Zweck der Verarbeitung",
+      "purposeBody": "Bearbeitung von Kontaktanfragen, Information interessierter Personen und Abwicklung dienstbezogener Kommunikation.",
+      "legalBasisTitle": "Rechtsgrundlage",
+      "legalBasisBody": "Einwilligung der betroffenen Person bei Absenden des Formulars.",
+      "retentionTitle": "Speicherdauer",
+      "retentionBody": "Die Daten werden so lange gespeichert, wie es zur Bearbeitung der Anfrage und gegebenenfalls der zugehörigen Kommunikation erforderlich ist, sofern keine andere gesetzliche Verpflichtung besteht.",
+      "rightsTitle": "Rechte",
+      "rightsBody": "Sie können Auskunft, Berichtigung oder Löschung sowie weitere gesetzlich vorgesehene Rechte geltend machen. Nutzen Sie hierfür das Formular dieser Website und geben Sie Ihr Anliegen an.",
+      "securityTitle": "Sicherheit",
+      "securityBody": "Es werden angemessene Maßnahmen ergriffen, um die Daten vor unbefugtem Zugriff zu schützen.",
+      "back": "Zurück zur Landing"
+    },
+    "cookies": {
+      "title": "Cookie-Richtlinie",
+      "body1": "Diese Website verwendet keine Cookies zu Werbe- oder Trackingzwecken.",
+      "body2": "Sollten zukünftig Cookies eingesetzt werden, werden Sie darüber informiert und ggf. um Ihre Einwilligung gebeten.",
+      "body3": "Die Sprachpräferenz kann lokal im Browser gespeichert werden, um die Nutzererfahrung zu verbessern.",
+      "back": "Zurück zur Landing"
+    }
+  }
+}

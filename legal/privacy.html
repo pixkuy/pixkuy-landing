@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="legal.privacy.title"></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Reutilizamos los mismos estilos por capas que la landing -->
+  <link rel="stylesheet" href="../assets/css/00-tokens.css" />
+  <link rel="stylesheet" href="../assets/css/10-base.css" />
+  <link rel="stylesheet" href="../assets/css/20-components.css" />
+  <link rel="stylesheet" href="../assets/css/30-sections.css" />
+  <link rel="stylesheet" href="../assets/css/90-a11y.css" />
+
+  <!-- a11y helper: labels ocultos pero existentes -->
+  <style>
+    .visually-hidden{
+      position:absolute !important;
+      width:1px !important;
+      height:1px !important;
+      padding:0 !important;
+      margin:-1px !important;
+      overflow:hidden !important;
+      clip:rect(0, 0, 0, 0) !important;
+      white-space:nowrap !important;
+      border:0 !important;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Selector de idioma (mismo patrón que la landing) -->
+  <nav class="lang" aria-label="Language selector">
+    <button
+      class="lang-trigger"
+      id="lang-trigger"
+      type="button"
+      aria-haspopup="menu"
+      aria-expanded="false"
+    >
+      <span class="lang-current" aria-hidden="true"></span>
+      <span class="visually-hidden" data-i18n="ui.language"></span>
+    </button>
+
+    <ul
+      class="lang-menu"
+      role="menu"
+      aria-labelledby="lang-trigger"
+      hidden
+    ></ul>
+  </nav>
+
+  <main class="screen legal">
+    <div class="content">
+      <h1 data-i18n="legal.privacy.title"></h1>
+
+      <h2 data-i18n="legal.privacy.controllerTitle"></h2>
+      <p data-i18n="legal.privacy.controllerBody"></p>
+
+      <h2 data-i18n="legal.privacy.dataTitle"></h2>
+      <p data-i18n="legal.privacy.dataBody"></p>
+
+      <h2 data-i18n="legal.privacy.purposeTitle"></h2>
+      <p data-i18n="legal.privacy.purposeBody"></p>
+
+      <h2 data-i18n="legal.privacy.legalBasisTitle"></h2>
+      <p data-i18n="legal.privacy.legalBasisBody"></p>
+
+      <h2 data-i18n="legal.privacy.retentionTitle"></h2>
+      <p data-i18n="legal.privacy.retentionBody"></p>
+
+      <h2 data-i18n="legal.privacy.rightsTitle"></h2>
+      <p data-i18n="legal.privacy.rightsBody"></p>
+
+      <h2 data-i18n="legal.privacy.securityTitle"></h2>
+      <p data-i18n="legal.privacy.securityBody"></p>
+
+      <p class="small">
+        <a href="../index.html" data-i18n="legal.privacy.back"></a>
+      </p>
+    </div>
+  </main>
+
+  <!-- i18n -->
+  <script src="../assets/js/i18n.js"></script>
+</body>
+</html>

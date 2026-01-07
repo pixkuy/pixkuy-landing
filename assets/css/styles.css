@@ -1,0 +1,496 @@
+:root{
+  --bg:#0f1113;          /* grafito profundo */
+  --fg:#f4f2ee;          /* blanco cálido */
+  --muted:#a6a6a6;
+  --accent:#1f7a6d;      /* verde Pixkuy */
+}
+
+*{ box-sizing:border-box; }
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* ✅ MEJORA UX: scroll suave en anclas */
+  scroll-behavior:smooth;
+}
+
+.lang{
+  position:fixed;
+  top:clamp(12px, 2vw, 16px);
+  right:clamp(12px, 2vw, 16px);
+  z-index:20;
+
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  padding:8px 10px;
+  border-radius:999px;
+
+  background:rgba(15,17,19,.55);
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.lang button{
+  background:transparent;
+  border:0;
+  color:var(--muted);
+  cursor:pointer;
+
+  padding:6px 10px;
+  border-radius:999px;
+
+  font-size:14px;
+  line-height:1;
+  white-space:nowrap;
+
+  transition:
+    color .15s ease,
+    background-color .15s ease,
+    opacity .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease,
+    border-color .15s ease;
+}
+
+/* ✅ Estado activo del idioma (CSS-driven, accesible) */
+.lang button[aria-pressed="true"]{
+  border:1px solid rgba(244, 242, 238, 0.35);
+  background:rgba(244, 242, 238, 0.12);
+  color:var(--fg);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+}
+
+.lang button:hover{
+  color:var(--fg);
+  background:rgba(255,255,255,.06);
+}
+
+.lang button:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:2px;
+  color:var(--fg);
+  background:rgba(31,122,109,.12);
+}
+
+.lang button:active{
+  opacity:.85;
+}
+
+/* -------------------------------------------------
+   LANGUAGE SELECTOR — PRO (trigger + dropdown/sheet)
+   Compatible con:
+   - Trigger: .lang-trigger / #lang-trigger
+   - Current: .lang-current
+   - Menu: .lang-menu (ul) + buttons con [data-lang]
+   Nota: NO rompe el modo legacy (3 botones) porque no toca .lang button salvo en el ámbito .lang-menu.
+   ------------------------------------------------- */
+
+.lang-trigger{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-width:44px;
+  height:36px;
+  padding:0 14px;
+
+  border-radius:999px;
+  background:transparent;
+  border:0;
+
+  color:var(--fg);
+  cursor:pointer;
+  font-size:14px;
+  line-height:1;
+  white-space:nowrap;
+
+  transition:
+    background-color .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease;
+}
+
+.lang-trigger:hover{
+  background:rgba(255,255,255,.06);
+}
+
+.lang-trigger:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:2px;
+  background:rgba(31,122,109,.12);
+}
+
+.lang-trigger[aria-expanded="true"]{
+  border:1px solid rgba(244, 242, 238, 0.35);
+  background:rgba(244, 242, 238, 0.12);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+}
+
+.lang-current{
+  font-weight:500;
+  letter-spacing:.02em;
+}
+
+/* Dropdown menu (desktop) */
+.lang-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+
+  min-width:180px;
+  padding:6px;
+
+  background:#111315;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:12px;
+
+  box-shadow: 0 20px 50px rgba(0,0,0,.45);
+}
+
+.lang-menu[hidden]{
+  display:none;
+}
+
+.lang-menu li{
+  list-style:none;
+}
+
+/* Estilo de items dentro del menú (no afecta a .lang button legacy) */
+.lang-menu button{
+  width:100%;
+  text-align:left;
+
+  background:transparent;
+  border:0;
+  border-radius:8px;
+
+  padding:10px 12px;
+  font-size:14px;
+  color:var(--fg);
+  cursor:pointer;
+
+  transition:
+    background-color .12s ease,
+    color .12s ease;
+}
+
+.lang-menu button:hover{
+  background:rgba(255,255,255,.06);
+}
+
+.lang-menu button:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:2px;
+  background:rgba(31,122,109,.12);
+}
+
+.lang-menu button[aria-checked="true"]{
+  background:rgba(31,122,109,.18);
+  color:var(--fg);
+}
+
+/* Mobile sheet */
+@media (max-width:720px){
+  .lang-menu{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    top:auto;
+
+    border-radius:16px 16px 0 0;
+    padding:16px;
+
+    background:#0f1113;
+    box-shadow: 0 -20px 50px rgba(0,0,0,.6);
+  }
+
+  .lang-menu button{
+    font-size:16px;
+    padding:14px 12px;
+  }
+}
+
+.screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8vh 6vw;
+}
+
+.content{ max-width:920px; }
+
+/* backgrounds */
+.hero{
+  background:
+    radial-gradient(60% 60% at 50% 40%, rgba(26,29,32,.45), rgba(15,17,19,.92)),
+    url("../img/hero-night-cdmx.webp") center/cover no-repeat;
+}
+
+/* ✅ FIX responsive-safe: evitar que el selector de idioma fijo pise el hero */
+.screen.hero{
+  padding-top: calc(8vh + clamp(44px, 6vw, 64px));
+}
+
+.local{
+  background:
+    linear-gradient(180deg, rgba(15,17,19,.65), rgba(20,24,27,.92)),
+    url("../img/cdmx-angel-night.webp") center/cover no-repeat;
+}
+
+/* FRANJA 3 — mantener EXACTO el asset que ya funciona */
+.standard{
+  background:
+    linear-gradient(180deg, rgba(15,17,19,.35), rgba(15,17,19,.72)),
+    url("../img/standard-silence.webp") center/cover no-repeat;
+}
+
+/* FRANJA 4 — CDMX blur editorial (nuevo fondo) */
+.services{
+  background:
+    linear-gradient(180deg, rgba(15,17,19,.82), rgba(15,17,19,.92)),
+    url("../img/cdmx-city-blur-night.webp") center/cover no-repeat;
+}
+
+.contact{ background:#0f1113; }
+
+h1{
+  font-size:clamp(40px,6vw,72px);
+  line-height:1.05;
+  margin:0 0 24px 0;
+}
+h2{
+  font-size:clamp(28px,4vw,44px);
+  margin:0 0 16px 0;
+}
+.subtitle{
+  font-size:18px;
+  color:var(--muted);
+  margin-bottom:32px;
+}
+
+p{
+  color:var(--muted);
+  font-size:18px;
+  line-height:1.5;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+  margin:24px 0 0 0;
+}
+.services ul{
+  margin-bottom:18px;
+}
+
+/* ✅ MEJORA: layout consistente para servicios (responsive-safe) */
+.services li{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  font-size:20px;
+  margin:10px 0;
+}
+
+.services li svg{
+  flex:0 0 auto;
+  margin:0 !important;           /* neutraliza márgenes inline */
+  vertical-align:baseline !important;
+  opacity:.75;
+  color:var(--fg);
+}
+
+.services li span{
+  display:block;
+  min-width:0;
+}
+
+/* CTA */
+.cta{
+  display:inline-block;
+  margin-top:24px;
+  padding:14px 26px;
+  border-radius:999px;
+  background:var(--accent);
+  color:#fff;
+  text-decoration:none;
+  border:0;
+  cursor:pointer;
+
+  /* ✅ contrast guard: mantiene legibilidad sobre fondos variables */
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.22),
+    0 0 0 rgba(0,0,0,0);
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease,
+    filter .12s ease,
+    background-color .12s ease;
+}
+
+.cta:hover{
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.28),
+    0 10px 24px rgba(0,0,0,.28);
+  filter: brightness(1.05);
+}
+
+.cta:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+  box-shadow: 0 0 0 4px rgba(31,122,109,.25);
+}
+
+.cta:active{
+  transform: translateY(0);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.28),
+    0 6px 16px rgba(0,0,0,.25);
+}
+
+.form{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:24px;
+}
+.form input,
+.form textarea{
+  background:#14181b;
+  border:1px solid #222;
+  color:var(--fg);
+  padding:12px 14px;
+  border-radius:8px;
+}
+
+.muted{ color:var(--muted); }
+.small{
+  font-size:14px;
+  margin-top:16px;
+  line-height:1.6;
+}
+
+/* ✅ breakpoint suave para densidad/legibilidad */
+@media (max-width:900px){
+  .services ul{ margin-top:18px; }
+  .services li{
+    font-size:18px;
+    margin:8px 0;
+    gap:10px;
+  }
+}
+
+/* -------------------------------------------------
+   FRANJA 6 — CIERRE LEGAL Y FIRMA
+   ------------------------------------------------- */
+
+.legal{
+  min-height:auto;              /* no pantalla completa */
+  padding:10vh 6vw 8vh;
+  text-align:center;
+
+  /* fondo editorial oscuro (sin imagen) */
+  background-color:#0e0f11;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.015),
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.04) 0%,
+      rgba(255,255,255,0.015) 35%,
+      rgba(0,0,0,0.25) 100%
+    );
+  background-blend-mode:overlay;
+}
+
+.legal .content{
+  max-width:720px;               /* más estrecho: sensación de cierre */
+}
+
+.legal-logo{
+  display:block;
+  margin:0 auto 32px;
+  max-width:220px;               /* firma, no hero */
+  width:100%;
+  height:auto;
+}
+
+.legal address{
+  font-style:normal;             /* evitar cursiva por defecto */
+  margin:24px 0;
+  line-height:1.6;
+}
+
+/* ✅ MEJORA: navegación legal con gap real y separadores discretos */
+.legal-links{
+  margin-top:22px;
+  font-size:14px;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.legal-links span[aria-hidden="true"]{
+  color:rgba(244,242,238,.32);
+  padding:0 2px;
+  transform: translateY(-1px);
+}
+
+/* ✅ enlaces legales con look premium + accesibilidad + tap-area */
+.legal-links a{
+  color:var(--fg);
+  text-decoration: underline;
+  text-decoration-color: rgba(244,242,238,.55);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  padding:6px 8px;              /* mejora tap-area sin romper layout */
+  border-radius:8px;
+}
+
+.legal-links a:hover{
+  color:var(--fg);
+  text-decoration-color: rgba(31,122,109,.9);
+}
+
+.legal-links a:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+  text-decoration-color: rgba(31,122,109,.95);
+}
+
+.legal-links a:active{
+  opacity:.85;
+}
+
+/* ✅ Accesibilidad: respetar preferencias de reducción de movimiento */
+@media (prefers-reduced-motion: reduce){
+  html,body{
+    scroll-behavior:auto;
+  }
+  .cta{
+    transition:none;
+  }
+}

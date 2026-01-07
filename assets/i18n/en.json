@@ -1,0 +1,84 @@
+{
+  "ui": {
+    "language": "Language"
+  },
+  "hero": {
+    "title": "Private mobility, with intent.",
+    "subtitle": "Selected drivers. Premium electric vehicles. Service in Mexico City.",
+    "cta": "Request access"
+  },
+  "local": {
+    "title": "Mexico City, frictionless.",
+    "body": "Clean routes, controlled timing, and a consistent standard. Designed for work, travel, and special occasions."
+  },
+  "standard": {
+    "title": "A standard built for silence.",
+    "subtitle": "High-end electric mobility.<br>Space. Calm. Continuity."
+  },
+  "services": {
+    "title": "Not all needs are the same.",
+    "item1": "Private transfers.",
+    "item2": "Hourly or daily service.",
+    "item3": "Events and special occasions.",
+    "item4": "Nearby getaways.",
+    "bridge": "If any of these scenarios fits you, tell us."
+  },
+  "contact": {
+    "title": "Stay informed.",
+    "subtitle": "Planned launch in March 2026.",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "msg": "E.g. event in 2026, planned transfer…",
+    "submit": "Send request",
+    "footer": "Not operational yet · Important updates only"
+  },
+  "legal": {
+    "tagline": "Private mobility, with intent.",
+    "location": "Mexico City, Mexico.",
+    "contact": "Contact: via this website form only.",
+    "links": {
+      "notice": "Legal notice",
+      "privacy": "Privacy",
+      "cookies": "Cookies"
+    },
+    "notice": {
+      "title": "Legal notice",
+      "provider": "Owner: Pixkuy Mobility S.A. de C.V.",
+      "purposeTitle": "Purpose",
+      "purposeBody": "This website provides information about Pixkuy Mobility and allows interested people to request contact via the form.",
+      "conditionsTitle": "Terms of use",
+      "conditionsBody": "By accessing and using this website, you accept these terms. The owner may update content and terms when needed.",
+      "ipTitle": "Intellectual property",
+      "ipBody": "Content, trademarks, design and visual identity are protected. Reproduction or distribution requires authorization.",
+      "liabilityTitle": "Liability",
+      "liabilityBody": "The owner is not liable for temporary service interruptions or damages derived from misuse of the website.",
+      "back": "Back to landing"
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "controllerTitle": "Data controller",
+      "controllerBody": "Controller: Pixkuy Mobility S.A. de C.V.",
+      "dataTitle": "Data collected",
+      "dataBody": "The form collects the information provided by the user (e.g., name, email, phone and message).",
+      "purposeTitle": "Purpose",
+      "purposeBody": "To handle contact requests, keep interested users informed, and manage communications related to the service.",
+      "legalBasisTitle": "Legal basis",
+      "legalBasisBody": "User consent when submitting the form.",
+      "retentionTitle": "Retention",
+      "retentionBody": "Data will be kept as long as needed to handle the request and related communications, unless a different legal obligation applies.",
+      "rightsTitle": "Your rights",
+      "rightsBody": "You may request access, rectification or deletion, and other applicable rights under the relevant law. Use this website form to submit your request.",
+      "securityTitle": "Security",
+      "securityBody": "Reasonable safeguards are applied to protect data against unauthorized access.",
+      "back": "Back to landing"
+    },
+    "cookies": {
+      "title": "Cookies policy",
+      "body1": "This website does not use advertising or tracking cookies.",
+      "body2": "If cookies are added in the future, you will be informed and consent will be requested when applicable.",
+      "body3": "Language preference may be stored locally in your browser to improve the experience.",
+      "back": "Back to landing"
+    }
+  }
+}

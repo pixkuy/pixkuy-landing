@@ -1,0 +1,84 @@
+{
+  "ui": {
+    "language": "语言"
+  },
+  "hero": {
+    "title": "有标准的私人出行。",
+    "subtitle": "精选司机。高端电动车。墨西哥城服务。",
+    "cta": "申请访问"
+  },
+  "local": {
+    "title": "无摩擦的墨西哥城。",
+    "body": "顺畅的出行、可控的时间与一致的服务标准。为工作、旅行和特殊场合而设计。"
+  },
+  "standard": {
+    "title": "为安静而设的标准。",
+    "subtitle": "高端电动出行。<br>空间。静谧。连续性。"
+  },
+  "services": {
+    "title": "并非所有需求都相同。",
+    "item1": "私人接送服务。",
+    "item2": "按小时或按天服务。",
+    "item3": "活动与特殊场合。",
+    "item4": "周边短途出行。",
+    "bridge": "如果其中某种情景适合您，请告知我们。"
+  },
+  "contact": {
+    "title": "保持联系。",
+    "subtitle": "预计于 2026 年 3 月上线。",
+    "name": "姓名",
+    "email": "电子邮箱",
+    "phone": "电话",
+    "msg": "例如：2026 年活动、已计划的接送服务…",
+    "submit": "提交请求",
+    "footer": "服务尚未正式运营 · 仅发送重要通知"
+  },
+  "legal": {
+    "tagline": "有标准的私人出行。",
+    "location": "墨西哥城，墨西哥。",
+    "contact": "联系方式：仅通过本网站表单。",
+    "links": {
+      "notice": "法律声明",
+      "privacy": "隐私政策",
+      "cookies": "Cookies"
+    },
+    "notice": {
+      "title": "法律声明",
+      "provider": "运营方：Pixkuy Mobility S.A. de C.V.",
+      "purposeTitle": "目的",
+      "purposeBody": "本网站用于介绍 Pixkuy Mobility，并允许有兴趣的用户通过表单请求联系。",
+      "conditionsTitle": "使用条款",
+      "conditionsBody": "访问和使用本网站即表示您同意本条款。运营方可在必要时更新内容和条款。",
+      "ipTitle": "知识产权",
+      "ipBody": "本网站的内容、商标、设计及视觉形象均受保护。未经授权，不得复制或传播。",
+      "liabilityTitle": "责任声明",
+      "liabilityBody": "因服务的临时中断或不当使用本网站所产生的任何损失，运营方不承担责任。",
+      "back": "返回首页"
+    },
+    "privacy": {
+      "title": "隐私政策",
+      "controllerTitle": "数据控制方",
+      "controllerBody": "控制方：Pixkuy Mobility S.A. de C.V.",
+      "dataTitle": "收集的数据",
+      "dataBody": "通过表单，我们会收集用户填写的信息（如姓名、电子邮箱、电话和留言）。",
+      "purposeTitle": "处理目的",
+      "purposeBody": "用于管理联系请求、向感兴趣的用户提供信息，以及处理与服务相关的沟通。",
+      "legalBasisTitle": "法律依据",
+      "legalBasisBody": "用户提交表单时所给予的同意。",
+      "retentionTitle": "保存期限",
+      "retentionBody": "数据将仅在处理请求及相关沟通所需的时间内保存，法律另有规定的除外。",
+      "rightsTitle": "用户权利",
+      "rightsBody": "用户可依法请求访问、更正或删除其数据，以及行使其他相关权利。可通过本网站表单提交请求。",
+      "securityTitle": "安全措施",
+      "securityBody": "我们采取合理的安全措施，防止数据遭到未经授权的访问。",
+      "back": "返回首页"
+    },
+    "cookies": {
+      "title": "Cookie 政策",
+      "body1": "本网站不使用广告或追踪用途的 Cookie。",
+      "body2": "如未来引入 Cookie，将提前告知用户，并在必要时征得同意。",
+      "body3": "语言偏好可能会本地存储在浏览器中，以提升使用体验。",
+      "back": "返回首页"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+/* assets/css/00-tokens.css
+   Design tokens (variables). Mantener como fuente única de verdad.
+*/
+
+:root{
+  --bg:#0f1113;          /* grafito profundo */
+  --fg:#f4f2ee;          /* blanco cálido */
+  --muted:#a6a6a6;
+  --accent:#1f7a6d;      /* verde Pixkuy */
+}

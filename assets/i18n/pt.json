@@ -1,0 +1,84 @@
+{
+  "ui": {
+    "language": "Idioma"
+  },
+  "hero": {
+    "title": "Mobilidade privada, com critério.",
+    "subtitle": "Motoristas selecionados. Veículos elétricos premium. Serviço na Cidade do México.",
+    "cta": "Solicitar acesso"
+  },
+  "local": {
+    "title": "Cidade do México, sem fricções.",
+    "body": "Deslocações fluidas, tempos controlados e um padrão constante. Pensado para trabalho, viagens e ocasiões especiais."
+  },
+  "standard": {
+    "title": "Um padrão pensado para o silêncio.",
+    "subtitle": "Mobilidade elétrica premium.<br>Espaço. Calma. Continuidade."
+  },
+  "services": {
+    "title": "Nem todas as necessidades são iguais.",
+    "item1": "Transfers privados.",
+    "item2": "Serviços por hora ou por dia.",
+    "item3": "Eventos e ocasiões especiais.",
+    "item4": "Escapadas de curta distância.",
+    "bridge": "Se algum destes cenários se aplica a si, diga-nos qual."
+  },
+  "contact": {
+    "title": "Mantenha-se informado.",
+    "subtitle": "Lançamento previsto para março de 2026.",
+    "name": "Nome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "msg": "Ex.: evento em 2026, transfer planeado…",
+    "submit": "Enviar pedido",
+    "footer": "Serviço ainda não operacional · Apenas comunicações relevantes"
+  },
+  "legal": {
+    "tagline": "Mobilidade privada, com critério.",
+    "location": "Cidade do México, México.",
+    "contact": "Contacto: apenas através do formulário deste site.",
+    "links": {
+      "notice": "Aviso legal",
+      "privacy": "Privacidade",
+      "cookies": "Cookies"
+    },
+    "notice": {
+      "title": "Aviso legal",
+      "provider": "Editor: Pixkuy Mobility S.A. de C.V.",
+      "purposeTitle": "Objeto",
+      "purposeBody": "Este site tem como objetivo informar sobre a Pixkuy Mobility e permitir que pessoas interessadas solicitem contacto através do formulário.",
+      "conditionsTitle": "Condições de utilização",
+      "conditionsBody": "O acesso e a utilização deste site implicam a aceitação das presentes condições. O editor pode atualizar conteúdos e condições sempre que necessário.",
+      "ipTitle": "Propriedade intelectual e industrial",
+      "ipBody": "Os conteúdos, marcas, design e identidade visual deste site estão protegidos. É proibida qualquer reprodução ou difusão sem autorização.",
+      "liabilityTitle": "Responsabilidade",
+      "liabilityBody": "O editor não se responsabiliza por interrupções temporárias do serviço nem por danos resultantes de uma utilização inadequada do site.",
+      "back": "Voltar à landing"
+    },
+    "privacy": {
+      "title": "Política de privacidade",
+      "controllerTitle": "Responsável pelo tratamento",
+      "controllerBody": "Responsável: Pixkuy Mobility S.A. de C.V.",
+      "dataTitle": "Dados recolhidos",
+      "dataBody": "Através do formulário recolhemos os dados introduzidos pela pessoa (por exemplo, nome, e-mail, telefone e mensagem).",
+      "purposeTitle": "Finalidade",
+      "purposeBody": "Gerir pedidos de contacto, manter informadas as pessoas interessadas e tratar comunicações relacionadas com o serviço.",
+      "legalBasisTitle": "Base legal",
+      "legalBasisBody": "O consentimento da pessoa ao enviar o formulário.",
+      "retentionTitle": "Conservação",
+      "retentionBody": "Os dados são conservados pelo tempo necessário para tratar o pedido e, se aplicável, para comunicações associadas, salvo obrigação legal diferente.",
+      "rightsTitle": "Direitos",
+      "rightsBody": "Pode solicitar acesso, retificação ou eliminação, bem como outros direitos aplicáveis segundo a legislação em vigor. Para exercê-los, utilize o formulário deste site indicando o seu pedido.",
+      "securityTitle": "Segurança",
+      "securityBody": "São aplicadas medidas razoáveis para proteger os dados contra acessos não autorizados.",
+      "back": "Voltar à landing"
+    },
+    "cookies": {
+      "title": "Política de cookies",
+      "body1": "Este site não utiliza cookies para fins publicitários nem de rastreamento.",
+      "body2": "Caso sejam adicionados cookies no futuro, o utilizador será informado e, se aplicável, será solicitado o seu consentimento.",
+      "body3": "A preferência de idioma pode ser armazenada localmente no navegador para melhorar a experiência.",
+      "back": "Voltar à landing"
+    }
+  }
+}

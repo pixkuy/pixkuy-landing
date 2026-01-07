@@ -1,0 +1,85 @@
+{
+  "ui": {
+    "language": "Idioma"
+  },
+  "hero": {
+    "title": "Movilidad privada con conductor, sin concesiones.",
+    "subtitle": "Conductores seleccionados. Vehículos eléctricos premium.\nUn estándar consistente para quienes no improvisan su movilidad en Ciudad de México.",
+    "cta": "Solicitar invitación",
+    "note": "Acceso limitado · Lanzamiento marzo de 2026"
+  },
+  "local": {
+    "title": "Ciudad de México, sin fricción.",
+    "body": "Rutas limpias, tiempos controlados y un estándar consistente. Pensado para trabajo, viajes y ocasiones especiales."
+  },
+  "standard": {
+    "title": "Un estándar pensado para el silencio.",
+    "subtitle": "Movilidad eléctrica de alta gama.<br>Espacio. Calma. Continuidad."
+  },
+  "services": {
+    "title": "No todas las necesidades son iguales.",
+    "item1": "Traslados privados planificados.",
+    "item2": "Servicios por horas o por días, con continuidad.",
+    "item3": "Eventos y ocasiones que requieren precisión.",
+    "item4": "Escapadas cercanas sin fricciones logísticas.",
+    "bridge": "Pixkuy está pensado para quienes valoran la planificación, la discreción y un estándar estable de servicio."
+  },
+  "contact": {
+    "title": "Mantente informado.",
+    "subtitle": "Lanzamiento previsto en marzo de 2026.",
+    "name": "Nombre",
+    "email": "Email",
+    "phone": "Teléfono",
+    "msg": "Ej. evento en 2026, traslado planificado…",
+    "submit": "Enviar solicitud",
+    "footer": "Servicio no operativo aún · Solo avisos relevantes"
+  },
+  "legal": {
+    "tagline": "Movilidad privada con conductor, sin concesiones.",
+    "location": "Ciudad de México, México.",
+    "contact": "Contacto exclusivamente mediante el formulario de esta web.",
+    "links": {
+      "notice": "Aviso legal",
+      "privacy": "Privacidad",
+      "cookies": "Cookies"
+    },
+    "notice": {
+      "title": "Aviso legal",
+      "provider": "Titular: Pixkuy Mobility S.A. de C.V.",
+      "purposeTitle": "Objeto",
+      "purposeBody": "Este sitio web tiene como finalidad informar sobre Pixkuy Mobility y permitir que las personas interesadas soliciten ser contactadas para recibir información sobre el servicio.",
+      "conditionsTitle": "Condiciones de uso",
+      "conditionsBody": "El acceso y uso de este sitio implica la aceptación de las presentes condiciones. El titular podrá actualizar contenidos y condiciones cuando resulte necesario.",
+      "ipTitle": "Propiedad intelectual e industrial",
+      "ipBody": "Los contenidos, marcas, diseño e identidad visual de este sitio están protegidos por la normativa vigente. No se permite su reproducción o distribución sin autorización expresa.",
+      "liabilityTitle": "Responsabilidad",
+      "liabilityBody": "El titular no se hace responsable de interrupciones temporales del servicio ni de daños derivados de un uso indebido del sitio.",
+      "back": "Volver a la landing"
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "controllerTitle": "Responsable del tratamiento",
+      "controllerBody": "Responsable: Pixkuy Mobility S.A. de C.V.",
+      "dataTitle": "Datos que se recogen",
+      "dataBody": "A través del formulario se recogen los datos que la persona interesada introduce, como nombre, correo electrónico, teléfono y mensaje.",
+      "purposeTitle": "Finalidad",
+      "purposeBody": "Gestionar solicitudes de contacto, mantener informadas a las personas interesadas sobre el lanzamiento del servicio y atender comunicaciones relacionadas.",
+      "legalBasisTitle": "Base legal",
+      "legalBasisBody": "El consentimiento de la persona interesada al enviar el formulario.",
+      "retentionTitle": "Conservación",
+      "retentionBody": "Los datos se conservarán el tiempo necesario para atender la solicitud y para comunicaciones relacionadas con el lanzamiento, salvo obligación legal distinta.",
+      "rightsTitle": "Derechos",
+      "rightsBody": "Puedes solicitar acceso, rectificación o supresión de tus datos, así como otros derechos aplicables conforme a la normativa vigente, utilizando el formulario de esta web.",
+      "securityTitle": "Seguridad",
+      "securityBody": "Se aplican medidas técnicas y organizativas razonables para proteger los datos frente a accesos no autorizados.",
+      "back": "Volver a la landing"
+    },
+    "cookies": {
+      "title": "Política de cookies",
+      "body1": "Este sitio no utiliza cookies con fines publicitarios ni de seguimiento.",
+      "body2": "En caso de que en el futuro se incorporen cookies, se informará debidamente y, cuando corresponda, se solicitará el consentimiento.",
+      "body3": "La preferencia de idioma puede almacenarse localmente en el navegador para mejorar la experiencia de navegación.",
+      "back": "Volver a la landing"
+    }
+  }
+}

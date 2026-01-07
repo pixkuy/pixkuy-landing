@@ -1,0 +1,59 @@
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* ✅ MEJORA UX: scroll suave en anclas */
+  scroll-behavior:smooth;
+}
+
+.screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8vh 6vw;
+}
+
+.content{ max-width:920px; }
+
+h1{
+  font-size:clamp(40px,6vw,72px);
+  line-height:1.05;
+  margin:0 0 24px 0;
+}
+
+h2{
+  font-size:clamp(28px,4vw,44px);
+  margin:0 0 16px 0;
+}
+
+.subtitle{
+  font-size:18px;
+  color:var(--muted);
+  margin-bottom:32px;
+}
+
+p{
+  color:var(--muted);
+  font-size:18px;
+  line-height:1.5;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+  margin:24px 0 0 0;
+}
+
+.muted{ color:var(--muted); }
+
+.small{
+  font-size:14px;
+  margin-top:16px;
+  line-height:1.6;
+}
