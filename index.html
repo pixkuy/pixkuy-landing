@@ -232,7 +232,7 @@
           data-i18n-ph="contact.msg"
         ></textarea>
 
-        <button type="submit" class="cta" data-i18n="contact.submit"></button>
+        <button id="contact-submit" type="submit" class="cta" data-i18n="contact.submit"></button>
       </form>
 
       <p class="muted small" data-i18n="contact.footer"></p>
@@ -272,11 +272,42 @@
 
   <script>
     (function () {
+      function lockContactForm(options) {
+        var form = document.querySelector('form[name="contact"]');
+        if (!form) return;
+
+        var btn = document.getElementById("contact-submit") || form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+
+        form.setAttribute("aria-busy", "true");
+        form.dataset.submitted = "1";
+
+        if (options && options.showStatus) {
+          var el = document.getElementById("contact-status");
+          if (el) el.hidden = false;
+        }
+      }
+
+      // 1) Prevent double submit (no extra deps, no copy changes)
+      (function bindSubmitLock() {
+        try {
+          var form = document.querySelector('form[name="contact"]');
+          if (!form) return;
+
+          form.addEventListener("submit", function () {
+            if (form.dataset.submitted === "1") return;
+            lockContactForm({ showStatus: false });
+          }, { passive: true });
+        } catch (e) {
+          // no-op
+        }
+      })();
+
+      // 2) Show success status on return and keep submit disabled to avoid re-sends on refresh/back
       try {
         var params = new URLSearchParams(window.location.search || "");
         if (params.get("lead") === "ok") {
-          var el = document.getElementById("contact-status");
-          if (el) el.hidden = false;
+          lockContactForm({ showStatus: true });
 
           params.delete("lead");
           var cleanQuery = params.toString();
@@ -290,4 +321,3 @@
   </script>
 </body>
 </html>
-
