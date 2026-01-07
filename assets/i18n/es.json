@@ -3,23 +3,23 @@
     "language": "Idioma"
   },
   "hero": {
-    "title": "Movilidad privada con conductor, sin concesiones.",
-    "subtitle": "Conductores seleccionados. Vehículos eléctricos premium.\nUn estándar consistente para quienes no improvisan su movilidad en Ciudad de México.",
+    "title": "Movilidad privada con conductor, definida por la excelencia.",
+    "subtitle": "Conductores seleccionados. Vehículos eléctricos premium.\nUn estándar sólido y confiable para quienes no improvisan su movilidad en Ciudad de México.",
     "cta": "Solicitar invitación",
     "note": "Acceso limitado · Lanzamiento marzo de 2026"
   },
   "local": {
-    "title": "Ciudad de México, sin fricción.",
+    "title": "Ciudad de México, movilidad de alto nivel.",
     "body": "Rutas limpias, tiempos controlados y un estándar consistente. Pensado para trabajo, viajes y ocasiones especiales."
   },
   "standard": {
     "title": "Un estándar pensado para el silencio.",
-    "subtitle": "Movilidad eléctrica de alta gama.<br>Espacio. Calma. Continuidad."
+    "subtitle": "Movilidad eléctrica de alta gama.<br>Espacio. Calma. Estabilidad."
   },
   "services": {
     "title": "No todas las necesidades son iguales.",
     "item1": "Traslados privados planificados.",
-    "item2": "Servicios por horas o por días, con continuidad.",
+    "item2": "Servicios por horas o por días, con cobertura continua.",
     "item3": "Eventos y ocasiones que requieren precisión.",
     "item4": "Escapadas cercanas sin fricciones logísticas.",
     "bridge": "Pixkuy está pensado para quienes valoran la planificación, la discreción y un estándar estable de servicio."
@@ -33,7 +33,7 @@
     "msg": "Ej. evento en 2026, traslado planificado…",
     "submit": "Enviar solicitud",
     "footer": "Servicio no operativo aún · Solo avisos relevantes",
-    "statusSent": "Solicitud enviada correctamente. Te contactaremos cuando el servicio esté disponible."
+    "statusSent": "Gracias. Hemos recibido tu solicitud. Te contactaremos tras revisarla."
   },
   "legal": {
     "tagline": "Movilidad privada con conductor, sin concesiones.",
