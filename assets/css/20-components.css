@@ -172,6 +172,12 @@
 
 /* Mobile sheet */
 @media (max-width:720px){
+  /* FIX iOS Safari: evita clipping del sheet al tener backdrop-filter en el trigger */
+  .lang{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+
   .lang-menu{
     position:fixed;
     left:0;
