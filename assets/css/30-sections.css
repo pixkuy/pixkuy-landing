@@ -174,3 +174,47 @@
 .legal-links a:active{
   opacity:.85;
 }
+
+/* -------------------------------
+   LINKEDIN — PRESENCIA INSTITUCIONAL
+-------------------------------- */
+
+.legal-social{
+  margin-top:12px;
+  display:flex;
+  justify-content:center;
+}
+
+.legal-social a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px;
+  border-radius:10px;
+
+  color:rgba(244,242,238,.55); /* muted */
+  text-decoration:none;
+
+  transition:
+    color .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+.legal-social a:hover{
+  color:var(--fg); /* sube a blanco, NO azul LinkedIn */
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px rgba(31,122,109,.25); /* halo teal sutil */
+}
+
+.legal-social a:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+}
+
+.legal-social svg,
+.legal-social img{
+  width:18px;
+  height:18px;
+  display:block;
+}
