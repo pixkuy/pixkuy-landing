@@ -3,25 +3,46 @@
     "language": "Sprache"
   },
   "hero": {
-    "title": "Private Mobilität, mit Anspruch.",
-    "subtitle": "Ausgewählte Fahrer. Premium-Elektrofahrzeuge. Service in Mexiko-Stadt.",
-    "cta": "Zugang anfragen"
+    "title": "Jede Fahrt, mit Komfort, Diskretion und Präzision ab dem ersten Kilometer.",
+    "subtitle": "Sorgfältig ausgewählte Fahrer. Premium-Elektrofahrzeuge.\nEin verlässlicher Standard für alle, die ihre Mobilität in Mexiko-Stadt nicht dem Zufall überlassen.",
+    "cta": "Service anfragen",
+    "note": "Service verfügbar ab März 2026"
   },
   "local": {
-    "title": "Mexiko-Stadt, ohne Reibung.",
-    "body": "Reibungslose Fahrten, kontrollierte Zeiten und ein konstanter Standard. Konzipiert für Arbeit, Reisen und besondere Anlässe."
+    "title": "Mexiko-Stadt, Mobilität auf höherem Niveau.",
+    "body": "Klare Routen, kontrollierte Zeitabläufe und ein konsistentes Erlebnis. Entwickelt für Arbeit, Reisen und besondere Anlässe."
   },
   "standard": {
-    "title": "Ein Standard, der für Stille entwickelt wurde.",
-    "subtitle": "Premium-Elektromobilität.<br>Raum. Ruhe. Kontinuität."
+    "title": "Ein Standard, der auf Ruhe ausgelegt ist.",
+    "subtitle": "Hochwertige Elektromobilität.<br>Raum. Gelassenheit. Stabilität.",
+    "origin": "Pixkuy leitet sich aus dem Totonakischen ab, einer der indigenen Sprachen Mexikos.\nEs bedeutet Roadrunner: sich präzise bewegen, ohne die Umgebung zu stören.\nDieser Gedanke prägt unseren Anspruch an Mobilität."
   },
   "services": {
-    "title": "Nicht alle Bedürfnisse sind gleich.",
-    "item1": "Private Transfers.",
-    "item2": "Stunden- oder Tagesservices.",
-    "item3": "Events und besondere Anlässe.",
-    "item4": "Kurztrips in die Umgebung.",
-    "bridge": "Wenn eines dieser Szenarien auf Sie zutrifft, teilen Sie uns mit welches."
+    "title": "Nicht jede Anforderung ist gleich.",
+    "item1": "Geplante private Transfers.",
+    "item2": "Stunden- oder mehrtägige Services mit durchgehender Betreuung.",
+    "item3": "Events und Anlässe, die Präzision erfordern.",
+    "item4": "Kurzreisen ohne logistischen Aufwand.",
+    "bridge": "Pixkuy richtet sich an Menschen, die Planung, Diskretion und einen stabilen Servicestandard schätzen."
+  },
+  "fleet": {
+    "intro": {
+      "title": "Die Pixkuy-Erfahrung wird auch durch das Fahrzeug definiert.",
+      "subtitle": "Nicht jede Fahrt verlangt dasselbe, und nicht jedes Fahrzeug bietet die gleiche Qualität."
+    },
+    "zeekr": {
+      "title": "Zeekr 001",
+      "subtitle": "Elektrische Executive-Limousine",
+      "desc": "Ruhe, Stabilität und Komfort auf längeren Strecken.",
+      "note": "Gedacht für Fahrten, bei denen der Weg Teil des Termins ist."
+    },
+    "m9": {
+      "title": "BYD M9",
+      "subtitle": "Elektrischer Executive-Van",
+      "desc": "Großzügiger Raum für Personen, Gepäck und Arbeiten unterwegs.",
+      "note": "Konzipiert für Reisen mit Gästen oder vielfältigen Anforderungen."
+    },
+    "operational": "Fahrzeugauswahl und Preis werden bis zum Marktstart im März begleitet bestätigt."
   },
   "contact": {
     "title": "Bleiben Sie informiert.",
@@ -29,14 +50,15 @@
     "name": "Name",
     "email": "E-Mail",
     "phone": "Telefon",
-    "msg": "Z. B. Event im Jahr 2026, geplanter Transfer …",
+    "msg": "z. B. Event im Jahr 2026, geplanter Transfer …",
     "submit": "Anfrage senden",
-    "footer": "Service noch nicht aktiv · Nur relevante Mitteilungen"
+    "footer": "Service verfügbar ab März 2026 · Wir melden uns persönlich bei Ihnen",
+    "statusSent": "Vielen Dank. Wir haben Ihre Anfrage erhalten und melden uns nach Prüfung bei Ihnen."
   },
   "legal": {
-    "tagline": "Private Mobilität, mit Anspruch.",
+    "tagline": "Eigene Flotte und fest angestellte Fahrer.",
     "location": "Mexiko-Stadt, Mexiko.",
-    "contact": "Kontakt: ausschließlich über das Formular dieser Website.",
+    "contact": "Kontakt ausschließlich über das Formular dieser Website.",
     "links": {
       "notice": "Impressum",
       "privacy": "Datenschutz",
@@ -44,15 +66,15 @@
     },
     "notice": {
       "title": "Impressum",
-      "provider": "Herausgeber: Pixkuy Mobility S.A. de C.V.",
+      "provider": "Anbieter: Pixkuy Mobility S.A. de C.V.",
       "purposeTitle": "Zweck",
-      "purposeBody": "Diese Website dient der Information über Pixkuy Mobility und ermöglicht interessierten Personen, über das Formular eine Kontaktaufnahme anzufragen.",
+      "purposeBody": "Diese Website dient der Information über Pixkuy Mobility und ermöglicht interessierten Personen, eine Kontaktaufnahme bezüglich des Services anzufragen.",
       "conditionsTitle": "Nutzungsbedingungen",
-      "conditionsBody": "Der Zugriff auf und die Nutzung dieser Website setzen die Akzeptanz dieser Bedingungen voraus. Der Herausgeber kann Inhalte und Bedingungen bei Bedarf aktualisieren.",
+      "conditionsBody": "Der Zugriff auf diese Website setzt die Zustimmung zu diesen Bedingungen voraus. Der Anbieter kann Inhalte und Bedingungen bei Bedarf anpassen.",
       "ipTitle": "Geistiges und gewerbliches Eigentum",
-      "ipBody": "Inhalte, Marken, Design und visuelle Identität dieser Website sind geschützt. Jede Vervielfältigung oder Verbreitung ohne Genehmigung ist untersagt.",
+      "ipBody": "Inhalte, Marken, Design und visuelle Identität dieser Website sind rechtlich geschützt. Eine Nutzung ohne vorherige Genehmigung ist nicht gestattet.",
       "liabilityTitle": "Haftung",
-      "liabilityBody": "Der Herausgeber haftet nicht für vorübergehende Unterbrechungen des Dienstes oder für Schäden, die aus einer unsachgemäßen Nutzung der Website entstehen.",
+      "liabilityBody": "Der Anbieter übernimmt keine Haftung für vorübergehende Unterbrechungen oder Schäden infolge unsachgemäßer Nutzung der Website.",
       "back": "Zurück zur Landing"
     },
     "privacy": {
@@ -60,24 +82,24 @@
       "controllerTitle": "Verantwortlicher",
       "controllerBody": "Verantwortlich: Pixkuy Mobility S.A. de C.V.",
       "dataTitle": "Erhobene Daten",
-      "dataBody": "Über das Formular erfassen wir die von der Person eingegebenen Daten (z. B. Name, E-Mail, Telefonnummer und Nachricht).",
+      "dataBody": "Über das Formular werden die von der interessierten Person freiwillig angegebenen Daten erfasst, etwa Name, E-Mail-Adresse, Telefonnummer und Nachricht.",
       "purposeTitle": "Zweck der Verarbeitung",
-      "purposeBody": "Bearbeitung von Kontaktanfragen, Information interessierter Personen und Abwicklung dienstbezogener Kommunikation.",
+      "purposeBody": "Bearbeitung von Kontaktanfragen, Information über den Servicestart und damit verbundene Kommunikation.",
       "legalBasisTitle": "Rechtsgrundlage",
       "legalBasisBody": "Einwilligung der betroffenen Person bei Absenden des Formulars.",
       "retentionTitle": "Speicherdauer",
-      "retentionBody": "Die Daten werden so lange gespeichert, wie es zur Bearbeitung der Anfrage und gegebenenfalls der zugehörigen Kommunikation erforderlich ist, sofern keine andere gesetzliche Verpflichtung besteht.",
-      "rightsTitle": "Rechte",
-      "rightsBody": "Sie können Auskunft, Berichtigung oder Löschung sowie weitere gesetzlich vorgesehene Rechte geltend machen. Nutzen Sie hierfür das Formular dieser Website und geben Sie Ihr Anliegen an.",
+      "retentionBody": "Die Daten werden nur so lange gespeichert, wie dies für die Bearbeitung der Anfrage und die zugehörige Kommunikation erforderlich ist, sofern keine gesetzlichen Pflichten entgegenstehen.",
+      "rightsTitle": "Ihre Rechte",
+      "rightsBody": "Sie haben das Recht auf Auskunft, Berichtigung oder Löschung Ihrer Daten sowie weitere gesetzlich vorgesehene Rechte. Bitte nutzen Sie hierfür das Formular dieser Website.",
       "securityTitle": "Sicherheit",
-      "securityBody": "Es werden angemessene Maßnahmen ergriffen, um die Daten vor unbefugtem Zugriff zu schützen.",
+      "securityBody": "Es werden angemessene technische und organisatorische Maßnahmen eingesetzt, um personenbezogene Daten vor unbefugtem Zugriff zu schützen.",
       "back": "Zurück zur Landing"
     },
     "cookies": {
       "title": "Cookie-Richtlinie",
       "body1": "Diese Website verwendet keine Cookies zu Werbe- oder Trackingzwecken.",
-      "body2": "Sollten zukünftig Cookies eingesetzt werden, werden Sie darüber informiert und ggf. um Ihre Einwilligung gebeten.",
-      "body3": "Die Sprachpräferenz kann lokal im Browser gespeichert werden, um die Nutzererfahrung zu verbessern.",
+      "body2": "Sollten künftig Cookies eingesetzt werden, werden Sie darüber informiert und um Ihre Einwilligung gebeten, sofern erforderlich.",
+      "body3": "Die bevorzugte Sprache kann lokal im Browser gespeichert werden, um die Nutzungserfahrung zu verbessern.",
       "back": "Zurück zur Landing"
     }
   }
