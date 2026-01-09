@@ -3,25 +3,46 @@
     "language": "Language"
   },
   "hero": {
-    "title": "Private mobility, with intent.",
-    "subtitle": "Selected drivers. Premium electric vehicles. Service in Mexico City.",
-    "cta": "Request access"
+    "title": "Every journey, handled with comfort, discretion and precision from the very first mile.",
+    "subtitle": "Carefully selected drivers. Premium electric vehicles.\nA solid, reliable standard for those who do not improvise their mobility in Mexico City.",
+    "cta": "Request service",
+    "note": "Service available from March 2026"
   },
   "local": {
-    "title": "Mexico City, frictionless.",
-    "body": "Clean routes, controlled timing, and a consistent standard. Designed for work, travel, and special occasions."
+    "title": "Mexico City, mobility at a higher standard.",
+    "body": "Clean routes, controlled timing and a consistent experience. Designed for work, travel and special occasions."
   },
   "standard": {
-    "title": "A standard built for silence.",
-    "subtitle": "High-end electric mobility.<br>Space. Calm. Continuity."
+    "title": "A standard designed for silence.",
+    "subtitle": "High-end electric mobility.<br>Space. Calm. Stability.",
+    "origin": "Pixkuy takes its name from Totonac, one of Mexico’s indigenous languages.\nIt means roadrunner: moving with precision, without disturbing the environment.\nThat idea defines the standard behind how we understand mobility."
   },
   "services": {
-    "title": "Not all needs are the same.",
-    "item1": "Private transfers.",
-    "item2": "Hourly or daily service.",
-    "item3": "Events and special occasions.",
-    "item4": "Nearby getaways.",
-    "bridge": "If any of these scenarios fits you, tell us."
+    "title": "Not every need is the same.",
+    "item1": "Planned private transfers.",
+    "item2": "Hourly or multi-day services with continuous coverage.",
+    "item3": "Events and occasions that require precision.",
+    "item4": "Short getaways without logistical friction.",
+    "bridge": "Pixkuy is built for those who value planning, discretion and a stable service standard."
+  },
+  "fleet": {
+    "intro": {
+      "title": "The Pixkuy experience is also defined by the vehicle.",
+      "subtitle": "Not every journey requires the same space, nor does every car offer the same experience."
+    },
+    "zeekr": {
+      "title": "Zeekr 001",
+      "subtitle": "Executive electric sedan",
+      "desc": "Silence, stability and comfort for longer journeys.",
+      "note": "Designed for transfers where the journey itself is part of the agenda."
+    },
+    "m9": {
+      "title": "BYD M9",
+      "subtitle": "Executive electric van",
+      "desc": "Real space for people, luggage and working on the move.",
+      "note": "Built for trips involving guests or multiple operational needs."
+    },
+    "operational": "Vehicle selection and pricing will be confirmed with assisted support until the March launch."
   },
   "contact": {
     "title": "Stay informed.",
@@ -29,30 +50,31 @@
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
-    "msg": "E.g. event in 2026, planned transfer…",
+    "msg": "e.g. event in 2026, planned transfer…",
     "submit": "Send request",
-    "footer": "Not operational yet · Important updates only"
+    "footer": "Service available from March 2026 · We will contact you personally",
+    "statusSent": "Thank you. We have received your request and will contact you after reviewing it."
   },
   "legal": {
-    "tagline": "Private mobility, with intent.",
+    "tagline": "Dedicated fleet and in-house drivers.",
     "location": "Mexico City, Mexico.",
-    "contact": "Contact: via this website form only.",
+    "contact": "Contact through this website’s form.",
     "links": {
       "notice": "Legal notice",
-      "privacy": "Privacy",
+      "privacy": "Privacy policy",
       "cookies": "Cookies"
     },
     "notice": {
       "title": "Legal notice",
       "provider": "Owner: Pixkuy Mobility S.A. de C.V.",
       "purposeTitle": "Purpose",
-      "purposeBody": "This website provides information about Pixkuy Mobility and allows interested people to request contact via the form.",
+      "purposeBody": "This website is intended to provide information about Pixkuy Mobility and to allow interested parties to request contact regarding the service.",
       "conditionsTitle": "Terms of use",
-      "conditionsBody": "By accessing and using this website, you accept these terms. The owner may update content and terms when needed.",
-      "ipTitle": "Intellectual property",
-      "ipBody": "Content, trademarks, design and visual identity are protected. Reproduction or distribution requires authorization.",
+      "conditionsBody": "Accessing and using this website implies acceptance of these terms. The owner may update content and conditions when necessary.",
+      "ipTitle": "Intellectual and industrial property",
+      "ipBody": "All content, trademarks, design and visual identity on this website are protected by applicable law. Reproduction or distribution without prior authorization is not permitted.",
       "liabilityTitle": "Liability",
-      "liabilityBody": "The owner is not liable for temporary service interruptions or damages derived from misuse of the website.",
+      "liabilityBody": "The owner is not responsible for temporary service interruptions or damages resulting from improper use of the website.",
       "back": "Back to landing"
     },
     "privacy": {
@@ -60,24 +82,24 @@
       "controllerTitle": "Data controller",
       "controllerBody": "Controller: Pixkuy Mobility S.A. de C.V.",
       "dataTitle": "Data collected",
-      "dataBody": "The form collects the information provided by the user (e.g., name, email, phone and message).",
+      "dataBody": "Through the form, we collect the information voluntarily provided by the interested party, such as name, email address, phone number and message.",
       "purposeTitle": "Purpose",
-      "purposeBody": "To handle contact requests, keep interested users informed, and manage communications related to the service.",
+      "purposeBody": "To manage contact requests, keep interested parties informed about the service launch, and handle related communications.",
       "legalBasisTitle": "Legal basis",
-      "legalBasisBody": "User consent when submitting the form.",
-      "retentionTitle": "Retention",
-      "retentionBody": "Data will be kept as long as needed to handle the request and related communications, unless a different legal obligation applies.",
+      "legalBasisBody": "The consent given by the interested party when submitting the form.",
+      "retentionTitle": "Data retention",
+      "retentionBody": "Data will be retained for as long as necessary to handle the request and related communications, unless a different legal obligation applies.",
       "rightsTitle": "Your rights",
-      "rightsBody": "You may request access, rectification or deletion, and other applicable rights under the relevant law. Use this website form to submit your request.",
+      "rightsBody": "You may request access to, rectification or deletion of your data, as well as other applicable rights under current regulations, using this website’s form.",
       "securityTitle": "Security",
-      "securityBody": "Reasonable safeguards are applied to protect data against unauthorized access.",
+      "securityBody": "Reasonable technical and organizational measures are applied to protect personal data against unauthorized access.",
       "back": "Back to landing"
     },
     "cookies": {
       "title": "Cookies policy",
-      "body1": "This website does not use advertising or tracking cookies.",
-      "body2": "If cookies are added in the future, you will be informed and consent will be requested when applicable.",
-      "body3": "Language preference may be stored locally in your browser to improve the experience.",
+      "body1": "This website does not use cookies for advertising or tracking purposes.",
+      "body2": "If cookies are introduced in the future, you will be properly informed and consent will be requested when applicable.",
+      "body3": "Language preferences may be stored locally in the browser to improve the browsing experience.",
       "back": "Back to landing"
     }
   }

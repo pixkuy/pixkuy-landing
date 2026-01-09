@@ -3,10 +3,10 @@
     "language": "Idioma"
   },
   "hero": {
-    "title": "Movilidad privada con conductor, definida por la excelencia.",
+    "title": "Cada trayecto, con confort, discreción y precisión desde el primer kilómetro.",
     "subtitle": "Conductores seleccionados. Vehículos eléctricos premium.\nUn estándar sólido y confiable para quienes no improvisan su movilidad en Ciudad de México.",
-    "cta": "Solicitar invitación",
-    "note": "Acceso limitado · Lanzamiento marzo de 2026"
+    "cta": "Solicitar servicio",
+    "note": "Operación disponible a partir de marzo de 2026"
   },
   "local": {
     "title": "Ciudad de México, movilidad de alto nivel.",
@@ -14,7 +14,8 @@
   },
   "standard": {
     "title": "Un estándar pensado para el silencio.",
-    "subtitle": "Movilidad eléctrica de alta gama.<br>Espacio. Calma. Estabilidad."
+    "subtitle": "Movilidad eléctrica de alta gama.<br>Espacio. Calma. Estabilidad.",
+	 "origin": "Pixkuy toma su nombre del totonaco, una de las lenguas originarias de México.\nSignifica correcaminos: desplazarse con precisión, sin alterar el entorno.\nEsa idea define el estándar con el que entendemos nuestra movilidad."
   },
   "services": {
     "title": "No todas las necesidades son iguales.",
@@ -24,6 +25,27 @@
     "item4": "Escapadas cercanas sin fricciones logísticas.",
     "bridge": "Pixkuy está pensado para quienes valoran la planificación, la discreción y un estándar estable de servicio."
   },
+
+  "fleet": {
+    "intro": {
+      "title": "La experiencia Pixkuy también se define por el vehículo.",
+      "subtitle": "No todos los trayectos piden lo mismo, ni todos los coches ofrecen la misma experiencia."
+    },
+    "zeekr": {
+      "title": "Zeekr 001",
+      "subtitle": "Sedán eléctrico ejecutivo",
+      "desc": "Silencio, estabilidad y comodidad en trayectos largos.",
+      "note": "Pensado para traslados donde el trayecto forma parte de la agenda."
+    },
+    "m9": {
+      "title": "BYD M9",
+      "subtitle": "Van ejecutiva eléctrica",
+      "desc": "Espacio real para personas, equipaje y trabajo en ruta.",
+      "note": "Diseñada para viajes con invitados o necesidades múltiples."
+    },
+    "operational": "La elección del modelo y el precio se confirman de forma asistida hasta el lanzamiento en marzo."
+  },
+
   "contact": {
     "title": "Mantente informado.",
     "subtitle": "Lanzamiento previsto en marzo de 2026.",
@@ -32,13 +54,13 @@
     "phone": "Teléfono",
     "msg": "Ej. evento en 2026, traslado planificado…",
     "submit": "Enviar solicitud",
-    "footer": "Servicio no operativo aún · Solo avisos relevantes",
+    "footer": "Servicio disponible a partir de marzo de 2026 · Te contactaremos personalmente",
     "statusSent": "Gracias. Hemos recibido tu solicitud. Te contactaremos tras revisarla."
   },
   "legal": {
-    "tagline": "Movilidad privada con conductor, sin concesiones.",
+    "tagline": "Flota dedicada y conductores propios.",
     "location": "Ciudad de México, México.",
-    "contact": "Contacto exclusivamente mediante el formulario de esta web.",
+    "contact": "Contacto mediante el formulario de esta web.",
     "links": {
       "notice": "Aviso legal",
       "privacy": "Privacidad",

@@ -3,25 +3,46 @@
     "language": "Idioma"
   },
   "hero": {
-    "title": "Mobilidade privada, com critério.",
-    "subtitle": "Motoristas selecionados. Veículos elétricos premium. Serviço na Cidade do México.",
-    "cta": "Solicitar acesso"
+    "title": "Cada trajeto, conduzido com conforto, discrição e precisão desde o primeiro quilómetro.",
+    "subtitle": "Motoristas cuidadosamente selecionados. Veículos elétricos premium.\nUm padrão sólido e confiável para quem não improvisa a sua mobilidade na Cidade do México.",
+    "cta": "Solicitar serviço",
+    "note": "Operação disponível a partir de março de 2026"
   },
   "local": {
-    "title": "Cidade do México, sem fricções.",
-    "body": "Deslocações fluidas, tempos controlados e um padrão constante. Pensado para trabalho, viagens e ocasiões especiais."
+    "title": "Cidade do México, mobilidade de alto nível.",
+    "body": "Rotas bem definidas, tempos controlados e um padrão consistente. Pensado para trabalho, viagens e ocasiões especiais."
   },
   "standard": {
     "title": "Um padrão pensado para o silêncio.",
-    "subtitle": "Mobilidade elétrica premium.<br>Espaço. Calma. Continuidade."
+    "subtitle": "Mobilidade elétrica de alto nível.<br>Espaço. Calma. Estabilidade.",
+    "origin": "Pixkuy tem origem no totonaco, uma das línguas indígenas do México.\nSignifica roadrunner: deslocar-se com precisão, sem alterar o ambiente.\nEssa ideia define o padrão com o qual entendemos a mobilidade."
   },
   "services": {
     "title": "Nem todas as necessidades são iguais.",
-    "item1": "Transfers privados.",
-    "item2": "Serviços por hora ou por dia.",
-    "item3": "Eventos e ocasiões especiais.",
-    "item4": "Escapadas de curta distância.",
-    "bridge": "Se algum destes cenários se aplica a si, diga-nos qual."
+    "item1": "Transfers privados planeados.",
+    "item2": "Serviços por hora ou por vários dias, com cobertura contínua.",
+    "item3": "Eventos e ocasiões que exigem precisão.",
+    "item4": "Deslocações de curta distância sem fricções logísticas.",
+    "bridge": "A Pixkuy foi pensada para quem valoriza planeamento, discrição e um padrão estável de serviço."
+  },
+  "fleet": {
+    "intro": {
+      "title": "A experiência Pixkuy também é definida pelo veículo.",
+      "subtitle": "Nem todos os trajetos pedem o mesmo, nem todos os carros oferecem a mesma experiência."
+    },
+    "zeekr": {
+      "title": "Zeekr 001",
+      "subtitle": "Sedã elétrico executivo",
+      "desc": "Silêncio, estabilidade e conforto em trajetos mais longos.",
+      "note": "Pensado para deslocações em que o trajeto faz parte da agenda."
+    },
+    "m9": {
+      "title": "BYD M9",
+      "subtitle": "Van executiva elétrica",
+      "desc": "Espaço real para pessoas, bagagem e trabalho em movimento.",
+      "note": "Desenhada para viagens com convidados ou necessidades múltiplas."
+    },
+    "operational": "A escolha do modelo e o preço serão confirmados de forma assistida até ao lançamento em março."
   },
   "contact": {
     "title": "Mantenha-se informado.",
@@ -29,30 +50,31 @@
     "name": "Nome",
     "email": "E-mail",
     "phone": "Telefone",
-    "msg": "Ex.: evento em 2026, transfer planeado…",
+    "msg": "Ex.: evento em 2026, deslocação planeada…",
     "submit": "Enviar pedido",
-    "footer": "Serviço ainda não operacional · Apenas comunicações relevantes"
+    "footer": "Serviço disponível a partir de março de 2026 · Entraremos em contacto pessoalmente",
+    "statusSent": "Obrigado. Recebemos o seu pedido e entraremos em contacto após a sua análise."
   },
   "legal": {
-    "tagline": "Mobilidade privada, com critério.",
+    "tagline": "Frota dedicada e motoristas próprios.",
     "location": "Cidade do México, México.",
-    "contact": "Contacto: apenas através do formulário deste site.",
+    "contact": "Contacto através do formulário deste site.",
     "links": {
       "notice": "Aviso legal",
-      "privacy": "Privacidade",
+      "privacy": "Política de privacidade",
       "cookies": "Cookies"
     },
     "notice": {
       "title": "Aviso legal",
-      "provider": "Editor: Pixkuy Mobility S.A. de C.V.",
+      "provider": "Titular: Pixkuy Mobility S.A. de C.V.",
       "purposeTitle": "Objeto",
-      "purposeBody": "Este site tem como objetivo informar sobre a Pixkuy Mobility e permitir que pessoas interessadas solicitem contacto através do formulário.",
+      "purposeBody": "Este site tem como finalidade apresentar a Pixkuy Mobility e permitir que pessoas interessadas solicitem contacto relativamente ao serviço.",
       "conditionsTitle": "Condições de utilização",
-      "conditionsBody": "O acesso e a utilização deste site implicam a aceitação das presentes condições. O editor pode atualizar conteúdos e condições sempre que necessário.",
+      "conditionsBody": "O acesso e utilização deste site implicam a aceitação das presentes condições. O titular poderá atualizar conteúdos e condições sempre que necessário.",
       "ipTitle": "Propriedade intelectual e industrial",
-      "ipBody": "Os conteúdos, marcas, design e identidade visual deste site estão protegidos. É proibida qualquer reprodução ou difusão sem autorização.",
+      "ipBody": "Os conteúdos, marcas, design e identidade visual deste site estão protegidos pela legislação em vigor. Não é permitida a sua reprodução ou distribuição sem autorização prévia.",
       "liabilityTitle": "Responsabilidade",
-      "liabilityBody": "O editor não se responsabiliza por interrupções temporárias do serviço nem por danos resultantes de uma utilização inadequada do site.",
+      "liabilityBody": "O titular não se responsabiliza por interrupções temporárias do serviço nem por danos resultantes de uma utilização inadequada do site.",
       "back": "Voltar à landing"
     },
     "privacy": {
@@ -60,24 +82,24 @@
       "controllerTitle": "Responsável pelo tratamento",
       "controllerBody": "Responsável: Pixkuy Mobility S.A. de C.V.",
       "dataTitle": "Dados recolhidos",
-      "dataBody": "Através do formulário recolhemos os dados introduzidos pela pessoa (por exemplo, nome, e-mail, telefone e mensagem).",
+      "dataBody": "Através do formulário recolhemos os dados fornecidos voluntariamente pela pessoa interessada, como nome, e-mail, telefone e mensagem.",
       "purposeTitle": "Finalidade",
-      "purposeBody": "Gerir pedidos de contacto, manter informadas as pessoas interessadas e tratar comunicações relacionadas com o serviço.",
+      "purposeBody": "Gerir pedidos de contacto, manter as pessoas interessadas informadas sobre o lançamento do serviço e tratar comunicações relacionadas.",
       "legalBasisTitle": "Base legal",
-      "legalBasisBody": "O consentimento da pessoa ao enviar o formulário.",
+      "legalBasisBody": "O consentimento da pessoa interessada no momento do envio do formulário.",
       "retentionTitle": "Conservação",
-      "retentionBody": "Os dados são conservados pelo tempo necessário para tratar o pedido e, se aplicável, para comunicações associadas, salvo obrigação legal diferente.",
+      "retentionBody": "Os dados serão conservados apenas pelo tempo necessário para tratar o pedido e as comunicações associadas, salvo obrigação legal em contrário.",
       "rightsTitle": "Direitos",
-      "rightsBody": "Pode solicitar acesso, retificação ou eliminação, bem como outros direitos aplicáveis segundo a legislação em vigor. Para exercê-los, utilize o formulário deste site indicando o seu pedido.",
+      "rightsBody": "Pode solicitar acesso, retificação ou eliminação dos seus dados, bem como exercer outros direitos previstos na legislação aplicável, utilizando o formulário deste site.",
       "securityTitle": "Segurança",
-      "securityBody": "São aplicadas medidas razoáveis para proteger os dados contra acessos não autorizados.",
+      "securityBody": "São aplicadas medidas técnicas e organizativas adequadas para proteger os dados contra acessos não autorizados.",
       "back": "Voltar à landing"
     },
     "cookies": {
       "title": "Política de cookies",
       "body1": "Este site não utiliza cookies para fins publicitários nem de rastreamento.",
-      "body2": "Caso sejam adicionados cookies no futuro, o utilizador será informado e, se aplicável, será solicitado o seu consentimento.",
-      "body3": "A preferência de idioma pode ser armazenada localmente no navegador para melhorar a experiência.",
+      "body2": "Caso cookies venham a ser introduzidos no futuro, o utilizador será devidamente informado e, quando aplicável, será solicitado o seu consentimento.",
+      "body3": "A preferência de idioma pode ser armazenada localmente no navegador para melhorar a experiência de navegação.",
       "back": "Voltar à landing"
     }
   }
