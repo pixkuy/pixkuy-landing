@@ -1,0 +1,327 @@
+/* assets/css/30-sections.css
+   Secciones (fondos, composición y layout específico).
+   NO incluir tokens/base/components/a11y.
+*/
+
+/* -------------------------------
+   FRANJA 1 — HERO
+-------------------------------- */
+
+.hero{
+  background:
+    radial-gradient(60% 60% at 50% 40%, rgba(26,29,32,.45), rgba(15,17,19,.92)),
+    url("../img/hero-night-cdmx.webp") center/cover no-repeat;
+}
+
+/* Evitar que el selector de idioma fijo pise el hero */
+.screen.hero{
+  padding-top: calc(8vh + clamp(44px, 6vw, 64px));
+}
+
+/* -------------------------------
+   FRANJA 2 — LOCAL
+-------------------------------- */
+
+.local{
+  background:
+    linear-gradient(180deg, rgba(15,17,19,.65), rgba(20,24,27,.92)),
+    url("../img/cdmx-angel-night.webp") center/cover no-repeat;
+}
+
+/* -------------------------------
+   FRANJA 3 — STANDARD
+-------------------------------- */
+
+.standard{
+  background:
+    linear-gradient(180deg, rgba(15,17,19,.35), rgba(15,17,19,.72)),
+    url("../img/standard-silence.webp") center/cover no-repeat;
+}
+
+/* Standard — bloque "origen" (renderizar \n del JSON como saltos reales y dar ritmo) */
+.standard .muted[data-i18n="standard.origin"]{
+  white-space: pre-line;
+  margin-top: 18px;
+  line-height: 1.6;
+  max-width: 72ch;
+}
+
+@media (max-width:900px){
+  .standard .muted[data-i18n="standard.origin"]{
+    margin-top: 14px;
+    max-width: 56ch;
+  }
+}
+
+/* -------------------------------
+   FRANJA 4 — SERVICES
+-------------------------------- */
+
+.services{
+  background:
+    linear-gradient(180deg, rgba(15,17,19,.82), rgba(15,17,19,.92)),
+    url("../img/cdmx-city-blur-night.webp") center/cover no-repeat;
+}
+
+.services ul{
+  margin-bottom:18px;
+}
+
+.services li{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  font-size:20px;
+  margin:10px 0;
+}
+
+.services li svg{
+  flex:0 0 auto;
+  margin:0 !important;
+  vertical-align:baseline !important;
+  opacity:.75;
+  color:var(--fg);
+}
+
+.services li span{
+  display:block;
+  min-width:0;
+}
+
+@media (max-width:900px){
+  .services ul{ margin-top:18px; }
+  .services li{
+    font-size:18px;
+    margin:8px 0;
+    gap:10px;
+  }
+}
+
+/* -------------------------------
+   FRANJA 5 — CONTACT
+-------------------------------- */
+
+.contact{ background:#0f1113; }
+
+/* -------------------------------
+   FRANJA 6 — LEGAL
+-------------------------------- */
+
+.legal{
+  min-height:auto;
+  padding:10vh 6vw 8vh;
+  text-align:center;
+
+  background-color:#0e0f11;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.015),
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.04) 0%,
+      rgba(255,255,255,0.015) 35%,
+      rgba(0,0,0,0.25) 100%
+    );
+  background-blend-mode:overlay;
+}
+
+.legal .content{
+  max-width:720px;
+}
+
+.legal-logo{
+  display:block;
+  margin:0 auto 32px;
+  max-width:220px;
+  width:100%;
+  height:auto;
+}
+
+.legal address{
+  font-style:normal;
+  margin:24px 0;
+  line-height:1.6;
+}
+
+/* Links dentro del contenido legal (p. ej. "Volver a la landing") */
+.legal .content a{
+  color:var(--fg);
+  text-decoration: underline;
+  text-decoration-color: rgba(244,242,238,.55);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.legal .content a:hover{
+  color:var(--fg);
+  text-decoration-color: rgba(31,122,109,.9);
+}
+
+.legal .content a:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+  text-decoration-color: rgba(31,122,109,.95);
+}
+
+.legal-links{
+  margin-top:22px;
+  font-size:14px;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.legal-links span[aria-hidden="true"]{
+  color:rgba(244,242,238,.32);
+  padding:0 2px;
+  transform: translateY(-1px);
+}
+
+.legal-links a{
+  color:var(--fg);
+  text-decoration: underline;
+  text-decoration-color: rgba(244,242,238,.55);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  padding:6px 8px;
+  border-radius:8px;
+}
+
+.legal-links a:hover{
+  color:var(--fg);
+  text-decoration-color: rgba(31,122,109,.9);
+}
+
+.legal-links a:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+  text-decoration-color: rgba(31,122,109,.95);
+}
+
+.legal-links a:active{
+  opacity:.85;
+}
+
+/* -------------------------------
+   LINKEDIN — PRESENCIA INSTITUCIONAL
+-------------------------------- */
+
+.legal-social{
+  margin-top:12px;
+  display:flex;
+  justify-content:center;
+}
+
+.legal-social a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px;
+  border-radius:10px;
+
+  color:rgba(244,242,238,.55);
+  text-decoration:none;
+
+  transition:
+    color .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+.legal-social a:hover{
+  color:var(--fg);
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px rgba(31,122,109,.25);
+}
+
+.legal-social a:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+}
+
+.legal-social svg,
+.legal-social img{
+  width:18px;
+  height:18px;
+  display:block;
+}
+
+/* -------------------------------
+   FRANJA X — FLEET (ZEERK / M9)
+-------------------------------- */
+
+.fleet{
+  background:#0f1113;
+  padding:12vh 6vw 10vh;
+}
+
+.fleet .fleet-grid{
+  max-width:1200px;
+  margin:0 auto;
+
+  display:grid;
+  grid-template-columns: 1fr 1.12fr;
+  gap:clamp(24px, 4vw, 48px);
+  align-items:end;
+}
+
+.fleet .fleet-card{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.fleet .fleet-media{
+  position:relative;
+  width:100%;
+  aspect-ratio: 16 / 9;
+  overflow:hidden;
+  border-radius:18px;
+}
+
+.fleet .fleet-media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.fleet .fleet-title{
+  font-size:22px;
+  font-weight:600;
+  margin-top:4px;
+}
+
+.fleet .fleet-subtitle{
+  font-size:15px;
+  opacity:.7;
+}
+
+.fleet .fleet-desc{
+  font-size:17px;
+  line-height:1.45;
+  opacity:.9;
+  max-width:38ch;
+}
+
+@media (max-width:900px){
+  .fleet{
+    padding:10vh 6vw 8vh;
+  }
+
+  .fleet .fleet-grid{
+    grid-template-columns:1fr;
+  }
+
+  .fleet .fleet-card.m9 .fleet-media{
+    aspect-ratio: 16 / 10;
+  }
+}

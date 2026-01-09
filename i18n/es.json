@@ -1,0 +1,108 @@
+{
+  "ui": {
+    "language": "Idioma"
+  },
+  "hero": {
+    "title": "Cada trayecto, con confort, discreción y precisión desde el primer kilómetro.",
+    "subtitle": "Conductores seleccionados. Vehículos eléctricos premium.\nUn estándar sólido y confiable para quienes no improvisan su movilidad en Ciudad de México.",
+    "cta": "Solicitar servicio",
+    "note": "Operación disponible a partir de marzo de 2026"
+  },
+  "local": {
+    "title": "Ciudad de México, movilidad de alto nivel.",
+    "body": "Rutas limpias, tiempos controlados y un estándar consistente. Pensado para trabajo, viajes y ocasiones especiales."
+  },
+  "standard": {
+    "title": "Un estándar pensado para el silencio.",
+    "subtitle": "Movilidad eléctrica de alta gama.<br>Espacio. Calma. Estabilidad.",
+	 "origin": "Pixkuy toma su nombre del totonaco, una de las lenguas originarias de México.\nSignifica correcaminos: desplazarse con precisión, sin alterar el entorno.\nEsa idea define el estándar con el que entendemos nuestra movilidad."
+  },
+  "services": {
+    "title": "No todas las necesidades son iguales.",
+    "item1": "Traslados privados planificados.",
+    "item2": "Servicios por horas o por días, con cobertura continua.",
+    "item3": "Eventos y ocasiones que requieren precisión.",
+    "item4": "Escapadas cercanas sin fricciones logísticas.",
+    "bridge": "Pixkuy está pensado para quienes valoran la planificación, la discreción y un estándar estable de servicio."
+  },
+
+  "fleet": {
+    "intro": {
+      "title": "La experiencia Pixkuy también se define por el vehículo.",
+      "subtitle": "No todos los trayectos piden lo mismo, ni todos los coches ofrecen la misma experiencia."
+    },
+    "zeekr": {
+      "title": "Zeekr 001",
+      "subtitle": "Sedán eléctrico ejecutivo",
+      "desc": "Silencio, estabilidad y comodidad en trayectos largos.",
+      "note": "Pensado para traslados donde el trayecto forma parte de la agenda."
+    },
+    "m9": {
+      "title": "BYD M9",
+      "subtitle": "Van ejecutiva eléctrica",
+      "desc": "Espacio real para personas, equipaje y trabajo en ruta.",
+      "note": "Diseñada para viajes con invitados o necesidades múltiples."
+    },
+    "operational": "La elección del modelo y el precio se confirman de forma asistida hasta el lanzamiento en marzo."
+  },
+
+  "contact": {
+    "title": "Mantente informado.",
+    "subtitle": "Lanzamiento previsto en marzo de 2026.",
+    "name": "Nombre",
+    "email": "Email",
+    "phone": "Teléfono",
+    "msg": "Ej. evento en 2026, traslado planificado…",
+    "submit": "Enviar solicitud",
+    "footer": "Servicio disponible a partir de marzo de 2026 · Te contactaremos personalmente",
+    "statusSent": "Gracias. Hemos recibido tu solicitud. Te contactaremos tras revisarla."
+  },
+  "legal": {
+    "tagline": "Flota dedicada y conductores propios.",
+    "location": "Ciudad de México, México.",
+    "contact": "Contacto mediante el formulario de esta web.",
+    "links": {
+      "notice": "Aviso legal",
+      "privacy": "Privacidad",
+      "cookies": "Cookies"
+    },
+    "notice": {
+      "title": "Aviso legal",
+      "provider": "Titular: Pixkuy Mobility S.A. de C.V.",
+      "purposeTitle": "Objeto",
+      "purposeBody": "Este sitio web tiene como finalidad informar sobre Pixkuy Mobility y permitir que las personas interesadas soliciten ser contactadas para recibir información sobre el servicio.",
+      "conditionsTitle": "Condiciones de uso",
+      "conditionsBody": "El acceso y uso de este sitio implica la aceptación de las presentes condiciones. El titular podrá actualizar contenidos y condiciones cuando resulte necesario.",
+      "ipTitle": "Propiedad intelectual e industrial",
+      "ipBody": "Los contenidos, marcas, diseño e identidad visual de este sitio están protegidos por la normativa vigente. No se permite su reproducción o distribución sin autorización expresa.",
+      "liabilityTitle": "Responsabilidad",
+      "liabilityBody": "El titular no se hace responsable de interrupciones temporales del servicio ni de daños derivados de un uso indebido del sitio.",
+      "back": "Volver a la landing"
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "controllerTitle": "Responsable del tratamiento",
+      "controllerBody": "Responsable: Pixkuy Mobility S.A. de C.V.",
+      "dataTitle": "Datos que se recogen",
+      "dataBody": "A través del formulario se recogen los datos que la persona interesada introduce, como nombre, correo electrónico, teléfono y mensaje.",
+      "purposeTitle": "Finalidad",
+      "purposeBody": "Gestionar solicitudes de contacto, mantener informadas a las personas interesadas sobre el lanzamiento del servicio y atender comunicaciones relacionadas.",
+      "legalBasisTitle": "Base legal",
+      "legalBasisBody": "El consentimiento de la persona interesada al enviar el formulario.",
+      "retentionTitle": "Conservación",
+      "retentionBody": "Los datos se conservarán el tiempo necesario para atender la solicitud y para comunicaciones relacionadas con el lanzamiento, salvo obligación legal distinta.",
+      "rightsTitle": "Derechos",
+      "rightsBody": "Puedes solicitar acceso, rectificación o supresión de tus datos, así como otros derechos aplicables conforme a la normativa vigente, utilizando el formulario de esta web.",
+      "securityTitle": "Seguridad",
+      "securityBody": "Se aplican medidas técnicas y organizativas razonables para proteger los datos frente a accesos no autorizados.",
+      "back": "Volver a la landing"
+    },
+    "cookies": {
+      "title": "Política de cookies",
+      "body1": "Este sitio no utiliza cookies con fines publicitarios ni de seguimiento.",
+      "body2": "En caso de que en el futuro se incorporen cookies, se informará debidamente y, cuando corresponda, se solicitará el consentimiento.",
+      "body3": "La preferencia de idioma puede almacenarse localmente en el navegador para mejorar la experiencia de navegación.",
+      "back": "Volver a la landing"
+    }
+  }
+}

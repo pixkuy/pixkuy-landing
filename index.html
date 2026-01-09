@@ -60,6 +60,29 @@
       border:0 !important;
     }
   </style>
+
+  <!-- Minimal structured data (no ContactPoint to avoid spam surface) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "Pixkuy Mobility",
+          "url": "https://get.pixkuy.com/",
+          "logo": "https://get.pixkuy.com/assets/img/og-image.png",
+          "sameAs": [
+            "https://www.linkedin.com/company/pixkuy-mobility/"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "name": "Pixkuy Mobility",
+          "url": "https://get.pixkuy.com/"
+        }
+      ]
+    }
+  </script>
 </head>
 
 <body>
@@ -73,7 +96,7 @@
       aria-expanded="false"
     >
       <span class="lang-current" aria-hidden="true"></span>
-      <span class="visually-hidden" data-i18n="ui.language"></span>
+      <span class="visually-hidden" data-i18n="ui.language">Idioma</span>
     </button>
 
     <ul
@@ -84,36 +107,71 @@
     ></ul>
   </nav>
 
+  <!-- No-JS / LLM-friendly minimal fallback (links use real ?lang=xx forcing supported by i18n.js) -->
+  <noscript>
+    <section style="max-width: 860px; margin: 24px auto; padding: 16px 18px; border: 1px solid rgba(255,255,255,.12); border-radius: 16px;">
+      <h1 style="margin: 0 0 10px 0; font-size: 22px; line-height: 1.2;">
+        Flota dedicada y conductores propios.
+      </h1>
+      <p style="margin: 0 0 10px 0; opacity: .9;">
+        Conductores seleccionados. Vehículos eléctricos premium. Un estándar consistente para quienes no improvisan su movilidad en Ciudad de México.
+      </p>
+      <p style="margin: 0 0 14px 0; opacity: .75;">
+        Para usar el formulario y ver la web completa, habilita JavaScript.
+      </p>
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+        <strong style="opacity:.85;">Idioma:</strong>
+        <a href="/?lang=es#contact">ES</a>
+        <a href="/?lang=en#contact">EN</a>
+        <a href="/?lang=ru#contact">RU</a>
+        <a href="/?lang=fr#contact">FR</a>
+        <a href="/?lang=pt#contact">PT</a>
+        <a href="/?lang=it#contact">IT</a>
+        <a href="/?lang=de#contact">DE</a>
+        <a href="/?lang=ko#contact">KO</a>
+        <a href="/?lang=zh-hans#contact">中文</a>
+      </div>
+    </section>
+  </noscript>
+
   <!-- PANTALLA 1 — HERO -->
   <section class="screen hero">
     <div class="content">
-      <h1 data-i18n="hero.title"></h1>
-      <p class="subtitle" data-i18n="hero.subtitle"></p>
-      <a class="cta" href="#contact" data-i18n="hero.cta"></a>
-      <p class="muted small" data-i18n="hero.note"></p>
+      <h1 data-i18n="hero.title">Cada trayecto, con confort, discreción y precisión desde el primer kilómetro.</h1>
+      <p class="subtitle" data-i18n="hero.subtitle">
+        Conductores seleccionados. Vehículos eléctricos premium.<br>Un estándar consistente para quienes no improvisan su movilidad en Ciudad de México.
+      </p>
+      <a class="cta" href="#contact" data-i18n="hero.cta">Solicitar servicio</a>
+      <p class="muted small" data-i18n="hero.note">Operación disponible a partir de marzo de 2026</p>
     </div>
   </section>
 
   <!-- PANTALLA 2 — LOCAL -->
   <section class="screen local">
     <div class="content">
-      <h2 data-i18n="local.title"></h2>
-      <p data-i18n="local.body"></p>
+      <h2 data-i18n="local.title">Ciudad de México, sin fricción.</h2>
+      <p data-i18n="local.body">
+        Rutas limpias, tiempos controlados y un estándar consistente. Pensado para trabajo, viajes y ocasiones especiales.
+      </p>
     </div>
   </section>
 
   <!-- PANTALLA 3 — ESTÁNDAR -->
   <section class="screen standard">
     <div class="content">
-      <h2 data-i18n="standard.title"></h2>
-      <p class="subtitle" data-i18n="standard.subtitle"></p>
+      <h2 data-i18n="standard.title">Un estándar pensado para el silencio.</h2>
+      <p class="subtitle" data-i18n="standard.subtitle">
+        Movilidad eléctrica de alta gama.<br>Espacio. Calma. Continuidad.
+      </p>
+	  <p class="muted" data-i18n="standard.origin"></p>
     </div>
   </section>
 
   <!-- PANTALLA 4 — ADAPTABILIDAD -->
   <section class="screen services">
     <div class="content">
-      <h2 data-i18n="services.title"></h2>
+      <h2 data-i18n="services.title">No todas las necesidades son iguales.</h2>
 
       <ul>
         <li>
@@ -127,7 +185,7 @@
             <path d="M16.5 16.5a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z"
                   stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span data-i18n="services.item1"></span>
+          <span data-i18n="services.item1">Traslados privados planificados.</span>
         </li>
 
         <li>
@@ -138,7 +196,7 @@
             <path d="M12 6v6l4 2"
                   stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span data-i18n="services.item2"></span>
+          <span data-i18n="services.item2">Servicios por horas o por días, con continuidad.</span>
         </li>
 
         <li>
@@ -149,7 +207,7 @@
             <path d="M19 12l.8 2.2L22 15l-2.2.8L19 18l-.8-2.2L16 15l2.2-.8L19 12Z"
                   stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span data-i18n="services.item3"></span>
+          <span data-i18n="services.item3">Eventos y ocasiones que requieren precisión.</span>
         </li>
 
         <li>
@@ -160,19 +218,81 @@
             <path d="M12 11.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z"
                   stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span data-i18n="services.item4"></span>
+          <span data-i18n="services.item4">Escapadas cercanas sin fricciones logísticas.</span>
         </li>
       </ul>
 
-      <p class="muted small" data-i18n="services.bridge"></p>
+      <p class="muted small" data-i18n="services.bridge">
+        Pixkuy está pensado para quienes valoran la planificación, la discreción y un estándar estable de servicio.
+      </p>
+    </div>
+  </section>
+
+  <!-- PANTALLA 4.5 — FLEET (antes del formulario) -->
+  <section class="fleet" aria-label="Fleet">
+   <!-- Ancla conceptual -->
+  <div class="content" style="max-width:1200px; margin: 0 auto 36px;">
+    <h2 data-i18n="fleet.intro.title">
+      La experiencia Pixkuy también se define por el vehículo.
+    </h2>
+    <p class="subtitle" data-i18n="fleet.intro.subtitle">
+      No todos los trayectos piden lo mismo, ni todos los coches ofrecen la misma experiencia.
+    </p>
+  </div>
+    <div class="fleet-grid">
+      <div class="fleet-card zeekr">
+        <div class="fleet-media">
+          <img
+            src="assets/img/fleet/zeekr-001-executive-night.webp"
+            alt="Zeekr 001 — sedán eléctrico ejecutivo"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <div class="fleet-title" data-i18n="fleet.zeekr.title">Zeekr 001</div>
+        <div class="fleet-subtitle" data-i18n="fleet.zeekr.subtitle">Sedán eléctrico ejecutivo</div>
+        <div class="fleet-desc" data-i18n="fleet.zeekr.desc">
+          Silencio, estabilidad y comodidad en trayectos largos.
+        </div>
+        <div class="fleet-desc muted" style="opacity:.75;" data-i18n="fleet.zeekr.note">
+          Pensado para traslados donde el trayecto forma parte de la agenda.
+        </div>
+      </div>
+
+      <div class="fleet-card m9">
+        <div class="fleet-media">
+          <img
+            src="assets/img/fleet/byd-m9-executive-night.webp"
+            alt="BYD M9 — van ejecutiva eléctrica"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <div class="fleet-title" data-i18n="fleet.m9.title">BYD M9</div>
+        <div class="fleet-subtitle" data-i18n="fleet.m9.subtitle">Van ejecutiva eléctrica</div>
+        <div class="fleet-desc" data-i18n="fleet.m9.desc">
+          Espacio real para personas, equipaje y trabajo en ruta.
+        </div>
+        <div class="fleet-desc muted" style="opacity:.75;" data-i18n="fleet.m9.note">
+          Diseñada para viajes con invitados o necesidades múltiples.
+        </div>
+      </div>
+    </div>
+
+    <div class="content" style="max-width:1200px; margin: 18px auto 0;">
+      <p class="muted small" data-i18n="fleet.operational">
+        La elección del modelo y el precio se confirman de forma asistida hasta el lanzamiento en marzo.
+      </p>
     </div>
   </section>
 
   <!-- PANTALLA 5 — CONTACTO -->
   <section id="contact" class="screen contact">
     <div class="content">
-      <h2 data-i18n="contact.title"></h2>
-      <p class="subtitle" data-i18n="contact.subtitle"></p>
+      <h2 data-i18n="contact.title">Mantente informado.</h2>
+      <p class="subtitle" data-i18n="contact.subtitle">Lanzamiento previsto en marzo de 2026.</p>
 
       <form
         class="form"
@@ -188,54 +308,56 @@
           <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
         </div>
 
-        <p id="contact-status" class="muted small" role="status" aria-live="polite" hidden data-i18n="contact.statusSent"></p>
+        <p id="contact-status" class="muted small" role="status" aria-live="polite" hidden data-i18n="contact.statusSent">
+          Solicitud enviada.
+        </p>
 
-        <label for="contact-name" class="visually-hidden" data-i18n="contact.name"></label>
+        <label for="contact-name" class="visually-hidden" data-i18n="contact.name">Nombre</label>
         <input
           id="contact-name"
           type="text"
           name="name"
-          placeholder=""
+          placeholder="Nombre"
           required
           autocomplete="name"
           data-i18n-ph="contact.name"
         />
 
-        <label for="contact-email" class="visually-hidden" data-i18n="contact.email"></label>
+        <label for="contact-email" class="visually-hidden" data-i18n="contact.email">Email</label>
         <input
           id="contact-email"
           type="email"
           name="email"
-          placeholder=""
+          placeholder="Email"
           required
           autocomplete="email"
           data-i18n-ph="contact.email"
         />
 
-        <label for="contact-phone" class="visually-hidden" data-i18n="contact.phone"></label>
+        <label for="contact-phone" class="visually-hidden" data-i18n="contact.phone">Teléfono</label>
         <input
           id="contact-phone"
           type="tel"
           name="phone"
-          placeholder=""
+          placeholder="Teléfono"
           required
           autocomplete="tel"
           data-i18n-ph="contact.phone"
         />
 
-        <label for="contact-message" class="visually-hidden" data-i18n="contact.msg"></label>
+        <label for="contact-message" class="visually-hidden" data-i18n="contact.msg">Ej. evento en 2026, traslado planificado…</label>
         <textarea
           id="contact-message"
           name="message"
           rows="3"
-          placeholder=""
+          placeholder="Ej. evento en 2026, traslado planificado…"
           data-i18n-ph="contact.msg"
         ></textarea>
 
-        <button id="contact-submit" type="submit" class="cta" data-i18n="contact.submit"></button>
+        <button id="contact-submit" type="submit" class="cta" data-i18n="contact.submit">Enviar solicitud</button>
       </form>
 
-      <p class="muted small" data-i18n="contact.footer"></p>
+      <p class="muted small" data-i18n="contact.footer">Servicio disponible a partir de marzo de 2026 · Te contactaremos personalmente</p>
     </div>
   </section>
 
@@ -250,12 +372,12 @@
         decoding="async"
       />
 
-      <p class="muted" data-i18n="legal.tagline"></p>
+      <p class="muted" data-i18n="legal.tagline">Movilidad privada con conductor, sin concesiones.</p>
 
       <address class="muted">
         <div>Pixkuy Mobility S.A. de C.V.</div>
-        <div data-i18n="legal.location"></div>
-        <div data-i18n="legal.contact"></div>
+        <div data-i18n="legal.location">Ciudad de México, México.</div>
+        <div data-i18n="legal.contact">Contacto mediante el formulario de esta web.</div>
       </address>
 
       <!-- LinkedIn (presencia institucional) -->
@@ -275,11 +397,11 @@
       </div>
 
       <nav class="legal-links" aria-label="Legal links">
-        <a href="legal/aviso-legal.html" data-i18n="legal.links.notice"></a>
+        <a href="legal/aviso-legal.html" data-i18n="legal.links.notice">Aviso legal</a>
         <span aria-hidden="true">·</span>
-        <a href="legal/privacy.html" data-i18n="legal.links.privacy"></a>
+        <a href="legal/privacy.html" data-i18n="legal.links.privacy">Privacidad</a>
         <span aria-hidden="true">·</span>
-        <a href="legal/cookies.html" data-i18n="legal.links.cookies"></a>
+        <a href="legal/cookies.html" data-i18n="legal.links.cookies">Cookies</a>
       </nav>
     </div>
   </footer>
