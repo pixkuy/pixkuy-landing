@@ -3,25 +3,46 @@
     "language": "Langue"
   },
   "hero": {
-    "title": "Mobilité privée, avec discernement.",
-    "subtitle": "Chauffeurs sélectionnés. Véhicules électriques premium. Service à Mexico.",
-    "cta": "Demander un accès"
+    "title": "Chaque trajet, conduit avec confort, discrétion et précision dès le premier kilomètre.",
+    "subtitle": "Chauffeurs soigneusement sélectionnés. Véhicules électriques premium.\nUn standard fiable pour celles et ceux qui ne laissent pas leur mobilité à l’improvisation à Mexico.",
+    "cta": "Demander le service",
+    "note": "Service disponible à partir de mars 2026"
   },
   "local": {
-    "title": "Mexico, sans friction.",
-    "body": "Des trajets fluides, des temps maîtrisés et un standard constant. Pensé pour le travail, les voyages et les occasions spéciales."
+    "title": "Mexico, une mobilité à un autre niveau.",
+    "body": "Des itinéraires maîtrisés, des temps contrôlés et une expérience cohérente. Pensée pour le travail, les déplacements et les occasions particulières."
   },
   "standard": {
-    "title": "Un standard pensé pour le silence.",
-    "subtitle": "Mobilité électrique haut de gamme.<br>Espace. Calme. Continuité."
+    "title": "Un standard conçu pour le silence.",
+    "subtitle": "Mobilité électrique haut de gamme.<br>Espace. Calme. Stabilité.",
+    "origin": "Pixkuy tire son nom du totonaque, l’une des langues autochtones du Mexique.\nIl signifie « roadrunner » : se déplacer avec précision, sans perturber l’environnement.\nCette idée définit notre manière d’envisager la mobilité."
   },
   "services": {
-    "title": "Tous les besoins ne se valent pas.",
-    "item1": "Transferts privés.",
-    "item2": "Services à l’heure ou à la journée.",
-    "item3": "Événements et occasions spéciales.",
-    "item4": "Escapades à proximité.",
-    "bridge": "Si l’un de ces scénarios vous concerne, dites-nous lequel."
+    "title": "Tous les besoins ne se ressemblent pas.",
+    "item1": "Transferts privés planifiés.",
+    "item2": "Services à l’heure ou sur plusieurs jours, avec continuité.",
+    "item3": "Événements et situations nécessitant de la précision.",
+    "item4": "Déplacements de proximité sans friction logistique.",
+    "bridge": "Pixkuy s’adresse à celles et ceux qui valorisent l’anticipation, la discrétion et un standard de service constant."
+  },
+  "fleet": {
+    "intro": {
+      "title": "L’expérience Pixkuy se définit aussi par le véhicule.",
+      "subtitle": "Tous les trajets n’exigent pas la même chose, et tous les véhicules n’offrent pas la même expérience."
+    },
+    "zeekr": {
+      "title": "Zeekr 001",
+      "subtitle": "Berline électrique exécutive",
+      "desc": "Silence, stabilité et confort sur les trajets les plus longs.",
+      "note": "Pensée pour les déplacements où le trajet fait partie de l’agenda."
+    },
+    "m9": {
+      "title": "BYD M9",
+      "subtitle": "Van exécutif électrique",
+      "desc": "Un espace réel pour les passagers, les bagages et le travail en déplacement.",
+      "note": "Conçue pour les trajets avec invités ou des besoins multiples."
+    },
+    "operational": "Le choix du véhicule et le tarif seront confirmés avec accompagnement jusqu’au lancement en mars."
   },
   "contact": {
     "title": "Restez informé.",
@@ -31,28 +52,29 @@
     "phone": "Téléphone",
     "msg": "Ex. événement en 2026, transfert planifié…",
     "submit": "Envoyer la demande",
-    "footer": "Service pas encore opérationnel · Avis importants uniquement"
+    "footer": "Service disponible à partir de mars 2026 · Nous vous contacterons personnellement",
+    "statusSent": "Merci. Votre demande a bien été reçue. Nous vous recontacterons après l’avoir examinée."
   },
   "legal": {
-    "tagline": "Mobilité privée, avec discernement.",
+    "tagline": "Flotte dédiée et chauffeurs internes.",
     "location": "Mexico, Mexique.",
-    "contact": "Contact : uniquement via le formulaire de ce site.",
+    "contact": "Contact uniquement via le formulaire de ce site.",
     "links": {
       "notice": "Mentions légales",
-      "privacy": "Confidentialité",
+      "privacy": "Politique de confidentialité",
       "cookies": "Cookies"
     },
     "notice": {
       "title": "Mentions légales",
       "provider": "Éditeur : Pixkuy Mobility S.A. de C.V.",
       "purposeTitle": "Objet",
-      "purposeBody": "Ce site a pour finalité d’informer sur Pixkuy Mobility et de permettre aux personnes intéressées de demander à être recontactées via le formulaire.",
+      "purposeBody": "Ce site a pour objectif de présenter Pixkuy Mobility et de permettre aux personnes intéressées de demander à être contactées au sujet du service.",
       "conditionsTitle": "Conditions d’utilisation",
-      "conditionsBody": "L’accès et l’utilisation de ce site impliquent l’acceptation des présentes conditions. L’éditeur peut mettre à jour les contenus et conditions lorsque nécessaire.",
+      "conditionsBody": "L’accès et l’utilisation de ce site impliquent l’acceptation des présentes conditions. L’éditeur se réserve le droit de modifier les contenus et conditions si nécessaire.",
       "ipTitle": "Propriété intellectuelle et industrielle",
-      "ipBody": "Les contenus, marques, design et identité visuelle de ce site sont protégés. Toute reproduction ou diffusion sans autorisation est interdite.",
+      "ipBody": "Les contenus, marques, design et identité visuelle de ce site sont protégés par la législation en vigueur. Toute reproduction ou diffusion sans autorisation préalable est interdite.",
       "liabilityTitle": "Responsabilité",
-      "liabilityBody": "L’éditeur ne saurait être tenu responsable des interruptions temporaires du service ni des dommages résultant d’une utilisation inappropriée du site.",
+      "liabilityBody": "L’éditeur ne peut être tenu responsable des interruptions temporaires du service ni des dommages résultant d’un usage inapproprié du site.",
       "back": "Retour à la landing"
     },
     "privacy": {
@@ -60,24 +82,24 @@
       "controllerTitle": "Responsable du traitement",
       "controllerBody": "Responsable : Pixkuy Mobility S.A. de C.V.",
       "dataTitle": "Données collectées",
-      "dataBody": "Via le formulaire, nous collectons les données saisies par la personne (p. ex. nom, e-mail, téléphone et message).",
+      "dataBody": "Via le formulaire, nous collectons les informations fournies volontairement par la personne concernée, telles que le nom, l’adresse e-mail, le numéro de téléphone et le message.",
       "purposeTitle": "Finalité",
-      "purposeBody": "Gérer les demandes de contact, tenir informées les personnes intéressées et traiter les communications liées au service.",
+      "purposeBody": "Gérer les demandes de contact, informer les personnes intéressées du lancement du service et assurer les communications associées.",
       "legalBasisTitle": "Base légale",
-      "legalBasisBody": "Le consentement de la personne concernée lors de l’envoi du formulaire.",
-      "retentionTitle": "Conservation",
-      "retentionBody": "Les données sont conservées le temps nécessaire pour traiter la demande et, le cas échéant, pour les communications associées, sauf obligation légale différente.",
-      "rightsTitle": "Droits",
-      "rightsBody": "Vous pouvez demander l’accès, la rectification ou la suppression, ainsi que d’autres droits applicables selon la réglementation en vigueur. Pour les exercer, utilisez le formulaire de ce site en indiquant votre demande.",
+      "legalBasisBody": "Le consentement donné par la personne concernée lors de l’envoi du formulaire.",
+      "retentionTitle": "Durée de conservation",
+      "retentionBody": "Les données sont conservées uniquement le temps nécessaire au traitement de la demande et des communications associées, sauf obligation légale contraire.",
+      "rightsTitle": "Vos droits",
+      "rightsBody": "Vous disposez d’un droit d’accès, de rectification et de suppression de vos données, ainsi que d’autres droits prévus par la réglementation en vigueur. Pour les exercer, utilisez le formulaire de ce site.",
       "securityTitle": "Sécurité",
-      "securityBody": "Des mesures raisonnables sont mises en œuvre pour protéger les données contre les accès non autorisés.",
+      "securityBody": "Des mesures techniques et organisationnelles appropriées sont mises en place afin de protéger les données contre tout accès non autorisé.",
       "back": "Retour à la landing"
     },
     "cookies": {
       "title": "Politique de cookies",
-      "body1": "Ce site n’utilise pas de cookies à des fins publicitaires ni de suivi.",
-      "body2": "Si des cookies étaient ajoutés à l’avenir, vous en seriez informé et, le cas échéant, votre consentement serait demandé.",
-      "body3": "La préférence de langue peut être enregistrée localement dans le navigateur afin d’améliorer l’expérience.",
+      "body1": "Ce site n’utilise pas de cookies à des fins publicitaires ou de suivi.",
+      "body2": "Si des cookies devaient être ajoutés ultérieurement, vous en seriez informé et votre consentement serait sollicité lorsque cela s’avère nécessaire.",
+      "body3": "La préférence de langue peut être enregistrée localement dans le navigateur afin d’améliorer l’expérience de navigation.",
       "back": "Retour à la landing"
     }
   }
