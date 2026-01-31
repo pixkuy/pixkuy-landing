@@ -4,25 +4,25 @@
   },
   "hero": {
     "title": "从第一公里开始，以舒适、克制与精准完成每一次出行。",
-    "subtitle": "严格甄选的司机。高端电动车辆。\n为不把出行交给即兴决策的人，在墨西哥城建立稳定而可靠的标准。",
+    "subtitle": "严格甄选的司机。高端电动车辆。\n为不把出行交给即兴决策的人，在墨西哥城建立一致而可靠的标准。",
     "cta": "请求服务",
     "note": "服务将于 2026 年 3 月开始提供"
   },
   "local": {
-    "title": "墨西哥城，更高水准的出行方式。",
-    "body": "清晰的路线、可控的时间，以及始终如一的服务体验。为工作、出行与重要时刻而设计。"
+    "title": "墨西哥城，高水准出行。",
+    "body": "清晰的路线、可控的时间，以及一致的服务标准。为工作、出行与重要时刻而设计。"
   },
   "standard": {
     "title": "为安静而设计的标准。",
     "subtitle": "高端电动出行。<br>空间。平静。稳定。",
-    "origin": "Pixkuy 这一名称源自墨西哥的托托纳克语。\n其含义为“走鹃”：精准移动，却不打扰周围环境。\n这一理念定义了我们理解并实践出行服务的方式。"
+    "origin": "Pixkuy 这一名称源自墨西哥的托托纳克语。其含义为“走鹃”。一种对本质的命名方式：支撑整体的细节。正是这一逻辑，定义了我们理解的出行标准。"
   },
   "services": {
     "title": "并非所有需求都相同。",
     "item1": "提前规划的私人接送服务。",
     "item2": "按小时或多日连续提供的服务。",
     "item3": "对精准度有要求的活动与重要安排。",
-    "item4": "无额外复杂性的短距离出行。",
+    "item4": "无物流摩擦的短距离出行。",
     "bridge": "Pixkuy 专为重视规划、克制与稳定服务标准的人而打造。"
   },
   "fleet": {
@@ -53,54 +53,80 @@
     "msg": "例如：2026 年的活动、已规划的出行需求……",
     "submit": "提交请求",
     "footer": "服务将于 2026 年 3 月开始提供 · 我们将进行人工跟进",
-    "statusSent": "感谢您的提交。我们已收到您的请求，审核后将与您联系。"
+    "statusSent": "请求已发送。"
   },
   "legal": {
     "tagline": "专属车队与自有司机。",
     "location": "墨西哥城，墨西哥。",
-    "contact": "联系方式：通过本网站表单。",
+    "contact": "通过本网站表单联系。",
     "links": {
       "notice": "法律声明",
       "privacy": "隐私政策",
       "cookies": "Cookies"
-    },
-    "notice": {
-      "title": "法律声明",
-      "provider": "运营主体：Pixkuy Mobility S.A. de C.V.",
-      "purposeTitle": "网站目的",
-      "purposeBody": "本网站用于介绍 Pixkuy Mobility，并允许有意向的用户就相关服务提交联系请求。",
-      "conditionsTitle": "使用条款",
-      "conditionsBody": "访问和使用本网站即表示您同意这些条款。运营方有权在必要时更新内容与条款。",
-      "ipTitle": "知识产权与工业产权",
-      "ipBody": "本网站的内容、商标、设计及视觉识别均受适用法律保护。未经事先许可，不得复制或传播。",
-      "liabilityTitle": "责任限制",
-      "liabilityBody": "对于服务的临时中断或因不当使用本网站所造成的损失，运营方不承担责任。",
-      "back": "返回主页"
-    },
-    "privacy": {
-      "title": "隐私政策",
-      "controllerTitle": "数据控制方",
-      "controllerBody": "控制方：Pixkuy Mobility S.A. de C.V.",
-      "dataTitle": "收集的数据",
-      "dataBody": "通过表单，我们收集用户自愿提供的信息，例如姓名、电子邮箱、电话及留言内容。",
-      "purposeTitle": "处理目的",
-      "purposeBody": "用于处理联系请求、向用户提供服务上线相关信息，以及开展相关沟通。",
-      "legalBasisTitle": "法律依据",
-      "legalBasisBody": "用户在提交表单时所给予的明确同意。",
-      "retentionTitle": "保存期限",
-      "retentionBody": "数据仅在处理请求及相关沟通所需的期间内保存，法律另有要求的除外。",
-      "rightsTitle": "用户权利",
-      "rightsBody": "用户有权依法请求访问、更正或删除其个人数据，并可行使其他相关权利。可通过本网站表单提交请求。",
-      "securityTitle": "安全措施",
-      "securityBody": "我们采取合理的技术与管理措施，防止数据遭到未经授权的访问。",
-      "back": "返回主页"
-    },
-    "cookies": {
-      "title": "Cookie 政策",
-      "body1": "本网站不使用用于广告或追踪目的的 Cookie。",
-      "body2": "如未来引入 Cookie，将提前通知用户，并在必要时征得同意。",
-      "body3": "语言偏好可能会保存在浏览器本地，以改善用户体验。",
-      "back": "返回主页"
+    }
+  },
+  "legalOverlay": {
+    "title": "法律信息",
+    "close": "关闭",
+    "ariaLabel": "法律信息面板",
+    "tabs": {
+      "notice": "法律声明",
+      "privacy": "隐私政策",
+      "cookies": "Cookies"
+    }
+  },
+  "notice": {
+    "title": "法律声明",
+    "body1": "本网站仅用于信息展示，描述的是处于发布阶段的服务。",
+    "body2": "相关信息可能会根据运营情况在不另行通知的情况下调整。",
+    "ownerTitle": "主体",
+    "ownerBody": "Pixkuy Mobility S.A. de C.V.",
+    "contactTitle": "联系",
+    "contactBody": "请使用本网站的表单与我们联系。",
+    "back": "返回主页"
+  },
+  "privacy": {
+    "title": "隐私政策",
+    "body1": "通过表单提供的数据仅用于处理您的请求。",
+    "body2": "我们不会将数据用于广告目的或与第三方共享。",
+    "purposeTitle": "目的",
+    "purposeBody": "处理联系请求、提供服务上线相关信息并开展相关沟通。",
+    "legalBasisTitle": "法律依据",
+    "legalBasisBody": "用户在提交表单时所给予的同意。",
+    "retentionTitle": "保存期限",
+    "retentionBody": "数据仅在处理请求及与上线相关沟通所需期间内保存，法律另有规定的除外。",
+    "rightsTitle": "权利",
+    "rightsBody": "您可依法请求访问、更正或删除个人数据，并通过本网站表单行使相关权利。",
+    "securityTitle": "安全",
+    "securityBody": "我们采取合理的技术与组织措施，防止未经授权的访问。",
+    "back": "返回主页"
+  },
+  "cookies": {
+    "title": "Cookie 政策",
+    "body1": "本网站不使用用于广告或追踪目的的 Cookie。",
+    "body2": "如未来引入 Cookie，将提前告知并在必要时征得同意。",
+    "body3": "语言偏好可能会保存在浏览器本地，以提升浏览体验。",
+    "back": "返回主页"
+  },
+  "event": {
+    "wc2026": {
+      "ariaLabel": "2026 年世界杯活动模式",
+      "eyebrow": "墨西哥\n2026 年 6–7 月",
+      "headline": "世界杯 ⚽\n不靠即兴应对。",
+      "headlinePrimary": "世界杯",
+      "headlineSecondary": "不靠即兴应对。",
+      "subline": "出行亦然。",
+      "support": "提前规划 · 专属车队 · 多车辆协调",
+      "disclaimer": "初步信息，需视可用性而定。具体运营细节与范围将另行确认。",
+      "cta": "2026 年世界杯规划",
+      "prefill": {
+        "separator": ":",
+        "line1": "对 2026 年世界杯规划的兴趣。",
+        "line2": "",
+        "line3": "",
+        "line4": "",
+        "line5": ""
+      }
     }
   }
 }

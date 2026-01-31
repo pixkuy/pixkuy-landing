@@ -15,7 +15,7 @@
   "standard": {
     "title": "A standard designed for silence.",
     "subtitle": "High-end electric mobility.<br>Space. Calm. Stability.",
-    "origin": "Pixkuy takes its name from Totonac, one of Mexico’s indigenous languages.\nIt means roadrunner: moving with precision, without disturbing the environment.\nThat idea defines the standard behind how we understand mobility."
+    "origin": "Pixkuy takes its name from Totonac, one of Mexico’s indigenous languages. It means “roadrunner”. A way of naming what is essential: the detail that sustains. That same logic defines the standard through which we understand mobility."
   },
   "services": {
     "title": "Not every need is the same.",
@@ -63,44 +63,70 @@
       "notice": "Legal notice",
       "privacy": "Privacy policy",
       "cookies": "Cookies"
-    },
-    "notice": {
-      "title": "Legal notice",
-      "provider": "Owner: Pixkuy Mobility S.A. de C.V.",
-      "purposeTitle": "Purpose",
-      "purposeBody": "This website is intended to provide information about Pixkuy Mobility and to allow interested parties to request contact regarding the service.",
-      "conditionsTitle": "Terms of use",
-      "conditionsBody": "Accessing and using this website implies acceptance of these terms. The owner may update content and conditions when necessary.",
-      "ipTitle": "Intellectual and industrial property",
-      "ipBody": "All content, trademarks, design and visual identity on this website are protected by applicable law. Reproduction or distribution without prior authorization is not permitted.",
-      "liabilityTitle": "Liability",
-      "liabilityBody": "The owner is not responsible for temporary service interruptions or damages resulting from improper use of the website.",
-      "back": "Back to landing"
-    },
-    "privacy": {
-      "title": "Privacy policy",
-      "controllerTitle": "Data controller",
-      "controllerBody": "Controller: Pixkuy Mobility S.A. de C.V.",
-      "dataTitle": "Data collected",
-      "dataBody": "Through the form, we collect the information voluntarily provided by the interested party, such as name, email address, phone number and message.",
-      "purposeTitle": "Purpose",
-      "purposeBody": "To manage contact requests, keep interested parties informed about the service launch, and handle related communications.",
-      "legalBasisTitle": "Legal basis",
-      "legalBasisBody": "The consent given by the interested party when submitting the form.",
-      "retentionTitle": "Data retention",
-      "retentionBody": "Data will be retained for as long as necessary to handle the request and related communications, unless a different legal obligation applies.",
-      "rightsTitle": "Your rights",
-      "rightsBody": "You may request access to, rectification or deletion of your data, as well as other applicable rights under current regulations, using this website’s form.",
-      "securityTitle": "Security",
-      "securityBody": "Reasonable technical and organizational measures are applied to protect personal data against unauthorized access.",
-      "back": "Back to landing"
-    },
-    "cookies": {
-      "title": "Cookies policy",
-      "body1": "This website does not use cookies for advertising or tracking purposes.",
-      "body2": "If cookies are introduced in the future, you will be properly informed and consent will be requested when applicable.",
-      "body3": "Language preferences may be stored locally in the browser to improve the browsing experience.",
-      "back": "Back to landing"
+    }
+  },
+  "legalOverlay": {
+    "title": "Legal information",
+    "close": "Close",
+    "ariaLabel": "Legal information panel",
+    "tabs": {
+      "notice": "Legal notice",
+      "privacy": "Privacy policy",
+      "cookies": "Cookies"
+    }
+  },
+  "notice": {
+    "title": "Legal notice",
+    "body1": "This website is for informational purposes only and describes a service currently in the launch phase.",
+    "body2": "The information presented may change without prior notice depending on operational availability.",
+    "ownerTitle": "Owner",
+    "ownerBody": "Pixkuy Mobility S.A. de C.V.",
+    "contactTitle": "Contact",
+    "contactBody": "Please use this website’s form to get in touch.",
+    "back": "Back to landing"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "body1": "Data provided through the form is used solely to manage your request.",
+    "body2": "We do not share data with third parties for advertising purposes.",
+    "purposeTitle": "Purpose",
+    "purposeBody": "To manage contact requests, keep information about the service launch, and handle related communications.",
+    "legalBasisTitle": "Legal basis",
+    "legalBasisBody": "The consent given by the data subject when submitting the form.",
+    "retentionTitle": "Data retention",
+    "retentionBody": "Data will be retained for as long as necessary to manage the request and communications related to the launch, unless a different legal obligation applies.",
+    "rightsTitle": "Rights",
+    "rightsBody": "You may request access, rectification or deletion in accordance with applicable regulations, using this website’s form.",
+    "securityTitle": "Security",
+    "securityBody": "Reasonable technical and organizational measures are applied to protect data against unauthorized access.",
+    "back": "Back to landing"
+  },
+  "cookies": {
+    "title": "Cookies policy",
+    "body1": "This website does not use cookies for advertising or tracking purposes.",
+    "body2": "If cookies are introduced in the future, you will be properly informed and consent will be requested when applicable.",
+    "body3": "Language preferences may be stored locally in the browser to improve the browsing experience.",
+    "back": "Back to landing"
+  },
+  "event": {
+    "wc2026": {
+      "ariaLabel": "World Cup 2026 event mode",
+      "eyebrow": "MEXICO\nJUNE–JULY 2026",
+      "headline": "The World Cup ⚽\nis not improvised.",
+      "headlinePrimary": "The World Cup",
+      "headlineSecondary": "is not improvised.",
+      "subline": "Neither is your transportation.",
+      "support": "Advance planning · Dedicated fleet · Multi-vehicle coordination",
+      "disclaimer": "Preliminary information subject to availability. Operational details and scope will be confirmed.",
+      "cta": "World Cup 2026 Planning",
+      "prefill": {
+        "separator": ":",
+        "line1": "Interest in World Cup 2026 Planning.",
+        "line2": "",
+        "line3": "",
+        "line4": "",
+        "line5": ""
+      }
     }
   }
 }

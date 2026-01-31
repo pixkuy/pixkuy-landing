@@ -3,32 +3,32 @@
     "language": "Langue"
   },
   "hero": {
-    "title": "Chaque trajet, conduit avec confort, discrétion et précision dès le premier kilomètre.",
-    "subtitle": "Chauffeurs soigneusement sélectionnés. Véhicules électriques premium.\nUn standard fiable pour celles et ceux qui ne laissent pas leur mobilité à l’improvisation à Mexico.",
+    "title": "Chaque trajet, avec confort, discrétion et précision dès le premier kilomètre.",
+    "subtitle": "Chauffeurs soigneusement sélectionnés. Véhicules électriques premium.\nUn standard cohérent pour celles et ceux qui n’improvisent pas leur mobilité à Mexico.",
     "cta": "Demander le service",
     "note": "Service disponible à partir de mars 2026"
   },
   "local": {
-    "title": "Mexico, une mobilité à un autre niveau.",
-    "body": "Des itinéraires maîtrisés, des temps contrôlés et une expérience cohérente. Pensée pour le travail, les déplacements et les occasions particulières."
+    "title": "Mexico, une mobilité de haut niveau.",
+    "body": "Des itinéraires maîtrisés, des temps contrôlés et un standard cohérent. Pensée pour le travail, les déplacements et les occasions particulières."
   },
   "standard": {
-    "title": "Un standard conçu pour le silence.",
+    "title": "Un standard pensé pour le silence.",
     "subtitle": "Mobilité électrique haut de gamme.<br>Espace. Calme. Stabilité.",
-    "origin": "Pixkuy tire son nom du totonaque, l’une des langues autochtones du Mexique.\nIl signifie « roadrunner » : se déplacer avec précision, sans perturber l’environnement.\nCette idée définit notre manière d’envisager la mobilité."
+    "origin": "Pixkuy tire son nom du totonaque, l’une des langues autochtones du Mexique. Il signifie « roadrunner ». Une manière de nommer l’essentiel : le détail qui soutient. Cette même logique définit le standard à travers lequel nous concevons notre mobilité."
   },
   "services": {
-    "title": "Tous les besoins ne se ressemblent pas.",
+    "title": "Tous les besoins ne sont pas identiques.",
     "item1": "Transferts privés planifiés.",
-    "item2": "Services à l’heure ou sur plusieurs jours, avec continuité.",
+    "item2": "Services à l’heure ou sur plusieurs jours, avec couverture continue.",
     "item3": "Événements et situations nécessitant de la précision.",
     "item4": "Déplacements de proximité sans friction logistique.",
-    "bridge": "Pixkuy s’adresse à celles et ceux qui valorisent l’anticipation, la discrétion et un standard de service constant."
+    "bridge": "Pixkuy s’adresse à celles et ceux qui valorisent la planification, la discrétion et un standard de service stable."
   },
   "fleet": {
     "intro": {
       "title": "L’expérience Pixkuy se définit aussi par le véhicule.",
-      "subtitle": "Tous les trajets n’exigent pas la même chose, et tous les véhicules n’offrent pas la même expérience."
+      "subtitle": "Tous les trajets ne requièrent pas la même chose, et tous les véhicules n’offrent pas la même expérience."
     },
     "zeekr": {
       "title": "Zeekr 001",
@@ -42,7 +42,7 @@
       "desc": "Un espace réel pour les passagers, les bagages et le travail en déplacement.",
       "note": "Conçue pour les trajets avec invités ou des besoins multiples."
     },
-    "operational": "Le choix du véhicule et le tarif seront confirmés avec accompagnement jusqu’au lancement en mars."
+    "operational": "Le choix du véhicule et le tarif sont confirmés de manière assistée jusqu’au lancement en mars."
   },
   "contact": {
     "title": "Restez informé.",
@@ -53,54 +53,80 @@
     "msg": "Ex. événement en 2026, transfert planifié…",
     "submit": "Envoyer la demande",
     "footer": "Service disponible à partir de mars 2026 · Nous vous contacterons personnellement",
-    "statusSent": "Merci. Votre demande a bien été reçue. Nous vous recontacterons après l’avoir examinée."
+    "statusSent": "Demande envoyée."
   },
   "legal": {
     "tagline": "Flotte dédiée et chauffeurs internes.",
     "location": "Mexico, Mexique.",
-    "contact": "Contact uniquement via le formulaire de ce site.",
+    "contact": "Contact via le formulaire de ce site.",
     "links": {
       "notice": "Mentions légales",
       "privacy": "Politique de confidentialité",
       "cookies": "Cookies"
-    },
-    "notice": {
-      "title": "Mentions légales",
-      "provider": "Éditeur : Pixkuy Mobility S.A. de C.V.",
-      "purposeTitle": "Objet",
-      "purposeBody": "Ce site a pour objectif de présenter Pixkuy Mobility et de permettre aux personnes intéressées de demander à être contactées au sujet du service.",
-      "conditionsTitle": "Conditions d’utilisation",
-      "conditionsBody": "L’accès et l’utilisation de ce site impliquent l’acceptation des présentes conditions. L’éditeur se réserve le droit de modifier les contenus et conditions si nécessaire.",
-      "ipTitle": "Propriété intellectuelle et industrielle",
-      "ipBody": "Les contenus, marques, design et identité visuelle de ce site sont protégés par la législation en vigueur. Toute reproduction ou diffusion sans autorisation préalable est interdite.",
-      "liabilityTitle": "Responsabilité",
-      "liabilityBody": "L’éditeur ne peut être tenu responsable des interruptions temporaires du service ni des dommages résultant d’un usage inapproprié du site.",
-      "back": "Retour à la landing"
-    },
-    "privacy": {
-      "title": "Politique de confidentialité",
-      "controllerTitle": "Responsable du traitement",
-      "controllerBody": "Responsable : Pixkuy Mobility S.A. de C.V.",
-      "dataTitle": "Données collectées",
-      "dataBody": "Via le formulaire, nous collectons les informations fournies volontairement par la personne concernée, telles que le nom, l’adresse e-mail, le numéro de téléphone et le message.",
-      "purposeTitle": "Finalité",
-      "purposeBody": "Gérer les demandes de contact, informer les personnes intéressées du lancement du service et assurer les communications associées.",
-      "legalBasisTitle": "Base légale",
-      "legalBasisBody": "Le consentement donné par la personne concernée lors de l’envoi du formulaire.",
-      "retentionTitle": "Durée de conservation",
-      "retentionBody": "Les données sont conservées uniquement le temps nécessaire au traitement de la demande et des communications associées, sauf obligation légale contraire.",
-      "rightsTitle": "Vos droits",
-      "rightsBody": "Vous disposez d’un droit d’accès, de rectification et de suppression de vos données, ainsi que d’autres droits prévus par la réglementation en vigueur. Pour les exercer, utilisez le formulaire de ce site.",
-      "securityTitle": "Sécurité",
-      "securityBody": "Des mesures techniques et organisationnelles appropriées sont mises en place afin de protéger les données contre tout accès non autorisé.",
-      "back": "Retour à la landing"
-    },
-    "cookies": {
-      "title": "Politique de cookies",
-      "body1": "Ce site n’utilise pas de cookies à des fins publicitaires ou de suivi.",
-      "body2": "Si des cookies devaient être ajoutés ultérieurement, vous en seriez informé et votre consentement serait sollicité lorsque cela s’avère nécessaire.",
-      "body3": "La préférence de langue peut être enregistrée localement dans le navigateur afin d’améliorer l’expérience de navigation.",
-      "back": "Retour à la landing"
+    }
+  },
+  "legalOverlay": {
+    "title": "Informations légales",
+    "close": "Fermer",
+    "ariaLabel": "Panneau d’informations légales",
+    "tabs": {
+      "notice": "Mentions légales",
+      "privacy": "Politique de confidentialité",
+      "cookies": "Cookies"
+    }
+  },
+  "notice": {
+    "title": "Mentions légales",
+    "body1": "Ce site a un caractère informatif et décrit un service en phase de lancement.",
+    "body2": "Les informations présentées peuvent évoluer sans préavis en fonction de la disponibilité opérationnelle.",
+    "ownerTitle": "Titulaire",
+    "ownerBody": "Pixkuy Mobility S.A. de C.V.",
+    "contactTitle": "Contact",
+    "contactBody": "Utilisez le formulaire de ce site pour nous contacter.",
+    "back": "Retour à la landing"
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "body1": "Les données fournies via le formulaire sont utilisées uniquement pour traiter votre demande.",
+    "body2": "Nous ne partageons pas les données avec des tiers à des fins publicitaires.",
+    "purposeTitle": "Finalité",
+    "purposeBody": "Gérer les demandes de contact, maintenir l’information relative au lancement du service et traiter les communications associées.",
+    "legalBasisTitle": "Base légale",
+    "legalBasisBody": "Le consentement de la personne concernée lors de l’envoi du formulaire.",
+    "retentionTitle": "Conservation",
+    "retentionBody": "Les données sont conservées le temps nécessaire au traitement de la demande et aux communications liées au lancement, sauf obligation légale contraire.",
+    "rightsTitle": "Droits",
+    "rightsBody": "Vous pouvez demander l’accès, la rectification ou la suppression de vos données conformément à la réglementation en vigueur, via le formulaire de ce site.",
+    "securityTitle": "Sécurité",
+    "securityBody": "Des mesures techniques et organisationnelles raisonnables sont appliquées afin de protéger les données contre tout accès non autorisé.",
+    "back": "Retour à la landing"
+  },
+  "cookies": {
+    "title": "Politique de cookies",
+    "body1": "Ce site n’utilise pas de cookies à des fins publicitaires ou de suivi.",
+    "body2": "Si des cookies sont ajoutés à l’avenir, vous en serez dûment informé et, le cas échéant, votre consentement sera requis.",
+    "body3": "La préférence de langue peut être enregistrée localement dans le navigateur afin d’améliorer l’expérience de navigation.",
+    "back": "Retour à la landing"
+  },
+  "event": {
+    "wc2026": {
+      "ariaLabel": "Mode événement Coupe du monde 2026",
+      "eyebrow": "MEXIQUE\nJUIN–JUILLET 2026",
+      "headline": "La Coupe du monde ⚽\nne s’improvise pas.",
+      "headlinePrimary": "La Coupe du monde",
+      "headlineSecondary": "ne s’improvise pas.",
+      "subline": "Votre transport non plus.",
+      "support": "Planification anticipée · Flotte dédiée · Coordination multi-véhicules",
+      "disclaimer": "Informations préliminaires soumises à disponibilité. Les détails opérationnels et le périmètre seront confirmés.",
+      "cta": "Planification Coupe du monde 2026",
+      "prefill": {
+        "separator": ":",
+        "line1": "Intérêt pour la planification Coupe du monde 2026.",
+        "line2": "",
+        "line3": "",
+        "line4": "",
+        "line5": ""
+      }
     }
   }
 }

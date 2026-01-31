@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title data-i18n="legal.notice.title"></title>
+  <title data-i18n="notice.title"></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Reutilizamos los mismos estilos por capas que la landing -->
@@ -52,29 +52,32 @@
 
   <main class="screen legal">
     <div class="content">
-      <h1 data-i18n="legal.notice.title"></h1>
+      <h1 data-i18n="notice.title"></h1>
 
-      <p data-i18n="legal.notice.provider"></p>
+      <p data-i18n="notice.body1"></p>
+      <p data-i18n="notice.body2"></p>
 
-      <h2 data-i18n="legal.notice.purposeTitle"></h2>
-      <p data-i18n="legal.notice.purposeBody"></p>
+      <h2 data-i18n="notice.ownerTitle"></h2>
+      <p data-i18n="notice.ownerBody"></p>
+	  <p class='muted small' data-i18n='legal.location'></p>",
 
-      <h2 data-i18n="legal.notice.conditionsTitle"></h2>
-      <p data-i18n="legal.notice.conditionsBody"></p>
-
-      <h2 data-i18n="legal.notice.ipTitle"></h2>
-      <p data-i18n="legal.notice.ipBody"></p>
-
-      <h2 data-i18n="legal.notice.liabilityTitle"></h2>
-      <p data-i18n="legal.notice.liabilityBody"></p>
+      <h2 data-i18n="notice.contactTitle"></h2>
+      <p data-i18n="notice.contactBody"></p>
 
       <p class="small">
-        <a href="../index.html" data-i18n="legal.notice.back"></a>
+        <a href="../index.html" data-i18n="notice.back"></a>
       </p>
     </div>
   </main>
 
-  <!-- i18n -->
+  <!-- i18n internal modules (must load before i18n.js) -->
+  <script src="../assets/js/i18n/fallback.es.js"></script>
+  <script src="../assets/js/i18n/catalog.js"></script>
+  <script src="../assets/js/i18n/loader.js"></script>
+  <script src="../assets/js/i18n/dom.js"></script>
+  <script src="../assets/js/i18n/selector.js"></script>
+
+  <!-- i18n public entrypoint -->
   <script src="../assets/js/i18n.js"></script>
 </body>
 </html>
