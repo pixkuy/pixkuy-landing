@@ -23,8 +23,11 @@
   }
 
   function isLegalHref(href) {
-    return typeof href === "string" && href.indexOf("legal/") !== -1 && href.indexOf(".html") !== -1;
-  }
+  if (typeof href !== "string") return false;
+  // Accept both "legal/*.html" and "/legal/*" (pretty URLs)
+  return href.indexOf("legal/") !== -1;
+}
+
 
   function ensureStyles() {
     if (document.getElementById("pixkuy-legal-overlay-styles")) return;
