@@ -19,6 +19,11 @@ html,body{
   padding:8vh 6vw;
 }
 
+/* WC2026: alinear el módulo como el resto (no centrar el item con flex) */
+.screen.screen--wc2026{
+  justify-content:flex-start;
+}
+
 .content{ max-width:920px; }
 
 h1{

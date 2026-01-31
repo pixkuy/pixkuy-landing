@@ -1,0 +1,541 @@
+/* assets/css/35-wc2026.css
+   WC2026 — Event Mode (extraído de 30-sections.css)
+   Mantener prefijo .wc2026-* y estados CSS↔JS intactos.
+*/
+
+/* =========================================================
+   WC2026 — EVENT MODE (Phase 2: CSS only, inert by default)
+   Aislamiento total por prefijo .wc2026-*
+   Sin animaciones activas; estados definidos para JS posterior
+========================================================= */
+
+.wc2026{
+  position: relative;
+  isolation: isolate; /* stacking context local */
+  padding: 12vh 6vw 10vh;
+  min-height: clamp(560px, 86vh, 980px);
+  overflow: hidden;
+  background: #0f1113;
+}
+
+/* Capas (z-index contract)
+   bg(0) → stadium(10) → planes(20) → inner/type(30) → CTA(40)
+*/
+.wc2026-bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(70% 60% at 50% 30%, rgba(255,255,255,.05), rgba(0,0,0,.65));
+}
+
+.wc2026-stadium{
+  position:absolute;
+  inset:0;
+  z-index:10;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.wc2026-stadium-wrap{
+  width:100%;
+  max-width:none;
+  margin:0 auto;
+  aspect-ratio: 16 / 9; /* reserva anti-CLS */
+}
+
+.wc2026-stadium-wrap img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+
+  /* Phase 2: el <img> solo reserva espacio, no se pinta */
+  opacity:1;
+}
+
+.wc2026-planes{
+  position:absolute;
+  inset:0;
+  z-index:20;
+  pointer-events:none;
+  background:
+    linear-gradient(135deg, rgba(0,0,0,.35), rgba(0,0,0,.05) 55%, rgba(0,0,0,.35));
+}
+
+/* Vignette controlado (para “cerco” + darkening progresivo sin matar legibilidad) */
+.wc2026-planes::before{
+  content:"";
+  position:absolute;
+  inset:-2%;
+  pointer-events:none;
+  background:
+    radial-gradient(70% 58% at 50% 38%,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,.42) 62%,
+      rgba(0,0,0,.72) 100%);
+  opacity:.55;
+}
+
+.wc2026-inner{
+  position:relative;
+  z-index:30;
+
+  /* Step L: layout editorial (bloque anclado a la izquierda) */
+  max-width:1200px;
+  margin:0;
+  margin-right:auto;
+}
+
+.wc2026-eyebrow{
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  opacity:.7;
+  margin-bottom:14px; /* editorial: menos “aire” */
+}
+
+.wc2026-headline{
+  white-space: pre-line; /* respeta saltos \n del i18n */
+  max-width: 24ch; /* editorial: menos estrecho que “hero poema” */
+}
+
+.wc2026-subline{
+  margin-top:14px; /* editorial: ritmo más tenso */
+  max-width: 50ch;
+  opacity:.9;
+}
+
+.wc2026-support{
+  margin-top:12px;
+  max-width: 62ch;
+  opacity:.8;
+}
+
+.wc2026-disclaimer{
+  margin-top:16px; /* editorial: reduce separación excesiva */
+  max-width: 62ch;
+  opacity:.65;
+}
+
+.wc2026-cta{
+  position:relative;
+  z-index:40;
+  margin-top:22px; /* editorial: CTA más integrado */
+}
+
+/* =========================================================
+   WC2026 — PHASE 4 MOTION (Editorial Cut, HIGH)
+   - One-shot reveal driven by JS classes:
+     wc2026--waiting → wc2026--revealing → wc2026--revealed
+   - Degraded + prefers-reduced-motion: no motion
+   - Only animatable, safe props: opacity + transform
+   - Ajuste: gesto único (empuje + oscurecimiento), sin coreografía larga de texto
+========================================================= */
+
+/* Baseline: do not animate until state changes to revealing/revealed */
+.wc2026 .wc2026-stadium,
+.wc2026 .wc2026-planes,
+.wc2026 .wc2026-planes::before,
+.wc2026 .wc2026-eyebrow,
+.wc2026 .wc2026-headline,
+.wc2026 .wc2026-subline,
+.wc2026 .wc2026-support,
+.wc2026 .wc2026-disclaimer,
+.wc2026 .wc2026-cta{
+  will-change: opacity, transform;
+}
+
+/* WAITING: pre-reveal composition (ya visible, “contenida”) */
+.wc2026--waiting .wc2026-stadium{
+  opacity: 1;
+  transform: translate3d(0,0,0) scale(1.00);
+}
+
+/* Planos: menos oscuros en WAITING; el darkening ocurre en REVEAL (contrato) */
+.wc2026--waiting .wc2026-planes{
+  opacity: .46;
+  transform: translate3d(0,0,0) scale(1.00);
+}
+
+.wc2026--waiting .wc2026-planes::before{
+  opacity: .48;
+}
+
+/* Texto: visible pero “en resistencia” (microdesplazamiento, sin coreografía) */
+.wc2026--waiting .wc2026-eyebrow,
+.wc2026--waiting .wc2026-headline,
+.wc2026--waiting .wc2026-subline,
+.wc2026--waiting .wc2026-support,
+.wc2026--waiting .wc2026-disclaimer,
+.wc2026--waiting .wc2026-cta{
+  opacity: 1;
+  transform: translate3d(0, 6px, 0);
+}
+
+/* Axis-driven “cut” offset for stadium in WAITING (frontal advance setup) */
+.wc2026--waiting.wc2026--axis-x .wc2026-stadium{
+  transform: translate3d(-2.4%, 0, 0) scale(1.00);
+}
+
+.wc2026--waiting.wc2026--axis-y .wc2026-stadium{
+  transform: translate3d(0, 2.0%, 0) scale(1.00);
+}
+
+/* REVEALING/REVEALED: enable transitions (avoid animating on initial paint) */
+.wc2026--revealing .wc2026-stadium,
+.wc2026--revealing .wc2026-planes,
+.wc2026--revealing .wc2026-planes::before,
+.wc2026--revealing .wc2026-eyebrow,
+.wc2026--revealing .wc2026-headline,
+.wc2026--revealing .wc2026-subline,
+.wc2026--revealing .wc2026-support,
+.wc2026--revealing .wc2026-disclaimer,
+.wc2026--revealing .wc2026-cta,
+.wc2026--revealed .wc2026-stadium,
+.wc2026--revealed .wc2026-planes,
+.wc2026--revealed .wc2026-planes::before,
+.wc2026--revealed .wc2026-eyebrow,
+.wc2026--revealed .wc2026-headline,
+.wc2026--revealed .wc2026-subline,
+.wc2026--revealed .wc2026-support,
+.wc2026--revealed .wc2026-disclaimer,
+.wc2026--revealed .wc2026-cta{
+  transition-property: opacity, transform;
+  transition-duration: 2800ms;
+  transition-timing-function: cubic-bezier(.12, .85, .18, 1);
+}
+
+/* Texto: corto y casi instantáneo (evita sensación de “segunda animación”) */
+.wc2026--revealing .wc2026-eyebrow,
+.wc2026--revealing .wc2026-headline,
+.wc2026--revealing .wc2026-subline,
+.wc2026--revealing .wc2026-support,
+.wc2026--revealing .wc2026-disclaimer,
+.wc2026--revealing .wc2026-cta{
+  transition-duration: 360ms;
+  transition-timing-function: cubic-bezier(.2, .9, .2, 1);
+}
+
+/* GESTO ÚNICO (REVEAL): empuje frontal + oscurecimiento progresivo */
+.wc2026--revealing .wc2026-stadium,
+.wc2026--revealed .wc2026-stadium{
+  opacity: 1;
+  transform: translate3d(0,0,0) scale(1.085);
+}
+
+.wc2026--revealing .wc2026-planes,
+.wc2026--revealed .wc2026-planes{
+  opacity: .74;
+  transform: translate3d(0,0,0) scale(1.015);
+}
+
+.wc2026--revealing .wc2026-planes::before,
+.wc2026--revealed .wc2026-planes::before{
+  opacity: .70;
+}
+
+/* Texto “resiste” y se asienta (sin coreografía) */
+.wc2026--revealing .wc2026-eyebrow,
+.wc2026--revealed .wc2026-eyebrow,
+.wc2026--revealing .wc2026-headline,
+.wc2026--revealed .wc2026-headline,
+.wc2026--revealing .wc2026-subline,
+.wc2026--revealed .wc2026-subline,
+.wc2026--revealing .wc2026-support,
+.wc2026--revealed .wc2026-support,
+.wc2026--revealing .wc2026-disclaimer,
+.wc2026--revealed .wc2026-disclaimer,
+.wc2026--revealing .wc2026-cta,
+.wc2026--revealed .wc2026-cta{
+  opacity: 1;
+  transform: translate3d(0,0,0);
+}
+
+/* Stagger: mínimo (impacto único). Stadium/planes llevan el tempo */
+.wc2026--revealing .wc2026-stadium{ transition-delay: 0ms; }
+.wc2026--revealing .wc2026-planes{ transition-delay: 0ms; }
+.wc2026--revealing .wc2026-planes::before{ transition-delay: 0ms; }
+
+/* Texto: prácticamente simultáneo */
+.wc2026--revealing .wc2026-eyebrow{ transition-delay: 60ms; }
+.wc2026--revealing .wc2026-headline{ transition-delay: 70ms; }
+.wc2026--revealing .wc2026-subline{ transition-delay: 80ms; }
+.wc2026--revealing .wc2026-support{ transition-delay: 90ms; }
+.wc2026--revealing .wc2026-disclaimer{ transition-delay: 100ms; }
+.wc2026--revealing .wc2026-cta{ transition-delay: 100ms; }
+
+/* DEGRADED: force stable, no motion (premium static) */
+.wc2026--degraded .wc2026-stadium,
+.wc2026--degraded .wc2026-planes,
+.wc2026--degraded .wc2026-planes::before,
+.wc2026--degraded .wc2026-eyebrow,
+.wc2026--degraded .wc2026-headline,
+.wc2026--degraded .wc2026-subline,
+.wc2026--degraded .wc2026-support,
+.wc2026--degraded .wc2026-disclaimer,
+.wc2026--degraded .wc2026-cta{
+  transition: none !important;
+  opacity: 1 !important;
+  transform: translate3d(0,0,0) scale(1) !important;
+}
+
+/* Reduced motion: reveal is effectively instant, stable */
+@media (prefers-reduced-motion: reduce){
+  .wc2026 .wc2026-stadium,
+  .wc2026 .wc2026-planes,
+  .wc2026 .wc2026-planes::before,
+  .wc2026 .wc2026-eyebrow,
+  .wc2026 .wc2026-headline,
+  .wc2026 .wc2026-subline,
+  .wc2026 .wc2026-support,
+  .wc2026 .wc2026-disclaimer,
+  .wc2026 .wc2026-cta{
+    transition: none !important;
+    opacity: 1 !important;
+    transform: translate3d(0,0,0) scale(1) !important;
+  }
+}
+
+/* Responsive */
+@media (max-width:900px){
+  .wc2026{
+    padding:10vh 6vw 8vh;
+  }
+  .wc2026-headline{
+    max-width: 22ch; /* tolera +30% long language */
+  }
+
+  /* Slightly shorter on smaller viewports */
+  .wc2026--revealing .wc2026-stadium,
+  .wc2026--revealed .wc2026-stadium,
+  .wc2026--revealing .wc2026-planes,
+  .wc2026--revealed .wc2026-planes,
+  .wc2026--revealing .wc2026-planes::before,
+  .wc2026--revealed .wc2026-planes::before{
+    transition-duration: 1050ms;
+  }
+
+  .wc2026--revealing .wc2026-eyebrow,
+  .wc2026--revealed .wc2026-eyebrow,
+  .wc2026--revealing .wc2026-headline,
+  .wc2026--revealed .wc2026-headline,
+  .wc2026--revealing .wc2026-subline,
+  .wc2026--revealed .wc2026-subline,
+  .wc2026--revealing .wc2026-support,
+  .wc2026--revealed .wc2026-support,
+  .wc2026--revealing .wc2026-disclaimer,
+  .wc2026--revealed .wc2026-disclaimer,
+  .wc2026--revealing .wc2026-cta,
+  .wc2026--revealed .wc2026-cta{
+    transition-duration: 320ms;
+  }
+}
+
+@media (max-width:720px){
+  .wc2026{
+    padding-left: calc(6vw + env(safe-area-inset-left));
+    padding-right: calc(6vw + env(safe-area-inset-right));
+  }
+  .wc2026-stadium-wrap{
+    aspect-ratio: 4 / 3; /* reserva estable en móvil */
+  }
+
+  /* Mobile: slightly reduce cut offsets */
+  .wc2026--waiting.wc2026--axis-x .wc2026-stadium{
+    transform: translate3d(-1.9%, 0, 0) scale(1.00);
+  }
+  .wc2026--waiting.wc2026--axis-y .wc2026-stadium{
+    transform: translate3d(0, 1.6%, 0) scale(1.00);
+  }
+
+  .wc2026--waiting .wc2026-eyebrow,
+  .wc2026--waiting .wc2026-headline,
+  .wc2026--waiting .wc2026-subline,
+  .wc2026--waiting .wc2026-support,
+  .wc2026--waiting .wc2026-disclaimer,
+  .wc2026--waiting .wc2026-cta{
+    transform: translate3d(0, 5px, 0);
+  }
+}
+
+/* =========================================================
+   WC2026 — STEP L (EDITORIAL TEXT LAYOUT)
+   Scope: ONLY layout + hierarchy of text (CSS-only).
+   IMPORTANT: Does NOT touch JS, state classes, timings, kill switch, or stadium/fondo.
+========================================================= */
+
+/* Layout editorial en 2 masas:
+   - Columna izquierda: placa (eyebrow)
+   - Columna derecha: copy (headline/sub/supporting/disclaimer/cta)
+   Sin tocar HTML: se logra con grid + asignación por selector.
+*/
+.wc2026 .wc2026-inner{
+  max-width: 1180px;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0;
+
+  display: grid;
+  grid-template-columns: minmax(260px, 380px) 1fr;
+  column-gap: clamp(24px, 4vw, 72px);
+  align-items: start;
+  
+}
+
+/* Placa izquierda (slot “Road to Glory”) */
+.wc2026 .wc2026-eyebrow{
+  grid-column: 1;
+  align-self: start;
+
+  /* Tipografía: más institucional/serif y con presencia */
+  font-family: var(--font-display, var(--font-serif, ui-serif, Georgia, "Times New Roman", serif));
+  font-weight: 700;
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: .92;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+
+  /* Forzamos un bloque “placa” en 2 líneas (tras el separador) sin tocar HTML */
+  max-width: 26ch;
+  white-space: pre-line;
+  text-align: center;
+  overflow-wrap: normal;
+  word-break: keep-all;
+
+  
+  /* Integración en el estadio: diagonal + “grabado” */
+  position: relative;
+  display: inline-block;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  transform-origin: left top;
+  transform: rotate(-13deg);
+
+  text-shadow:
+    0 1px 0 rgba(0,0,0,.55),
+    0 10px 28px rgba(0,0,0,.55);
+
+  opacity: .92;
+  margin-bottom: 0; /* el resto del copy vive en columna derecha */
+}
+
+/* NUEVO: líneas reales para el eyebrow (inyectadas por i18n dom.js)
+   - Cada span se convierte en línea propia
+   - Mantiene el eje de centrado (text-align: center en el contenedor)
+*/
+.wc2026 .wc2026-eyebrow-line{
+  display: block;
+  white-space: nowrap;
+}
+
+
+/* Máscara local de contraste (simula “tiza grabada” sin caja) */
+.wc2026 .wc2026-eyebrow::before{
+  content:"";
+  position:absolute;
+  inset:-10% -14%;
+  z-index:-1;
+  pointer-events:none;
+
+  background:
+    radial-gradient(70% 55% at 32% 55%, rgba(255,255,255,.14), rgba(255,255,255,0) 70%),
+    radial-gradient(65% 55% at 65% 45%, rgba(0,0,0,.55), rgba(0,0,0,0) 72%);
+  filter: blur(10px);
+  opacity: .55;
+}
+
+/* Bloque derecho: horizontal, grande, legible */
+.wc2026 .wc2026-headline{
+  grid-column: 2;
+  align-self: start;
+
+  max-width: none;
+  white-space: pre-line;
+  font-size: clamp(56px, 6.5vw, 96px);
+  line-height: .96;
+
+  /* Arranca ligeramente por debajo de la línea visual de “2026” */
+  margin-top: clamp(10px, 1.2vw, 16px);
+}
+
+.wc2026 .wc2026-subline{
+  grid-column: 2;
+
+  max-width: 46ch;
+  font-size: clamp(30px, 3.2vw, 38px);
+  line-height: 1.12;
+
+  margin-top: 16px;
+  opacity: .92;
+}
+
+.wc2026 .wc2026-support{
+  grid-column: 2;
+
+  max-width: 52ch;
+  font-size: 22px;
+  line-height: 1.6;
+
+  margin-top: 18px;
+  opacity: .82;
+}
+
+.wc2026 .wc2026-disclaimer{
+  grid-column: 2;
+
+  max-width: 56ch;
+  font-size: 20px;
+  line-height: 1.6;
+
+  margin-top: 14px;
+  opacity: .65;
+}
+
+.wc2026 .wc2026-cta{
+  grid-column: 2;
+
+  width: fit-content;
+  margin-top: 22px;
+}
+
+/* Mobile: colapsa a una sola columna, mantiene orden lógico y legibilidad */
+@media (max-width:720px){
+  .wc2026 .wc2026-inner{
+    padding-left: 0;
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
+  .wc2026 .wc2026-eyebrow,
+  .wc2026 .wc2026-headline,
+  .wc2026 .wc2026-subline,
+  .wc2026 .wc2026-support,
+  .wc2026 .wc2026-disclaimer,
+  .wc2026 .wc2026-cta{
+    grid-column: 1;
+  }
+
+  .wc2026 .wc2026-eyebrow{
+    /* En móvil, reduce tamaño y rotación para evitar recortes */
+    font-size: clamp(22px, 6.2vw, 30px);
+    max-width: 16ch;
+    transform: rotate(-10deg) skewX(-4deg);
+  }
+
+  .wc2026 .wc2026-headline{
+    margin-top: 14px;
+    font-size: clamp(36px, 10vw, 56px);
+    max-width: 22ch;
+  }
+
+  .wc2026 .wc2026-subline{
+    max-width: 34ch;
+  }
+}
