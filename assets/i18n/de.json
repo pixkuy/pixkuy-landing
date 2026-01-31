@@ -4,45 +4,45 @@
   },
   "hero": {
     "title": "Jede Fahrt, mit Komfort, Diskretion und Präzision ab dem ersten Kilometer.",
-    "subtitle": "Sorgfältig ausgewählte Fahrer. Premium-Elektrofahrzeuge.\nEin verlässlicher Standard für alle, die ihre Mobilität in Mexiko-Stadt nicht dem Zufall überlassen.",
+    "subtitle": "Sorgfältig ausgewählte Fahrer. Premium-Elektrofahrzeuge.\nEin konsistenter Standard für alle, die ihre Mobilität in Mexiko-Stadt nicht improvisieren.",
     "cta": "Service anfragen",
     "note": "Service verfügbar ab März 2026"
   },
   "local": {
-    "title": "Mexiko-Stadt, Mobilität auf höherem Niveau.",
-    "body": "Klare Routen, kontrollierte Zeitabläufe und ein konsistentes Erlebnis. Entwickelt für Arbeit, Reisen und besondere Anlässe."
+    "title": "Mexiko-Stadt, Mobilität auf hohem Niveau.",
+    "body": "Klare Routen, kontrollierte Zeitabläufe und ein konsistenter Standard. Konzipiert für Arbeit, Reisen und besondere Anlässe."
   },
   "standard": {
-    "title": "Ein Standard, der auf Ruhe ausgelegt ist.",
-    "subtitle": "Hochwertige Elektromobilität.<br>Raum. Gelassenheit. Stabilität.",
-    "origin": "Pixkuy leitet sich aus dem Totonakischen ab, einer der indigenen Sprachen Mexikos.\nEs bedeutet Roadrunner: sich präzise bewegen, ohne die Umgebung zu stören.\nDieser Gedanke prägt unseren Anspruch an Mobilität."
+    "title": "Ein Standard, der für Stille gedacht ist.",
+    "subtitle": "Hochwertige Elektromobilität.<br>Raum. Ruhe. Stabilität.",
+    "origin": "Pixkuy leitet seinen Namen aus dem Totonakischen ab, einer der indigenen Sprachen Mexikos. Er bedeutet „Roadrunner“. Eine Art, das Wesentliche zu benennen: das Detail, das trägt. Diese gleiche Logik definiert den Standard, mit dem wir unsere Mobilität verstehen."
   },
   "services": {
-    "title": "Nicht jede Anforderung ist gleich.",
+    "title": "Nicht alle Bedürfnisse sind gleich.",
     "item1": "Geplante private Transfers.",
-    "item2": "Stunden- oder mehrtägige Services mit durchgehender Betreuung.",
+    "item2": "Stunden- oder mehrtägige Services mit durchgehender Abdeckung.",
     "item3": "Events und Anlässe, die Präzision erfordern.",
-    "item4": "Kurzreisen ohne logistischen Aufwand.",
+    "item4": "Kurzstrecken ohne logistische Reibung.",
     "bridge": "Pixkuy richtet sich an Menschen, die Planung, Diskretion und einen stabilen Servicestandard schätzen."
   },
   "fleet": {
     "intro": {
       "title": "Die Pixkuy-Erfahrung wird auch durch das Fahrzeug definiert.",
-      "subtitle": "Nicht jede Fahrt verlangt dasselbe, und nicht jedes Fahrzeug bietet die gleiche Qualität."
+      "subtitle": "Nicht jede Fahrt erfordert dasselbe, und nicht jedes Fahrzeug bietet die gleiche Erfahrung."
     },
     "zeekr": {
       "title": "Zeekr 001",
       "subtitle": "Elektrische Executive-Limousine",
       "desc": "Ruhe, Stabilität und Komfort auf längeren Strecken.",
-      "note": "Gedacht für Fahrten, bei denen der Weg Teil des Termins ist."
+      "note": "Gedacht für Fahrten, bei denen der Weg Teil der Agenda ist."
     },
     "m9": {
       "title": "BYD M9",
       "subtitle": "Elektrischer Executive-Van",
-      "desc": "Großzügiger Raum für Personen, Gepäck und Arbeiten unterwegs.",
-      "note": "Konzipiert für Reisen mit Gästen oder vielfältigen Anforderungen."
+      "desc": "Großzügiger Raum für Personen, Gepäck und Arbeit unterwegs.",
+      "note": "Ausgelegt für Reisen mit Gästen oder mehreren Anforderungen."
     },
-    "operational": "Fahrzeugauswahl und Preis werden bis zum Marktstart im März begleitet bestätigt."
+    "operational": "Modellauswahl und Preis werden bis zum Start im März begleitet bestätigt."
   },
   "contact": {
     "title": "Bleiben Sie informiert.",
@@ -52,55 +52,81 @@
     "phone": "Telefon",
     "msg": "z. B. Event im Jahr 2026, geplanter Transfer …",
     "submit": "Anfrage senden",
-    "footer": "Service verfügbar ab März 2026 · Wir melden uns persönlich bei Ihnen",
-    "statusSent": "Vielen Dank. Wir haben Ihre Anfrage erhalten und melden uns nach Prüfung bei Ihnen."
+    "footer": "Service verfügbar ab März 2026 · Wir kontaktieren Sie persönlich",
+    "statusSent": "Anfrage gesendet."
   },
   "legal": {
     "tagline": "Eigene Flotte und fest angestellte Fahrer.",
     "location": "Mexiko-Stadt, Mexiko.",
-    "contact": "Kontakt ausschließlich über das Formular dieser Website.",
+    "contact": "Kontakt über das Formular dieser Website.",
     "links": {
       "notice": "Impressum",
       "privacy": "Datenschutz",
       "cookies": "Cookies"
-    },
-    "notice": {
-      "title": "Impressum",
-      "provider": "Anbieter: Pixkuy Mobility S.A. de C.V.",
-      "purposeTitle": "Zweck",
-      "purposeBody": "Diese Website dient der Information über Pixkuy Mobility und ermöglicht interessierten Personen, eine Kontaktaufnahme bezüglich des Services anzufragen.",
-      "conditionsTitle": "Nutzungsbedingungen",
-      "conditionsBody": "Der Zugriff auf diese Website setzt die Zustimmung zu diesen Bedingungen voraus. Der Anbieter kann Inhalte und Bedingungen bei Bedarf anpassen.",
-      "ipTitle": "Geistiges und gewerbliches Eigentum",
-      "ipBody": "Inhalte, Marken, Design und visuelle Identität dieser Website sind rechtlich geschützt. Eine Nutzung ohne vorherige Genehmigung ist nicht gestattet.",
-      "liabilityTitle": "Haftung",
-      "liabilityBody": "Der Anbieter übernimmt keine Haftung für vorübergehende Unterbrechungen oder Schäden infolge unsachgemäßer Nutzung der Website.",
-      "back": "Zurück zur Landing"
-    },
-    "privacy": {
-      "title": "Datenschutzerklärung",
-      "controllerTitle": "Verantwortlicher",
-      "controllerBody": "Verantwortlich: Pixkuy Mobility S.A. de C.V.",
-      "dataTitle": "Erhobene Daten",
-      "dataBody": "Über das Formular werden die von der interessierten Person freiwillig angegebenen Daten erfasst, etwa Name, E-Mail-Adresse, Telefonnummer und Nachricht.",
-      "purposeTitle": "Zweck der Verarbeitung",
-      "purposeBody": "Bearbeitung von Kontaktanfragen, Information über den Servicestart und damit verbundene Kommunikation.",
-      "legalBasisTitle": "Rechtsgrundlage",
-      "legalBasisBody": "Einwilligung der betroffenen Person bei Absenden des Formulars.",
-      "retentionTitle": "Speicherdauer",
-      "retentionBody": "Die Daten werden nur so lange gespeichert, wie dies für die Bearbeitung der Anfrage und die zugehörige Kommunikation erforderlich ist, sofern keine gesetzlichen Pflichten entgegenstehen.",
-      "rightsTitle": "Ihre Rechte",
-      "rightsBody": "Sie haben das Recht auf Auskunft, Berichtigung oder Löschung Ihrer Daten sowie weitere gesetzlich vorgesehene Rechte. Bitte nutzen Sie hierfür das Formular dieser Website.",
-      "securityTitle": "Sicherheit",
-      "securityBody": "Es werden angemessene technische und organisatorische Maßnahmen eingesetzt, um personenbezogene Daten vor unbefugtem Zugriff zu schützen.",
-      "back": "Zurück zur Landing"
-    },
-    "cookies": {
-      "title": "Cookie-Richtlinie",
-      "body1": "Diese Website verwendet keine Cookies zu Werbe- oder Trackingzwecken.",
-      "body2": "Sollten künftig Cookies eingesetzt werden, werden Sie darüber informiert und um Ihre Einwilligung gebeten, sofern erforderlich.",
-      "body3": "Die bevorzugte Sprache kann lokal im Browser gespeichert werden, um die Nutzungserfahrung zu verbessern.",
-      "back": "Zurück zur Landing"
+    }
+  },
+  "legalOverlay": {
+    "title": "Rechtliche Informationen",
+    "close": "Schließen",
+    "ariaLabel": "Panel mit rechtlichen Informationen",
+    "tabs": {
+      "notice": "Impressum",
+      "privacy": "Datenschutz",
+      "cookies": "Cookies"
+    }
+  },
+  "notice": {
+    "title": "Impressum",
+    "body1": "Diese Website hat informativen Charakter und beschreibt einen Service in der Einführungsphase.",
+    "body2": "Die dargestellten Informationen können sich je nach operativer Verfügbarkeit ohne vorherige Ankündigung ändern.",
+    "ownerTitle": "Inhaber",
+    "ownerBody": "Pixkuy Mobility S.A. de C.V.",
+    "contactTitle": "Kontakt",
+    "contactBody": "Bitte nutzen Sie das Formular dieser Website, um Kontakt aufzunehmen.",
+    "back": "Zurück zur Landing"
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "body1": "Die über das Formular bereitgestellten Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet.",
+    "body2": "Wir geben keine Daten zu Werbezwecken an Dritte weiter.",
+    "purposeTitle": "Zweck",
+    "purposeBody": "Bearbeitung von Kontaktanfragen, Bereitstellung von Informationen zum Servicestart und zugehörige Kommunikation.",
+    "legalBasisTitle": "Rechtsgrundlage",
+    "legalBasisBody": "Die Einwilligung der betroffenen Person bei Absenden des Formulars.",
+    "retentionTitle": "Speicherdauer",
+    "retentionBody": "Die Daten werden so lange gespeichert, wie es zur Bearbeitung der Anfrage und der damit verbundenen Kommunikation erforderlich ist, sofern keine andere gesetzliche Verpflichtung besteht.",
+    "rightsTitle": "Rechte",
+    "rightsBody": "Sie können gemäß geltendem Recht Auskunft, Berichtigung oder Löschung Ihrer Daten verlangen, indem Sie das Formular dieser Website nutzen.",
+    "securityTitle": "Sicherheit",
+    "securityBody": "Es werden angemessene technische und organisatorische Maßnahmen eingesetzt, um Daten vor unbefugtem Zugriff zu schützen.",
+    "back": "Zurück zur Landing"
+  },
+  "cookies": {
+    "title": "Cookie-Richtlinie",
+    "body1": "Diese Website verwendet keine Cookies zu Werbe- oder Trackingzwecken.",
+    "body2": "Sollten künftig Cookies eingeführt werden, werden Sie ordnungsgemäß informiert und es wird gegebenenfalls Ihre Einwilligung eingeholt.",
+    "body3": "Die bevorzugte Sprache kann lokal im Browser gespeichert werden, um die Nutzungserfahrung zu verbessern.",
+    "back": "Zurück zur Landing"
+  },
+  "event": {
+    "wc2026": {
+      "ariaLabel": "Eventmodus Fußball-Weltmeisterschaft 2026",
+      "eyebrow": "MEXIKO\nJUNI–JULI 2026",
+      "headline": "Die Weltmeisterschaft ⚽\nwird nicht improvisiert.",
+      "headlinePrimary": "Die Weltmeisterschaft",
+      "headlineSecondary": "wird nicht improvisiert.",
+      "subline": "Ihr Transport auch nicht.",
+      "support": "Vorausschauende Planung · Dedizierte Flotte · Koordination mehrerer Fahrzeuge",
+      "disclaimer": "Vorläufige Informationen vorbehaltlich der Verfügbarkeit. Operative Details und Umfang werden bestätigt.",
+      "cta": "Planung Weltmeisterschaft 2026",
+      "prefill": {
+        "separator": ":",
+        "line1": "Interesse an der Planung der Weltmeisterschaft 2026.",
+        "line2": "",
+        "line3": "",
+        "line4": "",
+        "line5": ""
+      }
     }
   }
 }
