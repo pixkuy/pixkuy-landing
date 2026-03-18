@@ -6,7 +6,7 @@
     "title": "Jede Fahrt, mit Komfort, Diskretion und Präzision ab dem ersten Kilometer.",
     "subtitle": "Sorgfältig ausgewählte Fahrer. Premium-Elektrofahrzeuge.\nEin konsistenter Standard für alle, die ihre Mobilität in Mexiko-Stadt nicht improvisieren.",
     "cta": "Service anfragen",
-    "note": "Service verfügbar ab März 2026"
+    "note": "Serviceanfrage vorbehaltlich operativer Prüfung und manueller Bestätigung."
   },
   "local": {
     "title": "Mexiko-Stadt, Mobilität auf hohem Niveau.",
@@ -42,18 +42,36 @@
       "desc": "Großzügiger Raum für Personen, Gepäck und Arbeit unterwegs.",
       "note": "Ausgelegt für Reisen mit Gästen oder mehreren Anforderungen."
     },
-    "operational": "Modellauswahl und Preis werden bis zum Start im März begleitet bestätigt."
+    "operational": "Modellauswahl und Servicebedingungen werden je nach angefragter Strecke individuell bestätigt."
   },
-  "contact": {
-    "title": "Bleiben Sie informiert.",
-    "subtitle": "Geplanter Start im März 2026.",
-    "name": "Name",
-    "email": "E-Mail",
+    "contact": {
+    "title": "Fordern Sie Ihren Transfer an",
+    "subtitle": "Teilen Sie uns die wichtigsten Details Ihrer Fahrt mit, und wir kontaktieren Sie, um Verfügbarkeit und nächste Schritte zu bestätigen.",
+    "name": "Vollständiger Name",
     "phone": "Telefon",
-    "msg": "z. B. Event im Jahr 2026, geplanter Transfer …",
+    "email": "E-Mail-Adresse",
+    "tripDate": "Transferdatum",
+    "tripTime": "Transferzeit",
+    "origin": "Abholort",
+    "destination": "Zielort",
+    "passengers": "Passagiere",
+    "luggage": "Gepäck",
+    "notes": "Hinweise zum Transfer (Flug, Hotel, Kindersitz, zusätzliche Details)",
     "submit": "Anfrage senden",
-    "footer": "Service verfügbar ab März 2026 · Wir kontaktieren Sie persönlich",
-    "statusSent": "Anfrage gesendet."
+    "statusSent": "Anfrage gesendet. Vielen Dank. Wir prüfen Ihre Fahrt und kontaktieren Sie so bald wie möglich.",
+    "validation": {
+      "formIncomplete": "Bitte prüfen Sie das Formular. Einige Pflichtfelder fehlen oder sind ungültig.",
+      "nameRequired": "Bitte geben Sie Ihren vollständigen Namen an.",
+      "phoneRequired": "Bitte geben Sie eine Kontakttelefonnummer an.",
+      "emailRequired": "Bitte geben Sie eine gültige E-Mail-Adresse an.",
+      "tripDateRequired": "Bitte wählen Sie das Transferdatum aus.",
+      "tripTimeRequired": "Bitte wählen Sie die Transferzeit aus.",
+      "originRequired": "Bitte geben Sie den Abholort an.",
+      "destinationRequired": "Bitte geben Sie den Zielort an.",
+      "passengersRequired": "Bitte geben Sie die Anzahl der Passagiere an.",
+      "luggageRequired": "Bitte geben Sie die Anzahl der Gepäckstücke an."
+    },
+    "footer": "Mit dem Absenden dieses Formulars erlauben Sie uns, Ihre Daten zu verwenden, um auf Ihre Anfrage zu antworten und Ihren Transfer zu organisieren."
   },
   "legal": {
     "tagline": "Eigene Flotte und fest angestellte Fahrer.",
@@ -77,7 +95,7 @@
   },
   "notice": {
     "title": "Impressum",
-    "body1": "Diese Website hat informativen Charakter und beschreibt einen Service in der Einführungsphase.",
+    "body1": "Diese Website hat informativen Charakter und ermöglicht Serviceanfragen, die einer operativen Prüfung und manuellen Bestätigung unterliegen.",
     "body2": "Die dargestellten Informationen können sich je nach operativer Verfügbarkeit ohne vorherige Ankündigung ändern.",
     "ownerTitle": "Inhaber",
     "ownerBody": "Pixkuy Mobility S.A. de C.V.",
@@ -87,18 +105,18 @@
   },
   "privacy": {
     "title": "Datenschutzerklärung",
-    "body1": "Die über das Formular bereitgestellten Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet.",
+    "body1": "Die über das Formular bereitgestellten Daten werden ausschließlich verwendet, um Ihre Transferanfrage und die dafür notwendigen Mitteilungen zu bearbeiten.",
     "body2": "Wir geben keine Daten zu Werbezwecken an Dritte weiter.",
     "purposeTitle": "Zweck",
-    "purposeBody": "Bearbeitung von Kontaktanfragen, Bereitstellung von Informationen zum Servicestart und zugehörige Kommunikation.",
+    "purposeBody": "Bearbeitung von Transfer- oder Reservierungsanfragen, Beantwortung damit verbundener Anfragen und Koordination der für die Leistungserbringung erforderlichen Kommunikation.",
     "legalBasisTitle": "Rechtsgrundlage",
-    "legalBasisBody": "Die Einwilligung der betroffenen Person bei Absenden des Formulars.",
+    "legalBasisBody": "Die Einwilligung der betroffenen Person beim Absenden des Formulars.",
     "retentionTitle": "Speicherdauer",
     "retentionBody": "Die Daten werden so lange gespeichert, wie es zur Bearbeitung der Anfrage und der damit verbundenen Kommunikation erforderlich ist, sofern keine andere gesetzliche Verpflichtung besteht.",
     "rightsTitle": "Rechte",
     "rightsBody": "Sie können gemäß geltendem Recht Auskunft, Berichtigung oder Löschung Ihrer Daten verlangen, indem Sie das Formular dieser Website nutzen.",
     "securityTitle": "Sicherheit",
-    "securityBody": "Es werden angemessene technische und organisatorische Maßnahmen eingesetzt, um Daten vor unbefugtem Zugriff zu schützen.",
+    "securityBody": "Es werden angemessene technische und organisatorische Maßnahmen angewendet, um Daten vor unbefugtem Zugriff zu schützen.",
     "back": "Zurück zur Landing"
   },
   "cookies": {

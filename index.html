@@ -6,20 +6,20 @@
   <title>Pixkuy Mobility — Movilidad privada en Ciudad de México</title>
 
   <!-- SEO básico -->
-  <meta name="description" content="Movilidad privada con conductor en Ciudad de México. Flota seleccionada, eléctrica y con criterio. Lanzamiento en marzo de 2026." />
+  <meta name="description" content="Movilidad privada con conductor en Ciudad de México. Flota seleccionada, eléctrica y con criterio. Solicitudes sujetas a validación operativa y confirmación manual." />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://get.pixkuy.com/" />
+  <link rel="canonical" href="https://pixkuy.com/" />
 
   <!-- Open Graph / Social -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Pixkuy Mobility — Movilidad privada en Ciudad de México" />
-  <meta property="og:description" content="Movilidad privada con conductor en Ciudad de México. Flota seleccionada, eléctrica y con criterio. Lanzamiento en marzo de 2026." />
-  <meta property="og:url" content="https://get.pixkuy.com/" />
+  <meta property="og:description" content="Movilidad privada con conductor en Ciudad de México. Flota seleccionada, eléctrica y con criterio. Solicitudes sujetas a validación operativa y confirmación manual." />
+  <meta property="og:url" content="https://pixkuy.com/" />
   <meta property="og:site_name" content="Pixkuy Mobility" />
   <meta property="og:locale" content="es_MX" />
 
   <!-- Open Graph image -->
-  <meta property="og:image" content="https://get.pixkuy.com/assets/img/og-image.png" />
+  <meta property="og:image" content="https://pixkuy.com/assets/img/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:type" content="image/png" />
@@ -27,8 +27,8 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Pixkuy Mobility — Movilidad privada en Ciudad de México" />
-  <meta name="twitter:description" content="Movilidad privada con conductor en Ciudad de México. Flota seleccionada, eléctrica y con criterio. Lanzamiento en marzo de 2026." />
-  <meta name="twitter:image" content="https://get.pixkuy.com/assets/img/og-image.png" />
+  <meta name="twitter:description" content="Movilidad privada con conductor en Ciudad de México. Flota seleccionada, eléctrica y con criterio. Solicitudes sujetas a validación operativa y confirmación manual." />
+  <meta name="twitter:image" content="https://pixkuy.com/assets/img/og-image.png" />
 
   <!-- UI theming -->
   <meta name="theme-color" content="#0f1113" />
@@ -39,12 +39,13 @@
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <!-- i18n / styles -->
+    <!-- i18n / styles -->
   <link rel="stylesheet" href="assets/css/00-tokens.css" />
   <link rel="stylesheet" href="assets/css/10-base.css" />
   <link rel="stylesheet" href="assets/css/20-components.css" />
   <link rel="stylesheet" href="assets/css/30-sections.css" />
   <link rel="stylesheet" href="assets/css/35-wc2026.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/90-a11y.css" />
 
   <!-- a11y helper: labels ocultos pero existentes -->
@@ -70,8 +71,8 @@
         {
           "@type": "Organization",
           "name": "Pixkuy Mobility",
-          "url": "https://get.pixkuy.com/",
-          "logo": "https://get.pixkuy.com/assets/img/og-image.png",
+          "url": "https://pixkuy.com/",
+          "logo": "https://pixkuy.com/assets/img/og-image.png",
           "sameAs": [
             "https://www.linkedin.com/company/pixkuy-mobility/"
           ]
@@ -79,7 +80,7 @@
         {
           "@type": "WebSite",
           "name": "Pixkuy Mobility",
-          "url": "https://get.pixkuy.com/"
+          "url": "https://pixkuy.com/"
         }
       ]
     }
@@ -334,67 +335,263 @@
       <h2 data-i18n="contact.title"></h2>
       <p class="subtitle" data-i18n="contact.subtitle"></p>
 
-      <form
+              <form
         class="form"
         name="contact"
         method="post"
         data-netlify="true"
         netlify-honeypot="bot-field"
         action="/?lead=ok#contact"
-        aria-label="Contact form"
+        aria-label="Reservation request form"
       >
         <input type="hidden" name="form-name" value="contact" />
         <input type="hidden" name="lead_source" value="" />
         <input type="hidden" name="lead_context" value="" />
+
         <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
           <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
         </div>
 
-        <p id="contact-status" class="muted small" role="status" aria-live="polite" hidden data-i18n="contact.statusSent"></p>
+        <p
+          id="contact-status"
+          class="muted small"
+          role="status"
+          aria-live="polite"
+          hidden
+          data-i18n="contact.statusSent"
+        ></p>
+		
+		<p
+          id="contact-form-error"
+          class="form-error form-error--global"
+          role="alert"
+          hidden
+          data-i18n="contact.validation.formIncomplete"
+        ></p>
 
-        <label for="contact-name" class="visually-hidden" data-i18n="contact.name"></label>
-        <input
-          id="contact-name"
-          type="text"
-          name="name"
-          placeholder=""
-          required
-          autocomplete="name"
-          data-i18n-ph="contact.name"
-        />
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="contact-name" class="visually-hidden" data-i18n="contact.name"></label>
+            <input
+              id="contact-name"
+              type="text"
+              name="name"
+              placeholder=""
+              required
+              autocomplete="name"
+              data-i18n-ph="contact.name"
+              aria-describedby="contact-name-error"
+            />
+            <p
+              id="contact-name-error"
+              class="form-error"
+              hidden
+              data-error-for="name"
+              data-i18n="contact.validation.nameRequired"
+            ></p>
+          </div>
 
-        <label for="contact-email" class="visually-hidden" data-i18n="contact.email"></label>
-        <input
-          id="contact-email"
-          type="email"
-          name="email"
-          placeholder=""
-          required
-          autocomplete="email"
-          data-i18n-ph="contact.email"
-        />
+          <div class="form-field">
+            <label for="contact-phone" class="visually-hidden" data-i18n="contact.phone"></label>
+            <input
+              id="contact-phone"
+              type="tel"
+              name="phone"
+              placeholder=""
+              required
+              autocomplete="tel"
+              data-i18n-ph="contact.phone"
+              aria-describedby="contact-phone-error"
+            />
+            <p
+              id="contact-phone-error"
+              class="form-error"
+              hidden
+              data-error-for="phone"
+              data-i18n="contact.validation.phoneRequired"
+            ></p>
+          </div>
 
-        <label for="contact-phone" class="visually-hidden" data-i18n="contact.phone"></label>
-        <input
-          id="contact-phone"
-          type="tel"
-          name="phone"
-          placeholder=""
-          required
-          autocomplete="tel"
-          data-i18n-ph="contact.phone"
-        />
+          <div class="form-field">
+            <label for="contact-email" class="visually-hidden" data-i18n="contact.email"></label>
+            <input
+              id="contact-email"
+              type="email"
+              name="email"
+              placeholder=""
+              required
+              autocomplete="email"
+              data-i18n-ph="contact.email"
+              aria-describedby="contact-email-error"
+            />
+            <p
+              id="contact-email-error"
+              class="form-error"
+              hidden
+              data-error-for="email"
+              data-i18n="contact.validation.emailRequired"
+            ></p>
+          </div>
 
-        <label for="contact-message" class="visually-hidden" data-i18n="contact.msg"></label>
-        <textarea
-          id="contact-message"
-          name="message"
-          rows="3"
-          placeholder=""
-          data-i18n-ph="contact.msg"
-        ></textarea>
+          <div class="form-row form-row--two">
+            <div class="form-field form-field--date">
+              <label for="contact-trip-date" class="visually-hidden" data-i18n="contact.tripDate"></label>
+              <input
+                id="contact-trip-date"
+                type="date"
+                name="trip_date"
+                required
+                autocomplete="off"
+                aria-describedby="contact-trip-date-error"
+              />
+              <span class="form-field-icon form-field-icon--date" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"></line>
+                  <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"></line>
+                  <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"></line>
+                </svg>
+              </span>
+              <p
+                id="contact-trip-date-error"
+                class="form-error"
+                hidden
+                data-error-for="trip_date"
+                data-i18n="contact.validation.tripDateRequired"
+              ></p>
+            </div>
 
-        <button id="contact-submit" type="submit" class="cta" data-i18n="contact.submit"></button>
+            <div class="form-field form-field--time">
+              <label for="contact-trip-time" class="visually-hidden" data-i18n="contact.tripTime"></label>
+              <input
+                id="contact-trip-time"
+                type="time"
+                name="trip_time"
+                required
+                autocomplete="off"
+                aria-describedby="contact-trip-time-error"
+              />
+              <span class="form-field-icon form-field-icon--time" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
+                  <polyline points="12 7 12 12 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                </svg>
+              </span>
+              <p
+                id="contact-trip-time-error"
+                class="form-error"
+                hidden
+                data-error-for="trip_time"
+                data-i18n="contact.validation.tripTimeRequired"
+              ></p>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="contact-origin" class="visually-hidden" data-i18n="contact.origin"></label>
+            <input
+              id="contact-origin"
+              type="text"
+              name="origin"
+              placeholder=""
+              required
+              autocomplete="off"
+              data-i18n-ph="contact.origin"
+              aria-describedby="contact-origin-error"
+            />
+            <p
+              id="contact-origin-error"
+              class="form-error"
+              hidden
+              data-error-for="origin"
+              data-i18n="contact.validation.originRequired"
+            ></p>
+          </div>
+
+          <div class="form-field">
+            <label for="contact-destination" class="visually-hidden" data-i18n="contact.destination"></label>
+            <input
+              id="contact-destination"
+              type="text"
+              name="destination"
+              placeholder=""
+              required
+              autocomplete="off"
+              data-i18n-ph="contact.destination"
+              aria-describedby="contact-destination-error"
+            />
+            <p
+              id="contact-destination-error"
+              class="form-error"
+              hidden
+              data-error-for="destination"
+              data-i18n="contact.validation.destinationRequired"
+            ></p>
+          </div>
+
+          <div class="form-row form-row--two">
+            <div class="form-field">
+              <label for="contact-passengers" class="visually-hidden" data-i18n="contact.passengers"></label>
+              <input
+                id="contact-passengers"
+                type="number"
+                name="passengers"
+                min="1"
+                step="1"
+                placeholder=""
+                required
+                inputmode="numeric"
+                data-i18n-ph="contact.passengers"
+                aria-describedby="contact-passengers-error"
+              />
+              <p
+                id="contact-passengers-error"
+                class="form-error"
+                hidden
+                data-error-for="passengers"
+                data-i18n="contact.validation.passengersRequired"
+              ></p>
+            </div>
+
+            <div class="form-field">
+              <label for="contact-luggage" class="visually-hidden" data-i18n="contact.luggage"></label>
+              <input
+                id="contact-luggage"
+                type="number"
+                name="luggage"
+                min="0"
+                step="1"
+                placeholder=""
+                required
+                inputmode="numeric"
+                data-i18n-ph="contact.luggage"
+                aria-describedby="contact-luggage-error"
+              />
+              <p
+                id="contact-luggage-error"
+                class="form-error"
+                hidden
+                data-error-for="luggage"
+                data-i18n="contact.validation.luggageRequired"
+              ></p>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="contact-message" class="visually-hidden" data-i18n="contact.notes"></label>
+            <textarea
+              id="contact-message"
+              name="message"
+              rows="4"
+              placeholder=""
+              data-i18n-ph="contact.notes"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button id="contact-submit" type="submit" class="cta" data-i18n="contact.submit"></button>
+          </div>
+        </div>
       </form>
 
       <p class="muted small" data-i18n="contact.footer"></p>
@@ -470,6 +667,9 @@
 <script src="assets/js/wc2026.js"></script>
 <script src="assets/js/wc2026/prefill.js"></script>
 
- 
+<!-- Forms -->
+<script src="assets/js/forms/reservation-request.js"></script>
+<script src="assets/js/forms/index.js"></script>
+
 </body>
 </html>

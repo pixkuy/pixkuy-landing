@@ -371,11 +371,123 @@ ul{
 }
 .form input,
 .form textarea{
+  width:100%;
+  box-sizing:border-box;
+  display:block;
   background:#14181b;
   border:1px solid #222;
   color:var(--fg);
   padding:12px 14px;
   border-radius:8px;
+}
+
+.form-grid{
+  display:grid;
+  gap:14px;
+}
+
+.form-field{
+  position:relative;
+  min-width:0;
+}
+
+.form-field.is-invalid input,
+.form-field.is-invalid textarea{
+  border-color:#d46a6a;
+  box-shadow:0 0 0 1px rgba(212,106,106,.18);
+}
+
+.form-field.is-invalid .form-field-icon{
+  color:#f0b4b4;
+  opacity:1;
+}
+
+.form-error{
+  margin:8px 0 0;
+  font-size:13px;
+  line-height:1.45;
+  color:#f0b4b4;
+}
+
+.form-error[hidden]{
+  display:none !important;
+}
+
+.form-error--global{
+  margin:0 0 16px;
+  padding:12px 14px;
+  border:1px solid rgba(212,106,106,.32);
+  border-radius:10px;
+  background:rgba(212,106,106,.08);
+  color:#ffd0d0;
+}
+
+.form-row{
+  display:grid;
+  gap:14px;
+}
+
+.form-row--two{
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+}
+
+.form-actions{
+  display:flex;
+  align-items:center;
+}
+
+.form-actions .cta{
+  width:100%;
+}
+
+.form-field--date input,
+.form-field--time input{
+  padding-right:44px;
+}
+
+.form-field-icon{
+  position:absolute;
+  top:50%;
+  right:14px;
+  transform:translateY(-50%);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
+  color:var(--fg);
+  opacity:.82;
+  pointer-events:none;
+}
+
+.form-field--date input,
+.form-field--time input{
+  color-scheme:dark;
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+.form-field--date input::-webkit-calendar-picker-indicator,
+.form-field--time input::-webkit-calendar-picker-indicator{
+  opacity:0;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  cursor:pointer;
+}
+
+.form-field--date input::-webkit-inner-spin-button,
+.form-field--date input::-webkit-clear-button,
+.form-field--time input::-webkit-inner-spin-button,
+.form-field--time input::-webkit-clear-button{
+  display:none;
+}
+
+@media (max-width: 720px){
+  .form-row--two{
+    grid-template-columns:1fr;
+  }
 }
 
 .muted{ color:var(--muted); }
