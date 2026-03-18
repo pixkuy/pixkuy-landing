@@ -6,7 +6,7 @@
     "title": "Chaque trajet, avec confort, discrétion et précision dès le premier kilomètre.",
     "subtitle": "Chauffeurs soigneusement sélectionnés. Véhicules électriques premium.\nUn standard cohérent pour celles et ceux qui n’improvisent pas leur mobilité à Mexico.",
     "cta": "Demander le service",
-    "note": "Service disponible à partir de mars 2026"
+    "note": "Les demandes de service sont soumises à une validation opérationnelle et à une confirmation manuelle."
   },
   "local": {
     "title": "Mexico, une mobilité de haut niveau.",
@@ -42,18 +42,36 @@
       "desc": "Un espace réel pour les passagers, les bagages et le travail en déplacement.",
       "note": "Conçue pour les trajets avec invités ou des besoins multiples."
     },
-    "operational": "Le choix du véhicule et le tarif sont confirmés de manière assistée jusqu’au lancement en mars."
+    "operational": "Le choix du véhicule et les conditions du service sont confirmés de manière assistée selon le trajet demandé."
   },
   "contact": {
-    "title": "Restez informé.",
-    "subtitle": "Lancement prévu en mars 2026.",
-    "name": "Nom",
-    "email": "E-mail",
+    "title": "Demandez votre transfert",
+    "subtitle": "Partagez les informations essentielles de votre trajet et nous vous contacterons pour confirmer la disponibilité et les prochaines étapes.",
+    "name": "Nom complet",
     "phone": "Téléphone",
-    "msg": "Ex. événement en 2026, transfert planifié…",
+    "email": "Adresse e-mail",
+    "tripDate": "Date du transfert",
+    "tripTime": "Heure du transfert",
+    "origin": "Origine",
+    "destination": "Destination",
+    "passengers": "Passagers",
+    "luggage": "Bagages",
+    "notes": "Notes sur le transfert (vol, hôtel, siège bébé, détails supplémentaires)",
     "submit": "Envoyer la demande",
-    "footer": "Service disponible à partir de mars 2026 · Nous vous contacterons personnellement",
-    "statusSent": "Demande envoyée."
+    "statusSent": "Demande envoyée. Merci. Nous allons examiner votre trajet et vous contacter dès que possible.",
+    "validation": {
+      "formIncomplete": "Veuillez vérifier le formulaire. Certains champs obligatoires sont manquants ou invalides.",
+      "nameRequired": "Veuillez indiquer votre nom complet.",
+      "phoneRequired": "Veuillez indiquer un numéro de téléphone de contact.",
+      "emailRequired": "Veuillez indiquer une adresse e-mail valide.",
+      "tripDateRequired": "Veuillez sélectionner la date du transfert.",
+      "tripTimeRequired": "Veuillez sélectionner l’heure du transfert.",
+      "originRequired": "Veuillez indiquer l’origine du trajet.",
+      "destinationRequired": "Veuillez indiquer la destination du trajet.",
+      "passengersRequired": "Veuillez indiquer le nombre de passagers.",
+      "luggageRequired": "Veuillez indiquer le nombre de bagages."
+    },
+    "footer": "En envoyant ce formulaire, vous nous autorisez à utiliser vos données pour répondre à votre demande et organiser votre transfert."
   },
   "legal": {
     "tagline": "Flotte dédiée et chauffeurs internes.",
@@ -77,7 +95,7 @@
   },
   "notice": {
     "title": "Mentions légales",
-    "body1": "Ce site a un caractère informatif et décrit un service en phase de lancement.",
+    "body1": "Ce site a un caractère informatif et permet de demander des services soumis à une validation opérationnelle et à une confirmation manuelle.",
     "body2": "Les informations présentées peuvent évoluer sans préavis en fonction de la disponibilité opérationnelle.",
     "ownerTitle": "Titulaire",
     "ownerBody": "Pixkuy Mobility S.A. de C.V.",
@@ -87,18 +105,18 @@
   },
   "privacy": {
     "title": "Politique de confidentialité",
-    "body1": "Les données fournies via le formulaire sont utilisées uniquement pour traiter votre demande.",
+    "body1": "Les données fournies via le formulaire sont utilisées uniquement pour gérer votre demande de transfert et les communications nécessaires pour la traiter.",
     "body2": "Nous ne partageons pas les données avec des tiers à des fins publicitaires.",
     "purposeTitle": "Finalité",
-    "purposeBody": "Gérer les demandes de contact, maintenir l’information relative au lancement du service et traiter les communications associées.",
+    "purposeBody": "Gérer les demandes de transfert ou de réservation, répondre aux questions associées et coordonner les communications nécessaires à la prestation du service.",
     "legalBasisTitle": "Base légale",
     "legalBasisBody": "Le consentement de la personne concernée lors de l’envoi du formulaire.",
     "retentionTitle": "Conservation",
-    "retentionBody": "Les données sont conservées le temps nécessaire au traitement de la demande et aux communications liées au lancement, sauf obligation légale contraire.",
+    "retentionBody": "Les données seront conservées pendant le temps nécessaire pour gérer la demande et les communications associées, sauf obligation légale contraire.",
     "rightsTitle": "Droits",
-    "rightsBody": "Vous pouvez demander l’accès, la rectification ou la suppression de vos données conformément à la réglementation en vigueur, via le formulaire de ce site.",
+    "rightsBody": "Vous pouvez demander l’accès, la rectification ou la suppression de vos données conformément à la réglementation applicable, en utilisant le formulaire de ce site.",
     "securityTitle": "Sécurité",
-    "securityBody": "Des mesures techniques et organisationnelles raisonnables sont appliquées afin de protéger les données contre tout accès non autorisé.",
+    "securityBody": "Des mesures techniques et organisationnelles raisonnables sont appliquées pour protéger les données contre tout accès non autorisé.",
     "back": "Retour à la landing"
   },
   "cookies": {

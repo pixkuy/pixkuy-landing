@@ -6,7 +6,7 @@
     "title": "Cada trajeto, com conforto, discrição e precisão desde o primeiro quilómetro.",
     "subtitle": "Motoristas cuidadosamente selecionados. Veículos elétricos premium.\nUm padrão consistente para quem não improvisa a sua mobilidade na Cidade do México.",
     "cta": "Solicitar serviço",
-    "note": "Operação disponível a partir de março de 2026"
+    "note": "Os pedidos de serviço estão sujeitos a validação operacional e confirmação manual."
   },
   "local": {
     "title": "Cidade do México, mobilidade de alto nível.",
@@ -42,18 +42,36 @@
       "desc": "Espaço real para pessoas, bagagem e trabalho em movimento.",
       "note": "Desenhada para viagens com convidados ou necessidades múltiplas."
     },
-    "operational": "A escolha do modelo e o preço são confirmados de forma assistida até ao lançamento em março."
+    "operational": "A escolha do modelo e as condições do serviço são confirmadas de forma assistida com base no trajeto solicitado."
   },
   "contact": {
-    "title": "Mantenha-se informado.",
-    "subtitle": "Lançamento previsto para março de 2026.",
-    "name": "Nome",
-    "email": "E-mail",
+    "title": "Solicite o seu transfer",
+    "subtitle": "Partilhe os detalhes essenciais do seu trajeto e entraremos em contacto para confirmar disponibilidade e próximos passos.",
+    "name": "Nome completo",
     "phone": "Telefone",
-    "msg": "Ex.: evento em 2026, deslocação planeada…",
+    "email": "Endereço de e-mail",
+    "tripDate": "Data do transfer",
+    "tripTime": "Hora do transfer",
+    "origin": "Origem",
+    "destination": "Destino",
+    "passengers": "Passageiros",
+    "luggage": "Bagagem",
+    "notes": "Notas do transfer (voo, hotel, cadeira de bebé, detalhes adicionais)",
     "submit": "Enviar pedido",
-    "footer": "Serviço disponível a partir de março de 2026 · Entraremos em contacto pessoalmente",
-    "statusSent": "Pedido enviado."
+    "statusSent": "Pedido enviado. Obrigado. Vamos rever o seu trajeto e entraremos em contacto o mais rapidamente possível.",
+    "validation": {
+      "formIncomplete": "Reveja o formulário. Existem campos obrigatórios em falta ou inválidos.",
+      "nameRequired": "Indique o seu nome completo.",
+      "phoneRequired": "Indique um telefone de contacto.",
+      "emailRequired": "Indique um endereço de e-mail válido.",
+      "tripDateRequired": "Selecione a data do transfer.",
+      "tripTimeRequired": "Selecione a hora do transfer.",
+      "originRequired": "Indique a origem do trajeto.",
+      "destinationRequired": "Indique o destino do trajeto.",
+      "passengersRequired": "Indique o número de passageiros.",
+      "luggageRequired": "Indique o número de peças de bagagem."
+    },
+    "footer": "Ao enviar este formulário, autoriza-nos a utilizar os seus dados para responder ao seu pedido e organizar o seu transfer."
   },
   "legal": {
     "tagline": "Frota dedicada e motoristas próprios.",
@@ -77,7 +95,7 @@
   },
   "notice": {
     "title": "Aviso legal",
-    "body1": "Este site tem caráter informativo e descreve um serviço em fase de lançamento.",
+    "body1": "Este site tem caráter informativo e permite solicitar serviços sujeitos a validação operacional e confirmação manual.",
     "body2": "A informação apresentada pode ser alterada sem aviso prévio em função da disponibilidade operacional.",
     "ownerTitle": "Titular",
     "ownerBody": "Pixkuy Mobility S.A. de C.V.",
@@ -87,14 +105,14 @@
   },
   "privacy": {
     "title": "Política de privacidade",
-    "body1": "Os dados fornecidos através do formulário são utilizados exclusivamente para gerir o seu pedido.",
+    "body1": "Os dados fornecidos através do formulário são utilizados exclusivamente para gerir o seu pedido de transfer e as comunicações necessárias para o tratar.",
     "body2": "Não partilhamos dados com terceiros para fins publicitários.",
     "purposeTitle": "Finalidade",
-    "purposeBody": "Gerir pedidos de contacto, manter informação sobre o lançamento do serviço e tratar comunicações relacionadas.",
+    "purposeBody": "Gerir pedidos de transfer ou reserva, responder a questões relacionadas e coordenar as comunicações necessárias para a prestação do serviço.",
     "legalBasisTitle": "Base legal",
     "legalBasisBody": "O consentimento da pessoa interessada no momento do envio do formulário.",
     "retentionTitle": "Conservação",
-    "retentionBody": "Os dados serão conservados pelo tempo necessário para tratar o pedido e comunicações relacionadas com o lançamento, salvo obrigação legal diferente.",
+    "retentionBody": "Os dados serão conservados pelo tempo necessário para gerir o pedido e as comunicações associadas, salvo obrigação legal diferente.",
     "rightsTitle": "Direitos",
     "rightsBody": "Pode solicitar acesso, retificação ou eliminação dos seus dados, de acordo com a legislação aplicável, utilizando o formulário deste site.",
     "securityTitle": "Segurança",

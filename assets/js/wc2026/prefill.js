@@ -1,41 +1,64 @@
-/* WC2026 — Prefill & Contact Form Lock
+/* WC2026 — Prefill & Reservation Request Lock
  * Ruta: assets/js/wc2026/prefill.js
- * Extraído 1:1 desde index.html (sin cambios funcionales)
  * Responsabilidad única:
  * - applyWc2026Prefill
- * - lockContactForm
+ * - lockReservationRequestForm
  * - submit lock
  * - success status handling
+ * Compatibilidad:
+ * - mantiene form[name="contact"] por Netlify
+ * - mantiene contact-message / contact-submit / contact-status
+ * - no invade la capa assets/js/forms/*
  */
-(function () {
+(function (window, document) {
   "use strict";
+
+  function getReservationRequestForm() {
+    return document.querySelector('form[name="contact"]');
+  }
 
   function applyWc2026Prefill() {
     try {
       var ds = document && document.documentElement && document.documentElement.dataset;
       if (ds && ds.wc2026 === "off") return;
 
-      var raw = sessionStorage.getItem("wc2026_prefill");
+      var raw = window.sessionStorage.getItem("wc2026_prefill");
       if (!raw) return;
 
-      var consumed = sessionStorage.getItem("wc2026_prefill_consumed");
+      var consumed = window.sessionStorage.getItem("wc2026_prefill_consumed");
       if (consumed === "1") return;
 
-      var form = document.querySelector('form[name="contact"]');
+      var form = getReservationRequestForm();
       if (!form) return;
 
-      var ta = document.getElementById("contact-message") || form.querySelector('textarea[name="message"]');
-      if (ta && !ta.value) {
-        ta.value = "Interés en Planificación Mundial 2026.";
+      var textarea =
+        document.getElementById("contact-message") ||
+        form.querySelector('textarea[name="message"]');
+
+      if (textarea && !textarea.value) {
+        textarea.value = "Interés en Planificación Mundial 2026.";
       }
 
-      var src = form.querySelector('input[name="lead_source"]');
-      if (src) src.value = "wc2026";
+      var sourceField = form.querySelector('input[name="lead_source"]');
+      if (sourceField) {
+        sourceField.value = "wc2026";
+      }
 
-      var ctx = form.querySelector('input[name="lead_context"]');
-      if (ctx) ctx.value = raw;
+      var contextField = form.querySelector('input[name="lead_context"]');
+      if (contextField) {
+        contextField.value = raw;
+      }
 
-      sessionStorage.setItem("wc2026_prefill_consumed", "1");
+      window.sessionStorage.setItem("wc2026_prefill_consumed", "1");
+
+      if (
+        window.PixkuyForms &&
+        typeof window.PixkuyForms.getReservationRequestFields === "function" &&
+        typeof window.PixkuyForms.syncReservationRequestState === "function"
+      ) {
+        var fields = window.PixkuyForms.getReservationRequestFields(form);
+        window.PixkuyForms.syncReservationRequestState(fields);
+      }
     } catch (e) {
       // no-op
     }
@@ -45,35 +68,42 @@
   // It remains inert when wc2026 is "off".
   window.__pixkuyWc2026ApplyPrefill = applyWc2026Prefill;
 
-  function lockContactForm(options) {
-    var form = document.querySelector('form[name="contact"]');
+  function lockReservationRequestForm(options) {
+    var form = getReservationRequestForm();
     if (!form) return;
 
-    var btn = document.getElementById("contact-submit") || form.querySelector('button[type="submit"]');
-    if (btn) btn.disabled = true;
+    var submitButton =
+      document.getElementById("contact-submit") ||
+      form.querySelector('button[type="submit"]');
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.setAttribute("aria-disabled", "true");
+    }
 
     form.setAttribute("aria-busy", "true");
     form.dataset.submitted = "1";
 
     if (options && options.showStatus) {
-      var el = document.getElementById("contact-status");
-      if (el) el.hidden = false;
+      var status = document.getElementById("contact-status");
+      if (status) {
+        status.hidden = false;
+      }
     }
   }
 
   applyWc2026Prefill();
 
-  // 1) Prevent double submit (no extra deps, no copy changes)
   (function bindSubmitLock() {
     try {
-      var form = document.querySelector('form[name="contact"]');
+      var form = getReservationRequestForm();
       if (!form) return;
 
       form.addEventListener(
         "submit",
         function () {
           if (form.dataset.submitted === "1") return;
-          lockContactForm({ showStatus: false });
+          lockReservationRequestForm({ showStatus: false });
         },
         { passive: true }
       );
@@ -82,11 +112,10 @@
     }
   })();
 
-  // 2) Show success status on return and keep submit disabled to avoid re-sends on refresh/back
   try {
-    var params = new URLSearchParams(window.location.search || "");
+    var params = new window.URLSearchParams(window.location.search || "");
     if (params.get("lead") === "ok") {
-      lockContactForm({ showStatus: true });
+      lockReservationRequestForm({ showStatus: true });
 
       params.delete("lead");
       var cleanQuery = params.toString();
@@ -94,9 +123,10 @@
         window.location.pathname +
         (cleanQuery ? "?" + cleanQuery : "") +
         window.location.hash;
+
       window.history.replaceState({}, "", cleanUrl);
     }
   } catch (e) {
     // no-op
   }
-})();
+})(window, document);

@@ -6,7 +6,7 @@
     "title": "Every journey, handled with comfort, discretion and precision from the very first mile.",
     "subtitle": "Carefully selected drivers. Premium electric vehicles.\nA solid, reliable standard for those who do not improvise their mobility in Mexico City.",
     "cta": "Request service",
-    "note": "Service available from March 2026"
+    "note": "Service requests are subject to operational review and manual confirmation."
   },
   "local": {
     "title": "Mexico City, mobility at a higher standard.",
@@ -42,18 +42,36 @@
       "desc": "Real space for people, luggage and working on the move.",
       "note": "Built for trips involving guests or multiple operational needs."
     },
-    "operational": "Vehicle selection and pricing will be confirmed with assisted support until the March launch."
+    "operational": "Vehicle selection and service conditions are confirmed with assisted support based on the requested trip."
   },
   "contact": {
-    "title": "Stay informed.",
-    "subtitle": "Planned launch in March 2026.",
-    "name": "Name",
-    "email": "Email",
+    "title": "Request your transfer",
+    "subtitle": "Share the key details of your trip and we will contact you to confirm availability and next steps.",
+    "name": "Full name",
     "phone": "Phone",
-    "msg": "e.g. event in 2026, planned transfer…",
+    "email": "Email address",
+    "tripDate": "Transfer date",
+    "tripTime": "Transfer time",
+    "origin": "Origin",
+    "destination": "Destination",
+    "passengers": "Passengers",
+    "luggage": "Luggage",
+    "notes": "Transfer notes (flight, hotel, baby seat, additional details)",
     "submit": "Send request",
-    "footer": "Service available from March 2026 · We will contact you personally",
-    "statusSent": "Thank you. We have received your request and will contact you after reviewing it."
+    "statusSent": "Request sent. Thank you. We will review your trip and contact you as soon as possible.",
+    "validation": {
+      "formIncomplete": "Please review the form. Some required fields are missing or invalid.",
+      "nameRequired": "Please enter your full name.",
+      "phoneRequired": "Please enter a contact phone number.",
+      "emailRequired": "Please enter a valid email address.",
+      "tripDateRequired": "Please select the transfer date.",
+      "tripTimeRequired": "Please select the transfer time.",
+      "originRequired": "Please enter the trip origin.",
+      "destinationRequired": "Please enter the trip destination.",
+      "passengersRequired": "Please enter the number of passengers.",
+      "luggageRequired": "Please enter the number of luggage items."
+    },
+    "footer": "By submitting this form, you authorize us to use your data to respond to your request and organize your transfer."
   },
   "legal": {
     "tagline": "Dedicated fleet and in-house drivers.",
@@ -77,7 +95,7 @@
   },
   "notice": {
     "title": "Legal notice",
-    "body1": "This website is for informational purposes only and describes a service currently in the launch phase.",
+    "body1": "This website is for informational purposes only and allows service requests subject to operational review and manual confirmation.",
     "body2": "The information presented may change without prior notice depending on operational availability.",
     "ownerTitle": "Owner",
     "ownerBody": "Pixkuy Mobility S.A. de C.V.",
@@ -87,14 +105,14 @@
   },
   "privacy": {
     "title": "Privacy policy",
-    "body1": "Data provided through the form is used solely to manage your request.",
+    "body1": "Data provided through the form is used solely to manage your transfer request and the communications necessary to handle it.",
     "body2": "We do not share data with third parties for advertising purposes.",
     "purposeTitle": "Purpose",
-    "purposeBody": "To manage contact requests, keep information about the service launch, and handle related communications.",
+    "purposeBody": "To manage transfer or reservation requests, respond to related inquiries, and coordinate the communications necessary to provide the service.",
     "legalBasisTitle": "Legal basis",
     "legalBasisBody": "The consent given by the data subject when submitting the form.",
     "retentionTitle": "Data retention",
-    "retentionBody": "Data will be retained for as long as necessary to manage the request and communications related to the launch, unless a different legal obligation applies.",
+    "retentionBody": "Data will be retained for as long as necessary to manage the request and the related communications, unless a different legal obligation applies.",
     "rightsTitle": "Rights",
     "rightsBody": "You may request access, rectification or deletion in accordance with applicable regulations, using this website’s form.",
     "securityTitle": "Security",

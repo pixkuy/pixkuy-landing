@@ -6,7 +6,7 @@
     "title": "Ogni tragitto, con comfort, discrezione e precisione fin dal primo chilometro.",
     "subtitle": "Autisti selezionati con cura. Veicoli elettrici premium.\nUno standard coerente per chi non improvvisa la propria mobilità a Città del Messico.",
     "cta": "Richiedi il servizio",
-    "note": "Servizio disponibile da marzo 2026"
+    "note": "Le richieste di servizio sono soggette a verifica operativa e conferma manuale."
   },
   "local": {
     "title": "Città del Messico, mobilità di alto livello.",
@@ -42,18 +42,36 @@
       "desc": "Spazio reale per persone, bagagli e lavoro in movimento.",
       "note": "Progettata per viaggi con ospiti o esigenze operative multiple."
     },
-    "operational": "La scelta del veicolo e il prezzo sono confermati con supporto assistito fino al lancio di marzo."
+    "operational": "La scelta del veicolo e le condizioni del servizio sono confermate con supporto assistito in base al tragitto richiesto."
   },
   "contact": {
-    "title": "Rimani informato.",
-    "subtitle": "Lancio previsto per marzo 2026.",
-    "name": "Nome",
-    "email": "Email",
+    "title": "Richiedi il tuo trasferimento",
+    "subtitle": "Condividi i dettagli essenziali del tuo tragitto e ti contatteremo per confermare disponibilità e prossimi passi.",
+    "name": "Nome completo",
     "phone": "Telefono",
-    "msg": "Es. evento nel 2026, trasferimento pianificato…",
+    "email": "Indirizzo email",
+    "tripDate": "Data del trasferimento",
+    "tripTime": "Ora del trasferimento",
+    "origin": "Origine",
+    "destination": "Destinazione",
+    "passengers": "Passeggeri",
+    "luggage": "Bagagli",
+    "notes": "Note sul trasferimento (volo, hotel, seggiolino, dettagli aggiuntivi)",
     "submit": "Invia richiesta",
-    "footer": "Servizio disponibile da marzo 2026 · Ti contatteremo personalmente",
-    "statusSent": "Richiesta inviata."
+    "statusSent": "Richiesta inviata. Grazie. Esamineremo il tuo tragitto e ti contatteremo il prima possibile.",
+    "validation": {
+      "formIncomplete": "Controlla il modulo. Alcuni campi obbligatori sono mancanti o non validi.",
+      "nameRequired": "Indica il tuo nome completo.",
+      "phoneRequired": "Indica un numero di telefono di contatto.",
+      "emailRequired": "Indica un indirizzo email valido.",
+      "tripDateRequired": "Seleziona la data del trasferimento.",
+      "tripTimeRequired": "Seleziona l’ora del trasferimento.",
+      "originRequired": "Indica l’origine del tragitto.",
+      "destinationRequired": "Indica la destinazione del tragitto.",
+      "passengersRequired": "Indica il numero di passeggeri.",
+      "luggageRequired": "Indica il numero di bagagli."
+    },
+    "footer": "Inviando questo modulo, ci autorizzi a utilizzare i tuoi dati per rispondere alla tua richiesta e organizzare il tuo trasferimento."
   },
   "legal": {
     "tagline": "Flotta dedicata e autisti interni.",
@@ -77,7 +95,7 @@
   },
   "notice": {
     "title": "Note legali",
-    "body1": "Questo sito ha carattere informativo e descrive un servizio in fase di lancio.",
+    "body1": "Questo sito ha carattere informativo e consente di richiedere servizi soggetti a verifica operativa e conferma manuale.",
     "body2": "Le informazioni presentate possono variare senza preavviso in base alla disponibilità operativa.",
     "ownerTitle": "Titolare",
     "ownerBody": "Pixkuy Mobility S.A. de C.V.",
@@ -87,18 +105,18 @@
   },
   "privacy": {
     "title": "Informativa sulla privacy",
-    "body1": "I dati forniti tramite il modulo sono utilizzati esclusivamente per gestire la tua richiesta.",
+    "body1": "I dati forniti tramite il modulo sono utilizzati esclusivamente per gestire la tua richiesta di trasferimento e le comunicazioni necessarie per seguirla.",
     "body2": "Non condividiamo i dati con terze parti per finalità pubblicitarie.",
     "purposeTitle": "Finalità",
-    "purposeBody": "Gestire le richieste di contatto, mantenere informazioni sul lancio del servizio e trattare le comunicazioni correlate.",
+    "purposeBody": "Gestire richieste di trasferimento o prenotazione, rispondere alle relative richieste di informazioni e coordinare le comunicazioni necessarie per l’erogazione del servizio.",
     "legalBasisTitle": "Base giuridica",
     "legalBasisBody": "Il consenso dell’interessato al momento dell’invio del modulo.",
     "retentionTitle": "Conservazione",
-    "retentionBody": "I dati sono conservati per il tempo necessario a gestire la richiesta e le comunicazioni legate al lancio, salvo obblighi di legge differenti.",
+    "retentionBody": "I dati saranno conservati per il tempo necessario a gestire la richiesta e le comunicazioni correlate, salvo obblighi di legge differenti.",
     "rightsTitle": "Diritti",
-    "rightsBody": "È possibile richiedere accesso, rettifica o cancellazione dei dati, in conformità alla normativa vigente, utilizzando il modulo di questo sito.",
+    "rightsBody": "Puoi richiedere accesso, rettifica o cancellazione dei dati, in conformità alla normativa applicabile, utilizzando il modulo di questo sito.",
     "securityTitle": "Sicurezza",
-    "securityBody": "Sono applicate misure tecniche e organizzative ragionevoli per proteggere i dati da accessi non autorizzati.",
+    "securityBody": "Vengono applicate misure tecniche e organizzative ragionevoli per proteggere i dati da accessi non autorizzati.",
     "back": "Torna alla landing"
   },
   "cookies": {
