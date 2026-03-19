@@ -59,7 +59,7 @@
     "notes": "接送备注（航班、酒店、婴儿座椅、其他说明）",
     "submit": "发送请求",
     "statusSent": "请求已发送。谢谢。我们会审核您的行程并尽快与您联系。",
-    "validation": {
+        "validation": {
       "formIncomplete": "请检查表单。有必填项缺失或填写无效。",
       "nameRequired": "请输入您的姓名。",
       "phoneRequired": "请输入联系电话。",
@@ -68,8 +68,19 @@
       "tripTimeRequired": "请选择接送时间。",
       "originRequired": "请输入出发地。",
       "destinationRequired": "请输入目的地。",
+      "originDestinationDifferent": "出发地和目的地不能相同。",
+      "placeOutOfCoverage": "该地点不在当前服务范围内。",
+      "placeSelectionInvalid": "请选择列表中的有效地点，或手动输入服务范围内的地址。",
+      "placeLoadError": "当前无法加载地点建议。您可以手动输入地址。",
       "passengersRequired": "请输入乘客人数。",
       "luggageRequired": "请输入行李数量。"
+    },
+	"places": {
+      "loading": "正在搜索地点…",
+      "noResults": "未找到结果。",
+      "manualFallback": "您可以手动输入地址。",
+      "outOfCoverage": "地点超出服务范围",
+      "selectionHint": "请选择一个建议项以更快完成输入。"
     },
     "footer": "提交此表单即表示您授权我们使用您的数据来回复您的请求并安排您的接送服务。"
   },

@@ -68,8 +68,19 @@
       "tripTimeRequired": "Selecciona la hora del traslado.",
       "originRequired": "Indica el origen del trayecto.",
       "destinationRequired": "Indica el destino del trayecto.",
+      "originDestinationDifferent": "El origen y el destino no pueden ser iguales.",
+      "placeOutOfCoverage": "Esta ubicación está fuera de la cobertura operativa actual.",
+      "placeSelectionInvalid": "Selecciona una ubicación válida de la lista o escribe una dirección dentro de cobertura.",
+      "placeLoadError": "No hemos podido cargar las sugerencias ahora mismo. Puedes escribir la dirección manualmente.",
       "passengersRequired": "Indica el número de pasajeros.",
       "luggageRequired": "Indica el número de maletas."
+    },
+    "places": {
+      "loading": "Buscando ubicaciones…",
+      "noResults": "No hemos encontrado resultados.",
+      "manualFallback": "Puedes escribir la dirección manualmente.",
+      "outOfCoverage": "Ubicación fuera de cobertura",
+      "selectionHint": "Selecciona una sugerencia para completar más rápido."
     },
     "footer": "Al enviar este formulario, nos autorizas a usar tus datos para responder a tu solicitud y organizar tu traslado."
   },

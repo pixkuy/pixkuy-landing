@@ -68,8 +68,19 @@
       "tripTimeRequired": "Please select the transfer time.",
       "originRequired": "Please enter the trip origin.",
       "destinationRequired": "Please enter the trip destination.",
+      "originDestinationDifferent": "Origin and destination cannot be the same.",
+      "placeOutOfCoverage": "This location is outside the current operating coverage.",
+      "placeSelectionInvalid": "Please select a valid location from the list or enter an address within coverage.",
+      "placeLoadError": "We could not load suggestions right now. You can enter the address manually.",
       "passengersRequired": "Please enter the number of passengers.",
       "luggageRequired": "Please enter the number of luggage items."
+    },
+	    "places": {
+      "loading": "Searching locations…",
+      "noResults": "No results found.",
+      "manualFallback": "You can enter the address manually.",
+      "outOfCoverage": "Location outside coverage",
+      "selectionHint": "Select a suggestion to complete it faster."
     },
     "footer": "By submitting this form, you authorize us to use your data to respond to your request and organize your transfer."
   },

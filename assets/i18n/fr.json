@@ -68,8 +68,19 @@
       "tripTimeRequired": "Veuillez sélectionner l’heure du transfert.",
       "originRequired": "Veuillez indiquer l’origine du trajet.",
       "destinationRequired": "Veuillez indiquer la destination du trajet.",
+      "originDestinationDifferent": "L’origine et la destination ne peuvent pas être identiques.",
+      "placeOutOfCoverage": "Ce lieu se trouve en dehors de la zone de couverture actuelle.",
+      "placeSelectionInvalid": "Veuillez sélectionner un lieu valide dans la liste ou saisir manuellement une adresse située dans la zone couverte.",
+      "placeLoadError": "Nous n’avons pas pu charger les suggestions pour le moment. Vous pouvez saisir l’adresse manuellement.",
       "passengersRequired": "Veuillez indiquer le nombre de passagers.",
       "luggageRequired": "Veuillez indiquer le nombre de bagages."
+    },
+	    "places": {
+      "loading": "Recherche des lieux…",
+      "noResults": "Aucun résultat trouvé.",
+      "manualFallback": "Vous pouvez saisir l’adresse manuellement.",
+      "outOfCoverage": "Lieu hors zone couverte",
+      "selectionHint": "Sélectionnez une suggestion pour compléter plus rapidement."
     },
     "footer": "En envoyant ce formulaire, vous nous autorisez à utiliser vos données pour répondre à votre demande et organiser votre transfert."
   },

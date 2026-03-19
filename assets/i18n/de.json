@@ -68,8 +68,19 @@
       "tripTimeRequired": "Bitte wählen Sie die Transferzeit aus.",
       "originRequired": "Bitte geben Sie den Abholort an.",
       "destinationRequired": "Bitte geben Sie den Zielort an.",
+      "originDestinationDifferent": "Abholort und Zielort dürfen nicht identisch sein.",
+      "placeOutOfCoverage": "Dieser Ort liegt außerhalb des aktuellen Einsatzgebiets.",
+      "placeSelectionInvalid": "Bitte wählen Sie einen gültigen Ort aus der Liste oder geben Sie eine Adresse innerhalb des Einsatzgebiets manuell ein.",
+      "placeLoadError": "Die Vorschläge konnten momentan nicht geladen werden. Sie können die Adresse manuell eingeben.",
       "passengersRequired": "Bitte geben Sie die Anzahl der Passagiere an.",
       "luggageRequired": "Bitte geben Sie die Anzahl der Gepäckstücke an."
+    },
+	    "places": {
+      "loading": "Orte werden gesucht…",
+      "noResults": "Keine Ergebnisse gefunden.",
+      "manualFallback": "Sie können die Adresse manuell eingeben.",
+      "outOfCoverage": "Ort außerhalb des Einsatzgebiets",
+      "selectionHint": "Wählen Sie einen Vorschlag aus, um die Eingabe schneller abzuschließen."
     },
     "footer": "Mit dem Absenden dieses Formulars erlauben Sie uns, Ihre Daten zu verwenden, um auf Ihre Anfrage zu antworten und Ihren Transfer zu organisieren."
   },

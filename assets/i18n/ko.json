@@ -59,7 +59,7 @@
     "notes": "이동 관련 메모 (항공편, 호텔, 유아용 카시트, 추가 정보)",
     "submit": "요청 보내기",
     "statusSent": "요청이 전송되었습니다. 감사합니다. 여정을 검토한 후 가능한 한 빨리 연락드리겠습니다.",
-    "validation": {
+        "validation": {
       "formIncomplete": "양식을 확인해 주세요. 필수 입력 항목이 비어 있거나 올바르지 않습니다.",
       "nameRequired": "성명을 입력해 주세요.",
       "phoneRequired": "연락 가능한 전화번호를 입력해 주세요.",
@@ -68,8 +68,19 @@
       "tripTimeRequired": "이동 시간을 선택해 주세요.",
       "originRequired": "출발지를 입력해 주세요.",
       "destinationRequired": "도착지를 입력해 주세요.",
+      "originDestinationDifferent": "출발지와 도착지는 같을 수 없습니다.",
+      "placeOutOfCoverage": "이 위치는 현재 운영 범위 밖에 있습니다.",
+      "placeSelectionInvalid": "목록에서 유효한 위치를 선택하거나 운영 범위 내 주소를 직접 입력해 주세요.",
+      "placeLoadError": "현재 추천 위치를 불러올 수 없습니다. 주소를 직접 입력해 주세요.",
       "passengersRequired": "승객 수를 입력해 주세요.",
       "luggageRequired": "수하물 수를 입력해 주세요."
+    },
+	    "places": {
+      "loading": "장소를 검색하는 중…",
+      "noResults": "검색 결과가 없습니다.",
+      "manualFallback": "주소를 직접 입력할 수 있습니다.",
+      "outOfCoverage": "운영 범위 밖의 위치",
+      "selectionHint": "더 빠르게 입력을 완료하려면 추천 항목을 선택해 주세요."
     },
     "footer": "이 양식을 제출함으로써, 귀하의 요청에 응답하고 이동을 준비하기 위해 귀하의 데이터를 사용하는 것에 동의하게 됩니다."
   },

@@ -15,8 +15,17 @@
       email: form.querySelector('input[name="email"]'),
       tripDate: form.querySelector('input[name="trip_date"]'),
       tripTime: form.querySelector('input[name="trip_time"]'),
-      origin: form.querySelector('input[name="origin"]'),
+           origin: form.querySelector('input[name="origin"]'),
       destination: form.querySelector('input[name="destination"]'),
+
+      originPlaceId: form.querySelector('input[name="origin_place_id"]'),
+      originLat: form.querySelector('input[name="origin_lat"]'),
+      originLng: form.querySelector('input[name="origin_lng"]'),
+
+      destinationPlaceId: form.querySelector('input[name="destination_place_id"]'),
+      destinationLat: form.querySelector('input[name="destination_lat"]'),
+      destinationLng: form.querySelector('input[name="destination_lng"]'),
+
       passengers: form.querySelector('input[name="passengers"]'),
       luggage: form.querySelector('input[name="luggage"]'),
       message: form.querySelector('textarea[name="message"]'),
@@ -65,6 +74,135 @@
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
+  
+    function normalizeLocationComparisonValue(value) {
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, ' ');
+  }
+
+  function areSameLocations(originValue, destinationValue) {
+    var normalizedOrigin = normalizeLocationComparisonValue(originValue);
+    var normalizedDestination = normalizeLocationComparisonValue(destinationValue);
+
+    if (!normalizedOrigin || !normalizedDestination) {
+      return false;
+    }
+
+    return normalizedOrigin === normalizedDestination;
+  }
+  
+    function padDateTimePart(value) {
+    return String(value).padStart(2, '0');
+  }
+
+  function formatDateForInput(date) {
+    return [
+      date.getFullYear(),
+      padDateTimePart(date.getMonth() + 1),
+      padDateTimePart(date.getDate())
+    ].join('-');
+  }
+
+  function formatTimeForInput(date) {
+    return [
+      padDateTimePart(date.getHours()),
+      padDateTimePart(date.getMinutes())
+    ].join(':');
+  }
+
+  function getReservationMinimumDateTime() {
+    return new Date(Date.now() + (24 * 60 * 60 * 1000));
+  }
+
+  function parseReservationDateTime(dateValue, timeValue) {
+    var parts;
+    var timeParts;
+    var year;
+    var month;
+    var day;
+    var hours;
+    var minutes;
+    var candidate;
+
+    if (!dateValue || !timeValue) {
+      return null;
+    }
+
+    parts = dateValue.split('-');
+    timeParts = timeValue.split(':');
+
+    if (parts.length !== 3 || timeParts.length < 2) {
+      return null;
+    }
+
+    year = Number(parts[0]);
+    month = Number(parts[1]);
+    day = Number(parts[2]);
+    hours = Number(timeParts[0]);
+    minutes = Number(timeParts[1]);
+
+    if (
+      !Number.isFinite(year) ||
+      !Number.isFinite(month) ||
+      !Number.isFinite(day) ||
+      !Number.isFinite(hours) ||
+      !Number.isFinite(minutes)
+    ) {
+      return null;
+    }
+
+    candidate = new Date(year, month - 1, day, hours, minutes, 0, 0);
+
+    if (Number.isNaN(candidate.getTime())) {
+      return null;
+    }
+
+    return candidate;
+  }
+
+  function isReservationDateTimeAtLeast24HoursAhead(dateValue, timeValue) {
+    var candidate;
+    var minimum;
+
+    candidate = parseReservationDateTime(dateValue, timeValue);
+
+    if (!candidate) {
+      return false;
+    }
+
+    minimum = getReservationMinimumDateTime();
+    return candidate.getTime() >= minimum.getTime();
+  }
+
+  function syncReservationDateTimeMinimum(fields) {
+    var minimum;
+    var minimumDate;
+    var minimumTime;
+    var selectedDate;
+
+    if (!fields || !fields.tripDate || !fields.tripTime) {
+      return false;
+    }
+
+    minimum = getReservationMinimumDateTime();
+    minimumDate = formatDateForInput(minimum);
+    minimumTime = formatTimeForInput(minimum);
+    selectedDate = getTrimmedValue(fields.tripDate);
+
+    fields.tripDate.setAttribute('min', minimumDate);
+
+    if (selectedDate === minimumDate) {
+      fields.tripTime.setAttribute('min', minimumTime);
+    } else {
+      fields.tripTime.removeAttribute('min');
+    }
+
+    return true;
+  }
 
   function getReservationRequestData(fields) {
     if (!hasCriticalFields(fields)) {
@@ -76,9 +214,18 @@
       phone: getTrimmedValue(fields.phone),
       email: getTrimmedValue(fields.email),
       tripDate: getTrimmedValue(fields.tripDate),
-      tripTime: getTrimmedValue(fields.tripTime),
+           tripTime: getTrimmedValue(fields.tripTime),
       origin: getTrimmedValue(fields.origin),
       destination: getTrimmedValue(fields.destination),
+
+      originPlaceId: fields.originPlaceId ? getTrimmedValue(fields.originPlaceId) : '',
+      originLat: fields.originLat ? getTrimmedValue(fields.originLat) : '',
+      originLng: fields.originLng ? getTrimmedValue(fields.originLng) : '',
+
+      destinationPlaceId: fields.destinationPlaceId ? getTrimmedValue(fields.destinationPlaceId) : '',
+      destinationLat: fields.destinationLat ? getTrimmedValue(fields.destinationLat) : '',
+      destinationLng: fields.destinationLng ? getTrimmedValue(fields.destinationLng) : '',
+
       passengers: getTrimmedValue(fields.passengers),
       luggage: getTrimmedValue(fields.luggage),
       notes: getTrimmedValue(fields.message),
@@ -220,14 +367,14 @@
 
     data = getReservationRequestData(fields);
 
-    validity = {
+     validity = {
       name: Boolean(data.name),
       phone: Boolean(data.phone),
       email: Boolean(data.email) && isValidEmail(data.email),
-      trip_date: Boolean(data.tripDate),
-      trip_time: Boolean(data.tripTime),
-      origin: Boolean(data.origin),
-      destination: Boolean(data.destination),
+      trip_date: Boolean(data.tripDate) && Boolean(data.tripTime) && isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime),
+      trip_time: Boolean(data.tripTime) && Boolean(data.tripDate) && isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime),
+      origin: Boolean(data.origin) && !areSameLocations(data.origin, data.destination),
+      destination: Boolean(data.destination) && !areSameLocations(data.origin, data.destination),
       passengers: isPositiveInteger(data.passengers),
       luggage: isZeroOrPositiveInteger(data.luggage)
     };
@@ -246,7 +393,7 @@
     return validity[fieldName];
   }
 
-  function hasValidationErrors(validity) {
+    function hasValidationErrors(validity) {
     var key;
 
     if (!validity) return true;
@@ -258,6 +405,71 @@
     }
 
     return false;
+  }
+
+  function getFieldRefByValidationName(fields, fieldName) {
+    if (!fields) {
+      return null;
+    }
+
+    switch (fieldName) {
+      case 'name':
+        return fields.name;
+      case 'phone':
+        return fields.phone;
+      case 'email':
+        return fields.email;
+      case 'trip_date':
+        return fields.tripDate;
+      case 'trip_time':
+        return fields.tripTime;
+      case 'origin':
+        return fields.origin;
+      case 'destination':
+        return fields.destination;
+      case 'passengers':
+        return fields.passengers;
+      case 'luggage':
+        return fields.luggage;
+      default:
+        return null;
+    }
+  }
+
+  function getRelatedValidationFieldNames(fieldName) {
+    switch (fieldName) {
+      case 'trip_date':
+      case 'trip_time':
+        return ['trip_date', 'trip_time'];
+      case 'origin':
+      case 'destination':
+        return ['origin', 'destination'];
+      default:
+        return [fieldName];
+    }
+  }
+
+  function applyPartialValidationState(fields, validity, fieldNames) {
+    var i;
+    var currentFieldName;
+    var currentField;
+
+    if (!hasCriticalFields(fields) || !validity || !Array.isArray(fieldNames) || !fieldNames.length) {
+      return false;
+    }
+
+    for (i = 0; i < fieldNames.length; i += 1) {
+      currentFieldName = fieldNames[i];
+
+      if (!Object.prototype.hasOwnProperty.call(validity, currentFieldName)) {
+        continue;
+      }
+
+      currentField = getFieldRefByValidationName(fields, currentFieldName);
+      setFieldValidity(currentField, currentFieldName, validity[currentFieldName]);
+    }
+
+    return true;
   }
 
   function applyValidationState(fields, validity) {
@@ -278,13 +490,15 @@
     return true;
   }
 
-  function syncReservationRequestState(fields) {
+    function syncReservationRequestState(fields) {
     var data;
     var canAttemptSubmit;
 
     if (!hasCriticalFields(fields)) {
       return false;
     }
+
+    syncReservationDateTimeMinimum(fields);
 
     if (isFormLocked(fields.form)) {
       setSubmitEnabled(fields, false);
@@ -298,9 +512,12 @@
     return true;
   }
 
-  function refreshValidationUX(fields) {
+     function refreshValidationUX(fields, fieldName) {
     var validity;
     var hasErrors;
+    var relatedFieldNames;
+    var i;
+    var hasPartialErrors;
 
     if (!hasCriticalFields(fields)) {
       return false;
@@ -311,6 +528,24 @@
     }
 
     validity = validateReservationRequestFields(fields);
+
+    if (fieldName && typeof fieldName === 'string') {
+      relatedFieldNames = getRelatedValidationFieldNames(fieldName);
+      applyPartialValidationState(fields, validity, relatedFieldNames);
+      syncReservationRequestState(fields);
+
+      hasPartialErrors = false;
+
+      for (i = 0; i < relatedFieldNames.length; i += 1) {
+        if (Object.prototype.hasOwnProperty.call(validity, relatedFieldNames[i]) && !validity[relatedFieldNames[i]]) {
+          hasPartialErrors = true;
+          break;
+        }
+      }
+
+      return !hasPartialErrors;
+    }
+
     hasErrors = hasValidationErrors(validity);
 
     applyValidationState(fields, validity);
@@ -376,34 +611,35 @@
 
       if (!field) continue;
 
-      field.addEventListener('input', (function (currentField, currentFieldName) {
+       field.addEventListener('input', (function (currentField, currentFieldName) {
         return function () {
           clearFieldValidationOnInput(currentField, currentFieldName);
           hideGlobalFormError(fields);
+
+          if (currentFieldName === 'trip_date' || currentFieldName === 'trip_time') {
+            syncReservationDateTimeMinimum(fields);
+          }
+
           syncReservationRequestState(fields);
         };
       })(field, fieldName));
 
-      field.addEventListener('change', (function (currentField, currentFieldName) {
+           field.addEventListener('change', (function (currentField, currentFieldName) {
         return function () {
           clearFieldValidationOnInput(currentField, currentFieldName);
           hideGlobalFormError(fields);
+
+          if (currentFieldName === 'trip_date' || currentFieldName === 'trip_time') {
+            syncReservationDateTimeMinimum(fields);
+          }
+
           syncReservationRequestState(fields);
         };
       })(field, fieldName));
 
       field.addEventListener('blur', (function (currentFieldName, currentFields) {
         return function () {
-          var isValid = validateSingleField(currentFields, currentFieldName);
-          var currentField = this;
-
-          setFieldValidity(currentField, currentFieldName, isValid);
-
-          if (isValid) {
-            hideGlobalFormError(currentFields);
-          }
-
-          syncReservationRequestState(currentFields);
+          refreshValidationUX(currentFields, currentFieldName);
         };
       })(fieldName, fields));
     }
@@ -449,10 +685,11 @@
       return false;
     }
 
-    setReadyState(form);
+        setReadyState(form);
     setStatusHidden(fields);
     hideGlobalFormError(fields);
     resetAllFieldErrors(fields);
+    syncReservationDateTimeMinimum(fields);
     bindLiveState(fields);
     bindSubmitValidation(fields);
     syncReservationRequestState(fields);

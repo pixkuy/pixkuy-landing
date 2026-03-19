@@ -59,7 +59,7 @@
     "notes": "Note sul trasferimento (volo, hotel, seggiolino, dettagli aggiuntivi)",
     "submit": "Invia richiesta",
     "statusSent": "Richiesta inviata. Grazie. Esamineremo il tuo tragitto e ti contatteremo il prima possibile.",
-    "validation": {
+        "validation": {
       "formIncomplete": "Controlla il modulo. Alcuni campi obbligatori sono mancanti o non validi.",
       "nameRequired": "Indica il tuo nome completo.",
       "phoneRequired": "Indica un numero di telefono di contatto.",
@@ -68,8 +68,19 @@
       "tripTimeRequired": "Seleziona l’ora del trasferimento.",
       "originRequired": "Indica l’origine del tragitto.",
       "destinationRequired": "Indica la destinazione del tragitto.",
+      "originDestinationDifferent": "Origine e destinazione non possono coincidere.",
+      "placeOutOfCoverage": "Questa località è fuori dall’area operativa attuale.",
+      "placeSelectionInvalid": "Seleziona una località valida dall’elenco oppure inserisci manualmente un indirizzo all’interno dell’area coperta.",
+      "placeLoadError": "Al momento non siamo riusciti a caricare i suggerimenti. Puoi inserire l’indirizzo manualmente.",
       "passengersRequired": "Indica il numero di passeggeri.",
       "luggageRequired": "Indica il numero di bagagli."
+    },
+	    "places": {
+      "loading": "Ricerca località in corso…",
+      "noResults": "Nessun risultato trovato.",
+      "manualFallback": "Puoi inserire l’indirizzo manualmente.",
+      "outOfCoverage": "Località fuori area operativa",
+      "selectionHint": "Seleziona un suggerimento per completare più velocemente."
     },
     "footer": "Inviando questo modulo, ci autorizzi a utilizzare i tuoi dati per rispondere alla tua richiesta e organizzare il tuo trasferimento."
   },
