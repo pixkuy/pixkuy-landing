@@ -18,13 +18,66 @@
     "origin": "Pixkuy tem origem no totonaco, uma das línguas indígenas do México. Significa “roadrunner”. Uma forma de nomear o essencial: o detalhe que sustenta. Essa mesma lógica define o padrão com o qual entendemos a nossa mobilidade."
   },
   "services": {
-    "title": "Nem todas as necessidades são iguais.",
-    "item1": "Transfers privados planeados.",
-    "item2": "Serviços por hora ou por vários dias, com cobertura contínua.",
-    "item3": "Eventos e ocasiões que exigem precisão.",
-    "item4": "Deslocações de curta distância sem fricções logísticas.",
-    "bridge": "A Pixkuy foi pensada para quem valoriza planeamento, discrição e um padrão estável de serviço."
+  "title": "Nem todas as necessidades são iguais.",
+  "cards": {
+    "airport": {
+      "title": "Aeroporto e hotel",
+      "text": "Transfers planeados para chegadas e partidas, com uma experiência clara e cuidada.",
+      "bullets": [
+        "Reserva antecipada",
+        "Acompanhamento",
+        "Suporte humano"
+      ],
+      "priceLabel": "Preço desde",
+      "priceValue": "1.200 MXN"
+    },
+    "tours": {
+      "title": "Tours e visitas privadas",
+      "text": "Percursos privados para lugares emblemáticos e planos à medida com motorista dedicado.",
+      "bullets": [
+        "Itinerário flexível",
+        "Espera incluída",
+        "Atenção personalizada"
+      ],
+      "priceLabel": "Preço à medida",
+      "priceValue": "Conforme o itinerário"
+    },
+    "hourly": {
+      "title": "À hora ou ao dia",
+      "text": "Um serviço flexível para agendas, reuniões e deslocações com várias paragens.",
+      "bullets": [
+        "Disponibilidade flexível",
+        "Várias paragens",
+        "Continuidade"
+      ],
+      "priceLabel": "Preço desde",
+      "priceValue": "1.450 MXN / hora"
+    },
+    "events": {
+      "title": "Eventos e ocasiões especiais",
+      "text": "Quando o transfer acompanha uma ocasião importante e precisa de estar à altura do momento.",
+      "bullets": [
+        "Planeamento",
+        "Pontualidade",
+        "Discrição"
+      ],
+      "priceLabel": "Conforme o planeamento",
+      "priceValue": "Serviço personalizado"
+    },
+    "direct": {
+      "title": "Transfers diretos",
+      "text": "Um trajeto claro entre dois pontos com o mesmo padrão de serviço porta a porta.",
+      "bullets": [
+        "Conforto",
+        "Antecipação",
+        "Clareza"
+      ],
+      "priceLabel": "Preço à medida",
+      "priceValue": "Conforme o percurso"
+    }
   },
+  "bridge": "A Pixkuy foi pensada para quem valoriza planeamento, discrição e um padrão estável de serviço."
+},
   "fleet": {
     "intro": {
       "title": "A experiência Pixkuy também é definida pelo veículo.",

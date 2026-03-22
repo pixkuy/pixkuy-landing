@@ -18,13 +18,66 @@
     "origin": "Pixkuy prende il nome dal totonaco, una delle lingue originarie del Messico. Significa “roadrunner”. Un modo di nominare l’essenziale: il dettaglio che sostiene. Questa stessa logica definisce lo standard attraverso cui intendiamo la nostra mobilità."
   },
   "services": {
-    "title": "Non tutte le esigenze sono uguali.",
-    "item1": "Trasferimenti privati pianificati.",
-    "item2": "Servizi a ore o su più giorni, con copertura continua.",
-    "item3": "Eventi e situazioni che richiedono precisione.",
-    "item4": "Spostamenti di breve distanza senza frizioni logistiche.",
-    "bridge": "Pixkuy è pensato per chi valorizza la pianificazione, la discrezione e uno standard di servizio stabile."
+  "title": "Non tutte le esigenze sono uguali.",
+  "cards": {
+    "airport": {
+      "title": "Aeroporto e hotel",
+      "text": "Trasferimenti programmati per arrivi e partenze, con un’esperienza chiara e curata.",
+      "bullets": [
+        "Prenotazione anticipata",
+        "Monitoraggio",
+        "Supporto umano"
+      ],
+      "priceLabel": "Prezzo da",
+      "priceValue": "1.200 MXN"
+    },
+    "tours": {
+      "title": "Tour e visite private",
+      "text": "Percorsi privati verso luoghi emblematici e programmi su misura con autista dedicato.",
+      "bullets": [
+        "Itinerario flessibile",
+        "Attesa inclusa",
+        "Assistenza personalizzata"
+      ],
+      "priceLabel": "Prezzo su misura",
+      "priceValue": "Secondo l’itinerario"
+    },
+    "hourly": {
+      "title": "A ore o a giornata",
+      "text": "Un servizio flessibile per agende, riunioni e spostamenti con più fermate.",
+      "bullets": [
+        "Disponibilità flessibile",
+        "Più fermate",
+        "Continuità"
+      ],
+      "priceLabel": "Prezzo da",
+      "priceValue": "1.450 MXN / ora"
+    },
+    "events": {
+      "title": "Eventi e occasioni speciali",
+      "text": "Quando il trasferimento accompagna un’occasione importante e deve essere all’altezza del momento.",
+      "bullets": [
+        "Pianificazione",
+        "Puntualità",
+        "Discrezione"
+      ],
+      "priceLabel": "Secondo la pianificazione",
+      "priceValue": "Servizio personalizzato"
+    },
+    "direct": {
+      "title": "Trasferimenti diretti",
+      "text": "Un tragitto chiaro tra due punti con lo stesso standard di servizio porta a porta.",
+      "bullets": [
+        "Comfort",
+        "Anticipazione",
+        "Chiarezza"
+      ],
+      "priceLabel": "Prezzo su misura",
+      "priceValue": "Secondo il percorso"
+    }
   },
+  "bridge": "Pixkuy è pensato per chi valorizza la pianificazione, la discrezione e uno standard di servizio stabile."
+},
   "fleet": {
     "intro": {
       "title": "L’esperienza Pixkuy è definita anche dal veicolo.",

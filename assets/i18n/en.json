@@ -18,13 +18,66 @@
     "origin": "Pixkuy takes its name from Totonac, one of Mexico’s indigenous languages. It means “roadrunner”. A way of naming what is essential: the detail that sustains. That same logic defines the standard through which we understand mobility."
   },
   "services": {
-    "title": "Not every need is the same.",
-    "item1": "Planned private transfers.",
-    "item2": "Hourly or multi-day services with continuous coverage.",
-    "item3": "Events and occasions that require precision.",
-    "item4": "Short getaways without logistical friction.",
-    "bridge": "Pixkuy is built for those who value planning, discretion and a stable service standard."
+  "title": "Not every need is the same.",
+  "cards": {
+    "airport": {
+      "title": "Airport and hotel",
+      "text": "Planned transfers for arrivals and departures with a clear and carefully handled experience.",
+      "bullets": [
+        "Advance booking",
+        "Follow-up",
+        "Human support"
+      ],
+      "priceLabel": "Price from",
+      "priceValue": "1.200 MXN"
+    },
+    "tours": {
+      "title": "Private tours and visits",
+      "text": "Private journeys to emblematic places and tailored plans with a dedicated chauffeur.",
+      "bullets": [
+        "Flexible itinerary",
+        "Waiting time included",
+        "Personalised attention"
+      ],
+      "priceLabel": "Tailored pricing",
+      "priceValue": "According to itinerary"
+    },
+    "hourly": {
+      "title": "By the hour or by the day",
+      "text": "A flexible service for schedules, meetings and journeys with multiple stops.",
+      "bullets": [
+        "Flexible availability",
+        "Multiple stops",
+        "Continuity"
+      ],
+      "priceLabel": "Price from",
+      "priceValue": "1.450 MXN / hour"
+    },
+    "events": {
+      "title": "Events and special occasions",
+      "text": "When the transfer accompanies an important occasion and needs to match the moment.",
+      "bullets": [
+        "Planning",
+        "Punctuality",
+        "Discretion"
+      ],
+      "priceLabel": "According to planning",
+      "priceValue": "Personalised service"
+    },
+    "direct": {
+      "title": "Direct transfers",
+      "text": "A clear journey between two points with the same door-to-door service standard.",
+      "bullets": [
+        "Comfort",
+        "Anticipation",
+        "Clarity"
+      ],
+      "priceLabel": "Tailored pricing",
+      "priceValue": "According to route"
+    }
   },
+  "bridge": "Pixkuy is built for those who value planning, discretion and a stable service standard."
+},
   "fleet": {
     "intro": {
       "title": "The Pixkuy experience is also defined by the vehicle.",
