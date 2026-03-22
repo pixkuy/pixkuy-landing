@@ -58,6 +58,9 @@
     "luggage": "Gepäck",
     "notes": "Hinweise zum Transfer (Flug, Hotel, Kindersitz, zusätzliche Details)",
     "submit": "Anfrage senden",
+    "whatsappEyebrow": "Direkter Kontakt",
+    "whatsappCta": "Per WhatsApp chatten",
+    "whatsappNote": "Sprechen Sie mit einem Mitglied unseres Teams und setzen Sie Ihre Anfrage über WhatsApp fort.",
     "statusSent": "Anfrage gesendet. Vielen Dank. Wir prüfen Ihre Fahrt und kontaktieren Sie so bald wie möglich.",
     "validation": {
       "formIncomplete": "Bitte prüfen Sie das Formular. Einige Pflichtfelder fehlen oder sind ungültig.",
@@ -72,16 +75,30 @@
       "placeOutOfCoverage": "Dieser Ort liegt außerhalb des aktuellen Einsatzgebiets.",
       "placeSelectionInvalid": "Bitte wählen Sie einen gültigen Ort aus der Liste oder geben Sie eine Adresse innerhalb des Einsatzgebiets manuell ein.",
       "placeLoadError": "Die Vorschläge konnten momentan nicht geladen werden. Sie können die Adresse manuell eingeben.",
-      "passengersRequired": "Bitte geben Sie die Anzahl der Passagiere an.",
+      "passengersRequired": "Bitte geben Sie zwischen 1 und 6 Passagiere an.",
       "luggageRequired": "Bitte geben Sie die Anzahl der Gepäckstücke an."
+        },
+    "whatsappMessage": {
+      "intro": "Hallo, ich möchte einen Transfer mit Pixkuy anfragen.",
+      "name": "Name",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "tripDate": "Transferdatum",
+      "tripTime": "Transferzeit",
+      "origin": "Abholort",
+      "destination": "Zielort",
+      "passengers": "Passagiere",
+      "luggage": "Gepäck",
+      "notes": "Hinweise"
     },
-	    "places": {
+    "places": {
       "loading": "Orte werden gesucht…",
       "noResults": "Keine Ergebnisse gefunden.",
       "manualFallback": "Sie können die Adresse manuell eingeben.",
       "outOfCoverage": "Ort außerhalb des Einsatzgebiets",
       "selectionHint": "Wählen Sie einen Vorschlag aus, um die Eingabe schneller abzuschließen."
     },
+	
     "footer": "Mit dem Absenden dieses Formulars erlauben Sie uns, Ihre Daten zu verwenden, um auf Ihre Anfrage zu antworten und Ihren Transfer zu organisieren."
   },
   "legal": {

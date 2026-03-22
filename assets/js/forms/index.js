@@ -14,6 +14,19 @@
     }
   }
 
+  function logPlacesBoot() {}
+  
+  function bootWhatsappHandoff() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initWhatsappHandoff,
+      'initWhatsappHandoff'
+    );
+  }
+
   function bootReservationRequestForm() {
     if (!window.PixkuyForms) {
       return false;
@@ -24,7 +37,7 @@
       'initReservationRequestForm'
     );
   }
-
+  
   function getDocumentLanguage() {
     var language = document.documentElement && document.documentElement.lang;
 
@@ -61,6 +74,32 @@
     };
   }
 
+  function focusFormField(form, fieldName) {
+    var nextElements;
+    var nextInput;
+
+    nextElements = getPlaceFieldElements(form, fieldName);
+    nextInput = nextElements && nextElements.input;
+
+    if (!nextInput && form && fieldName) {
+      nextInput = form.querySelector('[name="' + fieldName + '"]');
+    }
+
+    if (!nextInput || typeof nextInput.focus !== 'function') {
+      return false;
+    }
+
+    window.setTimeout(function () {
+      nextInput.focus();
+
+      if (typeof nextInput.select === 'function') {
+        nextInput.select();
+      }
+    }, 0);
+
+    return true;
+  }
+
   function bootGooglePlacesField(form, fieldName, language) {
     var formsNamespace;
     var googlePlacesApi;
@@ -87,7 +126,21 @@
         hiddenFields: elements.hiddenFields,
         language: normalizeGoogleLanguage(language),
         region: 'mx',
-        includedRegionCodes: ['mx']
+        includedRegionCodes: ['mx'],
+        onSelection: function onSelection(selectedPlace) {
+          if (!selectedPlace) {
+            return;
+          }
+
+          if (fieldName === 'origin') {
+            focusFormField(form, 'destination');
+            return;
+          }
+
+          if (fieldName === 'destination') {
+            focusFormField(form, 'passengers');
+          }
+        }
       });
 
       if (!formsNamespace.placeControllers) {
@@ -99,17 +152,31 @@
     }, 'bootGooglePlacesField:' + fieldName);
   }
 
-  function bootGooglePlacesOnFocusField(form, fieldName) {
+    function bootGooglePlacesOnFocusField(form, fieldName) {
   var formsNamespace;
   var elements;
   var input;
   var hasStarted;
   var detachFocusListener;
 
+  logPlacesBoot('field-bootstrap-start', {
+    fieldName: fieldName
+  });
+
   formsNamespace = window.PixkuyForms || {};
   elements = getPlaceFieldElements(form, fieldName);
 
+  logPlacesBoot('field-elements-resolved', {
+    fieldName: fieldName,
+    hasElements: Boolean(elements),
+    hasInput: Boolean(elements && elements.input),
+    hasMountNode: Boolean(elements && elements.mountNode)
+  });
+
   if (!elements || !elements.input || !elements.mountNode) {
+    logPlacesBoot('field-bootstrap-skip-missing-elements', {
+      fieldName: fieldName
+    });
     return false;
   }
 
@@ -127,7 +194,17 @@
   function startMount() {
     var liveLanguage;
 
+    logPlacesBoot('startMount-called', {
+      fieldName: fieldName,
+      hasStarted: hasStarted,
+      activeElementId: document.activeElement && document.activeElement.id ? document.activeElement.id : '',
+      activeElementTag: document.activeElement && document.activeElement.tagName ? document.activeElement.tagName : ''
+    });
+
     if (hasStarted) {
+      logPlacesBoot('startMount-skip-already-started', {
+        fieldName: fieldName
+      });
       return;
     }
 
@@ -135,10 +212,26 @@
     cleanupListeners();
 
     liveLanguage = getDocumentLanguage();
+
+    logPlacesBoot('startMount-bootGooglePlacesField', {
+      fieldName: fieldName,
+      liveLanguage: liveLanguage
+    });
+
     bootGooglePlacesField(form, fieldName, liveLanguage);
   }
 
-  input.addEventListener('focus', startMount, { once: true });
+  input.addEventListener('focus', function onPlaceFieldFocus() {
+    logPlacesBoot('input-focus-event', {
+      fieldName: fieldName,
+      value: input.value || ''
+    });
+    startMount();
+  }, { once: true });
+
+  logPlacesBoot('focus-listener-registered', {
+    fieldName: fieldName
+  });
 
   detachFocusListener = function detachFocusListenerFn() {
     input.removeEventListener('focus', startMount, { once: true });
@@ -158,14 +251,25 @@
   return true;
 }
 
-  function bootGooglePlacesOnFocus() {
+   function bootGooglePlacesOnFocus() {
   var form;
 
+  logPlacesBoot('bootGooglePlacesOnFocus-start', {
+    readyState: document.readyState,
+    hasPixkuyForms: Boolean(window.PixkuyForms),
+    hasGooglePlaces: Boolean(window.PixkuyForms && window.PixkuyForms.googlePlaces)
+  });
+
   if (!window.PixkuyForms || !window.PixkuyForms.googlePlaces) {
+    logPlacesBoot('bootGooglePlacesOnFocus-skip-missing-api', null);
     return false;
   }
 
   form = document.querySelector('form[name="contact"]');
+
+  logPlacesBoot('bootGooglePlacesOnFocus-form', {
+    hasForm: Boolean(form)
+  });
 
   if (!form) {
     return false;
@@ -177,9 +281,18 @@
   return true;
 }
 
-  function bootForms() {
+    function bootForms() {
+    logPlacesBoot('bootForms-start', {
+      readyState: document.readyState
+    });
+
     bootReservationRequestForm();
+    bootWhatsappHandoff();
     bootGooglePlacesOnFocus();
+
+    logPlacesBoot('bootForms-end', {
+      readyState: document.readyState
+    });
   }
 
   if (document.readyState === 'loading') {

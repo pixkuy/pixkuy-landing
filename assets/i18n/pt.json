@@ -48,7 +48,7 @@
     "title": "Solicite o seu transfer",
     "subtitle": "Partilhe os detalhes essenciais do seu trajeto e entraremos em contacto para confirmar disponibilidade e próximos passos.",
     "name": "Nome completo",
-    "phone": "Telefone",
+    "phone": "Telefone com prefixo internacional",
     "email": "Endereço de e-mail",
     "tripDate": "Data do transfer",
     "tripTime": "Hora do transfer",
@@ -58,11 +58,14 @@
     "luggage": "Bagagem",
     "notes": "Notas do transfer (voo, hotel, cadeira de bebé, detalhes adicionais)",
     "submit": "Enviar pedido",
+    "whatsappEyebrow": "Contacto direto",
+    "whatsappCta": "Conversar no WhatsApp",
+    "whatsappNote": "Fale com um membro da nossa equipa e continue o seu pedido pelo WhatsApp.",
     "statusSent": "Pedido enviado. Obrigado. Vamos rever o seu trajeto e entraremos em contacto o mais rapidamente possível.",
-        "validation": {
+    "validation": {
       "formIncomplete": "Reveja o formulário. Existem campos obrigatórios em falta ou inválidos.",
       "nameRequired": "Indique o seu nome completo.",
-      "phoneRequired": "Indique um telefone de contacto.",
+      "phoneRequired": "Indique um número de telefone válido em formato internacional completo (por exemplo, +34600000000).",
       "emailRequired": "Indique um endereço de e-mail válido.",
       "tripDateRequired": "Selecione a data do transfer.",
       "tripTimeRequired": "Selecione a hora do transfer.",
@@ -72,10 +75,23 @@
       "placeOutOfCoverage": "Este local está fora da área operacional atual.",
       "placeSelectionInvalid": "Selecione um local válido na lista ou introduza manualmente um endereço dentro da área coberta.",
       "placeLoadError": "Não foi possível carregar as sugestões neste momento. Pode introduzir o endereço manualmente.",
-      "passengersRequired": "Indique o número de passageiros.",
+      "passengersRequired": "Indique entre 1 e 6 passageiros.",
       "luggageRequired": "Indique o número de peças de bagagem."
     },
-	    "places": {
+    "whatsappMessage": {
+      "intro": "Olá, gostaria de solicitar um transfer com a Pixkuy.",
+      "name": "Nome",
+      "phone": "Telefone",
+      "email": "E-mail",
+      "tripDate": "Data do transfer",
+      "tripTime": "Hora do transfer",
+      "origin": "Origem",
+      "destination": "Destino",
+      "passengers": "Passageiros",
+      "luggage": "Bagagem",
+      "notes": "Notas"
+    },
+    "places": {
       "loading": "A procurar locais…",
       "noResults": "Nenhum resultado encontrado.",
       "manualFallback": "Pode introduzir o endereço manualmente.",

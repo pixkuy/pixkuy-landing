@@ -18,6 +18,24 @@
     'addressComponents',
     'types'
   ];
+  
+    function getCoverageApi() {
+    var namespace = window.PixkuyForms || {};
+    return namespace.coverage || null;
+  }
+
+   function getCoverageDecisionSafe(place, options) {
+    var resolvedCoverageApi = resolveCoverageApi(options);
+
+    if (!resolvedCoverageApi || !isFunction(resolvedCoverageApi.getCoverageDecision)) {
+      throw new Error('Coverage API is not available.');
+    }
+
+    return resolvedCoverageApi.getCoverageDecision(place);
+  }
+  
+  function appendFacadeDebug() {}
+  
   var DEFAULT_LOCATION_RESTRICTION = {
   north: 21.2000,
   south: 18.8000,
@@ -315,11 +333,31 @@ if (placesLibraryPromise) {
     var name = getString(displayName);
     var address = getString(formattedAddress);
 
-    if (name && address && address.toLowerCase().indexOf(name.toLowerCase()) === -1) {
-      return name + ', ' + address;
+    if (name && address) {
+      if (address.toLowerCase().indexOf(name.toLowerCase()) === -1) {
+        return name + ', ' + address;
+      }
+
+      return address;
     }
 
-    return name || address;
+    return address || name;
+  }
+
+  function getVisibleSelectedPlaceLabel(place) {
+    var displayName = getString(place && place.displayName);
+    var formattedAddress = getString(place && place.formattedAddress);
+    var label = getString(place && place.label);
+
+    if (displayName && formattedAddress) {
+      if (formattedAddress.toLowerCase().indexOf(displayName.toLowerCase()) === -1) {
+        return displayName + ', ' + formattedAddress;
+      }
+
+      return formattedAddress;
+    }
+
+    return label || formattedAddress || displayName;
   }
 
   function normalizePlace(place, prediction) {
@@ -381,6 +419,64 @@ if (placesLibraryPromise) {
     };
   }
 
+    function adaptMobileAutocompleteSuggestion(rawSuggestion) {
+    var suggestion;
+    var placePrediction;
+    var structuredFormat;
+    var mainText;
+    var secondaryText;
+    var textValue;
+    var placeId;
+
+    suggestion = isObject(rawSuggestion) ? rawSuggestion : {};
+    placePrediction = isObject(suggestion.placePrediction) ? suggestion.placePrediction : suggestion;
+    structuredFormat = isObject(placePrediction.structuredFormat)
+      ? placePrediction.structuredFormat
+      : (isObject(placePrediction.structuredFormatting) ? placePrediction.structuredFormatting : {});
+
+    mainText = getString(
+      structuredFormat.mainText && structuredFormat.mainText.text
+        ? structuredFormat.mainText.text
+        : (structuredFormat.mainText || '')
+    );
+
+    secondaryText = getString(
+      structuredFormat.secondaryText && structuredFormat.secondaryText.text
+        ? structuredFormat.secondaryText.text
+        : (structuredFormat.secondaryText || '')
+    );
+
+    textValue = getString(
+      placePrediction.text && placePrediction.text.text
+        ? placePrediction.text.text
+        : (placePrediction.text || '')
+    );
+
+    placeId = getString(
+      placePrediction.placeId ||
+      suggestion.placeId ||
+      suggestion.id
+    );
+
+    return {
+      placePrediction: placePrediction,
+      placeId: placeId,
+      text: {
+        text: textValue || mainText
+      },
+      structuredFormat: {
+        mainText: {
+          text: mainText || textValue
+        },
+        secondaryText: {
+          text: secondaryText
+        }
+      },
+      displayName: mainText || textValue,
+      secondaryText: secondaryText
+    };
+  }
+  
   function writeHiddenValue(input, value) {
     if (!input) {
       return;
@@ -488,64 +584,68 @@ if (placesLibraryPromise) {
     input.value = widgetValue;
   }
   
-  function focusWidgetInnerInput(widget) {
-    var innerInput = null;
+    function shouldUseMobileAutocompleteStrategy() {
+    var hasCoarsePointer;
+    var hasTouchPoints;
+    var isNarrowViewport;
 
-    function collapseSelectionToEnd(targetInput) {
-      var end;
+    hasCoarsePointer = false;
+    hasTouchPoints = false;
+    isNarrowViewport = false;
 
-      if (!targetInput || typeof targetInput.value !== 'string' || !isFunction(targetInput.setSelectionRange)) {
-        return false;
-      }
-
-      try {
-        end = targetInput.value.length;
-        targetInput.setSelectionRange(end, end);
-        return true;
-      } catch (error) {
-        return false;
-      }
-    }
-
-    if (!widget) {
-      return false;
+    try {
+      hasCoarsePointer = Boolean(
+        window.matchMedia &&
+        window.matchMedia('(pointer: coarse)').matches
+      );
+    } catch (error) {
+      hasCoarsePointer = false;
     }
 
     try {
-      innerInput = widget.shadowRoot && widget.shadowRoot.querySelector('input');
+      hasTouchPoints = Boolean(
+        navigator &&
+        typeof navigator.maxTouchPoints === 'number' &&
+        navigator.maxTouchPoints > 0
+      );
     } catch (error) {
-      innerInput = null;
+      hasTouchPoints = false;
     }
 
-    if (innerInput && isFunction(innerInput.focus)) {
-      try {
-        innerInput.focus();
-        collapseSelectionToEnd(innerInput);
-
-        window.requestAnimationFrame(function () {
-          collapseSelectionToEnd(innerInput);
-
-          window.setTimeout(function () {
-            collapseSelectionToEnd(innerInput);
-          }, 0);
-        });
-
-        return true;
-      } catch (error) {
-        return false;
-      }
+    try {
+      isNarrowViewport = Boolean(
+        window.matchMedia &&
+        window.matchMedia('(max-width: 720px)').matches
+      );
+    } catch (error) {
+      isNarrowViewport = false;
     }
 
-    if (isFunction(widget.focus)) {
-      try {
-        widget.focus();
-        return true;
-      } catch (error) {
-        return false;
-      }
+    return Boolean(isNarrowViewport && (hasCoarsePointer || hasTouchPoints));
+  }
+
+  function getDesktopAutocompleteControllerFactory() {
+    if (!window.PixkuyForms || typeof window.PixkuyForms.createDesktopPlacesAutocompleteController !== 'function') {
+      return null;
     }
 
-    return false;
+    return window.PixkuyForms.createDesktopPlacesAutocompleteController;
+  }
+
+  function getMobileAutocompleteControllerFactory() {
+    if (!window.PixkuyForms || typeof window.PixkuyForms.createMobilePlacesAutocompleteController !== 'function') {
+      return null;
+    }
+
+    return window.PixkuyForms.createMobilePlacesAutocompleteController;
+  }
+  
+  function getProgrammaticAutocompleteControllerFactory() {
+    if (!window.PixkuyForms || typeof window.PixkuyForms.createProgrammaticPlacesController !== 'function') {
+      return null;
+    }
+
+    return window.PixkuyForms.createProgrammaticPlacesController;
   }
   
   function syncReservationRequestUiFromInput(input) {
@@ -607,90 +707,104 @@ if (placesLibraryPromise) {
 
     return NAMESPACE.coverage || coverageApi || null;
   }
-
-  function getCoverageDecision(place, options) {
-    var api = resolveCoverageApi(options);
-
-    if (!api || !isFunction(api.getCoverageDecision)) {
-      return {
-        isWithinCoverage: true,
-        isAllowedPrimaryArea: false,
-        isAllowedAirport: false,
-        countryCode: '',
-        administrativeAreaLevel1: '',
-        airportIataCode: ''
-      };
+  
+    function resolveLocationRestriction(options) {
+    if (isObject(options) && isObject(options.locationRestriction)) {
+      return options.locationRestriction;
     }
 
-    return api.getCoverageDecision(place);
+    return DEFAULT_LOCATION_RESTRICTION;
   }
+  
+    function buildSuggestionCoverageProbe(suggestion) {
+    var placePrediction;
+    var structuredFormat;
+    var mainText;
+    var secondaryText;
+    var combinedText;
+    var lowerCombinedText;
+    var iataMatch;
 
-  function attachManualEditReset(widget, controller) {
-    if (!widget || !controller) {
-      return function () {};
-    }
+    placePrediction = isObject(suggestion && suggestion.placePrediction)
+      ? suggestion.placePrediction
+      : (isObject(suggestion) ? suggestion : {});
 
-    function handleManualEdit() {
-      syncWidgetValueToLegacyInput(widget, controller.input);
-      syncReservationRequestUiFromInput(controller.input);
+    structuredFormat = isObject(placePrediction.structuredFormat)
+      ? placePrediction.structuredFormat
+      : (isObject(placePrediction.structuredFormatting) ? placePrediction.structuredFormatting : {});
 
-      if (!controller.state.selectedPlace) {
-        syncControllerUiState(controller, {
-          isOpen: true,
-          isFallback: false
-        });
-        return;
-      }
+    mainText = getString(
+      structuredFormat.mainText && structuredFormat.mainText.text
+        ? structuredFormat.mainText.text
+        : (structuredFormat.mainText || '')
+    );
 
-      controller.clearSelection({
-        preserveInputValue: true,
-        reason: 'manual-edit'
-      });
+    secondaryText = getString(
+      structuredFormat.secondaryText && structuredFormat.secondaryText.text
+        ? structuredFormat.secondaryText.text
+        : (structuredFormat.secondaryText || '')
+    );
 
-      syncControllerUiState(controller, {
-        isOpen: true,
-        isFallback: false
-      });
-    }
+    combinedText = (mainText + ' ' + secondaryText).trim();
+    lowerCombinedText = combinedText.toLowerCase();
+    iataMatch = lowerCombinedText.match(/\b(mex|nlu|aifa|tol|tlc|pbc|qro)\b/i);
 
-    widget.addEventListener('input', handleManualEdit);
-
-    return function detach() {
-      widget.removeEventListener('input', handleManualEdit);
+    return {
+      label: combinedText,
+      displayName: mainText,
+      formattedAddress: secondaryText,
+      primaryText: mainText,
+      secondaryText: secondaryText,
+      text: combinedText,
+      placeId: getString(placePrediction.placeId || suggestion && suggestion.placeId || suggestion && suggestion.id),
+      countryCode: (
+        lowerCombinedText.indexOf('mex') !== -1 ||
+        lowerCombinedText.indexOf('méxico') !== -1 ||
+        lowerCombinedText.indexOf('mexico') !== -1
+      ) ? 'mx' : '',
+      administrativeAreaLevel1: secondaryText,
+      locality: secondaryText,
+      iataCode: iataMatch ? iataMatch[1].toUpperCase() : '',
+      types: []
     };
   }
 
-  function createWidgetElement(options) {
-    var library = placesLibraryModule;
-    var element;
-    var language = normalizeLanguage(options && options.language);
-    var region = normalizeRegion(options && options.region);
-    var locationRestriction = (options && options.locationRestriction) || DEFAULT_LOCATION_RESTRICTION;
-    var includedRegionCodes = getArray(options && options.includedRegionCodes);
+  function isSuggestionWithinCoverage(suggestion, options) {
+    var probePlace;
+    var decision;
 
-    if (!library || !library.PlaceAutocompleteElement) {
-  
-  throw new Error('Places library not ready or PlaceAutocompleteElement unavailable.');
-}
-
-    element = new library.PlaceAutocompleteElement({});
-    element.setAttribute('requested-language', language);
-    element.setAttribute('requested-region', region);
-
-    if (locationRestriction) {
-      element.locationRestriction = locationRestriction;
+    try {
+      probePlace = buildSuggestionCoverageProbe(suggestion);
+      decision = getCoverageDecisionSafe(probePlace, options);
+      return Boolean(decision && decision.isWithinCoverage);
+    } catch (error) {
+      return true;
     }
-
-    if (includedRegionCodes.length) {
-      element.includedRegionCodes = includedRegionCodes;
-    }
-
-    return element;
   }
 
-  function createAutocompleteController(options) {
-    var controller = {
-      options: options || {},
+
+    function buildMobileAutocompleteDebugMessage(error) {
+    var message = getString(error && error.message);
+
+    if (!message) {
+      message = 'Unknown mobile autocomplete error.';
+    }
+
+    return '[DEBUG Places móvil] ' + message;
+  }
+
+    function createAutocompleteController(options) {
+    var controller;
+    var strategyController;
+    var root;
+    var desktopFactory;
+    var mobileFactory;
+    var useMobileStrategy;
+
+    options = options || {};
+
+    controller = {
+      options: options,
       state: {
         widget: null,
         selectedPlace: null,
@@ -700,60 +814,412 @@ if (placesLibraryPromise) {
         isFallback: false,
         isDestroyed: false
       },
-      detachManualEditListener: null,
-      detachSelectListener: null,
-      mountNode: options && options.mountNode ? options.mountNode : null,
-      input: options && options.input ? options.input : null,
-      hiddenFields: isObject(options && options.hiddenFields) ? options.hiddenFields : {},
-      onReady: isFunction(options && options.onReady) ? options.onReady : function () {},
-      onSelection: isFunction(options && options.onSelection) ? options.onSelection : function () {},
-      onCoverageReject: isFunction(options && options.onCoverageReject) ? options.onCoverageReject : function () {},
-      onManualFallback: isFunction(options && options.onManualFallback) ? options.onManualFallback : function () {},
-      onError: isFunction(options && options.onError) ? options.onError : function () {}
+      mountNode: options.mountNode || null,
+      input: options.input || null,
+      hiddenFields: isObject(options.hiddenFields) ? options.hiddenFields : {},
+      onReady: isFunction(options.onReady) ? options.onReady : function () {},
+      onSelection: isFunction(options.onSelection) ? options.onSelection : function () {},
+      onCoverageReject: isFunction(options.onCoverageReject) ? options.onCoverageReject : function () {},
+      onManualFallback: isFunction(options.onManualFallback) ? options.onManualFallback : function () {},
+      onError: isFunction(options.onError) ? options.onError : function () {}
     };
 
-    controller.clearSelection = function clearSelection(meta) {
+        root = getPlaceContainer(controller.input) || controller.mountNode;
+    useMobileStrategy = false;
+
+    function syncFacadeUiState(partialState) {
+      syncControllerUiState(controller, partialState);
+    }
+
+    function clearSelectedPlace(meta) {
+      var nextMeta = meta || {};
+      var shouldPreserveInputValue = nextMeta.preserveInputValue === true;
+
       clearHiddenFields(controller.hiddenFields);
       controller.state.selectedPlace = null;
       controller.state.isOpen = false;
 
-      if (!meta || !meta.preserveInputValue) {
-        if (controller.state.widget && 'value' in controller.state.widget) {
-          try {
-            controller.state.widget.value = '';
-          } catch (error) {
-            // no-op
-          }
-        }
+      if (
+        strategyController &&
+        isFunction(strategyController.clearVisibleValue) &&
+        !shouldPreserveInputValue
+      ) {
+        strategyController.clearVisibleValue();
+      } else if (controller.input && !shouldPreserveInputValue) {
+        controller.input.value = '';
       }
 
-      syncWidgetValueToLegacyInput(controller.state.widget, controller.input);
       syncReservationRequestUiFromInput(controller.input);
-
       syncControllerUiState(controller, {
         isOpen: false
       });
+      controller.onSelection(null, nextMeta);
+    }
+	
+    function handleManualInput(value) {
+      if (controller.input && typeof value === 'string' && controller.input.value !== value) {
+        controller.input.value = value;
+      }
 
-      controller.onSelection(null, meta || {});
+      clearSelectedPlace({
+        preserveInputValue: true,
+        reason: 'manual-edit'
+      });
+    }
+
+    function handleResolvedPlace(normalizedPlace, meta) {
+      var coverageDecision;
+      var nextMeta;
+
+      appendFacadeDebug('coverage-place-input', {
+        fieldName: controller.input && controller.input.name ? controller.input.name : '',
+        label: normalizedPlace && normalizedPlace.label ? normalizedPlace.label : '',
+        displayName: normalizedPlace && normalizedPlace.displayName ? normalizedPlace.displayName : '',
+        formattedAddress: normalizedPlace && normalizedPlace.formattedAddress ? normalizedPlace.formattedAddress : '',
+        countryCode: normalizedPlace && normalizedPlace.countryCode ? normalizedPlace.countryCode : '',
+        administrativeAreaLevel1: normalizedPlace && normalizedPlace.administrativeAreaLevel1 ? normalizedPlace.administrativeAreaLevel1 : '',
+        locality: normalizedPlace && normalizedPlace.locality ? normalizedPlace.locality : '',
+        iataCode: normalizedPlace && normalizedPlace.iataCode ? normalizedPlace.iataCode : '',
+        types: normalizedPlace && Array.isArray(normalizedPlace.types) ? normalizedPlace.types : []
+      });
+
+      coverageDecision = getCoverageDecisionSafe(normalizedPlace, controller.options);
+
+      appendFacadeDebug('coverage-decision', {
+        fieldName: controller.input && controller.input.name ? controller.input.name : '',
+        label: normalizedPlace && normalizedPlace.label ? normalizedPlace.label : '',
+        isWithinCoverage: Boolean(coverageDecision && coverageDecision.isWithinCoverage),
+        matchedRule: coverageDecision && coverageDecision.matchedRule ? coverageDecision.matchedRule : '',
+        reason: coverageDecision && coverageDecision.reason ? coverageDecision.reason : ''
+      });
+
+            if (!coverageDecision.isWithinCoverage) {
+        appendFacadeDebug('coverage-reject', {
+          fieldName: controller.input && controller.input.name ? controller.input.name : '',
+          label: normalizedPlace && normalizedPlace.label ? normalizedPlace.label : '',
+          matchedRule: coverageDecision && coverageDecision.matchedRule ? coverageDecision.matchedRule : '',
+          reason: coverageDecision && coverageDecision.reason ? coverageDecision.reason : ''
+        });
+
+        clearSelectedPlace({
+          preserveInputValue: false,
+          reason: 'out-of-coverage',
+          place: normalizedPlace,
+          coverageDecision: coverageDecision
+        });
+
+        controller.onCoverageReject(normalizedPlace, coverageDecision);
+        return;
+      }
+	  
+	  
+
+      controller.state.selectedPlace = normalizedPlace;
+      controller.state.isFallback = false;
+      controller.state.isOpen = false;
+
+      if (controller.input && normalizedPlace) {
+        controller.input.value = getVisibleSelectedPlaceLabel(normalizedPlace);
+      }
+
+      writePlaceToHiddenFields(controller.hiddenFields, normalizedPlace);
+      syncReservationRequestUiFromInput(controller.input);
+
+      syncControllerUiState(controller, {
+        isReady: true,
+        isOpen: false,
+        isFallback: false
+      });
+
+      nextMeta = meta || {};
+      nextMeta.coverageDecision = coverageDecision;
+
+      controller.onSelection(normalizedPlace, nextMeta);
+    }
+     
+	        function handleControllerError(error) {
+      clearSelectedPlace({
+        preserveInputValue: true,
+        reason: 'controller-error'
+      });
+      syncReservationRequestUiFromInput(controller.input);
+      controller.onError(error);
+    }
+	
+    function createMobileStrategy() {
+      if (!isFunction(mobileFactory)) {
+        throw new Error('Mobile Places controller factory is unavailable.');
+      }
+
+      return mobileFactory({
+        root: root,
+        input: controller.input,
+        mountNode: controller.mountNode,
+        fieldName: getString(controller.input && controller.input.name),
+        debounceMs: 180,
+        minQueryLength: 2,
+        createSessionToken: function () {
+          return loadPlacesLibrary(controller.options).then(function (library) {
+            if (!library || !isFunction(library.AutocompleteSessionToken)) {
+              throw new Error('Google AutocompleteSessionToken API is unavailable.');
+            }
+
+            return new library.AutocompleteSessionToken();
+          });
+        },
+        fetchSuggestions: function (requestContext) {
+          return loadPlacesLibrary(controller.options).then(function (library) {
+            var request;
+            var fetchPromise;
+
+            if (!library || !library.AutocompleteSuggestion || !isFunction(library.AutocompleteSuggestion.fetchAutocompleteSuggestions)) {
+              throw new Error('Google AutocompleteSuggestion API is unavailable.');
+            }
+
+                       request = {
+              input: getString(requestContext && requestContext.input),
+              language: normalizeLanguage(controller.options.language),
+              region: normalizeRegion(controller.options.region),
+              includedRegionCodes: ['mx']
+            };
+
+            if (requestContext && requestContext.sessionToken) {
+              request.sessionToken = requestContext.sessionToken;
+            }
+
+            request.locationRestriction = resolveLocationRestriction(controller.options);
+			
+			            appendFacadeDebug('mobile-fetch-request', {
+              fieldName: controller.input && controller.input.name ? controller.input.name : '',
+              input: request.input,
+              locationRestriction: request.locationRestriction || null,
+              includedRegionCodes: request.includedRegionCodes || []
+            });
+
+            fetchPromise = library.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+
+            return Promise.resolve(fetchPromise).then(function (response) {
+              var suggestions;
+
+              suggestions = response && Array.isArray(response.suggestions)
+                ? response.suggestions
+                : [];
+
+              appendFacadeDebug('mobile-fetch-filtered', {
+                fieldName: controller.input && controller.input.name ? controller.input.name : '',
+                rawCount: suggestions.length,
+                filteredCount: suggestions.length
+              });
+
+              return suggestions.map(adaptMobileAutocompleteSuggestion);
+            });
+          });
+        },
+        resolveSuggestionToPlace: function (requestContext) {
+          var suggestion = requestContext && requestContext.suggestion;
+          var placePrediction;
+          var place;
+
+          placePrediction = suggestion && suggestion.placePrediction ? suggestion.placePrediction : suggestion;
+
+          if (!placePrediction || !isFunction(placePrediction.toPlace)) {
+            throw new Error('Google mobile suggestion cannot be resolved.');
+          }
+
+          place = placePrediction.toPlace();
+
+          if (!place || !isFunction(place.fetchFields)) {
+            throw new Error('Google place details API is unavailable.');
+          }
+
+          return Promise.resolve(place.fetchFields({
+            fields: controller.options.placeFields || DEFAULT_PLACE_FIELDS
+          })).then(function () {
+            return normalizePlace(place, placePrediction);
+          });
+        },
+        onPlaceSelected: function (normalizedPlace, meta) {
+          handleResolvedPlace(normalizedPlace, meta || {
+            reason: 'google-mobile-select'
+          });
+        },
+        onClearSelection: function () {
+          clearSelectedPlace({
+            preserveInputValue: true,
+            reason: 'clear-selection'
+          });
+        },
+        onManualInput: handleManualInput,
+        onError: function (error) {
+          controller.onError(error);
+        },
+        onUiStateChange: function (state) {
+          syncFacadeUiState(state);
+        }
+      });
+    }
+
+    function createDesktopStrategy() {
+      if (!isFunction(desktopFactory)) {
+        throw new Error('Desktop Places controller factory is unavailable.');
+      }
+
+      return desktopFactory({
+        root: root,
+        input: controller.input,
+        mountNode: controller.mountNode,
+        fieldName: getString(controller.input && controller.input.name),
+        inputId: controller.input && controller.input.id ? controller.input.id : '',
+        language: normalizeLanguage(controller.options.language),
+        placeholder: controller.input && controller.input.getAttribute ? (controller.input.getAttribute('placeholder') || '') : '',
+        loadPlacesLibrary: function () {
+          return loadPlacesLibrary(controller.options);
+        },
+        resolvePlaceFromSelection: function (requestContext) {
+          var selection = requestContext && requestContext.selection;
+          var place;
+
+          if (!selection || !isFunction(selection.toPlace)) {
+            throw new Error('Google desktop selection cannot be resolved.');
+          }
+
+          place = selection.toPlace();
+
+          if (!place || !isFunction(place.fetchFields)) {
+            throw new Error('Google place details API is unavailable.');
+          }
+
+          return Promise.resolve(place.fetchFields({
+            fields: controller.options.placeFields || DEFAULT_PLACE_FIELDS
+          })).then(function () {
+            return normalizePlace(place, selection);
+          });
+        },
+        onPlaceSelected: function (normalizedPlace, meta) {
+          handleResolvedPlace(normalizedPlace, meta || {
+            reason: 'google-desktop-select'
+          });
+        },
+        onClearSelection: function () {
+          clearSelectedPlace({
+            preserveInputValue: true,
+            reason: 'clear-selection'
+          });
+        },
+        onManualInput: handleManualInput,
+        onError: function (error) {
+          controller.onError(error);
+        },
+        onUiStateChange: function (state) {
+          syncFacadeUiState(state);
+        }
+      });
+    }
+
+    function createDesktopProgrammaticStrategy() {
+      if (!isFunction(desktopFactory)) {
+        throw new Error('Desktop Places controller factory is unavailable.');
+      }
+
+      return desktopFactory({
+        input: controller.input,
+        mountNode: controller.mountNode,
+        fieldName: getString(controller.input && controller.input.name),
+        getAutocompleteSessionToken: function () {
+          return loadPlacesLibrary(controller.options).then(function (library) {
+            if (!library || !isFunction(library.AutocompleteSessionToken)) {
+              throw new Error('Google AutocompleteSessionToken API is unavailable.');
+            }
+
+            return new library.AutocompleteSessionToken();
+          });
+        },
+        fetchSuggestions: function (requestContext) {
+          return loadPlacesLibrary(controller.options).then(function (library) {
+            var request;
+            var fetchPromise;
+
+            if (!library || !library.AutocompleteSuggestion || !isFunction(library.AutocompleteSuggestion.fetchAutocompleteSuggestions)) {
+              throw new Error('Google AutocompleteSuggestion API is unavailable.');
+            }
+
+            request = {
+              input: getString(requestContext && requestContext.query),
+              language: normalizeLanguage(controller.options.language),
+              region: normalizeRegion(controller.options.region),
+              includedRegionCodes: ['mx']
+            };
+
+            if (requestContext && requestContext.sessionToken) {
+              request.sessionToken = requestContext.sessionToken;
+            }
+
+            request.locationRestriction = resolveLocationRestriction(controller.options);
+
+            fetchPromise = library.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+
+            return Promise.resolve(fetchPromise).then(function (response) {
+              var suggestions;
+
+              suggestions = response && Array.isArray(response.suggestions)
+                ? response.suggestions
+                : [];
+
+              return suggestions.map(adaptMobileAutocompleteSuggestion);
+            });
+          });
+        },
+        resolveSuggestionToPlace: function (requestContext) {
+          var suggestion = requestContext && requestContext.suggestion;
+          var placePrediction;
+          var place;
+
+          placePrediction = suggestion && suggestion.placePrediction ? suggestion.placePrediction : suggestion;
+
+          if (!placePrediction || !isFunction(placePrediction.toPlace)) {
+            throw new Error('Google programmatic desktop suggestion cannot be resolved.');
+          }
+
+          place = placePrediction.toPlace();
+
+          if (!place || !isFunction(place.fetchFields)) {
+            throw new Error('Google place details API is unavailable.');
+          }
+
+          return Promise.resolve(place.fetchFields({
+            fields: controller.options.placeFields || DEFAULT_PLACE_FIELDS
+          })).then(function () {
+            return normalizePlace(place, placePrediction);
+          });
+        },
+        onPlaceSelected: function (normalizedPlace, meta) {
+          handleResolvedPlace(normalizedPlace, meta || {
+            reason: 'google-desktop-programmatic-select'
+          });
+        },
+        onCoverageReject: function (payload) {
+          controller.onCoverageReject(payload);
+        },
+        onError: function (error) {
+          handleControllerError(error);
+        },
+        onUiStateChange: function (state) {
+          syncFacadeUiState(state);
+        }
+      });
+    }
+    controller.clearSelection = function clearSelection(meta) {
+      clearSelectedPlace(meta);
     };
 
     controller.destroy = function destroy() {
       controller.state.isDestroyed = true;
 
-      if (isFunction(controller.detachManualEditListener)) {
-        controller.detachManualEditListener();
-        controller.detachManualEditListener = null;
+      if (strategyController && isFunction(strategyController.destroy)) {
+        strategyController.destroy();
       }
 
-      if (isFunction(controller.detachSelectListener)) {
-        controller.detachSelectListener();
-        controller.detachSelectListener = null;
-      }
-
-      if (controller.state.widget && controller.state.widget.parentNode) {
-        controller.state.widget.parentNode.removeChild(controller.state.widget);
-      }
-
+      strategyController = null;
       controller.state.widget = null;
       controller.state.selectedPlace = null;
       controller.state.isReady = false;
@@ -775,186 +1241,119 @@ if (placesLibraryPromise) {
       });
     };
 
-    controller.mount = function mount() {
-      var initialQuery = getString(controller.input && controller.input.value);
-	  
-	  if (!controller.mountNode || !controller.input) {
-         controller.onError(new Error('Missing mountNode or input for Google Places controller.'));
-         return Promise.resolve(false);
-}
+    controller.close = function close() {
+      if (strategyController && isFunction(strategyController.close)) {
+        strategyController.close();
+        return;
+      }
+
+      syncControllerUiState(controller, {
+        isOpen: false
+      });
+    };
+
+        controller.mount = function mount() {
+      appendFacadeDebug('facade-mount-start', {
+        fieldName: controller.input && controller.input.name ? controller.input.name : '',
+        hasMountNode: Boolean(controller.mountNode),
+        hasInput: Boolean(controller.input)
+      });
+
+      if (!controller.mountNode || !controller.input) {
+        appendFacadeDebug('facade-mount-missing-deps', {
+          fieldName: controller.input && controller.input.name ? controller.input.name : '',
+          hasMountNode: Boolean(controller.mountNode),
+          hasInput: Boolean(controller.input)
+        });
+        controller.onError(new Error('Missing mountNode or input for Google Places controller.'));
+        return Promise.resolve(false);
+      }
 
       controller.state.isDestroyed = false;
       controller.state.isLoading = true;
       controller.state.isFallback = false;
       controller.state.isOpen = false;
 
-      syncControllerUiState(controller, {
+       syncControllerUiState(controller, {
         isLoading: true,
         isFallback: false,
         isOpen: false
       });
 
-      return loadPlacesLibrary(controller.options).then(function () {
-        var widget = createWidgetElement(controller.options);
-		
-        function handleSelect(event) {
-          var placePrediction = event && (event.placePrediction || (event.detail && event.detail.placePrediction));
-          var place;
-          var normalizedPlace;
-          var coverageDecision;
+      useMobileStrategy = shouldUseMobileAutocompleteStrategy();
+	  
+            desktopFactory = getDesktopAutocompleteControllerFactory();
+      mobileFactory = getMobileAutocompleteControllerFactory();
 
-          if (!placePrediction || !isFunction(placePrediction.toPlace)) {
-               controller.onError(new Error('Google Places selection did not include a valid place prediction.'));
-              return;
-}
+      appendFacadeDebug('facade-strategy-decision', {
+        fieldName: controller.input && controller.input.name ? controller.input.name : '',
+        useMobileStrategy: Boolean(useMobileStrategy),
+        hasDesktopFactory: Boolean(desktopFactory),
+        hasMobileFactory: Boolean(mobileFactory),
+        viewportWidth: window.innerWidth || null,
+        maxTouchPoints: typeof navigator !== 'undefined' ? navigator.maxTouchPoints : null
+      });
 
-          place = placePrediction.toPlace();
-          
-place.fetchFields({
-  fields: controller.options.placeFields || DEFAULT_PLACE_FIELDS
-}).then(function () {
-            normalizedPlace = normalizePlace(place, placePrediction);
-            coverageDecision = getCoverageDecision(normalizedPlace, controller.options);
-					
-            if (!coverageDecision.isWithinCoverage) {
-              controller.clearSelection({
-                preserveInputValue: false,
-                reason: 'out-of-coverage',
-                place: normalizedPlace,
-                coverageDecision: coverageDecision
-              });
+            try {
+        appendFacadeDebug('facade-strategy-create', {
+          fieldName: controller.input && controller.input.name ? controller.input.name : '',
+          strategy: useMobileStrategy ? 'mobile' : 'desktop'
+        });
 
-              controller.onCoverageReject(normalizedPlace, coverageDecision);
-              return;
-            }
-
-            controller.state.selectedPlace = normalizedPlace;
-            writePlaceToHiddenFields(controller.hiddenFields, normalizedPlace);
-
-            controller.state.isOpen = false;
-            controller.state.isFallback = false;
-
-            if (controller.state.widget && 'value' in controller.state.widget) {
-              try {
-                controller.state.widget.value = normalizedPlace.label;
-              } catch (error) {
-                // no-op
-              }
-            }
-
-            syncWidgetValueToLegacyInput(controller.state.widget, controller.input);
-            syncReservationRequestUiFromInput(controller.input);
-
-            syncControllerUiState(controller, {
-              isReady: true,
-              isOpen: false,
-              isFallback: false
-            });
-
-            controller.onSelection(normalizedPlace, {
-              reason: 'google-select',
-              coverageDecision: coverageDecision
-            });
-          }).catch(function (error) {
-            controller.onError(error);
-          });
-        }
-		
-		controller.mountNode.innerHTML = '';
-        controller.mountNode.appendChild(widget);			
-        controller.state.widget = widget;					
-        controller.state.isReady = true;
-        controller.state.isLoading = false;
-        controller.state.isFallback = false;
-        controller.state.isOpen = false;
-
-        if (initialQuery && 'value' in widget) {
-  try {
-    widget.value = initialQuery;   
-  } catch (error) {    
-  }
-}
-
-syncWidgetValueToLegacyInput(widget, controller.input);
-
-syncControllerUiState(controller, {
-  isReady: true,
-  isLoading: false,
-  isFallback: false,
-  isOpen: Boolean(initialQuery)
-});
-
-window.requestAnimationFrame(function () {
-  window.requestAnimationFrame(function () {
-    focusWidgetInnerInput(widget);
-  });
-});
-
-        widget.addEventListener('gmp-select', handleSelect);
-        controller.detachSelectListener = function detachSelectListener() {
-          widget.removeEventListener('gmp-select', handleSelect);
-        };
-
-        function handleWidgetFocus() {
-  if (controller.input) {
-    controller.input.setAttribute('tabindex', '-1');
-    controller.input.setAttribute('aria-hidden', 'true');
-    controller.input.readOnly = true;
-  }
-
-  syncControllerUiState(controller, {
-    isOpen: true,
-    isFallback: false
-  });
-}
-
-        function handleWidgetBlur() {
-  window.setTimeout(function () {
-    if (controller.state.isDestroyed) {
-      return;
-    }
-
-    if (!controller.state.selectedPlace && controller.input) {
-      controller.input.removeAttribute('tabindex');
-      controller.input.removeAttribute('aria-hidden');
-      controller.input.readOnly = false;
-    }
-
-    syncControllerUiState(controller, {
-      isOpen: false
-    });
-  }, 120);
-}
-
-        function handleWidgetInput() {
-          syncControllerUiState(controller, {
-            isOpen: true,
-            isFallback: false
-          });
-        }
-
-        widget.addEventListener('focusin', handleWidgetFocus);
-        widget.addEventListener('focusout', handleWidgetBlur);
-        widget.addEventListener('input', handleWidgetInput);
-
-        controller.detachManualEditListener = (function () {
-          var detachReset = attachManualEditReset(widget, controller);
-
-          return function detachAll() {
-            detachReset();
-            widget.removeEventListener('focusin', handleWidgetFocus);
-            widget.removeEventListener('focusout', handleWidgetBlur);
-            widget.removeEventListener('input', handleWidgetInput);
-          };
-        })();
-
-controller.onReady(widget);
-return true;
-      }).catch(function (error) {
+        strategyController = useMobileStrategy
+          ? createMobileStrategy()
+          : createDesktopProgrammaticStrategy();
+      } catch (error) {
+        appendFacadeDebug('facade-strategy-create-error', {
+          fieldName: controller.input && controller.input.name ? controller.input.name : '',
+          strategy: useMobileStrategy ? 'mobile' : 'desktop',
+          message: error && error.message ? error.message : 'unknown'
+        });
         controller.state.isReady = false;
         controller.state.isLoading = false;
         controller.state.isFallback = true;
-        controller.state.isOpen = false;				 
+        controller.state.isOpen = false;
+
+        syncControllerUiState(controller, {
+          isReady: false,
+          isLoading: false,
+          isFallback: true,
+          isOpen: false
+        });
+
+        handleControllerError(error);
+        controller.onManualFallback(error);
+        return Promise.resolve(false);
+      }
+
+            return Promise.resolve(strategyController.mount()).then(function () {
+        appendFacadeDebug('facade-strategy-mount-ok', {
+          fieldName: controller.input && controller.input.name ? controller.input.name : '',
+          strategy: useMobileStrategy ? 'mobile' : 'desktop'
+        });
+
+        controller.state.widget = strategyController.state && strategyController.state.widget
+          ? strategyController.state.widget
+          : null;
+
+        if (controller.state.widget) {
+          controller.onReady(controller.state.widget);
+        } else {
+          controller.onReady(strategyController);
+        }
+
+        return !controller.state.isFallback;
+               }).catch(function (error) {
+        appendFacadeDebug('facade-strategy-mount-error', {
+          fieldName: controller.input && controller.input.name ? controller.input.name : '',
+          strategy: useMobileStrategy ? 'mobile' : 'desktop',
+          message: error && error.message ? error.message : 'unknown'
+        });
+
+        controller.state.isReady = false;
+        controller.state.isLoading = false;
+        controller.state.isFallback = true;
+        controller.state.isOpen = false;
 
         if (controller.input) {
           controller.input.removeAttribute('tabindex');
@@ -969,6 +1368,7 @@ return true;
           isOpen: false
         });
 
+        handleControllerError(error);
         controller.onManualFallback(error);
         return false;
       });
@@ -976,7 +1376,6 @@ return true;
 
     return controller;
   }
-
   NAMESPACE.googlePlaces = {
     DEFAULT_LOCATION_RESTRICTION: DEFAULT_LOCATION_RESTRICTION,
     loadGoogleMapsApi: loadGoogleMapsApi,
@@ -984,7 +1383,7 @@ return true;
     normalizePlace: normalizePlace,
     clearHiddenFields: clearHiddenFields,
     writePlaceToHiddenFields: writePlaceToHiddenFields,
-    getCoverageDecision: getCoverageDecision,
+    getCoverageDecision: getCoverageDecisionSafe,
     createAutocompleteController: createAutocompleteController
   };
 })(window, document);

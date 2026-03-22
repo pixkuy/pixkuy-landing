@@ -91,6 +91,8 @@
 
     document.documentElement.lang = finalLang;
     localStorage.setItem("lang", finalLang);
+    window.__pixkuyI18nDict = finalDict;
+    window.__pixkuyI18nLang = finalLang;
 
     applyI18nToDom(finalDict, finalLang);
 

@@ -408,6 +408,11 @@
               placeholder=""
               required
               autocomplete="tel"
+              inputmode="tel"
+              autocapitalize="off"
+              spellcheck="false"
+              maxlength="16"
+              pattern="^\+[1-9]\d{6,14}$"
               data-i18n-ph="contact.phone"
               aria-describedby="contact-phone-error"
             />
@@ -452,6 +457,10 @@
                 autocomplete="off"
                 aria-describedby="contact-trip-date-error"
               />
+              <span
+                class="form-field-overlay form-field-overlay--date"
+                aria-hidden="true"
+              >dd/mm/yyyy</span>
               <span class="form-field-icon form-field-icon--date" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
@@ -479,6 +488,10 @@
                 autocomplete="off"
                 aria-describedby="contact-trip-time-error"
               />
+              <span
+                class="form-field-overlay form-field-overlay--time"
+                aria-hidden="true"
+              >--:--</span>
               <span class="form-field-icon form-field-icon--time" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
@@ -495,7 +508,7 @@
             </div>
           </div>
 
-                    <div class="form-field form-field--place" data-place-field="origin">
+          <div class="form-field form-field--place" data-place-field="origin">
             <label for="contact-origin" class="visually-hidden" data-i18n="contact.origin"></label>
 
             <div
@@ -515,6 +528,16 @@
                 data-place-input="origin"
               />
 
+              <button
+                type="button"
+                class="place-autocomplete__clear"
+                data-place-clear="origin"
+                aria-label="Clear origin"
+                hidden
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+
               <div
                 class="place-autocomplete__mount"
                 data-place-mount="origin"
@@ -531,7 +554,7 @@
             ></p>
           </div>
 
-                    <div class="form-field form-field--place" data-place-field="destination">
+          <div class="form-field form-field--place" data-place-field="destination">
             <label for="contact-destination" class="visually-hidden" data-i18n="contact.destination"></label>
 
             <div
@@ -551,6 +574,16 @@
                 data-place-input="destination"
               />
 
+              <button
+                type="button"
+                class="place-autocomplete__clear"
+                data-place-clear="destination"
+                aria-label="Clear destination"
+                hidden
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+
               <div
                 class="place-autocomplete__mount"
                 data-place-mount="destination"
@@ -568,13 +601,14 @@
           </div>
 
           <div class="form-row form-row--two">
-            <div class="form-field">
+             <div class="form-field">
               <label for="contact-passengers" class="visually-hidden" data-i18n="contact.passengers"></label>
               <input
                 id="contact-passengers"
                 type="number"
                 name="passengers"
                 min="1"
+                max="6"
                 step="1"
                 placeholder=""
                 required
@@ -629,7 +663,43 @@
           <div class="form-actions">
             <button id="contact-submit" type="submit" class="cta" data-i18n="contact.submit"></button>
           </div>
-        </div>
+
+                    <div class="contact-handoff" data-contact-handoff="whatsapp">
+            <p
+              class="contact-handoff__eyebrow"
+              data-i18n="contact.whatsappEyebrow"
+            ></p>
+
+            <a
+              id="contact-whatsapp"
+              class="contact-handoff__link"
+              href="#contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-contact-whatsapp="1"
+            >
+              <img
+                class="contact-handoff__icon"
+                src="assets/img/icons/whatsapp-premium.png"
+                alt=""
+                width="18"
+                height="18"
+                loading="lazy"
+                decoding="async"
+                aria-hidden="true"
+              />
+              <span
+                class="contact-handoff__label"
+                data-i18n="contact.whatsappCta"
+              ></span>
+            </a>
+
+            <p
+              class="contact-handoff__meta muted small"
+              data-contact-whatsapp-note="1"
+              data-i18n="contact.whatsappNote"
+            ></p>
+          </div>
       </form>
 
       <p class="muted small" data-i18n="contact.footer"></p>
@@ -710,8 +780,13 @@
 <script>
   window.PIXKUY_GOOGLE_MAPS_API_KEY = 'AIzaSyCQLOjYnec2otzIEeL9DwnSiJxKGnuetyo';
 </script>
+<script src="assets/js/forms/google-places-programmatic.js"></script>
+<script src="assets/js/forms/google-places-mobile.js"></script>
+<script src="assets/js/forms/google-places-desktop.js"></script>
 <script src="assets/js/forms/google-places.js"></script>
+<script src="https://unpkg.com/libphonenumber-js@1.12.15/bundle/libphonenumber-max.js"></script>
 <script src="assets/js/forms/reservation-request.js"></script>
+<script src="assets/js/forms/whatsapp-handoff.js"></script>
 <script src="assets/js/forms/index.js"></script>
 
 </body>

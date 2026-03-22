@@ -44,11 +44,11 @@
     },
     "operational": "La elección del modelo y las condiciones del servicio se confirman de forma asistida según el trayecto solicitado."
   },
-    "contact": {
+      "contact": {
     "title": "Solicita tu traslado",
     "subtitle": "Compártenos los datos básicos de tu trayecto y te contactaremos para confirmar disponibilidad y siguientes pasos.",
     "name": "Nombre completo",
-    "phone": "Teléfono",
+    "phone": "Teléfono con prefijo internacional",
     "email": "Correo electrónico",
     "tripDate": "Fecha del traslado",
     "tripTime": "Hora del traslado",
@@ -58,13 +58,17 @@
     "luggage": "Maletas",
     "notes": "Notas del traslado (vuelo, hotel, silla de bebé, detalles adicionales)",
     "submit": "Enviar solicitud",
+    "whatsappEyebrow": "Contacto directo",
+    "whatsappCta": "Hablar por WhatsApp",
+    "whatsappNote": "Habla con una persona del equipo y continúa tu solicitud por WhatsApp.",
     "statusSent": "Solicitud enviada. Gracias. Revisaremos tu trayecto y te contactaremos lo antes posible.",
     "validation": {
       "formIncomplete": "Revisa el formulario. Hay campos obligatorios pendientes o inválidos.",
       "nameRequired": "Indica tu nombre completo.",
-      "phoneRequired": "Indica un teléfono de contacto.",
+      "phoneRequired": "Indica un teléfono válido en formato internacional completo (por ejemplo, +34600000000).",
       "emailRequired": "Indica un correo electrónico válido.",
       "tripDateRequired": "Selecciona la fecha del traslado.",
+      "tripDateMinimum24h": "La fecha del traslado debe ser al menos 24 horas posterior a la actual.",
       "tripTimeRequired": "Selecciona la hora del traslado.",
       "originRequired": "Indica el origen del trayecto.",
       "destinationRequired": "Indica el destino del trayecto.",
@@ -72,8 +76,21 @@
       "placeOutOfCoverage": "Esta ubicación está fuera de la cobertura operativa actual.",
       "placeSelectionInvalid": "Selecciona una ubicación válida de la lista o escribe una dirección dentro de cobertura.",
       "placeLoadError": "No hemos podido cargar las sugerencias ahora mismo. Puedes escribir la dirección manualmente.",
-      "passengersRequired": "Indica el número de pasajeros.",
+      "passengersRequired": "Indica entre 1 y 6 pasajeros.",
       "luggageRequired": "Indica el número de maletas."
+    },
+    "whatsappMessage": {
+      "intro": "Hola, quiero solicitar un traslado con Pixkuy.",
+      "name": "Nombre",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "tripDate": "Fecha del traslado",
+      "tripTime": "Hora del traslado",
+      "origin": "Origen",
+      "destination": "Destino",
+      "passengers": "Pasajeros",
+      "luggage": "Maletas",
+      "notes": "Notas"
     },
     "places": {
       "loading": "Buscando ubicaciones…",
