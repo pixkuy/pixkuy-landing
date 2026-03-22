@@ -76,7 +76,8 @@
       "placeSelectionInvalid": "Bitte wählen Sie einen gültigen Ort aus der Liste oder geben Sie eine Adresse innerhalb des Einsatzgebiets manuell ein.",
       "placeLoadError": "Die Vorschläge konnten momentan nicht geladen werden. Sie können die Adresse manuell eingeben.",
       "passengersRequired": "Bitte geben Sie zwischen 1 und 6 Passagiere an.",
-      "luggageRequired": "Bitte geben Sie die Anzahl der Gepäckstücke an."
+      "luggageRequired": "Bitte geben Sie die Anzahl der Gepäckstücke an.",
+	  "tripDateMinimum24h": "Das Datum und die Uhrzeit des Transfers müssen mindestens 24 Stunden ab jetzt liegen."
         },
     "whatsappMessage": {
       "intro": "Hallo, ich möchte einen Transfer mit Pixkuy anfragen.",

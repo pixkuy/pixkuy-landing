@@ -68,7 +68,7 @@
       "phoneRequired": "Indica un teléfono válido en formato internacional completo (por ejemplo, +34600000000).",
       "emailRequired": "Indica un correo electrónico válido.",
       "tripDateRequired": "Selecciona la fecha del traslado.",
-      "tripDateMinimum24h": "La fecha del traslado debe ser al menos 24 horas posterior a la actual.",
+      "tripDateMinimum24h": "La fecha y la hora del traslado deben ser al menos 24 horas posteriores a la actual.",
       "tripTimeRequired": "Selecciona la hora del traslado.",
       "originRequired": "Indica el origen del trayecto.",
       "destinationRequired": "Indica el destino del trayecto.",
