@@ -21,16 +21,63 @@
   "title": "Not every need is the same.",
   "cards": {
     "airport": {
-      "title": "Airport and hotel",
-      "text": "Planned transfers for arrivals and departures with a clear and carefully handled experience.",
-      "bullets": [
-        "Advance booking",
-        "Follow-up",
-        "Human support"
-      ],
-      "priceLabel": "Price from",
-      "priceValue": "1.200 MXN"
-    },
+  "title": "Airport and hotel",
+  "text": "Planned transfers for arrivals and departures with a clear and carefully handled experience.",
+  "bullets": [
+    "Advance booking",
+    "Follow-up",
+    "Human support"
+  ],
+  "priceLabel": "Price from",
+  "priceValue": "1.200 MXN",
+  "ctaClosed": "View fares",
+  "ctaOpen": "Hide fares",
+  "panel": {
+    "eyebrow": "Airport and hotel",
+    "title": "Fixed fare by zone",
+    "text": "Choose origin and destination to view the base transfer fare.",
+    "originLabel": "Origin",
+    "originAirportPlaceholder": "Select airport",
+    "originZonePlaceholder": "Select zone",
+    "destinationLabel": "Destination",
+    "hotelPlaceholder": "Search your hotel",
+    "hotelStatusLoading": "Searching accommodations…",
+    "hotelStatusEmpty": "No accommodations found.",
+    "hotelStatusError": "The search could not be loaded.",
+    "hotelStatusInvalid": "This panel only supports hotels and accommodations.",
+    "destinationAirportPlaceholder": "Select airport",
+    "destinationZonePlaceholder": "Select zone",
+    "swapAriaLabel": "Swap trip direction",
+    "clearResolvedDestination": "Clear selected destination",
+    "destinationZoneLabel": "Zone",
+    "passengersLabel": "Passengers",
+    "passengersPlaceholder": "Select passengers",
+    "fareValuePendingPassengers": "Select passengers",
+    "fareLabel": "Fare",
+    "fareValue": "—",
+    "cta": "Request",
+    "catalog": {
+      "airports": {
+        "mex": "MEX — Mexico City International Airport",
+        "nlu": "NLU — Felipe Ángeles International Airport",
+        "tlc": "TLC — Lic. Adolfo López Mateos International Airport",
+        "pbc": "PBC — Hermanos Serdán International Airport",
+        "qro": "QRO — Querétaro Intercontinental Airport"
+      },
+      "zones": {
+        "centro": "Historic Center / Alameda",
+        "reforma": "Reforma / Juárez / Cuauhtémoc",
+        "polanco": "Polanco / Chapultepec",
+        "roma_condesa": "Roma / Condesa",
+        "santa_fe": "Santa Fe / Bosques / Interlomas",
+        "coyoacan_del_valle_napoles": "Coyoacán / Del Valle / Nápoles",
+        "sur": "South / Perisur / Pedregal / San Ángel",
+        "norte": "North / Basílica / Lindavista",
+        "aeropuerto_oriente": "Airport / East / Foro Sol"
+      }
+    }
+  }
+},
     "tours": {
       "title": "Private tours and visits",
       "text": "Private journeys to emblematic places and tailored plans with a dedicated chauffeur.",
@@ -134,6 +181,7 @@
         },
     "whatsappMessage": {
       "intro": "Hello, I would like to request a transfer with Pixkuy.",
+      "serviceType": "Service type",
       "name": "Name",
       "phone": "Phone",
       "email": "Email",
@@ -141,6 +189,8 @@
       "tripTime": "Transfer time",
       "origin": "Origin",
       "destination": "Destination",
+      "zone": "Zone",
+      "fare": "Fare",
       "passengers": "Passengers",
       "luggage": "Luggage",
       "notes": "Notes"
@@ -151,6 +201,19 @@
       "manualFallback": "You can enter the address manually.",
       "outOfCoverage": "Location outside coverage",
       "selectionHint": "Select a suggestion to complete it faster."
+    },
+    "panelHandoff": {
+      "confirmInvalidate": "If you change the origin or destination, the zone and fare will no longer apply. Do you want to continue?"
+    },
+    "services": {
+      "switcherAriaLabel": "Service type selector",
+      "airportHotel": "Airport and hotel",
+      "other": "Other service",
+      "confirmChangeSpecificData": "If you change the service, the specific data for the current service will be lost. Do you want to continue?",
+      "airportHotelHelper": "Select airport and hotel to prepare the trip.",
+      "airportHotelAirportLabel": "Airport",
+      "airportHotelAirportPlaceholder": "Select airport",
+      "airportHotelHotelLabel": "Hotel"
     },
     "footer": "By submitting this form, you authorize us to use your data to respond to your request and organize your transfer."
   },

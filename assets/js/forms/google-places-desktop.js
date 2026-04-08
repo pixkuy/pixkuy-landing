@@ -446,9 +446,6 @@
           inputIsActive: document.activeElement === controller.input
         });
 
-        if (normalizeString(controller.input && controller.input.value)) {
-          controller.core.handleInputValueChange(controller.input.value);
-        }
       }
 
       function handlePointerDown(event) {

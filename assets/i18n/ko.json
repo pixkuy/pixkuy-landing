@@ -21,16 +21,63 @@
   "title": "모든 필요는 같지 않습니다.",
   "cards": {
     "airport": {
-      "title": "공항 및 호텔",
-      "text": "도착과 출발을 위한 사전 예약 이동 서비스로, 명확하고 세심하게 설계된 경험을 제공합니다.",
-      "bullets": [
-        "사전 예약",
-        "서비스 추적",
-        "사람이 직접 지원"
-      ],
-      "priceLabel": "가격 시작",
-      "priceValue": "1.200 MXN"
-    },
+  "title": "공항 및 호텔",
+  "text": "도착과 출발을 위한 사전 예약 이동 서비스로, 명확하고 세심하게 설계된 경험을 제공합니다.",
+  "bullets": [
+    "사전 예약",
+    "서비스 추적",
+    "사람이 직접 지원"
+  ],
+  "priceLabel": "가격 시작",
+  "priceValue": "1.200 MXN",
+  "ctaClosed": "요금 보기",
+  "ctaOpen": "요금 숨기기",
+  "panel": {
+    "eyebrow": "공항 및 호텔",
+    "title": "구역별 고정 요금",
+    "text": "출발지와 목적지를 선택해 기본 이동 요금을 확인하세요.",
+    "originLabel": "출발지",
+    "originAirportPlaceholder": "공항 선택",
+    "originZonePlaceholder": "구역 선택",
+    "destinationLabel": "목적지",
+    "hotelPlaceholder": "호텔 검색",
+    "hotelStatusLoading": "숙소를 검색하는 중…",
+    "hotelStatusEmpty": "숙소를 찾을 수 없습니다.",
+    "hotelStatusError": "검색을 불러올 수 없습니다.",
+    "hotelStatusInvalid": "이 패널은 호텔 및 숙소만 지원합니다.",
+    "destinationAirportPlaceholder": "공항 선택",
+    "destinationZonePlaceholder": "구역 선택",
+    "swapAriaLabel": "이동 방향 바꾸기",
+    "clearResolvedDestination": "선택한 목적지 지우기",
+    "destinationZoneLabel": "구역",
+    "passengersLabel": "승객",
+    "passengersPlaceholder": "승객 선택",
+    "fareValuePendingPassengers": "승객 선택",
+    "fareLabel": "요금",
+    "fareValue": "—",
+    "cta": "요청하기",
+    "catalog": {
+      "airports": {
+        "mex": "MEX — 멕시코시티 국제공항",
+        "nlu": "NLU — 펠리페 앙헬레스 국제공항",
+        "tlc": "TLC — 리센시아도 아돌포 로페스 마테오스 국제공항",
+        "pbc": "PBC — 에르마노스 세르단 국제공항",
+        "qro": "QRO — 케레타로 인터컨티넨털 공항"
+      },
+      "zones": {
+        "centro": "역사 지구 / 알라메다",
+        "reforma": "레포르마 / 후아레스 / 콰우테목",
+        "polanco": "폴랑코 / 차풀테펙",
+        "roma_condesa": "로마 / 콘데사",
+        "santa_fe": "산타페 / 보스케스 / 인터로마스",
+        "coyoacan_del_valle_napoles": "코요아칸 / 델 바예 / 나폴레스",
+        "sur": "남부 / 페리수르 / 페드레갈 / 산 앙헬",
+        "norte": "북부 / 바실리카 / 린다비스타",
+        "aeropuerto_oriente": "공항 / 동부 / 포로 솔"
+      }
+    }
+  }
+},
     "tours": {
       "title": "프라이빗 투어 및 방문",
       "text": "전담 쇼퍼와 함께 명소를 둘러보고 맞춤 일정으로 진행하는 프라이빗 이동입니다.",
@@ -134,6 +181,7 @@
         },
     "whatsappMessage": {
       "intro": "안녕하세요, Pixkuy로 이동 서비스를 요청하고 싶습니다.",
+      "serviceType": "서비스 유형",
       "name": "이름",
       "phone": "전화번호",
       "email": "이메일",
@@ -141,6 +189,8 @@
       "tripTime": "이동 시간",
       "origin": "출발지",
       "destination": "도착지",
+      "zone": "구역",
+      "fare": "요금",
       "passengers": "승객 수",
       "luggage": "수하물",
       "notes": "메모"
@@ -151,6 +201,19 @@
       "manualFallback": "주소를 직접 입력할 수 있습니다.",
       "outOfCoverage": "운영 범위 밖의 위치",
       "selectionHint": "더 빠르게 입력을 완료하려면 추천 항목을 선택해 주세요."
+    },
+    "panelHandoff": {
+      "confirmInvalidate": "출발지나 도착지를 변경하면 구역과 요금이 더 이상 적용되지 않습니다. 계속하시겠습니까?"
+    },
+    "services": {
+      "switcherAriaLabel": "서비스 유형 선택기",
+      "airportHotel": "공항 및 호텔",
+      "other": "기타 서비스",
+      "confirmChangeSpecificData": "서비스를 변경하면 현재 서비스의 전용 데이터가 사라집니다. 계속하시겠습니까?",
+      "airportHotelHelper": "이동을 준비하려면 공항과 호텔을 선택하세요.",
+      "airportHotelAirportLabel": "공항",
+      "airportHotelAirportPlaceholder": "공항 선택",
+      "airportHotelHotelLabel": "호텔"
     },
     "footer": "이 양식을 제출함으로써, 귀하의 요청에 응답하고 이동을 준비하기 위해 귀하의 데이터를 사용하는 것에 동의하게 됩니다."
   },

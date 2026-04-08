@@ -21,16 +21,63 @@
   "title": "Non tutte le esigenze sono uguali.",
   "cards": {
     "airport": {
-      "title": "Aeroporto e hotel",
-      "text": "Trasferimenti programmati per arrivi e partenze, con un’esperienza chiara e curata.",
-      "bullets": [
-        "Prenotazione anticipata",
-        "Monitoraggio",
-        "Supporto umano"
-      ],
-      "priceLabel": "Prezzo da",
-      "priceValue": "1.200 MXN"
-    },
+  "title": "Aeroporto e hotel",
+  "text": "Trasferimenti pianificati per arrivi e partenze, con un’esperienza chiara e curata.",
+  "bullets": [
+    "Prenotazione anticipata",
+    "Monitoraggio",
+    "Supporto umano"
+  ],
+  "priceLabel": "Prezzo da",
+  "priceValue": "1.200 MXN",
+  "ctaClosed": "Vedi tariffe",
+  "ctaOpen": "Nascondi tariffe",
+  "panel": {
+    "eyebrow": "Aeroporto e hotel",
+    "title": "Tariffa fissa per zona",
+    "text": "Scegli origine e destinazione per vedere la tariffa base del trasferimento.",
+    "originLabel": "Origine",
+    "originAirportPlaceholder": "Seleziona aeroporto",
+    "originZonePlaceholder": "Seleziona zona",
+    "destinationLabel": "Destinazione",
+    "hotelPlaceholder": "Cerca il tuo hotel",
+    "hotelStatusLoading": "Ricerca alloggi in corso…",
+    "hotelStatusEmpty": "Nessun alloggio trovato.",
+    "hotelStatusError": "Impossibile caricare la ricerca.",
+    "hotelStatusInvalid": "Questo pannello supporta solo hotel e alloggi.",
+    "destinationAirportPlaceholder": "Seleziona aeroporto",
+    "destinationZonePlaceholder": "Seleziona zona",
+    "swapAriaLabel": "Inverti il senso del tragitto",
+    "clearResolvedDestination": "Cancella la destinazione selezionata",
+    "destinationZoneLabel": "Zona",
+    "passengersLabel": "Passeggeri",
+    "passengersPlaceholder": "Seleziona passeggeri",
+    "fareValuePendingPassengers": "Seleziona passeggeri",
+    "fareLabel": "Tariffa",
+    "fareValue": "—",
+    "cta": "Richiedi",
+    "catalog": {
+      "airports": {
+        "mex": "MEX — Aeroporto Internazionale di Città del Messico",
+        "nlu": "NLU — Aeroporto Internazionale Felipe Ángeles",
+        "tlc": "TLC — Aeroporto Internazionale Lic. Adolfo López Mateos",
+        "pbc": "PBC — Aeroporto Internazionale Hermanos Serdán",
+        "qro": "QRO — Aeroporto Intercontinentale di Querétaro"
+      },
+      "zones": {
+        "centro": "Centro storico / Alameda",
+        "reforma": "Reforma / Juárez / Cuauhtémoc",
+        "polanco": "Polanco / Chapultepec",
+        "roma_condesa": "Roma / Condesa",
+        "santa_fe": "Santa Fe / Bosques / Interlomas",
+        "coyoacan_del_valle_napoles": "Coyoacán / Del Valle / Nápoles",
+        "sur": "Sud / Perisur / Pedregal / San Ángel",
+        "norte": "Nord / Basílica / Lindavista",
+        "aeropuerto_oriente": "Aeroporto / Est / Foro Sol"
+      }
+    }
+  }
+},
     "tours": {
       "title": "Tour e visite private",
       "text": "Percorsi privati verso luoghi emblematici e programmi su misura con autista dedicato.",
@@ -134,6 +181,7 @@
         },
     "whatsappMessage": {
       "intro": "Ciao, vorrei richiedere un trasferimento con Pixkuy.",
+      "serviceType": "Tipo di servizio",
       "name": "Nome",
       "phone": "Telefono",
       "email": "Email",
@@ -141,6 +189,8 @@
       "tripTime": "Ora del trasferimento",
       "origin": "Origine",
       "destination": "Destinazione",
+      "zone": "Zona",
+      "fare": "Tariffa",
       "passengers": "Passeggeri",
       "luggage": "Bagagli",
       "notes": "Note"
@@ -152,6 +202,19 @@
       "outOfCoverage": "Località fuori area operativa",
       "selectionHint": "Seleziona un suggerimento per completare più velocemente."
     },
+    "panelHandoff": {
+      "confirmInvalidate": "Se cambi origine o destinazione, zona e tariffa non saranno più applicabili. Vuoi continuare?"
+    },
+    "services": {
+      "switcherAriaLabel": "Selettore del tipo di servizio",
+      "airportHotel": "Aeroporto e hotel",
+      "other": "Altro servizio",
+      "confirmChangeSpecificData": "Se cambi servizio, i dati specifici del servizio attuale andranno persi. Vuoi continuare?",
+      "airportHotelHelper": "Seleziona aeroporto e hotel per preparare il tragitto.",
+      "airportHotelAirportLabel": "Aeroporto",
+      "airportHotelAirportPlaceholder": "Seleziona aeroporto",
+      "airportHotelHotelLabel": "Hotel"
+    },
     "footer": "Inviando questo modulo, ci autorizzi a utilizzare i tuoi dati per rispondere alla tua richiesta e organizzare il tuo trasferimento."
   },
   "legal": {
@@ -161,7 +224,7 @@
     "links": {
       "notice": "Note legali",
       "privacy": "Informativa sulla privacy",
-      "cookies": "Cookie"
+      "cookies": "Cookies"
     }
   },
   "legalOverlay": {
@@ -171,7 +234,7 @@
     "tabs": {
       "notice": "Note legali",
       "privacy": "Informativa sulla privacy",
-      "cookies": "Cookie"
+      "cookies": "Cookies"
     }
   },
   "notice": {

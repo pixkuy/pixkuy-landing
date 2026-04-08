@@ -21,16 +21,63 @@
   "title": "并非所有需求都相同。",
   "cards": {
     "airport": {
-      "title": "机场与酒店",
-      "text": "为到达和离开而安排的接送服务，提供清晰且周到的体验。",
-      "bullets": [
-        "提前预订",
-        "行程跟进",
-        "人工支持"
-      ],
-      "priceLabel": "价格起",
-      "priceValue": "1.200 MXN"
-    },
+  "title": "机场与酒店",
+  "text": "为到达和离开安排的接送服务，提供清晰且周到的体验。",
+  "bullets": [
+    "提前预订",
+    "行程跟进",
+    "人工支持"
+  ],
+  "priceLabel": "价格起",
+  "priceValue": "1.200 MXN",
+  "ctaClosed": "查看价格",
+  "ctaOpen": "隐藏价格",
+  "panel": {
+    "eyebrow": "机场与酒店",
+    "title": "按区域固定价格",
+    "text": "选择出发地和目的地以查看接送基础价格。",
+    "originLabel": "出发地",
+    "originAirportPlaceholder": "选择机场",
+    "originZonePlaceholder": "选择区域",
+    "destinationLabel": "目的地",
+    "hotelPlaceholder": "搜索您的酒店",
+    "hotelStatusLoading": "正在搜索住宿…",
+    "hotelStatusEmpty": "未找到住宿。",
+    "hotelStatusError": "无法加载搜索。",
+    "hotelStatusInvalid": "此面板仅支持酒店和住宿。",
+    "destinationAirportPlaceholder": "选择机场",
+    "destinationZonePlaceholder": "选择区域",
+    "swapAriaLabel": "切换行程方向",
+    "clearResolvedDestination": "清除已选目的地",
+    "destinationZoneLabel": "区域",
+    "passengersLabel": "乘客",
+    "passengersPlaceholder": "选择乘客",
+    "fareValuePendingPassengers": "选择乘客",
+    "fareLabel": "价格",
+    "fareValue": "—",
+    "cta": "请求",
+    "catalog": {
+      "airports": {
+        "mex": "MEX — 墨西哥城国际机场",
+        "nlu": "NLU — 费利佩·安赫莱斯国际机场",
+        "tlc": "TLC — 利森西亚多·阿道弗·洛佩斯·马特奥斯国际机场",
+        "pbc": "PBC — 埃尔马诺斯·塞尔丹国际机场",
+        "qro": "QRO — 克雷塔罗洲际机场"
+      },
+      "zones": {
+        "centro": "历史中心 / Alameda",
+        "reforma": "Reforma / Juárez / Cuauhtémoc",
+        "polanco": "Polanco / Chapultepec",
+        "roma_condesa": "Roma / Condesa",
+        "santa_fe": "Santa Fe / Bosques / Interlomas",
+        "coyoacan_del_valle_napoles": "Coyoacán / Del Valle / Nápoles",
+        "sur": "南部 / Perisur / Pedregal / San Ángel",
+        "norte": "北部 / Basílica / Lindavista",
+        "aeropuerto_oriente": "机场 / 东部 / Foro Sol"
+      }
+    }
+  }
+},
     "tours": {
       "title": "私人游览与参观",
       "text": "配备专属司机，前往标志性地点的私人行程与定制安排。",
@@ -134,6 +181,7 @@
         },
     "whatsappMessage": {
       "intro": "您好，我想通过 Pixkuy 申请一次接送服务。",
+      "serviceType": "服务类型",
       "name": "姓名",
       "phone": "电话",
       "email": "电子邮箱",
@@ -141,16 +189,31 @@
       "tripTime": "接送时间",
       "origin": "出发地",
       "destination": "目的地",
+      "zone": "区域",
+      "fare": "价格",
       "passengers": "乘客人数",
       "luggage": "行李数量",
       "notes": "备注"
     },
-	"places": {
+    "places": {
       "loading": "正在搜索地点…",
       "noResults": "未找到结果。",
       "manualFallback": "您可以手动输入地址。",
       "outOfCoverage": "地点超出服务范围",
       "selectionHint": "请选择一个建议项以更快完成输入。"
+    },
+    "panelHandoff": {
+      "confirmInvalidate": "如果您更改出发地或目的地，区域和价格将不再适用。是否继续？"
+    },
+    "services": {
+      "switcherAriaLabel": "服务类型选择器",
+      "airportHotel": "机场与酒店",
+      "other": "其他服务",
+      "confirmChangeSpecificData": "如果您更改服务，当前服务的专属数据将会丢失。是否继续？",
+      "airportHotelHelper": "请选择机场和酒店以准备行程。",
+      "airportHotelAirportLabel": "机场",
+      "airportHotelAirportPlaceholder": "选择机场",
+      "airportHotelHotelLabel": "酒店"
     },
     "footer": "提交此表单即表示您授权我们使用您的数据来回复您的请求并安排您的接送服务。"
   },

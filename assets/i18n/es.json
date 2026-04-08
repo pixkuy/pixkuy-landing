@@ -29,7 +29,54 @@
         "Soporte humano"
       ],
       "priceLabel": "Precio desde",
-      "priceValue": "1.200 MXN"
+      "priceValue": "1.200 MXN",
+      "ctaClosed": "Ver tarifas",
+      "ctaOpen": "Ocultar tarifas",
+      "panel": {
+  "eyebrow": "Aeropuerto y hotel",
+  "title": "Tarifa fija por zona",
+  "text": "Selecciona origen y destino para ver la tarifa base del traslado.",
+  "originLabel": "Origen",
+  "originAirportPlaceholder": "Selecciona aeropuerto",
+  "originZonePlaceholder": "Selecciona zona",
+  "destinationLabel": "Destino",
+  "hotelPlaceholder": "Busca tu hotel",
+  "hotelStatusLoading": "Buscando alojamientos…",
+  "hotelStatusEmpty": "No se han encontrado alojamientos.",
+  "hotelStatusError": "No se ha podido cargar la búsqueda.",
+  "hotelStatusInvalid": "Este panel solo admite hoteles y alojamientos.",
+  "destinationAirportPlaceholder": "Selecciona aeropuerto",
+  "destinationZonePlaceholder": "Selecciona zona",
+  "swapAriaLabel": "Cambiar sentido del trayecto",
+  "clearResolvedDestination": "Borrar destino seleccionado",
+  "destinationZoneLabel": "Zona",
+  "passengersLabel": "Pasajeros",
+  "passengersPlaceholder": "Selecciona pasajeros",
+  "fareValuePendingPassengers": "Selecciona pasajeros",
+  "fareLabel": "Tarifa",
+  "fareValue": "—",
+  "cta": "Solicitar",
+"catalog": {
+  "airports": {
+    "mex": "MEX — Aeropuerto Internacional de la Ciudad de México",
+    "nlu": "NLU — Aeropuerto Internacional Felipe Ángeles",
+    "tlc": "TLC — Aeropuerto Internacional Lic. Adolfo López Mateos",
+    "pbc": "PBC — Aeropuerto Internacional Hermanos Serdán",
+    "qro": "QRO — Aeropuerto Intercontinental de Querétaro"
+  },
+  "zones": {
+    "centro": "Centro Histórico / Alameda",
+    "reforma": "Reforma / Juárez / Cuauhtémoc",
+    "polanco": "Polanco / Chapultepec",
+    "roma_condesa": "Roma / Condesa",
+    "santa_fe": "Santa Fe / Bosques / Interlomas",
+    "coyoacan_del_valle_napoles": "Coyoacán / Del Valle / Nápoles",
+    "sur": "Sur / Perisur / Pedregal / San Ángel",
+    "norte": "Norte / Basílica / Lindavista",
+    "aeropuerto_oriente": "Aeropuerto / Oriente / Foro Sol"
+  }
+}
+}
     },
     "tours": {
       "title": "Tours y visitas privadas",
@@ -134,6 +181,7 @@
     },
     "whatsappMessage": {
       "intro": "Hola, quiero solicitar un traslado con Pixkuy.",
+      "serviceType": "Tipo de servicio",
       "name": "Nombre",
       "phone": "Teléfono",
       "email": "Correo electrónico",
@@ -141,6 +189,8 @@
       "tripTime": "Hora del traslado",
       "origin": "Origen",
       "destination": "Destino",
+      "zone": "Zona",
+      "fare": "Tarifa",
       "passengers": "Pasajeros",
       "luggage": "Maletas",
       "notes": "Notas"
@@ -151,6 +201,19 @@
       "manualFallback": "Puedes escribir la dirección manualmente.",
       "outOfCoverage": "Ubicación fuera de cobertura",
       "selectionHint": "Selecciona una sugerencia para completar más rápido."
+    },
+    "panelHandoff": {
+      "confirmInvalidate": "Si cambias origen o destino, la zona y la tarifa dejarán de aplicarse. ¿Quieres continuar?"
+    },
+    "services": {
+      "switcherAriaLabel": "Selector de tipo de servicio",
+      "airportHotel": "Aeropuerto y hotel",
+      "other": "Otro servicio",
+      "confirmChangeSpecificData": "Si cambias de servicio, se perderán los datos específicos del servicio actual. ¿Quieres continuar?",
+      "airportHotelHelper": "Selecciona aeropuerto y hotel para preparar el trayecto.",
+      "airportHotelAirportLabel": "Aeropuerto",
+      "airportHotelAirportPlaceholder": "Selecciona aeropuerto",
+      "airportHotelHotelLabel": "Hotel"
     },
     "footer": "Al enviar este formulario, nos autorizas a usar tus datos para responder a tu solicitud y organizar tu traslado."
   },

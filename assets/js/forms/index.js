@@ -37,6 +37,64 @@
       'initReservationRequestForm'
     );
   }
+
+  function bootContactServiceState() {
+    if (
+      !window.PixkuyForms ||
+      !window.PixkuyForms.contactServiceState
+    ) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.contactServiceState.init,
+      'contactServiceState.init'
+    );
+  }
+
+  function bootContactServiceSwitcher() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initContactServiceSwitcher,
+      'initContactServiceSwitcher'
+    );
+  }
+
+  function bootContactAirportHotelEditor() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initContactAirportHotelEditor,
+      'initContactAirportHotelEditor'
+    );
+  }
+
+  function bootContactAirportHotelLodgingAdapter() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initContactAirportHotelLodgingAdapter,
+      'initContactAirportHotelLodgingAdapter'
+    );
+  }
+  
+    function bootPanelHandoffSummary() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initPanelHandoffSummary,
+      'initPanelHandoffSummary'
+    );
+  }
   
   function getDocumentLanguage() {
     var language = document.documentElement && document.documentElement.lang;
@@ -287,6 +345,11 @@
     });
 
     bootReservationRequestForm();
+    bootContactServiceState();
+    bootContactServiceSwitcher();
+    bootContactAirportHotelEditor();
+    bootContactAirportHotelLodgingAdapter();
+    bootPanelHandoffSummary();
     bootWhatsappHandoff();
     bootGooglePlacesOnFocus();
 

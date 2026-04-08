@@ -25,6 +25,9 @@
       destinationPlaceId: form.querySelector('input[name="destination_place_id"]'),
       destinationLat: form.querySelector('input[name="destination_lat"]'),
       destinationLng: form.querySelector('input[name="destination_lng"]'),
+      serviceType: form.querySelector('input[name="service_type"]'),
+      zone: form.querySelector('input[name="zone"]'),
+      fare: form.querySelector('input[name="fare"]'),
 
       passengers: form.querySelector('input[name="passengers"]'),
       luggage: form.querySelector('input[name="luggage"]'),
@@ -395,6 +398,35 @@
     return true;
   }
 
+  function getSelectedAirportHotelFareKey() {
+    var bridge;
+    var bridgeState;
+    var selectedFareKey;
+
+    bridge = window.PixkuyAirportZoneTariff;
+
+    if (!bridge || typeof bridge !== 'object' || typeof bridge.getState !== 'function') {
+      return '';
+    }
+
+    bridgeState = bridge.getState();
+
+    if (!bridgeState || typeof bridgeState !== 'object') {
+      return '';
+    }
+
+    selectedFareKey = bridgeState.selectedFareKey;
+    return typeof selectedFareKey === 'string' ? selectedFareKey.trim() : '';
+  }
+
+  function hasAirportHotelFareKeySelected(data) {
+    if (!data || data.serviceType !== 'airport_hotel') {
+      return false;
+    }
+
+    return Boolean(data.passengerFareKey);
+  }
+
   function getReservationRequestData(fields) {
     if (!hasCriticalFields(fields)) {
       return null;
@@ -405,7 +437,7 @@
       phone: normalizeInternationalPhoneNumber(getTrimmedValue(fields.phone)) || normalizePhoneInputValue(getTrimmedValue(fields.phone)),
       email: getTrimmedValue(fields.email),
       tripDate: getTrimmedValue(fields.tripDate),
-           tripTime: getTrimmedValue(fields.tripTime),
+      tripTime: getTrimmedValue(fields.tripTime),
       origin: getTrimmedValue(fields.origin),
       destination: getTrimmedValue(fields.destination),
 
@@ -416,6 +448,10 @@
       destinationPlaceId: fields.destinationPlaceId ? getTrimmedValue(fields.destinationPlaceId) : '',
       destinationLat: fields.destinationLat ? getTrimmedValue(fields.destinationLat) : '',
       destinationLng: fields.destinationLng ? getTrimmedValue(fields.destinationLng) : '',
+      serviceType: fields.serviceType ? getTrimmedValue(fields.serviceType) : '',
+      zone: fields.zone ? getTrimmedValue(fields.zone) : '',
+      fare: fields.fare ? getTrimmedValue(fields.fare) : '',
+      passengerFareKey: getSelectedAirportHotelFareKey(),
 
       passengers: getTrimmedValue(fields.passengers),
       luggage: getTrimmedValue(fields.luggage),
@@ -425,7 +461,24 @@
     };
   }
 
-  function hasAttemptableReservationData(data) {
+  function hasAttemptableAirportHotelReservationData(data) {
+    if (!data) return false;
+
+    return Boolean(
+      data.name &&
+      isValidInternationalPhoneNumber(data.phone) &&
+      data.email &&
+      data.tripDate &&
+      data.tripTime &&
+      data.serviceType === 'airport_hotel' &&
+      data.zone &&
+      data.fare &&
+      hasAirportHotelFareKeySelected(data) &&
+      data.luggage !== ''
+    );
+  }
+
+  function hasAttemptableOtherReservationData(data) {
     if (!data) return false;
 
     return Boolean(
@@ -441,7 +494,34 @@
     );
   }
 
-  function hasMinimumRequiredReservationData(data) {
+  function hasAttemptableReservationData(data) {
+    if (!data) return false;
+
+    if (data.serviceType === 'airport_hotel') {
+      return hasAttemptableAirportHotelReservationData(data);
+    }
+
+    return hasAttemptableOtherReservationData(data);
+  }
+
+  function hasMinimumRequiredAirportHotelReservationData(data) {
+    if (!data) return false;
+
+    return Boolean(
+      data.name &&
+      isValidInternationalPhoneNumber(data.phone) &&
+      isValidEmail(data.email) &&
+      data.tripDate &&
+      data.tripTime &&
+      data.serviceType === 'airport_hotel' &&
+      data.zone &&
+      data.fare &&
+      hasAirportHotelFareKeySelected(data) &&
+      isZeroOrPositiveInteger(data.luggage)
+    );
+  }
+
+  function hasMinimumRequiredOtherReservationData(data) {
     if (!data) return false;
 
     return Boolean(
@@ -455,6 +535,16 @@
       isPositiveIntegerUpTo(data.passengers, 6) &&
       isZeroOrPositiveInteger(data.luggage)
     );
+  }
+
+  function hasMinimumRequiredReservationData(data) {
+    if (!data) return false;
+
+    if (data.serviceType === 'airport_hotel') {
+      return hasMinimumRequiredAirportHotelReservationData(data);
+    }
+
+    return hasMinimumRequiredOtherReservationData(data);
   }
 
   function isFormSubmitted(form) {
@@ -480,6 +570,28 @@
 
     fields.submit.disabled = !enabled;
     fields.submit.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+  }
+  
+  function syncNativeRequiredState(fields, data) {
+    var isAirportHotel;
+
+    if (!fields || !fields.origin || !fields.destination || !fields.passengers) {
+      return false;
+    }
+
+    isAirportHotel = Boolean(data && data.serviceType === 'airport_hotel');
+
+    if (isAirportHotel) {
+      fields.origin.required = false;
+      fields.destination.required = false;
+      fields.passengers.required = false;
+      return true;
+    }
+
+    fields.origin.required = true;
+    fields.destination.required = true;
+    fields.passengers.required = true;
+    return true;
   }
 
   function setStatusHidden(fields) {
@@ -659,9 +771,15 @@
         Boolean(data.tripTime) &&
         Boolean(data.tripDate) &&
         isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime),
-      origin: Boolean(data.origin) && !areSameLocations(data.origin, data.destination),
-      destination: Boolean(data.destination) && !areSameLocations(data.origin, data.destination),
-      passengers: isPositiveIntegerUpTo(data.passengers, 6),
+      origin: data.serviceType === 'airport_hotel'
+        ? true
+        : Boolean(data.origin) && !areSameLocations(data.origin, data.destination),
+      destination: data.serviceType === 'airport_hotel'
+        ? true
+        : Boolean(data.destination) && !areSameLocations(data.origin, data.destination),
+      passengers: data.serviceType === 'airport_hotel'
+        ? hasAirportHotelFareKeySelected(data)
+        : isPositiveIntegerUpTo(data.passengers, 6),
       luggage: isZeroOrPositiveInteger(data.luggage)
     };
 
@@ -706,8 +824,16 @@
 
         return isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime);
       case 'origin':
+        if (data.serviceType === 'airport_hotel') {
+          return true;
+        }
+
         return Boolean(data.origin) && !areSameLocations(data.origin, data.destination);
       case 'destination':
+        if (data.serviceType === 'airport_hotel') {
+          return true;
+        }
+
         return Boolean(data.destination) && !areSameLocations(data.origin, data.destination);
       default:
         validity = validateReservationRequestFields(fields);
@@ -835,13 +961,14 @@
     }
 
     syncReservationDateTimeMinimum(fields);
+    data = getReservationRequestData(fields);
+    syncNativeRequiredState(fields, data);
 
     if (isFormLocked(fields.form)) {
       setSubmitEnabled(fields, false);
       return true;
     }
 
-    data = getReservationRequestData(fields);
     canAttemptSubmit = hasAttemptableReservationData(data);
 
     setSubmitEnabled(fields, canAttemptSubmit);

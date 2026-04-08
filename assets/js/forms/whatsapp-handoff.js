@@ -44,27 +44,130 @@
     return value;
   }
 
+  function getAirportHotelSelectedFareKey() {
+    var bridge;
+    var bridgeState;
+    var selectedFareKey;
+
+    bridge = window.PixkuyAirportZoneTariff;
+
+    if (!bridge || typeof bridge !== 'object' || typeof bridge.getState !== 'function') {
+      return '';
+    }
+
+    bridgeState = bridge.getState();
+
+    if (!bridgeState || typeof bridgeState !== 'object') {
+      return '';
+    }
+
+    selectedFareKey = bridgeState.selectedFareKey;
+    return typeof selectedFareKey === 'string' ? selectedFareKey.trim() : '';
+  }
+
+  function resolveAirportHotelPassengersLabel() {
+    var utilsApi;
+    var fareKey;
+
+    utilsApi = window.PixkuyAirportTariffUtils;
+    fareKey = getAirportHotelSelectedFareKey();
+
+    if (
+      !utilsApi ||
+      typeof utilsApi !== 'object' ||
+      typeof utilsApi.resolveFareKeyDisplayLabel !== 'function' ||
+      !fareKey
+    ) {
+      return '';
+    }
+
+    return utilsApi.resolveFareKeyDisplayLabel(fareKey) || '';
+  }
+
+  function getAirportHotelEditorData(form) {
+    var formsApi;
+    var getTripSnapshot;
+    var snapshot;
+
+    if (!form) {
+      return {
+        origin: '',
+        destination: '',
+        passengers: ''
+      };
+    }
+
+    formsApi = window.PixkuyForms;
+    getTripSnapshot = formsApi && typeof formsApi.getContactAirportHotelTripSnapshot === 'function'
+      ? formsApi.getContactAirportHotelTripSnapshot
+      : null;
+
+    if (!getTripSnapshot) {
+      return {
+        origin: '',
+        destination: '',
+        passengers: ''
+      };
+    }
+
+    snapshot = getTripSnapshot();
+
+    if (!snapshot || typeof snapshot !== 'object') {
+      return {
+        origin: '',
+        destination: '',
+        passengers: ''
+      };
+    }
+
+    return {
+      origin: typeof snapshot.origin === 'string' ? snapshot.origin.trim() : '',
+      destination: typeof snapshot.destination === 'string' ? snapshot.destination.trim() : '',
+      passengers: resolveAirportHotelPassengersLabel()
+    };
+  }
+
   function getVisibleFormData(form) {
+    var serviceType;
+    var airportHotelData;
+    var fallbackOrigin;
+    var fallbackDestination;
+    var fallbackPassengers;
+
+    serviceType = getVisibleFieldValue(form, 'service_type');
+    fallbackOrigin = getVisibleFieldValue(form, 'origin');
+    fallbackDestination = getVisibleFieldValue(form, 'destination');
+    fallbackPassengers = getVisibleFieldValue(form, 'passengers');
+    airportHotelData = serviceType === 'airport_hotel'
+      ? getAirportHotelEditorData(form)
+      : null;
+
     return {
       name: getVisibleFieldValue(form, 'name'),
       phone: getVisibleFieldValue(form, 'phone'),
       email: getVisibleFieldValue(form, 'email'),
       tripDate: getVisibleFieldValue(form, 'trip_date'),
       tripTime: getVisibleFieldValue(form, 'trip_time'),
-      origin: getVisibleFieldValue(form, 'origin'),
-      destination: getVisibleFieldValue(form, 'destination'),
-      passengers: getVisibleFieldValue(form, 'passengers'),
+      origin: airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin,
+      destination: airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination,
+      serviceType: serviceType,
+      zone: getVisibleFieldValue(form, 'zone'),
+      fare: getVisibleFieldValue(form, 'fare'),
+      passengers: airportHotelData && airportHotelData.passengers ? airportHotelData.passengers : fallbackPassengers,
       luggage: getVisibleFieldValue(form, 'luggage'),
       notes: getVisibleFieldValue(form, 'message')
     };
   }
-
+  
   function buildMessageLines(data) {
     var lines;
     var labels;
 
     labels = {
       intro: getI18nValue('contact.whatsappMessage.intro', 'Hola, quiero solicitar un traslado con Pixkuy.'),
+      serviceType: getI18nValue('contact.whatsappMessage.serviceType', 'Tipo de servicio'),
+      serviceAirportHotel: getI18nValue('contact.services.airportHotel', 'Aeropuerto y hotel'),
+      serviceOther: getI18nValue('contact.services.other', 'Otro servicio'),
       name: getI18nValue('contact.whatsappMessage.name', 'Nombre'),
       phone: getI18nValue('contact.whatsappMessage.phone', 'Teléfono'),
       email: getI18nValue('contact.whatsappMessage.email', 'Correo electrónico'),
@@ -72,12 +175,20 @@
       tripTime: getI18nValue('contact.whatsappMessage.tripTime', 'Hora del traslado'),
       origin: getI18nValue('contact.whatsappMessage.origin', 'Origen'),
       destination: getI18nValue('contact.whatsappMessage.destination', 'Destino'),
+      zone: getI18nValue('contact.whatsappMessage.zone', 'Zona'),
+      fare: getI18nValue('contact.whatsappMessage.fare', 'Tarifa'),
       passengers: getI18nValue('contact.whatsappMessage.passengers', 'Pasajeros'),
       luggage: getI18nValue('contact.whatsappMessage.luggage', 'Maletas'),
       notes: getI18nValue('contact.whatsappMessage.notes', 'Notas')
     };
 
     lines = [labels.intro];
+
+    if (data.serviceType === 'airport_hotel') {
+      lines.push(labels.serviceType + ': ' + labels.serviceAirportHotel);
+    } else if (data.serviceType === 'other') {
+      lines.push(labels.serviceType + ': ' + labels.serviceOther);
+    }
 
     if (data.name) {
       lines.push(labels.name + ': ' + data.name);
@@ -105,6 +216,14 @@
 
     if (data.destination) {
       lines.push(labels.destination + ': ' + data.destination);
+    }
+
+    if (data.zone) {
+      lines.push(labels.zone + ': ' + data.zone);
+    }
+
+    if (data.fare) {
+      lines.push(labels.fare + ': ' + data.fare);
     }
 
     if (data.passengers) {
@@ -191,10 +310,22 @@
 
     link.addEventListener('click', function (event) {
       var url = updateWhatsappLink(link, form);
+      var target;
+
+      event.preventDefault();
 
       if (!url) {
-        event.preventDefault();
+        return;
       }
+
+      target = link.getAttribute('target');
+
+      if (target === '_blank') {
+        window.open(url, '_blank', 'noopener');
+        return;
+      }
+
+      window.location.href = url;
     });
 
     return true;

@@ -74,7 +74,8 @@
           "url": "https://pixkuy.com/",
           "logo": "https://pixkuy.com/assets/img/og-image.png",
           "sameAs": [
-            "https://www.linkedin.com/company/pixkuy-mobility/"
+            "https://www.linkedin.com/company/pixkuy-mobility/",
+            "https://www.instagram.com/pixkuymobility/"
           ]
         },
         {
@@ -190,9 +191,20 @@
       <li data-i18n="services.cards.airport.bullets.2"></li>
     </ul>
 
-    <div class="service-card__price">
-      <span class="service-card__price-label" data-i18n="services.cards.airport.priceLabel"></span>
-      <strong class="service-card__price-value" data-i18n="services.cards.airport.priceValue"></strong>
+    <div class="service-card__footer">
+      <div class="service-card__price">
+        <span class="service-card__price-label" data-i18n="services.cards.airport.priceLabel"></span>
+        <strong class="service-card__price-value" data-i18n="services.cards.airport.priceValue"></strong>
+      </div>
+
+      <div class="service-card__action" aria-hidden="true">
+        <span class="service-card__action-label" data-i18n="services.cards.airport.ctaClosed"></span>
+        <span class="service-card__action-chevron" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
     </div>
   </article>
 
@@ -218,7 +230,313 @@
       <strong class="service-card__price-value" data-i18n="services.cards.tours.priceValue"></strong>
     </div>
   </article>
+  
+    <div
+    class="services-expand"
+    id="services-expand"
+    aria-live="polite"
+    aria-hidden="true"
+    hidden
+  >
+    <div class="services-expand__inner">
+            <div
+        class="services-expand__panel"
+        id="services-expand-airport"
+        data-service-panel="airport"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="services-expand__eyebrow" data-i18n="services.cards.airport.panel.eyebrow"></div>
+        <h3 class="services-expand__title" data-i18n="services.cards.airport.panel.title"></h3>
+        <p class="services-expand__text" data-i18n="services.cards.airport.panel.text"></p>
 
+        <div class="services-expand__form">
+                    <div
+            class="services-expand__field"
+            data-airport-tariff-role="origin"
+            data-airport-tariff-type="airport"
+          >
+            <label
+              class="services-expand__label"
+              for="airport-tariff-origin"
+              data-i18n="services.cards.airport.panel.originLabel"
+            ></label>
+
+            <div
+              class="services-expand__airport-shell"
+              data-airport-endpoint-airport-root="0"
+              data-airport-endpoint-side="left"
+            >
+              <button
+                type="button"
+                class="services-expand__control services-expand__control--select"
+                id="airport-tariff-origin"
+                data-i18n="services.cards.airport.panel.originAirportPlaceholder"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                data-airport-tariff-control="origin"
+                data-airport-tariff-type="airport"
+              ></button>
+            </div>
+
+            <div
+              class="services-expand__destination"
+              data-airport-destination-root="0"
+              data-airport-destination-side="left"
+              data-airport-destination-mode="airport"
+              hidden
+            >
+              <div
+                class="services-expand__destination-search"
+                data-airport-destination-search="0"
+                hidden
+              >
+                <div
+                  class="services-expand__destination-mount"
+                  data-airport-destination-mount="0"
+                  aria-hidden="true"
+                ></div>
+              </div>
+
+              <div
+                class="services-expand__destination-resolved"
+                data-airport-destination-resolved="0"
+                hidden
+              >
+                <div class="services-expand__destination-resolved-main">
+                  <span
+                    class="services-expand__destination-resolved-label"
+                    data-airport-destination-label="0"
+                  ></span>
+
+                  <button
+                    type="button"
+                    class="services-expand__destination-clear"
+                    data-airport-destination-clear="0"
+                  >
+                    <span class="visually-hidden" data-i18n="services.cards.airport.panel.clearResolvedDestination"></span>
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="services-expand__swap">
+            <button
+              type="button"
+              class="services-expand__swap-button"
+              id="airport-tariff-swap"
+              data-airport-tariff-swap="1"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false" aria-hidden="true">
+                <path d="M8 7h10m0 0-3-3m3 3-3 3M16 17H6m0 0 3-3m-3 3 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div
+            class="services-expand__field"
+            data-airport-tariff-role="destination"
+            data-airport-tariff-type="zone"
+          >
+            <label
+              class="services-expand__label"
+              for="airport-tariff-destination"
+              data-i18n="services.cards.airport.panel.destinationLabel"
+            ></label>
+
+            <div
+              class="services-expand__airport-shell"
+              data-airport-endpoint-airport-root="1"
+              data-airport-endpoint-side="right"
+              hidden
+            >
+              <button
+                type="button"
+                class="services-expand__control services-expand__control--select"
+                data-airport-tariff-airport-display="1"
+                data-airport-tariff-type="airport"
+                aria-hidden="true"
+                tabindex="-1"
+              ></button>
+            </div>
+
+            <div
+              class="services-expand__destination"
+              data-airport-destination-root="1"
+              data-airport-destination-side="right"
+              data-airport-destination-mode="manual-zone"
+            >
+              <div
+                class="services-expand__destination-search"
+                data-airport-destination-search="1"
+                hidden
+              >
+                <div
+                  class="services-expand__destination-mount"
+                  data-airport-destination-mount="1"
+                  aria-hidden="true"
+                ></div>
+              </div>
+
+              <div
+                class="services-expand__destination-resolved"
+                data-airport-destination-resolved="1"
+                hidden
+              >
+                <div class="services-expand__destination-resolved-main">
+                  <span
+                    class="services-expand__destination-resolved-label"
+                    data-airport-destination-label="1"
+                  ></span>
+
+                  <button
+                    type="button"
+                    class="services-expand__destination-clear"
+                    data-airport-destination-clear="1"
+                  >
+                    <span class="visually-hidden" data-i18n="services.cards.airport.panel.clearResolvedDestination"></span>
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="services-expand__control services-expand__control--select"
+                id="airport-tariff-destination"
+                data-i18n="services.cards.airport.panel.destinationZonePlaceholder"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                data-airport-tariff-control="destination"
+                data-airport-tariff-type="zone"
+              ></button>
+            </div>
+          </div>
+
+          <div
+  class="services-expand__field services-expand__field--passengers"
+  data-airport-tariff-role="passengers"
+>
+  <label
+    class="services-expand__label"
+    for="airport-tariff-passengers"
+    data-i18n="services.cards.airport.panel.passengersLabel"
+  ></label>
+
+  <button
+    type="button"
+    class="services-expand__control services-expand__control--select"
+    id="airport-tariff-passengers"
+    data-airport-tariff-control="passengers"
+    data-airport-tariff-type="fare-key"
+    data-i18n="services.cards.airport.panel.passengersPlaceholder"
+    aria-expanded="false"
+    aria-haspopup="listbox"
+  ></button>
+
+  <div
+    class="services-expand__passengers-segmented"
+    role="group"
+    aria-labelledby="airport-tariff-passengers"
+    data-airport-tariff-passengers-group
+    aria-hidden="true"
+    hidden
+  >
+    <button
+      type="button"
+      class="services-expand__passenger-chip"
+      data-airport-tariff-passenger-option="van_1_2"
+      data-airport-tariff-fare-key="van_1_2"
+      aria-pressed="false"
+    >
+      <span class="services-expand__passenger-chip-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
+          <path d="M12 12a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M6.5 18.5c.9-2.4 3-3.8 5.5-3.8s4.6 1.4 5.5 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="services-expand__passenger-chip-text">1–2</span>
+    </button>
+
+    <button
+      type="button"
+      class="services-expand__passenger-chip"
+      data-airport-tariff-passenger-option="van_3_4"
+      data-airport-tariff-fare-key="van_3_4"
+      aria-pressed="false"
+    >
+      <span class="services-expand__passenger-chip-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
+          <path d="M9 11.5a2.75 2.75 0 1 0 0-5.5 2.75 2.75 0 0 0 0 5.5Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M15.5 12.2a2.35 2.35 0 1 0 0-4.7 2.35 2.35 0 0 0 0 4.7Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M4.8 18.3c.8-2.1 2.6-3.4 4.8-3.4 1.3 0 2.4.4 3.3 1.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M13.3 18.3c.6-1.5 1.8-2.4 3.4-2.4 1.2 0 2.2.5 3 1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="services-expand__passenger-chip-text">3–4</span>
+    </button>
+
+    <button
+      type="button"
+      class="services-expand__passenger-chip"
+      data-airport-tariff-passenger-option="van_5_6"
+      data-airport-tariff-fare-key="van_5_6"
+      aria-pressed="false"
+    >
+      <span class="services-expand__passenger-chip-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
+          <path d="M8 10.8a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M12 9.8a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M16.3 10.8a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M4.8 18.2c.7-1.9 2.1-3 4-3 .8 0 1.5.2 2.1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M9.2 18.6c.8-2.3 2.5-3.6 4.8-3.6s4 1.3 4.8 3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="services-expand__passenger-chip-text">5–6</span>
+    </button>
+  </div>
+</div>
+
+          <div class="services-expand__field services-expand__field--fare">
+            <span
+              class="services-expand__label"
+              data-i18n="services.cards.airport.panel.fareLabel"
+            ></span>
+            <strong
+              class="services-expand__fare"
+              data-i18n="services.cards.airport.panel.fareValue"
+            ></strong>
+
+            <div
+              class="services-expand__destination-zone"
+              data-airport-destination-zone="1"
+              hidden
+            >
+              <span
+                class="services-expand__destination-zone-label"
+                data-i18n="services.cards.airport.panel.destinationZoneLabel"
+              ></span>
+              <strong
+                class="services-expand__destination-zone-value"
+                data-airport-destination-zone-value="1"
+              ></strong>
+            </div>
+          </div>
+
+          <div class="services-expand__actions">
+            <button
+              type="button"
+              class="services-expand__cta"
+              data-i18n="services.cards.airport.panel.cta"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <article class="service-card">
     <div class="service-card__icon" aria-hidden="true">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" focusable="false">
@@ -289,7 +607,6 @@
     </div>
   </article>
 </div>
-
       <p class="muted small" data-i18n="services.bridge"></p>
     </div>
   </section>
@@ -423,6 +740,14 @@
         <input type="hidden" name="destination_place_id" value="" />
         <input type="hidden" name="destination_lat" value="" />
         <input type="hidden" name="destination_lng" value="" />
+        <input type="hidden" name="service_type" value="other" />
+		<input type="hidden" name="zone" value="" />
+        <input type="hidden" name="fare" value="" />
+        <input type="hidden" name="airport_hotel_direction" value="" />
+        <input type="hidden" name="airport_hotel_airport" value="" />
+        <input type="hidden" name="airport_hotel_hotel" value="" />
+        <input type="hidden" name="passenger_fare_key" value="" />
+        <input type="hidden" name="passenger_bucket_label" value="" />
 
         <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
           <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
@@ -446,6 +771,313 @@
         ></p>
 
         <div class="form-grid">
+          <div
+            class="contact-service-switcher"
+            data-contact-service-switcher
+            data-contact-service-switcher-aria-label="contact.services.switcherAriaLabel"
+            aria-label="Selector de tipo de servicio"
+          >
+            <button
+              type="button"
+              class="contact-service-switcher__button"
+              data-contact-service-trigger="airport_hotel"
+              aria-pressed="false"
+              data-i18n="contact.services.airportHotel"
+            >
+              Aeropuerto y hotel
+            </button>
+
+            <button
+              type="button"
+              class="contact-service-switcher__button"
+              data-contact-service-trigger="other"
+              aria-pressed="true"
+              data-i18n="contact.services.other"
+            >
+              Otro servicio
+            </button>
+          </div>
+
+                    <div
+            class="contact-service-panel"
+            data-contact-service-panel="airport_hotel"
+            aria-hidden="true"
+            hidden
+          >
+            <div
+              class="contact-airport-hotel-editor"
+              data-contact-airport-hotel-editor
+            >
+            <div class="contact-airport-hotel-editor__header">
+              <p
+                class="muted small"
+                data-contact-airport-hotel-helper
+                data-i18n="contact.services.airportHotelHelper"
+              ></p>
+            </div>
+
+              <div
+                class="contact-airport-hotel-editor__grid"
+                data-contact-airport-hotel-layout="side-aware"
+              >
+                <div
+                  class="contact-airport-hotel-editor__field"
+                  data-contact-airport-hotel-role="origin"
+                >
+                  <label
+                    class="services-expand__label"
+                    for="contact-airport-hotel-airport"
+                    data-i18n="contact.services.airportHotelAirportLabel"
+                  >
+                    Aeropuerto
+                  </label>
+
+                  <div
+                    class="contact-airport-hotel-editor__airport-shell"
+                    data-contact-airport-hotel-airport-shell="0"
+                    data-contact-airport-hotel-airport-side="origin"
+                  >
+                    <button
+                      type="button"
+                      class="services-expand__control services-expand__control--select"
+                      id="contact-airport-hotel-airport"
+                      data-contact-airport-hotel-airport-trigger
+                      aria-expanded="false"
+                      aria-haspopup="listbox"
+                      data-i18n="contact.services.airportHotelAirportPlaceholder"
+                    >
+                      Selecciona aeropuerto
+                    </button>
+                  </div>
+
+                  <div
+                    class="contact-airport-hotel-editor__lodging-shell"
+                    data-contact-airport-hotel-future-lodging-shell="0"
+                    data-contact-airport-hotel-future-lodging-side="origin"
+                    hidden
+                  >
+                    <div
+                      class="contact-airport-hotel-editor__resolved"
+                      data-contact-airport-hotel-future-resolved="0"
+                      hidden
+                    >
+                      <div class="contact-airport-hotel-editor__resolved-main">
+                        <span
+                          class="contact-airport-hotel-editor__resolved-label"
+                          data-contact-airport-hotel-future-resolved-label="0"
+                        ></span>
+
+                        <button
+                          type="button"
+                          class="contact-airport-hotel-editor__resolved-clear"
+                          data-contact-airport-hotel-future-resolved-clear="0"
+                        >
+                          <span class="visually-hidden" data-i18n="services.cards.airport.panel.clearResolvedDestination"></span>
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      class="contact-airport-hotel-editor__search"
+                      data-contact-airport-hotel-future-search="0"
+                      hidden
+                    >
+                      <div
+                        class="place-autocomplete__mount"
+                        data-contact-airport-hotel-future-mount="0"
+                        aria-hidden="true"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="contact-airport-hotel-editor__swap">
+                  <button
+                    type="button"
+                    class="services-expand__swap-button"
+                    data-contact-airport-hotel-swap
+                    aria-label="Cambiar sentido del trayecto"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false" aria-hidden="true">
+                      <path d="M8 7h10m0 0-3-3m3 3-3 3M16 17H6m0 0 3-3m-3 3 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div
+                  class="contact-airport-hotel-editor__field"
+                  data-contact-airport-hotel-role="destination"
+                >
+                  <label
+                    class="services-expand__label"
+                    for="contact-airport-hotel-hotel"
+                    data-i18n="contact.services.airportHotelHotelLabel"
+                  >
+                    Hotel
+                  </label>
+
+                  <div
+                    class="contact-airport-hotel-editor__airport-shell"
+                    data-contact-airport-hotel-future-airport-shell="1"
+                    data-contact-airport-hotel-future-airport-side="destination"
+                    hidden
+                  >
+                    <button
+                      type="button"
+                      class="services-expand__control services-expand__control--select"
+                      data-contact-airport-hotel-future-airport-display="1"
+                      aria-hidden="true"
+                      tabindex="-1"
+                    ></button>
+                  </div>
+
+                  <div
+                    class="place-autocomplete"
+                    data-contact-airport-hotel-hotel-root
+                    data-contact-airport-hotel-hotel-root-id="1"
+                    data-contact-airport-hotel-hotel-side="destination"
+                  >
+                    <input
+                      id="contact-airport-hotel-hotel"
+                      type="text"
+                      placeholder=""
+                      autocomplete="off"
+                      data-contact-airport-hotel-hotel-input
+                      data-i18n-ph="services.cards.airport.panel.hotelPlaceholder"
+                    />
+
+                    <button
+                      type="button"
+                      class="place-autocomplete__clear"
+                      data-contact-airport-hotel-hotel-clear
+                      aria-label="Borrar hotel"
+                      hidden
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+
+                    <div
+                      class="place-autocomplete__mount"
+                      data-contact-airport-hotel-hotel-mount
+                      aria-hidden="true"
+                    ></div>
+                  </div>
+                </div>
+                            </div>
+
+              <div
+                class="contact-airport-hotel-editor__passengers"
+                data-contact-airport-hotel-passengers
+              >
+                <label
+                  class="services-expand__label"
+                  data-contact-airport-hotel-passengers-label
+                  data-i18n="services.cards.airport.panel.passengersLabel"
+                >
+                  Pasajeros
+                </label>
+
+                <div
+                  class="services-expand__passengers-segmented"
+                  role="group"
+                  data-contact-airport-hotel-passengers-group
+                >
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-airport-hotel-passenger-option="van_1_2"
+                    data-contact-airport-hotel-fare-key="van_1_2"
+                    aria-pressed="false"
+                  >
+                    <span class="services-expand__passenger-chip-icon" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
+                        <path d="M12 12a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z" stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M6.5 18.5c.9-2.4 3-3.8 5.5-3.8s4.6 1.4 5.5 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <span class="services-expand__passenger-chip-text">1–2</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-airport-hotel-passenger-option="van_3_4"
+                    data-contact-airport-hotel-fare-key="van_3_4"
+                    aria-pressed="false"
+                  >
+                    <span class="services-expand__passenger-chip-icon" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
+                        <path d="M9 11.5a2.75 2.75 0 1 0 0-5.5 2.75 2.75 0 0 0 0 5.5Z" stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M15.5 12.2a2.35 2.35 0 1 0 0-4.7 2.35 2.35 0 0 0 0 4.7Z" stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M4.8 18.3c.8-2.1 2.6-3.4 4.8-3.4 1.3 0 2.4.4 3.3 1.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        <path d="M13.3 18.3c.6-1.5 1.8-2.4 3.4-2.4 1.2 0 2.2.5 3 1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <span class="services-expand__passenger-chip-text">3–4</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-airport-hotel-passenger-option="van_5_6"
+                    data-contact-airport-hotel-fare-key="van_5_6"
+                    aria-pressed="false"
+                  >
+                    <span class="services-expand__passenger-chip-icon" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
+                        <path d="M8 10.8a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z" stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M12 9.8a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Z" stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M16.3 10.8a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z" stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M4.8 18.2c.7-1.9 2.1-3 4-3 .8 0 1.5.2 2.1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        <path d="M9.2 18.6c.8-2.3 2.5-3.6 4.8-3.6s4 1.3 4.8 3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <span class="services-expand__passenger-chip-text">5–6</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="contact-panel-summary contact-panel-summary--zone"
+              data-contact-panel-zone
+              hidden
+            >
+              <p class="contact-panel-summary__text">
+                <span
+                  class="contact-panel-summary__zone-label"
+                  data-i18n="services.cards.airport.panel.destinationZoneLabel"
+                ></span>
+                <strong
+                  class="contact-panel-summary__zone-value"
+                  data-contact-panel-zone-value
+                ></strong>
+              </p>
+            </div>
+
+            <div
+              class="contact-panel-fare"
+              data-contact-panel-fare
+              hidden
+            >
+              <p
+                class="contact-panel-fare__label"
+                data-i18n="services.cards.airport.panel.fareLabel"
+              ></p>
+              <strong
+                class="contact-panel-fare__value"
+                data-contact-panel-fare-value
+              ></strong>
+            </div>
+          </div>
+
+          <div
+            class="contact-service-panel"
+            data-contact-service-panel="other"
+            aria-hidden="false"
+          ></div>
+
           <div class="form-field">
             <label for="contact-name" class="visually-hidden" data-i18n="contact.name"></label>
             <input
@@ -793,7 +1425,7 @@
         <div data-i18n="legal.contact"></div>
       </address>
 
-      <!-- LinkedIn (presencia institucional) -->
+      <!-- LinkedIn + Instagram (presencia institucional) -->
       <div class="legal-social">
         <a
           href="https://www.linkedin.com/company/pixkuy-mobility/"
@@ -805,6 +1437,19 @@
             <path d="M4.98 3.5C4.98 4.6 4.08 5.5 2.98 5.5C1.88 5.5 1 4.6 1 3.5C1 2.4 1.88 1.5 2.98 1.5C4.08 1.5 4.98 2.4 4.98 3.5Z" fill="currentColor" />
             <path d="M1.5 8.5H4.5V23H1.5V8.5Z" fill="currentColor" />
             <path d="M8.5 8.5H11.3V10.48H11.34C11.73 9.74 12.68 8.96 14.09 8.96C17.18 8.96 17.75 11 17.75 14.15V23H14.75V14.97C14.75 13.06 14.71 10.6 12.46 10.6C10.17 10.6 9.82 12.43 9.82 14.84V23H6.82V8.5H8.5Z" fill="currentColor" />
+          </svg>
+        </a>
+
+        <a
+          href="https://www.instagram.com/pixkuymobility/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Pixkuy Mobility en Instagram"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+            <rect x="3.25" y="3.25" width="17.5" height="17.5" rx="5" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="4.1" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="17.35" cy="6.65" r="1.15" fill="currentColor"/>
           </svg>
         </a>
       </div>
@@ -854,8 +1499,30 @@
 <script src="assets/js/forms/google-places.js"></script>
 <script src="https://unpkg.com/libphonenumber-js@1.12.15/bundle/libphonenumber-max.js"></script>
 <script src="assets/js/forms/reservation-request.js"></script>
+<script src="assets/js/forms/contact-service-state.js"></script>
+<script src="assets/js/forms/contact-service-switcher.js"></script>
+<script src="assets/js/forms/contact-airport-hotel-editor.js"></script>
+<script src="assets/js/forms/contact-airport-hotel-lodging-adapter.js"></script>
 <script src="assets/js/forms/whatsapp-handoff.js"></script>
+<script src="assets/js/forms/panel-handoff-summary.js"></script>
 <script src="assets/js/forms/index.js"></script>
+<script src="assets/js/services-expand.js"></script>
+<script src="assets/js/data/airport-zone-catalog.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-utils.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-catalog.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-dropdowns.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-state.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-passengers.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-cta.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-handoff.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-swap.js"></script>
+<script src="assets/js/geo/zone-resolver.js"></script>
+<script src="assets/js/services/airport-endpoints-state.js"></script>
+<script src="assets/js/airport-zone-tariff.js"></script>
+<script src="assets/js/services/airport-lodging-types.js"></script>
+<script src="assets/js/services/airport-destination.js"></script>
+<script src="assets/js/services/airport-lodging-autocomplete.js"></script>
+<script src="assets/js/services/airport-lodging-places.js"></script>
 
 </body>
 </html>
