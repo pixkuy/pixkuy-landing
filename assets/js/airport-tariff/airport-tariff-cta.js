@@ -64,9 +64,23 @@
       return false;
     }
 
+    const lodgingSide =
+      state.lodgingEndpointSide === "origin" ||
+      state.lodgingEndpointSide === "destination"
+        ? state.lodgingEndpointSide
+        : "";
+
+    const hasResolvedLodging =
+      deps.normalizeText(state.lodgingEndpointLabel).length > 0 &&
+      lodgingSide.length > 0;
+
+    if (hasResolvedLodging) {
+      return true;
+    }
+
     return (
       state.destinationMode === "resolved-place" &&
-      deps.normalizeText(state.lodgingEndpointLabel || state.destinationPlaceLabel).length > 0
+      deps.normalizeText(state.destinationPlaceLabel).length > 0
     );
   }
 
