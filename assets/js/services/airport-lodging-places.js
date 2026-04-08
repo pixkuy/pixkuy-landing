@@ -26,12 +26,12 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
     return typeof value === "string" ? value.trim() : "";
   }
   
-    function debugTrace(step, payload) {
-    console.debug("[Pixkuy][airport-lodging-places]", step, payload || {});
+  function debugTrace() {
+    return;
   }
-  
-    function debugCoverage(label, payload) {
-    console.debug("[Pixkuy][airport-lodging-places][coverage]", label, payload || {});
+
+  function debugCoverage() {
+    return;
   }
 
   function getAutocompleteUi() {
