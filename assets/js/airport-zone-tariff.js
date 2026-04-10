@@ -910,21 +910,20 @@ function shouldUsePassengerChipUi(nodes) {
 
   function seedInitialState(state) {
     const airports = getActiveItemsByType("airport");
-    const zones = getActiveItemsByType("zone");
-
     const firstAirport = airports[0] || null;
-    const firstZone = zones[0] || null;
 
     clearResolvedDestinationState(state);
+    clearLodgingEndpointState(state);
+
+    state.destinationValue = "";
+    state.destinationLabel = "";
+    state.resolvedZoneId = "";
+    state.resolvedZoneLabelKey = "";
+    state.selectedFareKey = "";
 
     if (firstAirport) {
       state.originValue = firstAirport.id;
       state.originLabel = resolveItemLabel(firstAirport);
-    }
-
-    if (firstZone) {
-      state.destinationValue = firstZone.id;
-      state.destinationLabel = resolveItemLabel(firstZone);
     }
 
     syncResolvedZoneFromState(state);
