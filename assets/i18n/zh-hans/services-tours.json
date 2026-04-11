@@ -1,0 +1,125 @@
+{
+  "services": {
+    "cards": {
+      "tours": {
+        "title": "私人游览与参观",
+        "text": "前往标志性地点的私人行程，具有清晰的配置流程，并从出发到返回都提供细致周到的服务。",
+        "bullets": [
+          "固定游览方案",
+          "预先配置",
+          "个性化服务"
+        ],
+        "priceLabel": "价格起",
+        "priceValue": "4.000 MXN",
+        "ctaClosed": "查看游览项目",
+        "ctaOpen": "隐藏游览项目",
+        "panel": {
+          "title": "选择您的游览项目",
+          "text": "请先选择您感兴趣的路线。之后，您可以配置乘客人数、接载地点、日期、时间，以及在适用情况下配置导游和语言。",
+          "selectedTourLabel": "已选游览项目",
+          "durationLabel": "时长",
+          "priceFromLabel": "价格起",
+          "pickupLabel": "接载",
+          "pickupPlaceholder": "请输入接载地点",
+          "pickupHelp": "接载地点用于运营可行性确认，但不会改变价格。",
+          "dateLabel": "日期",
+          "timeLabel": "时间",
+          "passengersLabel": "乘客",
+          "guideLabel": "导游",
+          "guideIncludedLabel": "含导游",
+          "guideNotIncludedLabel": "不含导游",
+          "guideLanguageLabel": "导游语言",
+          "guideLanguagePlaceholder": "选择语言",
+          "priceLabel": "最终价格",
+          "priceValuePending": "—",
+          "cta": "请求",
+          "ctaDisabled": "请完成配置",
+          "emptyStateTitle": "请选择一个游览项目",
+          "emptyStateText": "请先从目录中选择一个选项，以查看其配置和最终价格。",
+          "changeTourConfirm": "如果您更改游览项目，我们将重新检查当前配置，并仅保留兼容的数据。是否继续？",
+          "confirmAccept": "继续",
+          "confirmCancel": "取消",
+          "catalog": {
+            "teotihuacan": {
+              "title": "特奥蒂瓦坎金字塔",
+              "description": "通过含往返接送和门票的私人行程，以您自己的节奏探索特奥蒂瓦坎。",
+              "duration": "6小时",
+              "priceFrom": "4.000 MXN",
+              "imageAlt": "特奥蒂瓦坎金字塔"
+            },
+            "teotihuacan_basilica": {
+              "title": "特奥蒂瓦坎金字塔 + 瓜达卢佩圣母大殿",
+              "description": "在含往返接送和门票的一日私人行程中，探索特奥蒂瓦坎和圣母大殿，充分利用参观时间。",
+              "duration": "9小时",
+              "priceFrom": "5.000 MXN",
+              "imageAlt": "特奥蒂瓦坎金字塔和瓜达卢佩圣母大殿"
+            },
+            "xochimilco_coyoacan": {
+              "title": "索奇米尔科 + 科约阿坎",
+              "description": "通过含往返接送的私人行程，以从容舒适的方式体验墨西哥城两个最具代表性的地方：索奇米尔科和科约阿坎。",
+              "duration": "6小时",
+              "priceFrom": "4.500 MXN",
+              "imageAlt": "索奇米尔科和科约阿坎"
+            },
+            "cholula_puebla": {
+              "title": "乔卢拉 + 普埃布拉",
+              "description": "从墨西哥城出发，享受一整天的私人行程前往乔卢拉和普埃布拉，并拥有充足时间按自己的节奏参观。",
+              "duration": "9小时",
+              "priceFrom": "7.200 MXN",
+              "imageAlt": "乔卢拉和普埃布拉"
+            },
+            "san_miguel_allende": {
+              "title": "圣米格尔-德阿连德",
+              "description": "从墨西哥城出发的私人行程，旨在让您以舒适且不慌不忙的方式体验圣米格尔-德阿连德。",
+              "duration": "10小时",
+              "priceFrom": "7.800 MXN",
+              "imageAlt": "圣米格尔-德阿连德"
+            }
+          },
+          "guideLanguages": {
+            "es": "西班牙语",
+            "en": "英语",
+            "fr": "法语"
+          },
+          "guideOptions": {
+            "yes": "是",
+            "no": "否"
+          },
+          "passengerBuckets": {
+            "van_1_2": "1–2",
+            "van_3_4": "3–4",
+            "van_5_6": "5–6"
+          }
+        },
+        "contact": {
+          "serviceLabel": "私人游览与参观",
+          "helper": "请选择游览项目，并在发送请求前完成运营配置。",
+          "tourLabel": "游览项目",
+          "tourPlaceholder": "选择游览项目",
+          "passengersLabel": "乘客",
+          "pickupLabel": "接载",
+          "pickupPlaceholder": "请输入接载地点",
+          "dateLabel": "游览日期",
+          "timeLabel": "出发时间",
+          "timePlaceholder": "出发时间",
+          "guideLabel": "导游",
+          "guideLanguageLabel": "导游语言",
+          "guideLanguagePlaceholder": "选择语言",
+          "summaryTourLabel": "游览项目",
+          "summaryDurationLabel": "时长",
+          "summaryTicketsLabel": "门票",
+          "summaryPriceLabel": "最终价格"
+        },
+        "whatsapp": {
+          "tour": "游览项目",
+          "pickup": "接载",
+          "guide": "导游",
+          "guideLanguage": "导游语言",
+          "price": "最终价格",
+          "guideYes": "是",
+          "guideNo": "否"
+        }
+      }
+    }
+  }
+}

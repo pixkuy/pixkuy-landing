@@ -84,6 +84,17 @@
       'initContactAirportHotelLodgingAdapter'
     );
   }
+
+  function bootContactTourPrivateEditor() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initContactTourPrivateEditor,
+      'initContactTourPrivateEditor'
+    );
+  }
   
     function bootPanelHandoffSummary() {
     if (!window.PixkuyForms) {
@@ -94,6 +105,137 @@
       window.PixkuyForms.initPanelHandoffSummary,
       'initPanelHandoffSummary'
     );
+  }
+
+  function getContactServiceStateApi() {
+    if (
+      !window.PixkuyForms ||
+      !window.PixkuyForms.contactServiceState
+    ) {
+      return null;
+    }
+
+    return window.PixkuyForms.contactServiceState;
+  }
+
+  function getReservationForm() {
+    if (
+      window.PixkuyForms &&
+      typeof window.PixkuyForms.getReservationForm === 'function'
+    ) {
+      return window.PixkuyForms.getReservationForm();
+    }
+
+    return document.querySelector('form[name="contact"]');
+  }
+
+  function scrollToContactSection(form) {
+    var section;
+
+    if (form && typeof form.closest === 'function') {
+      section = form.closest('#contact');
+    }
+
+    if (!section) {
+      section = document.getElementById('contact');
+    }
+
+    if (!section || typeof section.scrollIntoView !== 'function') {
+      return false;
+    }
+
+    section.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+
+    return true;
+  }
+
+  function focusTourPrivatePrimaryField(form) {
+    var target;
+
+    if (!form) {
+      return false;
+    }
+
+    target =
+      form.querySelector('[data-contact-tour-private-pickup]') ||
+      form.querySelector('[data-contact-tour-private-tour]') ||
+      form.querySelector('#contact-name');
+
+    if (!target || typeof target.focus !== 'function') {
+      return false;
+    }
+
+    window.setTimeout(function () {
+      target.focus();
+
+      if (typeof target.select === 'function') {
+        target.select();
+      }
+    }, 0);
+
+    return true;
+  }
+
+  function bindToursPanelHandoff() {
+    var formsNamespace;
+    var serviceStateApi;
+
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    formsNamespace = window.PixkuyForms;
+    serviceStateApi = getContactServiceStateApi();
+
+    if (
+      !serviceStateApi ||
+      typeof serviceStateApi.setActiveServiceType !== 'function' ||
+      typeof formsNamespace.applyContactTourPrivateHandoff !== 'function'
+    ) {
+      return false;
+    }
+
+    if (formsNamespace.__tourPrivateHandoffBound === true) {
+      return true;
+    }
+
+    window.addEventListener('pixkuy:tours-panel-submit', function (event) {
+      var detail;
+      var form;
+      var result;
+
+      detail = event && event.detail && typeof event.detail === 'object'
+        ? event.detail
+        : null;
+
+      if (!detail) {
+        return;
+      }
+
+      form = getReservationForm();
+
+      if (!form) {
+        return;
+      }
+
+      result = serviceStateApi.setActiveServiceType('tour_private', {
+        source: 'tours-panel-handoff'
+      });
+
+      if (!result || result.ok !== true) {
+        return;
+      }
+
+      formsNamespace.applyContactTourPrivateHandoff(detail);
+      scrollToContactSection(form);
+      focusTourPrivatePrimaryField(form);
+    });
+
+    formsNamespace.__tourPrivateHandoffBound = true;
+    return true;
   }
   
   function getDocumentLanguage() {
@@ -117,17 +259,23 @@
   }
 
   function getPlaceFieldElements(form, fieldName) {
+    var hiddenFieldBaseName;
+
     if (!form || !fieldName) {
       return null;
     }
+
+    hiddenFieldBaseName = fieldName === 'tour_private_pickup'
+      ? 'tour_private_pickup'
+      : fieldName;
 
     return {
       input: form.querySelector('[data-place-input="' + fieldName + '"]'),
       mountNode: form.querySelector('[data-place-mount="' + fieldName + '"]'),
       hiddenFields: {
-        placeId: form.querySelector('input[name="' + fieldName + '_place_id"]'),
-        lat: form.querySelector('input[name="' + fieldName + '_lat"]'),
-        lng: form.querySelector('input[name="' + fieldName + '_lng"]')
+        placeId: form.querySelector('input[name="' + hiddenFieldBaseName + '_place_id"]'),
+        lat: form.querySelector('input[name="' + hiddenFieldBaseName + '_lat"]'),
+        lng: form.querySelector('input[name="' + hiddenFieldBaseName + '_lng"]')
       }
     };
   }
@@ -141,6 +289,10 @@
 
     if (!nextInput && form && fieldName) {
       nextInput = form.querySelector('[name="' + fieldName + '"]');
+    }
+
+    if (!nextInput && form && fieldName) {
+      nextInput = form.querySelector('#' + fieldName);
     }
 
     if (!nextInput || typeof nextInput.focus !== 'function') {
@@ -179,14 +331,33 @@
 
     return safeInit(function () {
       var controller = googlePlacesApi.createAutocompleteController({
+        fieldName: fieldName,
         input: elements.input,
         mountNode: elements.mountNode,
         hiddenFields: elements.hiddenFields,
         language: normalizeGoogleLanguage(language),
         region: 'mx',
         includedRegionCodes: ['mx'],
-        onSelection: function onSelection(selectedPlace) {
+        onSelection: function onSelection(selectedPlace, meta) {
+          var safeMeta = meta && typeof meta === 'object' ? meta : {};
+          var shouldPreserveVisibleInput = safeMeta.preserveInputValue === true;
+
           if (!selectedPlace) {
+            if (
+              fieldName === 'tour_private_pickup' &&
+              typeof formsNamespace.clearContactTourPrivatePickupPlace === 'function' &&
+              !shouldPreserveVisibleInput
+            ) {
+              formsNamespace.clearContactTourPrivatePickupPlace();
+            }
+            return;
+          }
+
+          if (fieldName === 'tour_private_pickup') {
+            if (typeof formsNamespace.setContactTourPrivatePickupPlace === 'function') {
+              formsNamespace.setContactTourPrivatePickupPlace(selectedPlace);
+            }
+            focusFormField(form, 'contact-tour-private-date');
             return;
           }
 
@@ -215,7 +386,6 @@
   var elements;
   var input;
   var hasStarted;
-  var detachFocusListener;
 
   logPlacesBoot('field-bootstrap-start', {
     fieldName: fieldName
@@ -240,34 +410,33 @@
 
   input = elements.input;
   hasStarted = false;
-  detachFocusListener = null;
-
-  function cleanupListeners() {
-    if (typeof detachFocusListener === 'function') {
-      detachFocusListener();
-      detachFocusListener = null;
-    }
-  }
 
   function startMount() {
     var liveLanguage;
+    var existingController;
+
+    existingController =
+      formsNamespace.placeControllers &&
+      formsNamespace.placeControllers[fieldName]
+        ? formsNamespace.placeControllers[fieldName]
+        : null;
 
     logPlacesBoot('startMount-called', {
       fieldName: fieldName,
       hasStarted: hasStarted,
+      hasExistingController: Boolean(existingController),
       activeElementId: document.activeElement && document.activeElement.id ? document.activeElement.id : '',
       activeElementTag: document.activeElement && document.activeElement.tagName ? document.activeElement.tagName : ''
     });
 
-    if (hasStarted) {
-      logPlacesBoot('startMount-skip-already-started', {
-        fieldName: fieldName
-      });
+    if (
+      existingController &&
+      typeof existingController.close === 'function'
+    ) {
+      existingController.close();
+      hasStarted = true;
       return;
     }
-
-    hasStarted = true;
-    cleanupListeners();
 
     liveLanguage = getDocumentLanguage();
 
@@ -276,6 +445,7 @@
       liveLanguage: liveLanguage
     });
 
+    hasStarted = true;
     bootGooglePlacesField(form, fieldName, liveLanguage);
   }
 
@@ -285,15 +455,11 @@
       value: input.value || ''
     });
     startMount();
-  }, { once: true });
+  });
 
   logPlacesBoot('focus-listener-registered', {
     fieldName: fieldName
   });
-
-  detachFocusListener = function detachFocusListenerFn() {
-    input.removeEventListener('focus', startMount, { once: true });
-  };
 
   if (!formsNamespace.placeBootstrapState) {
     formsNamespace.placeBootstrapState = {};
@@ -303,6 +469,9 @@
     mode: 'on-focus',
     started: function () {
       return hasStarted;
+    },
+    reset: function () {
+      hasStarted = false;
     }
   };
 
@@ -311,6 +480,7 @@
 
    function bootGooglePlacesOnFocus() {
   var form;
+  var formsNamespace;
 
   logPlacesBoot('bootGooglePlacesOnFocus-start', {
     readyState: document.readyState,
@@ -324,6 +494,7 @@
   }
 
   form = document.querySelector('form[name="contact"]');
+  formsNamespace = window.PixkuyForms || {};
 
   logPlacesBoot('bootGooglePlacesOnFocus-form', {
     hasForm: Boolean(form)
@@ -335,6 +506,54 @@
 
   bootGooglePlacesOnFocusField(form, 'origin');
   bootGooglePlacesOnFocusField(form, 'destination');
+  bootGooglePlacesOnFocusField(form, 'tour_private_pickup');
+
+  if (!formsNamespace.__placeControllerServiceCleanupBound) {
+    form.addEventListener('pixkuy:contact-service-change', function (event) {
+      var detail;
+      var previousServiceType;
+      var nextServiceType;
+      var controller;
+      var bootstrapState;
+
+      detail = event && event.detail ? event.detail : {};
+      previousServiceType = String(detail.previousServiceType || '').trim();
+      nextServiceType = String(detail.nextServiceType || '').trim();
+
+      if (
+        previousServiceType === 'tour_private' &&
+        nextServiceType !== 'tour_private'
+      ) {
+        controller =
+          formsNamespace.placeControllers &&
+          formsNamespace.placeControllers.tour_private_pickup
+            ? formsNamespace.placeControllers.tour_private_pickup
+            : null;
+
+        if (controller && typeof controller.destroy === 'function') {
+          window.setTimeout(function () {
+            controller.destroy();
+
+            if (formsNamespace.placeControllers) {
+              delete formsNamespace.placeControllers.tour_private_pickup;
+            }
+
+            bootstrapState =
+              formsNamespace.placeBootstrapState &&
+              formsNamespace.placeBootstrapState.tour_private_pickup
+                ? formsNamespace.placeBootstrapState.tour_private_pickup
+                : null;
+
+            if (bootstrapState && typeof bootstrapState.reset === 'function') {
+              bootstrapState.reset();
+            }
+          }, 0);
+        }
+      }
+    });
+
+    formsNamespace.__placeControllerServiceCleanupBound = true;
+  }
 
   return true;
 }
@@ -349,7 +568,9 @@
     bootContactServiceSwitcher();
     bootContactAirportHotelEditor();
     bootContactAirportHotelLodgingAdapter();
+    bootContactTourPrivateEditor();
     bootPanelHandoffSummary();
+    bindToursPanelHandoff();
     bootWhatsappHandoff();
     bootGooglePlacesOnFocus();
 

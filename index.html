@@ -44,6 +44,11 @@
   <link rel="stylesheet" href="assets/css/10-base.css" />
   <link rel="stylesheet" href="assets/css/20-components.css" />
   <link rel="stylesheet" href="assets/css/30-sections.css" />
+  <link rel="stylesheet" href="assets/css/31-contact-services.css" />
+  <link rel="stylesheet" href="assets/css/32-services-core.css" />
+  <link rel="stylesheet" href="assets/css/33-services-airport.css" />
+  <link rel="stylesheet" href="assets/css/34-services-tours.css" />
+  <link rel="stylesheet" href="assets/css/36-services-tours-sheet-mobile.css" />
   <link rel="stylesheet" href="assets/css/35-wc2026.css" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/90-a11y.css" />
@@ -145,7 +150,7 @@
       <p class="subtitle" data-i18n="hero.subtitle">
         <br>
       </p>
-      <a class="cta" href="#contact" data-i18n="hero.cta"></a>
+      <a class="cta" href="#services" data-i18n="hero.cta"></a>
       <p class="muted small" data-i18n="hero.note"></p>
     </div>
   </section>
@@ -170,7 +175,7 @@
   </section>
 
   <!-- PANTALLA 4 — ADAPTABILIDAD -->
-  <section class="screen services">
+  <section id="services" class="screen services">
     <div class="content">
       <h2 data-i18n="services.title"></h2>
 
@@ -225,9 +230,20 @@
       <li data-i18n="services.cards.tours.bullets.2"></li>
     </ul>
 
-    <div class="service-card__price">
-      <span class="service-card__price-label" data-i18n="services.cards.tours.priceLabel"></span>
-      <strong class="service-card__price-value" data-i18n="services.cards.tours.priceValue"></strong>
+    <div class="service-card__footer">
+      <div class="service-card__price">
+        <span class="service-card__price-label" data-i18n="services.cards.tours.priceLabel"></span>
+        <strong class="service-card__price-value" data-i18n="services.cards.tours.priceValue"></strong>
+      </div>
+
+      <div class="service-card__action" aria-hidden="true">
+        <span class="service-card__action-label" data-i18n="services.cards.tours.ctaClosed"></span>
+        <span class="service-card__action-chevron" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
     </div>
   </article>
   
@@ -239,7 +255,7 @@
     hidden
   >
     <div class="services-expand__inner">
-            <div
+      <div
         class="services-expand__panel"
         id="services-expand-airport"
         data-service-panel="airport"
@@ -534,6 +550,41 @@
           </div>
         </div>
       </div>
+	  
+	        <div
+        class="services-expand__panel"
+        id="services-expand-tours"
+        data-service-panel="tours"
+        aria-hidden="true"
+        hidden
+      >
+        <h3
+          class="services-expand__title"
+          data-i18n="services.cards.tours.panel.title"
+        ></h3>
+
+        <p
+          class="services-expand__text"
+          data-i18n="services.cards.tours.panel.text"
+        ></p>
+
+        <div
+          class="services-tours-panel"
+          data-services-tours-panel
+        >
+          <div
+            class="services-tours-panel__catalog"
+            data-services-tours-catalog
+          ></div>
+
+          <div
+            class="services-tours-panel__config"
+            data-services-tours-config
+            hidden
+          ></div>
+        </div>
+      </div>
+	  
     </div>
   </div>
   
@@ -749,6 +800,39 @@
         <input type="hidden" name="passenger_fare_key" value="" />
         <input type="hidden" name="passenger_bucket_label" value="" />
 
+        <input type="hidden" name="tour_private_tour_id" value="" />
+        <input type="hidden" name="tour_private_tour_label" value="" />
+        <input type="hidden" name="tour_private_duration_hours" value="" />
+        <input type="hidden" name="tour_private_passenger_fare_key" value="" />
+        <input type="hidden" name="tour_private_passenger_bucket_label" value="" />
+        <input type="hidden" name="tour_private_pickup" value="" />
+        <input type="hidden" name="tour_private_pickup_place_id" value="" />
+        <input type="hidden" name="tour_private_pickup_lat" value="" />
+        <input type="hidden" name="tour_private_pickup_lng" value="" />
+        <input type="hidden" name="tour_private_date" value="" />
+        <input type="hidden" name="tour_private_time" value="" />
+        <input type="hidden" name="tour_private_has_guide" value="" />
+        <input type="hidden" name="tour_private_guide_language" value="" />
+        <input type="hidden" name="tour_private_price" value="" />
+        <input type="hidden" name="tour_private_currency" value="" />
+        
+        <input type="hidden" name="service_label" value="" />
+        <input type="hidden" name="request_summary" value="" />
+        
+        <input type="hidden" name="airport_hotel_trip_summary" value="" />
+        <input type="hidden" name="airport_hotel_direction_label" value="" />
+        <input type="hidden" name="airport_hotel_airport_label" value="" />
+        <input type="hidden" name="airport_hotel_hotel_label" value="" />
+        <input type="hidden" name="airport_hotel_zone_label" value="" />
+        <input type="hidden" name="airport_hotel_fare_label" value="" />
+        <input type="hidden" name="airport_hotel_passenger_bucket_label" value="" />
+        
+        <input type="hidden" name="tour_private_trip_summary" value="" />
+        <input type="hidden" name="tour_private_pickup_label" value="" />
+        <input type="hidden" name="tour_private_guide_label" value="" />
+        <input type="hidden" name="tour_private_guide_language_label" value="" />
+        <input type="hidden" name="tour_private_price_label" value="" />
+
         <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
           <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
         </div>
@@ -790,6 +874,14 @@
             <button
               type="button"
               class="contact-service-switcher__button"
+              data-contact-service-trigger="tour_private"
+              aria-pressed="false"
+              data-i18n="contact.services.tourPrivate"
+            ></button>
+
+            <button
+              type="button"
+              class="contact-service-switcher__button"
               data-contact-service-trigger="other"
               aria-pressed="true"
               data-i18n="contact.services.other"
@@ -798,7 +890,7 @@
             </button>
           </div>
 
-                    <div
+           <div
             class="contact-service-panel"
             data-contact-service-panel="airport_hotel"
             aria-hidden="true"
@@ -837,7 +929,7 @@
                     data-contact-airport-hotel-airport-shell="0"
                     data-contact-airport-hotel-airport-side="origin"
                   >
-                    <button
+                                        <button
                       type="button"
                       class="services-expand__control services-expand__control--select"
                       id="contact-airport-hotel-airport"
@@ -845,9 +937,7 @@
                       aria-expanded="false"
                       aria-haspopup="listbox"
                       data-i18n="contact.services.airportHotelAirportPlaceholder"
-                    >
-                      Selecciona aeropuerto
-                    </button>
+                    ></button>
                   </div>
 
                   <div
@@ -897,7 +987,8 @@
                     type="button"
                     class="services-expand__swap-button"
                     data-contact-airport-hotel-swap
-                    aria-label="Cambiar sentido del trayecto"
+                    data-contact-airport-hotel-swap-aria-label="services.cards.airport.panel.swapAriaLabel"
+                    aria-label=""
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false" aria-hidden="true">
                       <path d="M8 7h10m0 0-3-3m3 3-3 3M16 17H6m0 0 3-3m-3 3 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -951,7 +1042,8 @@
                       type="button"
                       class="place-autocomplete__clear"
                       data-contact-airport-hotel-hotel-clear
-                      aria-label="Borrar hotel"
+                      data-contact-airport-hotel-hotel-clear-aria-label="services.cards.airport.panel.clearResolvedDestination"
+                      aria-label=""
                       hidden
                     >
                       <span aria-hidden="true">×</span>
@@ -1074,6 +1166,631 @@
 
           <div
             class="contact-service-panel"
+            data-contact-service-panel="tour_private"
+            aria-hidden="true"
+            hidden
+          >
+            <div
+              class="contact-tour-private-editor"
+              data-contact-tour-private-editor
+            >
+              <div class="contact-tour-private-editor__header">
+                <p
+                  class="muted small"
+                  data-contact-tour-private-helper
+                  data-i18n="services.cards.tours.contact.helper"
+                ></p>
+              </div>
+
+              <div class="contact-tour-private-editor__summary">
+                <div
+                  class="contact-tour-private-editor__summary-media"
+                  data-contact-tour-private-summary-media
+                  hidden
+                >
+                  <img
+                    class="contact-tour-private-editor__summary-image"
+                    data-contact-tour-private-summary-image
+                    src=""
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+
+                <div class="contact-tour-private-editor__summary-row">
+                  <span
+                    class="contact-tour-private-editor__summary-label"
+                    data-i18n="services.cards.tours.contact.summaryDurationLabel"
+                  ></span>
+                  <strong
+                    class="contact-tour-private-editor__summary-value"
+                    data-contact-tour-private-summary-duration
+                  ></strong>
+                </div>
+
+                <div class="contact-tour-private-editor__summary-row">
+                  <span
+                    class="contact-tour-private-editor__summary-label"
+                    data-i18n="services.cards.tours.contact.summaryTicketsLabel"
+                  ></span>
+                  <strong
+                    class="contact-tour-private-editor__summary-value"
+                    data-contact-tour-private-summary-tickets
+                  ></strong>
+                </div>
+
+                <p
+                  class="contact-tour-private-editor__summary-description"
+                  data-contact-tour-private-summary-description
+                ></p>
+
+                <div hidden aria-hidden="true">
+                  <span data-contact-tour-private-summary-tour></span>
+                  <span data-contact-tour-private-summary-price></span>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label
+                  for="contact-tour-private-tour-trigger"
+                  class="visually-hidden"
+                  data-i18n="services.cards.tours.contact.tourLabel"
+                ></label>
+
+                <div
+                  class="contact-tour-private-select"
+                  data-contact-tour-private-tourpicker
+                >
+                  <input
+                    id="contact-tour-private-tour"
+                    type="hidden"
+                    data-contact-tour-private-tour
+                  />
+
+                  <button
+                    id="contact-tour-private-tour-trigger"
+                    type="button"
+                    class="contact-tour-private-select__trigger"
+                    data-contact-tour-private-tour-trigger
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="contact-tour-private-tour-listbox"
+                    aria-describedby="contact-tour-private-tour-error"
+                  >
+                    <span
+                      class="contact-tour-private-select__value"
+                      data-contact-tour-private-tour-value
+                    ></span>
+                    <span
+                      class="contact-tour-private-select__chevron"
+                      aria-hidden="true"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                  </button>
+
+                  <div
+                    class="contact-tour-private-select__panel contact-tour-private-select__panel--stacked"
+                    data-contact-tour-private-tour-panel
+                    hidden
+                  >
+                    <div
+                      id="contact-tour-private-tour-listbox"
+                      class="contact-tour-private-select__listbox contact-tour-private-select__listbox--stacked"
+                      role="listbox"
+                      aria-labelledby="contact-tour-private-tour-trigger"
+                    >
+                      <div
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        data-contact-tour-private-tour-hint
+                        aria-hidden="true"
+                      >
+                        <span data-i18n="services.cards.tours.contact.tourPlaceholder"></span>
+                      </div>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-tour-option="teotihuacan"
+                        aria-selected="false"
+                      ></button>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-tour-option="teotihuacan_basilica"
+                        aria-selected="false"
+                      ></button>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-tour-option="xochimilco_coyoacan"
+                        aria-selected="false"
+                      ></button>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-tour-option="cholula_puebla"
+                        aria-selected="false"
+                      ></button>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-tour-option="san_miguel_allende"
+                        aria-selected="false"
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+
+                <p
+                  id="contact-tour-private-tour-error"
+                  class="form-error"
+                  hidden
+                  data-error-for="tour_private_tour"
+                  data-i18n="contact.validation.tourPrivateTourRequired"
+                ></p>
+              </div>
+
+              <div
+                class="contact-tour-private-editor__passengers"
+                data-contact-tour-private-passengers
+              >
+                <label
+                  class="services-expand__label"
+                  data-contact-tour-private-passengers-label
+                  data-i18n="services.cards.tours.contact.passengersLabel"
+                ></label>
+
+                <div
+                  class="services-expand__passengers-segmented"
+                  role="group"
+                  data-contact-tour-private-passengers-group
+                >
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-tour-private-passenger-option="van_1_2"
+                    data-contact-tour-private-fare-key="van_1_2"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="services-expand__passenger-chip-text"
+                      data-i18n="services.cards.tours.panel.passengerBuckets.van_1_2"
+                    ></span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-tour-private-passenger-option="van_3_4"
+                    data-contact-tour-private-fare-key="van_3_4"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="services-expand__passenger-chip-text"
+                      data-i18n="services.cards.tours.panel.passengerBuckets.van_3_4"
+                    ></span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-tour-private-passenger-option="van_5_6"
+                    data-contact-tour-private-fare-key="van_5_6"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="services-expand__passenger-chip-text"
+                      data-i18n="services.cards.tours.panel.passengerBuckets.van_5_6"
+                    ></span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-field form-field--place" data-place-field="tour_private_pickup">
+                <label
+                  for="contact-tour-private-pickup"
+                  class="visually-hidden"
+                  data-i18n="services.cards.tours.contact.pickupLabel"
+                ></label>
+
+                <div
+                  class="place-autocomplete"
+                  data-place-autocomplete="tour_private_pickup"
+                  data-place-language-source="document"
+                >
+                  <input
+                    id="contact-tour-private-pickup"
+                    type="text"
+                    name="tour_private_pickup_visible"
+                    placeholder=""
+                    autocomplete="off"
+                    data-contact-tour-private-pickup
+                    data-place-input="tour_private_pickup"
+                    data-i18n-ph="services.cards.tours.contact.pickupPlaceholder"
+                    aria-describedby="contact-tour-private-pickup-error"
+                  />
+
+                  <button
+                    type="button"
+                    class="place-autocomplete__clear"
+                    data-place-clear="tour_private_pickup"
+                    aria-label="Clear pickup"
+                    hidden
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+
+                  <div
+                    class="place-autocomplete__mount"
+                    data-place-mount="tour_private_pickup"
+                    aria-hidden="true"
+                  ></div>
+                </div>
+
+                <p
+                  id="contact-tour-private-pickup-error"
+                  class="form-error"
+                  hidden
+                  data-error-for="tour_private_pickup"
+                  data-i18n="contact.validation.tourPrivatePickupRequired"
+                ></p>
+              </div>
+
+              <div class="form-row form-row--two">
+                <div class="form-field form-field--date">
+                  <label
+                    for="contact-tour-private-date"
+                    class="visually-hidden"
+                    data-i18n="services.cards.tours.contact.dateLabel"
+                  ></label>
+                  <input
+                    id="contact-tour-private-date"
+                    type="date"
+                    data-contact-tour-private-date
+                    aria-describedby="contact-tour-private-date-error"
+                  />
+                  <span
+  class="form-field-overlay form-field-overlay--date"
+  aria-hidden="true"
+  data-i18n="contact.datePlaceholder"
+>dd/mm/aaaa</span>
+                  <span class="form-field-icon form-field-icon--date" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"></line>
+                      <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"></line>
+                      <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"></line>
+                    </svg>
+                  </span>
+                  <p
+                    id="contact-tour-private-date-error"
+                    class="form-error"
+                    hidden
+                    data-error-for="tour_private_date"
+                    data-i18n="contact.validation.tourPrivateDateRequired"
+                  ></p>
+                </div>
+
+                <div class="form-field form-field--time">
+                  <label
+                    for="contact-tour-private-time-trigger"
+                    class="visually-hidden"
+                    data-i18n="services.cards.tours.contact.timeLabel"
+                  ></label>
+
+                  <div
+                    class="contact-tour-private-timepicker"
+                    data-contact-tour-private-timepicker
+                  >
+                    <input
+                      id="contact-tour-private-time"
+                      type="hidden"
+                      data-contact-tour-private-time
+                    />
+
+                    <button
+                      id="contact-tour-private-time-trigger"
+                      type="button"
+                      class="contact-tour-private-timepicker__trigger"
+                      data-contact-tour-private-time-trigger
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                      aria-controls="contact-tour-private-time-listbox"
+                      aria-describedby="contact-tour-private-time-error"
+                    >
+                      <span
+                        class="contact-tour-private-timepicker__value"
+                        data-contact-tour-private-time-value
+                      ></span>
+                      <span
+                        class="contact-tour-private-timepicker__chevron"
+                        aria-hidden="true"
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </button>
+
+                    <div
+                      class="contact-tour-private-timepicker__panel"
+                      data-contact-tour-private-time-panel
+                      hidden
+                    >
+                      <div
+                        id="contact-tour-private-time-listbox"
+                        class="contact-tour-private-timepicker__listbox"
+                        role="listbox"
+                        aria-labelledby="contact-tour-private-time-trigger"
+                      >
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="05:00"
+                          aria-selected="false"
+                        >
+                          05:00
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="05:30"
+                          aria-selected="false"
+                        >
+                          05:30
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="06:00"
+                          aria-selected="false"
+                        >
+                          06:00
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="06:30"
+                          aria-selected="false"
+                        >
+                          06:30
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="07:00"
+                          aria-selected="false"
+                        >
+                          07:00
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="07:30"
+                          aria-selected="false"
+                        >
+                          07:30
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="08:00"
+                          aria-selected="false"
+                        >
+                          08:00
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="08:30"
+                          aria-selected="false"
+                        >
+                          08:30
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="09:00"
+                          aria-selected="false"
+                        >
+                          09:00
+                        </button>
+                        <button
+                          type="button"
+                          class="contact-tour-private-timepicker__option"
+                          role="option"
+                          data-contact-tour-private-time-option="09:30"
+                          aria-selected="false"
+                        >
+                          09:30
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p
+                    id="contact-tour-private-time-error"
+                    class="form-error"
+                    hidden
+                    data-error-for="tour_private_time"
+                    data-i18n="contact.validation.tourPrivateTimeRequired"
+                  ></p>
+                </div>
+              </div>
+
+              <div
+                class="contact-tour-private-editor__guide"
+                data-contact-tour-private-guide
+              >
+                <label
+                  class="services-expand__label"
+                  data-i18n="services.cards.tours.contact.guideLabel"
+                ></label>
+
+                <div
+                  class="services-expand__passengers-segmented"
+                  role="group"
+                  data-contact-tour-private-guide-group
+                >
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-tour-private-guide-option="no"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="services-expand__passenger-chip-text"
+                      data-i18n="services.cards.tours.panel.guideOptions.no"
+                    ></span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="services-expand__passenger-chip"
+                    data-contact-tour-private-guide-option="yes"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="services-expand__passenger-chip-text"
+                      data-i18n="services.cards.tours.panel.guideOptions.yes"
+                    ></span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-field" data-contact-tour-private-guide-language-wrapper hidden>
+                <label
+                  for="contact-tour-private-guide-language-trigger"
+                  class="visually-hidden"
+                  data-i18n="services.cards.tours.contact.guideLanguageLabel"
+                ></label>
+
+                <div
+                  class="contact-tour-private-select"
+                  data-contact-tour-private-guide-language-picker
+                >
+                  <input
+                    id="contact-tour-private-guide-language"
+                    type="hidden"
+                    data-contact-tour-private-guide-language
+                  />
+
+                  <button
+                    id="contact-tour-private-guide-language-trigger"
+                    type="button"
+                    class="contact-tour-private-select__trigger"
+                    data-contact-tour-private-guide-language-trigger
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="contact-tour-private-guide-language-listbox"
+                    aria-describedby="contact-tour-private-guide-language-error"
+                  >
+                     <span
+                      class="contact-tour-private-select__value"
+                      data-contact-tour-private-guide-language-value
+                    ></span>
+                    <span
+                      class="contact-tour-private-select__chevron"
+                      aria-hidden="true"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                  </button>
+
+                  <div
+                    class="contact-tour-private-select__panel contact-tour-private-select__panel--stacked"
+                    data-contact-tour-private-guide-language-panel
+                    hidden
+                  >
+                    <div
+                      id="contact-tour-private-guide-language-listbox"
+                      class="contact-tour-private-select__listbox contact-tour-private-select__listbox--stacked"
+                      role="listbox"
+                      aria-labelledby="contact-tour-private-guide-language-trigger"
+                    >
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-guide-language-option=""
+                        aria-selected="false"
+                        data-i18n="services.cards.tours.contact.guideLanguagePlaceholder"
+                      ></button>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-guide-language-option="es"
+                        aria-selected="false"
+                        data-i18n="services.cards.tours.panel.guideLanguages.es"
+                      ></button>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-guide-language-option="en"
+                        aria-selected="false"
+                        data-i18n="services.cards.tours.panel.guideLanguages.en"
+                      ></button>
+                      <button
+                        type="button"
+                        class="contact-tour-private-select__option contact-tour-private-select__option--stacked"
+                        role="option"
+                        data-contact-tour-private-guide-language-option="fr"
+                        aria-selected="false"
+                        data-i18n="services.cards.tours.panel.guideLanguages.fr"
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+
+                <p
+                  id="contact-tour-private-guide-language-error"
+                  class="form-error"
+                  hidden
+                  data-error-for="tour_private_guide_language"
+                  data-i18n="contact.validation.tourPrivateGuideLanguageRequired"
+                ></p>
+              </div>
+
+              <div
+                class="contact-panel-fare"
+                data-contact-tour-private-price
+                hidden
+              >
+                <p
+                  class="contact-panel-fare__label"
+                  data-i18n="services.cards.tours.contact.summaryPriceLabel"
+                ></p>
+                <strong
+                  class="contact-panel-fare__value"
+                  data-contact-tour-private-price-value
+                ></strong>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="contact-service-panel"
             data-contact-service-panel="other"
             aria-hidden="false"
           ></div>
@@ -1158,9 +1875,10 @@
                 aria-describedby="contact-trip-date-error"
               />
               <span
-                class="form-field-overlay form-field-overlay--date"
-                aria-hidden="true"
-              >dd/mm/yyyy</span>
+  class="form-field-overlay form-field-overlay--date"
+  aria-hidden="true"
+  data-i18n="contact.datePlaceholder"
+>dd/mm/aaaa</span>
               <span class="form-field-icon form-field-icon--date" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
@@ -1505,6 +2223,7 @@
 <script src="assets/js/forms/contact-airport-hotel-lodging-adapter.js"></script>
 <script src="assets/js/forms/whatsapp-handoff.js"></script>
 <script src="assets/js/forms/panel-handoff-summary.js"></script>
+<script src="assets/js/forms/contact-tour-private-editor.js?v=20260411-1"></script>
 <script src="assets/js/forms/index.js"></script>
 <script src="assets/js/services-expand.js"></script>
 <script src="assets/js/data/airport-zone-catalog.js"></script>
@@ -1523,6 +2242,8 @@
 <script src="assets/js/services/airport-destination.js"></script>
 <script src="assets/js/services/airport-lodging-autocomplete.js"></script>
 <script src="assets/js/services/airport-lodging-places.js"></script>
+<script src="assets/js/services/tours-panel.js"></script>
+<script src="assets/js/services/tours-mobile-sheet.js"></script>
 
 </body>
 </html>

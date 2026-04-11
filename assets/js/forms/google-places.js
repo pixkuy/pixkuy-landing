@@ -816,6 +816,7 @@ if (placesLibraryPromise) {
       },
       mountNode: options.mountNode || null,
       input: options.input || null,
+      fieldName: getString(options.fieldName),
       hiddenFields: isObject(options.hiddenFields) ? options.hiddenFields : {},
       onReady: isFunction(options.onReady) ? options.onReady : function () {},
       onSelection: isFunction(options.onSelection) ? options.onSelection : function () {},
@@ -1068,7 +1069,7 @@ if (placesLibraryPromise) {
         root: root,
         input: controller.input,
         mountNode: controller.mountNode,
-        fieldName: getString(controller.input && controller.input.name),
+        fieldName: controller.fieldName || getString(controller.input && controller.input.name),
         inputId: controller.input && controller.input.id ? controller.input.id : '',
         language: normalizeLanguage(controller.options.language),
         placeholder: controller.input && controller.input.getAttribute ? (controller.input.getAttribute('placeholder') || '') : '',
@@ -1122,9 +1123,10 @@ if (placesLibraryPromise) {
       }
 
       return desktopFactory({
+        root: root,
         input: controller.input,
         mountNode: controller.mountNode,
-        fieldName: getString(controller.input && controller.input.name),
+        fieldName: controller.fieldName || getString(controller.input && controller.input.name),
         getAutocompleteSessionToken: function () {
           return loadPlacesLibrary(controller.options).then(function (library) {
             if (!library || !isFunction(library.AutocompleteSessionToken)) {

@@ -1,12 +1,19 @@
 /* i18n — JSON Loader & Cache
  * Ruta: assets/js/i18n/loader.js
- * Origen: extraído sin cambios funcionales desde assets/js/i18n.js
  * Responsabilidad única:
  * - I18N_JSON_BASE
  * - translationsCache
  * - isDevHost()
  * - fetchJson()
+ * - deepMerge()
  * - loadTranslationsForLang()
+ *
+ * Evolución:
+ * - Mantiene compatibilidad con el modelo legacy:
+ *   /assets/i18n/<lang>.json
+ * - Añade soporte para fragmentos opcionales por idioma:
+ *   /assets/i18n/<lang>/<fragment>.json
+ * - Devuelve siempre un único diccionario final fusionado.
  */
 
 (function () {
@@ -19,12 +26,25 @@
     window.__pixkuyI18nModules = root;
   }
 
-  // --- Loader JSON ---
-
   // IMPORTANTE: base absoluta para funcionar también en /legal/*
   var I18N_JSON_BASE = "/assets/i18n";
 
+  // Cache por combinación idioma + fragmentos
   var translationsCache = new Map();
+
+  // Registro centralizado de fragmentos opcionales por idioma.
+  // Primera apertura: tours como nuevo dominio modular.
+  var I18N_OPTIONAL_FRAGMENTS = {
+    es: ["services-tours"],
+    en: ["services-tours"],
+    ru: ["services-tours"],
+    fr: ["services-tours"],
+    pt: ["services-tours"],
+    it: ["services-tours"],
+    de: ["services-tours"],
+    ko: ["services-tours"],
+    "zh-hans": ["services-tours"]
+  };
 
   function isDevHost() {
     if (typeof location === "undefined") return false;
@@ -41,19 +61,92 @@
     return res.json();
   }
 
-  async function loadTranslationsForLang(lang) {
-    if (!lang) return null;
+  function isPlainObject(value) {
+    return !!value && typeof value === "object" && !Array.isArray(value);
+  }
 
-    if (translationsCache.has(lang)) {
-      return translationsCache.get(lang);
+  function deepMerge(target, source) {
+    var out = isPlainObject(target) ? target : {};
+
+    if (!isPlainObject(source)) {
+      return out;
     }
+
+    Object.keys(source).forEach(function (key) {
+      var sourceValue = source[key];
+      var targetValue = out[key];
+
+      if (isPlainObject(sourceValue) && isPlainObject(targetValue)) {
+        out[key] = deepMerge(targetValue, sourceValue);
+        return;
+      }
+
+      if (isPlainObject(sourceValue)) {
+        out[key] = deepMerge({}, sourceValue);
+        return;
+      }
+
+      if (Array.isArray(sourceValue)) {
+        out[key] = sourceValue.slice();
+        return;
+      }
+
+      out[key] = sourceValue;
+    });
+
+    return out;
+  }
+
+  function cloneDict(dict) {
+    if (!isPlainObject(dict)) return {};
+    return deepMerge({}, dict);
+  }
+
+  function buildCacheKey(lang, fragments) {
+    var safeLang = lang || "";
+    var safeFragments = Array.isArray(fragments) ? fragments.slice() : [];
+    return safeLang + "::" + safeFragments.join("|");
+  }
+
+  function getOptionalFragmentsForLang(lang) {
+    var own = I18N_OPTIONAL_FRAGMENTS[lang];
+    if (!Array.isArray(own)) return [];
+    return own.slice();
+  }
+
+  async function tryLoadOptionalFragment(lang, fragmentName) {
+    if (!lang || !fragmentName) return null;
+
+    var url =
+      I18N_JSON_BASE +
+      "/" +
+      encodeURIComponent(lang) +
+      "/" +
+      encodeURIComponent(fragmentName) +
+      ".json";
+
+    try {
+      return await fetchJson(url);
+    } catch (err) {
+      if (isDevHost()) {
+        console.warn("[i18n] Optional fragment not available", {
+          lang: lang,
+          fragment: fragmentName,
+          url: url,
+          err: String(err && err.message ? err.message : err)
+        });
+      }
+      return null;
+    }
+  }
+
+  async function loadBaseTranslationsForLang(lang) {
+    if (!lang) return null;
 
     var url = I18N_JSON_BASE + "/" + encodeURIComponent(lang) + ".json";
 
     try {
-      var json = await fetchJson(url);
-      translationsCache.set(lang, json);
-      return json;
+      return await fetchJson(url);
     } catch (err) {
       if (lang === "es") {
         if (isDevHost()) {
@@ -63,7 +156,6 @@
             err: String(err && err.message ? err.message : err)
           });
         }
-        translationsCache.set("es", root.FALLBACK_ES);
         return root.FALLBACK_ES;
       }
 
@@ -78,10 +170,47 @@
     }
   }
 
+  async function loadTranslationsForLang(lang, fragments) {
+    if (!lang) return null;
+
+    var requestedFragments;
+    if (Array.isArray(fragments)) {
+      requestedFragments = fragments.slice();
+    } else {
+      requestedFragments = getOptionalFragmentsForLang(lang);
+    }
+
+    var cacheKey = buildCacheKey(lang, requestedFragments);
+    if (translationsCache.has(cacheKey)) {
+      return translationsCache.get(cacheKey);
+    }
+
+    var baseDict = await loadBaseTranslationsForLang(lang);
+    if (!baseDict) {
+      return null;
+    }
+
+    var finalDict = cloneDict(baseDict);
+
+    for (var i = 0; i < requestedFragments.length; i++) {
+      var fragmentName = requestedFragments[i];
+      var fragmentDict = await tryLoadOptionalFragment(lang, fragmentName);
+
+      if (fragmentDict) {
+        finalDict = deepMerge(finalDict, fragmentDict);
+      }
+    }
+
+    translationsCache.set(cacheKey, finalDict);
+    return finalDict;
+  }
+
   // Exposición pública
   root.I18N_JSON_BASE = I18N_JSON_BASE;
+  root.I18N_OPTIONAL_FRAGMENTS = I18N_OPTIONAL_FRAGMENTS;
   root.translationsCache = translationsCache;
   root.isDevHost = isDevHost;
   root.fetchJson = fetchJson;
+  root.deepMerge = deepMerge;
   root.loadTranslationsForLang = loadTranslationsForLang;
 })();

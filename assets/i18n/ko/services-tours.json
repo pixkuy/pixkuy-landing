@@ -1,0 +1,125 @@
+{
+  "services": {
+    "cards": {
+      "tours": {
+        "title": "프라이빗 투어 및 방문",
+        "text": "출발부터 귀환까지 명확한 구성과 세심한 응대를 갖춘 상징적인 장소로의 프라이빗 일정입니다.",
+        "bullets": [
+          "고정형 투어",
+          "사전 구성",
+          "맞춤형 응대"
+        ],
+        "priceLabel": "가격 시작",
+        "priceValue": "4.000 MXN",
+        "ctaClosed": "투어 보기",
+        "ctaOpen": "투어 숨기기",
+        "panel": {
+          "title": "투어를 선택하세요",
+          "text": "먼저 원하는 코스를 선택하세요. 그다음 승객 수, 픽업, 날짜, 시간, 그리고 해당되는 경우 가이드와 언어를 설정할 수 있습니다.",
+          "selectedTourLabel": "선택된 투어",
+          "durationLabel": "소요 시간",
+          "priceFromLabel": "가격 시작",
+          "pickupLabel": "픽업",
+          "pickupPlaceholder": "픽업 지점을 입력하세요",
+          "pickupHelp": "픽업 지점은 운영 가능 여부 확인용이며, 가격에는 영향을 주지 않습니다.",
+          "dateLabel": "날짜",
+          "timeLabel": "시간",
+          "passengersLabel": "승객",
+          "guideLabel": "가이드",
+          "guideIncludedLabel": "가이드 포함",
+          "guideNotIncludedLabel": "가이드 없음",
+          "guideLanguageLabel": "가이드 언어",
+          "guideLanguagePlaceholder": "언어 선택",
+          "priceLabel": "최종 가격",
+          "priceValuePending": "—",
+          "cta": "요청하기",
+          "ctaDisabled": "구성을 완료하세요",
+          "emptyStateTitle": "투어를 선택하세요",
+          "emptyStateText": "먼저 카탈로그에서 옵션을 선택하면 구성과 최종 가격을 확인할 수 있습니다.",
+          "changeTourConfirm": "투어를 변경하면 현재 구성을 검토하며, 호환되는 정보만 유지됩니다. 계속하시겠습니까?",
+          "confirmAccept": "계속",
+          "confirmCancel": "취소",
+          "catalog": {
+            "teotihuacan": {
+              "title": "테오티우아칸 피라미드",
+              "description": "왕복 이동과 입장권이 포함된 프라이빗 일정으로, 원하는 속도로 테오티우아칸을 둘러보세요.",
+              "duration": "6시간",
+              "priceFrom": "4.000 MXN",
+              "imageAlt": "테오티우아칸 피라미드"
+            },
+            "teotihuacan_basilica": {
+              "title": "테오티우아칸 피라미드 + 산타 마리아 데 과달루페 대성당",
+              "description": "왕복 이동과 입장권이 포함된 하루 일정의 프라이빗 경험으로, 테오티우아칸과 대성당을 효율적으로 둘러보세요.",
+              "duration": "9시간",
+              "priceFrom": "5.000 MXN",
+              "imageAlt": "테오티우아칸 피라미드와 과달루페 대성당"
+            },
+            "xochimilco_coyoacan": {
+              "title": "소치밀코 + 코요아칸",
+              "description": "왕복 이동이 포함된 프라이빗 일정으로, 멕시코시티의 대표적인 두 장소를 여유롭고 편안하게 경험하세요.",
+              "duration": "6시간",
+              "priceFrom": "4.500 MXN",
+              "imageAlt": "소치밀코와 코요아칸"
+            },
+            "cholula_puebla": {
+              "title": "촐룰라 + 푸에블라",
+              "description": "멕시코시티 출발 왕복 이동과 충분한 자유 시간이 포함된 하루 일정의 프라이빗 경험으로, 촐룰라와 푸에블라를 당신의 속도에 맞게 즐기세요.",
+              "duration": "9시간",
+              "priceFrom": "7.200 MXN",
+              "imageAlt": "촐룰라와 푸에블라"
+            },
+            "san_miguel_allende": {
+              "title": "산 미겔 데 아옌데",
+              "description": "멕시코시티 출발 프라이빗 일정으로, 불필요한 서두름 없이 편안하게 산 미겔 데 아옌데를 즐기도록 설계되었습니다.",
+              "duration": "10시간",
+              "priceFrom": "7.800 MXN",
+              "imageAlt": "산 미겔 데 아옌데"
+            }
+          },
+          "guideLanguages": {
+            "es": "스페인어",
+            "en": "영어",
+            "fr": "프랑스어"
+          },
+          "guideOptions": {
+            "yes": "예",
+            "no": "아니요"
+          },
+          "passengerBuckets": {
+            "van_1_2": "1–2",
+            "van_3_4": "3–4",
+            "van_5_6": "5–6"
+          }
+        },
+        "contact": {
+          "serviceLabel": "프라이빗 투어 및 방문",
+          "helper": "투어를 선택하고 운영 구성을 완료한 뒤 요청을 보내세요.",
+          "tourLabel": "투어",
+          "tourPlaceholder": "투어 선택",
+          "passengersLabel": "승객",
+          "pickupLabel": "픽업",
+          "pickupPlaceholder": "픽업 지점을 입력하세요",
+          "dateLabel": "투어 날짜",
+          "timeLabel": "출발 시간",
+          "timePlaceholder": "출발 시간",
+          "guideLabel": "가이드",
+          "guideLanguageLabel": "가이드 언어",
+          "guideLanguagePlaceholder": "언어 선택",
+          "summaryTourLabel": "투어",
+          "summaryDurationLabel": "소요 시간",
+          "summaryTicketsLabel": "입장권",
+          "summaryPriceLabel": "최종 가격"
+        },
+        "whatsapp": {
+          "tour": "투어",
+          "pickup": "픽업",
+          "guide": "가이드",
+          "guideLanguage": "가이드 언어",
+          "price": "최종 가격",
+          "guideYes": "예",
+          "guideNo": "아니요"
+        }
+      }
+    }
+  }
+}

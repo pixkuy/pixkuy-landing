@@ -203,6 +203,7 @@
     const fieldsToClear = [
       nodes.commonOrigin,
       nodes.commonDestination,
+      nodes.commonPassengers,
       nodes.visibleOriginInput,
       nodes.visibleDestinationInput,
       nodes.originPlaceId,
@@ -332,6 +333,15 @@
       airportHotelHotel: form.querySelector('input[name="airport_hotel_hotel"]'),
       passengerFareKey: form.querySelector('input[name="passenger_fare_key"]'),
       passengerBucketLabel: form.querySelector('input[name="passenger_bucket_label"]'),
+      hiddenServiceLabel: form.querySelector('input[name="service_label"]'),
+      hiddenRequestSummary: form.querySelector('input[name="request_summary"]'),
+      hiddenAirportHotelTripSummary: form.querySelector('input[name="airport_hotel_trip_summary"]'),
+      hiddenAirportHotelDirectionLabel: form.querySelector('input[name="airport_hotel_direction_label"]'),
+      hiddenAirportHotelAirportLabel: form.querySelector('input[name="airport_hotel_airport_label"]'),
+      hiddenAirportHotelHotelLabel: form.querySelector('input[name="airport_hotel_hotel_label"]'),
+      hiddenAirportHotelZoneLabel: form.querySelector('input[name="airport_hotel_zone_label"]'),
+      hiddenAirportHotelFareLabel: form.querySelector('input[name="airport_hotel_fare_label"]'),
+      hiddenAirportHotelPassengerBucketLabel: form.querySelector('input[name="airport_hotel_passenger_bucket_label"]'),
       visibleOriginInput: form.querySelector('[data-place-input="origin"]'),
       visibleDestinationInput: form.querySelector('[data-place-input="destination"]'),
       originPlaceId: form.querySelector('input[name="origin_place_id"]'),
@@ -400,6 +410,89 @@
         return normalizeText(airport && airport.id) === safeAirportId;
       }) || null
     );
+  }
+  
+    function writeHiddenValue(field, value) {
+    if (!field) {
+      return;
+    }
+
+    field.value = typeof value === "string" ? value : "";
+  }
+
+  function isAirportHotelServiceActive(form) {
+    const reservationForm = form || getReservationForm();
+    const serviceTypeField = reservationForm
+      ? reservationForm.querySelector('input[name="service_type"]')
+      : null;
+
+    return normalizeText(serviceTypeField && serviceTypeField.value) === "airport_hotel";
+  }
+
+  function getAirportHotelServiceLabel() {
+    return getI18nValue(
+      "contact.services.airportHotel",
+      "Aeropuerto y hotel"
+    );
+  }
+
+  function getAirportHotelDirectionLabel(direction) {
+    const safeDirection = normalizeText(direction);
+
+    if (safeDirection === "hotel_to_airport") {
+      return "Hotel → Aeropuerto";
+    }
+
+    return "Aeropuerto → Hotel";
+  }
+
+  function getAirportHotelZoneLabel() {
+    const form = getReservationForm();
+    const zoneField = form ? form.querySelector('input[name="zone"]') : null;
+    return normalizeText(zoneField && zoneField.value);
+  }
+
+  function getAirportHotelFareLabel() {
+    const form = getReservationForm();
+    const fareField = form ? form.querySelector('input[name="fare"]') : null;
+    return normalizeText(fareField && fareField.value);
+  }
+
+  function buildAirportHotelTripSummary(snapshot) {
+    const safeSnapshot = snapshot && typeof snapshot === "object" ? snapshot : {};
+    const parts = [];
+    const directionLabel = getAirportHotelDirectionLabel(safeSnapshot.direction);
+    const airportLabel = normalizeText(safeSnapshot.airport);
+    const hotelLabel = normalizeText(safeSnapshot.hotel);
+    const zoneLabel = getAirportHotelZoneLabel();
+    const fareLabel = getAirportHotelFareLabel();
+    const passengerBucketLabel = normalizeText(safeSnapshot.passengerBucketLabel);
+
+    if (directionLabel) {
+      parts.push("Trayecto: " + directionLabel);
+    }
+
+    if (airportLabel) {
+      parts.push("Aeropuerto: " + airportLabel);
+    }
+
+    if (hotelLabel) {
+      parts.push("Hotel: " + hotelLabel);
+    }
+
+    if (zoneLabel) {
+      parts.push("Zona: " + zoneLabel);
+    }
+
+    if (passengerBucketLabel) {
+      parts.push("Pasajeros: " + passengerBucketLabel);
+    }
+
+    if (fareLabel) {
+      parts.push("Tarifa: " + fareLabel);
+    }
+
+    return parts.join(" | ");
   }
 
   function buildAirportButtonLabel(airport) {
@@ -1381,17 +1474,17 @@
           source: source
         });
 
-        if (
+                if (
           previousServiceType === "airport_hotel" &&
           nextServiceType !== "airport_hotel"
         ) {
-          resetAirportHotelSpecificDraft(editorState, nodes);
+          clearCommonTripFields(nodes);
           return;
         }
 
         if (
-          nextServiceType === "airport_hotel" &&
-          source === "airport-panel-handoff"
+          previousServiceType !== "airport_hotel" &&
+          nextServiceType === "airport_hotel"
         ) {
           window.setTimeout(function () {
             rehydrateEditorFromTariffBridge(editorState, nodes);
@@ -1498,6 +1591,40 @@
       nodes.passengerBucketLabel.value = snapshot.passengerBucketLabel || "";
     }
 
+    writeHiddenValue(
+      nodes.hiddenAirportHotelTripSummary,
+      buildAirportHotelTripSummary(snapshot)
+    );
+    writeHiddenValue(
+      nodes.hiddenAirportHotelDirectionLabel,
+      getAirportHotelDirectionLabel(snapshot.direction)
+    );
+    writeHiddenValue(
+      nodes.hiddenAirportHotelAirportLabel,
+      snapshot.airport || ""
+    );
+    writeHiddenValue(
+      nodes.hiddenAirportHotelHotelLabel,
+      snapshot.hotel || ""
+    );
+    writeHiddenValue(
+      nodes.hiddenAirportHotelZoneLabel,
+      getAirportHotelZoneLabel()
+    );
+    writeHiddenValue(
+      nodes.hiddenAirportHotelFareLabel,
+      getAirportHotelFareLabel()
+    );
+    writeHiddenValue(
+      nodes.hiddenAirportHotelPassengerBucketLabel,
+      snapshot.passengerBucketLabel || ""
+    );
+
+    if (isAirportHotelServiceActive(getReservationForm())) {
+      writeHiddenValue(nodes.hiddenServiceLabel, getAirportHotelServiceLabel());
+      writeHiddenValue(nodes.hiddenRequestSummary, buildAirportHotelTripSummary(snapshot));
+    }
+
     return true;
   }
 
@@ -1545,17 +1672,8 @@
       );
     }
 
-    if (
-      contactServiceStateApi &&
-      typeof contactServiceStateApi.registerSpecificReset === "function"
-    ) {
-      contactServiceStateApi.registerSpecificReset(
-        "airport_hotel",
-        function airportHotelSpecificReset() {
-          return resetAirportHotelSpecificDraft(editorState, nodes);
-        }
-      );
-    }
+    /* airport_hotel preserva su draft al cambiar de servicio:
+     no registrar reset destructivo */
 
     NAMESPACE.getContactAirportHotelTripSnapshot = function getContactAirportHotelTripSnapshot() {
       return getAirportHotelTripSnapshot(editorState, nodes);

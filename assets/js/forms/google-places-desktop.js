@@ -104,6 +104,40 @@
     return mainText || secondaryText || getSuggestionDisplayValue(suggestion);
   }
 
+  function getClearButtonNode(root, fieldName) {
+    var safeFieldName = normalizeString(fieldName);
+
+    if (!root || !safeFieldName || typeof root.querySelector !== 'function') {
+      return null;
+    }
+
+    return root.querySelector('[data-place-clear="' + safeFieldName + '"]');
+  }
+
+  function getInputValue(input) {
+    return input && typeof input.value === 'string'
+      ? input.value.trim()
+      : '';
+  }
+
+  function syncClearButtonVisibility(controller) {
+    var clearButton;
+    var hasValue;
+
+    clearButton = controller && controller.clearButton
+      ? controller.clearButton
+      : null;
+
+    if (!clearButton) {
+      return;
+    }
+
+    hasValue = Boolean(getInputValue(controller.input));
+
+    clearButton.hidden = !hasValue;
+    clearButton.setAttribute('aria-hidden', hasValue ? 'false' : 'true');
+  }
+
   function createDesktopPlacesAutocompleteController(config) {
     var controller;
     var programmaticFactory;
@@ -136,6 +170,7 @@
       input: config.input || null,
       mountNode: config.mountNode || null,
       fieldName: config.fieldName || '',
+      clearButton: getClearButtonNode(config.root, config.fieldName),
       callbacks: {
         onPlaceSelected: isFunction(config.onPlaceSelected) ? config.onPlaceSelected : noop,
         onCoverageReject: isFunction(config.onCoverageReject) ? config.onCoverageReject : noop,
@@ -191,6 +226,20 @@
     }
 	
     function closePanel() {
+      var hasOpenState;
+      var hasLoadingState;
+      var hasSuggestions;
+
+      hasOpenState = Boolean(controller.state.isOpen);
+      hasLoadingState = Boolean(controller.state.isLoading);
+      hasSuggestions = Boolean(
+        controller.state.suggestions && controller.state.suggestions.length
+      );
+
+      if (!hasOpenState && !hasLoadingState && !hasSuggestions) {
+        return;
+      }
+
       controller.state.isOpen = false;
       controller.state.isLoading = false;
       controller.state.suggestions = [];
@@ -208,6 +257,8 @@
         isOpen: false,
         isLoading: false
       });
+
+      syncClearButtonVisibility(controller);
     }
 	
     function openPanel() {
@@ -367,6 +418,7 @@
 	  
       openPanel();
       syncActiveSuggestionUi();
+      syncClearButtonVisibility(controller);
     }
 
     function bindDocumentEvents() {
@@ -377,8 +429,17 @@
           typeof target.closest === 'function' &&
           target.closest('[data-place-autocomplete-item="true"]')
         );
+        var hasActiveUi = Boolean(
+          controller.state.isOpen ||
+          controller.state.isLoading ||
+          (controller.state.suggestions && controller.state.suggestions.length)
+        );
 
         if (controller.state.isDestroyed) {
+          return;
+        }
+
+        if (!hasActiveUi) {
           return;
         }
 
@@ -425,6 +486,7 @@
           value: event.target && event.target.value
         });
 
+        syncClearButtonVisibility(controller);
         controller.core.handleInputValueChange(event.target.value);
       }
 
@@ -557,16 +619,50 @@
         }
       }
 
+      function handleClearClick(event) {
+        event.preventDefault();
+
+        if (controller.input) {
+          controller.input.value = '';
+        }
+
+        controller.state.pendingSelectedDisplayValue = '';
+        closePanel();
+
+        if (controller.core && isFunction(controller.core.clearVisibleValue)) {
+          controller.core.clearVisibleValue();
+        }
+
+        if (controller.callbacks && isFunction(controller.callbacks.onPlaceSelected)) {
+          controller.callbacks.onPlaceSelected(null, {
+            reason: 'clear-selection'
+          });
+        }
+
+        if (controller.input && typeof controller.input.focus === 'function') {
+          controller.input.focus();
+        }
+      }
+
       controller.input.addEventListener('input', handleInput);
       controller.input.addEventListener('focus', handleFocus);
       controller.input.addEventListener('pointerdown', handlePointerDown);
       document.addEventListener('keydown', handleKeydown, true);
+
+      if (controller.clearButton) {
+        controller.clearButton.addEventListener('click', handleClearClick);
+        syncClearButtonVisibility(controller);
+      }
 
       detachInputListeners = function detach() {
         controller.input.removeEventListener('input', handleInput);
         controller.input.removeEventListener('focus', handleFocus);
         controller.input.removeEventListener('pointerdown', handlePointerDown);
         document.removeEventListener('keydown', handleKeydown, true);
+
+        if (controller.clearButton) {
+          controller.clearButton.removeEventListener('click', handleClearClick);
+        }
       };
     }
 	

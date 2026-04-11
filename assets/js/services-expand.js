@@ -1,24 +1,27 @@
 (function () {
   const root = document.querySelector('.services-cards');
   const expand = document.getElementById('services-expand');
-  const airportPanel = document.getElementById('services-expand-airport');
 
-  if (!root || !expand || !airportPanel) return;
+  if (!root || !expand) return;
+
+  const inner = expand.querySelector('.services-expand__inner');
+  if (!inner) return;
 
   const cards = Array.from(root.querySelectorAll('.service-card'));
-  const airportCard = cards.find((card) => {
-    const title = card.querySelector('[data-i18n="services.cards.airport.title"]');
-    return !!title;
-  });
+  const panels = Array.from(inner.querySelectorAll('.services-expand__panel[data-service-panel]'));
 
-  if (!airportCard) return;
+  if (!cards.length || !panels.length) return;
 
   const ACTIVE_CLASS = 'service-card--active';
   const EXPAND_OPEN_CLASS = 'services-expand--open';
   const MOBILE_MEDIA = '(max-width: 720px)';
+  const MOBILE_HINT_CLASS = 'service-card--mobile-hint';
   const mobileQuery = window.matchMedia(MOBILE_MEDIA);
-  const airportCardNextSibling = airportCard.nextElementSibling;
-  const actionLabel = airportCard.querySelector('.service-card__action-label');
+
+  let mobileHintTimeout = null;
+  let mobileHintObserver = null;
+  let mobileHintWasVisible = false;
+  let openService = null;
 
   function getI18nValue(path) {
     const dict = window.__pixkuyI18nDict;
@@ -30,76 +33,176 @@
     }, dict) || '';
   }
 
-  function setActionLabelI18n(path) {
-    if (!actionLabel) return;
+  function findCardByI18nKey(path) {
+    return cards.find((card) => !!card.querySelector(`[data-i18n="${path}"]`)) || null;
+  }
 
-    actionLabel.setAttribute('data-i18n', path);
+  function buildServiceRegistry() {
+    const registry = {
+      airport: {
+        key: 'airport',
+        card: findCardByI18nKey('services.cards.airport.title'),
+        panel: document.getElementById('services-expand-airport'),
+        closedLabel: 'services.cards.airport.ctaClosed',
+        openLabel: 'services.cards.airport.ctaOpen'
+      },
+      tours: {
+        key: 'tours',
+        card: findCardByI18nKey('services.cards.tours.title'),
+        panel: document.getElementById('services-expand-tours'),
+        closedLabel: 'services.cards.tours.ctaClosed',
+        openLabel: 'services.cards.tours.ctaOpen'
+      }
+    };
 
-    const translated = getI18nValue(path);
-    if (translated) {
-      actionLabel.textContent = translated;
-    }
+    Object.keys(registry).forEach((serviceKey) => {
+      const entry = registry[serviceKey];
+      if (!entry.card || !entry.panel) return;
+
+      entry.actionLabel = entry.card.querySelector('.service-card__action-label');
+    });
+
+    return registry;
+  }
+
+  const services = buildServiceRegistry();
+
+  const serviceKeys = Object.keys(services).filter((serviceKey) => {
+    const entry = services[serviceKey];
+    return !!(entry && entry.card && entry.panel);
+  });
+
+  if (!serviceKeys.length) return;
+
+  function getPrimaryCard() {
+    const airport = services.airport;
+    if (airport && airport.card) return airport.card;
+    const tours = services.tours;
+    if (tours && tours.card) return tours.card;
+    return cards[0] || null;
+  }
+  
+  function getMobileHintCards() {
+    return serviceKeys
+      .map((serviceKey) => services[serviceKey])
+      .filter((entry) => !!(entry && entry.card));
+  }
+
+  function getAnchorCardForDesktop() {
+    const primaryCard = getPrimaryCard();
+    if (!primaryCard) return null;
+    return primaryCard.nextElementSibling || null;
   }
 
   function placeExpandForViewport() {
+    const primaryCard = getPrimaryCard();
+    if (!primaryCard) return;
+
     if (mobileQuery.matches) {
-      airportCard.insertAdjacentElement('afterend', expand);
+      if (openService && services[openService] && services[openService].card) {
+        services[openService].card.insertAdjacentElement('afterend', expand);
+        return;
+      }
+
+      primaryCard.insertAdjacentElement('afterend', expand);
       return;
     }
 
-    if (airportCardNextSibling && airportCardNextSibling.parentNode === root) {
-      airportCardNextSibling.insertAdjacentElement('afterend', expand);
+    const desktopAnchor = getAnchorCardForDesktop();
+    if (desktopAnchor && desktopAnchor.parentNode === root) {
+      desktopAnchor.insertAdjacentElement('afterend', expand);
       return;
     }
 
     root.appendChild(expand);
   }
 
-  function setExpandedState(isOpen) {
+  function setActionLabel(entry, path) {
+    if (!entry || !entry.actionLabel || !path) return;
+
+    entry.actionLabel.setAttribute('data-i18n', path);
+
+    const translated = getI18nValue(path);
+    if (translated) {
+      entry.actionLabel.textContent = translated;
+    }
+  }
+
+  function updateCardState(entry, isOpen) {
+    if (!entry || !entry.card) return;
+
+    entry.card.classList.toggle(ACTIVE_CLASS, isOpen);
+    entry.card.setAttribute('aria-expanded', String(isOpen));
+
+    setActionLabel(entry, isOpen ? entry.openLabel : entry.closedLabel);
+  }
+
+  function updatePanelState(entry, isOpen) {
+    if (!entry || !entry.panel) return;
+
+    entry.panel.hidden = !isOpen;
+    entry.panel.setAttribute('aria-hidden', String(!isOpen));
+  }
+
+  function setExpandedState(nextServiceKey) {
+    openService = nextServiceKey || null;
+
     placeExpandForViewport();
 
-    expand.hidden = !isOpen;
-    expand.setAttribute('aria-hidden', String(!isOpen));
-    airportPanel.hidden = !isOpen;
-    airportPanel.setAttribute('aria-hidden', String(!isOpen));
+    const isAnyOpen = !!openService;
 
-    airportCard.classList.toggle(ACTIVE_CLASS, isOpen);
-    expand.classList.toggle(EXPAND_OPEN_CLASS, isOpen);
-    airportCard.setAttribute('aria-expanded', String(isOpen));
+    expand.hidden = !isAnyOpen;
+    expand.setAttribute('aria-hidden', String(!isAnyOpen));
+    expand.classList.toggle(EXPAND_OPEN_CLASS, isAnyOpen);
 
-    setActionLabelI18n(
-      isOpen
-        ? 'services.cards.airport.ctaOpen'
-        : 'services.cards.airport.ctaClosed'
-    );
+    serviceKeys.forEach((serviceKey) => {
+      const entry = services[serviceKey];
+      const isOpen = serviceKey === openService;
+
+      updateCardState(entry, isOpen);
+      updatePanelState(entry, isOpen);
+    });
   }
 
-  function toggleAirportExpand() {
-    const isOpen = !expand.hidden;
-    setExpandedState(!isOpen);
+  function toggleService(serviceKey) {
+    if (!serviceKey || !services[serviceKey]) return;
+
+    const nextService = openService === serviceKey ? null : serviceKey;
+    setExpandedState(nextService);
   }
 
-  airportCard.setAttribute('role', 'button');
-  airportCard.setAttribute('tabindex', '0');
-  airportCard.setAttribute('aria-controls', 'services-expand');
-  airportCard.setAttribute('aria-expanded', 'false');
+  function bindCard(entry) {
+    if (!entry || !entry.card) return;
 
-  airportCard.addEventListener('click', toggleAirportExpand);
+    entry.card.setAttribute('role', 'button');
+    entry.card.setAttribute('tabindex', '0');
+    entry.card.setAttribute('aria-controls', 'services-expand');
+    entry.card.setAttribute('aria-expanded', 'false');
+    entry.card.setAttribute('data-service-expand-trigger', entry.key);
 
-  airportCard.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggleAirportExpand();
+    entry.card.addEventListener('click', () => {
+      toggleService(entry.key);
+    });
+
+    entry.card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleService(entry.key);
+      }
+    });
+  }
+
+  function clearMobileHint(card) {
+    if (card) {
+      card.classList.remove(MOBILE_HINT_CLASS);
+    } else {
+      serviceKeys.forEach((serviceKey) => {
+        const entry = services[serviceKey];
+        if (entry && entry.card) {
+          entry.card.classList.remove(MOBILE_HINT_CLASS);
+        }
+      });
     }
-  });
-
-  const MOBILE_HINT_CLASS = 'service-card--mobile-hint';
-  let mobileHintTimeout = null;
-  let mobileHintObserver = null;
-  let mobileHintWasVisible = false;
-
-  function clearMobileHint() {
-    airportCard.classList.remove(MOBILE_HINT_CLASS);
 
     if (mobileHintTimeout) {
       window.clearTimeout(mobileHintTimeout);
@@ -107,16 +210,18 @@
     }
   }
 
-  function triggerMobileHint() {
-    if (!mobileQuery.matches || airportCard.classList.contains(ACTIVE_CLASS)) {
+  function triggerMobileHint(card) {
+    if (!mobileQuery.matches || !card) return;
+
+    if (openService && services[openService] && services[openService].card === card) {
       return;
     }
 
-    clearMobileHint();
-    airportCard.classList.add(MOBILE_HINT_CLASS);
+    clearMobileHint(card);
+    card.classList.add(MOBILE_HINT_CLASS);
 
     mobileHintTimeout = window.setTimeout(() => {
-      airportCard.classList.remove(MOBILE_HINT_CLASS);
+      card.classList.remove(MOBILE_HINT_CLASS);
       mobileHintTimeout = null;
     }, 1400);
   }
@@ -129,46 +234,55 @@
       mobileHintObserver = null;
     }
 
-    mobileHintWasVisible = false;
+    const hintCards = getMobileHintCards();
+    if (!hintCards.length) return;
+
+    const visibilityState = new WeakMap();
 
     mobileHintObserver = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
+      entries.forEach((entry) => {
+        const card = entry.target;
+        const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
+        const wasVisible = visibilityState.get(card) === true;
 
-      const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
+        if (isVisible && !wasVisible) {
+          visibilityState.set(card, true);
+          triggerMobileHint(card);
+          return;
+        }
 
-      if (isVisible && !mobileHintWasVisible) {
-        mobileHintWasVisible = true;
-        triggerMobileHint();
-        return;
-      }
-
-      if (!isVisible && mobileHintWasVisible) {
-        mobileHintWasVisible = false;
-        clearMobileHint();
-      }
+        if (!isVisible && wasVisible) {
+          visibilityState.set(card, false);
+          clearMobileHint(card);
+        }
+      });
     }, {
       threshold: [0, 0.55]
     });
 
-    mobileHintObserver.observe(airportCard);
+    hintCards.forEach((entry) => {
+      visibilityState.set(entry.card, false);
+      mobileHintObserver.observe(entry.card);
+    });
   }
 
+  function handleViewportChange() {
+    placeExpandForViewport();
+    clearMobileHint();
+    bindMobileHintObserver();
+  }
+
+  serviceKeys.forEach((serviceKey) => {
+    bindCard(services[serviceKey]);
+  });
+
   if (typeof mobileQuery.addEventListener === 'function') {
-    mobileQuery.addEventListener('change', () => {
-      placeExpandForViewport();
-      clearMobileHint();
-      bindMobileHintObserver();
-    });
+    mobileQuery.addEventListener('change', handleViewportChange);
   } else if (typeof mobileQuery.addListener === 'function') {
-    mobileQuery.addListener(() => {
-      placeExpandForViewport();
-      clearMobileHint();
-      bindMobileHintObserver();
-    });
+    mobileQuery.addListener(handleViewportChange);
   }
 
   placeExpandForViewport();
-  setExpandedState(false);
+  setExpandedState(null);
   bindMobileHintObserver();
 })();

@@ -127,9 +127,38 @@
     };
   }
 
+  function getTourPrivateEditorData(form) {
+    if (!form) {
+      return {
+        tourLabel: '',
+        passengers: '',
+        pickup: '',
+        tripDate: '',
+        tripTime: '',
+        hasGuide: '',
+        guideLanguage: '',
+        price: '',
+        currency: ''
+      };
+    }
+
+    return {
+      tourLabel: getVisibleFieldValue(form, 'tour_private_tour_label'),
+      passengers: getVisibleFieldValue(form, 'tour_private_passenger_bucket_label'),
+      pickup: getVisibleFieldValue(form, 'tour_private_pickup'),
+      tripDate: getVisibleFieldValue(form, 'tour_private_date'),
+      tripTime: getVisibleFieldValue(form, 'tour_private_time'),
+      hasGuide: getVisibleFieldValue(form, 'tour_private_has_guide'),
+      guideLanguage: getVisibleFieldValue(form, 'tour_private_guide_language'),
+      price: getVisibleFieldValue(form, 'tour_private_price'),
+      currency: getVisibleFieldValue(form, 'tour_private_currency')
+    };
+  }
+
   function getVisibleFormData(form) {
     var serviceType;
     var airportHotelData;
+    var tourPrivateData;
     var fallbackOrigin;
     var fallbackDestination;
     var fallbackPassengers;
@@ -141,32 +170,45 @@
     airportHotelData = serviceType === 'airport_hotel'
       ? getAirportHotelEditorData(form)
       : null;
+    tourPrivateData = serviceType === 'tour_private'
+      ? getTourPrivateEditorData(form)
+      : null;
 
     return {
       name: getVisibleFieldValue(form, 'name'),
       phone: getVisibleFieldValue(form, 'phone'),
       email: getVisibleFieldValue(form, 'email'),
-      tripDate: getVisibleFieldValue(form, 'trip_date'),
-      tripTime: getVisibleFieldValue(form, 'trip_time'),
+      tripDate: tourPrivateData && tourPrivateData.tripDate ? tourPrivateData.tripDate : getVisibleFieldValue(form, 'trip_date'),
+      tripTime: tourPrivateData && tourPrivateData.tripTime ? tourPrivateData.tripTime : getVisibleFieldValue(form, 'trip_time'),
       origin: airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin,
       destination: airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination,
       serviceType: serviceType,
       zone: getVisibleFieldValue(form, 'zone'),
       fare: getVisibleFieldValue(form, 'fare'),
-      passengers: airportHotelData && airportHotelData.passengers ? airportHotelData.passengers : fallbackPassengers,
+      passengers: airportHotelData && airportHotelData.passengers
+        ? airportHotelData.passengers
+        : (tourPrivateData && tourPrivateData.passengers ? tourPrivateData.passengers : fallbackPassengers),
       luggage: getVisibleFieldValue(form, 'luggage'),
-      notes: getVisibleFieldValue(form, 'message')
+      notes: getVisibleFieldValue(form, 'message'),
+      tourLabel: tourPrivateData && tourPrivateData.tourLabel ? tourPrivateData.tourLabel : '',
+      pickup: tourPrivateData && tourPrivateData.pickup ? tourPrivateData.pickup : '',
+      hasGuide: tourPrivateData && tourPrivateData.hasGuide ? tourPrivateData.hasGuide : '',
+      guideLanguage: tourPrivateData && tourPrivateData.guideLanguage ? tourPrivateData.guideLanguage : '',
+      price: tourPrivateData && tourPrivateData.price ? tourPrivateData.price : '',
+      currency: tourPrivateData && tourPrivateData.currency ? tourPrivateData.currency : ''
     };
   }
   
   function buildMessageLines(data) {
     var lines;
     var labels;
+    var guideValue;
 
     labels = {
       intro: getI18nValue('contact.whatsappMessage.intro', 'Hola, quiero solicitar un traslado con Pixkuy.'),
       serviceType: getI18nValue('contact.whatsappMessage.serviceType', 'Tipo de servicio'),
       serviceAirportHotel: getI18nValue('contact.services.airportHotel', 'Aeropuerto y hotel'),
+      serviceTourPrivate: getI18nValue('contact.services.tourPrivate', 'Tours y visitas privadas'),
       serviceOther: getI18nValue('contact.services.other', 'Otro servicio'),
       name: getI18nValue('contact.whatsappMessage.name', 'Nombre'),
       phone: getI18nValue('contact.whatsappMessage.phone', 'Teléfono'),
@@ -179,13 +221,20 @@
       fare: getI18nValue('contact.whatsappMessage.fare', 'Tarifa'),
       passengers: getI18nValue('contact.whatsappMessage.passengers', 'Pasajeros'),
       luggage: getI18nValue('contact.whatsappMessage.luggage', 'Maletas'),
-      notes: getI18nValue('contact.whatsappMessage.notes', 'Notas')
+      notes: getI18nValue('contact.whatsappMessage.notes', 'Notas'),
+      tour: getI18nValue('contact.whatsappMessage.tour', 'Tour'),
+      pickup: getI18nValue('contact.whatsappMessage.pickup', 'Recogida'),
+      guide: getI18nValue('contact.whatsappMessage.guide', 'Guía'),
+      guideLanguage: getI18nValue('contact.whatsappMessage.guideLanguage', 'Idioma del guía'),
+      price: getI18nValue('contact.whatsappMessage.price', 'Precio final')
     };
 
     lines = [labels.intro];
 
     if (data.serviceType === 'airport_hotel') {
       lines.push(labels.serviceType + ': ' + labels.serviceAirportHotel);
+    } else if (data.serviceType === 'tour_private') {
+      lines.push(labels.serviceType + ': ' + labels.serviceTourPrivate);
     } else if (data.serviceType === 'other') {
       lines.push(labels.serviceType + ': ' + labels.serviceOther);
     }
@@ -226,8 +275,29 @@
       lines.push(labels.fare + ': ' + data.fare);
     }
 
+    if (data.tourLabel) {
+      lines.push(labels.tour + ': ' + data.tourLabel);
+    }
+
+    if (data.pickup) {
+      lines.push(labels.pickup + ': ' + data.pickup);
+    }
+
     if (data.passengers) {
       lines.push(labels.passengers + ': ' + data.passengers);
+    }
+
+    if (data.serviceType === 'tour_private' && data.hasGuide) {
+      guideValue = data.hasGuide === 'true' ? 'Sí' : 'No';
+      lines.push(labels.guide + ': ' + guideValue);
+    }
+
+    if (data.guideLanguage) {
+      lines.push(labels.guideLanguage + ': ' + data.guideLanguage);
+    }
+
+    if (data.price) {
+      lines.push(labels.price + ': ' + data.price + (data.currency ? ' ' + data.currency : ''));
     }
 
     if (data.luggage) {

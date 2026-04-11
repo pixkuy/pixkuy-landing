@@ -1,0 +1,664 @@
+/* assets/css/31-contact-services.css
+   UI específica de servicios dentro de #contact.
+   Alcance:
+   - switcher de servicio en formulario
+   - paneles específicos de servicio dentro de #contact
+   - editor tour_private
+   - ajustes visuales del editor airport_hotel en #contact
+   NO incluir:
+   - paneles comerciales de services
+   - core compartido de services
+   - estilos base globales del formulario
+*/
+
+/* -------------------------------------------------
+   CONTACT SERVICES — shell común
+   ------------------------------------------------- */
+
+.contact-service-switcher{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:4px;
+}
+
+.contact-service-switcher__button{
+  min-height:42px;
+  padding:0 16px;
+  border-radius:999px;
+  border:1px solid rgba(236,220,189,.20);
+  background:rgba(22,18,17,.46);
+  color:rgba(255,249,238,.90);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.04);
+}
+
+.contact-service-switcher__button:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);
+}
+
+.contact-service-switcher__button[data-service-active="true"]{
+  border-color:rgba(31,122,109,.62);
+  background:rgba(31,122,109,.14);
+  color:var(--fg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 10px 22px rgba(0,0,0,.16);
+}
+
+/* confirmación inline retirada:
+   el cambio de servicio ahora preserva draft por servicio y no requiere warning */
+
+/* -------------------------------------------------
+   CONTACT SERVICE PANEL — base
+   ------------------------------------------------- */
+
+.contact-service-panel{
+  display:grid;
+  gap:14px;
+}
+
+.contact-service-panel[hidden]{
+  display:none !important;
+}
+
+/* -------------------------------------------------
+   TOUR PRIVATE EDITOR — shell
+   ------------------------------------------------- */
+
+.contact-tour-private-editor{
+  display:grid;
+  grid-template-columns:minmax(220px, 268px) minmax(0, 1fr);
+  gap:18px 26px;
+  align-items:start;
+  padding:20px 20px 18px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  background:
+    linear-gradient(180deg, rgba(255,248,236,.05) 0%, rgba(255,240,214,.025) 100%),
+    rgba(255,255,255,.02);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.06),
+    0 18px 36px rgba(0,0,0,.16);
+}
+
+.contact-tour-private-editor__header{
+  grid-column:1 / -1;
+  display:grid;
+  gap:6px;
+}
+
+.contact-tour-private-editor__header .muted.small{
+  margin:0;
+  color:rgba(255,245,228,.82);
+}
+
+.contact-tour-private-editor__summary{
+  grid-column:1;
+  display:grid;
+  gap:10px;
+  align-self:start;
+  position:sticky;
+  top:18px;
+  padding:14px 14px 12px;
+  border-radius:18px;
+  border:1px solid rgba(236,220,189,.18);
+  background:rgba(22,18,17,.54);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.05),
+    0 14px 28px rgba(0,0,0,.14);
+}
+
+.contact-tour-private-editor__summary-media{
+  position:relative;
+  width:100%;
+  aspect-ratio:16 / 10;
+  overflow:hidden;
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(236,220,189,.14);
+}
+
+.contact-tour-private-editor__summary-media[hidden]{
+  display:none !important;
+}
+
+.contact-tour-private-editor__summary-image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+}
+
+.contact-tour-private-editor__summary-row{
+  display:grid;
+  gap:3px;
+}
+
+.contact-tour-private-editor__summary-label{
+  font-size:10px;
+  line-height:1.15;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:rgba(244,242,238,.52);
+}
+
+.contact-tour-private-editor__summary-value{
+  font-size:18px;
+  line-height:1.18;
+  color:rgba(255,249,238,.98);
+  word-break:break-word;
+}
+
+.contact-tour-private-editor > .form-field,
+.contact-tour-private-editor > .form-row,
+.contact-tour-private-editor > .contact-tour-private-editor__passengers,
+.contact-tour-private-editor > .contact-tour-private-editor__guide,
+.contact-tour-private-editor > .contact-panel-fare{
+  grid-column:2;
+}
+
+@media (min-width: 961px){
+  .contact-tour-private-editor{
+    grid-template-areas:
+      "header header"
+      "summary tour"
+      "summary passengers"
+      "summary pickup"
+      "summary datetime"
+      "summary guide"
+      "summary guide-language"
+      "summary fare";
+    grid-auto-rows:min-content;
+    align-items:start;
+  }
+
+  .contact-tour-private-editor__header{
+    grid-area:header;
+  }
+
+  .contact-tour-private-editor__summary{
+    grid-area:summary;
+  }
+
+  .contact-tour-private-editor > .form-field:nth-of-type(1){
+    grid-area:tour;
+    align-self:start;
+  }
+
+  .contact-tour-private-editor > .contact-tour-private-editor__passengers{
+    grid-area:passengers;
+    align-self:start;
+  }
+
+  .contact-tour-private-editor > .form-field:nth-of-type(2){
+    grid-area:pickup;
+    align-self:start;
+  }
+
+  .contact-tour-private-editor > .form-row.form-row--two{
+    grid-area:datetime;
+    align-self:start;
+  }
+
+  .contact-tour-private-editor > .contact-tour-private-editor__guide{
+    grid-area:guide;
+    align-self:start;
+  }
+
+  .contact-tour-private-editor > .form-field[data-contact-tour-private-guide-language-wrapper]{
+    grid-area:guide-language;
+    align-self:start;
+  }
+
+  .contact-tour-private-editor > .contact-panel-fare{
+    grid-area:fare;
+    align-self:start;
+  }
+}
+
+.contact-tour-private-editor .form-field,
+.contact-tour-private-editor .form-row,
+.contact-tour-private-editor__passengers,
+.contact-tour-private-editor__guide{
+  margin:0;
+}
+
+.contact-tour-private-editor .form-field{
+  display:grid;
+  gap:8px;
+}
+
+.contact-tour-private-editor .form-field input,
+.contact-tour-private-editor .form-field select{
+  width:100%;
+  min-height:54px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.20);
+  background:rgba(22,18,17,.46);
+  color:rgba(255,249,238,.98);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+}
+
+.contact-tour-private-editor .form-field input::placeholder{
+  color:rgba(255,249,238,.62);
+}
+
+.contact-tour-private-editor .form-field select{
+  padding-right:42px;
+  appearance:auto;
+  -webkit-appearance:menulist;
+}
+
+.contact-tour-private-editor__passengers,
+.contact-tour-private-editor__guide{
+  display:grid;
+  gap:10px;
+}
+
+.contact-tour-private-editor__passengers .services-expand__label,
+.contact-tour-private-editor__guide .services-expand__label{
+  display:block;
+  margin:0;
+  font-size:13px;
+  line-height:1.2;
+  font-weight:700;
+  color:rgba(255,247,230,.98);
+}
+
+.contact-tour-private-editor__passengers .services-expand__passengers-segmented,
+.contact-tour-private-editor__guide .services-expand__passengers-segmented{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:10px;
+}
+
+.contact-tour-private-editor__guide .services-expand__passengers-segmented{
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  max-width:360px;
+}
+
+.contact-tour-private-editor .services-expand__passenger-chip{
+  min-height:48px;
+  border-radius:14px;
+  border:1px solid rgba(236,220,189,.24);
+  background:rgba(22,18,17,.52);
+  color:rgba(255,249,238,.92);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+}
+
+.contact-tour-private-editor .services-expand__passenger-chip:hover{
+  border-color:rgba(255,255,255,.20);
+  background:rgba(255,255,255,.05);
+}
+
+.contact-tour-private-editor .services-expand__passenger-chip[aria-pressed="true"],
+.contact-tour-private-editor .services-expand__passenger-chip[data-service-active="true"]{
+  border-color:rgba(31,122,109,.62);
+  background:rgba(31,122,109,.14);
+  color:var(--fg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(31,122,109,.12);
+}
+
+.contact-tour-private-editor .services-expand__passenger-chip-text{
+  font-size:15px;
+  font-weight:600;
+  line-height:1.1;
+}
+
+.contact-tour-private-editor .form-row--two{
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+}
+
+.contact-tour-private-select,
+.contact-tour-private-timepicker{
+  position:relative;
+}
+
+.contact-tour-private-select__trigger,
+.contact-tour-private-timepicker__trigger{
+  width:100%;
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 16px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.20);
+  background:rgba(22,18,17,.46);
+  color:rgba(255,249,238,.98);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+  cursor:pointer;
+  text-align:left;
+}
+
+.contact-tour-private-select__trigger:hover,
+.contact-tour-private-timepicker__trigger:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.05);
+}
+
+.contact-tour-private-select__trigger[aria-expanded="true"],
+.contact-tour-private-timepicker__trigger[aria-expanded="true"]{
+  border-color:rgba(31,122,109,.58);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.05),
+    0 0 0 1px rgba(31,122,109,.14);
+}
+
+.contact-tour-private-select__value,
+.contact-tour-private-timepicker__value{
+  display:block;
+  min-width:0;
+  font-size:16px;
+  line-height:1.2;
+  color:rgba(255,249,238,.96);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.contact-tour-private-select__value[data-select-empty="true"],
+.contact-tour-private-timepicker__value[data-timepicker-empty="true"]{
+  color:rgba(255,249,238,.62);
+}
+
+.contact-tour-private-select__chevron,
+.contact-tour-private-timepicker__chevron{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  color:rgba(255,249,238,.82);
+  transition:transform .18s ease;
+}
+
+.contact-tour-private-select[data-select-open="true"] .contact-tour-private-select__chevron,
+.contact-tour-private-timepicker[data-timepicker-open="true"] .contact-tour-private-timepicker__chevron{
+  transform:rotate(180deg);
+}
+
+.contact-tour-private-select__panel,
+.contact-tour-private-timepicker__panel{
+  position:absolute;
+  top:calc(100% + 8px);
+  left:0;
+  right:0;
+  z-index:40;
+  padding:8px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.16);
+  background:
+    linear-gradient(180deg, rgba(34,30,28,.96) 0%, rgba(20,18,17,.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.04),
+    0 18px 36px rgba(0,0,0,.34);
+  backdrop-filter:blur(10px);
+}
+
+.contact-tour-private-select__panel[hidden],
+.contact-tour-private-timepicker__panel[hidden]{
+  display:none !important;
+}
+
+.contact-tour-private-select__listbox,
+.contact-tour-private-timepicker__listbox{
+  display:grid;
+  gap:8px;
+}
+
+.contact-tour-private-timepicker__listbox{
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+}
+
+.contact-tour-private-select__listbox--stacked{
+  grid-template-columns:1fr;
+}
+
+.contact-tour-private-select__option,
+.contact-tour-private-timepicker__option{
+  min-height:42px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 10px;
+  border-radius:12px;
+  border:1px solid rgba(236,220,189,.18);
+  background:rgba(255,255,255,.03);
+  color:rgba(255,249,238,.92);
+  font-size:14px;
+  line-height:1;
+  font-weight:600;
+  cursor:pointer;
+  transition:
+    background .16s ease,
+    border-color .16s ease,
+    transform .16s ease;
+}
+
+.contact-tour-private-select__option:hover,
+.contact-tour-private-timepicker__option:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);
+}
+
+.contact-tour-private-select__option[aria-selected="true"],
+.contact-tour-private-select__option[data-select-selected="true"],
+.contact-tour-private-timepicker__option[aria-selected="true"],
+.contact-tour-private-timepicker__option[data-timepicker-selected="true"]{
+  border-color:rgba(31,122,109,.62);
+  background:rgba(31,122,109,.16);
+  color:var(--fg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(31,122,109,.10);
+}
+
+.contact-tour-private-select__option--stacked{
+  min-height:50px;
+  justify-content:flex-start;
+  padding:0 14px;
+  text-align:left;
+  line-height:1.3;
+}
+
+.contact-tour-private-editor .contact-panel-fare{
+  margin-top:2px;
+}
+
+/* -------------------------------------------------
+   AIRPORT HOTEL EDITOR — pequeños ajustes de convivencia
+   ------------------------------------------------- */
+
+.contact-airport-hotel-editor{
+  border-radius:20px;
+  background:
+    linear-gradient(180deg, rgba(255,248,236,.05) 0%, rgba(255,240,214,.025) 100%),
+    rgba(255,255,255,.02);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.06),
+    0 18px 36px rgba(0,0,0,.16);
+}
+
+.contact-airport-hotel-editor__header .muted.small{
+  color:rgba(255,245,228,.82);
+}
+
+/* -------------------------------------------------
+   CONTACT PANEL FARE — consistencia visual
+   ------------------------------------------------- */
+
+.contact-panel-fare{
+  border-radius:18px;
+}
+
+/* -------------------------------------------------
+   MOBILE / TABLET
+   ------------------------------------------------- */
+
+@media (max-width: 960px){
+  .contact-tour-private-editor{
+    grid-template-columns:1fr;
+    gap:16px;
+    padding:18px 18px 16px;
+    border-radius:18px;
+  }
+
+  .contact-tour-private-editor__summary{
+    grid-column:auto;
+    position:relative;
+    top:auto;
+  }
+
+  .contact-tour-private-editor > .form-field,
+  .contact-tour-private-editor > .form-row,
+  .contact-tour-private-editor > .contact-tour-private-editor__passengers,
+  .contact-tour-private-editor > .contact-tour-private-editor__guide,
+  .contact-tour-private-editor > .contact-panel-fare{
+    grid-column:auto;
+  }
+}
+
+@media (max-width: 720px){
+  .contact-service-switcher{
+    gap:8px;
+  }
+
+  .contact-service-switcher__button{
+    min-height:40px;
+    padding:0 14px;
+    font-size:14px;
+  }
+  
+    .contact-tour-private-editor__header{
+    order:1;
+  }
+
+  .contact-tour-private-editor > .form-field:has([data-contact-tour-private-tourpicker]){
+    order:2;
+  }
+
+  .contact-tour-private-editor__summary{
+    order:3;
+  }
+
+  .contact-tour-private-editor > .contact-tour-private-editor__passengers{
+    order:4;
+  }
+
+  .contact-tour-private-editor > .form-field:has([data-contact-tour-private-pickup]){
+    order:5;
+  }
+
+  .contact-tour-private-editor > .form-row.form-row--two{
+    order:6;
+  }
+
+  .contact-tour-private-editor > .contact-tour-private-editor__guide{
+    order:7;
+  }
+
+  .contact-tour-private-editor > .form-field[data-contact-tour-private-guide-language-wrapper]{
+    order:8;
+  }
+
+  .contact-tour-private-editor > .contact-panel-fare{
+    order:9;
+  }
+  
+    /* confirmación inline retirada en móvil */
+
+  .contact-tour-private-editor{
+    gap:14px;
+    padding:16px 14px 14px;
+    border-radius:16px;
+  }
+
+  .contact-tour-private-editor__summary{
+    gap:8px;
+    padding:14px 14px 12px;
+    border-radius:16px;
+  }
+
+  .contact-tour-private-editor__summary-media{
+    aspect-ratio:16 / 9;
+    border-radius:12px;
+  }
+
+  .contact-tour-private-editor__summary-value{
+    font-size:16px;
+    line-height:1.22;
+  }
+
+  .contact-tour-private-editor .form-field input,
+  .contact-tour-private-editor .form-field select{
+    min-height:52px;
+    border-radius:14px;
+  }
+  
+  .contact-tour-private-editor > .form-field:has([data-contact-tour-private-tourpicker]){
+    min-width:0;
+    max-width:100%;
+  }
+
+  .contact-tour-private-editor > .form-field:has([data-contact-tour-private-tourpicker]) .contact-tour-private-select{
+    min-width:0;
+    max-width:100%;
+  }
+
+  .contact-tour-private-editor > .form-field:has([data-contact-tour-private-tourpicker]) .contact-tour-private-select__trigger{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    overflow:hidden;
+  }
+
+  .contact-tour-private-editor .form-row--two{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .contact-tour-private-select__panel,
+  .contact-tour-private-timepicker__panel{
+    padding:8px;
+    border-radius:14px;
+  }
+
+  .contact-tour-private-timepicker__listbox{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+  }
+
+  .contact-tour-private-select__option,
+  .contact-tour-private-timepicker__option{
+    min-height:44px;
+    border-radius:12px;
+  }
+
+  .contact-tour-private-select__option--stacked{
+    min-height:48px;
+  }
+
+  .contact-tour-private-editor__passengers .services-expand__passengers-segmented{
+    gap:8px;
+  }
+
+  .contact-tour-private-editor__guide .services-expand__passengers-segmented{
+    max-width:none;
+  }
+
+  .contact-tour-private-editor .services-expand__passenger-chip{
+    min-height:46px;
+    border-radius:12px;
+  }
+
+  .contact-tour-private-editor .services-expand__passenger-chip-text{
+    font-size:14px;
+  }
+}

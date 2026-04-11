@@ -96,6 +96,12 @@
 
     applyI18nToDom(finalDict, finalLang);
 
+    window.dispatchEvent(new CustomEvent("pixkuy:i18n-applied", {
+      detail: {
+        lang: finalLang
+      }
+    }));
+
     // Actualiza UI del selector (pro o legacy)
     updateLangUI(finalLang);
   }

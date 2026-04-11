@@ -139,6 +139,8 @@ function clearDomValue(dom) {
   if (dom.input.value !== "") {
     dom.input.value = "";
   }
+
+  syncSearchClearVisibility(dom);
 }
 
 function clearRootUi(rootId) {
@@ -246,6 +248,24 @@ function clearAllRootUis() {
       nodes.mount.appendChild(input);
     }
 
+    let clearSearch = nodes.mount.querySelector(
+      '[data-airport-lodging-clear-search="' + String(rootId) + '"]'
+    );
+
+    if (!clearSearch) {
+      clearSearch = document.createElement("button");
+      clearSearch.type = "button";
+      clearSearch.className = "services-expand__control-clear";
+      clearSearch.hidden = true;
+      clearSearch.setAttribute(
+        "data-airport-lodging-clear-search",
+        String(rootId)
+      );
+      clearSearch.setAttribute("aria-label", "Limpiar búsqueda");
+      clearSearch.textContent = "×";
+      nodes.mount.appendChild(clearSearch);
+    }
+
     if (!panel) {
       panel = document.createElement("div");
       panel.className = "place-autocomplete__panel";
@@ -270,7 +290,8 @@ function clearAllRootUis() {
     return {
       input: input,
       panel: panel,
-      status: status
+      status: status,
+      clearSearch: clearSearch
     };
   }
 
@@ -285,6 +306,15 @@ function clearAllRootUis() {
     state.activeIndex = -1;
     state.query = "";
     state.items = [];
+  }
+  
+  function syncSearchClearVisibility(dom) {
+    if (!dom || !dom.clearSearch || !dom.input) {
+      return;
+    }
+
+    const hasValue = normalizeText(dom.input.value).trim().length > 0;
+    dom.clearSearch.hidden = !hasValue;
   }
 
   function closePanel(nodes, dom) {
@@ -416,6 +446,7 @@ function clearAllRootUis() {
     state.activeIndex = -1;
     closePanel(nodes, dom);
     renderStatus(dom, "idle");
+    syncSearchClearVisibility(dom);
 
     debugTrace("clearResults:after", {
       rootId: rootId,
@@ -438,6 +469,7 @@ function clearAllRootUis() {
     if (dom && dom.input && dom.input.value !== nextValue) {
       dom.input.value = nextValue;
     }
+    syncSearchClearVisibility(dom);
   }
 
   function moveActiveIndex(dom, direction) {
@@ -547,6 +579,7 @@ function clearAllRootUis() {
       syncQuery(dom, nextValue);
       renderStatus(dom, "idle");
       clearResults(nodes, dom);
+      syncSearchClearVisibility(dom);
     });
 
     dom.input.addEventListener("focus", function () {
@@ -624,6 +657,37 @@ function clearAllRootUis() {
 
       clearResults(activeNodes, activeDom);
     });
+  }
+  
+  function bindSearchClear(nodes, dom) {
+    if (
+      !dom ||
+      !dom.clearSearch ||
+      dom.clearSearch.dataset.airportLodgingSearchClearBound === "1"
+    ) {
+      return;
+    }
+
+    dom.clearSearch.dataset.airportLodgingSearchClearBound = "1";
+
+    function runSearchClear(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      state.selectedItem = null;
+      syncQuery(dom, "");
+      clearResults(nodes, dom);
+      renderStatus(dom, "idle");
+
+      if (dom.input) {
+        dom.input.focus({ preventScroll: true });
+      }
+    }
+
+    dom.clearSearch.addEventListener("pointerdown", runSearchClear);
+    dom.clearSearch.addEventListener("click", runSearchClear);
   }
 
   function bindResolvedClear(nodes, dom) {
@@ -781,6 +845,7 @@ function clearAllRootUis() {
 
     bindPanelClick(nextNodes, nextDom);
     bindInput(nextNodes, nextDom);
+    bindSearchClear(nextNodes, nextDom);
     bindResolvedClear(nextNodes, nextDom);
 
     activeNodes = nextNodes;
@@ -911,8 +976,10 @@ function clearAllRootUis() {
     bindPanelClick(nodes, dom);
     bindInput(nodes, dom);
     bindDocumentDismiss();
+    bindSearchClear(nodes, dom);
     bindResolvedClear(nodes, dom);
     renderFromTariffState(nodes, dom);
+    syncSearchClearVisibility(dom);
 
     window.PixkuyAirportLodgingAutocomplete = getApi(nodes, dom);
   }

@@ -29,6 +29,22 @@
       zone: form.querySelector('input[name="zone"]'),
       fare: form.querySelector('input[name="fare"]'),
 
+      tourPrivateTourId: form.querySelector('input[name="tour_private_tour_id"]'),
+      tourPrivateTourLabel: form.querySelector('input[name="tour_private_tour_label"]'),
+      tourPrivateDurationHours: form.querySelector('input[name="tour_private_duration_hours"]'),
+      tourPrivatePassengerFareKey: form.querySelector('input[name="tour_private_passenger_fare_key"]'),
+      tourPrivatePassengerBucketLabel: form.querySelector('input[name="tour_private_passenger_bucket_label"]'),
+      tourPrivatePickup: form.querySelector('input[name="tour_private_pickup"]'),
+      tourPrivatePickupPlaceId: form.querySelector('input[name="tour_private_pickup_place_id"]'),
+      tourPrivatePickupLat: form.querySelector('input[name="tour_private_pickup_lat"]'),
+      tourPrivatePickupLng: form.querySelector('input[name="tour_private_pickup_lng"]'),
+      tourPrivateDate: form.querySelector('input[name="tour_private_date"]'),
+      tourPrivateTime: form.querySelector('input[name="tour_private_time"]'),
+      tourPrivateHasGuide: form.querySelector('input[name="tour_private_has_guide"]'),
+      tourPrivateGuideLanguage: form.querySelector('input[name="tour_private_guide_language"]'),
+      tourPrivatePrice: form.querySelector('input[name="tour_private_price"]'),
+      tourPrivateCurrency: form.querySelector('input[name="tour_private_currency"]'),
+
       passengers: form.querySelector('input[name="passengers"]'),
       luggage: form.querySelector('input[name="luggage"]'),
       message: form.querySelector('textarea[name="message"]'),
@@ -453,6 +469,22 @@
       fare: fields.fare ? getTrimmedValue(fields.fare) : '',
       passengerFareKey: getSelectedAirportHotelFareKey(),
 
+      tourPrivateTourId: fields.tourPrivateTourId ? getTrimmedValue(fields.tourPrivateTourId) : '',
+      tourPrivateTourLabel: fields.tourPrivateTourLabel ? getTrimmedValue(fields.tourPrivateTourLabel) : '',
+      tourPrivateDurationHours: fields.tourPrivateDurationHours ? getTrimmedValue(fields.tourPrivateDurationHours) : '',
+      tourPrivatePassengerFareKey: fields.tourPrivatePassengerFareKey ? getTrimmedValue(fields.tourPrivatePassengerFareKey) : '',
+      tourPrivatePassengerBucketLabel: fields.tourPrivatePassengerBucketLabel ? getTrimmedValue(fields.tourPrivatePassengerBucketLabel) : '',
+      tourPrivatePickup: fields.tourPrivatePickup ? getTrimmedValue(fields.tourPrivatePickup) : '',
+      tourPrivatePickupPlaceId: fields.tourPrivatePickupPlaceId ? getTrimmedValue(fields.tourPrivatePickupPlaceId) : '',
+      tourPrivatePickupLat: fields.tourPrivatePickupLat ? getTrimmedValue(fields.tourPrivatePickupLat) : '',
+      tourPrivatePickupLng: fields.tourPrivatePickupLng ? getTrimmedValue(fields.tourPrivatePickupLng) : '',
+      tourPrivateDate: fields.tourPrivateDate ? getTrimmedValue(fields.tourPrivateDate) : '',
+      tourPrivateTime: fields.tourPrivateTime ? getTrimmedValue(fields.tourPrivateTime) : '',
+      tourPrivateHasGuide: fields.tourPrivateHasGuide ? getTrimmedValue(fields.tourPrivateHasGuide) : '',
+      tourPrivateGuideLanguage: fields.tourPrivateGuideLanguage ? getTrimmedValue(fields.tourPrivateGuideLanguage) : '',
+      tourPrivatePrice: fields.tourPrivatePrice ? getTrimmedValue(fields.tourPrivatePrice) : '',
+      tourPrivateCurrency: fields.tourPrivateCurrency ? getTrimmedValue(fields.tourPrivateCurrency) : '',
+
       passengers: getTrimmedValue(fields.passengers),
       luggage: getTrimmedValue(fields.luggage),
       notes: getTrimmedValue(fields.message),
@@ -494,11 +526,37 @@
     );
   }
 
+  function hasAttemptableTourPrivateReservationData(data) {
+  if (!data) return false;
+
+  return Boolean(
+    data.name &&
+    isValidInternationalPhoneNumber(data.phone) &&
+    data.email &&
+    data.serviceType === 'tour_private' &&
+    data.tourPrivateTourId &&
+    data.tourPrivatePassengerFareKey &&
+    data.tourPrivatePickup &&
+    data.tourPrivateDate &&
+    data.tourPrivateTime &&
+    data.tourPrivatePrice &&
+    data.tourPrivateCurrency &&
+    (
+      data.tourPrivateHasGuide !== 'true' ||
+      data.tourPrivateGuideLanguage
+    )
+  );
+}
+
   function hasAttemptableReservationData(data) {
     if (!data) return false;
 
     if (data.serviceType === 'airport_hotel') {
       return hasAttemptableAirportHotelReservationData(data);
+    }
+
+    if (data.serviceType === 'tour_private') {
+      return hasAttemptableTourPrivateReservationData(data);
     }
 
     return hasAttemptableOtherReservationData(data);
@@ -537,11 +595,37 @@
     );
   }
 
+  function hasMinimumRequiredTourPrivateReservationData(data) {
+  if (!data) return false;
+
+  return Boolean(
+    data.name &&
+    isValidInternationalPhoneNumber(data.phone) &&
+    isValidEmail(data.email) &&
+    data.serviceType === 'tour_private' &&
+    data.tourPrivateTourId &&
+    data.tourPrivatePassengerFareKey &&
+    data.tourPrivatePickup &&
+    data.tourPrivateDate &&
+    data.tourPrivateTime &&
+    data.tourPrivatePrice &&
+    data.tourPrivateCurrency &&
+    (
+      data.tourPrivateHasGuide !== 'true' ||
+      data.tourPrivateGuideLanguage
+    )
+  );
+}
+
   function hasMinimumRequiredReservationData(data) {
     if (!data) return false;
 
     if (data.serviceType === 'airport_hotel') {
       return hasMinimumRequiredAirportHotelReservationData(data);
+    }
+
+    if (data.serviceType === 'tour_private') {
+      return hasMinimumRequiredTourPrivateReservationData(data);
     }
 
     return hasMinimumRequiredOtherReservationData(data);
@@ -573,26 +657,52 @@
   }
   
   function syncNativeRequiredState(fields, data) {
-    var isAirportHotel;
+  var usesSpecificServiceModel;
+  var isTourPrivate;
 
-    if (!fields || !fields.origin || !fields.destination || !fields.passengers) {
-      return false;
-    }
+  if (
+    !fields ||
+    !fields.tripDate ||
+    !fields.tripTime ||
+    !fields.origin ||
+    !fields.destination ||
+    !fields.passengers ||
+    !fields.luggage
+  ) {
+    return false;
+  }
 
-    isAirportHotel = Boolean(data && data.serviceType === 'airport_hotel');
+  usesSpecificServiceModel = Boolean(
+    data &&
+    (
+      data.serviceType === 'airport_hotel' ||
+      data.serviceType === 'tour_private'
+    )
+  );
 
-    if (isAirportHotel) {
-      fields.origin.required = false;
-      fields.destination.required = false;
-      fields.passengers.required = false;
-      return true;
-    }
+  isTourPrivate = Boolean(
+    data &&
+    data.serviceType === 'tour_private'
+  );
 
-    fields.origin.required = true;
-    fields.destination.required = true;
-    fields.passengers.required = true;
+  if (usesSpecificServiceModel) {
+    fields.tripDate.required = false;
+    fields.tripTime.required = false;
+    fields.origin.required = false;
+    fields.destination.required = false;
+    fields.passengers.required = false;
+    fields.luggage.required = !isTourPrivate;
     return true;
   }
+
+  fields.tripDate.required = true;
+  fields.tripTime.required = true;
+  fields.origin.required = true;
+  fields.destination.required = true;
+  fields.passengers.required = true;
+  fields.luggage.required = true;
+  return true;
+}
 
   function setStatusHidden(fields) {
     if (!fields || !fields.status) return;
@@ -771,16 +881,28 @@
         Boolean(data.tripTime) &&
         Boolean(data.tripDate) &&
         isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime),
-      origin: data.serviceType === 'airport_hotel'
+      origin: (
+        data.serviceType === 'airport_hotel' ||
+        data.serviceType === 'tour_private'
+      )
         ? true
         : Boolean(data.origin) && !areSameLocations(data.origin, data.destination),
-      destination: data.serviceType === 'airport_hotel'
+      destination: (
+        data.serviceType === 'airport_hotel' ||
+        data.serviceType === 'tour_private'
+      )
         ? true
         : Boolean(data.destination) && !areSameLocations(data.origin, data.destination),
       passengers: data.serviceType === 'airport_hotel'
         ? hasAirportHotelFareKeySelected(data)
-        : isPositiveIntegerUpTo(data.passengers, 6),
-      luggage: isZeroOrPositiveInteger(data.luggage)
+        : (
+            data.serviceType === 'tour_private'
+              ? Boolean(data.tourPrivatePassengerFareKey)
+              : isPositiveIntegerUpTo(data.passengers, 6)
+          ),
+      luggage: data.serviceType === 'tour_private'
+        ? true
+        : isZeroOrPositiveInteger(data.luggage)
     };
 
     return validity;
@@ -824,13 +946,19 @@
 
         return isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime);
       case 'origin':
-        if (data.serviceType === 'airport_hotel') {
+        if (
+          data.serviceType === 'airport_hotel' ||
+          data.serviceType === 'tour_private'
+        ) {
           return true;
         }
 
         return Boolean(data.origin) && !areSameLocations(data.origin, data.destination);
       case 'destination':
-        if (data.serviceType === 'airport_hotel') {
+        if (
+          data.serviceType === 'airport_hotel' ||
+          data.serviceType === 'tour_private'
+        ) {
           return true;
         }
 
@@ -1242,4 +1370,10 @@
   window.PixkuyForms.refreshReservationRequestValidationUX = refreshValidationUX;
   window.PixkuyForms.syncReservationRequestState = syncReservationRequestState;
   window.PixkuyForms.initReservationRequestForm = initReservationRequestForm;
+
+  window.PixkuyForms.getReservationMinimumDateTime = getReservationMinimumDateTime;
+  window.PixkuyForms.formatReservationDateForInput = formatDateForInput;
+  window.PixkuyForms.formatReservationTimeForInput = formatTimeForInput;
+  window.PixkuyForms.parseReservationDateTime = parseReservationDateTime;
+  window.PixkuyForms.isReservationDateTimeAtLeast24HoursAhead = isReservationDateTimeAtLeast24HoursAhead;
 })(window, document);

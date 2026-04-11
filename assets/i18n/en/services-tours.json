@@ -1,0 +1,125 @@
+{
+  "services": {
+    "cards": {
+      "tours": {
+        "title": "Private tours and visits",
+        "text": "Private journeys to iconic places with clear configuration and attentive service from departure to return.",
+        "bullets": [
+          "Curated tours",
+          "Advance configuration",
+          "Personalized attention"
+        ],
+        "priceLabel": "Price from",
+        "priceValue": "4.000 MXN",
+        "ctaClosed": "View tours",
+        "ctaOpen": "Hide tours",
+        "panel": {
+          "title": "Choose your tour",
+          "text": "First select the route you are interested in. Then you can configure passengers, pickup, date, time and, where applicable, guide and language.",
+          "selectedTourLabel": "Selected tour",
+          "durationLabel": "Duration",
+          "priceFromLabel": "Price from",
+          "pickupLabel": "Pickup",
+          "pickupPlaceholder": "Enter pickup point",
+          "pickupHelp": "The pickup point validates operational feasibility, but does not change the price.",
+          "dateLabel": "Date",
+          "timeLabel": "Time",
+          "passengersLabel": "Passengers",
+          "guideLabel": "Guide",
+          "guideIncludedLabel": "With guide",
+          "guideNotIncludedLabel": "Without guide",
+          "guideLanguageLabel": "Guide language",
+          "guideLanguagePlaceholder": "Select language",
+          "priceLabel": "Final price",
+          "priceValuePending": "—",
+          "cta": "Request",
+          "ctaDisabled": "Complete configuration",
+          "emptyStateTitle": "Select a tour",
+          "emptyStateText": "First choose an option from the catalog to see its configuration and final price.",
+          "changeTourConfirm": "If you change the tour, we will review the current configuration and only compatible data will be kept. Do you want to continue?",
+          "confirmAccept": "Continue",
+          "confirmCancel": "Cancel",
+          "catalog": {
+            "teotihuacan": {
+              "title": "Teotihuacan Pyramids",
+              "description": "Discover Teotihuacan in a private experience with round-trip transfer, tickets included, and a visit at your own pace.",
+              "duration": "6 hours",
+              "priceFrom": "4.000 MXN",
+              "imageAlt": "Teotihuacan Pyramids"
+            },
+            "teotihuacan_basilica": {
+              "title": "Teotihuacan Pyramids + Basilica of Our Lady of Guadalupe",
+              "description": "Discover Teotihuacan and the Basilica in a full-day private experience, with round-trip transfer, tickets included, and a well-paced visit.",
+              "duration": "9 hours",
+              "priceFrom": "5.000 MXN",
+              "imageAlt": "Teotihuacan Pyramids and Basilica of Guadalupe"
+            },
+            "xochimilco_coyoacan": {
+              "title": "Xochimilco + Coyoacán",
+              "description": "Enjoy Xochimilco and Coyoacán in a private journey with round-trip transfer, designed to experience two of Mexico City’s most iconic places with calm and comfort.",
+              "duration": "6 hours",
+              "priceFrom": "4.500 MXN",
+              "imageAlt": "Xochimilco and Coyoacán"
+            },
+            "cholula_puebla": {
+              "title": "Cholula + Puebla",
+              "description": "Explore Cholula and Puebla in a full-day private experience, with transfer from Mexico City and enough time to enjoy the visit at your own pace.",
+              "duration": "9 hours",
+              "priceFrom": "7.200 MXN",
+              "imageAlt": "Cholula and Puebla"
+            },
+            "san_miguel_allende": {
+              "title": "San Miguel de Allende",
+              "description": "Discover San Miguel de Allende in a private journey with transfer from Mexico City, designed to enjoy the visit comfortably and without unnecessary rush.",
+              "duration": "10 hours",
+              "priceFrom": "7.800 MXN",
+              "imageAlt": "San Miguel de Allende"
+            }
+          },
+          "guideLanguages": {
+            "es": "Spanish",
+            "en": "English",
+            "fr": "French"
+          },
+          "guideOptions": {
+            "yes": "Yes",
+            "no": "No"
+          },
+          "passengerBuckets": {
+            "van_1_2": "1–2",
+            "van_3_4": "3–4",
+            "van_5_6": "5–6"
+          }
+        },
+        "contact": {
+          "serviceLabel": "Private tours and visits",
+          "helper": "Select the tour and complete the operational configuration before sending the request.",
+          "tourLabel": "Tour",
+          "tourPlaceholder": "Select tour",
+          "passengersLabel": "Passengers",
+          "pickupLabel": "Pickup",
+          "pickupPlaceholder": "Enter pickup point",
+          "dateLabel": "Tour date",
+          "timeLabel": "Departure time",
+          "timePlaceholder": "Departure time",
+          "guideLabel": "Guide",
+          "guideLanguageLabel": "Guide language",
+          "guideLanguagePlaceholder": "Select language",
+          "summaryTourLabel": "Tour",
+          "summaryDurationLabel": "Duration",
+          "summaryTicketsLabel": "Tickets",
+          "summaryPriceLabel": "Final price"
+        },
+        "whatsapp": {
+          "tour": "Tour",
+          "pickup": "Pickup",
+          "guide": "Guide",
+          "guideLanguage": "Guide language",
+          "price": "Final price",
+          "guideYes": "Yes",
+          "guideNo": "No"
+        }
+      }
+    }
+  }
+}

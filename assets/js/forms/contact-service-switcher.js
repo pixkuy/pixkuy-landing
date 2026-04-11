@@ -96,7 +96,12 @@
 
   function isSupportedServiceType(serviceType) {
     const safeServiceType = normalizeText(serviceType);
-    return safeServiceType === "airport_hotel" || safeServiceType === "other";
+
+    return (
+      safeServiceType === "airport_hotel" ||
+      safeServiceType === "tour_private" ||
+      safeServiceType === "other"
+    );
   }
 
   function findFirstFocusable(container) {
@@ -142,6 +147,7 @@
 
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
       button.setAttribute("data-service-active", isActive ? "true" : "false");
+      button.removeAttribute("data-service-pending-confirm");
     });
   }
 
@@ -162,21 +168,97 @@
     const passengersWrapper = passengersField
       ? passengersField.closest('.form-field')
       : null;
-    const shouldHide = activeServiceType === "airport_hotel";
+    const luggageField = form.querySelector(
+      '#contact-luggage'
+    );
+    const luggageWrapper = luggageField
+      ? luggageField.closest('.form-field')
+      : null;
+    const commonTripDateField = form.querySelector('#contact-trip-date');
+    const commonTripDateWrapper = commonTripDateField
+      ? commonTripDateField.closest('.form-field')
+      : null;
+    const commonTripTimeField = form.querySelector('#contact-trip-time');
+    const commonTripTimeWrapper = commonTripTimeField
+      ? commonTripTimeField.closest('.form-field')
+      : null;
+    const shouldHideSharedPlacesAndPassengers =
+      activeServiceType === "airport_hotel" ||
+      activeServiceType === "tour_private";
+    const shouldHideSharedTripDateTime =
+      activeServiceType === "tour_private";
+    const shouldHideSharedLuggage =
+      activeServiceType === "tour_private";
 
     if (originField) {
-      originField.hidden = shouldHide;
-      originField.setAttribute("aria-hidden", shouldHide ? "true" : "false");
+      originField.hidden = shouldHideSharedPlacesAndPassengers;
+      originField.setAttribute(
+        "aria-hidden",
+        shouldHideSharedPlacesAndPassengers ? "true" : "false"
+      );
     }
 
     if (destinationField) {
-      destinationField.hidden = shouldHide;
-      destinationField.setAttribute("aria-hidden", shouldHide ? "true" : "false");
+      destinationField.hidden = shouldHideSharedPlacesAndPassengers;
+      destinationField.setAttribute(
+        "aria-hidden",
+        shouldHideSharedPlacesAndPassengers ? "true" : "false"
+      );
     }
 
     if (passengersWrapper) {
-      passengersWrapper.hidden = shouldHide;
-      passengersWrapper.setAttribute("aria-hidden", shouldHide ? "true" : "false");
+      passengersWrapper.hidden = shouldHideSharedPlacesAndPassengers;
+      passengersWrapper.setAttribute(
+        "aria-hidden",
+        shouldHideSharedPlacesAndPassengers ? "true" : "false"
+      );
+    }
+
+    if (luggageWrapper) {
+      luggageWrapper.hidden = shouldHideSharedLuggage;
+      luggageWrapper.setAttribute(
+        "aria-hidden",
+        shouldHideSharedLuggage ? "true" : "false"
+      );
+    }
+
+    if (commonTripDateWrapper) {
+      commonTripDateWrapper.hidden = shouldHideSharedTripDateTime;
+      commonTripDateWrapper.setAttribute(
+        "aria-hidden",
+        shouldHideSharedTripDateTime ? "true" : "false"
+      );
+    }
+
+    if (commonTripTimeWrapper) {
+      commonTripTimeWrapper.hidden = shouldHideSharedTripDateTime;
+      commonTripTimeWrapper.setAttribute(
+        "aria-hidden",
+        shouldHideSharedTripDateTime ? "true" : "false"
+      );
+    }
+
+    return true;
+  }
+  
+  function syncOperationalSummaryFields(form, activeServiceType) {
+    var serviceLabelField;
+    var requestSummaryField;
+
+    if (!form) {
+      return false;
+    }
+
+    serviceLabelField = form.querySelector('input[name="service_label"]');
+    requestSummaryField = form.querySelector('input[name="request_summary"]');
+
+    if (!serviceLabelField || !requestSummaryField) {
+      return false;
+    }
+
+    if (activeServiceType === "other") {
+      serviceLabelField.value = "";
+      requestSummaryField.value = "";
     }
 
     return true;
@@ -209,6 +291,7 @@
     syncSwitcherAriaLabel(nodes.switcher);
     syncButtonState(nodes.buttons, activeServiceType);
     syncPanelState(form, nodes.panels, activeServiceType);
+    syncOperationalSummaryFields(form, activeServiceType);
 
     if (safeOptions.focusPanel === true) {
       const activePanel = nodes.panels.find(function (panel) {
@@ -287,7 +370,7 @@
 
     return true;
   }
-
+  
   function initContactServiceSwitcher() {
     const form = getReservationForm();
     const serviceStateApi = getServiceStateApi();

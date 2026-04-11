@@ -1,0 +1,125 @@
+{
+  "services": {
+    "cards": {
+      "tours": {
+        "title": "Tours e visitas privadas",
+        "text": "Percursos privados para lugares emblemáticos com configuração clara e atenção cuidada desde a partida até ao regresso.",
+        "bullets": [
+          "Tours fechados",
+          "Configuração prévia",
+          "Atenção personalizada"
+        ],
+        "priceLabel": "Preço desde",
+        "priceValue": "4.000 MXN",
+        "ctaClosed": "Ver tours",
+        "ctaOpen": "Ocultar tours",
+        "panel": {
+          "title": "Escolha o seu tour",
+          "text": "Selecione primeiro o percurso que lhe interessa. Depois poderá configurar passageiros, recolha, data, hora e, quando aplicável, guia e idioma.",
+          "selectedTourLabel": "Tour selecionado",
+          "durationLabel": "Duração",
+          "priceFromLabel": "Preço desde",
+          "pickupLabel": "Recolha",
+          "pickupPlaceholder": "Indique o ponto de recolha",
+          "pickupHelp": "O ponto de recolha serve para validação operacional, mas não altera o preço.",
+          "dateLabel": "Data",
+          "timeLabel": "Hora",
+          "passengersLabel": "Passageiros",
+          "guideLabel": "Guia",
+          "guideIncludedLabel": "Com guia",
+          "guideNotIncludedLabel": "Sem guia",
+          "guideLanguageLabel": "Idioma do guia",
+          "guideLanguagePlaceholder": "Selecione o idioma",
+          "priceLabel": "Preço final",
+          "priceValuePending": "—",
+          "cta": "Solicitar",
+          "ctaDisabled": "Complete a configuração",
+          "emptyStateTitle": "Selecione um tour",
+          "emptyStateText": "Escolha primeiro uma opção do catálogo para ver a sua configuração e o preço final.",
+          "changeTourConfirm": "Se mudar de tour, iremos rever a configuração atual e apenas os dados compatíveis serão mantidos. Quer continuar?",
+          "confirmAccept": "Continuar",
+          "confirmCancel": "Cancelar",
+          "catalog": {
+            "teotihuacan": {
+              "title": "Pirâmides de Teotihuacán",
+              "description": "Descubra Teotihuacán numa experiência privada com transfer de ida e volta, entradas incluídas e uma visita ao seu ritmo.",
+              "duration": "6 horas",
+              "priceFrom": "4.000 MXN",
+              "imageAlt": "Pirâmides de Teotihuacán"
+            },
+            "teotihuacan_basilica": {
+              "title": "Pirâmides de Teotihuacán + Basílica Santa María de Guadalupe",
+              "description": "Descubra Teotihuacán e a Basílica numa experiência privada de dia completo, com transfer de ida e volta, entradas incluídas e uma visita bem aproveitada.",
+              "duration": "9 horas",
+              "priceFrom": "5.000 MXN",
+              "imageAlt": "Pirâmides de Teotihuacán e Basílica de Guadalupe"
+            },
+            "xochimilco_coyoacan": {
+              "title": "Xochimilco + Coyoacán",
+              "description": "Desfrute de Xochimilco e Coyoacán num percurso privado com transfer de ida e volta, pensado para viver dois dos lugares mais emblemáticos da Cidade do México com calma e conforto.",
+              "duration": "6 horas",
+              "priceFrom": "4.500 MXN",
+              "imageAlt": "Xochimilco e Coyoacán"
+            },
+            "cholula_puebla": {
+              "title": "Cholula + Puebla",
+              "description": "Explore Cholula e Puebla numa experiência privada de dia completo, com transfer desde a Cidade do México e tempo suficiente para desfrutar da visita ao seu ritmo.",
+              "duration": "9 horas",
+              "priceFrom": "7.200 MXN",
+              "imageAlt": "Cholula e Puebla"
+            },
+            "san_miguel_allende": {
+              "title": "San Miguel de Allende",
+              "description": "Descubra San Miguel de Allende num percurso privado com transfer desde a Cidade do México, pensado para desfrutar da visita com conforto e sem pressas desnecessárias.",
+              "duration": "10 horas",
+              "priceFrom": "7.800 MXN",
+              "imageAlt": "San Miguel de Allende"
+            }
+          },
+          "guideLanguages": {
+            "es": "Espanhol",
+            "en": "Inglês",
+            "fr": "Francês"
+          },
+          "guideOptions": {
+            "yes": "Sim",
+            "no": "Não"
+          },
+          "passengerBuckets": {
+            "van_1_2": "1–2",
+            "van_3_4": "3–4",
+            "van_5_6": "5–6"
+          }
+        },
+        "contact": {
+          "serviceLabel": "Tours e visitas privadas",
+          "helper": "Selecione o tour e complete a configuração operacional antes de enviar o pedido.",
+          "tourLabel": "Tour",
+          "tourPlaceholder": "Selecione um tour",
+          "passengersLabel": "Passageiros",
+          "pickupLabel": "Recolha",
+          "pickupPlaceholder": "Indique o ponto de recolha",
+          "dateLabel": "Data do tour",
+          "timeLabel": "Hora de partida",
+          "timePlaceholder": "Hora de partida",
+          "guideLabel": "Guia",
+          "guideLanguageLabel": "Idioma do guia",
+          "guideLanguagePlaceholder": "Selecione o idioma",
+          "summaryTourLabel": "Tour",
+          "summaryDurationLabel": "Duração",
+          "summaryTicketsLabel": "Entradas",
+          "summaryPriceLabel": "Preço final"
+        },
+        "whatsapp": {
+          "tour": "Tour",
+          "pickup": "Recolha",
+          "guide": "Guia",
+          "guideLanguage": "Idioma do guia",
+          "price": "Preço final",
+          "guideYes": "Sim",
+          "guideNo": "Não"
+        }
+      }
+    }
+  }
+}

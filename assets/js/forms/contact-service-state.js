@@ -9,6 +9,7 @@
 
   const SERVICE_TYPES = Object.freeze({
     AIRPORT_HOTEL: "airport_hotel",
+    TOUR_PRIVATE: "tour_private",
     OTHER: "other"
   });
 
@@ -27,6 +28,7 @@
   function isSupportedServiceType(value) {
     return (
       value === SERVICE_TYPES.AIRPORT_HOTEL ||
+      value === SERVICE_TYPES.TOUR_PRIVATE ||
       value === SERVICE_TYPES.OTHER
     );
   }
@@ -75,7 +77,7 @@
   function getConfirmChangeMessage() {
     return (
       getI18nValue("contact.services.confirmChangeSpecificData") ||
-      "Si cambias de servicio, se perderán los datos específicos del servicio actual. ¿Quieres continuar?"
+      "Si cambias de servicio, se perderán los datos específicos del servicio actual."
     );
   }
 
@@ -218,12 +220,8 @@
     return hasSpecificDraftData(currentServiceType);
   }
 
-  function confirmServiceChange(currentServiceType, nextServiceType, options) {
-    if (!shouldConfirmServiceChange(currentServiceType, nextServiceType, options)) {
-      return true;
-    }
-
-    return window.confirm(getConfirmChangeMessage());
+  function confirmServiceChange() {
+    return true;
   }
 
   function dispatchServiceChangeEvent(form, detail) {

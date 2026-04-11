@@ -152,6 +152,7 @@
     "email": "Correo electrónico",
     "tripDate": "Fecha del traslado",
     "tripTime": "Hora del traslado",
+    "datePlaceholder": "dd/mm/aaaa",
     "origin": "Origen",
     "destination": "Destino",
     "passengers": "Pasajeros",
@@ -177,7 +178,12 @@
       "placeSelectionInvalid": "Selecciona una ubicación válida de la lista o escribe una dirección dentro de cobertura.",
       "placeLoadError": "No hemos podido cargar las sugerencias ahora mismo. Puedes escribir la dirección manualmente.",
       "passengersRequired": "Indica entre 1 y 6 pasajeros.",
-      "luggageRequired": "Indica el número de maletas."
+      "luggageRequired": "Indica el número de maletas.",
+      "tourPrivateTourRequired": "Selecciona un tour.",
+      "tourPrivatePickupRequired": "Indica el punto de recogida.",
+      "tourPrivateDateRequired": "Selecciona la fecha del tour.",
+      "tourPrivateTimeRequired": "Selecciona la hora de salida.",
+      "tourPrivateGuideLanguageRequired": "Selecciona el idioma del guía."
     },
     "whatsappMessage": {
       "intro": "Hola, quiero solicitar un traslado con Pixkuy.",
@@ -208,8 +214,11 @@
     "services": {
       "switcherAriaLabel": "Selector de tipo de servicio",
       "airportHotel": "Aeropuerto y hotel",
+      "tourPrivate": "Tours y visitas privadas",
       "other": "Otro servicio",
       "confirmChangeSpecificData": "Si cambias de servicio, se perderán los datos específicos del servicio actual. ¿Quieres continuar?",
+      "confirmAccept": "Continuar",
+      "confirmCancel": "Cancelar",
       "airportHotelHelper": "Selecciona aeropuerto y hotel para preparar el trayecto.",
       "airportHotelAirportLabel": "Aeropuerto",
       "airportHotelAirportPlaceholder": "Selecciona aeropuerto",

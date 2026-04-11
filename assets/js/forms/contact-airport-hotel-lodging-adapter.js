@@ -673,7 +673,9 @@
           previousServiceType === "airport_hotel" &&
           nextServiceType !== "airport_hotel"
         ) {
-          resetAdapterState(nodes, dom);
+          window.setTimeout(function () {
+            resetAdapterState(nodes, dom);
+          }, 0);
         }
       });
     }
