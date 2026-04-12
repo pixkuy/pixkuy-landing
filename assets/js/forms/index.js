@@ -96,7 +96,7 @@
     );
   }
   
-    function bootPanelHandoffSummary() {
+  function bootPanelHandoffSummary() {
     if (!window.PixkuyForms) {
       return false;
     }

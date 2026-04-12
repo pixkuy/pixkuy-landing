@@ -781,44 +781,12 @@
         aria-label="Reservation request form"
       >
                 <input type="hidden" name="form-name" value="contact" />
-        <input type="hidden" name="lead_source" value="" />
-        <input type="hidden" name="lead_context" value="" />
 
-        <input type="hidden" name="origin_place_id" value="" />
-        <input type="hidden" name="origin_lat" value="" />
-        <input type="hidden" name="origin_lng" value="" />
-
-        <input type="hidden" name="destination_place_id" value="" />
-        <input type="hidden" name="destination_lat" value="" />
-        <input type="hidden" name="destination_lng" value="" />
-        <input type="hidden" name="service_type" value="other" />
-		<input type="hidden" name="zone" value="" />
-        <input type="hidden" name="fare" value="" />
-        <input type="hidden" name="airport_hotel_direction" value="" />
-        <input type="hidden" name="airport_hotel_airport" value="" />
-        <input type="hidden" name="airport_hotel_hotel" value="" />
-        <input type="hidden" name="passenger_fare_key" value="" />
-        <input type="hidden" name="passenger_bucket_label" value="" />
-
-        <input type="hidden" name="tour_private_tour_id" value="" />
-        <input type="hidden" name="tour_private_tour_label" value="" />
-        <input type="hidden" name="tour_private_duration_hours" value="" />
-        <input type="hidden" name="tour_private_passenger_fare_key" value="" />
-        <input type="hidden" name="tour_private_passenger_bucket_label" value="" />
-        <input type="hidden" name="tour_private_pickup" value="" />
-        <input type="hidden" name="tour_private_pickup_place_id" value="" />
-        <input type="hidden" name="tour_private_pickup_lat" value="" />
-        <input type="hidden" name="tour_private_pickup_lng" value="" />
-        <input type="hidden" name="tour_private_date" value="" />
-        <input type="hidden" name="tour_private_time" value="" />
-        <input type="hidden" name="tour_private_has_guide" value="" />
-        <input type="hidden" name="tour_private_guide_language" value="" />
-        <input type="hidden" name="tour_private_price" value="" />
-        <input type="hidden" name="tour_private_currency" value="" />
-        
+        <!-- Resumen operativo global -->
         <input type="hidden" name="service_label" value="" />
         <input type="hidden" name="request_summary" value="" />
-        
+
+        <!-- Resumen operativo airport_hotel -->
         <input type="hidden" name="airport_hotel_trip_summary" value="" />
         <input type="hidden" name="airport_hotel_direction_label" value="" />
         <input type="hidden" name="airport_hotel_airport_label" value="" />
@@ -826,12 +794,52 @@
         <input type="hidden" name="airport_hotel_zone_label" value="" />
         <input type="hidden" name="airport_hotel_fare_label" value="" />
         <input type="hidden" name="airport_hotel_passenger_bucket_label" value="" />
-        
+
+        <!-- Resumen operativo tour_private -->
         <input type="hidden" name="tour_private_trip_summary" value="" />
         <input type="hidden" name="tour_private_pickup_label" value="" />
         <input type="hidden" name="tour_private_guide_label" value="" />
         <input type="hidden" name="tour_private_guide_language_label" value="" />
         <input type="hidden" name="tour_private_price_label" value="" />
+
+        <!-- Contexto y clasificación -->
+        <input type="hidden" name="service_type" value="other" />
+        <input type="hidden" name="lead_source" value="" />
+        <input type="hidden" name="lead_context" value="" />
+
+        <!-- Payload semántico airport_hotel -->
+        <input type="hidden" name="zone" value="" />
+        <input type="hidden" name="fare" value="" />
+        <input type="hidden" name="airport_hotel_direction" value="" />
+        <input type="hidden" name="airport_hotel_airport" value="" />
+        <input type="hidden" name="airport_hotel_hotel" value="" />
+        <input type="hidden" name="passenger_fare_key" value="" />
+        <input type="hidden" name="passenger_bucket_label" value="" />
+
+        <!-- Payload semántico tour_private -->
+        <input type="hidden" name="tour_private_tour_id" value="" />
+        <input type="hidden" name="tour_private_tour_label" value="" />
+        <input type="hidden" name="tour_private_duration_hours" value="" />
+        <input type="hidden" name="tour_private_passenger_fare_key" value="" />
+        <input type="hidden" name="tour_private_passenger_bucket_label" value="" />
+        <input type="hidden" name="tour_private_pickup" value="" />
+        <input type="hidden" name="tour_private_date" value="" />
+        <input type="hidden" name="tour_private_time" value="" />
+        <input type="hidden" name="tour_private_has_guide" value="" />
+        <input type="hidden" name="tour_private_guide_language" value="" />
+        <input type="hidden" name="tour_private_price" value="" />
+        <input type="hidden" name="tour_private_currency" value="" />
+
+        <!-- Capa técnica de Places / coordenadas -->
+        <input type="hidden" name="origin_place_id" value="" />
+        <input type="hidden" name="origin_lat" value="" />
+        <input type="hidden" name="origin_lng" value="" />
+        <input type="hidden" name="destination_place_id" value="" />
+        <input type="hidden" name="destination_lat" value="" />
+        <input type="hidden" name="destination_lng" value="" />
+        <input type="hidden" name="tour_private_pickup_place_id" value="" />
+        <input type="hidden" name="tour_private_pickup_lat" value="" />
+        <input type="hidden" name="tour_private_pickup_lng" value="" />
 
         <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
           <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
@@ -1406,10 +1414,9 @@
                   data-place-autocomplete="tour_private_pickup"
                   data-place-language-source="document"
                 >
-                  <input
+                <input
                     id="contact-tour-private-pickup"
                     type="text"
-                    name="tour_private_pickup_visible"
                     placeholder=""
                     autocomplete="off"
                     data-contact-tour-private-pickup

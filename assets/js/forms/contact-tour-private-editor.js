@@ -994,40 +994,65 @@
   }
 
   function syncHiddenFields(nodes) {
+    const form = getReservationForm();
     const tour = getTourById(state.selectedTourId);
     const durationHours = tour ? String(tour.durationHours) : "";
     const priceNumber = normalizeText(state.price);
     const tourLabel = getTourLabel(state.selectedTourId);
     const passengerBucketLabel = getPassengerBucketLabel(state.passengerFareKey);
+    const isActive = isTourPrivateServiceActive(form);
 
-    writeHiddenValue(nodes.hiddenTourId, state.selectedTourId);
-    writeHiddenValue(nodes.hiddenTourLabel, tourLabel);
-    writeHiddenValue(nodes.hiddenDurationHours, durationHours);
-    writeHiddenValue(nodes.hiddenPassengerFareKey, state.passengerFareKey);
-    writeHiddenValue(nodes.hiddenPassengerBucketLabel, passengerBucketLabel);
-    writeHiddenValue(nodes.hiddenPickup, state.pickup);
-    writeHiddenValue(nodes.hiddenPickupPlaceId, normalizeText(state.pickupPlaceId));
-    writeHiddenValue(nodes.hiddenPickupLat, normalizeText(state.pickupLat));
-    writeHiddenValue(nodes.hiddenPickupLng, normalizeText(state.pickupLng));
-    writeHiddenValue(nodes.hiddenDate, state.tripDate);
-    writeHiddenValue(nodes.hiddenTime, state.tripTime);
-    writeHiddenValue(nodes.hiddenHasGuide, state.hasGuide === "yes" ? "true" : "false");
-    writeHiddenValue(nodes.hiddenGuideLanguage, state.guideLanguage);
-    writeHiddenValue(nodes.hiddenPrice, priceNumber);
-    writeHiddenValue(nodes.hiddenCurrency, priceNumber ? state.currency : "");
+    if (isActive) {
+      writeHiddenValue(nodes.hiddenTourId, state.selectedTourId);
+      writeHiddenValue(nodes.hiddenTourLabel, tourLabel);
+      writeHiddenValue(nodes.hiddenDurationHours, durationHours);
+      writeHiddenValue(nodes.hiddenPassengerFareKey, state.passengerFareKey);
+      writeHiddenValue(nodes.hiddenPassengerBucketLabel, passengerBucketLabel);
+      writeHiddenValue(nodes.hiddenPickup, state.pickup);
+      writeHiddenValue(nodes.hiddenPickupPlaceId, normalizeText(state.pickupPlaceId));
+      writeHiddenValue(nodes.hiddenPickupLat, normalizeText(state.pickupLat));
+      writeHiddenValue(nodes.hiddenPickupLng, normalizeText(state.pickupLng));
+      writeHiddenValue(nodes.hiddenDate, state.tripDate);
+      writeHiddenValue(nodes.hiddenTime, state.tripTime);
+      writeHiddenValue(nodes.hiddenHasGuide, state.hasGuide === "yes" ? "true" : "false");
+      writeHiddenValue(nodes.hiddenGuideLanguage, state.guideLanguage);
+      writeHiddenValue(nodes.hiddenPrice, priceNumber);
+      writeHiddenValue(nodes.hiddenCurrency, priceNumber ? state.currency : "");
 
-    if (isTourPrivateServiceActive(getReservationForm())) {
       writeHiddenValue(nodes.hiddenServiceLabel, getTourPrivateServiceLabel());
       writeHiddenValue(nodes.hiddenRequestSummary, buildTourPrivateTripSummary());
-    } else {
-      writeHiddenValue(nodes.hiddenServiceLabel, "");
-      writeHiddenValue(nodes.hiddenRequestSummary, "");
+      writeHiddenValue(nodes.hiddenTourPrivateTripSummary, buildTourPrivateTripSummary());
+      writeHiddenValue(nodes.hiddenTourPrivatePickupLabel, state.pickup);
+      writeHiddenValue(nodes.hiddenTourPrivateGuideLabel, getTourPrivateGuideSummaryLabel());
+      writeHiddenValue(nodes.hiddenTourPrivateGuideLanguageLabel, getTourPrivateGuideLanguageSummaryLabel());
+      writeHiddenValue(nodes.hiddenTourPrivatePriceLabel, getTourPrivatePriceSummaryLabel());
+
+      return true;
     }
-    writeHiddenValue(nodes.hiddenTourPrivateTripSummary, buildTourPrivateTripSummary());
-    writeHiddenValue(nodes.hiddenTourPrivatePickupLabel, state.pickup);
-    writeHiddenValue(nodes.hiddenTourPrivateGuideLabel, getTourPrivateGuideSummaryLabel());
-    writeHiddenValue(nodes.hiddenTourPrivateGuideLanguageLabel, getTourPrivateGuideLanguageSummaryLabel());
-    writeHiddenValue(nodes.hiddenTourPrivatePriceLabel, getTourPrivatePriceSummaryLabel());
+
+    writeHiddenValue(nodes.hiddenTourId, "");
+    writeHiddenValue(nodes.hiddenTourLabel, "");
+    writeHiddenValue(nodes.hiddenDurationHours, "");
+    writeHiddenValue(nodes.hiddenPassengerFareKey, "");
+    writeHiddenValue(nodes.hiddenPassengerBucketLabel, "");
+    writeHiddenValue(nodes.hiddenPickup, "");
+    writeHiddenValue(nodes.hiddenPickupPlaceId, "");
+    writeHiddenValue(nodes.hiddenPickupLat, "");
+    writeHiddenValue(nodes.hiddenPickupLng, "");
+    writeHiddenValue(nodes.hiddenDate, "");
+    writeHiddenValue(nodes.hiddenTime, "");
+    writeHiddenValue(nodes.hiddenHasGuide, "");
+    writeHiddenValue(nodes.hiddenGuideLanguage, "");
+    writeHiddenValue(nodes.hiddenPrice, "");
+    writeHiddenValue(nodes.hiddenCurrency, "");
+
+    writeHiddenValue(nodes.hiddenTourPrivateTripSummary, "");
+    writeHiddenValue(nodes.hiddenTourPrivatePickupLabel, "");
+    writeHiddenValue(nodes.hiddenTourPrivateGuideLabel, "");
+    writeHiddenValue(nodes.hiddenTourPrivateGuideLanguageLabel, "");
+    writeHiddenValue(nodes.hiddenTourPrivatePriceLabel, "");
+
+    return true;
   }
 
   function syncSummary(nodes) {

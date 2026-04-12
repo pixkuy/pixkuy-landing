@@ -244,6 +244,23 @@
   function syncOperationalSummaryFields(form, activeServiceType) {
     var serviceLabelField;
     var requestSummaryField;
+    var airportHotelFieldNames;
+    var tourPrivateFieldNames;
+
+    function clearFields(fieldNames) {
+      var index;
+      var field;
+
+      for (index = 0; index < fieldNames.length; index += 1) {
+        field = form.querySelector('input[name="' + fieldNames[index] + '"]');
+
+        if (!field) {
+          continue;
+        }
+
+        field.value = "";
+      }
+    }
 
     if (!form) {
       return false;
@@ -256,10 +273,60 @@
       return false;
     }
 
-    if (activeServiceType === "other") {
-      serviceLabelField.value = "";
-      requestSummaryField.value = "";
+    airportHotelFieldNames = [
+      "zone",
+      "fare",
+      "airport_hotel_direction",
+      "airport_hotel_airport",
+      "airport_hotel_hotel",
+      "passenger_fare_key",
+      "passenger_bucket_label",
+      "airport_hotel_trip_summary",
+      "airport_hotel_direction_label",
+      "airport_hotel_airport_label",
+      "airport_hotel_hotel_label",
+      "airport_hotel_zone_label",
+      "airport_hotel_fare_label",
+      "airport_hotel_passenger_bucket_label"
+    ];
+
+    tourPrivateFieldNames = [
+      "tour_private_tour_id",
+      "tour_private_tour_label",
+      "tour_private_duration_hours",
+      "tour_private_passenger_fare_key",
+      "tour_private_passenger_bucket_label",
+      "tour_private_pickup",
+      "tour_private_pickup_place_id",
+      "tour_private_pickup_lat",
+      "tour_private_pickup_lng",
+      "tour_private_date",
+      "tour_private_time",
+      "tour_private_has_guide",
+      "tour_private_guide_language",
+      "tour_private_price",
+      "tour_private_currency",
+      "tour_private_trip_summary",
+      "tour_private_pickup_label",
+      "tour_private_guide_label",
+      "tour_private_guide_language_label",
+      "tour_private_price_label"
+    ];
+
+    if (activeServiceType === "airport_hotel") {
+      clearFields(tourPrivateFieldNames);
+      return true;
     }
+
+    if (activeServiceType === "tour_private") {
+      clearFields(airportHotelFieldNames);
+      return true;
+    }
+
+    serviceLabelField.value = "";
+    requestSummaryField.value = "";
+    clearFields(airportHotelFieldNames);
+    clearFields(tourPrivateFieldNames);
 
     return true;
   }

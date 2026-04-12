@@ -1553,77 +1553,101 @@
   }
 
    function syncAirportHotelPayloadFields(editorState, nodes) {
+    const form = getReservationForm();
     const snapshot = getAirportHotelTripSnapshot(editorState, nodes);
+    const isActive = isAirportHotelServiceActive(form);
 
     if (!nodes || !snapshot) {
       return false;
     }
 
-    if (nodes.commonOrigin) {
-      nodes.commonOrigin.value = snapshot.origin || "";
+    if (isActive) {
+      if (nodes.commonOrigin) {
+        nodes.commonOrigin.value = snapshot.origin || "";
+      }
+
+      if (nodes.commonDestination) {
+        nodes.commonDestination.value = snapshot.destination || "";
+      }
+
+      if (nodes.commonPassengers) {
+        nodes.commonPassengers.value = snapshot.passengerBucketLabel || "";
+      }
+
+      if (nodes.airportHotelDirection) {
+        nodes.airportHotelDirection.value = snapshot.direction || "";
+      }
+
+      if (nodes.airportHotelAirport) {
+        nodes.airportHotelAirport.value = snapshot.airport || "";
+      }
+
+      if (nodes.airportHotelHotel) {
+        nodes.airportHotelHotel.value = snapshot.hotel || "";
+      }
+
+      if (nodes.passengerFareKey) {
+        nodes.passengerFareKey.value = snapshot.passengerFareKey || "";
+      }
+
+      if (nodes.passengerBucketLabel) {
+        nodes.passengerBucketLabel.value = snapshot.passengerBucketLabel || "";
+      }
+
+      writeHiddenValue(
+        nodes.hiddenAirportHotelTripSummary,
+        buildAirportHotelTripSummary(snapshot)
+      );
+      writeHiddenValue(
+        nodes.hiddenAirportHotelDirectionLabel,
+        getAirportHotelDirectionLabel(snapshot.direction)
+      );
+      writeHiddenValue(
+        nodes.hiddenAirportHotelAirportLabel,
+        snapshot.airport || ""
+      );
+      writeHiddenValue(
+        nodes.hiddenAirportHotelHotelLabel,
+        snapshot.hotel || ""
+      );
+      writeHiddenValue(
+        nodes.hiddenAirportHotelZoneLabel,
+        getAirportHotelZoneLabel()
+      );
+      writeHiddenValue(
+        nodes.hiddenAirportHotelFareLabel,
+        getAirportHotelFareLabel()
+      );
+      writeHiddenValue(
+        nodes.hiddenAirportHotelPassengerBucketLabel,
+        snapshot.passengerBucketLabel || ""
+      );
+
+      writeHiddenValue(
+        nodes.hiddenServiceLabel,
+        getAirportHotelServiceLabel()
+      );
+      writeHiddenValue(
+        nodes.hiddenRequestSummary,
+        buildAirportHotelTripSummary(snapshot)
+      );
+
+      return true;
     }
 
-    if (nodes.commonDestination) {
-      nodes.commonDestination.value = snapshot.destination || "";
-    }
+    writeHiddenValue(nodes.airportHotelDirection, "");
+    writeHiddenValue(nodes.airportHotelAirport, "");
+    writeHiddenValue(nodes.airportHotelHotel, "");
+    writeHiddenValue(nodes.passengerFareKey, "");
+    writeHiddenValue(nodes.passengerBucketLabel, "");
 
-    if (nodes.commonPassengers) {
-      nodes.commonPassengers.value = snapshot.passengerBucketLabel || "";
-    }
-
-    if (nodes.airportHotelDirection) {
-      nodes.airportHotelDirection.value = snapshot.direction || "";
-    }
-
-    if (nodes.airportHotelAirport) {
-      nodes.airportHotelAirport.value = snapshot.airport || "";
-    }
-
-    if (nodes.airportHotelHotel) {
-      nodes.airportHotelHotel.value = snapshot.hotel || "";
-    }
-
-    if (nodes.passengerFareKey) {
-      nodes.passengerFareKey.value = snapshot.passengerFareKey || "";
-    }
-
-    if (nodes.passengerBucketLabel) {
-      nodes.passengerBucketLabel.value = snapshot.passengerBucketLabel || "";
-    }
-
-    writeHiddenValue(
-      nodes.hiddenAirportHotelTripSummary,
-      buildAirportHotelTripSummary(snapshot)
-    );
-    writeHiddenValue(
-      nodes.hiddenAirportHotelDirectionLabel,
-      getAirportHotelDirectionLabel(snapshot.direction)
-    );
-    writeHiddenValue(
-      nodes.hiddenAirportHotelAirportLabel,
-      snapshot.airport || ""
-    );
-    writeHiddenValue(
-      nodes.hiddenAirportHotelHotelLabel,
-      snapshot.hotel || ""
-    );
-    writeHiddenValue(
-      nodes.hiddenAirportHotelZoneLabel,
-      getAirportHotelZoneLabel()
-    );
-    writeHiddenValue(
-      nodes.hiddenAirportHotelFareLabel,
-      getAirportHotelFareLabel()
-    );
-    writeHiddenValue(
-      nodes.hiddenAirportHotelPassengerBucketLabel,
-      snapshot.passengerBucketLabel || ""
-    );
-
-    if (isAirportHotelServiceActive(getReservationForm())) {
-      writeHiddenValue(nodes.hiddenServiceLabel, getAirportHotelServiceLabel());
-      writeHiddenValue(nodes.hiddenRequestSummary, buildAirportHotelTripSummary(snapshot));
-    }
+    writeHiddenValue(nodes.hiddenAirportHotelTripSummary, "");
+    writeHiddenValue(nodes.hiddenAirportHotelDirectionLabel, "");
+    writeHiddenValue(nodes.hiddenAirportHotelAirportLabel, "");
+    writeHiddenValue(nodes.hiddenAirportHotelHotelLabel, "");
+    writeHiddenValue(nodes.hiddenAirportHotelZoneLabel, "");
+    writeHiddenValue(nodes.hiddenAirportHotelFareLabel, "");
+    writeHiddenValue(nodes.hiddenAirportHotelPassengerBucketLabel, "");
 
     return true;
   }
