@@ -1418,7 +1418,9 @@
     });
 
     nodes.pickupInput.addEventListener("input", function () {
-      state.pickup = normalizeText(nodes.pickupInput.value);
+      state.pickup = typeof nodes.pickupInput.value === "string"
+        ? nodes.pickupInput.value
+        : "";
       clearPickupPlaceSelection();
       syncView(nodes);
     });
