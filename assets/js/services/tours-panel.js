@@ -440,6 +440,9 @@ function placeConfigMountForCurrentLayout() {
   const tourIndex = getSelectedTourIndex();
 
   if (tourIndex === -1) {
+    configMount.hidden = true;
+    configMount.innerHTML = '';
+
     if (configMount.parentElement !== panelRoot) {
       panelRoot.appendChild(configMount);
     }
