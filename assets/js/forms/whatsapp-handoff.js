@@ -93,7 +93,9 @@
       return {
         origin: '',
         destination: '',
-        passengers: ''
+        passengers: '',
+        tripDate: '',
+        tripTime: ''
       };
     }
 
@@ -106,7 +108,9 @@
       return {
         origin: '',
         destination: '',
-        passengers: ''
+        passengers: '',
+        tripDate: getVisibleFieldValue(form, 'airport_hotel_date'),
+        tripTime: getVisibleFieldValue(form, 'airport_hotel_time')
       };
     }
 
@@ -116,14 +120,22 @@
       return {
         origin: '',
         destination: '',
-        passengers: ''
+        passengers: '',
+        tripDate: getVisibleFieldValue(form, 'airport_hotel_date'),
+        tripTime: getVisibleFieldValue(form, 'airport_hotel_time')
       };
     }
 
     return {
       origin: typeof snapshot.origin === 'string' ? snapshot.origin.trim() : '',
       destination: typeof snapshot.destination === 'string' ? snapshot.destination.trim() : '',
-      passengers: resolveAirportHotelPassengersLabel()
+      passengers: resolveAirportHotelPassengersLabel(),
+      tripDate: typeof snapshot.serviceDate === 'string' && snapshot.serviceDate.trim()
+        ? snapshot.serviceDate.trim()
+        : getVisibleFieldValue(form, 'airport_hotel_date'),
+      tripTime: typeof snapshot.serviceTime === 'string' && snapshot.serviceTime.trim()
+        ? snapshot.serviceTime.trim()
+        : getVisibleFieldValue(form, 'airport_hotel_time')
     };
   }
 
@@ -149,7 +161,7 @@
       tripDate: getVisibleFieldValue(form, 'tour_private_date'),
       tripTime: getVisibleFieldValue(form, 'tour_private_time'),
       hasGuide: getVisibleFieldValue(form, 'tour_private_has_guide'),
-      guideLanguage: getVisibleFieldValue(form, 'tour_private_guide_language'),
+      guideLanguage: getVisibleFieldValue(form, 'tour_private_guide_language_label') || getVisibleFieldValue(form, 'tour_private_guide_language'),
       price: getVisibleFieldValue(form, 'tour_private_price'),
       currency: getVisibleFieldValue(form, 'tour_private_currency')
     };
@@ -178,8 +190,12 @@
       name: getVisibleFieldValue(form, 'name'),
       phone: getVisibleFieldValue(form, 'phone'),
       email: getVisibleFieldValue(form, 'email'),
-      tripDate: tourPrivateData && tourPrivateData.tripDate ? tourPrivateData.tripDate : getVisibleFieldValue(form, 'trip_date'),
-      tripTime: tourPrivateData && tourPrivateData.tripTime ? tourPrivateData.tripTime : getVisibleFieldValue(form, 'trip_time'),
+      tripDate: airportHotelData && airportHotelData.tripDate
+        ? airportHotelData.tripDate
+        : (tourPrivateData && tourPrivateData.tripDate ? tourPrivateData.tripDate : getVisibleFieldValue(form, 'trip_date')),
+      tripTime: airportHotelData && airportHotelData.tripTime
+        ? airportHotelData.tripTime
+        : (tourPrivateData && tourPrivateData.tripTime ? tourPrivateData.tripTime : getVisibleFieldValue(form, 'trip_time')),
       origin: airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin,
       destination: airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination,
       serviceType: serviceType,

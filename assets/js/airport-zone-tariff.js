@@ -46,6 +46,8 @@
     lodgingEndpointZoneId: "",
     lodgingEndpointZoneLabelKey: "",
     selectedFareKey: "",
+    serviceDate: "",
+    serviceTime: "",
     openRole: "",
     activeIndex: -1
   };
@@ -120,6 +122,16 @@
     return ctaApi;
   }
 
+  const temporalPricingApi = window.PixkuyAirportTariffTemporalPricing || null;
+
+  function getTemporalPricingApi() {
+    if (!temporalPricingApi || typeof temporalPricingApi !== "object") {
+      return null;
+    }
+
+    return temporalPricingApi;
+  }
+
   function getStateDeps() {
     return {
       isFiniteNumber: isFiniteNumber,
@@ -140,6 +152,7 @@
       getZoneIdForFare: getZoneIdForFare,
       resolveFare: resolveFare,
       formatPrice: formatPrice,
+      resolveFareKeyDisplayLabel: resolveFareKeyDisplayLabel,
       debugSwapTrace: debugSwapTrace
     };
   }
@@ -159,7 +172,8 @@
       normalizeText: normalizeText,
       getSelectedFareKey: getSelectedFareKey,
       getZoneIdForFare: getZoneIdForFare,
-      resolveFare: resolveFare
+      resolveFare: resolveFare,
+      getTemporalPricingApi: getTemporalPricingApi
     };
   }
 
@@ -395,6 +409,12 @@
   const swapButton = panel.querySelector(SELECTORS.swapButton);
   const fareValue = panel.querySelector(SELECTORS.fareValue);
   const cta = panel.querySelector(SELECTORS.cta);
+  const dateField = panel.querySelector('[data-airport-tariff-role="date"]');
+  const dateInput = panel.querySelector('[data-airport-tariff-date]');
+  const dateOverlay = panel.querySelector(".services-expand__date-overlay");
+  const timeField = panel.querySelector('[data-airport-tariff-role="time"]');
+  const timeInput = panel.querySelector('[data-airport-tariff-time]');
+  const timeOverlay = panel.querySelector(".services-expand__time-overlay");
   const passengersSegmentedGroup = passengersField
     ? passengersField.querySelector("[data-airport-tariff-passengers-group]")
     : null;
@@ -424,7 +444,13 @@
     passengersSegmentedGroup,
     swapButton,
     fareValue,
-    cta
+    cta,
+    dateField,
+    dateInput,
+    dateOverlay,
+    timeField,
+    timeInput,
+    timeOverlay
   };
 }
 
@@ -467,6 +493,8 @@ function shouldUsePassengerChipUi(nodes) {
       lodgingEndpointZoneId: DEFAULT_STATE.lodgingEndpointZoneId,
       lodgingEndpointZoneLabelKey: DEFAULT_STATE.lodgingEndpointZoneLabelKey,
       selectedFareKey: DEFAULT_STATE.selectedFareKey,
+      serviceDate: DEFAULT_STATE.serviceDate,
+      serviceTime: DEFAULT_STATE.serviceTime,
       openRole: DEFAULT_STATE.openRole,
       activeIndex: DEFAULT_STATE.activeIndex
     };
@@ -527,27 +555,173 @@ function shouldUsePassengerChipUi(nodes) {
   function resolveFare(state) {
     return requireCatalogApi().resolveFare(state);
   }
+  
+    function getReservationMinimumDateLiteral() {
+    const formsApi = window.PixkuyForms || {};
+    const getMinimumDateTime =
+      typeof formsApi.getReservationMinimumDateTime === "function"
+        ? formsApi.getReservationMinimumDateTime
+        : null;
+    const formatDate =
+      typeof formsApi.formatReservationDateForInput === "function"
+        ? formsApi.formatReservationDateForInput
+        : null;
+    const minimumDateTime = getMinimumDateTime
+      ? getMinimumDateTime()
+      : null;
+
+    if (!minimumDateTime || !formatDate) {
+      return "";
+    }
+
+    return normalizeText(formatDate(minimumDateTime));
+  }
+
+  function syncTemporalDateInput(nodes, state) {
+    const minimumDateLiteral = getReservationMinimumDateLiteral();
+    const currentServiceDate =
+      state && typeof state.serviceDate === "string"
+        ? normalizeText(state.serviceDate)
+        : "";
+
+    if (!nodes || !nodes.dateInput) {
+      return false;
+    }
+
+    if (minimumDateLiteral) {
+      nodes.dateInput.setAttribute("min", minimumDateLiteral);
+    } else {
+      nodes.dateInput.removeAttribute("min");
+    }
+
+    if (minimumDateLiteral && currentServiceDate && currentServiceDate < minimumDateLiteral) {
+      state.serviceDate = "";
+    }
+
+    if (nodes.dateInput.value !== (state.serviceDate || "")) {
+      nodes.dateInput.value = state.serviceDate || "";
+    }
+
+    if (nodes.dateOverlay) {
+      nodes.dateOverlay.hidden = Boolean(nodes.dateInput.value);
+    }
+
+    return true;
+  }
+
+  function syncTemporalDateFieldVisibility(nodes, state) {
+    const temporalPricing = getTemporalPricingApi();
+    const shouldShow =
+      !!(
+        temporalPricing &&
+        typeof temporalPricing.shouldShowDateFieldInServices === "function" &&
+        temporalPricing.shouldShowDateFieldInServices()
+      );
+
+    if (!nodes || !nodes.dateField || !nodes.dateInput) {
+      return false;
+    }
+
+    nodes.dateField.hidden = !shouldShow;
+    nodes.dateField.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+
+    if (nodes.timeField) {
+      nodes.timeField.hidden = !shouldShow;
+      nodes.timeField.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+    }
+
+    if (!shouldShow) {
+      nodes.dateInput.value = "";
+      if (state) {
+        state.serviceDate = "";
+        state.serviceTime = "";
+      }
+
+      if (nodes.dateOverlay) {
+        nodes.dateOverlay.hidden = false;
+      }
+
+      if (nodes.timeInput) {
+        nodes.timeInput.value = "";
+      }
+
+      if (nodes.timeOverlay) {
+        nodes.timeOverlay.hidden = false;
+      }
+    }
+
+    return true;
+  }
+  
+  function syncTemporalTimeInput(nodes, state) {
+    const currentServiceTime =
+      state && typeof state.serviceTime === "string"
+        ? normalizeText(state.serviceTime)
+        : "";
+
+    if (!nodes || !nodes.timeInput) {
+      return false;
+    }
+
+    if (nodes.timeInput.value !== (currentServiceTime || "")) {
+      nodes.timeInput.value = currentServiceTime || "";
+    }
+
+    if (nodes.timeOverlay) {
+      nodes.timeOverlay.hidden = Boolean(nodes.timeInput.value);
+    }
+
+    return true;
+  }
 
   function renderFare(nodes, state) {
-  const fareKey = getSelectedFareKey(state);
-  const fare = resolveFare(state);
+    const fareKey = getSelectedFareKey(state);
+    const fare = resolveFare(state);
+    const temporalPricing = getTemporalPricingApi();
+    const serviceDate =
+      state && typeof state.serviceDate === "string"
+        ? normalizeText(state.serviceDate)
+        : "";
 
-  if (!fareKey) {
-    nodes.fareValue.textContent = getFareFallbackValue();
-    nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
-    return;
+    if (!fareKey) {
+      nodes.fareValue.textContent = getFareFallbackValue();
+      nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
+      return;
+    }
+
+    if (!fare) {
+      nodes.fareValue.textContent = getFareFallbackValue();
+      nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
+      return;
+    }
+
+    if (
+      temporalPricing &&
+      typeof temporalPricing.shouldShowDateFieldInServices === "function" &&
+      temporalPricing.shouldShowDateFieldInServices() &&
+      !serviceDate
+    ) {
+      nodes.fareValue.textContent = getFareFallbackValue();
+      nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
+      return;
+    }
+
+    const finalPrice =
+      temporalPricing &&
+      typeof temporalPricing.applyTemporalPricing === "function"
+        ? temporalPricing.applyTemporalPricing(fare.price, serviceDate)
+        : fare.price;
+
+    if (typeof finalPrice !== "number" || !Number.isFinite(finalPrice)) {
+      nodes.fareValue.textContent = getFareFallbackValue();
+      nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
+      return;
+    }
+
+    const formattedPrice = formatPrice(finalPrice, fare.currency);
+    nodes.fareValue.textContent = formattedPrice;
+    nodes.fareValue.removeAttribute("data-i18n");
   }
-
-  if (!fare) {
-    nodes.fareValue.textContent = getFareFallbackValue();
-    nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
-    return;
-  }
-
-  const formattedPrice = formatPrice(fare.price, fare.currency);
-  nodes.fareValue.textContent = formattedPrice;
-  nodes.fareValue.removeAttribute("data-i18n");
-}
 
   function renderCtaState(nodes, state) {
     const eligibility = requireCtaApi().getCtaEligibility(
@@ -692,6 +866,9 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     renderControls(nodes, state);
+    syncTemporalDateFieldVisibility(nodes, state);
+    syncTemporalDateInput(nodes, state);
+    syncTemporalTimeInput(nodes, state);
     ensureOriginDropdownAnchored(nodes, state);
     renderFare(nodes, state);
     renderCtaState(nodes, state);
@@ -1455,6 +1632,16 @@ function shouldUsePassengerChipUi(nodes) {
   });
 
   nodes.cta.addEventListener("click", function (event) {
+    if (nodes.dateInput) {
+      state.serviceDate = normalizeText(nodes.dateInput.value);
+      syncTemporalDateInput(nodes, state);
+    }
+
+    if (nodes.timeInput) {
+      state.serviceTime = normalizeText(nodes.timeInput.value);
+      syncTemporalTimeInput(nodes, state);
+    }
+
     const eligibility = requireCtaApi().getCtaEligibility(
       state,
       getCtaDeps()
@@ -1501,6 +1688,34 @@ function shouldUsePassengerChipUi(nodes) {
     );
   } else {
     bindControlToggle(nodes, state, nodes.passengersControl, "passengers");
+  }
+
+  if (nodes.dateInput) {
+    nodes.dateInput.addEventListener("input", function () {
+      state.serviceDate = normalizeText(nodes.dateInput.value);
+      syncTemporalDateInput(nodes, state);
+      renderPanel(nodes, state);
+    });
+
+    nodes.dateInput.addEventListener("change", function () {
+      state.serviceDate = normalizeText(nodes.dateInput.value);
+      syncTemporalDateInput(nodes, state);
+      renderPanel(nodes, state);
+    });
+  }
+
+  if (nodes.timeInput) {
+    nodes.timeInput.addEventListener("input", function () {
+      state.serviceTime = normalizeText(nodes.timeInput.value);
+      syncTemporalTimeInput(nodes, state);
+      renderPanel(nodes, state);
+    });
+
+    nodes.timeInput.addEventListener("change", function () {
+      state.serviceTime = normalizeText(nodes.timeInput.value);
+      syncTemporalTimeInput(nodes, state);
+      renderPanel(nodes, state);
+    });
   }
 
   bindOptionSelection(nodes, state);
@@ -1627,6 +1842,8 @@ function shouldUsePassengerChipUi(nodes) {
           lodgingEndpointZoneId: state.lodgingEndpointZoneId,
           lodgingEndpointZoneLabelKey: state.lodgingEndpointZoneLabelKey,
           selectedFareKey: state.selectedFareKey,
+          serviceDate: state.serviceDate,
+          serviceTime: state.serviceTime,
           openRole: state.openRole,
           activeIndex: state.activeIndex
         };

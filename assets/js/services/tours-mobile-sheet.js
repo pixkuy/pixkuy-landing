@@ -20,6 +20,7 @@
   let activeTourTitle = '';
   let activeTourDuration = '';
   let pointerSession = null;
+  let isNativeDatePickerActive = false;
 
   function ensureSheet() {
     if (backdropEl && sheetEl) return;
@@ -172,6 +173,24 @@
     return configMount.querySelector('[data-services-tours-cta]');
   }
   
+  function isDateFieldTarget(target) {
+    return !!(target && typeof target.matches === 'function' && target.matches('[data-services-tours-date]'));
+  }
+
+  function setNativeDatePickerActive(nextValue) {
+    isNativeDatePickerActive = nextValue === true;
+  }
+  
+  function isSheetUsingLiveConfigMount(target, selector) {
+    const inline = configMount.querySelector(selector);
+
+    if (!inline || !target) {
+      return false;
+    }
+
+    return inline === target;
+  }
+  
   function syncInlineConfigVisibility() {
     if (!MOBILE_QUERY.matches) {
       configMount.hidden = false;
@@ -233,6 +252,7 @@
     syncInlineConfigVisibility();
 
     if (!MOBILE_QUERY.matches || !isSheetOpen || !sheetEl) return;
+    if (isNativeDatePickerActive) return;
 
     mountConfigIntoSheet();
     syncSheetHeader();
@@ -245,6 +265,10 @@
   
     function forceSheetOwnsConfigMount() {
     if (!MOBILE_QUERY.matches || !isSheetOpen || !sheetEl || !bodyEl || !configMount) {
+      return false;
+    }
+
+    if (isNativeDatePickerActive) {
       return false;
     }
 
@@ -310,6 +334,7 @@
 
     isSheetOpen = false;
     pointerSession = null;
+    setNativeDatePickerActive(false);
 
     panelRoot.classList.remove('services-tours-panel--sheet-open');
     sheetEl.classList.remove('is-open');
@@ -360,6 +385,10 @@
       const target = event.target;
 
       if (target.matches('[data-services-tours-pickup]')) {
+        if (isSheetUsingLiveConfigMount(target, '[data-services-tours-pickup]')) {
+          return;
+        }
+
         const inline = configMount.querySelector('[data-services-tours-pickup]');
         if (inline) {
           inline.value = target.value;
@@ -369,6 +398,10 @@
       }
 
       if (target.matches('[data-services-tours-date]')) {
+        if (isSheetUsingLiveConfigMount(target, '[data-services-tours-date]')) {
+          return;
+        }
+
         const inline = configMount.querySelector('[data-services-tours-date]');
         if (inline) {
           inline.value = target.value;
@@ -378,6 +411,10 @@
       }
 
       if (target.matches('[data-services-tours-time]')) {
+        if (isSheetUsingLiveConfigMount(target, '[data-services-tours-time]')) {
+          return;
+        }
+
         const inline = configMount.querySelector('[data-services-tours-time]');
         if (inline) {
           inline.value = target.value;
@@ -390,11 +427,41 @@
       const target = event.target;
 
       if (target.matches('[data-services-tours-guide-language]')) {
+        if (isSheetUsingLiveConfigMount(target, '[data-services-tours-guide-language]')) {
+          return;
+        }
+
         const inline = configMount.querySelector('[data-services-tours-guide-language]');
         if (inline) {
           inline.value = target.value;
           inline.dispatchEvent(new Event('change', { bubbles: true }));
         }
+        return;
+      }
+
+      if (target.matches('[data-services-tours-date]')) {
+        if (isSheetUsingLiveConfigMount(target, '[data-services-tours-date]')) {
+          return;
+        }
+
+        setNativeDatePickerActive(false);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            syncSheetFromPanel();
+          });
+        });
+      }
+    });
+
+    sheetEl.addEventListener('pointerdown', (event) => {
+      if (isDateFieldTarget(event.target)) {
+        setNativeDatePickerActive(true);
+      }
+    });
+
+    sheetEl.addEventListener('focusin', (event) => {
+      if (isDateFieldTarget(event.target)) {
+        setNativeDatePickerActive(true);
       }
     });
 
@@ -482,6 +549,7 @@
 
   function handlePanelSync() {
     if (!MOBILE_QUERY.matches || !isSheetOpen) return;
+    if (isNativeDatePickerActive) return;
 
     requestAnimationFrame(() => {
       syncSheetFromPanel();
@@ -546,5 +614,13 @@
         syncInlineConfigVisibility();
       });
     });
+  });
+
+  window.addEventListener('pixkuy:tours-panel-ui-sync', () => {
+    if (!isSheetOpen) {
+      return;
+    }
+
+    syncSheetFooter();
   });
 })();

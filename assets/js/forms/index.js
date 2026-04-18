@@ -211,6 +211,12 @@
         ? event.detail
         : null;
 
+      if (detail && typeof detail === 'object') {
+        detail.tour_private_date = typeof detail.tour_private_date === 'string'
+          ? detail.tour_private_date.trim()
+          : '';
+      }
+
       if (!detail) {
         return;
       }

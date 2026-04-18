@@ -821,6 +821,10 @@
 
   function getComputedPrice() {
     const tour = getTourById(state.selectedTourId);
+    const temporalPricing =
+      window && window.PixkuyToursTemporalPricing
+        ? window.PixkuyToursTemporalPricing
+        : null;
 
     if (!tour || !state.passengerFareKey) {
       return null;
@@ -835,9 +839,26 @@
       ? "yes"
       : "no";
 
-    return typeof fareBucket[guideKey] === "number"
-      ? fareBucket[guideKey]
-      : null;
+    const basePrice =
+      typeof fareBucket[guideKey] === "number"
+        ? fareBucket[guideKey]
+        : null;
+
+    if (basePrice === null) {
+      return null;
+    }
+
+    if (
+      !temporalPricing ||
+      typeof temporalPricing.applyTemporalPricing !== "function"
+    ) {
+      return basePrice;
+    }
+
+    return temporalPricing.applyTemporalPricing(
+      basePrice,
+      normalizeText(state.tripDate)
+    );
   }
 
   function syncDerivedState() {

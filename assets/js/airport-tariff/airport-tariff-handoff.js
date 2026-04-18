@@ -13,6 +13,7 @@
       "getZoneIdForFare",
       "resolveFare",
       "formatPrice",
+      "resolveFareKeyDisplayLabel",
       "debugSwapTrace"
     ];
 
@@ -198,9 +199,26 @@
     const zoneId = deps.getZoneIdForFare(state);
     const zoneLabel = zoneId ? deps.resolveDisplayLabel("zone", zoneId) : "";
     const fare = deps.resolveFare(state);
+    const temporalPricing =
+      window && window.PixkuyAirportTariffTemporalPricing
+        ? window.PixkuyAirportTariffTemporalPricing
+        : null;
+    const serviceDate =
+      state && typeof state.serviceDate === "string"
+        ? deps.normalizeText(state.serviceDate)
+        : "";
+    const finalPrice =
+      fare &&
+      typeof fare.price === "number" &&
+      temporalPricing &&
+      typeof temporalPricing.applyTemporalPricing === "function"
+        ? temporalPricing.applyTemporalPricing(fare.price, serviceDate)
+        : fare && typeof fare.price === "number"
+          ? fare.price
+          : null;
     const fareLabel =
-      fare && typeof fare.price === "number"
-        ? deps.formatPrice(fare.price, fare.currency)
+      typeof finalPrice === "number" && fare && fare.currency
+        ? deps.formatPrice(finalPrice, fare.currency)
         : "";
 
     if (!prefill || !zoneLabel || !fareLabel) {
@@ -211,7 +229,12 @@
       origin: prefill.origin,
       destination: prefill.destination,
       zone: zoneLabel,
-      fare: fareLabel
+      fare: fareLabel,
+      serviceDate: serviceDate,
+      serviceTime:
+        state && typeof state.serviceTime === "string"
+          ? deps.normalizeText(state.serviceTime)
+          : ""
     };
   }
 
@@ -287,6 +310,36 @@
 
     if (panelSummaryApi && summaryPayload) {
       panelSummaryApi.setPanelHandoffSummary(summaryPayload);
+    }
+
+    if (fields && fields.form) {
+      fields.form.dispatchEvent(
+        new CustomEvent("pixkuy:airport-hotel-panel-handoff", {
+          bubbles: true,
+          detail: {
+            serviceDate:
+              state && typeof state.serviceDate === "string"
+                ? deps.normalizeText(state.serviceDate)
+                : "",
+            serviceTime:
+              state && typeof state.serviceTime === "string"
+                ? deps.normalizeText(state.serviceTime)
+                : "",
+            passengerFareKey:
+              state && typeof state.selectedFareKey === "string"
+                ? deps.normalizeText(state.selectedFareKey)
+                : "",
+            passengerBucketLabel:
+              state && typeof state.selectedFareKey === "string"
+                ? deps.normalizeText(
+                    typeof deps.resolveFareKeyDisplayLabel === "function"
+                      ? deps.resolveFareKeyDisplayLabel(state.selectedFareKey)
+                      : ""
+                  )
+                : ""
+          }
+        })
+      );
     }
 
     deps.debugSwapTrace("handoffPanelSelectionToContact:after-prefill", {

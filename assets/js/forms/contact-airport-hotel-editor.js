@@ -114,7 +114,7 @@
           }
 
           if (fields.passengers) {
-            fields.passengers.value = snapshot.passengerBucketLabel || "";
+            fields.passengers.value = "";
           }
 
           const directionField = form.querySelector('input[name="airport_hotel_direction"]');
@@ -321,6 +321,8 @@
       hotelClear: root.querySelector("[data-contact-airport-hotel-hotel-clear]"),
       hotelShellOrigin: root.querySelector('[data-contact-airport-hotel-future-lodging-shell="0"]'),
       swapButton: root.querySelector("[data-contact-airport-hotel-swap]"),
+      serviceDateInput: root.querySelector("[data-contact-airport-hotel-date]"),
+      serviceTimeInput: root.querySelector("[data-contact-airport-hotel-time]"),
       passengersGroup: root.querySelector("[data-contact-airport-hotel-passengers-group]"),
       passengerOptionNodes: Array.from(
         root.querySelectorAll("[data-contact-airport-hotel-passenger-option]")
@@ -331,6 +333,8 @@
       airportHotelDirection: form.querySelector('input[name="airport_hotel_direction"]'),
       airportHotelAirport: form.querySelector('input[name="airport_hotel_airport"]'),
       airportHotelHotel: form.querySelector('input[name="airport_hotel_hotel"]'),
+      airportHotelDate: form.querySelector('input[name="airport_hotel_date"]'),
+      airportHotelTime: form.querySelector('input[name="airport_hotel_time"]'),
       passengerFareKey: form.querySelector('input[name="passenger_fare_key"]'),
       passengerBucketLabel: form.querySelector('input[name="passenger_bucket_label"]'),
       hiddenServiceLabel: form.querySelector('input[name="service_label"]'),
@@ -430,26 +434,226 @@
   }
 
   function getAirportHotelServiceLabel() {
-    return getI18nValue(
-      "contact.services.airportHotel",
-      "Aeropuerto y hotel"
-    );
+    return getI18nValue("contact.services.airportHotel");
   }
 
   function getAirportHotelDirectionLabel(direction) {
     const safeDirection = normalizeText(direction);
 
     if (safeDirection === "hotel_to_airport") {
-      return "Hotel → Aeropuerto";
+      return getI18nValue("contact.services.airportHotelDirectionHotelToAirport");
     }
 
-    return "Aeropuerto → Hotel";
+    return getI18nValue("contact.services.airportHotelDirectionAirportToHotel");
   }
 
   function getAirportHotelZoneLabel() {
+    const bridgeState = getBridgeState();
+    const catalogApi = window.PixkuyAirportTariffCatalog;
+    const bridgeZoneId = bridgeState
+      ? normalizeText(
+          bridgeState.lodgingEndpointZoneId || bridgeState.resolvedZoneId || ""
+        )
+      : "";
+
+    if (
+      bridgeZoneId &&
+      catalogApi &&
+      typeof catalogApi.resolveDisplayLabel === "function"
+    ) {
+      return normalizeText(catalogApi.resolveDisplayLabel("zone", bridgeZoneId));
+    }
+
     const form = getReservationForm();
     const zoneField = form ? form.querySelector('input[name="zone"]') : null;
     return normalizeText(zoneField && zoneField.value);
+  }
+
+  function getAirportHotelServiceDate(editorState, nodes) {
+    const editorDate =
+      editorState && typeof editorState.serviceDate === "string"
+        ? normalizeText(editorState.serviceDate)
+        : "";
+    const visibleDate =
+      nodes && nodes.root
+        ? normalizeText(
+            (
+              nodes.root.querySelector("[data-contact-airport-hotel-date]") || {}
+            ).value
+          )
+        : "";
+
+    return editorDate || visibleDate || "";
+  }
+  
+    function getAirportHotelServiceTime(editorState, nodes) {
+    const editorTime =
+      editorState && typeof editorState.serviceTime === "string"
+        ? normalizeText(editorState.serviceTime)
+        : "";
+    const visibleTime =
+      nodes && nodes.root
+        ? normalizeText(
+            (
+              nodes.root.querySelector("[data-contact-airport-hotel-time]") || {}
+            ).value
+          )
+        : "";
+
+    return editorTime || visibleTime || "";
+  }
+
+  function isAirportHotelDateRequiredForPricing() {
+    const temporalPricing =
+      window && window.PixkuyAirportTariffTemporalPricing
+        ? window.PixkuyAirportTariffTemporalPricing
+        : null;
+
+    if (
+      !temporalPricing ||
+      typeof temporalPricing.shouldShowDateFieldInServices !== "function"
+    ) {
+      return false;
+    }
+
+    return temporalPricing.shouldShowDateFieldInServices();
+  }
+
+  function hasAirportHotelValidPricingDate(editorState, nodes) {
+    const temporalPricing =
+      window && window.PixkuyAirportTariffTemporalPricing
+        ? window.PixkuyAirportTariffTemporalPricing
+        : null;
+    const serviceDate = getAirportHotelServiceDate(editorState, nodes);
+
+    if (!isAirportHotelDateRequiredForPricing()) {
+      return true;
+    }
+
+    if (
+      !temporalPricing ||
+      typeof temporalPricing.isIsoDateLiteral !== "function"
+    ) {
+      return serviceDate !== "";
+    }
+
+    return temporalPricing.isIsoDateLiteral(serviceDate);
+  }
+
+  function getAirportHotelMinimumDateLiteral() {
+    const formsApi = NAMESPACE && typeof NAMESPACE === "object"
+      ? NAMESPACE
+      : null;
+    const minimumDateTime =
+      formsApi && typeof formsApi.getReservationMinimumDateTime === "function"
+        ? formsApi.getReservationMinimumDateTime()
+        : null;
+    const formatDate =
+      formsApi && typeof formsApi.formatReservationDateForInput === "function"
+        ? formsApi.formatReservationDateForInput
+        : null;
+
+    if (!minimumDateTime || typeof formatDate !== "function") {
+      return "";
+    }
+
+    return normalizeText(formatDate(minimumDateTime));
+  }
+
+  function syncAirportHotelDateMinimum(nodes, editorState) {
+    const minimumDateLiteral = getAirportHotelMinimumDateLiteral();
+    const currentValue =
+      nodes && nodes.serviceDateInput
+        ? normalizeText(nodes.serviceDateInput.value)
+        : "";
+
+    if (!nodes || !nodes.serviceDateInput) {
+      return false;
+    }
+
+    if (minimumDateLiteral) {
+      nodes.serviceDateInput.setAttribute("min", minimumDateLiteral);
+    } else {
+      nodes.serviceDateInput.removeAttribute("min");
+    }
+
+    if (minimumDateLiteral && currentValue && currentValue < minimumDateLiteral) {
+      nodes.serviceDateInput.value = "";
+      editorState.serviceDate = "";
+      syncAirportHotelDateUiState(nodes);
+      return false;
+    }
+
+    syncAirportHotelDateUiState(nodes);
+    return true;
+  }
+
+  function syncAirportHotelDateUiState(nodes) {
+    const hasValue =
+      !!(nodes && nodes.serviceDateInput && normalizeText(nodes.serviceDateInput.value));
+
+    if (!nodes || !nodes.serviceDateInput) {
+      return false;
+    }
+
+    if (hasValue) {
+      nodes.serviceDateInput.setAttribute("data-has-value", "true");
+    } else {
+      nodes.serviceDateInput.removeAttribute("data-has-value");
+    }
+
+    return true;
+  }
+  
+    function getAirportHotelTemporalFareLabel(editorState, nodes) {
+    const bridge = getTariffBridge();
+    const temporalPricing =
+      window && window.PixkuyAirportTariffTemporalPricing
+        ? window.PixkuyAirportTariffTemporalPricing
+        : null;
+    const utilsApi = getTariffUtilsApi();
+    const bridgeState =
+      bridge && typeof bridge.getState === "function"
+        ? bridge.getState()
+        : null;
+
+    if (!hasAirportHotelValidPricingDate(editorState, nodes)) {
+      return "";
+    }
+
+    if (
+      !bridge ||
+      typeof bridge.getState !== "function" ||
+      !window.PixkuyAirportTariffCatalog ||
+      typeof window.PixkuyAirportTariffCatalog.resolveFare !== "function" ||
+      !utilsApi ||
+      typeof utilsApi.formatPrice !== "function"
+    ) {
+      return "";
+    }
+
+    const resolvedFare = window.PixkuyAirportTariffCatalog.resolveFare(bridgeState);
+    const serviceDate = getAirportHotelServiceDate(editorState, nodes);
+    const finalPrice =
+      resolvedFare &&
+      typeof resolvedFare.price === "number" &&
+      temporalPricing &&
+      typeof temporalPricing.applyTemporalPricing === "function"
+        ? temporalPricing.applyTemporalPricing(resolvedFare.price, serviceDate)
+        : resolvedFare && typeof resolvedFare.price === "number"
+          ? resolvedFare.price
+          : null;
+
+    if (
+      typeof finalPrice !== "number" ||
+      !Number.isFinite(finalPrice) ||
+      !resolvedFare ||
+      !resolvedFare.currency
+    ) {
+      return "";
+    }
+
+    return normalizeText(utilsApi.formatPrice(finalPrice, resolvedFare.currency));
   }
 
   function getAirportHotelFareLabel() {
@@ -458,49 +662,80 @@
     return normalizeText(fareField && fareField.value);
   }
 
-  function buildAirportHotelTripSummary(snapshot) {
+  function buildAirportHotelTripSummary(snapshot, editorState, nodes) {
     const safeSnapshot = snapshot && typeof snapshot === "object" ? snapshot : {};
     const parts = [];
     const directionLabel = getAirportHotelDirectionLabel(safeSnapshot.direction);
     const airportLabel = normalizeText(safeSnapshot.airport);
     const hotelLabel = normalizeText(safeSnapshot.hotel);
     const zoneLabel = getAirportHotelZoneLabel();
-    const fareLabel = getAirportHotelFareLabel();
+    const fareLabel = getAirportHotelTemporalFareLabel(editorState, nodes);
     const passengerBucketLabel = normalizeText(safeSnapshot.passengerBucketLabel);
+    const tripLabel = getI18nValue("contact.services.airportHotelSummaryTrip");
+    const airportSummaryLabel = getI18nValue("contact.services.airportHotelSummaryAirport");
+    const hotelSummaryLabel = getI18nValue("contact.services.airportHotelSummaryHotel");
+    const zoneSummaryLabel = getI18nValue("contact.services.airportHotelSummaryZone");
+    const passengersSummaryLabel = getI18nValue("contact.services.airportHotelSummaryPassengers");
+    const fareSummaryLabel = getI18nValue("contact.services.airportHotelSummaryFare");
 
     if (directionLabel) {
-      parts.push("Trayecto: " + directionLabel);
+      parts.push(tripLabel + ": " + directionLabel);
     }
 
     if (airportLabel) {
-      parts.push("Aeropuerto: " + airportLabel);
+      parts.push(airportSummaryLabel + ": " + airportLabel);
     }
 
     if (hotelLabel) {
-      parts.push("Hotel: " + hotelLabel);
+      parts.push(hotelSummaryLabel + ": " + hotelLabel);
     }
 
     if (zoneLabel) {
-      parts.push("Zona: " + zoneLabel);
+      parts.push(zoneSummaryLabel + ": " + zoneLabel);
     }
 
     if (passengerBucketLabel) {
-      parts.push("Pasajeros: " + passengerBucketLabel);
+      parts.push(passengersSummaryLabel + ": " + passengerBucketLabel);
     }
 
     if (fareLabel) {
-      parts.push("Tarifa: " + fareLabel);
+      parts.push(fareSummaryLabel + ": " + fareLabel);
     }
 
     return parts.join(" | ");
   }
 
+  function buildAirportHotelContactSummaryPayload(editorState, nodes) {
+    const snapshot = getAirportHotelTripSnapshot(editorState, nodes);
+    const zone = getAirportHotelZoneLabel();
+    const fare = getAirportHotelTemporalFareLabel(editorState, nodes);
+    const serviceDate = getAirportHotelServiceDate(editorState, nodes);
+
+    if (!snapshot) {
+      return null;
+    }
+
+    if (
+      !normalizeText(snapshot.origin) ||
+      !normalizeText(snapshot.destination) ||
+      !zone ||
+      !fare
+    ) {
+      return null;
+    }
+
+    return {
+      origin: snapshot.origin,
+      destination: snapshot.destination,
+      zone: zone,
+      fare: fare,
+      serviceDate: serviceDate
+    };
+  }
+
   function buildAirportButtonLabel(airport) {
     if (!airport) {
-      return getI18nValue(
-        "contact.services.airportHotelAirportPlaceholder",
-        "Selecciona aeropuerto"
-      );
+      return getI18nValue("contact.services.airportHotelAirportPlaceholder");
     }
 
     if (typeof airport.label === "string" && airport.label.trim()) {
@@ -508,17 +743,14 @@
     }
 
     if (typeof airport.labelKey === "string" && airport.labelKey.trim()) {
-      return getI18nValue(airport.labelKey, airport.labelKey);
+      return getI18nValue(airport.labelKey);
     }
 
     if (typeof airport.code === "string" && airport.code.trim()) {
       return airport.code.trim();
     }
 
-    return getI18nValue(
-      "contact.services.airportHotelAirportPlaceholder",
-      "Selecciona aeropuerto"
-    );
+    return getI18nValue("contact.services.airportHotelAirportPlaceholder");
   }
 
   function setLabelNode(labelNode, text, targetId) {
@@ -639,7 +871,7 @@
     return match && typeof match.id === "string" ? normalizeText(match.id) : "";
   }
 
-  function applyPassengerFareKeySelection(nodes, fareKey) {
+  function applyPassengerFareKeySelection(editorState, nodes, fareKey) {
     const bridge = getTariffBridge();
     const safeFareKey = normalizeText(fareKey);
 
@@ -658,7 +890,7 @@
 
     bridge.setFareKeySelection({ fareKey: safeFareKey });
     syncPassengerSelectionFromBridge(nodes);
-    syncPanelSummaryFromTariffBridge();
+    syncPanelSummaryFromTariffBridge(editorState, nodes);
     syncReservationRequestUiState({ skipValidation: true });
 
     debugLog("applyPassengerFareKeySelection:done", {
@@ -714,14 +946,8 @@
     }
 
     const hotelSide = getActiveHotelSide(editorState);
-    const airportLabel = getI18nValue(
-      "contact.services.airportHotelAirportLabel",
-      "Aeropuerto"
-    );
-    const hotelLabel = getI18nValue(
-      "contact.services.airportHotelHotelLabel",
-      "Hotel"
-    );
+    const airportLabel = getI18nValue("contact.services.airportHotelAirportLabel");
+    const hotelLabel = getI18nValue("contact.services.airportHotelHotelLabel");
 
     // Los shells "future" no deben participar en el layout real actual.
     if (nodes.airportShellDestination) {
@@ -961,20 +1187,15 @@
     return result;
   }
 
-  function syncPanelSummaryFromTariffBridge() {
-    const tariffBridge = getTariffBridge();
+  function syncPanelSummaryFromTariffBridge(editorState, nodes) {
     const panelSummaryApi = getPanelSummaryApi();
 
     if (
-      !tariffBridge ||
-      typeof tariffBridge.getContactSummaryPayload !== "function" ||
       !panelSummaryApi ||
       typeof panelSummaryApi.setPanelHandoffSummary !== "function" ||
       typeof panelSummaryApi.clearPanelHandoffSummary !== "function"
     ) {
       debugLog("syncPanelSummaryFromTariffBridge:skip", {
-        hasTariffBridge: !!tariffBridge,
-        hasGetPayload: !!(tariffBridge && typeof tariffBridge.getContactSummaryPayload === "function"),
         hasPanelSummaryApi: !!panelSummaryApi,
         hasSetPanelHandoffSummary: !!(panelSummaryApi && typeof panelSummaryApi.setPanelHandoffSummary === "function"),
         hasClearPanelHandoffSummary: !!(panelSummaryApi && typeof panelSummaryApi.clearPanelHandoffSummary === "function")
@@ -982,7 +1203,12 @@
       return false;
     }
 
-    const payload = tariffBridge.getContactSummaryPayload();
+    if (!hasAirportHotelValidPricingDate(editorState, nodes)) {
+      panelSummaryApi.clearPanelHandoffSummary();
+      return false;
+    }
+
+    const payload = buildAirportHotelContactSummaryPayload(editorState, nodes);
 
     debugLog("syncPanelSummaryFromTariffBridge:payload", {
       hasPayload: !!payload,
@@ -1033,7 +1259,7 @@
     syncAirportTrigger(editorState, nodes);
     syncSideAwareLayout(editorState, nodes);
     syncPassengerSelectionFromBridge(nodes);
-    syncPanelSummaryFromTariffBridge();
+    syncPanelSummaryFromTariffBridge(editorState, nodes);
     syncReservationRequestUiState({ skipValidation: true });
 
     debugLog("rehydrateEditorFromTariffBridge:done", {
@@ -1060,7 +1286,7 @@
     syncTariffBridgeAirportSelection(editorState);
     syncSideAwareLayout(editorState, nodes);
     syncPassengerSelectionFromBridge(nodes);
-    syncPanelSummaryFromTariffBridge();
+    syncPanelSummaryFromTariffBridge(editorState, nodes);
     syncReservationRequestUiState({ skipValidation: true });
   }
 
@@ -1166,7 +1392,7 @@
     });
 
     syncSideAwareLayout(editorState, nodes);
-    syncPanelSummaryFromTariffBridge();
+    syncPanelSummaryFromTariffBridge(editorState, nodes);
     syncReservationRequestUiState({ skipValidation: true });
     return true;
   }
@@ -1270,7 +1496,7 @@
       nodes.hotelInput.value = previousHotelValue;
       syncHotelClear(nodes);
       syncSideAwareLayout(editorState, nodes);
-      syncPanelSummaryFromTariffBridge();
+      syncPanelSummaryFromTariffBridge(editorState, nodes);
 
       if (settleSelection) {
         settleSelection({
@@ -1290,7 +1516,7 @@
     }
 
     syncSideAwareLayout(editorState, nodes);
-    syncPanelSummaryFromTariffBridge();
+    syncPanelSummaryFromTariffBridge(editorState, nodes);
     syncReservationRequestUiState({ skipValidation: true });
 
     if (settleSelection) {
@@ -1320,7 +1546,7 @@
       bridge.swapTripDirection();
       syncAirportTrigger(editorState, nodes);
       syncSideAwareLayout(editorState, nodes);
-      syncPanelSummaryFromTariffBridge();
+      syncPanelSummaryFromTariffBridge(editorState, nodes);
       syncPassengerSelectionFromBridge(nodes);
       syncReservationRequestUiState({ skipValidation: true });
       return true;
@@ -1329,18 +1555,19 @@
     syncAirportTrigger(editorState, nodes);
     syncSideAwareLayout(editorState, nodes);
     syncTariffBridgeAirportSelection(editorState);
-    syncPanelSummaryFromTariffBridge();
+    syncPanelSummaryFromTariffBridge(editorState, nodes);
     syncPassengerSelectionFromBridge(nodes);
     syncReservationRequestUiState({ skipValidation: true });
     return true;
   }
 
   function bindEditorEvents(editorState, nodes) {
-    if (!nodes.airportTrigger || !nodes.swapButton || !nodes.hotelInput) {
+    if (!nodes.airportTrigger || !nodes.swapButton || !nodes.hotelInput || !nodes.serviceDateInput) {
       debugLog("bindEditorEvents:missing-required-nodes", {
         hasAirportTrigger: !!nodes.airportTrigger,
         hasSwapButton: !!nodes.swapButton,
-        hasHotelInput: !!nodes.hotelInput
+        hasHotelInput: !!nodes.hotelInput,
+        hasServiceDateInput: !!nodes.serviceDateInput
       });
       return false;
     }
@@ -1385,6 +1612,58 @@
       syncHotelClear(nodes);
     });
 	
+	  nodes.serviceDateInput.addEventListener("input", function () {
+      syncAirportHotelDateMinimum(nodes, editorState);
+      editorState.serviceDate = normalizeText(nodes.serviceDateInput.value);
+      syncAirportHotelDateUiState(nodes);
+
+      debugLog("serviceDateInput:input", {
+        serviceDate: editorState.serviceDate
+      });
+
+      syncPanelSummaryFromTariffBridge(editorState, nodes);
+      syncAirportHotelPayloadFields(editorState, nodes);
+      syncReservationRequestUiState({ skipValidation: true });
+    });
+
+    nodes.serviceDateInput.addEventListener("change", function () {
+      syncAirportHotelDateMinimum(nodes, editorState);
+      editorState.serviceDate = normalizeText(nodes.serviceDateInput.value);
+      syncAirportHotelDateUiState(nodes);
+
+      debugLog("serviceDateInput:change", {
+        serviceDate: editorState.serviceDate
+      });
+
+      syncPanelSummaryFromTariffBridge(editorState, nodes);
+      syncAirportHotelPayloadFields(editorState, nodes);
+      syncReservationRequestUiState({ skipValidation: true });
+    });
+	
+	    if (nodes.serviceTimeInput) {
+      nodes.serviceTimeInput.addEventListener("input", function () {
+        editorState.serviceTime = normalizeText(nodes.serviceTimeInput.value);
+
+        debugLog("serviceTimeInput:input", {
+          serviceTime: editorState.serviceTime
+        });
+
+        syncAirportHotelPayloadFields(editorState, nodes);
+        syncReservationRequestUiState({ skipValidation: true });
+      });
+
+      nodes.serviceTimeInput.addEventListener("change", function () {
+        editorState.serviceTime = normalizeText(nodes.serviceTimeInput.value);
+
+        debugLog("serviceTimeInput:change", {
+          serviceTime: editorState.serviceTime
+        });
+
+        syncAirportHotelPayloadFields(editorState, nodes);
+        syncReservationRequestUiState({ skipValidation: true });
+      });
+    }
+	
 	    if (Array.isArray(nodes.passengerOptionNodes)) {
       nodes.passengerOptionNodes.forEach(function (button) {
         button.addEventListener("click", function () {
@@ -1396,7 +1675,7 @@
             fareKey: fareKey
           });
 
-          applyPassengerFareKeySelection(nodes, fareKey);
+          applyPassengerFareKeySelection(editorState, nodes, fareKey);
         });
       });
     }
@@ -1417,7 +1696,7 @@
           return;
         }
 
-        applyPassengerFareKeySelection(nodes, derivedFareKey);
+        applyPassengerFareKeySelection(editorState, nodes, derivedFareKey);
       });
     }
 
@@ -1509,6 +1788,52 @@
       positionAirportListbox(editorState, nodes);
     }, true);
 
+    window.addEventListener("pixkuy:airport-hotel-panel-handoff", function (event) {
+      const detail = event && event.detail ? event.detail : {};
+      const serviceDate = normalizeText(detail.serviceDate);
+      const serviceTime = normalizeText(detail.serviceTime);
+      const passengerFareKey = normalizeText(detail.passengerFareKey);
+      const passengerBucketLabel = normalizeText(detail.passengerBucketLabel);
+
+      rehydrateEditorFromTariffBridge(editorState, nodes);
+
+      editorState.serviceDate = serviceDate;
+      editorState.serviceTime = serviceTime;
+
+      if (nodes.serviceDateInput) {
+        nodes.serviceDateInput.value = serviceDate;
+      }
+
+      if (nodes.serviceTimeInput) {
+        nodes.serviceTimeInput.value = serviceTime;
+      }
+
+      syncAirportHotelDateMinimum(nodes, editorState);
+      syncAirportHotelDateUiState(nodes);
+
+      if (passengerFareKey) {
+        syncPassengerChipSelection(nodes, passengerFareKey);
+
+        if (nodes.passengerFareKey) {
+          nodes.passengerFareKey.value = passengerFareKey;
+        }
+      } else {
+        syncPassengerSelectionFromBridge(nodes);
+      }
+
+      if (nodes.commonPassengers) {
+        nodes.commonPassengers.value = "";
+      }
+
+      if (passengerBucketLabel && nodes.passengerBucketLabel) {
+        nodes.passengerBucketLabel.value = passengerBucketLabel;
+      }
+
+      syncAirportHotelPayloadFields(editorState, nodes);
+      syncPanelSummaryFromTariffBridge(editorState, nodes);
+      syncReservationRequestUiState({ skipValidation: true });
+    });
+
     return true;
   }
   
@@ -1526,6 +1851,14 @@
         : "airport_to_hotel";
     const selectedFareKey = getSelectedFareKeyFromBridge();
     const passengerBucketLabel = resolveFareKeyDisplayLabel(selectedFareKey);
+    const serviceDate =
+      editorState && typeof editorState.serviceDate === "string"
+        ? normalizeText(editorState.serviceDate)
+        : "";
+    const serviceTime =
+      editorState && typeof editorState.serviceTime === "string"
+        ? normalizeText(editorState.serviceTime)
+        : "";
 
     if (direction === "hotel_to_airport") {
       return {
@@ -1536,7 +1869,9 @@
         hotel: hotelValue,
         airport: airportValue,
         passengerFareKey: selectedFareKey,
-        passengerBucketLabel: passengerBucketLabel
+        passengerBucketLabel: passengerBucketLabel,
+        serviceDate: serviceDate,
+        serviceTime: serviceTime
       };
     }
 
@@ -1548,7 +1883,9 @@
       hotel: hotelValue,
       airport: airportValue,
       passengerFareKey: selectedFareKey,
-      passengerBucketLabel: passengerBucketLabel
+      passengerBucketLabel: passengerBucketLabel,
+      serviceDate: serviceDate,
+      serviceTime: serviceTime
     };
   }
 
@@ -1571,7 +1908,7 @@
       }
 
       if (nodes.commonPassengers) {
-        nodes.commonPassengers.value = snapshot.passengerBucketLabel || "";
+        nodes.commonPassengers.value = "";
       }
 
       if (nodes.airportHotelDirection) {
@@ -1586,6 +1923,14 @@
         nodes.airportHotelHotel.value = snapshot.hotel || "";
       }
 
+      if (nodes.airportHotelDate) {
+        nodes.airportHotelDate.value = snapshot.serviceDate || "";
+      }
+
+      if (nodes.airportHotelTime) {
+        nodes.airportHotelTime.value = snapshot.serviceTime || "";
+      }
+
       if (nodes.passengerFareKey) {
         nodes.passengerFareKey.value = snapshot.passengerFareKey || "";
       }
@@ -1596,7 +1941,7 @@
 
       writeHiddenValue(
         nodes.hiddenAirportHotelTripSummary,
-        buildAirportHotelTripSummary(snapshot)
+        buildAirportHotelTripSummary(snapshot, editorState, nodes)
       );
       writeHiddenValue(
         nodes.hiddenAirportHotelDirectionLabel,
@@ -1616,7 +1961,7 @@
       );
       writeHiddenValue(
         nodes.hiddenAirportHotelFareLabel,
-        getAirportHotelFareLabel()
+        getAirportHotelTemporalFareLabel(editorState, nodes)
       );
       writeHiddenValue(
         nodes.hiddenAirportHotelPassengerBucketLabel,
@@ -1629,7 +1974,7 @@
       );
       writeHiddenValue(
         nodes.hiddenRequestSummary,
-        buildAirportHotelTripSummary(snapshot)
+        buildAirportHotelTripSummary(snapshot, editorState, nodes)
       );
 
       return true;
@@ -1638,6 +1983,8 @@
     writeHiddenValue(nodes.airportHotelDirection, "");
     writeHiddenValue(nodes.airportHotelAirport, "");
     writeHiddenValue(nodes.airportHotelHotel, "");
+    writeHiddenValue(nodes.airportHotelDate, "");
+    writeHiddenValue(nodes.airportHotelTime, "");
     writeHiddenValue(nodes.passengerFareKey, "");
     writeHiddenValue(nodes.passengerBucketLabel, "");
 
@@ -1672,6 +2019,8 @@
     const editorState = {
       direction: DEFAULT_DIRECTION,
       selectedAirport: null,
+      serviceDate: "",
+      serviceTime: "",
       airportPanel: null,
       airportPanelOpen: false
     };
@@ -1679,6 +2028,8 @@
 
     syncAirportTrigger(editorState, nodes);
     syncHotelClear(nodes);
+    syncAirportHotelDateMinimum(nodes, editorState);
+    syncAirportHotelDateUiState(nodes);
     syncSideAwareLayout(editorState, nodes);
     syncPassengerSelectionFromBridge(nodes);
     syncAirportHotelPayloadFields(editorState, nodes);

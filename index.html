@@ -49,6 +49,7 @@
   <link rel="stylesheet" href="assets/css/33-services-airport.css" />
   <link rel="stylesheet" href="assets/css/34-services-tours.css" />
   <link rel="stylesheet" href="assets/css/36-services-tours-sheet-mobile.css" />
+  <link rel="stylesheet" href="assets/css/37-brand-collaborations.css" />
   <link rel="stylesheet" href="assets/css/35-wc2026.css" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/90-a11y.css" />
@@ -515,6 +516,77 @@
   </div>
 </div>
 
+                    <div
+            class="services-expand__field services-expand__field--date"
+            data-airport-tariff-role="date"
+            hidden
+            aria-hidden="true"
+          >
+            <label
+              class="services-expand__label"
+              for="airport-tariff-date"
+              data-i18n="services.cards.airport.panel.dateLabel"
+            ></label>
+
+            <div class="services-expand__date-wrap">
+              <input
+                id="airport-tariff-date"
+                type="date"
+                class="services-expand__control"
+                data-airport-tariff-date
+              />
+
+              <span
+                class="services-expand__date-overlay"
+                aria-hidden="true"
+                data-i18n="contact.datePlaceholder"
+              >dd/mm/aaaa</span>
+
+              <span class="services-expand__date-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"></line>
+                  <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"></line>
+                  <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"></line>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div
+            class="services-expand__field services-expand__field--time"
+            data-airport-tariff-role="time"
+            hidden
+            aria-hidden="true"
+          >
+            <label
+              class="services-expand__label"
+              for="airport-tariff-time"
+              data-i18n="services.cards.airport.panel.timeLabel"
+            ></label>
+
+            <div class="services-expand__date-wrap services-expand__time-wrap">
+              <input
+                id="airport-tariff-time"
+                type="time"
+                class="services-expand__control"
+                data-airport-tariff-time
+              />
+
+              <span
+                class="services-expand__date-overlay services-expand__time-overlay"
+                aria-hidden="true"
+              >--:--</span>
+
+              <span class="services-expand__date-icon services-expand__time-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
+                  <polyline points="12 7 12 12 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+
           <div class="services-expand__field services-expand__field--fare">
             <span
               class="services-expand__label"
@@ -659,6 +731,20 @@
   </article>
 </div>
       <p class="muted small" data-i18n="services.bridge"></p>
+    </div>
+  </section>
+
+  <section
+    class="screen brand-collaborations"
+    id="brand-collaborations"
+    aria-label="Marcas que nos acompañan"
+    hidden
+  >
+    <div class="content">
+      <div
+        class="brand-collaborations__inner"
+        data-brand-collaborations-root
+      ></div>
     </div>
   </section>
 
@@ -813,6 +899,8 @@
         <input type="hidden" name="airport_hotel_direction" value="" />
         <input type="hidden" name="airport_hotel_airport" value="" />
         <input type="hidden" name="airport_hotel_hotel" value="" />
+        <input type="hidden" name="airport_hotel_date" value="" />
+        <input type="hidden" name="airport_hotel_time" value="" />
         <input type="hidden" name="passenger_fare_key" value="" />
         <input type="hidden" name="passenger_bucket_label" value="" />
 
@@ -1066,7 +1154,12 @@
                 </div>
                             </div>
 
-              <div
+             <div
+                class="contact-airport-hotel-editor__config-row"
+                data-contact-airport-hotel-config-row
+              >
+			 
+			 <div
                 class="contact-airport-hotel-editor__passengers"
                 data-contact-airport-hotel-passengers
               >
@@ -1137,7 +1230,74 @@
                   </button>
                 </div>
               </div>
+
+              <div class="form-field form-field--date contact-airport-hotel-editor__date">
+                <label
+                  for="contact-airport-hotel-date"
+                  class="visually-hidden"
+                  data-i18n="services.cards.airport.panel.dateLabel"
+                ></label>
+                <input
+                  id="contact-airport-hotel-date"
+                  type="date"
+                  data-contact-airport-hotel-date
+                  aria-describedby="contact-airport-hotel-date-error"
+                />
+                <span
+                  class="form-field-overlay form-field-overlay--date"
+                  aria-hidden="true"
+                  data-i18n="contact.datePlaceholder"
+                >dd/mm/aaaa</span>
+                <span class="form-field-icon form-field-icon--date" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"></line>
+                    <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"></line>
+                    <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"></line>
+                  </svg>
+                </span>
+                <p
+                  id="contact-airport-hotel-date-error"
+                  class="form-error"
+                  hidden
+                  data-error-for="airport_hotel_date"
+                  data-i18n="contact.validation.tripDateRequired"
+                ></p>
+              </div>
+
+              <div class="form-field form-field--time contact-airport-hotel-editor__time">
+                <label
+                  for="contact-airport-hotel-time"
+                  class="visually-hidden"
+                  data-i18n="services.cards.airport.panel.timeLabel"
+                ></label>
+                <input
+                  id="contact-airport-hotel-time"
+                  type="time"
+                  data-contact-airport-hotel-time
+                  aria-describedby="contact-airport-hotel-time-error"
+                />
+                <span
+                  class="form-field-overlay form-field-overlay--time"
+                  aria-hidden="true"
+                >--:--</span>
+                <span class="form-field-icon form-field-icon--time" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
+                    <polyline points="12 7 12 12 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                  </svg>
+                </span>
+                <p
+                  id="contact-airport-hotel-time-error"
+                  class="form-error"
+                  hidden
+                  data-error-for="airport_hotel_time"
+                  data-i18n="contact.validation.tripTimeRequired"
+                ></p>
+              </div>
             </div>
+			
+		</div>
 
             <div
               class="contact-panel-summary contact-panel-summary--zone"
@@ -2233,6 +2393,7 @@
 <script src="assets/js/forms/contact-tour-private-editor.js?v=20260411-1"></script>
 <script src="assets/js/forms/index.js"></script>
 <script src="assets/js/services-expand.js"></script>
+<script src="assets/js/data/brand-collaborations-config.js"></script>
 <script src="assets/js/data/airport-zone-catalog.js"></script>
 <script src="assets/js/airport-tariff/airport-tariff-utils.js"></script>
 <script src="assets/js/airport-tariff/airport-tariff-catalog.js"></script>
@@ -2242,6 +2403,7 @@
 <script src="assets/js/airport-tariff/airport-tariff-cta.js"></script>
 <script src="assets/js/airport-tariff/airport-tariff-handoff.js"></script>
 <script src="assets/js/airport-tariff/airport-tariff-swap.js"></script>
+<script src="assets/js/airport-tariff/airport-tariff-temporal-pricing.js"></script>
 <script src="assets/js/geo/zone-resolver.js"></script>
 <script src="assets/js/services/airport-endpoints-state.js"></script>
 <script src="assets/js/airport-zone-tariff.js"></script>
@@ -2249,6 +2411,8 @@
 <script src="assets/js/services/airport-destination.js"></script>
 <script src="assets/js/services/airport-lodging-autocomplete.js"></script>
 <script src="assets/js/services/airport-lodging-places.js"></script>
+<script src="assets/js/services/brand-collaborations.js"></script>
+<script src="assets/js/services/tours-temporal-pricing.js"></script>
 <script src="assets/js/services/tours-panel.js"></script>
 <script src="assets/js/services/tours-mobile-sheet.js"></script>
 

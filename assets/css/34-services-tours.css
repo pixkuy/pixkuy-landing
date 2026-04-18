@@ -258,6 +258,47 @@
   min-width:0;
 }
 
+.services-tours-panel__date-wrap{
+  position:relative;
+  min-width:0;
+}
+
+.services-tours-panel__date-wrap .services-tours-panel__control{
+  position:relative;
+  z-index:1;
+}
+
+.services-tours-panel__date-overlay{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:14px;
+  line-height:1;
+  color:rgba(255,249,238,.62);
+  pointer-events:none;
+  z-index:2;
+}
+
+.services-tours-panel__date-overlay[hidden]{
+  display:none !important;
+}
+
+.services-tours-panel__date-icon{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
+  color:rgba(255,249,238,.92);
+  pointer-events:none;
+  z-index:2;
+}
+
 .services-tours-panel__field--full{
   grid-column:1 / -1;
 }
@@ -624,6 +665,111 @@
   justify-content:center;
 }
 
+@media (min-width: 721px){
+  .services-tours-panel__row--top{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    gap:18px;
+  }
+  
+    .services-tours-panel__date-overlay{
+    display:none !important;
+  }
+
+  .services-tours-panel__field--passengers,
+  .services-tours-panel__field--guide{
+    width:auto;
+    flex:0 0 auto;
+  }
+
+  .services-tours-panel__field--passengers .services-tours-panel__chips,
+  .services-tours-panel__field--guide .services-tours-panel__chips{
+    gap:6px;
+  }
+
+  .services-tours-panel__field--passengers .services-tours-panel__chip,
+  .services-tours-panel__field--guide .services-tours-panel__chip{
+    min-width:66px;
+    min-height:40px;
+    padding:0 10px;
+    border-radius:11px;
+    font-size:14px;
+  }
+
+  .services-tours-panel__field--guide-language{
+    width:180px;
+    flex:0 0 180px;
+  }
+
+  .services-tours-panel__field--guide-language .services-tours-panel__control{
+    min-height:40px;
+    height:40px;
+    padding:0 14px;
+    line-height:40px;
+    box-sizing:border-box;
+  }
+
+  .services-tours-panel__field--guide-language .services-tours-panel__control--select{
+    padding-right:34px;
+  }
+
+  .services-tours-panel__field--guide-language .services-tours-panel__control--select::after{
+    right:12px;
+  }
+
+  .services-tours-panel__field--date{
+    margin-right:0;
+    width:150px;
+    flex:0 0 150px;
+  }
+
+  .services-tours-panel__field--date .services-tours-panel__control{
+    display:block;
+    width:100%;
+    min-height:40px;
+    height:40px;
+    padding:0 40px 0 14px;
+    border-radius:12px;
+    line-height:40px;
+    box-sizing:border-box;
+  }
+
+  .services-tours-panel__field--date::after{
+    display:none;
+  }
+
+  .services-tours-panel__field--date input::-webkit-calendar-picker-indicator{
+    right:0;
+    width:40px;
+    height:40px;
+    opacity:0;
+    cursor:pointer;
+  }
+
+  .services-tours-panel__price--inline{
+    flex:0 0 200px;
+    width:200px;
+    min-width:200px;
+    max-width:200px;
+    margin-left:auto;
+    align-self:flex-end;
+  }
+
+  .services-tours-panel__price--inline .services-tours-panel__price{
+    padding:12px 14px;
+    border-radius:14px;
+  }
+
+  .services-tours-panel__price--inline .services-tours-panel__price-label{
+    font-size:11px;
+  }
+
+  .services-tours-panel__price--inline .services-tours-panel__price-value{
+    font-size:clamp(18px, 2vw, 24px);
+  }
+}
+
 /* -------------------------------------------------
    TOURS PANEL — footer precio + CTA
    ------------------------------------------------- */
@@ -848,27 +994,102 @@
     gap:14px;
   }
   
-    .services-tours-panel__field--date::after,
+    .services-tours-panel__field--date{
+    width:154px;
+    max-width:154px;
+    flex:0 0 154px;
+    margin-right:0;
+    align-self:start;
+  }
+
+  .services-tours-panel__date-wrap{
+    display:block;
+    width:154px;
+    max-width:154px;
+  }
+
+  .services-tours-panel__field--date::after,
   .services-tours-panel__field--time::after{
-    right:16px;
-    top:39px;
-    width:16px;
-    height:16px;
-    background-size:16px 16px;
+    display:none;
   }
 
   .services-tours-panel__field--date input::-webkit-calendar-picker-indicator,
   .services-tours-panel__field--time input::-webkit-calendar-picker-indicator{
-    right:12px;
-    width:20px;
-    height:20px;
+    right:0;
+    width:34px;
+    height:50px;
   }
 
   .services-tours-panel__field--date .services-tours-panel__control,
   .services-tours-panel__field--time .services-tours-panel__control{
+    display:block;
+    width:100%;
+    min-width:0;
     min-height:50px;
     height:50px;
-    padding-right:44px;
+    padding:0 34px 0 14px;
+    box-sizing:border-box;
+  }
+
+  .services-tours-panel__field--date .services-tours-panel__control{
+    display:flex;
+    align-items:center;
+    width:auto;
+    min-width:0;
+    font-size:13px;
+    line-height:1;
+    white-space:nowrap;
+  }
+
+  .services-tours-panel__field--date .services-tours-panel__control::-webkit-date-and-time-value{
+    min-height:50px;
+    height:50px;
+    display:flex;
+    align-items:center;
+    text-align:left;
+  }
+
+  .services-tours-panel__field--date .services-tours-panel__control::-webkit-datetime-edit{
+    display:flex;
+    align-items:center;
+    min-height:50px;
+    height:50px;
+    padding:0;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+
+  .services-tours-panel__field--date .services-tours-panel__control::-webkit-datetime-edit-fields-wrapper{
+    display:flex;
+    align-items:center;
+    flex-wrap:nowrap;
+    min-height:50px;
+    height:50px;
+    white-space:nowrap;
+    padding:0;
+  }
+
+  .services-tours-panel__field--date .services-tours-panel__control::-webkit-datetime-edit-text,
+  .services-tours-panel__field--date .services-tours-panel__control::-webkit-datetime-edit-day-field,
+  .services-tours-panel__field--date .services-tours-panel__control::-webkit-datetime-edit-month-field,
+  .services-tours-panel__field--date .services-tours-panel__control::-webkit-datetime-edit-year-field{
+    display:inline-flex;
+    align-items:center;
+    height:50px;
+    padding:0;
+    white-space:nowrap;
+  }
+
+  .services-tours-panel__date-overlay{
+    left:14px;
+    font-size:14px;
+    white-space:nowrap;
+  }
+
+  .services-tours-panel__date-icon{
+    right:34px;
+    width:16px;
+    height:16px;
   }
 
   .services-tours-panel__row,

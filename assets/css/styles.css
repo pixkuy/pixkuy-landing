@@ -973,6 +973,16 @@ ul{
     opacity:0;
   }
 
+  .contact-airport-hotel-editor__date input:valid + .form-field-overlay--date{
+    opacity:1;
+  }
+
+  .contact-airport-hotel-editor__date input[data-has-value="true"] + .form-field-overlay--date,
+  .contact-airport-hotel-editor__date input:focus + .form-field-overlay--date,
+  .contact-airport-hotel-editor__date.is-invalid .form-field-overlay--date{
+    opacity:0;
+  }
+
   .form-field--date input::-webkit-calendar-picker-indicator,
   .form-field--time input::-webkit-calendar-picker-indicator{
     opacity:0;

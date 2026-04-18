@@ -197,6 +197,67 @@
   function getTourById(tourId) {
     return TOURS[tourId] || null;
   }
+  
+    function getTemporalPricingApi() {
+    const api = window.PixkuyToursTemporalPricing;
+    return api && typeof api === "object" ? api : null;
+  }
+
+  function shouldShowTemporalDateField() {
+    const api = getTemporalPricingApi();
+
+    if (!api || typeof api.shouldShowDateFieldInServices !== "function") {
+      return false;
+    }
+
+    return api.shouldShowDateFieldInServices();
+  }
+
+  function applyTemporalDatePricing(basePrice, serviceDateLiteral) {
+    const api = getTemporalPricingApi();
+
+    if (!api || typeof api.applyTemporalPricing !== "function") {
+      return basePrice;
+    }
+
+    return api.applyTemporalPricing(basePrice, serviceDateLiteral);
+  }
+
+  function getReservationMinimumDateLiteral() {
+    const formsApi = window.PixkuyForms || {};
+    const getMinimumDateTime =
+      typeof formsApi.getReservationMinimumDateTime === "function"
+        ? formsApi.getReservationMinimumDateTime
+        : null;
+    const formatDate =
+      typeof formsApi.formatReservationDateForInput === "function"
+        ? formsApi.formatReservationDateForInput
+        : null;
+    const minimumDateTime = getMinimumDateTime
+      ? getMinimumDateTime()
+      : null;
+
+    if (!minimumDateTime || !formatDate) {
+      return "";
+    }
+
+    return String(formatDate(minimumDateTime) || "").trim();
+  }
+  
+    function isServicesDateAtOrAfterMinimum(dateLiteral) {
+    const safeDate = typeof dateLiteral === "string" ? dateLiteral.trim() : "";
+    const minimumDateLiteral = getReservationMinimumDateLiteral();
+
+    if (!safeDate || !minimumDateLiteral) {
+      return false;
+    }
+
+    return safeDate >= minimumDateLiteral;
+  }
+
+  function getServicesDateFieldValue() {
+    return typeof state.tripDate === "string" ? state.tripDate.trim() : "";
+  }
 
   function formatCurrency(value, currency) {
     const labels = getLabels();
@@ -227,17 +288,38 @@
 
   function getComputedPrice() {
     const tour = getTourById(state.selectedTourId);
+    const serviceDateLiteral = getServicesDateFieldValue();
+    let basePrice = null;
+
     if (!tour || !state.passengerFareKey) return null;
 
     const fareBucket = tour.fares[state.passengerFareKey];
     if (!fareBucket) return null;
 
     const guideKey = tour.supportsGuide && state.hasGuide === 'yes' ? 'yes' : 'no';
-    return typeof fareBucket[guideKey] === 'number' ? fareBucket[guideKey] : null;
+    basePrice = typeof fareBucket[guideKey] === 'number' ? fareBucket[guideKey] : null;
+
+    if (typeof basePrice !== "number") {
+      return null;
+    }
+
+    if (shouldShowTemporalDateField() && !serviceDateLiteral) {
+      return null;
+    }
+
+    if (shouldShowTemporalDateField() && !isServicesDateAtOrAfterMinimum(serviceDateLiteral)) {
+      return null;
+    }
+
+    return applyTemporalDatePricing(basePrice, serviceDateLiteral);
   }
 
   function syncDerivedState() {
     const tour = getTourById(state.selectedTourId);
+
+    if (!shouldShowTemporalDateField()) {
+      state.tripDate = '';
+    }
 
     if (!tour) {
       state.price = null;
@@ -262,9 +344,12 @@
 
   function isConfigComplete() {
     const tour = getTourById(state.selectedTourId);
+
     if (!tour) return false;
     if (!state.passengerFareKey) return false;
+    if (shouldShowTemporalDateField() && !getServicesDateFieldValue()) return false;
     if (tour.supportsGuide && state.hasGuide === 'yes' && !state.guideLanguage) return false;
+
     return typeof state.price === 'number';
   }
 
@@ -342,6 +427,10 @@ function placeConfigMountForCurrentLayout() {
   if (!catalogMount || !configMount) return;
 
   if (!isDesktopToursLayout()) {
+    if (panelRoot.classList.contains('services-tours-panel--sheet-open')) {
+      return;
+    }
+
     if (configMount.parentElement !== panelRoot) {
       panelRoot.appendChild(configMount);
     }
@@ -613,6 +702,9 @@ function ensureSelectedTourRowVisible() {
     const ctaDisabled = !isConfigComplete();
     const showGuide = !!tour.supportsGuide;
     const showGuideLanguage = showGuide && state.hasGuide === 'yes';
+    const showTemporalDateField = shouldShowTemporalDateField();
+    const minimumDateLiteral = getReservationMinimumDateLiteral();
+    const currentDateValue = getServicesDateFieldValue();
 
     return `
       <div class="services-tours-panel__config-head">
@@ -648,6 +740,49 @@ function ensureSelectedTourRowVisible() {
                     ${
             showGuideLanguage
               ? buildGuideLanguageFieldMarkup(tour)
+              : ''
+          }
+
+                    ${
+            showTemporalDateField
+              ? `
+                <div class="services-tours-panel__field services-tours-panel__field--date">
+                  <label
+                    class="services-tours-panel__label"
+                    for="services-tours-date"
+                  >
+                    ${escapeHtml(labels.dateLabel)}
+                  </label>
+
+                  <div class="services-tours-panel__date-wrap">
+                    <input
+                      id="services-tours-date"
+                      type="date"
+                      class="services-tours-panel__control"
+                      data-services-tours-date
+                      value="${escapeHtml(currentDateValue)}"
+                      ${minimumDateLiteral ? `min="${escapeHtml(minimumDateLiteral)}"` : ""}
+                    />
+
+                    <span
+                      class="services-tours-panel__date-overlay"
+                      aria-hidden="true"
+                      ${currentDateValue ? 'hidden' : ''}
+                    >
+                      dd/mm/aaaa
+                    </span>
+
+                    <span class="services-tours-panel__date-icon" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"></line>
+                        <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"></line>
+                        <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"></line>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              `
               : ''
           }
 
@@ -689,6 +824,32 @@ function ensureSelectedTourRowVisible() {
   function renderAll() {
   renderCatalog();
   renderConfig();
+}
+
+function syncConfigComputedUi() {
+  const priceValueNodes = configMount.querySelectorAll('.services-tours-panel__price-value');
+  const ctaNodes = configMount.querySelectorAll('[data-services-tours-cta]');
+  const dateInput = configMount.querySelector('[data-services-tours-date]');
+  const dateOverlay = configMount.querySelector('.services-tours-panel__date-overlay');
+  const nextPriceText = formatCurrency(state.price, state.currency);
+  const nextCtaDisabled = !isConfigComplete();
+  const labels = getLabels();
+
+  priceValueNodes.forEach((node) => {
+    node.textContent = nextPriceText;
+  });
+
+  ctaNodes.forEach((node) => {
+    node.disabled = nextCtaDisabled;
+    node.setAttribute('aria-disabled', nextCtaDisabled ? 'true' : 'false');
+    node.textContent = nextCtaDisabled ? labels.ctaDisabled : labels.cta;
+  });
+
+  if (dateOverlay) {
+    dateOverlay.hidden = !!(dateInput && dateInput.value);
+  }
+
+  window.dispatchEvent(new CustomEvent('pixkuy:tours-panel-ui-sync'));
 }
 
   function applyTourSelection(nextTourId) {
@@ -747,6 +908,8 @@ function ensureSelectedTourRowVisible() {
       tour_private_currency: state.currency
     };
 
+    detail.tour_private_date = getServicesDateFieldValue();
+
     window.dispatchEvent(new CustomEvent('pixkuy:tours-panel-submit', { detail }));
   }
 
@@ -801,8 +964,14 @@ function ensureSelectedTourRowVisible() {
 
       if (target.matches('[data-services-tours-date]')) {
         state.tripDate = target.value || '';
+
+        if (state.tripDate && !isServicesDateAtOrAfterMinimum(state.tripDate)) {
+          state.tripDate = '';
+          target.value = '';
+        }
+
         syncDerivedState();
-        renderConfig();
+        syncConfigComputedUi();
         return;
       }
 
@@ -815,6 +984,20 @@ function ensureSelectedTourRowVisible() {
 
     configMount.addEventListener('change', (event) => {
       if (state.pendingTourId) return;
+
+      const target = event.target;
+
+      if (target.matches('[data-services-tours-date]')) {
+        state.tripDate = target.value || '';
+
+        if (state.tripDate && !isServicesDateAtOrAfterMinimum(state.tripDate)) {
+          state.tripDate = '';
+          target.value = '';
+        }
+
+        syncDerivedState();
+        syncConfigComputedUi();
+      }
     });
 
     configMount.addEventListener('click', (event) => {

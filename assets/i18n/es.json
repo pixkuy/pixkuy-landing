@@ -51,7 +51,9 @@
   "clearResolvedDestination": "Borrar destino seleccionado",
   "destinationZoneLabel": "Zona",
   "passengersLabel": "Pasajeros",
-  "passengersPlaceholder": "Selecciona pasajeros",
+"dateLabel": "Fecha",
+"timeLabel": "Hora",
+"passengersPlaceholder": "Selecciona pasajeros",
   "fareValuePendingPassengers": "Selecciona pasajeros",
   "fareLabel": "Tarifa",
   "fareValue": "—",
@@ -222,7 +224,15 @@
       "airportHotelHelper": "Selecciona aeropuerto y hotel para preparar el trayecto.",
       "airportHotelAirportLabel": "Aeropuerto",
       "airportHotelAirportPlaceholder": "Selecciona aeropuerto",
-      "airportHotelHotelLabel": "Hotel"
+      "airportHotelHotelLabel": "Hotel",
+      "airportHotelDirectionAirportToHotel": "Aeropuerto → Hotel",
+      "airportHotelDirectionHotelToAirport": "Hotel → Aeropuerto",
+      "airportHotelSummaryTrip": "Trayecto",
+      "airportHotelSummaryAirport": "Aeropuerto",
+      "airportHotelSummaryHotel": "Hotel",
+      "airportHotelSummaryZone": "Zona",
+      "airportHotelSummaryPassengers": "Pasajeros",
+      "airportHotelSummaryFare": "Tarifa"
     },
     "footer": "Al enviar este formulario, nos autorizas a usar tus datos para responder a tu solicitud y organizar tu traslado."
   },

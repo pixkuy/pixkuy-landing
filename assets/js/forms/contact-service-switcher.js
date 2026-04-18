@@ -186,6 +186,7 @@
       activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private";
     const shouldHideSharedTripDateTime =
+      activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private";
     const shouldHideSharedLuggage =
       activeServiceType === "tour_private";

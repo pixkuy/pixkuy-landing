@@ -10,7 +10,8 @@
       "normalizeText",
       "getSelectedFareKey",
       "getZoneIdForFare",
-      "resolveFare"
+      "resolveFare",
+      "getTemporalPricingApi"
     ];
 
     required.forEach(function (key) {
@@ -83,6 +84,33 @@
       deps.normalizeText(state.destinationPlaceLabel).length > 0
     );
   }
+  
+    function hasValidTemporalServiceDate(state, deps) {
+    requireDeps(deps);
+
+    if (!state || typeof state !== "object") {
+      return false;
+    }
+
+    const temporalPricing = deps.getTemporalPricingApi();
+    const serviceDate =
+      typeof state.serviceDate === "string"
+        ? deps.normalizeText(state.serviceDate)
+        : "";
+
+    if (
+      !temporalPricing ||
+      typeof temporalPricing.shouldShowDateFieldInServices !== "function"
+    ) {
+      return true;
+    }
+
+    if (!temporalPricing.shouldShowDateFieldInServices()) {
+      return true;
+    }
+
+    return serviceDate.length > 0;
+  }
 
   function hasResolvableFare(state, deps) {
     requireDeps(deps);
@@ -107,6 +135,7 @@
     const passengersReady = hasPassengerSelection(state, deps);
     const destinationReady = hasRealDestinationInput(state, deps);
     const zoneReady = hasResolvableZone(state, deps);
+    const temporalDateReady = hasValidTemporalServiceDate(state, deps);
     const fareReady = hasResolvableFare(state, deps);
 
     const canNavigate =
@@ -114,6 +143,7 @@
       passengersReady &&
       destinationReady &&
       zoneReady &&
+      temporalDateReady &&
       fareReady;
 
     return {
@@ -121,6 +151,7 @@
       passengersReady: passengersReady,
       destinationReady: destinationReady,
       zoneReady: zoneReady,
+      temporalDateReady: temporalDateReady,
       fareReady: fareReady,
       canNavigate: canNavigate
     };

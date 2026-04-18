@@ -28,6 +28,9 @@
       serviceType: form.querySelector('input[name="service_type"]'),
       zone: form.querySelector('input[name="zone"]'),
       fare: form.querySelector('input[name="fare"]'),
+      airportHotelDate: form.querySelector('input[name="airport_hotel_date"]'),
+      airportHotelTime: form.querySelector('input[name="airport_hotel_time"]'),
+      passengerFareKey: form.querySelector('input[name="passenger_fare_key"]'),
 
       tourPrivateTourId: form.querySelector('input[name="tour_private_tour_id"]'),
       tourPrivateTourLabel: form.querySelector('input[name="tour_private_tour_label"]'),
@@ -414,25 +417,12 @@
     return true;
   }
 
-  function getSelectedAirportHotelFareKey() {
-    var bridge;
-    var bridgeState;
-    var selectedFareKey;
-
-    bridge = window.PixkuyAirportZoneTariff;
-
-    if (!bridge || typeof bridge !== 'object' || typeof bridge.getState !== 'function') {
+  function getSelectedAirportHotelFareKey(fields) {
+    if (!fields || !fields.passengerFareKey) {
       return '';
     }
 
-    bridgeState = bridge.getState();
-
-    if (!bridgeState || typeof bridgeState !== 'object') {
-      return '';
-    }
-
-    selectedFareKey = bridgeState.selectedFareKey;
-    return typeof selectedFareKey === 'string' ? selectedFareKey.trim() : '';
+    return getTrimmedValue(fields.passengerFareKey);
   }
 
   function hasAirportHotelFareKeySelected(data) {
@@ -467,7 +457,9 @@
       serviceType: fields.serviceType ? getTrimmedValue(fields.serviceType) : '',
       zone: fields.zone ? getTrimmedValue(fields.zone) : '',
       fare: fields.fare ? getTrimmedValue(fields.fare) : '',
-      passengerFareKey: getSelectedAirportHotelFareKey(),
+      airportHotelDate: fields.airportHotelDate ? getTrimmedValue(fields.airportHotelDate) : '',
+      airportHotelTime: fields.airportHotelTime ? getTrimmedValue(fields.airportHotelTime) : '',
+      passengerFareKey: getSelectedAirportHotelFareKey(fields),
 
       tourPrivateTourId: fields.tourPrivateTourId ? getTrimmedValue(fields.tourPrivateTourId) : '',
       tourPrivateTourLabel: fields.tourPrivateTourLabel ? getTrimmedValue(fields.tourPrivateTourLabel) : '',
@@ -500,9 +492,9 @@
       data.name &&
       isValidInternationalPhoneNumber(data.phone) &&
       data.email &&
-      data.tripDate &&
-      data.tripTime &&
       data.serviceType === 'airport_hotel' &&
+      data.airportHotelDate &&
+      data.airportHotelTime &&
       data.zone &&
       data.fare &&
       hasAirportHotelFareKeySelected(data) &&
@@ -569,9 +561,9 @@
       data.name &&
       isValidInternationalPhoneNumber(data.phone) &&
       isValidEmail(data.email) &&
-      data.tripDate &&
-      data.tripTime &&
       data.serviceType === 'airport_hotel' &&
+      data.airportHotelDate &&
+      data.airportHotelTime &&
       data.zone &&
       data.fare &&
       hasAirportHotelFareKeySelected(data) &&
@@ -873,14 +865,22 @@
       name: Boolean(data.name),
       phone: isValidInternationalPhoneNumber(data.phone),
       email: Boolean(data.email) && isValidEmail(data.email),
-      trip_date: !hasMobileMinimumViolation &&
-        Boolean(data.tripDate) &&
-        Boolean(data.tripTime) &&
-        isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime),
-      trip_time: !hasMobileMinimumViolation &&
-        Boolean(data.tripTime) &&
-        Boolean(data.tripDate) &&
-        isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime),
+      trip_date: data.serviceType === 'airport_hotel'
+        ? Boolean(data.airportHotelDate)
+        : (
+            !hasMobileMinimumViolation &&
+            Boolean(data.tripDate) &&
+            Boolean(data.tripTime) &&
+            isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime)
+          ),
+      trip_time: data.serviceType === 'airport_hotel'
+        ? true
+        : (
+            !hasMobileMinimumViolation &&
+            Boolean(data.tripTime) &&
+            Boolean(data.tripDate) &&
+            isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime)
+          ),
       origin: (
         data.serviceType === 'airport_hotel' ||
         data.serviceType === 'tour_private'
@@ -922,6 +922,10 @@
       case 'phone':
         return isValidInternationalPhoneNumber(data.phone);
       case 'trip_date':
+        if (data.serviceType === 'airport_hotel') {
+          return Boolean(data.airportHotelDate);
+        }
+
         if (hasAnyMobileDateTimeMinimumViolation(fields)) {
           return false;
         }
@@ -936,6 +940,10 @@
 
         return isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime);
       case 'trip_time':
+        if (data.serviceType === 'airport_hotel') {
+          return true;
+        }
+
         if (hasAnyMobileDateTimeMinimumViolation(fields)) {
           return false;
         }
