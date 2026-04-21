@@ -35,15 +35,15 @@
   // Registro centralizado de fragmentos opcionales por idioma.
   // Primera apertura: tours como nuevo dominio modular.
   var I18N_OPTIONAL_FRAGMENTS = {
-    es: ["services-tours", "brand-collaborations"],
-    en: ["services-tours", "brand-collaborations"],
-    ru: ["services-tours", "brand-collaborations"],
-    fr: ["services-tours", "brand-collaborations"],
-    pt: ["services-tours", "brand-collaborations"],
-    it: ["services-tours", "brand-collaborations"],
-    de: ["services-tours", "brand-collaborations"],
-    ko: ["services-tours", "brand-collaborations"],
-    "zh-hans": ["services-tours", "brand-collaborations"]
+    es: ["services-tours", "services-hourly", "brand-collaborations"],
+    en: ["services-tours", "services-hourly", "brand-collaborations"],
+    ru: ["services-tours", "services-hourly", "brand-collaborations"],
+    fr: ["services-tours", "services-hourly", "brand-collaborations"],
+    pt: ["services-tours", "services-hourly", "brand-collaborations"],
+    it: ["services-tours", "services-hourly", "brand-collaborations"],
+    de: ["services-tours", "services-hourly", "brand-collaborations"],
+    ko: ["services-tours", "services-hourly", "brand-collaborations"],
+    "zh-hans": ["services-tours", "services-hourly", "brand-collaborations"]
   };
 
   function isDevHost() {

@@ -1,0 +1,850 @@
+/* assets/css/38-services-hourly.css
+   UI específica del panel Conductor por horas / día completo dentro de services.
+   Alcance:
+   - services-hourly-panel
+   - tabs de modalidad
+   - layout desktop del panel
+   - chips de duración / planes largos
+   - bloque de vehículo
+   - textarea de notas
+   - disclaimers
+   - precio + CTA
+   NO incluir:
+   - core compartido de services
+   - móvil sheet
+   - #contact
+*/
+
+.services-hourly-panel{
+  margin-top:22px;
+  display:grid;
+  gap:18px;
+}
+
+.services-expand__panel[data-service-panel="hourly"] .services-expand__text{
+  max-width:none;
+}
+
+.services-hourly-panel__config,
+.services-hourly-panel__config[hidden]{
+  min-width:0;
+}
+
+.services-hourly-panel__config[hidden]{
+  display:none !important;
+}
+
+.services-hourly-panel__config{
+  display:grid;
+  gap:16px;
+  padding:20px 18px 18px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:rgba(255,255,255,.02);
+}
+
+.services-hourly-panel__config-head{
+  display:grid;
+  gap:10px;
+}
+
+.services-hourly-panel__tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.services-hourly-panel__tab{
+  min-height:42px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 14px;
+  border:1px solid rgba(236,220,189,.24);
+  border-radius:12px;
+  background:rgba(22,18,17,.56);
+  color:rgba(255,249,238,.92);
+  font:inherit;
+  font-size:14px;
+  line-height:1.1;
+  font-weight:600;
+  cursor:pointer;
+  transition:
+    border-color .16s ease,
+    background-color .16s ease,
+    color .16s ease,
+    box-shadow .16s ease;
+}
+
+.services-hourly-panel__tab:hover{
+  border-color:rgba(255,255,255,.20);
+  background:rgba(255,255,255,.05);
+  color:var(--fg);
+}
+
+.services-hourly-panel__tab:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:2px;
+}
+
+.services-hourly-panel__tab.is-active,
+.services-hourly-panel__tab[aria-pressed="true"]{
+  border-color:rgba(31,122,109,.66);
+  background:rgba(31,122,109,.14);
+  color:var(--fg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(31,122,109,.16);
+}
+
+.services-hourly-panel__layout{
+  display:grid;
+  gap:16px;
+}
+
+.services-hourly-panel__row{
+  display:grid;
+  gap:14px;
+  min-width:0;
+}
+
+.services-hourly-panel__row--top{
+  display:grid;
+  grid-template-columns:320px 170px 120px minmax(0, 1fr) 178px;
+  grid-template-areas:
+    "vehicle pickup pickup pickup price"
+    "vehicle date   time   .      .";
+  gap:16px;
+  align-items:start;
+}
+
+.services-hourly-panel__row--middle{
+  display:grid;
+  grid-template-columns:320px minmax(0, 1fr);
+  grid-template-areas:"duration notes";
+  gap:18px;
+  align-items:start;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="full_day"] .services-hourly-panel__row--middle{
+  grid-template-columns:minmax(0, 1fr);
+  grid-template-areas:"notes";
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="full_day"] .services-hourly-panel__field--notes{
+  width:100%;
+  max-width:none;
+  justify-self:stretch;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__row--middle{
+  grid-template-columns:280px minmax(0, 1fr);
+  grid-template-areas:"duration notes";
+  gap:20px;
+  align-items:start;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__field--long-term{
+  width:280px;
+  max-width:100%;
+  justify-self:start;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__field--notes{
+  width:100%;
+  max-width:none;
+  justify-self:stretch;
+}
+
+.services-hourly-panel__row--bottom,
+.services-hourly-panel__row--cta{
+  grid-template-columns:minmax(0, 1fr);
+}
+
+.services-hourly-panel__field{
+  display:grid;
+  gap:8px;
+  min-width:0;
+}
+
+.services-hourly-panel__field--pickup,
+.services-hourly-panel__field--vehicle,
+.services-hourly-panel__field--date,
+.services-hourly-panel__field--time{
+  min-width:0;
+}
+
+.services-hourly-panel__field--pickup{
+  grid-area:pickup;
+}
+
+.services-hourly-panel__field--vehicle{
+  grid-area:vehicle;
+  align-self:stretch;
+}
+
+.services-hourly-panel__field--date{
+  grid-area:date;
+  transform:translateY(-18px);
+}
+
+.services-hourly-panel__field--time{
+  grid-area:time;
+  transform:translateY(-18px);
+}
+
+.services-hourly-panel__field--duration,
+.services-hourly-panel__field--long-term{
+  min-width:0;
+  grid-area:duration;
+}
+
+.services-hourly-panel__field--duration{
+  width:320px;
+  max-width:100%;
+  justify-self:start;
+}
+
+.services-hourly-panel__field--notes{
+  min-width:0;
+  grid-area:notes;
+  width:700px;
+  max-width:100%;
+  justify-self:end;
+}
+
+.services-hourly-panel__label{
+  display:block;
+  font-size:13px;
+  line-height:1.2;
+  font-weight:700;
+  color:rgba(255,247,230,.98);
+}
+
+.services-hourly-panel__notes-helper{
+  margin:0 0 2px;
+  font-size:13px;
+  line-height:1.45;
+  color:rgba(255,245,228,.72);
+}
+
+.services-hourly-panel__control{
+  width:100%;
+  min-height:56px;
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.30);
+  background:rgba(22,18,17,.62);
+  color:rgba(255,249,238,.98);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.08);
+}
+
+.services-hourly-panel__control::placeholder{
+  color:rgba(255,249,238,.62);
+}
+
+.services-hourly-panel__control--textarea{
+  min-height:148px;
+  display:block;
+  padding:14px 16px;
+  resize:vertical;
+  font:inherit;
+  line-height:1.55;
+}
+
+.services-hourly-panel__date-wrap{
+  position:relative;
+  min-width:0;
+}
+
+.services-hourly-panel__date-overlay{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:14px;
+  line-height:1;
+  color:rgba(255,249,238,.62);
+  pointer-events:none;
+  z-index:2;
+}
+
+.services-hourly-panel__date-overlay[hidden]{
+  display:none !important;
+}
+
+@media (min-width: 721px){
+  .services-hourly-panel__date-overlay{
+    display:none !important;
+  }
+}
+
+.services-hourly-panel__date-icon{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
+  color:rgba(255,249,238,.92);
+  pointer-events:none;
+  z-index:2;
+}
+
+.services-hourly-panel__field--date .services-hourly-panel__control,
+.services-hourly-panel__field--time .services-hourly-panel__control{
+  min-height:48px;
+  height:48px;
+  border-radius:13px;
+}
+
+.services-hourly-panel__field--date .services-hourly-panel__control{
+  padding-right:34px;
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+.services-hourly-panel__field--time .services-hourly-panel__control{
+  padding-right:34px;
+}
+
+.services-hourly-panel__field--date .services-hourly-panel__control::-webkit-calendar-picker-indicator{
+  position:absolute;
+  top:50%;
+  right:0;
+  transform:translateY(-50%);
+  width:34px;
+  height:48px;
+  margin:0;
+  opacity:0;
+  cursor:pointer;
+}
+
+.services-hourly-panel__field--time .services-hourly-panel__control::-webkit-calendar-picker-indicator{
+  opacity:0;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  cursor:pointer;
+}
+
+.services-hourly-panel__vehicle{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  align-items:start;
+  min-height:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+
+.services-hourly-panel__vehicle-media{
+  position:relative;
+  width:100%;
+  height:146px;
+  overflow:hidden;
+  border-radius:14px;
+  background:transparent;
+}
+
+.services-hourly-panel__vehicle-image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 77%;
+  border-radius:14px;
+}
+
+.services-hourly-panel__vehicle-copy{
+  min-width:0;
+  display:grid;
+  gap:0;
+}
+
+.services-hourly-panel__vehicle-name{
+  font-size:16px;
+  line-height:1.25;
+  color:var(--fg);
+}
+
+.services-hourly-panel__chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.services-hourly-panel__duration-rows{
+  display:grid;
+  gap:8px;
+  width:100%;
+}
+
+.services-hourly-panel__duration-row{
+  display:grid;
+  gap:8px;
+  width:100%;
+}
+
+.services-hourly-panel__duration-row--four{
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+}
+
+.services-hourly-panel__duration-row--single{
+  grid-template-columns:1fr;
+}
+
+.services-hourly-panel__chip--full{
+  width:100%;
+}
+
+.services-hourly-panel__chip{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-width:0;
+  width:100%;
+  padding:0 12px;
+  border:1px solid rgba(236,220,189,.28);
+  border-radius:13px;
+  background:rgba(22,18,17,.56);
+  color:rgba(255,249,238,.90);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.06);
+  cursor:pointer;
+  transition:
+    border-color .16s ease,
+    background-color .16s ease,
+    color .16s ease,
+    box-shadow .16s ease;
+}
+
+.services-hourly-panel__chip:hover{
+  border-color:rgba(255,255,255,.20);
+  background:rgba(255,255,255,.05);
+  color:var(--fg);
+}
+
+.services-hourly-panel__chip:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:2px;
+}
+
+.services-hourly-panel__chip.is-active,
+.services-hourly-panel__chip[aria-pressed="true"]{
+  border-color:rgba(31,122,109,.66);
+  background:rgba(31,122,109,.14);
+  color:var(--fg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(31,122,109,.16);
+}
+
+.services-hourly-panel__meta{
+  display:grid;
+  gap:10px;
+}
+
+.services-hourly-panel__disclaimers-groups{
+  display:grid;
+  grid-template-columns:minmax(0, 2fr) minmax(260px, 1fr);
+  gap:22px;
+  align-items:start;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__disclaimers-groups{
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:18px;
+}
+
+.services-hourly-panel__disclaimer-group{
+  display:grid;
+  gap:8px;
+  align-content:start;
+  min-width:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__disclaimer-group{
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+.services-hourly-panel__disclaimer-group--includes-wide{
+  grid-column:1;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__disclaimer-group--includes-wide{
+  grid-column:auto;
+}
+
+.services-hourly-panel__disclaimer-group--supplements{
+  grid-column:2;
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__disclaimer-group--supplements{
+  grid-column:auto;
+}
+
+.services-hourly-panel__disclaimer-title{
+  margin:0;
+  padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.10);
+  font-size:11px;
+  line-height:1.2;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(255,245,228,.72);
+}
+
+.services-hourly-panel__disclaimer-group:nth-child(1) .services-hourly-panel__disclaimer-title{
+  color:rgba(226,211,178,.88);
+  border-top-color:rgba(226,211,178,.24);
+}
+
+.services-hourly-panel__disclaimer-group:nth-child(2) .services-hourly-panel__disclaimer-title{
+  color:rgba(247,226,170,.92);
+  border-top-color:rgba(247,226,170,.30);
+}
+
+.services-hourly-panel__disclaimer-group:nth-child(3) .services-hourly-panel__disclaimer-title{
+  color:rgba(255,214,143,.96);
+  border-top-color:rgba(255,214,143,.34);
+}
+
+.services-hourly-panel__disclaimers{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  gap:6px;
+}
+
+.services-hourly-panel__disclaimers-columns{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:18px;
+  align-items:start;
+}
+
+.services-hourly-panel__disclaimers li{
+  position:relative;
+  padding-left:12px;
+  margin:0;
+  font-size:13px;
+  line-height:1.45;
+  color:rgba(255,245,228,.82);
+}
+
+.services-hourly-panel__disclaimers li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.56em;
+  width:4px;
+  height:4px;
+  border-radius:999px;
+  background:currentColor;
+}
+
+.services-hourly-panel__price--inline{
+  grid-area:price;
+  min-height:0;
+  align-self:start;
+  margin-top:22px;
+  display:grid;
+  gap:6px;
+  padding:14px 16px;
+  border-radius:16px;
+  border:1px solid rgba(247,226,170,.52);
+  background:linear-gradient(180deg, rgba(255,242,214,.18) 0%, rgba(255,226,178,.12) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.16),
+    0 10px 22px rgba(0,0,0,.12);
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__price--inline{
+  border-color:rgba(31,122,109,.34);
+  background:linear-gradient(180deg, rgba(31,122,109,.16) 0%, rgba(31,122,109,.08) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 10px 22px rgba(0,0,0,.10);
+}
+
+.services-hourly-panel__price-label{
+  margin:0;
+  font-size:12px;
+  line-height:1.2;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(255,245,228,.72);
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__price-label{
+  color:rgba(214,240,233,.78);
+}
+
+.services-hourly-panel__price-value{
+  margin:0;
+  font-size:clamp(16px, 1.7vw, 24px);
+  line-height:1.05;
+  letter-spacing:-0.02em;
+  white-space:nowrap;
+  color:rgba(255,224,140,.98);
+}
+
+.services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__price-value{
+  font-size:clamp(14px, 1.35vw, 18px);
+  line-height:1.15;
+  letter-spacing:-0.01em;
+  white-space:normal;
+  text-wrap:balance;
+  color:rgba(232,248,244,.96);
+}
+
+.services-hourly-panel__cta{
+  min-height:48px;
+  padding:0 22px;
+  border:1px solid rgba(48,118,109,.72);
+  border-radius:999px;
+  background:linear-gradient(180deg, rgba(27,92,86,.96) 0%, rgba(18,71,67,.96) 100%);
+  color:rgba(255,248,236,.98);
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:
+    0 12px 26px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  transition:
+    border-color .18s ease,
+    background-color .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.services-hourly-panel__cta:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.12);
+  transform:translateY(-1px);
+  box-shadow:0 12px 24px rgba(0,0,0,.18);
+}
+
+.services-hourly-panel__cta--full{
+  width:100%;
+  justify-content:center;
+}
+
+.services-hourly-panel__cta[disabled],
+.services-hourly-panel__cta[aria-disabled="true"]{
+  cursor:not-allowed;
+  border-color:rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06);
+  color:rgba(244,242,238,.58);
+  box-shadow:none;
+  transform:none;
+  opacity:1;
+}
+
+.services-hourly-panel__cta[disabled]:hover,
+.services-hourly-panel__cta[aria-disabled="true"]:hover{
+  border-color:rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06);
+  color:rgba(244,242,238,.58);
+  box-shadow:none;
+  transform:none;
+}
+
+@media (max-width: 1024px){
+  .services-hourly-panel__row--top{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "vehicle pickup"
+      "vehicle price"
+      "date time";
+    gap:16px;
+  }
+
+  .services-hourly-panel__row--middle{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "duration"
+      "notes";
+  }
+
+  .services-hourly-panel__disclaimers-groups{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+
+  .services-hourly-panel__disclaimer-group{
+    padding:0;
+  }
+
+  .services-hourly-panel__disclaimer-group--includes-wide,
+  .services-hourly-panel__disclaimer-group--supplements{
+    grid-column:auto;
+  }
+
+  .services-hourly-panel__disclaimers-columns{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .services-hourly-panel__disclaimers{
+    gap:6px;
+  }
+
+  .services-hourly-panel__price--inline{
+    width:100%;
+    min-width:0;
+    max-width:none;
+  }
+
+  .services-hourly-panel__vehicle{
+    grid-template-columns:1fr;
+    min-height:0;
+  }
+
+  .services-hourly-panel__vehicle-media{
+    width:100%;
+    height:118px;
+  }
+}
+
+@media (max-width: 720px){
+  .services-hourly-panel{
+    margin-top:18px;
+    gap:14px;
+  }
+
+  .services-hourly-panel__config{
+    gap:14px;
+    padding:16px;
+    border-radius:14px;
+  }
+
+  .services-hourly-panel__layout{
+    gap:14px;
+  }
+
+  .services-hourly-panel__row,
+  .services-hourly-panel__row--top,
+  .services-hourly-panel__row--middle,
+  .services-hourly-panel__row--bottom,
+  .services-hourly-panel__row--cta{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .services-hourly-panel__tabs{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .services-hourly-panel__tab{
+    min-height:44px;
+    border-radius:12px;
+  }
+
+  .services-hourly-panel__field--pickup,
+  .services-hourly-panel__field--vehicle,
+  .services-hourly-panel__field--date,
+  .services-hourly-panel__field--time{
+    width:auto;
+    min-width:0;
+    flex:none;
+  }
+
+  .services-hourly-panel__vehicle{
+    grid-template-columns:76px minmax(0, 1fr);
+    min-height:76px;
+    border-radius:12px;
+  }
+
+  .services-hourly-panel__vehicle-media{
+    width:76px;
+    height:58px;
+    border-radius:10px;
+  }
+
+  .services-hourly-panel__chips{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:8px;
+  }
+
+  .services-hourly-panel__chip{
+    min-width:0;
+    width:100%;
+    min-height:50px;
+    padding:0 10px;
+    border-radius:12px;
+    font-size:13px;
+  }
+
+  .services-hourly-panel__control{
+    min-height:52px;
+    border-radius:14px;
+  }
+
+  .services-hourly-panel__control--textarea{
+    min-height:132px;
+  }
+
+  .services-hourly-panel__field--date .services-hourly-panel__control,
+  .services-hourly-panel__field--time .services-hourly-panel__control{
+    min-height:50px;
+    height:50px;
+    padding:0 34px 0 14px;
+    box-sizing:border-box;
+  }
+
+  .services-hourly-panel__date-overlay{
+    left:14px;
+    font-size:14px;
+    white-space:nowrap;
+  }
+
+  .services-hourly-panel__date-icon{
+    right:12px;
+    width:16px;
+    height:16px;
+  }
+
+  .services-hourly-panel__price--inline{
+    width:100%;
+    min-width:0;
+    max-width:none;
+    margin-left:0;
+    padding:12px 14px;
+    border-radius:14px;
+  }
+
+  .services-hourly-panel__price-value{
+    font-size:26px;
+  }
+
+  .services-hourly-panel__cta{
+    width:100%;
+    min-height:54px;
+    justify-content:center;
+  }
+}

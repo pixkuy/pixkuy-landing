@@ -96,6 +96,17 @@
     );
   }
   
+  function bootContactHourlyDailyEditor() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initContactHourlyDailyEditor,
+      'initContactHourlyDailyEditor'
+    );
+  }
+  
   function bootPanelHandoffSummary() {
     if (!window.PixkuyForms) {
       return false;
@@ -178,6 +189,30 @@
 
     return true;
   }
+  
+  function focusHourlyDailyPrimaryField(form) {
+    var target;
+
+    if (!form) {
+      return false;
+    }
+
+    target = form.querySelector('#contact-name');
+
+    if (!target || typeof target.focus !== 'function') {
+      return false;
+    }
+
+    window.setTimeout(function () {
+      target.focus();
+
+      if (typeof target.select === 'function') {
+        target.select();
+      }
+    }, 0);
+
+    return true;
+  }
 
   function bindToursPanelHandoff() {
     var formsNamespace;
@@ -243,6 +278,71 @@
     formsNamespace.__tourPrivateHandoffBound = true;
     return true;
   }
+
+  function bindHourlyDailyPanelHandoff() {
+    var formsNamespace;
+    var serviceStateApi;
+
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    formsNamespace = window.PixkuyForms;
+    serviceStateApi = getContactServiceStateApi();
+
+    if (
+      !serviceStateApi ||
+      typeof serviceStateApi.setActiveServiceType !== 'function' ||
+      typeof formsNamespace.applyContactHourlyDailyHandoff !== 'function'
+    ) {
+      return false;
+    }
+
+    if (formsNamespace.__hourlyDailyHandoffBound === true) {
+      return true;
+    }
+
+    window.addEventListener('pixkuy:hourly-daily-panel-submit', function (event) {
+      var detail;
+      var form;
+      var result;
+
+      detail = event && event.detail && typeof event.detail === 'object'
+        ? event.detail
+        : null;
+
+      if (detail && typeof detail === 'object') {
+        detail.hourly_daily_date = typeof detail.hourly_daily_date === 'string'
+          ? detail.hourly_daily_date.trim()
+          : '';
+      }
+
+      if (!detail) {
+        return;
+      }
+
+      form = getReservationForm();
+
+      if (!form) {
+        return;
+      }
+
+      result = serviceStateApi.setActiveServiceType('hourly_daily', {
+        source: 'hourly-daily-panel-handoff'
+      });
+
+      if (!result || result.ok !== true) {
+        return;
+      }
+
+      formsNamespace.applyContactHourlyDailyHandoff(detail);
+      scrollToContactSection(form);
+      focusHourlyDailyPrimaryField(form);
+    });
+
+    formsNamespace.__hourlyDailyHandoffBound = true;
+    return true;
+  }
   
   function getDocumentLanguage() {
     var language = document.documentElement && document.documentElement.lang;
@@ -271,9 +371,14 @@
       return null;
     }
 
-    hiddenFieldBaseName = fieldName === 'tour_private_pickup'
-      ? 'tour_private_pickup'
-      : fieldName;
+    hiddenFieldBaseName =
+      fieldName === 'tour_private_pickup'
+        ? 'tour_private_pickup'
+        : (
+            fieldName === 'hourly_daily_pickup'
+              ? 'hourly_daily_pickup'
+              : fieldName
+          );
 
     return {
       input: form.querySelector('[data-place-input="' + fieldName + '"]'),
@@ -364,6 +469,14 @@
               formsNamespace.setContactTourPrivatePickupPlace(selectedPlace);
             }
             focusFormField(form, 'contact-tour-private-date');
+            return;
+          }
+
+          if (fieldName === 'hourly_daily_pickup') {
+            if (typeof formsNamespace.setContactHourlyDailyPickupPlace === 'function') {
+              formsNamespace.setContactHourlyDailyPickupPlace(selectedPlace);
+            }
+            focusFormField(form, 'contact-hourly-daily-date');
             return;
           }
 
@@ -526,7 +639,7 @@
       previousServiceType = String(detail.previousServiceType || '').trim();
       nextServiceType = String(detail.nextServiceType || '').trim();
 
-      if (
+          if (
         previousServiceType === 'tour_private' &&
         nextServiceType !== 'tour_private'
       ) {
@@ -556,6 +669,37 @@
           }, 0);
         }
       }
+
+      if (
+        previousServiceType === 'hourly_daily' &&
+        nextServiceType !== 'hourly_daily'
+      ) {
+        controller =
+          formsNamespace.placeControllers &&
+          formsNamespace.placeControllers.hourly_daily_pickup
+            ? formsNamespace.placeControllers.hourly_daily_pickup
+            : null;
+
+        if (controller && typeof controller.destroy === 'function') {
+          window.setTimeout(function () {
+            controller.destroy();
+
+            if (formsNamespace.placeControllers) {
+              delete formsNamespace.placeControllers.hourly_daily_pickup;
+            }
+
+            bootstrapState =
+              formsNamespace.placeBootstrapState &&
+              formsNamespace.placeBootstrapState.hourly_daily_pickup
+                ? formsNamespace.placeBootstrapState.hourly_daily_pickup
+                : null;
+
+            if (bootstrapState && typeof bootstrapState.reset === 'function') {
+              bootstrapState.reset();
+            }
+          }, 0);
+        }
+      }
     });
 
     formsNamespace.__placeControllerServiceCleanupBound = true;
@@ -575,8 +719,10 @@
     bootContactAirportHotelEditor();
     bootContactAirportHotelLodgingAdapter();
     bootContactTourPrivateEditor();
+    bootContactHourlyDailyEditor();
     bootPanelHandoffSummary();
     bindToursPanelHandoff();
+    bindHourlyDailyPanelHandoff();
     bootWhatsappHandoff();
     bootGooglePlacesOnFocus();
 

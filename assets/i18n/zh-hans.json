@@ -1,6 +1,8 @@
 {
   "ui": {
-    "language": "语言"
+    "language": "语言",
+    "yes": "是",
+    "no": "否"
   },
   "hero": {
     "title": "从第一公里开始，以舒适、克制与精准完成每一次出行。",
@@ -185,7 +187,10 @@
   "tourPrivatePickupRequired": "请输入接载地点。",
   "tourPrivateDateRequired": "请选择游览日期。",
   "tourPrivateTimeRequired": "请选择出发时间。",
-  "tourPrivateGuideLanguageRequired": "请选择导游语言。"
+  "tourPrivateGuideLanguageRequired": "请选择导游语言。",
+  "hourlyDailyPickupRequired": "请输入接载地点。",
+  "hourlyDailyDateRequired": "请选择服务日期。",
+  "hourlyDailyTimeRequired": "请选择接载时间。"
 },
     "whatsappMessage": {
   "intro": "您好，我想通过 Pixkuy 申请一次接送服务。",
@@ -222,6 +227,7 @@
   "switcherAriaLabel": "服务类型选择器",
   "airportHotel": "机场与酒店",
   "tourPrivate": "私人游览与参观",
+  "hourlyDaily": "按小时或按天",
   "other": "其他服务",
   "confirmChangeSpecificData": "如果您更改服务，当前服务的专属数据将会丢失。是否继续？",
   "confirmAccept": "继续",

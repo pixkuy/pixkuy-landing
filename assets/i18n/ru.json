@@ -1,6 +1,8 @@
 {
   "ui": {
-    "language": "Язык"
+    "language": "Язык",
+    "yes": "Да",
+    "no": "Нет"
   },
   "hero": {
     "title": "Каждая поездка — с комфортом, сдержанностью и точностью с первого километра.",
@@ -185,7 +187,10 @@
   "tourPrivatePickupRequired": "Укажите точку посадки.",
   "tourPrivateDateRequired": "Выберите дату тура.",
   "tourPrivateTimeRequired": "Выберите время отправления.",
-  "tourPrivateGuideLanguageRequired": "Выберите язык гида."
+  "tourPrivateGuideLanguageRequired": "Выберите язык гида.",
+  "hourlyDailyPickupRequired": "Укажите точку посадки.",
+  "hourlyDailyDateRequired": "Выберите дату сервиса.",
+  "hourlyDailyTimeRequired": "Выберите время подачи."
 },
     "whatsappMessage": {
   "intro": "Здравствуйте, я хотел(а) бы запросить трансфер с Pixkuy.",
@@ -222,6 +227,7 @@
   "switcherAriaLabel": "Выбор типа сервиса",
   "airportHotel": "Аэропорт и отель",
   "tourPrivate": "Частные туры и визиты",
+  "hourlyDaily": "Почасово или на день",
   "other": "Другой сервис",
   "confirmChangeSpecificData": "Если вы измените сервис, специфические данные текущего сервиса будут потеряны. Хотите продолжить?",
   "confirmAccept": "Продолжить",

@@ -1,6 +1,8 @@
 {
   "ui": {
-    "language": "언어"
+    "language": "언어",
+    "yes": "예",
+    "no": "아니요"
   },
   "hero": {
     "title": "첫 순간부터 편안함, 절제, 그리고 정확함으로 이어지는 이동.",
@@ -185,7 +187,10 @@
   "tourPrivatePickupRequired": "픽업 지점을 입력해 주세요.",
   "tourPrivateDateRequired": "투어 날짜를 선택해 주세요.",
   "tourPrivateTimeRequired": "출발 시간을 선택해 주세요.",
-  "tourPrivateGuideLanguageRequired": "가이드 언어를 선택해 주세요."
+  "tourPrivateGuideLanguageRequired": "가이드 언어를 선택해 주세요.",
+  "hourlyDailyPickupRequired": "픽업 지점을 입력해 주세요.",
+  "hourlyDailyDateRequired": "서비스 날짜를 선택해 주세요.",
+  "hourlyDailyTimeRequired": "픽업 시간을 선택해 주세요."
 },
     "whatsappMessage": {
   "intro": "안녕하세요, Pixkuy로 이동 서비스를 요청하고 싶습니다.",
@@ -222,6 +227,7 @@
   "switcherAriaLabel": "서비스 유형 선택기",
   "airportHotel": "공항 및 호텔",
   "tourPrivate": "프라이빗 투어 및 방문",
+  "hourlyDaily": "시간 또는 일 단위",
   "other": "기타 서비스",
   "confirmChangeSpecificData": "서비스를 변경하면 현재 서비스의 전용 데이터가 사라집니다. 계속하시겠습니까?",
   "confirmAccept": "계속",

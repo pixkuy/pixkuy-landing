@@ -652,6 +652,7 @@ if (placesLibraryPromise) {
     var formsNamespace;
     var form;
     var fields;
+    var validationFieldName;
 
     if (!input) {
       return;
@@ -664,6 +665,12 @@ if (placesLibraryPromise) {
       return;
     }
 
+    validationFieldName = getString(input.name);
+
+    if (!validationFieldName && isFunction(input.getAttribute)) {
+      validationFieldName = getString(input.getAttribute('data-place-input'));
+    }
+
     if (
       isFunction(formsNamespace.getReservationRequestFields) &&
       isFunction(formsNamespace.syncReservationRequestState)
@@ -673,8 +680,11 @@ if (placesLibraryPromise) {
       if (fields) {
         formsNamespace.syncReservationRequestState(fields);
 
-        if (isFunction(formsNamespace.refreshReservationRequestValidationUX)) {
-          formsNamespace.refreshReservationRequestValidationUX(fields, input.name);
+        if (
+          validationFieldName &&
+          isFunction(formsNamespace.refreshReservationRequestValidationUX)
+        ) {
+          formsNamespace.refreshReservationRequestValidationUX(fields, validationFieldName);
         }
       }
     }

@@ -1,0 +1,89 @@
+{
+  "services": {
+    "cards": {
+      "hourly": {
+        "title": "By the hour or by the day",
+        "text": "A flexible service for schedules, meetings and journeys with multiple stops.",
+        "contact": {
+          "helper": "Set the mode, pickup, date and time to prepare the request."
+        },
+        "bullets": [
+          "Flexible availability",
+          "Multiple stops",
+          "Continuity"
+        ],
+        "priceLabel": "Price from",
+        "priceValue": "4.500 MXN",
+        "ctaClosed": "View details",
+        "ctaOpen": "Hide details",
+        "panel": {
+          "title": "Driver by the hour / full day",
+          "text": "Set the mode, date and pickup time to see the final service price.",
+          "modeLabel": "Mode",
+          "pickupLabel": "Pickup point",
+          "pickupPlaceholder": "Enter pickup point",
+          "vehicleLabel": "Vehicle",
+          "dateLabel": "Date",
+          "timeLabel": "Pickup time",
+          "durationLabel": "Duration",
+          "longTermDurationLabel": "Requested period",
+          "notesLabel": "Notes / Itinerary",
+          "longTermNotesLabel": "Agenda / operations",
+          "notesPlaceholder": "Add stops, agenda or relevant instructions",
+          "longTermNotesPlaceholder": "Example: corporate service for 2 weeks, daily transfers, variable agenda and availability in CDMX",
+          "fullDayNotesHelper": "Book the vehicle for a full day, with a fixed rate and room for a flexible agenda.",
+          "longTermNotesHelper": "Indicate dates, type of use, approximate schedules, base city, expected trips and any relevant operational needs.",
+          "priceLabel": "Final price",
+          "fullDayPriceLabel": "Day rate",
+          "longTermPriceLabel": "Rate",
+          "longTermPriceValue": "According to operation",
+          "priceValuePending": "—",
+          "cta": "Request",
+          "ctaDisabled": "Complete the configuration",
+          "tabs": {
+            "hourly": "By the hour",
+            "fullDay": "Full day",
+            "longTerm": "Long-term plans"
+          },
+          "vehicles": {
+            "executive_van": "Executive van"
+          },
+          "longTerm": {
+            "week": "Week",
+            "fortnight": "15 days",
+            "monthly": "Monthly",
+            "custom": "Other period"
+          },
+          "disclaimers": {
+            "includesTitle": "Includes",
+            "supplementsTitle": "Possible supplements",
+            "includesServiceKm": "40 km included per booked hour",
+            "fullDayIncludesKm": "Up to 12 service hours and 500 km per day",
+            "includesServiceWifi": "On-board Wi-Fi",
+            "includesServiceWater": "Water and amenities",
+            "includesVanPassengers": "Up to 6 passengers",
+            "includesVanUsb": "USB and USB-C connectors",
+            "includesVanSeats": "Captain seats in the second row with independent climate control",
+            "extraHourExtension": "Service extension in full 1-hour blocks: 1.300 MXN",
+            "fullDayExtraKm": "35 MXN per additional km after 500 km per day",
+            "fullDayExtensionPolicy": "Extensions subject to availability and operational validation",
+            "extraKm": "35 MXN per additional km",
+            "outOfZone": "+4.500 MXN if the service ends outside the operating zone",
+            "longTermApproachTitle": "Service approach",
+            "longTermApproach1": "Configuration adapted to the operation",
+            "longTermApproach2": "Executive vehicle and driver",
+            "longTermApproach3": "Continuity for multi-day schedules",
+            "longTermPricingTitle": "How the proposal is defined",
+            "longTermPricing1": "According to the requested period",
+            "longTermPricing2": "According to expected use and coverage",
+            "longTermPricing3": "According to schedules, mileage and availability",
+            "longTermValidationTitle": "Operational validation",
+            "longTermValidation1": "Subject to real availability",
+            "longTermValidation2": "Prior operational confirmation",
+            "longTermValidation3": "Final conditions according to the requested service"
+          }
+        }
+      }
+    }
+  }
+}

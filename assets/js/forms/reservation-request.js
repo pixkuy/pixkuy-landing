@@ -48,6 +48,24 @@
       tourPrivatePrice: form.querySelector('input[name="tour_private_price"]'),
       tourPrivateCurrency: form.querySelector('input[name="tour_private_currency"]'),
 
+      hourlyDailyVisiblePickup: form.querySelector('[data-contact-hourly-daily-pickup]'),
+      hourlyDailyVisibleDate: form.querySelector('[data-contact-hourly-daily-date]'),
+      hourlyDailyVisibleTime: form.querySelector('[data-contact-hourly-daily-time]'),
+
+      hourlyDailyMode: form.querySelector('input[name="hourly_daily_mode"]'),
+      hourlyDailyVehicleType: form.querySelector('input[name="hourly_daily_vehicle_type"]'),
+      hourlyDailyPickup: form.querySelector('input[name="hourly_daily_pickup"]'),
+      hourlyDailyPickupPlaceId: form.querySelector('input[name="hourly_daily_pickup_place_id"]'),
+      hourlyDailyPickupLat: form.querySelector('input[name="hourly_daily_pickup_lat"]'),
+      hourlyDailyPickupLng: form.querySelector('input[name="hourly_daily_pickup_lng"]'),
+      hourlyDailyDate: form.querySelector('input[name="hourly_daily_date"]'),
+      hourlyDailyStartTime: form.querySelector('input[name="hourly_daily_start_time"]'),
+      hourlyDailyDurationHours: form.querySelector('input[name="hourly_daily_duration_hours"]'),
+      hourlyDailyCustomTerm: form.querySelector('input[name="hourly_daily_custom_term"]'),
+      hourlyDailyNotes: form.querySelector('input[name="hourly_daily_notes"]'),
+      hourlyDailyPrice: form.querySelector('input[name="hourly_daily_price"]'),
+      hourlyDailyCurrency: form.querySelector('input[name="hourly_daily_currency"]'),
+
       passengers: form.querySelector('input[name="passengers"]'),
       luggage: form.querySelector('input[name="luggage"]'),
       message: form.querySelector('textarea[name="message"]'),
@@ -477,6 +495,20 @@
       tourPrivatePrice: fields.tourPrivatePrice ? getTrimmedValue(fields.tourPrivatePrice) : '',
       tourPrivateCurrency: fields.tourPrivateCurrency ? getTrimmedValue(fields.tourPrivateCurrency) : '',
 
+      hourlyDailyMode: fields.hourlyDailyMode ? getTrimmedValue(fields.hourlyDailyMode) : '',
+      hourlyDailyVehicleType: fields.hourlyDailyVehicleType ? getTrimmedValue(fields.hourlyDailyVehicleType) : '',
+      hourlyDailyPickup: fields.hourlyDailyPickup ? getTrimmedValue(fields.hourlyDailyPickup) : '',
+      hourlyDailyPickupPlaceId: fields.hourlyDailyPickupPlaceId ? getTrimmedValue(fields.hourlyDailyPickupPlaceId) : '',
+      hourlyDailyPickupLat: fields.hourlyDailyPickupLat ? getTrimmedValue(fields.hourlyDailyPickupLat) : '',
+      hourlyDailyPickupLng: fields.hourlyDailyPickupLng ? getTrimmedValue(fields.hourlyDailyPickupLng) : '',
+      hourlyDailyDate: fields.hourlyDailyDate ? getTrimmedValue(fields.hourlyDailyDate) : '',
+      hourlyDailyStartTime: fields.hourlyDailyStartTime ? getTrimmedValue(fields.hourlyDailyStartTime) : '',
+      hourlyDailyDurationHours: fields.hourlyDailyDurationHours ? getTrimmedValue(fields.hourlyDailyDurationHours) : '',
+      hourlyDailyCustomTerm: fields.hourlyDailyCustomTerm ? getTrimmedValue(fields.hourlyDailyCustomTerm) : '',
+      hourlyDailyNotes: fields.hourlyDailyNotes ? getTrimmedValue(fields.hourlyDailyNotes) : '',
+      hourlyDailyPrice: fields.hourlyDailyPrice ? getTrimmedValue(fields.hourlyDailyPrice) : '',
+      hourlyDailyCurrency: fields.hourlyDailyCurrency ? getTrimmedValue(fields.hourlyDailyCurrency) : '',
+
       passengers: getTrimmedValue(fields.passengers),
       luggage: getTrimmedValue(fields.luggage),
       notes: getTrimmedValue(fields.message),
@@ -540,6 +572,30 @@
   );
 }
 
+function hasAttemptableHourlyDailyReservationData(data) {
+  if (!data) return false;
+
+  return Boolean(
+    data.name &&
+    isValidInternationalPhoneNumber(data.phone) &&
+    data.email &&
+    data.serviceType === 'hourly_daily' &&
+    data.hourlyDailyMode &&
+    data.hourlyDailyPickup &&
+    data.hourlyDailyDate &&
+    data.hourlyDailyStartTime &&
+    (
+      (data.hourlyDailyMode === 'hourly' && data.hourlyDailyDurationHours) ||
+      (data.hourlyDailyMode === 'full_day' && data.hourlyDailyDurationHours) ||
+      (data.hourlyDailyMode === 'custom_long_term' && data.hourlyDailyCustomTerm)
+    ) &&
+    (
+      data.hourlyDailyMode === 'custom_long_term' ||
+      (data.hourlyDailyPrice && data.hourlyDailyCurrency)
+    )
+  );
+}
+
   function hasAttemptableReservationData(data) {
     if (!data) return false;
 
@@ -549,6 +605,10 @@
 
     if (data.serviceType === 'tour_private') {
       return hasAttemptableTourPrivateReservationData(data);
+    }
+
+    if (data.serviceType === 'hourly_daily') {
+      return hasAttemptableHourlyDailyReservationData(data);
     }
 
     return hasAttemptableOtherReservationData(data);
@@ -609,6 +669,46 @@
   );
 }
 
+function hasMinimumRequiredHourlyDailyReservationData(data) {
+  if (!data) return false;
+
+  return Boolean(
+    data.name &&
+    isValidInternationalPhoneNumber(data.phone) &&
+    isValidEmail(data.email) &&
+    data.serviceType === 'hourly_daily' &&
+    data.hourlyDailyMode &&
+    data.hourlyDailyPickup &&
+    data.hourlyDailyDate &&
+    data.hourlyDailyStartTime &&
+    (
+      (data.hourlyDailyMode === 'hourly' && data.hourlyDailyDurationHours) ||
+      (data.hourlyDailyMode === 'full_day' && data.hourlyDailyDurationHours) ||
+      (data.hourlyDailyMode === 'custom_long_term' && data.hourlyDailyCustomTerm)
+    ) &&
+    (
+      data.hourlyDailyMode === 'custom_long_term' ||
+      (data.hourlyDailyPrice && data.hourlyDailyCurrency)
+    )
+  );
+}
+
+  function validateHourlyDailySpecificFields(data) {
+    if (!data || data.serviceType !== 'hourly_daily') {
+      return {
+        hourly_daily_pickup: true,
+        hourly_daily_date: true,
+        hourly_daily_time: true
+      };
+    }
+
+    return {
+      hourly_daily_pickup: Boolean(data.hourlyDailyPickup),
+      hourly_daily_date: Boolean(data.hourlyDailyDate),
+      hourly_daily_time: Boolean(data.hourlyDailyStartTime)
+    };
+  }
+
   function hasMinimumRequiredReservationData(data) {
     if (!data) return false;
 
@@ -618,6 +718,10 @@
 
     if (data.serviceType === 'tour_private') {
       return hasMinimumRequiredTourPrivateReservationData(data);
+    }
+
+    if (data.serviceType === 'hourly_daily') {
+      return hasMinimumRequiredHourlyDailyReservationData(data);
     }
 
     return hasMinimumRequiredOtherReservationData(data);
@@ -651,6 +755,7 @@
   function syncNativeRequiredState(fields, data) {
   var usesSpecificServiceModel;
   var isTourPrivate;
+  var isHourlyDaily;
 
   if (
     !fields ||
@@ -668,7 +773,8 @@
     data &&
     (
       data.serviceType === 'airport_hotel' ||
-      data.serviceType === 'tour_private'
+      data.serviceType === 'tour_private' ||
+      data.serviceType === 'hourly_daily'
     )
   );
 
@@ -677,13 +783,18 @@
     data.serviceType === 'tour_private'
   );
 
+  isHourlyDaily = Boolean(
+    data &&
+    data.serviceType === 'hourly_daily'
+  );
+
   if (usesSpecificServiceModel) {
     fields.tripDate.required = false;
     fields.tripTime.required = false;
     fields.origin.required = false;
     fields.destination.required = false;
     fields.passengers.required = false;
-    fields.luggage.required = !isTourPrivate;
+    fields.luggage.required = !(isTourPrivate || isHourlyDaily);
     return true;
   }
 
@@ -847,6 +958,9 @@
     setFieldValidity(fields.destination, 'destination', true);
     setFieldValidity(fields.passengers, 'passengers', true);
     setFieldValidity(fields.luggage, 'luggage', true);
+    setFieldValidity(fields.hourlyDailyVisiblePickup, 'hourly_daily_pickup', true);
+    setFieldValidity(fields.hourlyDailyVisibleDate, 'hourly_daily_date', true);
+    setFieldValidity(fields.hourlyDailyVisibleTime, 'hourly_daily_time', true);
   }
 
   function validateReservationRequestFields(fields) {
@@ -861,19 +975,28 @@
     data = getReservationRequestData(fields);
     hasMobileMinimumViolation = hasAnyMobileDateTimeMinimumViolation(fields);
 
-    validity = {
-      name: Boolean(data.name),
-      phone: isValidInternationalPhoneNumber(data.phone),
-      email: Boolean(data.email) && isValidEmail(data.email),
-      trip_date: data.serviceType === 'airport_hotel'
-        ? Boolean(data.airportHotelDate)
+    validity = Object.assign(
+      {
+        name: Boolean(data.name),
+        phone: isValidInternationalPhoneNumber(data.phone),
+        email: Boolean(data.email) && isValidEmail(data.email),
+      trip_date: (
+        data.serviceType === 'airport_hotel' ||
+        data.serviceType === 'tour_private' ||
+        data.serviceType === 'hourly_daily'
+      )
+        ? true
         : (
             !hasMobileMinimumViolation &&
             Boolean(data.tripDate) &&
             Boolean(data.tripTime) &&
             isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime)
           ),
-      trip_time: data.serviceType === 'airport_hotel'
+      trip_time: (
+        data.serviceType === 'airport_hotel' ||
+        data.serviceType === 'tour_private' ||
+        data.serviceType === 'hourly_daily'
+      )
         ? true
         : (
             !hasMobileMinimumViolation &&
@@ -883,27 +1006,35 @@
           ),
       origin: (
         data.serviceType === 'airport_hotel' ||
-        data.serviceType === 'tour_private'
+        data.serviceType === 'tour_private' ||
+        data.serviceType === 'hourly_daily'
       )
         ? true
         : Boolean(data.origin) && !areSameLocations(data.origin, data.destination),
       destination: (
         data.serviceType === 'airport_hotel' ||
-        data.serviceType === 'tour_private'
+        data.serviceType === 'tour_private' ||
+        data.serviceType === 'hourly_daily'
       )
         ? true
         : Boolean(data.destination) && !areSameLocations(data.origin, data.destination),
       passengers: data.serviceType === 'airport_hotel'
         ? hasAirportHotelFareKeySelected(data)
         : (
-            data.serviceType === 'tour_private'
-              ? Boolean(data.tourPrivatePassengerFareKey)
+            data.serviceType === 'tour_private' ||
+            data.serviceType === 'hourly_daily'
+              ? true
               : isPositiveIntegerUpTo(data.passengers, 6)
           ),
-      luggage: data.serviceType === 'tour_private'
+      luggage: (
+        data.serviceType === 'tour_private' ||
+        data.serviceType === 'hourly_daily'
+      )
         ? true
         : isZeroOrPositiveInteger(data.luggage)
-    };
+      },
+      validateHourlyDailySpecificFields(data)
+    );
 
     return validity;
   }
@@ -922,8 +1053,12 @@
       case 'phone':
         return isValidInternationalPhoneNumber(data.phone);
       case 'trip_date':
-        if (data.serviceType === 'airport_hotel') {
-          return Boolean(data.airportHotelDate);
+        if (
+          data.serviceType === 'airport_hotel' ||
+          data.serviceType === 'tour_private' ||
+          data.serviceType === 'hourly_daily'
+        ) {
+          return true;
         }
 
         if (hasAnyMobileDateTimeMinimumViolation(fields)) {
@@ -940,7 +1075,11 @@
 
         return isReservationDateTimeAtLeast24HoursAhead(data.tripDate, data.tripTime);
       case 'trip_time':
-        if (data.serviceType === 'airport_hotel') {
+        if (
+          data.serviceType === 'airport_hotel' ||
+          data.serviceType === 'tour_private' ||
+          data.serviceType === 'hourly_daily'
+        ) {
           return true;
         }
 
@@ -956,7 +1095,8 @@
       case 'origin':
         if (
           data.serviceType === 'airport_hotel' ||
-          data.serviceType === 'tour_private'
+          data.serviceType === 'tour_private' ||
+          data.serviceType === 'hourly_daily'
         ) {
           return true;
         }
@@ -965,12 +1105,44 @@
       case 'destination':
         if (
           data.serviceType === 'airport_hotel' ||
-          data.serviceType === 'tour_private'
+          data.serviceType === 'tour_private' ||
+          data.serviceType === 'hourly_daily'
         ) {
           return true;
         }
 
         return Boolean(data.destination) && !areSameLocations(data.origin, data.destination);
+      case 'passengers':
+        if (
+          data.serviceType === 'tour_private' ||
+          data.serviceType === 'hourly_daily'
+        ) {
+          return true;
+        }
+
+        validity = validateReservationRequestFields(fields);
+        return validity && Object.prototype.hasOwnProperty.call(validity, fieldName)
+          ? validity[fieldName]
+          : true;
+      case 'luggage':
+        if (
+          data.serviceType === 'tour_private' ||
+          data.serviceType === 'hourly_daily'
+        ) {
+          return true;
+        }
+
+        validity = validateReservationRequestFields(fields);
+        return validity && Object.prototype.hasOwnProperty.call(validity, fieldName)
+          ? validity[fieldName]
+          : true;
+      case 'hourly_daily_pickup':
+      case 'hourly_daily_date':
+      case 'hourly_daily_time':
+        validity = validateReservationRequestFields(fields);
+        return validity && Object.prototype.hasOwnProperty.call(validity, fieldName)
+          ? validity[fieldName]
+          : true;
       default:
         validity = validateReservationRequestFields(fields);
         return validity && Object.prototype.hasOwnProperty.call(validity, fieldName)
@@ -1017,6 +1189,12 @@
         return fields.passengers;
       case 'luggage':
         return fields.luggage;
+      case 'hourly_daily_pickup':
+        return fields.hourlyDailyVisiblePickup;
+      case 'hourly_daily_date':
+        return fields.hourlyDailyVisibleDate;
+      case 'hourly_daily_time':
+        return fields.hourlyDailyVisibleTime;
       default:
         return null;
     }
@@ -1084,6 +1262,9 @@
     setFieldValidity(fields.destination, 'destination', validity.destination);
     setFieldValidity(fields.passengers, 'passengers', validity.passengers);
     setFieldValidity(fields.luggage, 'luggage', validity.luggage);
+    setFieldValidity(fields.hourlyDailyVisiblePickup, 'hourly_daily_pickup', validity.hourly_daily_pickup);
+    setFieldValidity(fields.hourlyDailyVisibleDate, 'hourly_daily_date', validity.hourly_daily_date);
+    setFieldValidity(fields.hourlyDailyVisibleTime, 'hourly_daily_time', validity.hourly_daily_time);
 
     return true;
   }
@@ -1220,7 +1401,10 @@
       origin: fields.origin,
       destination: fields.destination,
       passengers: fields.passengers,
-      luggage: fields.luggage
+      luggage: fields.luggage,
+      hourly_daily_pickup: fields.hourlyDailyVisiblePickup,
+      hourly_daily_date: fields.hourlyDailyVisibleDate,
+      hourly_daily_time: fields.hourlyDailyVisibleTime
     };
 
     keys = Object.keys(fieldMap);
@@ -1309,6 +1493,10 @@
             if (normalizedPhone) {
               currentField.value = normalizedPhone;
             }
+          }
+
+          if (currentFieldName === 'hourly_daily_pickup') {
+            return;
           }
 
           refreshValidationUX(currentFields, currentFieldName);

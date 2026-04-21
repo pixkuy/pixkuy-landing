@@ -5,6 +5,9 @@
 
   if (!panelRoot || !catalogMount || !configMount) return;
 
+  configMount.hidden = true;
+  configMount.innerHTML = '';
+
   const PASSENGER_BUCKETS = ['van_1_2', 'van_3_4', 'van_5_6'];
   const GUIDE_LANGUAGES = ['es', 'en', 'fr'];
 

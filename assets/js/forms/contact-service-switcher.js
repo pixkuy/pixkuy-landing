@@ -100,6 +100,7 @@
     return (
       safeServiceType === "airport_hotel" ||
       safeServiceType === "tour_private" ||
+      safeServiceType === "hourly_daily" ||
       safeServiceType === "other"
     );
   }
@@ -184,12 +185,15 @@
       : null;
     const shouldHideSharedPlacesAndPassengers =
       activeServiceType === "airport_hotel" ||
-      activeServiceType === "tour_private";
+      activeServiceType === "tour_private" ||
+      activeServiceType === "hourly_daily";
     const shouldHideSharedTripDateTime =
       activeServiceType === "airport_hotel" ||
-      activeServiceType === "tour_private";
+      activeServiceType === "tour_private" ||
+      activeServiceType === "hourly_daily";
     const shouldHideSharedLuggage =
-      activeServiceType === "tour_private";
+      activeServiceType === "tour_private" ||
+      activeServiceType === "hourly_daily";
 
     if (originField) {
       originField.hidden = shouldHideSharedPlacesAndPassengers;
@@ -247,6 +251,7 @@
     var requestSummaryField;
     var airportHotelFieldNames;
     var tourPrivateFieldNames;
+    var hourlyDailyFieldNames;
 
     function clearFields(fieldNames) {
       var index;
@@ -313,14 +318,46 @@
       "tour_private_guide_language_label",
       "tour_private_price_label"
     ];
+	
+	    hourlyDailyFieldNames = [
+      "hourly_daily_mode",
+      "hourly_daily_vehicle_type",
+      "hourly_daily_pickup",
+      "hourly_daily_pickup_place_id",
+      "hourly_daily_pickup_lat",
+      "hourly_daily_pickup_lng",
+      "hourly_daily_date",
+      "hourly_daily_start_time",
+      "hourly_daily_duration_hours",
+      "hourly_daily_custom_term",
+      "hourly_daily_notes",
+      "hourly_daily_price",
+      "hourly_daily_currency",
+      "hourly_daily_km_included",
+      "hourly_daily_extra_km_price",
+      "hourly_daily_out_of_zone_supplement",
+      "hourly_daily_trip_summary",
+      "hourly_daily_pickup_label",
+      "hourly_daily_mode_label",
+      "hourly_daily_duration_label",
+      "hourly_daily_price_label"
+    ];
 
     if (activeServiceType === "airport_hotel") {
       clearFields(tourPrivateFieldNames);
+      clearFields(hourlyDailyFieldNames);
       return true;
     }
 
     if (activeServiceType === "tour_private") {
       clearFields(airportHotelFieldNames);
+      clearFields(hourlyDailyFieldNames);
+      return true;
+    }
+
+    if (activeServiceType === "hourly_daily") {
+      clearFields(airportHotelFieldNames);
+      clearFields(tourPrivateFieldNames);
       return true;
     }
 
@@ -328,6 +365,7 @@
     requestSummaryField.value = "";
     clearFields(airportHotelFieldNames);
     clearFields(tourPrivateFieldNames);
+    clearFields(hourlyDailyFieldNames);
 
     return true;
   }

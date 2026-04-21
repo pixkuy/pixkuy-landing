@@ -1,0 +1,89 @@
+{
+  "services": {
+    "cards": {
+      "hourly": {
+        "title": "按小时或按天",
+        "text": "适用于日程、会议以及含多站点行程的灵活服务。",
+        "contact": {
+          "helper": "请配置模式、接载点、日期和时间，以准备请求。"
+        },
+        "bullets": [
+          "灵活安排",
+          "多站停靠",
+          "连续服务"
+        ],
+        "priceLabel": "价格起",
+        "priceValue": "4.500 MXN",
+        "ctaClosed": "查看详情",
+        "ctaOpen": "隐藏详情",
+        "panel": {
+          "title": "按小时 / 全天司机服务",
+          "text": "请配置模式、日期和接载时间，以查看服务最终价格。",
+          "modeLabel": "模式",
+          "pickupLabel": "接载地点",
+          "pickupPlaceholder": "请输入接载地点",
+          "vehicleLabel": "车辆",
+          "dateLabel": "日期",
+          "timeLabel": "接载时间",
+          "durationLabel": "时长",
+          "longTermDurationLabel": "申请周期",
+          "notesLabel": "备注 / 行程",
+          "longTermNotesLabel": "日程 / 运营",
+          "notesPlaceholder": "添加停靠点、日程或相关说明",
+          "longTermNotesPlaceholder": "例如：为期 2 周的企业服务、每日接送、可变日程以及在 CDMX 的可用性",
+          "fullDayNotesHelper": "可按整天预订车辆，采用固定价格，并为灵活日程保留空间。",
+          "longTermNotesHelper": "请说明日期、使用方式、大致时段、基础城市、预计行程以及任何相关运营需求。",
+          "priceLabel": "最终价格",
+          "fullDayPriceLabel": "日费",
+          "longTermPriceLabel": "价格",
+          "longTermPriceValue": "视运营而定",
+          "priceValuePending": "—",
+          "cta": "请求",
+          "ctaDisabled": "请完成配置",
+          "tabs": {
+            "hourly": "按小时",
+            "fullDay": "全天",
+            "longTerm": "长期方案"
+          },
+          "vehicles": {
+            "executive_van": "高端行政 MPV"
+          },
+          "longTerm": {
+            "week": "一周",
+            "fortnight": "15 天",
+            "monthly": "按月",
+            "custom": "其他周期"
+          },
+          "disclaimers": {
+            "includesTitle": "包含",
+            "supplementsTitle": "可能附加费用",
+            "includesServiceKm": "每预订 1 小时包含 40 公里",
+            "fullDayIncludesKm": "每天最多 12 小时服务及 500 公里",
+            "includesServiceWifi": "车载专属 Wi-Fi",
+            "includesServiceWater": "饮用水及基础礼遇",
+            "includesVanPassengers": "最多 6 位乘客",
+            "includesVanUsb": "USB 和 USB-C 接口",
+            "includesVanSeats": "第二排独立空调行政座椅",
+            "extraHourExtension": "按完整 1 小时延长服务：1.300 MXN",
+            "fullDayExtraKm": "每天超过 500 公里后，每增加 1 公里加收 35 MXN",
+            "fullDayExtensionPolicy": "延长服务需视可用性并经运营审核",
+            "extraKm": "每增加 1 公里加收 35 MXN",
+            "outOfZone": "若服务在运营区域外结束，另加 +4.500 MXN",
+            "longTermApproachTitle": "服务方式",
+            "longTermApproach1": "根据运营需求进行配置",
+            "longTermApproach2": "高端行政车辆与司机",
+            "longTermApproach3": "适用于多日安排的连续服务",
+            "longTermPricingTitle": "报价如何确定",
+            "longTermPricing1": "根据申请周期",
+            "longTermPricing2": "根据预期使用方式与覆盖范围",
+            "longTermPricing3": "根据时段、里程及可用性",
+            "longTermValidationTitle": "运营审核",
+            "longTermValidation1": "需视实际可用性而定",
+            "longTermValidation2": "需事先进行运营确认",
+            "longTermValidation3": "最终条件取决于所申请的服务"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "services": {
+    "cards": {
+      "hourly": {
+        "title": "À l’heure ou à la journée",
+        "text": "Un service flexible pour les agendas, les rendez-vous et les déplacements avec plusieurs arrêts.",
+        "contact": {
+          "helper": "Configurez le mode, la prise en charge, la date et l’heure pour préparer la demande."
+        },
+        "bullets": [
+          "Disponibilité flexible",
+          "Plusieurs arrêts",
+          "Continuité"
+        ],
+        "priceLabel": "Prix à partir de",
+        "priceValue": "4.500 MXN",
+        "ctaClosed": "Voir les détails",
+        "ctaOpen": "Masquer les détails",
+        "panel": {
+          "title": "Chauffeur à l’heure / journée complète",
+          "text": "Configurez le mode, la date et l’heure de prise en charge pour voir le prix final du service.",
+          "modeLabel": "Mode",
+          "pickupLabel": "Point de prise en charge",
+          "pickupPlaceholder": "Indiquez le point de prise en charge",
+          "vehicleLabel": "Véhicule",
+          "dateLabel": "Date",
+          "timeLabel": "Heure de prise en charge",
+          "durationLabel": "Durée",
+          "longTermDurationLabel": "Période demandée",
+          "notesLabel": "Notes / Itinéraire",
+          "longTermNotesLabel": "Agenda / opération",
+          "notesPlaceholder": "Ajoutez des arrêts, un agenda ou des indications pertinentes",
+          "longTermNotesPlaceholder": "Ex. : service entreprise pendant 2 semaines, transferts quotidiens, agenda variable et disponibilité à CDMX",
+          "fullDayNotesHelper": "Réservez le véhicule pour une journée complète, avec un tarif fixe et une marge pour un agenda flexible.",
+          "longTermNotesHelper": "Indiquez les dates, le type d’usage, les horaires approximatifs, la ville de base, les déplacements prévus et tout besoin opérationnel pertinent.",
+          "priceLabel": "Prix final",
+          "fullDayPriceLabel": "Tarif journée",
+          "longTermPriceLabel": "Tarif",
+          "longTermPriceValue": "Selon l’opération",
+          "priceValuePending": "—",
+          "cta": "Demander",
+          "ctaDisabled": "Complétez la configuration",
+          "tabs": {
+            "hourly": "À l’heure",
+            "fullDay": "Journée complète",
+            "longTerm": "Plans longue durée"
+          },
+          "vehicles": {
+            "executive_van": "Van exécutif"
+          },
+          "longTerm": {
+            "week": "Semaine",
+            "fortnight": "15 jours",
+            "monthly": "Mensuel",
+            "custom": "Autre période"
+          },
+          "disclaimers": {
+            "includesTitle": "Inclut",
+            "supplementsTitle": "Suppléments possibles",
+            "includesServiceKm": "40 km inclus par heure réservée",
+            "fullDayIncludesKm": "Jusqu’à 12 heures de service et 500 km par jour",
+            "includesServiceWifi": "Wi-Fi à bord",
+            "includesServiceWater": "Eau et attentions",
+            "includesVanPassengers": "Jusqu’à 6 passagers",
+            "includesVanUsb": "Connecteurs USB et USB-C",
+            "includesVanSeats": "Sièges capitaine en deuxième rangée avec climatisation indépendante",
+            "extraHourExtension": "Extension du service par blocs complets de 1 heure : 1.300 MXN",
+            "fullDayExtraKm": "35 MXN par km supplémentaire au-delà de 500 km par jour",
+            "fullDayExtensionPolicy": "Extensions soumises à disponibilité et validation opérationnelle",
+            "extraKm": "35 MXN par km supplémentaire",
+            "outOfZone": "+4.500 MXN si le service se termine hors de la zone opérationnelle",
+            "longTermApproachTitle": "Approche du service",
+            "longTermApproach1": "Configuration adaptée à l’opération",
+            "longTermApproach2": "Véhicule exécutif et chauffeur",
+            "longTermApproach3": "Continuité pour des agendas de plusieurs jours",
+            "longTermPricingTitle": "Comment la proposition est définie",
+            "longTermPricing1": "Selon la période demandée",
+            "longTermPricing2": "Selon l’usage prévu et la couverture",
+            "longTermPricing3": "Selon les horaires, les kilomètres et la disponibilité",
+            "longTermValidationTitle": "Validation opérationnelle",
+            "longTermValidation1": "Sous réserve de disponibilité réelle",
+            "longTermValidation2": "Confirmation opérationnelle préalable",
+            "longTermValidation3": "Conditions finales selon le service demandé"
+          }
+        }
+      }
+    }
+  }
+}

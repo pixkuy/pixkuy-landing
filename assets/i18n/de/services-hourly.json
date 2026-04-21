@@ -1,0 +1,89 @@
+{
+  "services": {
+    "cards": {
+      "hourly": {
+        "title": "Stundenweise oder tageweise",
+        "text": "Ein flexibler Service für Termine, Meetings und Fahrten mit mehreren Stopps.",
+        "contact": {
+          "helper": "Wählen Sie Modus, Abholpunkt, Datum und Uhrzeit, um die Anfrage vorzubereiten."
+        },
+        "bullets": [
+          "Flexible Verfügbarkeit",
+          "Mehrere Stopps",
+          "Kontinuität"
+        ],
+        "priceLabel": "Preis ab",
+        "priceValue": "4.500 MXN",
+        "ctaClosed": "Details ansehen",
+        "ctaOpen": "Details ausblenden",
+        "panel": {
+          "title": "Chauffeur stundenweise / ganztägig",
+          "text": "Wählen Sie Modus, Datum und Abholzeit, um den Endpreis des Services zu sehen.",
+          "modeLabel": "Modus",
+          "pickupLabel": "Abholpunkt",
+          "pickupPlaceholder": "Abholpunkt angeben",
+          "vehicleLabel": "Fahrzeug",
+          "dateLabel": "Datum",
+          "timeLabel": "Abholzeit",
+          "durationLabel": "Dauer",
+          "longTermDurationLabel": "Gewünschter Zeitraum",
+          "notesLabel": "Notizen / Ablauf",
+          "longTermNotesLabel": "Agenda / Betrieb",
+          "notesPlaceholder": "Fügen Sie Stopps, Agenda oder relevante Hinweise hinzu",
+          "longTermNotesPlaceholder": "Z. B.: Firmenservice für 2 Wochen, tägliche Transfers, variable Agenda und Verfügbarkeit in CDMX",
+          "fullDayNotesHelper": "Buchen Sie das Fahrzeug für einen ganzen Tag mit festem Tarif und Spielraum für eine flexible Agenda.",
+          "longTermNotesHelper": "Geben Sie Daten, Art der Nutzung, ungefähre Zeiten, Basisstadt, geplante Fahrten und relevante operative Anforderungen an.",
+          "priceLabel": "Endpreis",
+          "fullDayPriceLabel": "Tagestarif",
+          "longTermPriceLabel": "Tarif",
+          "longTermPriceValue": "Je nach Einsatz",
+          "priceValuePending": "—",
+          "cta": "Anfragen",
+          "ctaDisabled": "Konfiguration vervollständigen",
+          "tabs": {
+            "hourly": "Stundenweise",
+            "fullDay": "Ganztägig",
+            "longTerm": "Längere Zeiträume"
+          },
+          "vehicles": {
+            "executive_van": "Executive-Van"
+          },
+          "longTerm": {
+            "week": "Woche",
+            "fortnight": "15 Tage",
+            "monthly": "Monatlich",
+            "custom": "Anderer Zeitraum"
+          },
+          "disclaimers": {
+            "includesTitle": "Enthalten",
+            "supplementsTitle": "Mögliche Zuschläge",
+            "includesServiceKm": "40 km pro gebuchter Stunde inbegriffen",
+            "fullDayIncludesKm": "Bis zu 12 Stunden Service und 500 km pro Tag",
+            "includesServiceWifi": "Eigenes WLAN an Bord",
+            "includesServiceWater": "Wasser und Aufmerksamkeiten",
+            "includesVanPassengers": "Bis zu 6 Passagiere",
+            "includesVanUsb": "USB- und USB-C-Anschlüsse",
+            "includesVanSeats": "Captain Seats in der zweiten Reihe mit unabhängiger Klimaregelung",
+            "extraHourExtension": "Verlängerung des Services in vollen 1-Stunden-Blöcken: 1.300 MXN",
+            "fullDayExtraKm": "35 MXN pro zusätzlichem km ab 500 km pro Tag",
+            "fullDayExtensionPolicy": "Verlängerungen vorbehaltlich Verfügbarkeit und operativer Prüfung",
+            "extraKm": "35 MXN pro zusätzlichem km",
+            "outOfZone": "+4.500 MXN, wenn die Fahrt außerhalb der operativen Zone endet",
+            "longTermApproachTitle": "Serviceansatz",
+            "longTermApproach1": "An den Betrieb angepasste Konfiguration",
+            "longTermApproach2": "Executive-Fahrzeug und Fahrer",
+            "longTermApproach3": "Kontinuität für mehrtägige Agenden",
+            "longTermPricingTitle": "Wie das Angebot definiert wird",
+            "longTermPricing1": "Je nach angefragtem Zeitraum",
+            "longTermPricing2": "Je nach geplanter Nutzung und Abdeckung",
+            "longTermPricing3": "Je nach Zeiten, Kilometern und Verfügbarkeit",
+            "longTermValidationTitle": "Operative Validierung",
+            "longTermValidation1": "Vorbehaltlich tatsächlicher Verfügbarkeit",
+            "longTermValidation2": "Vorherige operative Bestätigung",
+            "longTermValidation3": "Endgültige Bedingungen je nach angefragtem Service"
+          }
+        }
+      }
+    }
+  }
+}

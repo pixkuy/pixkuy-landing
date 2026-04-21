@@ -1,0 +1,603 @@
+/* assets/css/40-contact-hourly-daily.css
+   UI específica de hourly_daily dentro de #contact.
+   Alcance:
+   - editor hourly_daily en formulario
+   - selector de modalidad
+   - bloques duración / long term
+   - precio inline del editor
+   NO incluir:
+   - shell común de contact services
+   - panel comercial de services
+   - móvil sheet de hourly comercial
+*/
+
+.contact-hourly-daily-editor{
+  display:grid;
+  gap:18px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  background:rgba(255,255,255,.02);
+  box-shadow:none;
+}
+
+.contact-hourly-daily-editor__header{
+  display:grid;
+  gap:6px;
+}
+
+.contact-hourly-daily-editor__header .muted.small{
+  margin:0;
+  color:rgba(255,245,228,.82);
+}
+
+.contact-hourly-daily-editor .form-field,
+.contact-hourly-daily-editor .form-row,
+.contact-hourly-daily-editor__duration,
+.contact-hourly-daily-editor__long-term,
+.contact-hourly-daily-editor .contact-panel-fare{
+  margin:0;
+}
+
+.contact-hourly-daily-editor__hero{
+  display:grid;
+  grid-template-columns:220px minmax(0, 1fr);
+  gap:18px;
+  align-items:start;
+}
+
+.contact-hourly-daily-editor__vehicle{
+  display:grid;
+  grid-template-rows:auto 1fr;
+  gap:8px;
+  min-width:0;
+  align-self:start;
+}
+
+.contact-hourly-daily-editor__vehicle-label{
+  margin:0;
+  font-size:13px;
+  line-height:1.2;
+  font-weight:700;
+  color:rgba(255,247,230,.98);
+}
+
+.contact-hourly-daily-editor__vehicle-media{
+  position:relative;
+  overflow:hidden;
+  border-radius:12px;
+  border:1px solid rgba(236,220,189,.18);
+  background:rgba(22,18,17,.46);
+  height:202px;
+  min-height:202px;
+  margin-top:0;
+}
+
+.contact-hourly-daily-editor__vehicle-image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 100%;
+}
+
+.contact-hourly-daily-editor__hero-fields{
+  display:grid;
+  grid-template-rows:auto auto auto;
+  gap:14px;
+  min-width:0;
+  align-self:start;
+}
+
+.contact-hourly-daily-editor__mode-field,
+.contact-hourly-daily-editor__pickup{
+  position:relative;
+  align-self:start;
+}
+
+.contact-hourly-daily-editor__mode-field{
+  z-index:40;
+}
+
+.contact-hourly-daily-editor__pickup{
+  z-index:30;
+}
+
+.contact-hourly-daily-editor__pickup .place-autocomplete{
+  position:relative;
+  min-width:0;
+  z-index:30;
+}
+
+.contact-hourly-daily-editor__pickup .place-autocomplete.is-open{
+  z-index:60;
+}
+
+.contact-hourly-daily-editor__pickup .place-autocomplete__mount{
+  z-index:61;
+}
+
+.contact-hourly-daily-editor__pickup .place-autocomplete__panel{
+  z-index:62;
+}
+
+.contact-hourly-daily-editor__pickup .place-autocomplete{
+  min-width:0;
+}
+
+.contact-hourly-daily-editor__hero-datetime{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+  align-self:start;
+}
+
+.contact-hourly-daily-editor__date,
+.contact-hourly-daily-editor__time{
+  margin:0;
+}
+
+.contact-hourly-daily-editor__date input[type="date"],
+.contact-hourly-daily-editor__time input[type="time"]{
+  height:54px;
+  min-height:54px;
+  padding-top:0;
+  padding-bottom:0;
+  line-height:54px;
+  box-sizing:border-box;
+}
+
+.contact-hourly-daily-editor .form-field{
+  display:grid;
+  gap:8px;
+}
+
+.contact-hourly-daily-editor .form-field input,
+.contact-hourly-daily-editor .form-field textarea{
+  width:100%;
+  min-height:54px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.20);
+  background:rgba(22,18,17,.46);
+  color:rgba(255,249,238,.98);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+}
+
+.contact-hourly-daily-editor .form-field textarea{
+  min-height:132px;
+  padding:14px 16px;
+  resize:vertical;
+  line-height:1.55;
+}
+
+.contact-hourly-daily-editor .form-field input::placeholder,
+.contact-hourly-daily-editor .form-field textarea::placeholder{
+  color:rgba(255,249,238,.62);
+}
+
+.contact-hourly-daily-editor .form-row--two{
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+}
+
+.contact-hourly-daily-select{
+  position:relative;
+  width:100%;
+}
+
+.contact-hourly-daily-select__trigger{
+  width:100%;
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 16px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.20);
+  background:rgba(22,18,17,.46);
+  color:rgba(255,249,238,.98);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+  cursor:pointer;
+  text-align:left;
+}
+
+.contact-hourly-daily-select__trigger:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.05);
+}
+
+.contact-hourly-daily-select__trigger[aria-expanded="true"]{
+  border-color:rgba(31,122,109,.58);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.05),
+    0 0 0 1px rgba(31,122,109,.14);
+}
+
+.contact-hourly-daily-select__value{
+  display:block;
+  min-width:0;
+  font-size:16px;
+  line-height:1.2;
+  color:rgba(255,249,238,.96);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.contact-hourly-daily-select__value[data-select-empty="true"]{
+  color:rgba(255,249,238,.62);
+}
+
+.contact-hourly-daily-select__chevron{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  color:rgba(255,249,238,.82);
+  transition:transform .18s ease;
+}
+
+.contact-hourly-daily-select[data-select-open="true"] .contact-hourly-daily-select__chevron{
+  transform:rotate(180deg);
+}
+
+.contact-hourly-daily-select__panel{
+  position:absolute;
+  top:calc(100% + 8px);
+  left:0;
+  right:0;
+  z-index:90;
+  padding:8px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.16);
+  background:
+    linear-gradient(180deg, rgba(34,30,28,.96) 0%, rgba(20,18,17,.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.04),
+    0 18px 36px rgba(0,0,0,.34);
+  backdrop-filter:blur(10px);
+}
+
+.contact-hourly-daily-select__panel[hidden]{
+  display:none !important;
+}
+
+.contact-hourly-daily-select__listbox{
+  display:grid;
+  gap:8px;
+}
+
+.contact-hourly-daily-select__listbox--stacked{
+  grid-template-columns:1fr;
+}
+
+.contact-hourly-daily-select__option{
+  min-height:42px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 10px;
+  border-radius:12px;
+  border:1px solid rgba(236,220,189,.18);
+  background:rgba(255,255,255,.03);
+  color:rgba(255,249,238,.92);
+  font-size:14px;
+  line-height:1;
+  font-weight:600;
+  cursor:pointer;
+  transition:
+    background .16s ease,
+    border-color .16s ease,
+    transform .16s ease;
+}
+
+.contact-hourly-daily-select__option:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);
+}
+
+.contact-hourly-daily-select__option[aria-selected="true"],
+.contact-hourly-daily-select__option[data-select-selected="true"]{
+  border-color:rgba(31,122,109,.62);
+  background:rgba(31,122,109,.16);
+  color:var(--fg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(31,122,109,.10);
+}
+
+.contact-hourly-daily-select__option--stacked{
+  min-height:50px;
+  justify-content:flex-start;
+  padding:0 14px;
+  text-align:left;
+  line-height:1.3;
+}
+
+.contact-hourly-daily-editor__duration,
+.contact-hourly-daily-editor__long-term{
+  display:grid;
+  gap:10px;
+}
+
+.contact-hourly-daily-editor__duration[hidden],
+.contact-hourly-daily-editor__long-term[hidden]{
+  display:none !important;
+}
+
+.contact-hourly-daily-editor__duration .services-expand__label,
+.contact-hourly-daily-editor__long-term .services-expand__label{
+  display:block;
+  margin:0;
+  font-size:13px;
+  line-height:1.2;
+  font-weight:700;
+  color:rgba(255,247,230,.98);
+}
+
+.contact-hourly-daily-editor__duration .services-expand__passengers-segmented,
+.contact-hourly-daily-editor__long-term .services-expand__passengers-segmented{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:10px;
+}
+
+.contact-hourly-daily-editor .services-expand__passenger-chip{
+  min-height:48px;
+  border-radius:14px;
+  border:1px solid rgba(236,220,189,.24);
+  background:rgba(22,18,17,.52);
+  color:rgba(255,249,238,.92);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+}
+
+.contact-hourly-daily-editor .services-expand__passenger-chip:hover{
+  border-color:rgba(255,255,255,.20);
+  background:rgba(255,255,255,.05);
+}
+
+.contact-hourly-daily-editor .services-expand__passenger-chip[aria-pressed="true"],
+.contact-hourly-daily-editor .services-expand__passenger-chip[data-service-active="true"]{
+  border-color:rgba(31,122,109,.62);
+  background:rgba(31,122,109,.14);
+  color:var(--fg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(31,122,109,.12);
+}
+
+.contact-hourly-daily-editor .services-expand__passenger-chip-text{
+  font-size:15px;
+  font-weight:600;
+  line-height:1.1;
+}
+
+.contact-hourly-daily-editor .contact-panel-fare{
+  margin-top:2px;
+}
+
+@media (min-width: 1025px){
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) .services-hourly-panel__disclaimers-groups{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:18px;
+  }
+
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) .services-hourly-panel__disclaimer-group{
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+  }
+
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) .services-hourly-panel__disclaimer-group--includes-wide{
+    grid-column:auto;
+  }
+
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) .services-hourly-panel__disclaimer-group--supplements{
+    grid-column:auto;
+  }
+
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) [data-contact-hourly-daily-price] .contact-panel-fare__label{
+    color:rgba(214,240,233,.78);
+  }
+
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) [data-contact-hourly-daily-price] .contact-panel-fare__value{
+    color:rgba(232,248,244,.96);
+  }
+}
+
+.contact-hourly-daily-editor__meta{
+  display:grid;
+  gap:12px;
+}
+
+.contact-hourly-daily-editor__disclaimers:empty{
+  display:none;
+}
+
+.contact-hourly-daily-editor__disclaimers-groups{
+  display:grid;
+  gap:12px;
+}
+
+.contact-hourly-daily-editor__disclaimer-group{
+  display:grid;
+  gap:8px;
+  padding:14px 16px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.16);
+  background:rgba(22,18,17,.42);
+}
+
+.contact-hourly-daily-editor__disclaimer-group--includes-wide{
+  background:rgba(255,255,255,.03);
+}
+
+.contact-hourly-daily-editor__disclaimer-group--supplements{
+  background:rgba(255,255,255,.02);
+}
+
+.contact-hourly-daily-editor__disclaimer-title{
+  margin:0;
+  font-size:12px;
+  line-height:1.2;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(255,247,230,.72);
+}
+
+.contact-hourly-daily-editor__disclaimers-columns{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px 18px;
+}
+
+.contact-hourly-daily-editor__disclaimers-list{
+  margin:0;
+  padding-left:18px;
+  display:grid;
+  gap:6px;
+}
+
+.contact-hourly-daily-editor__disclaimers-list li{
+  color:rgba(255,249,238,.84);
+  font-size:14px;
+  line-height:1.5;
+}
+
+@media (max-width: 720px){
+  .contact-hourly-daily-editor{
+    gap:14px;
+    padding:14px;
+    border-radius:12px;
+  }
+
+  .contact-hourly-daily-editor__hero{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  
+    .contact-hourly-daily-select{
+    width:100%;
+    margin-left:0;
+  }
+
+  .contact-hourly-daily-editor__hero{
+    margin-top:0;
+  }
+
+  .contact-hourly-daily-editor__vehicle{
+    gap:6px;
+    margin-top:0;
+  }
+
+  .contact-hourly-daily-editor__vehicle-media{
+    height:160px;
+    min-height:160px;
+    margin-top:0;
+  }
+
+  .contact-hourly-daily-editor__vehicle-image{
+    object-position:center 82%;
+  }
+
+  .contact-hourly-daily-editor__hero-fields{
+    grid-template-rows:auto auto auto;
+    gap:12px;
+  }
+
+  .contact-hourly-daily-editor__hero-datetime{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .contact-hourly-daily-editor .form-field input,
+  .contact-hourly-daily-editor .form-field textarea{
+    min-height:52px;
+    border-radius:14px;
+  }
+  
+    .contact-hourly-daily-editor__date input[type="date"],
+  .contact-hourly-daily-editor__time input[type="time"]{
+    height:52px;
+    min-height:52px;
+    padding-top:0;
+    padding-bottom:0;
+    line-height:52px;
+    box-sizing:border-box;
+  }
+
+  .contact-hourly-daily-editor .form-row--two{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .contact-hourly-daily-select__panel{
+    padding:8px;
+    border-radius:14px;
+  }
+
+  .contact-hourly-daily-select__option{
+    min-height:44px;
+    border-radius:12px;
+  }
+
+  .contact-hourly-daily-select__option--stacked{
+    min-height:48px;
+  }
+
+  .contact-hourly-daily-editor__duration .services-expand__passengers-segmented,
+  .contact-hourly-daily-editor__long-term .services-expand__passengers-segmented{
+    gap:8px;
+  }
+
+  .contact-hourly-daily-editor .services-expand__passenger-chip{
+    min-height:46px;
+    border-radius:12px;
+  }
+
+  .contact-hourly-daily-editor .services-expand__passenger-chip-text{
+    font-size:14px;
+  }
+
+  .contact-hourly-daily-editor__disclaimer-group{
+    padding:12px 14px;
+    border-radius:14px;
+  }
+
+  .contact-hourly-daily-editor__disclaimers-columns{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .contact-hourly-daily-editor__disclaimers-list li{
+    font-size:13px;
+    line-height:1.45;
+  }
+
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) [data-contact-hourly-daily-price] .contact-panel-fare__label{
+    color:rgba(214,240,233,.78);
+  }
+
+  .contact-hourly-daily-editor:has(
+    [data-contact-hourly-daily-mode-option="custom_long_term"][data-select-selected="true"]
+  ) [data-contact-hourly-daily-price] .contact-panel-fare__value{
+    color:rgba(232,248,244,.96);
+  }
+}

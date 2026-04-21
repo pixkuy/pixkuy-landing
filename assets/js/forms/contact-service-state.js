@@ -10,6 +10,7 @@
   const SERVICE_TYPES = Object.freeze({
     AIRPORT_HOTEL: "airport_hotel",
     TOUR_PRIVATE: "tour_private",
+    HOURLY_DAILY: "hourly_daily",
     OTHER: "other"
   });
 
@@ -29,6 +30,7 @@
     return (
       value === SERVICE_TYPES.AIRPORT_HOTEL ||
       value === SERVICE_TYPES.TOUR_PRIVATE ||
+      value === SERVICE_TYPES.HOURLY_DAILY ||
       value === SERVICE_TYPES.OTHER
     );
   }

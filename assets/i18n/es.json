@@ -1,6 +1,8 @@
 {
   "ui": {
-    "language": "Idioma"
+    "language": "Idioma",
+    "yes": "Sí",
+    "no": "No"
   },
   "hero": {
     "title": "Cada trayecto, con confort, discreción y precisión desde el primer kilómetro.",
@@ -185,7 +187,10 @@
       "tourPrivatePickupRequired": "Indica el punto de recogida.",
       "tourPrivateDateRequired": "Selecciona la fecha del tour.",
       "tourPrivateTimeRequired": "Selecciona la hora de salida.",
-      "tourPrivateGuideLanguageRequired": "Selecciona el idioma del guía."
+      "tourPrivateGuideLanguageRequired": "Selecciona el idioma del guía.",
+      "hourlyDailyPickupRequired": "Indica el punto de recogida.",
+      "hourlyDailyDateRequired": "Selecciona la fecha del servicio.",
+      "hourlyDailyTimeRequired": "Selecciona la hora de recogida."
     },
     "whatsappMessage": {
       "intro": "Hola, quiero solicitar un traslado con Pixkuy.",
@@ -201,7 +206,12 @@
       "fare": "Tarifa",
       "passengers": "Pasajeros",
       "luggage": "Maletas",
-      "notes": "Notas"
+      "notes": "Notas",
+      "tour": "Tour",
+      "pickup": "Punto de recogida",
+      "guide": "Guía",
+      "guideLanguage": "Idioma del guía",
+      "price": "Precio final"
     },
     "places": {
       "loading": "Buscando ubicaciones…",
@@ -217,6 +227,7 @@
       "switcherAriaLabel": "Selector de tipo de servicio",
       "airportHotel": "Aeropuerto y hotel",
       "tourPrivate": "Tours y visitas privadas",
+      "hourlyDaily": "Por horas o por día",
       "other": "Otro servicio",
       "confirmChangeSpecificData": "Si cambias de servicio, se perderán los datos específicos del servicio actual. ¿Quieres continuar?",
       "confirmAccept": "Continuar",

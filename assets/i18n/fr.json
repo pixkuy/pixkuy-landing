@@ -1,6 +1,8 @@
 {
   "ui": {
-    "language": "Langue"
+    "language": "Langue",
+    "yes": "Oui",
+    "no": "Non"
   },
   "hero": {
     "title": "Chaque trajet, avec confort, discrétion et précision dès le premier kilomètre.",
@@ -185,7 +187,10 @@
   "tourPrivatePickupRequired": "Veuillez indiquer le point de prise en charge.",
   "tourPrivateDateRequired": "Veuillez sélectionner la date du tour.",
   "tourPrivateTimeRequired": "Veuillez sélectionner l’heure de départ.",
-  "tourPrivateGuideLanguageRequired": "Veuillez sélectionner la langue du guide."
+  "tourPrivateGuideLanguageRequired": "Veuillez sélectionner la langue du guide.",
+  "hourlyDailyPickupRequired": "Veuillez indiquer le point de prise en charge.",
+  "hourlyDailyDateRequired": "Veuillez sélectionner la date du service.",
+  "hourlyDailyTimeRequired": "Veuillez sélectionner l’heure de prise en charge."
 },
     "whatsappMessage": {
   "intro": "Bonjour, je souhaite demander un transfert avec Pixkuy.",
@@ -222,6 +227,7 @@
   "switcherAriaLabel": "Sélecteur de type de service",
   "airportHotel": "Aéroport et hôtel",
   "tourPrivate": "Tours et visites privées",
+  "hourlyDaily": "À l’heure ou à la journée",
   "other": "Autre service",
   "confirmChangeSpecificData": "Si vous changez de service, les données spécifiques du service actuel seront perdues. Voulez-vous continuer ?",
   "confirmAccept": "Continuer",

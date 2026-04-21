@@ -52,6 +52,13 @@
         panel: document.getElementById('services-expand-tours'),
         closedLabel: 'services.cards.tours.ctaClosed',
         openLabel: 'services.cards.tours.ctaOpen'
+      },
+      hourly: {
+        key: 'hourly',
+        card: findCardByI18nKey('services.cards.hourly.title'),
+        panel: document.getElementById('services-expand-hourly'),
+        closedLabel: 'services.cards.hourly.ctaClosed',
+        openLabel: 'services.cards.hourly.ctaOpen'
       }
     };
 
@@ -90,6 +97,12 @@
 
   function getAnchorCardForDesktop() {
     const primaryCard = getPrimaryCard();
+    const hourlyEntry = services.hourly;
+
+    if (openService === 'hourly' && hourlyEntry && hourlyEntry.card) {
+      return cards[cards.length - 1] || hourlyEntry.card;
+    }
+
     if (!primaryCard) return null;
     return primaryCard.nextElementSibling || null;
   }

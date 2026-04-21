@@ -1,6 +1,8 @@
 {
   "ui": {
-    "language": "Language"
+    "language": "Language",
+    "yes": "Yes",
+    "no": "No"
   },
   "hero": {
     "title": "Every journey, handled with comfort, discretion and precision from the very first mile.",
@@ -185,7 +187,10 @@
   "tourPrivatePickupRequired": "Please enter the pickup point.",
   "tourPrivateDateRequired": "Please select the tour date.",
   "tourPrivateTimeRequired": "Please select the departure time.",
-  "tourPrivateGuideLanguageRequired": "Please select the guide language."
+  "tourPrivateGuideLanguageRequired": "Please select the guide language.",
+  "hourlyDailyPickupRequired": "Please enter the pickup point.",
+  "hourlyDailyDateRequired": "Please select the service date.",
+  "hourlyDailyTimeRequired": "Please select the pickup time."
 },
     "whatsappMessage": {
   "intro": "Hello, I would like to request a transfer with Pixkuy.",
@@ -222,6 +227,7 @@
   "switcherAriaLabel": "Service type selector",
   "airportHotel": "Airport and hotel",
   "tourPrivate": "Private tours and visits",
+  "hourlyDaily": "By the hour or by the day",
   "other": "Other service",
   "confirmChangeSpecificData": "If you change the service, the specific data for the current service will be lost. Do you want to continue?",
   "confirmAccept": "Continue",
