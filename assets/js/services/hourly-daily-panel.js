@@ -57,6 +57,79 @@
   function normalizeText(value) {
     return typeof value === 'string' ? value.trim() : '';
   }
+  
+    let deepLinkedHourlyScrollDone = false;
+
+  function isHourlyDailyDeepLink() {
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      const rawService = String(params.get('service') || '').trim().toLowerCase();
+
+      return rawService === 'hourly_daily';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function ensureDeepLinkedHourlyPanelVisible() {
+    if (!isHourlyDailyDeepLink()) return;
+    if (!configMount || configMount.hidden) return;
+
+    const configRect = configMount.getBoundingClientRect();
+    const topSafeOffset = 24;
+    const targetTop = Math.max(0, window.scrollY + configRect.top - topSafeOffset);
+
+    if (Math.abs(targetTop - window.scrollY) < 4) return;
+
+    window.scrollTo({
+      top: targetTop,
+      behavior: 'smooth'
+    });
+  }
+
+  function applyDeepLinkedHourlyPanelScrollWhenReady(attempt, previousTop) {
+    if (!isHourlyDailyDeepLink()) return;
+    if (deepLinkedHourlyScrollDone) return;
+
+    const safeAttempt = Number.isFinite(attempt) ? attempt : 0;
+    const lastTop = Number.isFinite(previousTop) ? previousTop : null;
+
+    const isReady =
+      document.readyState === 'complete' &&
+      panelRoot &&
+      !panelRoot.hidden &&
+      configMount &&
+      !configMount.hidden &&
+      configMount.offsetHeight > 0;
+
+    if (!isReady) {
+      if (safeAttempt >= 40) return;
+
+      requestAnimationFrame(() => {
+        applyDeepLinkedHourlyPanelScrollWhenReady(safeAttempt + 1, lastTop);
+      });
+      return;
+    }
+
+    const currentTop = Math.round(configMount.getBoundingClientRect().top);
+
+    if (lastTop === null || Math.abs(currentTop - lastTop) > 1) {
+      if (safeAttempt >= 40) return;
+
+      requestAnimationFrame(() => {
+        applyDeepLinkedHourlyPanelScrollWhenReady(safeAttempt + 1, currentTop);
+      });
+      return;
+    }
+
+    deepLinkedHourlyScrollDone = true;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        ensureDeepLinkedHourlyPanelVisible();
+      });
+    });
+  }
 
   function getLabels() {
     return {
@@ -1182,7 +1255,22 @@
   bindEvents();
   renderAll();
 
+  if (document.readyState === 'complete') {
+    applyDeepLinkedHourlyPanelScrollWhenReady(0, null);
+  } else {
+    window.addEventListener('load', () => {
+      applyDeepLinkedHourlyPanelScrollWhenReady(0, null);
+    }, { once: true });
+  }
+
+  window.addEventListener('pageshow', () => {
+    deepLinkedHourlyScrollDone = false;
+    applyDeepLinkedHourlyPanelScrollWhenReady(0, null);
+  });
+
   window.addEventListener('pixkuy:i18n-applied', () => {
     renderAll();
+    deepLinkedHourlyScrollDone = false;
+    applyDeepLinkedHourlyPanelScrollWhenReady(0, null);
   });
 })();

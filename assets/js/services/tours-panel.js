@@ -122,6 +122,8 @@
     currency: 'MXN',
     pendingTourId: null
   };
+  
+  let deepLinkedTourScrollDone = false;
 
   function getI18nValue(path) {
     const dict = window.__pixkuyI18nDict;
@@ -199,6 +201,22 @@
 
   function getTourById(tourId) {
     return TOURS[tourId] || null;
+  }
+  
+  function getRequestedTourFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      const rawService = String(params.get('service') || '').trim().toLowerCase();
+      const rawTour = String(params.get('tour') || '').trim();
+
+      if (rawService !== 'tour_private') return null;
+      if (!rawTour) return null;
+      if (!Object.prototype.hasOwnProperty.call(TOURS, rawTour)) return null;
+
+      return rawTour;
+    } catch (error) {
+      return null;
+    }
   }
   
     function getTemporalPricingApi() {
@@ -524,6 +542,208 @@ function ensureSelectedTourRowVisible() {
   window.scrollTo({
     top: targetTop,
     behavior: 'smooth'
+  });
+}
+
+function getDeepLinkedToursScrollTarget() {
+  let rawService = '';
+
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    rawService = String(params.get('service') || '').trim().toLowerCase();
+  } catch (error) {
+    rawService = '';
+  }
+
+  if (rawService !== 'tour_private') return null;
+
+  const requestedTourId = getRequestedTourFromUrl();
+
+  if (!requestedTourId) {
+    return catalogMount || panelRoot || null;
+  }
+
+  const selectedTourCard = catalogMount
+    ? catalogMount.querySelector(`[data-services-tour-option="${requestedTourId}"]`)
+    : null;
+
+  if (window.innerWidth <= 720) {
+    return selectedTourCard || panelRoot || null;
+  }
+
+  const selectedTourIndex = getSelectedTourIndex();
+
+  if (selectedTourIndex >= 3 && configMount && !configMount.hidden) {
+    return configMount;
+  }
+
+  return panelRoot || null;
+}
+
+function ensureDeepLinkedTourConfigVisible() {
+  const targetNode = getDeepLinkedToursScrollTarget();
+  if (!targetNode) return;
+
+  const requestedTourId = getRequestedTourFromUrl();
+  const topSafeOffset = requestedTourId ? 24 : 8;
+  const targetRect = targetNode.getBoundingClientRect();
+  const targetTop = Math.max(0, window.scrollY + targetRect.top - topSafeOffset);
+
+  if (Math.abs(targetTop - window.scrollY) < 4) return;
+
+  window.scrollTo({
+    top: targetTop,
+    behavior: 'smooth'
+  });
+}
+
+function applyDeepLinkedToursScrollWhenReady(attempt, previousTop) {
+  if (deepLinkedTourScrollDone) return;
+
+  let rawService = '';
+
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    rawService = String(params.get('service') || '').trim().toLowerCase();
+  } catch (error) {
+    rawService = '';
+  }
+
+  if (rawService !== 'tour_private') return;
+
+  const requestedTourId = getRequestedTourFromUrl();
+  const safeAttempt = Number.isFinite(attempt) ? attempt : 0;
+  const lastTop = Number.isFinite(previousTop) ? previousTop : null;
+  const targetNode = getDeepLinkedToursScrollTarget();
+
+  const isReady =
+    document.readyState === 'complete' &&
+    panelRoot &&
+    !panelRoot.hidden &&
+    catalogMount &&
+    catalogMount.offsetHeight > 0 &&
+    targetNode &&
+    targetNode.offsetHeight > 0 &&
+    (!requestedTourId || state.selectedTourId === requestedTourId);
+
+  if (!isReady) {
+    if (safeAttempt >= 40) return;
+
+    requestAnimationFrame(() => {
+      applyDeepLinkedToursScrollWhenReady(safeAttempt + 1, lastTop);
+    });
+    return;
+  }
+
+  const currentTop = Math.round(targetNode.getBoundingClientRect().top);
+
+  if (lastTop === null || Math.abs(currentTop - lastTop) > 1) {
+    if (safeAttempt >= 40) return;
+
+    requestAnimationFrame(() => {
+      applyDeepLinkedToursScrollWhenReady(safeAttempt + 1, currentTop);
+    });
+    return;
+  }
+
+  deepLinkedTourScrollDone = true;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      ensureDeepLinkedTourConfigVisible();
+    });
+  });
+}
+
+function ensureDeepLinkedTourConfigVisible() {
+  let rawService = '';
+
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    rawService = String(params.get('service') || '').trim().toLowerCase();
+  } catch (error) {
+    rawService = '';
+  }
+
+  if (rawService !== 'tour_private') return;
+
+  const requestedTourId = getRequestedTourFromUrl();
+  const isMobile = window.innerWidth <= 720;
+  const topSafeOffset = requestedTourId ? 24 : 8;
+  let targetNode = null;
+
+  if (!requestedTourId) {
+    targetNode = catalogMount || panelRoot;
+  } else if (isMobile) {
+    targetNode = catalogMount
+      ? catalogMount.querySelector(`[data-services-tour-option="${requestedTourId}"]`)
+      : null;
+
+    targetNode = targetNode || panelRoot;
+  } else {
+    const selectedTourIndex = getSelectedTourIndex();
+
+    if (selectedTourIndex >= 3) {
+      targetNode = getSelectedRowAnchorCard() || configMount || panelRoot;
+    } else {
+      targetNode = panelRoot;
+    }
+  }
+
+  if (!targetNode) return;
+
+  if (!isMobile) {
+    const targetRect = targetNode.getBoundingClientRect();
+    const targetTop = Math.max(0, window.scrollY + targetRect.top - topSafeOffset);
+
+    if (Math.abs(targetTop - window.scrollY) < 4) return;
+
+    window.scrollTo({
+      top: targetTop,
+      behavior: 'smooth'
+    });
+    return;
+  }
+
+  let attempts = 0;
+  const maxAttempts = 8;
+
+  function runScroll() {
+    const liveTargetNode = requestedTourId && catalogMount
+      ? catalogMount.querySelector(`[data-services-tour-option="${requestedTourId}"]`)
+      : targetNode;
+
+    const node = liveTargetNode || targetNode;
+    if (!node) return;
+
+    const targetRect = node.getBoundingClientRect();
+    const targetTop = Math.max(0, window.scrollY + targetRect.top - topSafeOffset);
+
+    window.scrollTo(0, targetTop);
+
+    attempts += 1;
+    if (attempts >= maxAttempts) return;
+
+    window.setTimeout(() => {
+      const currentNode = requestedTourId && catalogMount
+        ? catalogMount.querySelector(`[data-services-tour-option="${requestedTourId}"]`)
+        : node;
+
+      if (!currentNode) return;
+
+      const currentTop = Math.max(0, window.scrollY + currentNode.getBoundingClientRect().top - topSafeOffset);
+      const delta = Math.abs(currentTop - targetTop);
+
+      if (delta > 6) {
+        runScroll();
+      }
+    }, 120);
+  }
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      runScroll();
+    });
   });
 }
 
@@ -862,6 +1082,8 @@ function syncConfigComputedUi() {
     const nextTour = getTourById(nextTourId);
     const previousTour = getTourById(state.selectedTourId);
     const hadSpecificConfig = hasSpecificConfigData();
+    const requestedTourId = getRequestedTourFromUrl();
+    const isDeepLinkedSelection = requestedTourId === nextTourId;
 
     state.selectedTourId = nextTourId;
     state.pendingTourId = null;
@@ -881,6 +1103,10 @@ function syncConfigComputedUi() {
 
     renderAll();
 
+    if (isDeepLinkedSelection) {
+      return;
+    }
+
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         ensureSelectedTourRowVisible();
@@ -893,6 +1119,29 @@ function syncConfigComputedUi() {
     if (state.selectedTourId === nextTourId) return;
 
     applyTourSelection(nextTourId);
+  }
+  
+    function applyRequestedTourSelectionWhenPanelReady(attempt) {
+    const requestedTourId = getRequestedTourFromUrl();
+
+    if (!requestedTourId) return;
+    if (state.selectedTourId === requestedTourId) return;
+
+    const safeAttempt = Number.isFinite(attempt) ? attempt : 0;
+    const isPanelVisible = !panelRoot.hidden;
+
+    if (isPanelVisible) {
+      requestTourSelection(requestedTourId);
+      return;
+    }
+
+    if (safeAttempt >= 20) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      applyRequestedTourSelectionWhenPanelReady(safeAttempt + 1);
+    });
   }
 
   function emitSubmit() {
@@ -1058,28 +1307,52 @@ function syncConfigComputedUi() {
   }
 
   function ensureCatalogTextReady(attempt) {
-    renderAll();
+  renderAll();
 
-    const firstTitle = catalogMount.querySelector('.services-tours-panel__tour-title');
-    const hasText = firstTitle && firstTitle.textContent && firstTitle.textContent.trim();
+  const firstTitle = catalogMount.querySelector('.services-tours-panel__tour-title');
+  const hasText = firstTitle && firstTitle.textContent && firstTitle.textContent.trim();
 
-    if (!hasText && attempt < 10) {
-      window.setTimeout(() => {
-        ensureCatalogTextReady(attempt + 1);
-      }, 80);
-    }
+  if (!hasText && attempt < 10) {
+    window.setTimeout(() => {
+      ensureCatalogTextReady(attempt + 1);
+    }, 80);
+    return;
   }
+
+  applyDeepLinkedToursScrollWhenReady(0, null);
+}
 
   bindEvents();
 
+  applyRequestedTourSelectionWhenPanelReady(0);
+
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
+      deepLinkedTourScrollDone = false;
       ensureCatalogTextReady(0);
     });
   });
 
-  window.addEventListener('pageshow', () => {
+  window.addEventListener('load', () => {
+    if (window.innerWidth > 720) return;
+
+    deepLinkedTourScrollDone = false;
     ensureCatalogTextReady(0);
+
+    window.setTimeout(() => {
+      ensureDeepLinkedTourConfigVisible();
+    }, 180);
+  }, { once: true });
+
+  window.addEventListener('pageshow', () => {
+    deepLinkedTourScrollDone = false;
+    ensureCatalogTextReady(0);
+
+    if (window.innerWidth > 720) return;
+
+    window.setTimeout(() => {
+      ensureDeepLinkedTourConfigVisible();
+    }, 180);
   });
   
   let lastIsMobileToursCatalogLayout = isMobileToursCatalogLayout();
@@ -1090,6 +1363,8 @@ function syncConfigComputedUi() {
     if (nextIsMobileToursCatalogLayout !== lastIsMobileToursCatalogLayout) {
       lastIsMobileToursCatalogLayout = nextIsMobileToursCatalogLayout;
       renderAll();
+      deepLinkedTourScrollDone = false;
+      applyDeepLinkedToursScrollWhenReady(0, null);
       return;
     }
 
@@ -1098,5 +1373,7 @@ function syncConfigComputedUi() {
 
   window.addEventListener('pixkuy:i18n-applied', () => {
     renderAll();
+    deepLinkedTourScrollDone = false;
+    applyDeepLinkedToursScrollWhenReady(0, null);
   });
 })();

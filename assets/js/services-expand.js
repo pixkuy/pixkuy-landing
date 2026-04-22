@@ -81,6 +81,38 @@
 
   if (!serviceKeys.length) return;
 
+  function getRequestedServiceFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      const rawService = String(params.get('service') || '').trim().toLowerCase();
+
+      const publicToInternalMap = {
+        airport_hotel: 'airport',
+        tour_private: 'tours',
+        hourly_daily: 'hourly'
+      };
+
+      return publicToInternalMap[rawService] || null;
+    } catch (error) {
+      return null;
+    }
+  }
+  
+    function shouldSkipMobileDeepLinkFraming(serviceKey) {
+    if (!mobileQuery.matches) return false;
+    if (serviceKey !== 'tours') return false;
+
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      const rawService = String(params.get('service') || '').trim().toLowerCase();
+      const rawTour = String(params.get('tour') || '').trim();
+
+      return rawService === 'tour_private' && !!rawTour;
+    } catch (error) {
+      return false;
+    }
+  }
+
   function getPrimaryCard() {
     const airport = services.airport;
     if (airport && airport.card) return airport.card;
@@ -88,7 +120,7 @@
     if (tours && tours.card) return tours.card;
     return cards[0] || null;
   }
-  
+
   function getMobileHintCards() {
     return serviceKeys
       .map((serviceKey) => services[serviceKey])
@@ -284,7 +316,45 @@
     clearMobileHint();
     bindMobileHintObserver();
   }
+  
+      function scrollMobileDeepLinkedPanelIntoView(serviceKey) {
+    if (!mobileQuery.matches || !serviceKey || !services[serviceKey]) return;
 
+    const entry = services[serviceKey];
+    if (!entry || !entry.panel) return;
+
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    function runScroll() {
+      if (!mobileQuery.matches || entry.panel.hidden) return;
+
+      const panelRect = entry.panel.getBoundingClientRect();
+      const panelTop = panelRect.top + window.scrollY;
+      const targetTop = Math.max(panelTop - 12, 0);
+
+      window.scrollTo(0, targetTop);
+
+      attempts += 1;
+      if (attempts >= maxAttempts) return;
+
+      window.setTimeout(() => {
+        const currentTop = entry.panel.getBoundingClientRect().top + window.scrollY;
+        const delta = Math.abs(currentTop - targetTop);
+
+        if (delta > 6) {
+          runScroll();
+        }
+      }, 120);
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        runScroll();
+      });
+    });
+  }
+  
   serviceKeys.forEach((serviceKey) => {
     bindCard(services[serviceKey]);
   });
@@ -296,6 +366,25 @@
   }
 
   placeExpandForViewport();
-  setExpandedState(null);
+
+  const requestedService = getRequestedServiceFromUrl();
+  if (requestedService && services[requestedService]) {
+    setExpandedState(requestedService);
+
+    if (!shouldSkipMobileDeepLinkFraming(requestedService)) {
+      scrollMobileDeepLinkedPanelIntoView(requestedService);
+
+      window.addEventListener('load', () => {
+        scrollMobileDeepLinkedPanelIntoView(requestedService);
+      }, { once: true });
+
+      window.addEventListener('pageshow', () => {
+        scrollMobileDeepLinkedPanelIntoView(requestedService);
+      }, { once: true });
+    }
+  } else {
+    setExpandedState(null);
+  }
+
   bindMobileHintObserver();
 })();
