@@ -199,25 +199,32 @@
     );
   }
 
+  function isDesktopViewport() {
+    return !isMobileViewport();
+  }
+
   function bindI18nRefresh() {
     window.addEventListener('pixkuy:i18n-applied', function () {
       var banner = document.getElementById(BANNER_ID);
       var stored = getStoredConsent();
+
+      if (stored === ACCEPTED || stored === REJECTED) {
+        return;
+      }
 
       if (banner) {
         syncBannerCopy(banner);
         return;
       }
 
-      if (!isMobileViewport()) {
+      if (isMobileViewport()) {
+        showBanner();
         return;
       }
 
-      if (stored === ACCEPTED || stored === REJECTED) {
-        return;
+      if (isDesktopViewport()) {
+        showBanner();
       }
-
-      showBanner();
     });
   }
 
