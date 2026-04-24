@@ -280,7 +280,7 @@
   "privacy": {
     "title": "Privacy policy",
     "body1": "Data provided through the form is used solely to manage your transfer request and the communications necessary to handle it.",
-    "body2": "We do not share data with third parties for advertising purposes.",
+    "body2": "We may use measurement and advertising tools, such as Google Ads, to understand site activity and measure the effectiveness of our campaigns. These tools may process technical browser information and interactions with the website according to their own policies.",
     "purposeTitle": "Purpose",
     "purposeBody": "To manage transfer or reservation requests, respond to related inquiries, and coordinate the communications necessary to provide the service.",
     "legalBasisTitle": "Legal basis",
@@ -295,8 +295,8 @@
   },
   "cookies": {
     "title": "Cookies policy",
-    "body1": "This website does not use cookies for advertising or tracking purposes.",
-    "body2": "If cookies are introduced in the future, you will be properly informed and consent will be requested when applicable.",
+    "body1": "This website may use measurement and advertising technologies, including Google tags, to measure visits, interactions and conversions associated with our campaigns.",
+    "body2": "These technologies may use cookies, identifiers or local browser storage. When required, consent will be requested before activating non-essential advertising or measurement purposes.",
     "body3": "Language preferences may be stored locally in the browser to improve the browsing experience.",
     "back": "Back to landing"
   },

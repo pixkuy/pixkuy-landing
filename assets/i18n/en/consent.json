@@ -1,0 +1,11 @@
+{
+  "consent": {
+    "googleAds": {
+      "ariaLabel": "Cookie settings",
+      "title": "Cookies and measurement",
+      "text": "We use cookies to measure site usage and improve our campaigns. You can accept or reject non-essential cookies.",
+      "accept": "Accept",
+      "reject": "Reject"
+    }
+  }
+}

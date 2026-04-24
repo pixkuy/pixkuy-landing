@@ -280,7 +280,7 @@
   "privacy": {
     "title": "Politique de confidentialité",
     "body1": "Les données fournies via le formulaire sont utilisées uniquement pour gérer votre demande de transfert et les communications nécessaires pour la traiter.",
-    "body2": "Nous ne partageons pas les données avec des tiers à des fins publicitaires.",
+    "body2": "Nous pouvons utiliser des outils de mesure et de publicité, comme Google Ads, afin de comprendre l’activité du site et de mesurer l’efficacité de nos campagnes. Ces outils peuvent traiter des informations techniques du navigateur et des interactions avec le site conformément à leurs propres politiques.",
     "purposeTitle": "Finalité",
     "purposeBody": "Gérer les demandes de transfert ou de réservation, répondre aux questions associées et coordonner les communications nécessaires à la prestation du service.",
     "legalBasisTitle": "Base légale",
@@ -295,8 +295,8 @@
   },
   "cookies": {
     "title": "Politique de cookies",
-    "body1": "Ce site n’utilise pas de cookies à des fins publicitaires ou de suivi.",
-    "body2": "Si des cookies sont ajoutés à l’avenir, vous en serez dûment informé et, le cas échéant, votre consentement sera requis.",
+    "body1": "Ce site peut utiliser des technologies de mesure et de publicité, y compris des balises Google, pour mesurer les visites, les interactions et les conversions associées à nos campagnes.",
+    "body2": "Ces technologies peuvent utiliser des cookies, des identifiants ou le stockage local du navigateur. Lorsque cela est nécessaire, le consentement sera demandé avant d’activer des finalités publicitaires ou de mesure non essentielles.",
     "body3": "La préférence de langue peut être enregistrée localement dans le navigateur afin d’améliorer l’expérience de navigation.",
     "back": "Retour à la landing"
   },

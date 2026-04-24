@@ -280,7 +280,7 @@
   "privacy": {
     "title": "Datenschutzerklärung",
     "body1": "Die über das Formular bereitgestellten Daten werden ausschließlich verwendet, um Ihre Transferanfrage und die dafür notwendigen Mitteilungen zu bearbeiten.",
-    "body2": "Wir geben keine Daten zu Werbezwecken an Dritte weiter.",
+    "body2": "Wir können Mess- und Werbetools wie Google Ads verwenden, um die Aktivität auf der Website zu verstehen und die Wirksamkeit unserer Kampagnen zu messen. Diese Tools können technische Informationen des Browsers und der Interaktion mit der Website gemäß ihren eigenen Richtlinien verarbeiten.",
     "purposeTitle": "Zweck",
     "purposeBody": "Bearbeitung von Transfer- oder Reservierungsanfragen, Beantwortung damit verbundener Anfragen und Koordination der für die Leistungserbringung erforderlichen Kommunikation.",
     "legalBasisTitle": "Rechtsgrundlage",
@@ -294,12 +294,12 @@
     "back": "Zurück zur Landing"
   },
   "cookies": {
-    "title": "Cookie-Richtlinie",
-    "body1": "Diese Website verwendet keine Cookies zu Werbe- oder Trackingzwecken.",
-    "body2": "Sollten künftig Cookies eingeführt werden, werden Sie ordnungsgemäß informiert und es wird gegebenenfalls Ihre Einwilligung eingeholt.",
-    "body3": "Die bevorzugte Sprache kann lokal im Browser gespeichert werden, um die Nutzungserfahrung zu verbessern.",
-    "back": "Zurück zur Landing"
-  },
+  "title": "Cookie-Richtlinie",
+  "body1": "Diese Website kann Mess- und Werbetechnologien, einschließlich Google-Tags, verwenden, um Besuche, Interaktionen und Conversions im Zusammenhang mit unseren Kampagnen zu messen.",
+  "body2": "Diese Technologien können Cookies, Kennungen oder lokalen Browserspeicher verwenden. Wenn erforderlich, wird vor der Aktivierung nicht notwendiger Werbe- oder Messzwecke eine Einwilligung eingeholt.",
+  "body3": "Die bevorzugte Sprache kann lokal im Browser gespeichert werden, um die Nutzungserfahrung zu verbessern.",
+  "back": "Zurück zur Landing"
+},
   "event": {
     "wc2026": {
       "ariaLabel": "Eventmodus Fußball-Weltmeisterschaft 2026",

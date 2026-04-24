@@ -280,7 +280,7 @@
   "privacy": {
     "title": "Informativa sulla privacy",
     "body1": "I dati forniti tramite il modulo sono utilizzati esclusivamente per gestire la tua richiesta di trasferimento e le comunicazioni necessarie per seguirla.",
-    "body2": "Non condividiamo i dati con terze parti per finalità pubblicitarie.",
+    "body2": "Possiamo utilizzare strumenti di misurazione e pubblicità, come Google Ads, per comprendere l’attività del sito e misurare l’efficacia delle nostre campagne. Questi strumenti possono trattare informazioni tecniche del browser e dell’interazione con il sito secondo le proprie politiche.",
     "purposeTitle": "Finalità",
     "purposeBody": "Gestire richieste di trasferimento o prenotazione, rispondere alle relative richieste di informazioni e coordinare le comunicazioni necessarie per l’erogazione del servizio.",
     "legalBasisTitle": "Base giuridica",
@@ -295,8 +295,8 @@
   },
   "cookies": {
     "title": "Informativa sui cookie",
-    "body1": "Questo sito non utilizza cookie a fini pubblicitari o di tracciamento.",
-    "body2": "Qualora in futuro vengano introdotti cookie, sarai adeguatamente informato e, se necessario, verrà richiesto il consenso.",
+    "body1": "Questo sito può utilizzare tecnologie di misurazione e pubblicità, inclusi tag di Google, per misurare visite, interazioni e conversioni associate alle nostre campagne.",
+    "body2": "Queste tecnologie possono utilizzare cookie, identificatori o archiviazione locale del browser. Quando necessario, verrà richiesto il consenso prima di attivare finalità pubblicitarie o di misurazione non essenziali.",
     "body3": "La preferenza di lingua può essere memorizzata localmente nel browser per migliorare l’esperienza di navigazione.",
     "back": "Torna alla landing"
   },

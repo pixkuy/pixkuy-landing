@@ -280,7 +280,7 @@
   "privacy": {
     "title": "Política de privacidad",
     "body1": "Los datos facilitados mediante el formulario se utilizan únicamente para gestionar tu solicitud de traslado y las comunicaciones necesarias para atenderla.",
-    "body2": "No compartimos datos con terceros con fines publicitarios.",
+    "body2": "Podemos utilizar herramientas de medición y publicidad, como Google Ads, para entender la actividad del sitio y medir la eficacia de nuestras campañas. Estas herramientas pueden tratar información técnica del navegador y de la interacción con la web conforme a sus propias políticas.",
     "purposeTitle": "Finalidad",
     "purposeBody": "Gestionar solicitudes de traslado o reserva, responder a consultas relacionadas y coordinar las comunicaciones necesarias para la prestación del servicio.",
     "legalBasisTitle": "Base legal",
@@ -295,8 +295,8 @@
   },
   "cookies": {
     "title": "Política de cookies",
-    "body1": "Este sitio no utiliza cookies con fines publicitarios ni de seguimiento.",
-    "body2": "En caso de que en el futuro se incorporen cookies, se informará debidamente y, cuando corresponda, se solicitará el consentimiento.",
+    "body1": "Este sitio puede utilizar tecnologías de medición y publicidad, incluidas etiquetas de Google, para medir visitas, interacciones y conversiones asociadas a nuestras campañas.",
+    "body2": "Estas tecnologías pueden usar cookies, identificadores o almacenamiento local del navegador. Cuando sea necesario, se solicitará el consentimiento antes de activar finalidades publicitarias o de medición no esenciales.",
     "body3": "La preferencia de idioma puede almacenarse localmente en el navegador para mejorar la experiencia de navegación.",
     "back": "Volver a la landing"
   },

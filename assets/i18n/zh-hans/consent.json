@@ -1,0 +1,11 @@
+{
+  "consent": {
+    "googleAds": {
+      "ariaLabel": "Cookie 设置",
+      "title": "Cookie 和衡量",
+      "text": "我们使用 Cookie 来衡量网站使用情况并改进广告活动。你可以接受或拒绝非必要 Cookie。",
+      "accept": "接受",
+      "reject": "拒绝"
+    }
+  }
+}

@@ -280,7 +280,7 @@
   "privacy": {
     "title": "Política de privacidade",
     "body1": "Os dados fornecidos através do formulário são utilizados exclusivamente para gerir o seu pedido de transfer e as comunicações necessárias para o tratar.",
-    "body2": "Não partilhamos dados com terceiros para fins publicitários.",
+    "body2": "Podemos utilizar ferramentas de medição e publicidade, como o Google Ads, para compreender a atividade do site e medir a eficácia das nossas campanhas. Estas ferramentas podem tratar informações técnicas do navegador e da interação com o site de acordo com as suas próprias políticas.",
     "purposeTitle": "Finalidade",
     "purposeBody": "Gerir pedidos de transfer ou reserva, responder a questões relacionadas e coordenar as comunicações necessárias para a prestação do serviço.",
     "legalBasisTitle": "Base legal",
@@ -295,8 +295,8 @@
   },
   "cookies": {
     "title": "Política de cookies",
-    "body1": "Este site não utiliza cookies para fins publicitários nem de rastreamento.",
-    "body2": "Caso cookies sejam introduzidos no futuro, será devidamente informado e, quando aplicável, será solicitado o consentimento.",
+    "body1": "Este site pode utilizar tecnologias de medição e publicidade, incluindo etiquetas Google, para medir visitas, interações e conversões associadas às nossas campanhas.",
+    "body2": "Estas tecnologias podem utilizar cookies, identificadores ou armazenamento local do navegador. Quando necessário, será solicitado o consentimento antes de ativar finalidades publicitárias ou de medição não essenciais.",
     "body3": "A preferência de idioma pode ser armazenada localmente no navegador para melhorar a experiência de navegação.",
     "back": "Voltar à landing"
   },
