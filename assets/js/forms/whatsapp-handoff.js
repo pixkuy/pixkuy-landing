@@ -2,13 +2,30 @@
   'use strict';
 
   function getI18nValue(path, fallback) {
-    var i18n;
+    var modules;
+    var getValue;
+    var dict;
     var parts;
     var value;
     var i;
 
-    i18n = window.PixkuyI18n;
-    value = i18n && i18n.currentCopy;
+    if (!path || typeof path !== 'string') {
+      return fallback;
+    }
+
+    modules = window.__pixkuyI18nModules || {};
+    getValue = modules.getValue;
+    dict = window.__pixkuyI18nDict || null;
+
+    if (typeof getValue === 'function' && dict) {
+      value = getValue(dict, path);
+
+      if (typeof value === 'string' && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    value = dict;
     parts = String(path || '').split('.');
 
     for (i = 0; i < parts.length; i += 1) {
@@ -461,14 +478,25 @@
     var message;
     var url;
     var phoneNumber;
+    var mode;
 
     if (!link || !form) {
       return '';
     }
 
     phoneNumber = getWhatsappPhoneNumber();
-    data = getVisibleFormData(form);
-    message = buildMessageLines(data).join('\n');
+    mode = link.getAttribute('data-contact-whatsapp-mode');
+
+    if (mode === 'general') {
+      message = getI18nValue(
+        'contact.whatsappMessage.generalIntro',
+        getI18nValue('contact.whatsappMessage.intro', '')
+      );
+    } else {
+      data = getVisibleFormData(form);
+      message = buildMessageLines(data).join('\n');
+    }
+
     url = buildWhatsappUrl(phoneNumber, message);
 
     if (url) {
@@ -520,16 +548,23 @@
 
   function initWhatsappHandoff() {
     var form;
-    var link;
+    var links;
+    var i;
+    var hasBoundLink;
 
     form = getContactForm();
-    link = document.querySelector('[data-contact-whatsapp="1"]');
+    links = document.querySelectorAll('[data-contact-whatsapp="1"]');
+    hasBoundLink = false;
 
-    if (!form || !link) {
+    if (!form || !links.length) {
       return false;
     }
 
-    return bindWhatsappLink(link, form);
+    for (i = 0; i < links.length; i += 1) {
+      hasBoundLink = bindWhatsappLink(links[i], form) || hasBoundLink;
+    }
+
+    return hasBoundLink;
   }
 
   if (!window.PixkuyForms) {

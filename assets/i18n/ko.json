@@ -194,6 +194,7 @@
 },
     "whatsappMessage": {
   "intro": "안녕하세요, Pixkuy로 이동 서비스를 요청하고 싶습니다.",
+  "generalIntro": "안녕하세요, Pixkuy의 프라이빗 이동 서비스에 대해 상담하고 싶습니다.",
   "serviceType": "서비스 유형",
   "name": "이름",
   "phone": "전화번호",

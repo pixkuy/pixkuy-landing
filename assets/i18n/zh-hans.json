@@ -194,6 +194,7 @@
 },
     "whatsappMessage": {
   "intro": "您好，我想通过 Pixkuy 申请一次接送服务。",
+  "generalIntro": "您好，我想向 Pixkuy 咨询私人交通服务。",
   "serviceType": "服务类型",
   "name": "姓名",
   "phone": "电话",

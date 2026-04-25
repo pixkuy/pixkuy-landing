@@ -194,6 +194,7 @@
 },
     "whatsappMessage": {
   "intro": "Bonjour, je souhaite demander un transfert avec Pixkuy.",
+  "generalIntro": "Bonjour, je souhaite échanger avec Pixkuy au sujet d’un service de transport privé.",
   "serviceType": "Type de service",
   "name": "Nom",
   "phone": "Téléphone",
