@@ -558,6 +558,14 @@
   bindExternalEvents();
   handleViewportChange();
 
+  window.addEventListener('pixkuy:events-special-panel-submit', () => {
+    if (!MOBILE_QUERY.matches || !isSheetOpen) {
+      return;
+    }
+
+    closeSheet();
+  });
+
   window.addEventListener('pixkuy:i18n-applied', () => {
     syncSheetI18n();
 
