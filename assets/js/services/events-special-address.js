@@ -1,4 +1,4 @@
-﻿(function initEventsSpecialAddressModule(window, document) {
+(function initEventsSpecialAddressModule(window, document) {
   'use strict';
 
   if (!window || !document) {
@@ -21,7 +21,7 @@
   function normalizeText(value) {
     return typeof value === 'string' ? value.trim() : '';
   }
-
+  
   function getFieldName(options) {
     var safeOptions = isObject(options) ? options : {};
     return normalizeText(safeOptions.fieldName) || DEFAULT_FIELD_NAME;
@@ -54,7 +54,7 @@
       ? window.PixkuyForms.googlePlaces
       : null;
   }
-
+  
   function ensureAutocompleteVisible(root) {
     if (!root || window.innerWidth <= 720) {
       return;
@@ -111,7 +111,7 @@
           ' aria-label="Clear address"' +
           ' hidden' +
         '>' +
-          '<span aria-hidden="true">Ã—</span>' +
+          '<span aria-hidden="true">&times;</span>' +
         '</button>' +
         '<div' +
           ' class="place-autocomplete__mount"' +

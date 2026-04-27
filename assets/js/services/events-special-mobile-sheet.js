@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   'use strict';
 
   const panelRoot = document.querySelector('[data-services-events-panel]');
@@ -61,7 +61,7 @@
           data-services-events-sheet-close
           aria-label="Cerrar"
         >
-          <span aria-hidden="true">Ã—</span>
+          <span aria-hidden="true">&times;</span>
         </button>
       </div>
 
@@ -123,7 +123,7 @@
   function setNativeTimePickerActive(nextValue) {
     isNativeTimePickerActive = nextValue === true;
   }
-
+  
   function isSheetUsingLiveConfigMount(target, selector) {
     const inlineNodes = Array.from(configMount.querySelectorAll(selector));
 

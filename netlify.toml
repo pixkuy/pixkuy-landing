@@ -4,3 +4,8 @@
 
 [functions]
   node_bundler = "esbuild"
+  included_files = [
+    "assets/js/data/events-special-venues.json",
+    "assets/js/data/events-special-catalog.json",
+    "assets/js/data/events-special-pricing.json"
+  ]
