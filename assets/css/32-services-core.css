@@ -115,7 +115,7 @@
   gap:6px;
 }
 
-.service-card--featured .service-card__footer{
+.service-card__footer{
   margin-top:auto;
   padding-top:20px;
   display:flex;
@@ -124,13 +124,13 @@
   gap:18px;
 }
 
-.service-card--featured .service-card__footer .service-card__price{
+.service-card__footer .service-card__price{
   margin-top:0;
   padding-top:0;
   flex:1 1 auto;
 }
 
-.service-card--featured .service-card__footer .service-card__action{
+.service-card__footer .service-card__action{
   flex:0 0 auto;
   align-self:flex-end;
 }
@@ -218,6 +218,17 @@
   .service-card[role="button"]:focus-visible .service-card__action{
     color:var(--fg);
   }
+  
+  .service-card[role="button"]:hover .service-card__action-label,
+  .service-card[role="button"]:focus-visible .service-card__action-label,
+  .service-card--active .service-card__action-label{
+    display:inline-block;
+    color:var(--fg);
+    background:rgba(31,122,109,.22);
+    border:1px solid rgba(74,211,190,.62);
+    border-radius:12px;
+    padding:8px 10px;
+  }
 
   .service-card[role="button"]:hover .service-card__action-chevron,
   .service-card[role="button"]:focus-visible .service-card__action-chevron{
@@ -302,7 +313,21 @@
   }
 
   .service-card__footer{
-    display:block;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:14px;
+  }
+
+  .service-card__footer .service-card__price{
+    min-width:0;
+  }
+
+  .service-card__footer .service-card__action-label{
+    max-width:132px;
+    white-space:normal;
+    text-align:right;
+    line-height:1.15;
   }
 
   .service-card__price-value{
@@ -423,16 +448,27 @@
 
   .service-card--mobile-hint .service-card__action{
     color:var(--fg);
-    background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.24);
-    border-radius:14px;
-    padding:12px 14px;
-    box-shadow:0 10px 22px rgba(0,0,0,.18);
-    animation:serviceCardMobileHintAction .9s ease 2;
+    background:transparent;
+    border:0;
+    border-radius:0;
+    padding:0;
+    box-shadow:none;
+    animation:none;
   }
 
   .service-card--mobile-hint .service-card__action-label{
+    display:inline-block;
     font-weight:700;
+    background:rgba(31,122,109,.22);
+    border:1px solid rgba(74,211,190,.62);
+    border-radius:12px;
+    padding:8px 9px;
+    box-shadow:0 10px 22px rgba(0,0,0,.18);
+    animation:serviceCardMobileHintAction .9s ease 2;
+  }
+  
+  .service-card--mobile-hint .service-card__action .service-card__action-label{
+    max-width:132px;
   }
 
   .service-card--mobile-hint .service-card__action-chevron{
@@ -484,19 +520,19 @@
 
 @keyframes serviceCardMobileHintAction{
   0%{
-    background:rgba(255,255,255,.10);
+    background:rgba(31,122,109,.16);
     transform:scale(1);
   }
   30%{
-    background:rgba(255,255,255,.22);
+    background:rgba(31,122,109,.30);
     transform:scale(1.02);
   }
   60%{
-    background:rgba(255,255,255,.18);
+    background:rgba(31,122,109,.22);
     transform:scale(1);
   }
   100%{
-    background:rgba(255,255,255,.18);
+    background:rgba(31,122,109,.22);
     transform:scale(1);
   }
 }

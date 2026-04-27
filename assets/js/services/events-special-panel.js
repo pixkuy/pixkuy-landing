@@ -1628,6 +1628,75 @@
 
     renderAll();
   }
+  
+    function getRequestedEventFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      return String(params.get("event") || "").trim();
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function findGroupByEventId(eventId) {
+    const safeEventId = String(eventId || "").trim();
+
+    if (!safeEventId) {
+      return null;
+    }
+
+    return state.groups.find((group) => {
+      return group.events.some((event) => event && event.id === safeEventId);
+    }) || null;
+  }
+
+  function scrollEventGroupCardIntoView(groupId) {
+    const safeGroupId = String(groupId || "").trim();
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    if (!safeGroupId) {
+      return false;
+    }
+
+    function runScroll() {
+      const card = catalogMount.querySelector(
+        '[data-services-events-group="' + safeGroupId + '"]'
+      );
+
+      if (!card || typeof card.scrollIntoView !== "function") {
+        attempts += 1;
+
+        if (attempts < maxAttempts) {
+          window.setTimeout(runScroll, 120);
+        }
+
+        return;
+      }
+
+      card.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runScroll);
+    });
+
+    return true;
+  }
+
+  function handleEventDeeplinkFocus() {
+    const requestedEventId = getRequestedEventFromUrl();
+    const targetGroup = findGroupByEventId(requestedEventId);
+
+    if (!targetGroup) {
+      return false;
+    }
+
+    return scrollEventGroupCardIntoView(targetGroup.id);
+  }
 
   function selectEventFromExternalRequest(eventId) {
     const safeEventId = String(eventId || "").trim();
@@ -1913,6 +1982,7 @@
       }
 
       renderAll();
+      handleEventDeeplinkFocus();
     } catch (error) {
       state.groups = [];
       state.selectedGroupId = "";

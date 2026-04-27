@@ -531,6 +531,10 @@
     border-radius:14px;
   }
   
+  .contact-hourly-daily-editor__pickup .place-autocomplete__clear{
+    z-index:63;
+  }
+  
     .contact-hourly-daily-editor__date input[type="date"],
   .contact-hourly-daily-editor__time input[type="time"]{
     height:52px;

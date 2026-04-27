@@ -239,12 +239,21 @@
     }
 
     window.setTimeout(function () {
-      target.focus();
-
-      if (typeof target.select === 'function') {
-        target.select();
+      if (typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
       }
-    }, 0);
+
+      window.setTimeout(function () {
+        target.focus({ preventScroll: true });
+
+        if (typeof target.select === 'function') {
+          target.select();
+        }
+      }, 120);
+    }, 260);
 
     return true;
   }
