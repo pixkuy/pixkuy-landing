@@ -1,4 +1,4 @@
-﻿.services-events-panel {
+.services-events-panel {
   display: grid;
   gap: 16px;
 }
@@ -469,7 +469,7 @@
     text-align: center;
     white-space: normal;
   }
-
+  
   .service-card:has([data-i18n="services.cards.events.title"]).service-card--mobile-hint .service-card__action {
     margin-top: 12px;
   }

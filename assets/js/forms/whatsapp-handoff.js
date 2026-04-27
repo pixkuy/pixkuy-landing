@@ -1,4 +1,4 @@
-﻿(function (window, document) {
+(function (window, document) {
   'use strict';
 
   function getI18nValue(path, fallback) {
@@ -183,7 +183,7 @@
       currency: getVisibleFieldValue(form, 'tour_private_currency')
     };
   }
-
+  
   function getHourlyDailyEditorData(form) {
   if (!form) {
     return {
@@ -357,7 +357,7 @@
       eventSpecialEstimatedDestinationArrivalTime: eventSpecialData && eventSpecialData.estimatedDestinationArrivalTime ? eventSpecialData.estimatedDestinationArrivalTime : ''
     };
   }
-
+  
   function buildMessageLines(data) {
     var lines;
     var labels;
@@ -368,12 +368,12 @@
       serviceType: getI18nValue('contact.whatsappMessage.serviceType', 'Tipo de servicio'),
       serviceAirportHotel: getI18nValue('contact.services.airportHotel', 'Aeropuerto y hotel'),
       serviceTourPrivate: getI18nValue('contact.services.tourPrivate', 'Tours y visitas privadas'),
-      serviceHourlyDaily: getI18nValue('contact.services.hourlyDaily', 'Por horas o por dÃ­a'),
+      serviceHourlyDaily: getI18nValue('contact.services.hourlyDaily', 'Por horas o por día'),
       serviceEventSpecial: getI18nValue('contact.services.eventSpecial.label', 'Eventos y ocasiones especiales'),
       serviceOther: getI18nValue('contact.services.other', 'Otro servicio'),
       name: getI18nValue('contact.whatsappMessage.name', 'Nombre'),
-      phone: getI18nValue('contact.whatsappMessage.phone', 'TelÃ©fono'),
-      email: getI18nValue('contact.whatsappMessage.email', 'Correo electrÃ³nico'),
+      phone: getI18nValue('contact.whatsappMessage.phone', 'Teléfono'),
+      email: getI18nValue('contact.whatsappMessage.email', 'Correo electrónico'),
       tripDate: getI18nValue('contact.whatsappMessage.tripDate', 'Fecha del traslado'),
       tripTime: getI18nValue('contact.whatsappMessage.tripTime', 'Hora del traslado'),
       origin: getI18nValue('contact.whatsappMessage.origin', 'Origen'),
@@ -385,19 +385,19 @@
       notes: getI18nValue('contact.whatsappMessage.notes', 'Notas'),
       tour: getI18nValue('contact.whatsappMessage.tour', 'Tour'),
       pickup: getI18nValue('contact.whatsappMessage.pickup', 'Recogida'),
-      guide: getI18nValue('contact.whatsappMessage.guide', 'GuÃ­a'),
-      guideLanguage: getI18nValue('contact.whatsappMessage.guideLanguage', 'Idioma del guÃ­a'),
+      guide: getI18nValue('contact.whatsappMessage.guide', 'Guía'),
+      guideLanguage: getI18nValue('contact.whatsappMessage.guideLanguage', 'Idioma del guía'),
       price: getI18nValue('contact.whatsappMessage.price', 'Precio final'),
-      yes: getI18nValue('ui.yes', 'SÃ­'),
+      yes: getI18nValue('ui.yes', 'Sí'),
       no: getI18nValue('ui.no', 'No'),
       hourlyDailyMode: getI18nValue('services.cards.hourly.panel.modeLabel', 'Modalidad'),
-      hourlyDailyDuration: getI18nValue('services.cards.hourly.panel.durationLabel', 'DuraciÃ³n'),
+      hourlyDailyDuration: getI18nValue('services.cards.hourly.panel.durationLabel', 'Duración'),
       hourlyDailyLongTerm: getI18nValue('services.cards.hourly.panel.longTermDurationLabel', 'Periodo solicitado'),
       hourlyTabHourly: getI18nValue('services.cards.hourly.panel.tabs.hourly', 'Por horas'),
-      hourlyTabFullDay: getI18nValue('services.cards.hourly.panel.tabs.fullDay', 'DÃ­a completo'),
+      hourlyTabFullDay: getI18nValue('services.cards.hourly.panel.tabs.fullDay', 'Día completo'),
       hourlyTabLongTerm: getI18nValue('services.cards.hourly.panel.tabs.longTerm', 'Planes largos'),
       hourlyLongTermWeek: getI18nValue('services.cards.hourly.panel.longTerm.week', 'Semana'),
-      hourlyLongTermFortnight: getI18nValue('services.cards.hourly.panel.longTerm.fortnight', '15 dÃ­as'),
+      hourlyLongTermFortnight: getI18nValue('services.cards.hourly.panel.longTerm.fortnight', '15 días'),
       hourlyLongTermMonthly: getI18nValue('services.cards.hourly.panel.longTerm.monthly', 'Mensual'),
       hourlyLongTermCustom: getI18nValue('services.cards.hourly.panel.longTerm.custom', 'Otro periodo'),
       event: getI18nValue('contact.services.eventSpecial.eventLabel', 'Evento'),
@@ -466,7 +466,7 @@
     if (data.pickup) {
       lines.push(labels.pickup + ': ' + data.pickup);
     }
-
+	
 	    if (data.serviceType === 'event_special' && data.eventSpecialEventLabel) {
       lines.push(labels.event + ': ' + data.eventSpecialEventLabel);
     }
@@ -494,7 +494,7 @@
     if (data.serviceType === 'event_special' && data.eventSpecialEstimatedDestinationArrivalTime) {
       lines.push(labels.estimatedDestinationArrival + ': ' + data.eventSpecialEstimatedDestinationArrivalTime);
     }
-
+	
 	if (data.serviceType === 'hourly_daily' && data.hourlyDailyMode) {
       if (data.hourlyDailyMode === 'hourly') {
         lines.push(labels.hourlyDailyMode + ': ' + labels.hourlyTabHourly);
@@ -662,7 +662,7 @@
 
     return true;
   }
-
+  
   function initWhatsappHandoff() {
     var form;
     var links;

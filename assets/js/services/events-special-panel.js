@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   "use strict";
 
   const expandedPanel = document.getElementById("services-expand-events");
@@ -37,7 +37,7 @@
     quoteRequestId: 0,
     addressControllers: []
   };
-
+  
   const nativeTimePickerState = {
     activeField: "",
     pendingField: "",
@@ -402,7 +402,7 @@
       </article>
     `;
   }
-
+  
     function getAvailableVariants() {
     const variants = state.pricing && state.pricing.variants ? state.pricing.variants : {};
     return ["arrival", "departure", "round_trip"].filter((variantId) => {
@@ -438,7 +438,7 @@
       `;
     }).join("");
   }
-
+  
     function getAvailablePassengerFareKeys() {
     const passengerFactors = state.pricing && state.pricing.passengerFactors
       ? state.pricing.passengerFactors
@@ -547,7 +547,7 @@
       </select>
     `;
   }
-
+  
     function getAddressModule() {
     return window.PixkuyServicesEventsSpecialAddress &&
       typeof window.PixkuyServicesEventsSpecialAddress.buildAddressMarkup === "function"
@@ -571,12 +571,12 @@
     if (state.selectedVariant === "departure") {
       return getI18nValue("services.cards.events.panel.addressDestinationPlaceholder") ||
         getI18nValue("services.cards.events.panel.addressPlaceholder") ||
-        "Escribe la direcciÃ³n en Ciudad de MÃ©xico donde te llevaremos tras el evento";
+        "Escribe la dirección en Ciudad de México donde te llevaremos tras el evento";
     }
 
     return getI18nValue("services.cards.events.panel.addressOriginPlaceholder") ||
       getI18nValue("services.cards.events.panel.addressPlaceholder") ||
-      "Escribe tu direcciÃ³n de origen en Ciudad de MÃ©xico donde tenemos que recogerte";
+      "Escribe tu dirección de origen en Ciudad de México donde tenemos que recogerte";
   }
 
   function getRoundTripOriginLabel() {
@@ -594,14 +594,14 @@
   function getRoundTripOriginPlaceholder() {
     return getI18nValue("services.cards.events.panel.addressOriginPlaceholder") ||
       getI18nValue("services.cards.events.panel.addressPlaceholder") ||
-      "Escribe tu direcciÃ³n de origen en Ciudad de MÃ©xico donde tenemos que recogerte";
+      "Escribe tu dirección de origen en Ciudad de México donde tenemos que recogerte";
   }
 
   function getRoundTripDestinationPlaceholder() {
     return getI18nValue("services.cards.events.panel.addressReturnDestinationPlaceholder") ||
       getI18nValue("services.cards.events.panel.addressDestinationPlaceholder") ||
       getI18nValue("services.cards.events.panel.addressPlaceholder") ||
-      "Escribe la direcciÃ³n en Ciudad de MÃ©xico donde te llevaremos despuÃ©s del evento";
+      "Escribe la dirección en Ciudad de México donde te llevaremos después del evento";
   }
 
   function buildSingleAddressFieldMarkup() {
@@ -716,7 +716,7 @@
 
     return buildSingleAddressFieldMarkup();
   }
-
+  
     function getPickupTimePlaceholder() {
     return getI18nValue("services.cards.events.panel.pickupTimePlaceholder") || "--:--";
   }
@@ -730,7 +730,7 @@
     return getI18nValue("services.cards.events.panel.pickupTimeAfterEventLabel") ||
       "Hora de recogida tras el evento";
   }
-
+  
     function normalizeTimeValue(value) {
     const raw = String(value || "").trim();
     return /^\d{2}:\d{2}$/.test(raw) ? raw : "";
@@ -802,7 +802,7 @@
 
     return isReturnPickupTimeAllowed(value);
   }
-
+  
     function getTimeFieldName(target) {
     if (!target || typeof target.getAttribute !== "function") {
       return "";
@@ -1128,7 +1128,7 @@
       mountAddressControllerForRoot(addressModule, addressRoot);
     });
   }
-
+  
     function getQuoteModule() {
     return window.PixkuyServicesEventsSpecialQuote &&
       typeof window.PixkuyServicesEventsSpecialQuote.requestQuote === "function"
@@ -1289,7 +1289,7 @@
     renderEstimatedArrivals();
     syncContinueCtaState();
   }
-
+  
     function isReadyForContactHandoff() {
     return Boolean(
       state.quoteStatus === "ready" &&
@@ -1543,7 +1543,7 @@
 
         ${buildAddressFieldMarkup()}
 
-        ${isMobileViewport() ? "" : buildContinueCtaMarkup()}
+        ${buildContinueCtaMarkup()}
       </div>
     `;
   }
@@ -1663,7 +1663,7 @@
 
     return true;
   }
-
+  
     function focusExpandedPanel() {
     if (!expandedPanel || expandedPanel.hidden) return;
     if (window.innerWidth <= 720) return;
@@ -1680,7 +1680,7 @@
       });
     });
   }
-
+  
     function ensureConfigVisibleAfterGrowth() {
     if (!configMount || configMount.hidden) return;
     if (window.innerWidth <= 720) return;
@@ -1703,7 +1703,7 @@
       });
     });
   }
-
+  
   function syncTimeOverlay(input) {
     if (!input || typeof input.closest !== "function") return;
 
@@ -1757,7 +1757,7 @@
 
       handleTimeFieldInteraction(target);
     });
-
+	
 	    configMount.addEventListener("pointerdown", (event) => {
       const target = event.target;
 

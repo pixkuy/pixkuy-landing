@@ -1,4 +1,4 @@
-﻿(function (window, document) {
+(function (window, document) {
   'use strict';
 
   function safeInit(fn, label) {
@@ -15,7 +15,7 @@
   }
 
   function logPlacesBoot() {}
-
+  
   function bootWhatsappHandoff() {
     if (!window.PixkuyForms) {
       return false;
@@ -95,7 +95,7 @@
       'initContactTourPrivateEditor'
     );
   }
-
+  
   function bootContactHourlyDailyEditor() {
     if (!window.PixkuyForms) {
       return false;
@@ -106,7 +106,7 @@
       'initContactHourlyDailyEditor'
     );
   }
-
+  
   function bootContactEventSpecialEditor() {
     if (!window.PixkuyForms) {
       return false;
@@ -117,7 +117,7 @@
       'initContactEventSpecialEditor'
     );
   }
-
+  
   function bootPanelHandoffSummary() {
     if (!window.PixkuyForms) {
       return false;
@@ -200,7 +200,7 @@
 
     return true;
   }
-
+  
   function focusHourlyDailyPrimaryField(form) {
     var target;
 
@@ -224,7 +224,7 @@
 
     return true;
   }
-
+  
     function focusEventSpecialPrimaryField(form) {
     var target;
 
@@ -378,7 +378,7 @@
     formsNamespace.__hourlyDailyHandoffBound = true;
     return true;
   }
-
+  
     function bindEventsSpecialPanelHandoff() {
     var formsNamespace;
     var serviceStateApi;
@@ -437,7 +437,7 @@
     formsNamespace.__eventSpecialHandoffBound = true;
     return true;
   }
-
+  
   function getDocumentLanguage() {
     var language = document.documentElement && document.documentElement.lang;
 

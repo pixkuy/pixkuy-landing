@@ -1,4 +1,4 @@
-﻿(function initContactServiceSwitcherModule(window, document) {
+(function initContactServiceSwitcherModule(window, document) {
   "use strict";
 
   if (!window || !document) {
@@ -160,7 +160,7 @@
       button.removeAttribute("data-service-pending-confirm");
     });
   }
-
+  
     function syncMobileSelectState(mobileSelect, activeServiceType) {
     if (!mobileSelect) {
       return false;
@@ -172,7 +172,7 @@
 
     return true;
   }
-
+  
     function isMobileServiceSelectViewport() {
     return Boolean(
       window &&
@@ -290,7 +290,7 @@
 
     return true;
   }
-
+  
   function syncOperationalSummaryFields(form, activeServiceType) {
     var serviceLabelField;
     var requestSummaryField;
@@ -364,7 +364,7 @@
       "tour_private_guide_language_label",
       "tour_private_price_label"
     ];
-
+	
     hourlyDailyFieldNames = [
       "hourly_daily_mode",
       "hourly_daily_vehicle_type",
@@ -555,7 +555,7 @@
         });
       });
     });
-
+	
 	    if (
       nodes.mobileSelect &&
       nodes.mobileSelect.dataset.contactServiceSwitcherBound !== "1"
@@ -611,7 +611,7 @@
 
     return true;
   }
-
+  
   function initContactServiceSwitcher() {
     const form = getReservationForm();
     const serviceStateApi = getServiceStateApi();
