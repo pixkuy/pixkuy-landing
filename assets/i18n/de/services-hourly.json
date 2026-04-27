@@ -2,8 +2,8 @@
   "services": {
     "cards": {
       "hourly": {
-        "title": "Stundenweise oder tageweise",
-        "text": "Ein flexibler Service für Termine, Meetings und Fahrten mit mehreren Stopps.",
+        "title": "Privater Fahrer- und Fahrservice",
+        "text": "Buchen Sie einen privaten Fahrservice in Mexiko-Stadt stundenweise oder für den ganzen Tag, mit festem Fahrer und Premiumfahrzeug.",
         "contact": {
           "helper": "Wählen Sie Modus, Abholpunkt, Datum und Uhrzeit, um die Anfrage vorzubereiten."
         },

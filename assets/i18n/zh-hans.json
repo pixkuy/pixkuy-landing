@@ -94,7 +94,7 @@
       "priceValue": "根据行程安排"
     },
     "hourly": {
-      "title": "按小时或按天",
+      "title": "私人司机与专车服务",
       "text": "适用于日程、会议以及含多站点行程的灵活服务。",
       "bullets": [
         "灵活安排",
@@ -228,7 +228,7 @@
   "switcherAriaLabel": "服务类型选择器",
   "airportHotel": "机场与酒店",
   "tourPrivate": "私人游览与参观",
-  "hourlyDaily": "按小时或按天",
+  "hourlyDaily": "私人司机与专车服务",
   "other": "其他服务",
   "confirmChangeSpecificData": "如果您更改服务，当前服务的专属数据将会丢失。是否继续？",
   "confirmAccept": "继续",

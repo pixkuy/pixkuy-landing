@@ -1,0 +1,188 @@
+{
+  "services": {
+    "cards": {
+      "events": {
+        "ctaClosed": "View upcoming events",
+        "ctaOpen": "Hide events",
+        "panel": {
+          "title": "Upcoming events in CDMX",
+          "intro": "Choose a featured event and request a private transfer coordinated for arrival, departure, or round trip.",
+          "empty": "There are no featured events available for booking at this time.",
+          "selectedEventLabel": "Selected event",
+          "venueLabel": "Venue",
+          "dateLabel": "Date and time",
+          "variantLabel": "Mode",
+          "addressLabel": "Address",
+          "addressOriginLabel": "Origin",
+          "addressDestinationLabel": "Destination",
+          "addressBaseLabel": "Base address",
+          "addressReturnDestinationLabel": "Destination after the event",
+          "addressPlaceholder": "Enter an address in Mexico City",
+          "addressOriginPlaceholder": "Enter your pickup address in Mexico City where we should collect you for the event",
+          "addressDestinationPlaceholder": "Enter the address in Mexico City where we will take you after the event",
+          "addressReturnDestinationPlaceholder": "Enter the address in Mexico City where we will take you after the event",
+          "pickupTimeOriginLabel": "Pickup time at origin",
+          "pickupTimeAfterEventLabel": "Pickup time after the event",
+          "pickupTimePlaceholder": "--:--",
+          "passengersLabel": "Passengers",
+          "priceFromLabel": "From",
+          "finalPriceLabel": "Final price",
+          "eventCta": "Configure transfer",
+          "continueCta": "Continue request",
+          "posterAlt": "Event poster",
+          "configurationTitle": "Configure your transfer",
+          "configurationIntro": "Select the mode, address, and passengers to calculate the price.",
+          "quotePending": "Complete the details to calculate the price.",
+          "quoteLoading": "Calculating price...",
+          "quoteUnavailable": "We cannot calculate the price for this route at this time.",
+          "estimatedEventArrivalLabel": "Estimated arrival at the event",
+          "estimatedDestinationArrivalLabel": "Estimated arrival at destination",
+          "estimatedArrivalPending": "Pending",
+          "routeUnavailable": "We could not calculate a valid route for this address.",
+          "outOfCoverage": "The address is outside the available operating coverage.",
+          "ctaDisabled": "Complete the event details to continue."
+        },
+        "variants": {
+          "arrival": "Transfer to the event",
+          "departure": "Pickup at the event",
+          "round_trip": "Coordinated round trip"
+        },
+        "passengerBuckets": {
+          "van_1_2": "1–2 passengers",
+          "van_3_4": "3–4 passengers",
+          "van_5_6": "5–6 passengers"
+        },
+        "passengerBucketsMobile": {
+          "van_1_2": "1–2",
+          "van_3_4": "3–4",
+          "van_5_6": "5–6"
+        },
+        "states": {
+          "empty": "There are no featured events available for booking at this time.",
+          "loading": "Loading events...",
+          "error": "We could not load the featured events.",
+          "selectEvent": "Select an event to configure your transfer.",
+          "priceUnavailable": "Price not available.",
+          "ready": "Transfer ready to continue."
+        },
+        "spotlight": {
+          "label": "Event with transfer available",
+          "cta": "View transfer",
+          "close": "Close highlight",
+          "metaFallback": "Private transfer available"
+        },
+        "types": {
+          "concert": "Concert",
+          "sport": "Sport",
+          "festival": "Festival",
+          "expo": "Expo",
+          "other": "Event"
+        },
+        "venues": {
+          "estadio_gnp": {
+            "name": "Estadio GNP Seguros",
+            "address": "Viaducto Río de la Piedad, Mexico City"
+          },
+          "palacio_de_los_deportes": {
+            "name": "Palacio de los Deportes",
+            "address": "Granjas México, Mexico City"
+          },
+          "autodromo_hermanos_rodriguez": {
+            "name": "Autódromo Hermanos Rodríguez",
+            "address": "Granjas México, Mexico City"
+          },
+          "auditorio_nacional": {
+            "name": "Auditorio Nacional",
+            "address": "Polanco, Mexico City"
+          },
+          "arena_cdmx": {
+            "name": "Arena CDMX",
+            "address": "Azcapotzalco, Mexico City"
+          },
+          "estadio_azteca": {
+            "name": "Estadio Azteca",
+            "address": "Coyoacán, Mexico City"
+          },
+          "estadio_olimpico_universitario": {
+            "name": "Estadio Olímpico Universitario",
+            "address": "Ciudad Universitaria, Mexico City"
+          },
+          "centro_banamex": {
+            "name": "Centro Banamex",
+            "address": "Hipódromo de las Américas, Mexico City"
+          },
+          "expo_santa_fe": {
+            "name": "Expo Santa Fe",
+            "address": "Santa Fe, Mexico City"
+          },
+          "zocalo_reforma": {
+            "name": "Zócalo / Reforma",
+            "address": "Centro / Reforma, Mexico City"
+          }
+        },
+        "catalog": {
+          "bts_arirang_2026": {
+            "title": "BTS WORLD TOUR ‘ARIRANG’",
+            "dates": {
+              "2026_05_07": "Thursday, May 7 · 20:00",
+              "2026_05_09": "Saturday, May 9 · 20:00",
+              "2026_05_10": "Sunday, May 10 · 20:00"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "services": {
+      "eventSpecial": {
+        "label": "Upcoming Events",
+        "helper": "Review the event, mode, and transfer details before submitting the request.",
+        "summaryTitle": "Event transfer",
+        "eventLabel": "Event",
+        "dateLabel": "Date and time",
+        "venueLabel": "Venue",
+        "variantLabel": "Mode",
+        "originLabel": "Origin",
+        "destinationLabel": "Destination after the event",
+        "destinationPlaceholder": "Address where we will take you after the event",
+        "originPickupTimeLabel": "Pickup time at origin",
+        "returnPickupTimeLabel": "Pickup time after the event",
+        "estimatedEventArrivalLabel": "Estimated arrival at the event",
+        "estimatedDestinationPickupLead": "Pickup at the venue",
+        "estimatedDestinationArrivalLabel": "Estimated arrival at destination",
+        "passengersLabel": "Passengers",
+        "priceLabel": "Price",
+        "notesLabel": "Notes"
+      }
+    },
+    "validation": {
+      "eventSpecialEventRequired": "Select an event.",
+      "eventSpecialVariantRequired": "Select a mode.",
+      "eventSpecialOriginRequired": "Select a valid origin address.",
+      "eventSpecialDestinationRequired": "Select a valid destination address.",
+      "eventSpecialOriginPickupTimeRequired": "Select the pickup time at origin.",
+      "eventSpecialReturnPickupTimeRequired": "Select the pickup time after the event.",
+      "eventSpecialPassengersRequired": "Select the number of passengers.",
+      "eventSpecialPriceRequired": "Calculate the price before continuing."
+    },
+    "whatsappMessage": {
+      "eventSpecial": {
+        "serviceType": "Service type",
+        "event": "Event",
+        "date": "Date and time",
+        "venue": "Venue",
+        "variant": "Mode",
+        "origin": "Origin",
+        "destination": "Destination after the event",
+        "originPickupTime": "Pickup time at origin",
+        "returnPickupTime": "Pickup time after the event",
+        "estimatedEventArrival": "Estimated arrival at the event",
+        "estimatedDestinationArrival": "Estimated arrival at destination",
+        "passengers": "Passengers",
+        "price": "Price",
+        "notes": "Notes"
+      }
+    }
+  }
+}

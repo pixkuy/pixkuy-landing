@@ -1,0 +1,188 @@
+{
+  "services": {
+    "cards": {
+      "events": {
+        "ctaClosed": "Vedi prossimi eventi",
+        "ctaOpen": "Nascondi eventi",
+        "panel": {
+          "title": "Prossimi eventi a CDMX",
+          "intro": "Scegli un evento in evidenza e richiedi un transfer privato coordinato per arrivo, uscita o andata e ritorno.",
+          "empty": "Al momento non ci sono eventi in evidenza disponibili per la prenotazione.",
+          "selectedEventLabel": "Evento selezionato",
+          "venueLabel": "Location",
+          "dateLabel": "Data e ora",
+          "variantLabel": "Modalità",
+          "addressLabel": "Indirizzo",
+          "addressOriginLabel": "Origine",
+          "addressDestinationLabel": "Destinazione",
+          "addressBaseLabel": "Indirizzo base",
+          "addressReturnDestinationLabel": "Destinazione dopo l’evento",
+          "addressPlaceholder": "Inserisci un indirizzo a Città del Messico",
+          "addressOriginPlaceholder": "Inserisci l’indirizzo di partenza a Città del Messico dove dovremo venirti a prendere per portarti all’evento",
+          "addressDestinationPlaceholder": "Inserisci l’indirizzo a Città del Messico dove ti porteremo dopo l’evento",
+          "addressReturnDestinationPlaceholder": "Inserisci l’indirizzo a Città del Messico dove ti porteremo dopo l’evento",
+          "pickupTimeOriginLabel": "Ora di prelievo all’origine",
+          "pickupTimeAfterEventLabel": "Ora di prelievo dopo l’evento",
+          "pickupTimePlaceholder": "--:--",
+          "passengersLabel": "Passeggeri",
+          "priceFromLabel": "Da",
+          "finalPriceLabel": "Prezzo finale",
+          "eventCta": "Configura transfer",
+          "continueCta": "Continua richiesta",
+          "posterAlt": "Poster dell’evento",
+          "configurationTitle": "Configura il tuo transfer",
+          "configurationIntro": "Seleziona modalità, indirizzo e passeggeri per calcolare il prezzo.",
+          "quotePending": "Completa i dati per calcolare il prezzo.",
+          "quoteLoading": "Calcolo del prezzo...",
+          "quoteUnavailable": "Non possiamo calcolare il prezzo per questo percorso in questo momento.",
+          "estimatedEventArrivalLabel": "Arrivo stimato all’evento",
+          "estimatedDestinationArrivalLabel": "Arrivo stimato a destinazione",
+          "estimatedArrivalPending": "In sospeso",
+          "routeUnavailable": "Non abbiamo potuto calcolare un percorso valido per questo indirizzo.",
+          "outOfCoverage": "L’indirizzo è fuori dalla copertura operativa disponibile.",
+          "ctaDisabled": "Completa i dati dell’evento per continuare."
+        },
+        "variants": {
+          "arrival": "Transfer verso l’evento",
+          "departure": "Prelievo all’evento",
+          "round_trip": "Andata e ritorno coordinati"
+        },
+        "passengerBuckets": {
+          "van_1_2": "1–2 passeggeri",
+          "van_3_4": "3–4 passeggeri",
+          "van_5_6": "5–6 passeggeri"
+        },
+        "passengerBucketsMobile": {
+          "van_1_2": "1–2",
+          "van_3_4": "3–4",
+          "van_5_6": "5–6"
+        },
+        "states": {
+          "empty": "Al momento non ci sono eventi in evidenza disponibili per la prenotazione.",
+          "loading": "Caricamento eventi...",
+          "error": "Non abbiamo potuto caricare gli eventi in evidenza.",
+          "selectEvent": "Seleziona un evento per configurare il tuo transfer.",
+          "priceUnavailable": "Prezzo non disponibile.",
+          "ready": "Transfer pronto per continuare."
+        },
+        "spotlight": {
+          "label": "Evento con transfer disponibile",
+          "cta": "Vedi transfer",
+          "close": "Chiudi evidenza",
+          "metaFallback": "Transfer privato disponibile"
+        },
+        "types": {
+          "concert": "Concerto",
+          "sport": "Sport",
+          "festival": "Festival",
+          "expo": "Expo",
+          "other": "Evento"
+        },
+        "venues": {
+          "estadio_gnp": {
+            "name": "Estadio GNP Seguros",
+            "address": "Viaducto Río de la Piedad, Città del Messico"
+          },
+          "palacio_de_los_deportes": {
+            "name": "Palacio de los Deportes",
+            "address": "Granjas México, Città del Messico"
+          },
+          "autodromo_hermanos_rodriguez": {
+            "name": "Autódromo Hermanos Rodríguez",
+            "address": "Granjas México, Città del Messico"
+          },
+          "auditorio_nacional": {
+            "name": "Auditorio Nacional",
+            "address": "Polanco, Città del Messico"
+          },
+          "arena_cdmx": {
+            "name": "Arena CDMX",
+            "address": "Azcapotzalco, Città del Messico"
+          },
+          "estadio_azteca": {
+            "name": "Estadio Azteca",
+            "address": "Coyoacán, Città del Messico"
+          },
+          "estadio_olimpico_universitario": {
+            "name": "Estadio Olímpico Universitario",
+            "address": "Ciudad Universitaria, Città del Messico"
+          },
+          "centro_banamex": {
+            "name": "Centro Banamex",
+            "address": "Hipódromo de las Américas, Città del Messico"
+          },
+          "expo_santa_fe": {
+            "name": "Expo Santa Fe",
+            "address": "Santa Fe, Città del Messico"
+          },
+          "zocalo_reforma": {
+            "name": "Zócalo / Reforma",
+            "address": "Centro / Reforma, Città del Messico"
+          }
+        },
+        "catalog": {
+          "bts_arirang_2026": {
+            "title": "BTS WORLD TOUR ‘ARIRANG’",
+            "dates": {
+              "2026_05_07": "Giovedì 7 maggio · 20:00",
+              "2026_05_09": "Sabato 9 maggio · 20:00",
+              "2026_05_10": "Domenica 10 maggio · 20:00"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "services": {
+      "eventSpecial": {
+        "label": "Prossimi eventi",
+        "helper": "Controlla l’evento, la modalità e i dati del transfer prima di inviare la richiesta.",
+        "summaryTitle": "Transfer per evento",
+        "eventLabel": "Evento",
+        "dateLabel": "Data e ora",
+        "venueLabel": "Location",
+        "variantLabel": "Modalità",
+        "originLabel": "Origine",
+        "destinationLabel": "Destinazione dopo l’evento",
+        "destinationPlaceholder": "Indirizzo dove ti porteremo dopo l’evento",
+        "originPickupTimeLabel": "Ora di prelievo all’origine",
+        "returnPickupTimeLabel": "Ora di prelievo dopo l’evento",
+        "estimatedEventArrivalLabel": "Arrivo stimato all’evento",
+        "estimatedDestinationPickupLead": "Prelievo presso la location",
+        "estimatedDestinationArrivalLabel": "Arrivo stimato a destinazione",
+        "passengersLabel": "Passeggeri",
+        "priceLabel": "Prezzo",
+        "notesLabel": "Note"
+      }
+    },
+    "validation": {
+      "eventSpecialEventRequired": "Seleziona un evento.",
+      "eventSpecialVariantRequired": "Seleziona una modalità.",
+      "eventSpecialOriginRequired": "Seleziona un indirizzo di origine valido.",
+      "eventSpecialDestinationRequired": "Seleziona un indirizzo di destinazione valido.",
+      "eventSpecialOriginPickupTimeRequired": "Seleziona l’ora di prelievo all’origine.",
+      "eventSpecialReturnPickupTimeRequired": "Seleziona l’ora di prelievo dopo l’evento.",
+      "eventSpecialPassengersRequired": "Seleziona il numero di passeggeri.",
+      "eventSpecialPriceRequired": "Calcola il prezzo prima di continuare."
+    },
+    "whatsappMessage": {
+      "eventSpecial": {
+        "serviceType": "Tipo di servizio",
+        "event": "Evento",
+        "date": "Data e ora",
+        "venue": "Location",
+        "variant": "Modalità",
+        "origin": "Origine",
+        "destination": "Destinazione dopo l’evento",
+        "originPickupTime": "Ora di prelievo all’origine",
+        "returnPickupTime": "Ora di prelievo dopo l’evento",
+        "estimatedEventArrival": "Arrivo stimato all’evento",
+        "estimatedDestinationArrival": "Arrivo stimato a destinazione",
+        "passengers": "Passeggeri",
+        "price": "Prezzo",
+        "notes": "Note"
+      }
+    }
+  }
+}

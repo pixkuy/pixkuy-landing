@@ -2,8 +2,8 @@
   "services": {
     "cards": {
       "hourly": {
-        "title": "A ore o a giornata",
-        "text": "Un servizio flessibile per agende, riunioni e spostamenti con più fermate.",
+        "title": "Auto con autista privato",
+        "text": "Prenota un servizio di auto privata a Città del Messico, a ore o per l’intera giornata, con autista dedicato e veicolo premium.",
         "contact": {
           "helper": "Configura modalità, raccolta, data e ora per preparare la richiesta."
         },

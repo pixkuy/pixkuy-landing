@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "id": "bts_arirang_2026_05_07",
+      "eventGroupId": "bts_arirang_2026",
+      "titleKey": "services.cards.events.catalog.bts_arirang_2026.title",
+      "dateLabelKey": "services.cards.events.catalog.bts_arirang_2026.dates.2026_05_07",
+      "type": "concert",
+      "startsAt": "2026-05-07T20:00",
+      "estimatedEndAt": "2026-05-07T22:30",
+      "venueId": "estadio_gnp",
+      "posterSrc": "assets/img/events/bts-arirang-cdmx-2026.webp",
+      "posterMobileSrc": "assets/img/events/bts-arirang-cdmx-2026-mobile.webp",
+      "active": true,
+      "featured": true,
+      "priority": 10
+    },
+    {
+      "id": "bts_arirang_2026_05_09",
+      "eventGroupId": "bts_arirang_2026",
+      "titleKey": "services.cards.events.catalog.bts_arirang_2026.title",
+      "dateLabelKey": "services.cards.events.catalog.bts_arirang_2026.dates.2026_05_09",
+      "type": "concert",
+      "startsAt": "2026-05-09T20:00",
+      "estimatedEndAt": "2026-05-09T22:30",
+      "venueId": "estadio_gnp",
+      "posterSrc": "assets/img/events/bts-arirang-cdmx-2026.webp",
+      "posterMobileSrc": "assets/img/events/bts-arirang-cdmx-2026-mobile.webp",
+      "active": true,
+      "featured": true,
+      "priority": 20
+    },
+    {
+      "id": "bts_arirang_2026_05_10",
+      "eventGroupId": "bts_arirang_2026",
+      "titleKey": "services.cards.events.catalog.bts_arirang_2026.title",
+      "dateLabelKey": "services.cards.events.catalog.bts_arirang_2026.dates.2026_05_10",
+      "type": "concert",
+      "startsAt": "2026-05-10T20:00",
+      "estimatedEndAt": "2026-05-10T22:30",
+      "venueId": "estadio_gnp",
+      "posterSrc": "assets/img/events/bts-arirang-cdmx-2026.webp",
+      "posterMobileSrc": "assets/img/events/bts-arirang-cdmx-2026-mobile.webp",
+      "active": true,
+      "featured": true,
+      "priority": 30
+    }
+  ]
+}

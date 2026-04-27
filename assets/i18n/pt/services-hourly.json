@@ -2,8 +2,8 @@
   "services": {
     "cards": {
       "hourly": {
-        "title": "À hora ou ao dia",
-        "text": "Um serviço flexível para agendas, reuniões e deslocações com várias paragens.",
+        "title": "Serviço de carro com motorista privado",
+        "text": "Reserve um serviço de carro privado na Cidade do México, à hora ou ao dia, com motorista dedicado e veículo premium.",
         "contact": {
           "helper": "Configure modalidade, recolha, data e hora para preparar o pedido."
         },

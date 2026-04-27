@@ -94,7 +94,7 @@
       "priceValue": "Conforme o itinerário"
     },
     "hourly": {
-      "title": "À hora ou ao dia",
+      "title": "Serviço de carro com motorista privado",
       "text": "Um serviço flexível para agendas, reuniões e deslocações com várias paragens.",
       "bullets": [
         "Disponibilidade flexível",
@@ -228,7 +228,7 @@
   "switcherAriaLabel": "Seletor do tipo de serviço",
   "airportHotel": "Aeroporto e hotel",
   "tourPrivate": "Tours e visitas privadas",
-  "hourlyDaily": "À hora ou ao dia",
+  "hourlyDaily": "Serviço de carro com motorista privado",
   "other": "Outro serviço",
   "confirmChangeSpecificData": "Se mudar de serviço, os dados específicos do serviço atual serão perdidos. Quer continuar?",
   "confirmAccept": "Continuar",

@@ -59,6 +59,13 @@
         panel: document.getElementById('services-expand-hourly'),
         closedLabel: 'services.cards.hourly.ctaClosed',
         openLabel: 'services.cards.hourly.ctaOpen'
+      },
+      events: {
+        key: 'events',
+        card: findCardByI18nKey('services.cards.events.title'),
+        panel: document.getElementById('services-expand-events'),
+        closedLabel: 'services.cards.events.ctaClosed',
+        openLabel: 'services.cards.events.ctaOpen'
       }
     };
 
@@ -89,7 +96,8 @@
       const publicToInternalMap = {
         airport_hotel: 'airport',
         tour_private: 'tours',
-        hourly_daily: 'hourly'
+        hourly_daily: 'hourly',
+        event_special: 'events'
       };
 
       return publicToInternalMap[rawService] || null;
@@ -133,6 +141,11 @@
 
     if (openService === 'hourly' && hourlyEntry && hourlyEntry.card) {
       return cards[cards.length - 1] || hourlyEntry.card;
+    }
+
+    const eventsEntry = services.events;
+    if (openService === 'events' && eventsEntry && eventsEntry.card) {
+      return cards[cards.length - 1] || eventsEntry.card;
     }
 
     if (!primaryCard) return null;
@@ -317,7 +330,7 @@
     bindMobileHintObserver();
   }
   
-      function scrollMobileDeepLinkedPanelIntoView(serviceKey) {
+  function scrollMobileDeepLinkedPanelIntoView(serviceKey) {
     if (!mobileQuery.matches || !serviceKey || !services[serviceKey]) return;
 
     const entry = services[serviceKey];
@@ -354,6 +367,37 @@
       });
     });
   }
+
+  function scrollDesktopEventsDeepLinkPanelIntoView(serviceKey) {
+    if (mobileQuery.matches || serviceKey !== 'events') return;
+
+    const entry = services.events;
+    if (!entry || !entry.panel || entry.panel.hidden || expand.hidden) return;
+
+    let attempts = 0;
+    const maxAttempts = 6;
+
+    function runScroll() {
+      if (mobileQuery.matches || entry.panel.hidden || expand.hidden) return;
+
+      const targetRect = expand.getBoundingClientRect();
+      const targetTop = Math.max(targetRect.top + window.scrollY - 18, 0);
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: 'auto'
+      });
+
+      attempts += 1;
+      if (attempts >= maxAttempts) return;
+
+      window.setTimeout(runScroll, 140);
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runScroll);
+    });
+  }
   
   serviceKeys.forEach((serviceKey) => {
     bindCard(services[serviceKey]);
@@ -371,14 +415,18 @@
   if (requestedService && services[requestedService]) {
     setExpandedState(requestedService);
 
+    scrollDesktopEventsDeepLinkPanelIntoView(requestedService);
+
     if (!shouldSkipMobileDeepLinkFraming(requestedService)) {
       scrollMobileDeepLinkedPanelIntoView(requestedService);
 
       window.addEventListener('load', () => {
+        scrollDesktopEventsDeepLinkPanelIntoView(requestedService);
         scrollMobileDeepLinkedPanelIntoView(requestedService);
       }, { once: true });
 
       window.addEventListener('pageshow', () => {
+        scrollDesktopEventsDeepLinkPanelIntoView(requestedService);
         scrollMobileDeepLinkedPanelIntoView(requestedService);
       }, { once: true });
     }

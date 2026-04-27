@@ -1,0 +1,394 @@
+/* assets/css/43-services-events-sheet-mobile.css
+   Sábana móvil para Eventos y ocasiones especiales.
+   Alcance:
+   - overlay móvil
+   - bottom sheet móvil
+   - header con drag handle / evento / recinto / close
+   - body scrolleable
+   - sticky footer con precio
+   - composición móvil específica del configurador Events dentro del sheet
+   NO incluir:
+   - desktop
+   - core compartido de services
+   - #contact
+*/
+
+@media (max-width: 720px) {
+  .services-events-panel--sheet-open {
+    position: relative;
+    z-index: 40;
+  }
+
+  .services-events-panel--sheet-open .services-events-panel__catalog {
+    pointer-events: none;
+  }
+
+  .services-events-panel__sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(0, 0, 0, 0.52);
+  }
+
+  .services-events-panel__sheet-backdrop[hidden] {
+    display: none !important;
+  }
+
+  .services-events-panel__sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 81;
+    height: auto;
+    max-height: min(84vh, 760px);
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    background: #14181b;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.38);
+    transform: translateY(100%);
+    transition: transform 0.18s ease;
+    will-change: transform;
+    overflow: hidden;
+    touch-action: auto;
+  }
+
+  .services-events-panel__sheet.is-open {
+    transform: translateY(0);
+  }
+
+  .services-events-panel__sheet[hidden] {
+    display: none !important;
+  }
+
+  .services-events-panel__sheet-handle-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 8px 16px 6px;
+    touch-action: none;
+  }
+
+  .services-events-panel__sheet-handle {
+    width: 42px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(244, 242, 238, 0.28);
+  }
+
+  .services-events-panel__sheet-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: start;
+    padding: 0 16px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .services-events-panel__sheet-title {
+    margin: 0;
+    color: var(--fg);
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .services-events-panel__sheet-meta {
+    margin: 4px 0 0;
+    color: rgba(244, 242, 238, 0.72);
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .services-events-panel__sheet-close {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: var(--fg);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+  }
+
+  .services-events-panel__sheet-close:focus-visible {
+    outline: 2px solid rgba(31, 122, 109, 0.95);
+    outline-offset: 2px;
+  }
+
+  .services-events-panel__sheet-close span {
+    display: block;
+    font-size: 22px;
+    line-height: 1;
+    transform: translateY(-1px);
+  }
+
+  .services-events-panel__sheet-body {
+    min-height: 0;
+    overflow: auto;
+    padding: 10px 16px 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__config {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__config-inner {
+    gap: 14px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__config-title,
+  .services-events-panel__sheet-body .services-events-panel__selected {
+    display: none;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__mobile-controls {
+    display: grid;
+    gap: 12px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__mobile-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(104px, 0.58fr);
+    gap: 10px;
+    align-items: end;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__mobile-field {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__mobile-select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 34px 0 12px;
+    color: var(--fg);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.035);
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.2;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__mobile-field {
+    position: relative;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__mobile-field::after {
+    content: "";
+    position: absolute;
+    right: 14px;
+    bottom: 18px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid rgba(255, 249, 238, 0.82);
+    border-bottom: 2px solid rgba(255, 249, 238, 0.82);
+    transform: rotate(45deg);
+    pointer-events: none;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__mobile-select:focus {
+    outline: none;
+    border-color: rgba(74, 211, 190, 0.72);
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__option-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__route-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 76px !important;
+    gap: 8px !important;
+    align-items: start !important;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__route-row .services-events-panel__address-field {
+    min-width: 0;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__route-row .services-events-panel__time-field {
+    min-width: 0;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__route-row .services-events-panel__eta-field {
+    grid-column: 1 / -1;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__time-field > .services-events-panel__label {
+    font-size: 0;
+    line-height: 1.2;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__time-field > .services-events-panel__label::after {
+    content: "Hora";
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.25;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__time-field .services-events-panel__control {
+    width: 76px;
+    max-width: 76px;
+    height: 50px;
+    min-height: 50px;
+    padding: 0 22px 0 8px;
+    border-radius: 10px;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__time-field .services-events-panel__date-wrap {
+    min-width: 0;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__time-field .services-events-panel__time-overlay {
+    left: 8px;
+    font-size: 12px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__time-field .services-events-panel__time-icon {
+    right: 6px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__round-trip-routes {
+    gap: 12px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__date-options,
+  .services-events-panel__sheet-body .services-events-panel__variant-options,
+  .services-events-panel__sheet-body .services-events-panel__passenger-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__date-option,
+  .services-events-panel__sheet-body .services-events-panel__variant-option,
+  .services-events-panel__sheet-body .services-events-panel__passenger-option {
+    width: 100%;
+    min-height: 44px;
+    text-align: left;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__passenger-field {
+    justify-self: stretch;
+    width: auto;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__control {
+    min-height: 50px;
+    border-radius: 10px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__time-field .services-events-panel__control {
+    width: 76px;
+    max-width: 76px;
+    height: 50px;
+    min-height: 50px;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__eta-field {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__eta-field .services-events-panel__label {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__eta-value {
+    min-height: 0;
+    flex: 0 0 auto;
+    font-size: 13px;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .services-events-panel__sheet-body .services-events-panel__address-autocomplete {
+    overflow: visible;
+  }
+
+  .services-events-panel__sheet-body .place-autocomplete__mount {
+    position: static;
+    inset: auto;
+    z-index: auto;
+    pointer-events: none;
+  }
+
+  .services-events-panel__sheet-body .place-autocomplete.is-open .place-autocomplete__mount {
+    pointer-events: auto;
+  }
+
+  .services-events-panel__sheet-body .place-autocomplete__panel {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    z-index: auto;
+    margin-top: 6px;
+    border-top: 1px solid #222;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .services-events-panel__sheet-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #14181b;
+  }
+
+  .services-events-panel__sheet-price {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .services-events-panel__sheet-price-label {
+    margin: 0;
+    color: rgba(255, 245, 228, 0.72);
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .services-events-panel__sheet-price-value {
+    margin: 0;
+    color: rgba(255, 224, 140, 0.98);
+    font-size: 24px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+}

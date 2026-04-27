@@ -42,7 +42,7 @@
   }
 
   .whatsapp-floating__link::before{
-    content:"Hablar por WhatsApp";
+    content:attr(aria-label);
     position:absolute;
     top:50%;
     right:74px;

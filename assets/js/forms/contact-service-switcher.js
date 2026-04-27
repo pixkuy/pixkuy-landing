@@ -1,4 +1,4 @@
-(function initContactServiceSwitcherModule(window, document) {
+﻿(function initContactServiceSwitcherModule(window, document) {
   "use strict";
 
   if (!window || !document) {
@@ -47,6 +47,12 @@
     const panels = Array.from(
       form.querySelectorAll("[data-contact-service-panel]")
     );
+    const mobileField = switcher
+      ? switcher.querySelector("[data-contact-service-mobile-field]")
+      : null;
+    const mobileSelect = switcher
+      ? switcher.querySelector("[data-contact-service-mobile-select]")
+      : null;
 
     if (!switcher || !buttons.length || !panels.length) {
       return null;
@@ -55,7 +61,9 @@
     return {
       switcher,
       buttons,
-      panels
+      panels,
+      mobileField,
+      mobileSelect
     };
   }
 
@@ -101,6 +109,7 @@
       safeServiceType === "airport_hotel" ||
       safeServiceType === "tour_private" ||
       safeServiceType === "hourly_daily" ||
+      safeServiceType === "event_special" ||
       safeServiceType === "other"
     );
   }
@@ -152,6 +161,39 @@
     });
   }
 
+    function syncMobileSelectState(mobileSelect, activeServiceType) {
+    if (!mobileSelect) {
+      return false;
+    }
+
+    if (mobileSelect.value !== activeServiceType) {
+      mobileSelect.value = activeServiceType;
+    }
+
+    return true;
+  }
+
+    function isMobileServiceSelectViewport() {
+    return Boolean(
+      window &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(max-width: 720px)").matches
+    );
+  }
+
+  function syncMobileFieldVisibility(mobileField) {
+    const shouldShow = isMobileServiceSelectViewport();
+
+    if (!mobileField) {
+      return false;
+    }
+
+    mobileField.hidden = !shouldShow;
+    mobileField.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+
+    return true;
+  }
+
   function syncCommonTripFieldsVisibility(form, activeServiceType) {
     if (!form) {
       return false;
@@ -186,14 +228,17 @@
     const shouldHideSharedPlacesAndPassengers =
       activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private" ||
-      activeServiceType === "hourly_daily";
+      activeServiceType === "hourly_daily" ||
+      activeServiceType === "event_special";
     const shouldHideSharedTripDateTime =
       activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private" ||
-      activeServiceType === "hourly_daily";
+      activeServiceType === "hourly_daily" ||
+      activeServiceType === "event_special";
     const shouldHideSharedLuggage =
       activeServiceType === "tour_private" ||
-      activeServiceType === "hourly_daily";
+      activeServiceType === "hourly_daily" ||
+      activeServiceType === "event_special";
 
     if (originField) {
       originField.hidden = shouldHideSharedPlacesAndPassengers;
@@ -245,13 +290,14 @@
 
     return true;
   }
-  
+
   function syncOperationalSummaryFields(form, activeServiceType) {
     var serviceLabelField;
     var requestSummaryField;
     var airportHotelFieldNames;
     var tourPrivateFieldNames;
     var hourlyDailyFieldNames;
+    var eventSpecialFieldNames;
 
     function clearFields(fieldNames) {
       var index;
@@ -318,8 +364,8 @@
       "tour_private_guide_language_label",
       "tour_private_price_label"
     ];
-	
-	    hourlyDailyFieldNames = [
+
+    hourlyDailyFieldNames = [
       "hourly_daily_mode",
       "hourly_daily_vehicle_type",
       "hourly_daily_pickup",
@@ -343,21 +389,67 @@
       "hourly_daily_price_label"
     ];
 
+    eventSpecialFieldNames = [
+      "event_special_trip_summary",
+      "event_special_event_label",
+      "event_special_venue_label",
+      "event_special_variant_label",
+      "event_special_origin_label",
+      "event_special_destination_label",
+      "event_special_passenger_bucket_label",
+      "event_special_price_label",
+      "event_special_event_id",
+      "event_special_event_type",
+      "event_special_event_starts_at",
+      "event_special_venue_id",
+      "event_special_variant",
+      "event_special_origin_address",
+      "event_special_origin_address_place_id",
+      "event_special_origin_address_lat",
+      "event_special_origin_address_lng",
+      "event_special_destination_address",
+      "event_special_destination_address_place_id",
+      "event_special_destination_address_lat",
+      "event_special_destination_address_lng",
+      "event_special_origin_pickup_time",
+      "event_special_return_pickup_time",
+      "event_special_estimated_event_arrival_time",
+      "event_special_estimated_destination_arrival_time",
+      "event_special_outbound_duration_seconds",
+      "event_special_return_duration_seconds",
+      "event_special_outbound_distance_meters",
+      "event_special_return_distance_meters",
+      "event_special_passenger_fare_key",
+      "event_special_price",
+      "event_special_currency",
+      "event_special_notes"
+    ];
+
     if (activeServiceType === "airport_hotel") {
       clearFields(tourPrivateFieldNames);
       clearFields(hourlyDailyFieldNames);
+      clearFields(eventSpecialFieldNames);
       return true;
     }
 
     if (activeServiceType === "tour_private") {
       clearFields(airportHotelFieldNames);
       clearFields(hourlyDailyFieldNames);
+      clearFields(eventSpecialFieldNames);
       return true;
     }
 
     if (activeServiceType === "hourly_daily") {
       clearFields(airportHotelFieldNames);
       clearFields(tourPrivateFieldNames);
+      clearFields(eventSpecialFieldNames);
+      return true;
+    }
+
+    if (activeServiceType === "event_special") {
+      clearFields(airportHotelFieldNames);
+      clearFields(tourPrivateFieldNames);
+      clearFields(hourlyDailyFieldNames);
       return true;
     }
 
@@ -366,6 +458,7 @@
     clearFields(airportHotelFieldNames);
     clearFields(tourPrivateFieldNames);
     clearFields(hourlyDailyFieldNames);
+    clearFields(eventSpecialFieldNames);
 
     return true;
   }
@@ -396,6 +489,8 @@
 
     syncSwitcherAriaLabel(nodes.switcher);
     syncButtonState(nodes.buttons, activeServiceType);
+    syncMobileSelectState(nodes.mobileSelect, activeServiceType);
+    syncMobileFieldVisibility(nodes.mobileField);
     syncPanelState(form, nodes.panels, activeServiceType);
     syncOperationalSummaryFields(form, activeServiceType);
 
@@ -461,6 +556,42 @@
       });
     });
 
+	    if (
+      nodes.mobileSelect &&
+      nodes.mobileSelect.dataset.contactServiceSwitcherBound !== "1"
+    ) {
+      nodes.mobileSelect.dataset.contactServiceSwitcherBound = "1";
+
+      nodes.mobileSelect.addEventListener("change", function () {
+        const nextServiceType = normalizeText(nodes.mobileSelect.value);
+
+        if (!isSupportedServiceType(nextServiceType)) {
+          syncMobileSelectState(
+            nodes.mobileSelect,
+            serviceStateApi.getActiveServiceType()
+          );
+          return;
+        }
+
+        const result = serviceStateApi.setActiveServiceType(nextServiceType, {
+          source: "contact-service-mobile-select"
+        });
+
+        if (!result || result.ok !== true) {
+          renderActiveService(
+            form,
+            serviceStateApi.getActiveServiceType(),
+            { focusPanel: false }
+          );
+          return;
+        }
+
+        renderActiveService(form, result.activeServiceType, {
+          focusPanel: false
+        });
+      });
+    }
+
     form.addEventListener("pixkuy:contact-service-change", function (event) {
       const detail = event && event.detail ? event.detail : {};
       const nextServiceType = normalizeText(detail.nextServiceType);
@@ -474,12 +605,17 @@
       });
     });
 
+    window.addEventListener("resize", function () {
+      syncMobileFieldVisibility(nodes.mobileField);
+    });
+
     return true;
   }
-  
+
   function initContactServiceSwitcher() {
     const form = getReservationForm();
     const serviceStateApi = getServiceStateApi();
+    let activeServiceType;
 
     if (!form || !serviceStateApi) {
       return false;
@@ -492,9 +628,21 @@
 
     bindSwitcherEvents(form);
 
+    activeServiceType = serviceStateApi.getActiveServiceType() || getDefaultServiceType();
+
+        if (activeServiceType === "other") {
+      const result = serviceStateApi.setActiveServiceType("hourly_daily", {
+        source: "contact-service-default"
+      });
+
+      if (result && result.ok === true) {
+        activeServiceType = result.activeServiceType;
+      }
+    }
+
     return renderActiveService(
       form,
-      serviceStateApi.getActiveServiceType() || getDefaultServiceType(),
+      activeServiceType,
       { focusPanel: false }
     );
   }

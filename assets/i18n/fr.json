@@ -94,7 +94,7 @@
       "priceValue": "Selon l’itinéraire"
     },
     "hourly": {
-      "title": "À l’heure ou à la journée",
+      "title": "Chauffeur privé et service de voiture",
       "text": "Un service flexible pour les agendas, les rendez-vous et les déplacements avec plusieurs arrêts.",
       "bullets": [
         "Disponibilité flexible",
@@ -228,7 +228,7 @@
   "switcherAriaLabel": "Sélecteur de type de service",
   "airportHotel": "Aéroport et hôtel",
   "tourPrivate": "Tours et visites privées",
-  "hourlyDaily": "À l’heure ou à la journée",
+  "hourlyDaily": "Chauffeur privé et service de voiture",
   "other": "Autre service",
   "confirmChangeSpecificData": "Si vous changez de service, les données spécifiques du service actuel seront perdues. Voulez-vous continuer ?",
   "confirmAccept": "Continuer",

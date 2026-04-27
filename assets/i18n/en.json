@@ -94,7 +94,7 @@
       "priceValue": "According to itinerary"
     },
     "hourly": {
-      "title": "By the hour or by the day",
+      "title": "Private driver & car service",
       "text": "A flexible service for schedules, meetings and journeys with multiple stops.",
       "bullets": [
         "Flexible availability",
@@ -228,7 +228,7 @@
   "switcherAriaLabel": "Service type selector",
   "airportHotel": "Airport and hotel",
   "tourPrivate": "Private tours and visits",
-  "hourlyDaily": "By the hour or by the day",
+  "hourlyDaily": "Private driver & car service",
   "other": "Other service",
   "confirmChangeSpecificData": "If you change the service, the specific data for the current service will be lost. Do you want to continue?",
   "confirmAccept": "Continue",

@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "venues": [
+    {
+      "id": "estadio_gnp",
+      "nameKey": "services.cards.events.venues.estadio_gnp.name",
+      "addressKey": "services.cards.events.venues.estadio_gnp.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.404194,
+        "lng": -99.098611
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "stadium"
+      }
+    },
+    {
+      "id": "palacio_de_los_deportes",
+      "nameKey": "services.cards.events.venues.palacio_de_los_deportes.name",
+      "addressKey": "services.cards.events.venues.palacio_de_los_deportes.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.405556,
+        "lng": -99.099722
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "arena"
+      }
+    },
+    {
+      "id": "autodromo_hermanos_rodriguez",
+      "nameKey": "services.cards.events.venues.autodromo_hermanos_rodriguez.name",
+      "addressKey": "services.cards.events.venues.autodromo_hermanos_rodriguez.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.404167,
+        "lng": -99.090556
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "circuit"
+      }
+    },
+    {
+      "id": "auditorio_nacional",
+      "nameKey": "services.cards.events.venues.auditorio_nacional.name",
+      "addressKey": "services.cards.events.venues.auditorio_nacional.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.425306,
+        "lng": -99.194694
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "auditorium"
+      }
+    },
+    {
+      "id": "arena_cdmx",
+      "nameKey": "services.cards.events.venues.arena_cdmx.name",
+      "addressKey": "services.cards.events.venues.arena_cdmx.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.496944,
+        "lng": -99.175556
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "arena"
+      }
+    },
+    {
+      "id": "estadio_azteca",
+      "nameKey": "services.cards.events.venues.estadio_azteca.name",
+      "addressKey": "services.cards.events.venues.estadio_azteca.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.302861,
+        "lng": -99.150528
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "stadium"
+      }
+    },
+    {
+      "id": "estadio_olimpico_universitario",
+      "nameKey": "services.cards.events.venues.estadio_olimpico_universitario.name",
+      "addressKey": "services.cards.events.venues.estadio_olimpico_universitario.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.331944,
+        "lng": -99.192778
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "stadium"
+      }
+    },
+    {
+      "id": "centro_banamex",
+      "nameKey": "services.cards.events.venues.centro_banamex.name",
+      "addressKey": "services.cards.events.venues.centro_banamex.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.440833,
+        "lng": -99.224167
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "expo"
+      }
+    },
+    {
+      "id": "expo_santa_fe",
+      "nameKey": "services.cards.events.venues.expo_santa_fe.name",
+      "addressKey": "services.cards.events.venues.expo_santa_fe.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.364444,
+        "lng": -99.261389
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "expo"
+      }
+    },
+    {
+      "id": "zocalo_reforma",
+      "nameKey": "services.cards.events.venues.zocalo_reforma.name",
+      "addressKey": "services.cards.events.venues.zocalo_reforma.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.432608,
+        "lng": -99.133209
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "public_area"
+      }
+    }
+  ]
+}

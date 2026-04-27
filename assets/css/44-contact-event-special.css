@@ -1,0 +1,597 @@
+/* assets/css/44-contact-event-special.css
+   UI específica de event_special dentro de #contact.
+   Alcance:
+   - editor event_special en formulario
+   - imagen/resumen del evento
+   - selectores, rutas, ETA y precio
+   NO incluir:
+   - panel comercial de services
+   - sheet móvil Events
+   - shell común de contact services
+*/
+
+.contact-event-special-editor{
+  display:grid;
+  gap:18px;
+  padding:20px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  background:
+    linear-gradient(180deg, rgba(255,248,236,.05) 0%, rgba(255,240,214,.025) 100%),
+    rgba(255,255,255,.02);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.06),
+    0 18px 36px rgba(0,0,0,.16);
+}
+
+.contact-event-special-editor__header{
+  display:grid;
+  gap:6px;
+}
+
+.contact-event-special-editor__header .muted.small{
+  margin:0;
+  color:rgba(255,245,228,.82);
+}
+
+.contact-event-special-editor__layout{
+  display:grid;
+  grid-template-columns:minmax(220px, 286px) minmax(0, 1fr);
+  gap:18px 26px;
+  align-items:stretch;
+}
+
+.contact-event-special-editor__summary{
+  display:grid;
+  gap:12px;
+  align-self:stretch;
+  position:sticky;
+  top:18px;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(236,220,189,.18);
+  background:rgba(22,18,17,.54);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.05),
+    0 14px 28px rgba(0,0,0,.14);
+}
+
+.contact-event-special-editor__media{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  aspect-ratio:1 / 1;
+  border-radius:14px;
+  border:1px solid rgba(236,220,189,.14);
+  background:rgba(0,0,0,.18);
+}
+
+.contact-event-special-editor__image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+}
+
+.contact-event-special-editor__summary-body{
+  display:grid;
+  gap:10px;
+  min-width:0;
+}
+
+.contact-event-special-editor__eyebrow{
+  margin:0;
+  color:rgba(244,242,238,.58);
+  font-size:11px;
+  line-height:1.2;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.contact-event-special-editor__title{
+  margin:0;
+  color:rgba(255,249,238,.98);
+  font-size:20px;
+  line-height:1.18;
+  letter-spacing:-.02em;
+}
+
+.contact-event-special-editor__meta{
+  display:grid;
+  gap:8px;
+  margin:0;
+}
+
+.contact-event-special-editor__meta div{
+  display:grid;
+  gap:3px;
+}
+
+.contact-event-special-editor__meta dt{
+  color:rgba(244,242,238,.52);
+  font-size:10px;
+  line-height:1.15;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.contact-event-special-editor__meta dd{
+  margin:0;
+  color:rgba(255,249,238,.92);
+  font-size:15px;
+  line-height:1.35;
+}
+
+.contact-event-special-editor__fields{
+  display:grid;
+  grid-template-rows:auto auto auto 1fr auto;
+  gap:14px;
+  min-width:0;
+  align-self:stretch;
+  height:100%;
+}
+
+.contact-event-special-editor__control-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+  align-items:start;
+}
+
+.contact-event-special-editor__control-grid--event{
+  grid-template-columns:minmax(0, 1.1fr) minmax(0, .9fr);
+}
+
+.contact-event-special-editor .form-field{
+  display:grid;
+  gap:8px;
+  margin:0;
+  min-width:0;
+}
+
+.contact-event-special-editor select,
+.contact-event-special-editor input,
+.contact-event-special-editor textarea{
+  width:100%;
+  min-height:54px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.20);
+  background:rgba(22,18,17,.46);
+  color:rgba(255,249,238,.98);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+  font:inherit;
+}
+
+.contact-event-special-editor select{
+  padding:0 42px 0 16px;
+  appearance:auto;
+  -webkit-appearance:menulist;
+}
+
+.contact-event-special-editor select option{
+  background:#161211;
+  color:rgba(255,249,238,.98);
+}
+
+.contact-event-special-editor select optgroup{
+  background:#161211;
+  color:rgba(255,249,238,.98);
+}
+
+.contact-event-special-editor input{
+  padding:0 16px;
+}
+
+.contact-event-special-editor textarea{
+  min-height:112px;
+  padding:14px 16px;
+  resize:vertical;
+  line-height:1.55;
+}
+
+.contact-event-special-editor input::placeholder,
+.contact-event-special-editor textarea::placeholder{
+  color:rgba(255,249,238,.62);
+}
+
+.contact-event-special-editor select:hover,
+.contact-event-special-editor input:hover,
+.contact-event-special-editor textarea:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.05);
+}
+
+.contact-event-special-editor select:focus,
+.contact-event-special-editor input:focus,
+.contact-event-special-editor textarea:focus{
+  outline:none;
+  border-color:rgba(31,122,109,.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255,248,236,.05),
+    0 0 0 1px rgba(31,122,109,.14);
+}
+
+.contact-event-special-editor__route{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 148px;
+  gap:12px;
+  align-items:end;
+}
+
+.contact-event-special-editor__route-group{
+  display:grid;
+  gap:7px;
+  position:relative;
+  z-index:1;
+  overflow:visible;
+}
+
+.contact-event-special-editor__route-group:focus-within{
+  z-index:160;
+}
+
+.contact-event-special-editor__route-eta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-items:baseline;
+  margin:-2px 0 0;
+  padding-left:2px;
+  color:rgba(255,249,238,.78);
+  font-size:13px;
+  line-height:1.35;
+}
+
+.contact-event-special-editor__route-eta span{
+  color:rgba(244,242,238,.58);
+}
+
+.contact-event-special-editor__route-eta .contact-event-special-editor__route-eta-lead{
+  color:rgba(255,249,238,.92);
+  font-size:15px;
+  font-weight:700;
+}
+
+.contact-event-special-editor__route-eta strong{
+  color:rgba(255,249,238,.96);
+  font-weight:700;
+}
+
+.contact-event-special-editor__address{
+  position:relative;
+  z-index:30;
+  overflow:visible;
+}
+
+.contact-event-special-editor__address:focus-within{
+  z-index:180;
+}
+
+.contact-event-special-editor__address .place-autocomplete{
+  position:relative;
+  min-width:0;
+  z-index:30;
+  overflow:visible;
+}
+
+.contact-event-special-editor__address .place-autocomplete.is-open,
+.contact-event-special-editor__address .place-autocomplete:focus-within{
+  z-index:190;
+}
+
+.contact-event-special-editor__address .place-autocomplete__mount{
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(100% + 8px);
+  z-index:200;
+}
+
+.contact-event-special-editor__address .place-autocomplete__panel{
+  position:relative;
+  z-index:201;
+  max-height:min(320px, 42vh);
+  overflow:auto;
+  border:1px solid rgba(236,220,189,.16);
+  border-radius:16px;
+  background:#111315;
+  box-shadow:0 22px 46px rgba(0,0,0,.48);
+}
+
+.contact-event-special-editor__address .services-events-panel__label{
+  display:block;
+  margin:0 0 8px;
+  font-size:13px;
+  line-height:1.2;
+  font-weight:700;
+  color:rgba(255,247,230,.98);
+}
+
+.contact-event-special-editor__address .services-events-panel__control{
+  min-height:54px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.20);
+  background:rgba(22,18,17,.46);
+  color:rgba(255,249,238,.98);
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.05);
+}
+
+.contact-event-special-editor__time{
+  position:relative;
+  align-self:end;
+}
+
+.contact-event-special-editor__time input[type="time"]{
+  height:54px;
+  min-height:54px;
+  padding:0 44px 0 16px;
+  line-height:54px;
+  box-sizing:border-box;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.contact-event-special-editor__time input[type="time"]::-webkit-calendar-picker-indicator{
+  position:absolute;
+  right:12px;
+  width:22px;
+  height:22px;
+  opacity:0;
+  cursor:pointer;
+}
+
+.contact-event-special-editor__time input[type="time"]::-webkit-datetime-edit{
+  color:rgba(255,249,238,.98);
+}
+
+.contact-event-special-editor__time input[type="time"]::-webkit-datetime-edit-fields-wrapper{
+  padding:0;
+}
+
+.contact-event-special-editor__time input[type="time"]::-webkit-datetime-edit-hour-field,
+.contact-event-special-editor__time input[type="time"]::-webkit-datetime-edit-minute-field,
+.contact-event-special-editor__time input[type="time"]::-webkit-datetime-edit-text{
+  color:rgba(255,249,238,.98);
+}
+
+.contact-event-special-editor__time .form-field-overlay--time{
+  left:16px;
+  right:44px;
+  top:50%;
+  bottom:auto;
+  height:18px;
+  display:flex;
+  align-items:center;
+  color:rgba(255,249,238,.62);
+  line-height:1;
+  transform:translateY(-50%);
+  pointer-events:none;
+}
+
+.contact-event-special-editor__time input[type="time"]:valid + .form-field-overlay--time{
+  display:none;
+}
+
+.contact-event-special-editor__time .form-field-icon--time{
+  position:absolute;
+  top:50%;
+  right:14px;
+  z-index:3;
+  width:18px;
+  height:18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(255,249,238,.82);
+  opacity:.9;
+  transform:translateY(-50%);
+  pointer-events:none;
+}
+
+.contact-event-special-editor__time .form-field-icon--time svg{
+  display:block;
+  width:18px;
+  height:18px;
+  stroke:currentColor;
+}
+
+.contact-event-special-editor__notes{
+  margin-top:2px;
+}
+
+.contact-event-special-editor__price-spacer{
+  min-height:0;
+}
+
+.contact-event-special-editor__fare{
+  margin-top:0;
+  align-self:end;
+  border-radius:18px;
+}
+
+.contact-event-special-editor__fare--error{
+  border-color:rgba(255,255,255,.18);
+  background:rgba(255,255,255,.03);
+}
+
+.contact-event-special-editor__eta{
+  display:grid;
+  gap:6px;
+  margin-top:10px;
+}
+
+.contact-event-special-editor__eta p{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-items:baseline;
+  margin:0;
+  color:rgba(255,249,238,.82);
+  font-size:13px;
+  line-height:1.35;
+}
+
+.contact-event-special-editor__eta span{
+  color:rgba(244,242,238,.58);
+}
+
+.contact-event-special-editor__eta strong{
+  color:rgba(255,249,238,.96);
+  font-weight:700;
+}
+
+.contact-event-special-editor__loading,
+.contact-event-special-editor__empty{
+  padding:16px;
+  border-radius:16px;
+  border:1px solid rgba(236,220,189,.14);
+  background:rgba(22,18,17,.42);
+}
+
+.contact-event-special-editor__loading p,
+.contact-event-special-editor__empty p{
+  margin:0;
+}
+
+@media (max-width: 960px){
+  .contact-event-special-editor{
+    padding:18px;
+    border-radius:18px;
+  }
+
+  .contact-event-special-editor__layout{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+
+  .contact-event-special-editor__summary{
+    position:relative;
+    top:auto;
+  }
+
+  .contact-event-special-editor__media{
+    aspect-ratio:16 / 9;
+  }
+}
+
+@media (max-width: 720px){
+  .contact-event-special-editor{
+    gap:14px;
+    padding:16px 14px 14px;
+    border-radius:16px;
+  }
+
+  .contact-event-special-editor__control-grid,
+  .contact-event-special-editor__control-grid--event,
+  .contact-event-special-editor__route{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .contact-event-special-editor__summary{
+    gap:10px;
+    padding:14px;
+    border-radius:16px;
+  }
+
+  .contact-event-special-editor__title{
+    font-size:18px;
+    line-height:1.2;
+  }
+
+  .contact-event-special-editor select,
+  .contact-event-special-editor input,
+  .contact-event-special-editor textarea,
+  .contact-event-special-editor__address .services-events-panel__control{
+    min-height:52px;
+    border-radius:14px;
+  }
+
+  .contact-event-special-editor__time input[type="time"]{
+    height:52px;
+    min-height:52px;
+    line-height:52px;
+  }
+
+  .contact-event-special-editor__route{
+    grid-template-columns:minmax(0, 1fr) 96px;
+    gap:10px;
+    align-items:start;
+  }
+
+  .contact-event-special-editor__route .form-field--time{
+    width:96px;
+    max-width:96px;
+    align-self:end;
+  }
+
+  .contact-event-special-editor__route .form-field--time input[type="time"]{
+    height:52px;
+    min-height:52px;
+    padding:0 28px 0 8px;
+    font-size:13px;
+    line-height:52px;
+    text-align:left;
+    box-sizing:border-box;
+  }
+
+  .contact-event-special-editor__route .form-field--time input[type="time"]::-webkit-datetime-edit{
+    display:flex;
+    align-items:center;
+    height:52px;
+    padding:0;
+    line-height:52px;
+  }
+
+  .contact-event-special-editor__route .form-field--time input[type="time"]::-webkit-datetime-edit-fields-wrapper{
+    display:flex;
+    align-items:center;
+    height:52px;
+    padding:0;
+    line-height:52px;
+  }
+
+  .contact-event-special-editor__route .form-field--time input[type="time"]::-webkit-datetime-edit-hour-field,
+  .contact-event-special-editor__route .form-field--time input[type="time"]::-webkit-datetime-edit-minute-field,
+  .contact-event-special-editor__route .form-field--time input[type="time"]::-webkit-datetime-edit-text{
+    line-height:52px;
+    padding:0;
+  }
+
+  .contact-event-special-editor__route .form-field--time .form-field-overlay--time{
+    left:8px;
+    right:28px;
+    font-size:12px;
+  }
+
+  .contact-event-special-editor__route .form-field--time .form-field-icon--time{
+    right:8px;
+    width:14px;
+    height:14px;
+  }
+
+  .contact-event-special-editor__route .form-field--time .form-field-icon--time svg{
+    width:14px;
+    height:14px;
+  }
+
+  .contact-event-special-editor__selected-address{
+    position:relative;
+    z-index:205;
+    margin:0;
+    padding:2px 2px 0;
+    background:#0f1113;
+    color:rgba(255,249,238,.86);
+    font-size:13px;
+    line-height:1.35;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+  }
+
+  .contact-event-special-editor__address .place-autocomplete:not(.is-open) .place-autocomplete__mount{
+    display:none;
+  }
+}

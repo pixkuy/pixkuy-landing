@@ -94,7 +94,7 @@
       "priceValue": "Je nach Reiseverlauf"
     },
     "hourly": {
-      "title": "Stundenweise oder tageweise",
+      "title": "Privater Fahrer- und Fahrservice",
       "text": "Ein flexibler Service für Termine, Meetings und Fahrten mit mehreren Stopps.",
       "bullets": [
         "Flexible Verfügbarkeit",
@@ -228,7 +228,7 @@
   "switcherAriaLabel": "Auswahl des Servicetyps",
   "airportHotel": "Flughafen und Hotel",
   "tourPrivate": "Private Touren und Besuche",
-  "hourlyDaily": "Stundenweise oder tageweise",
+  "hourlyDaily": "Privater Fahrer- und Fahrservice",
   "other": "Anderer Service",
   "confirmChangeSpecificData": "Wenn Sie den Service wechseln, gehen die spezifischen Daten des aktuellen Services verloren. Möchten Sie fortfahren?",
   "confirmAccept": "Fortfahren",

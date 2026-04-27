@@ -1,4 +1,4 @@
-(function (window, document) {
+﻿(function (window, document) {
   'use strict';
 
   function getI18nValue(path, fallback) {
@@ -183,7 +183,7 @@
       currency: getVisibleFieldValue(form, 'tour_private_currency')
     };
   }
-  
+
   function getHourlyDailyEditorData(form) {
   if (!form) {
     return {
@@ -210,11 +210,51 @@
   };
 }
 
+  function getEventSpecialEditorData(form) {
+    if (!form) {
+      return {
+        eventLabel: '',
+        venueLabel: '',
+        variantLabel: '',
+        originAddress: '',
+        destinationAddress: '',
+        originPickupTime: '',
+        returnPickupTime: '',
+        returnPickupLabel: '',
+        estimatedEventArrivalTime: '',
+        estimatedDestinationArrivalTime: '',
+        passengers: '',
+        price: '',
+        currency: '',
+        notes: ''
+      };
+    }
+
+    return {
+      eventLabel: getVisibleFieldValue(form, 'event_special_event_label'),
+      venueLabel: getVisibleFieldValue(form, 'event_special_venue_label'),
+      variantLabel: getVisibleFieldValue(form, 'event_special_variant_label'),
+      originAddress: getVisibleFieldValue(form, 'event_special_origin_address'),
+      destinationAddress: getVisibleFieldValue(form, 'event_special_destination_address'),
+      originPickupTime: getVisibleFieldValue(form, 'event_special_origin_pickup_time'),
+      returnPickupTime: getVisibleFieldValue(form, 'event_special_return_pickup_time'),
+      returnPickupLabel: getVisibleFieldValue(form, 'event_special_return_pickup_label') ||
+        getVisibleFieldValue(form, 'event_special_return_pickup_time'),
+      estimatedEventArrivalTime: getVisibleFieldValue(form, 'event_special_estimated_event_arrival_time'),
+      estimatedDestinationArrivalTime: getVisibleFieldValue(form, 'event_special_estimated_destination_arrival_time'),
+      passengers: getVisibleFieldValue(form, 'event_special_passenger_bucket_label'),
+      price: getVisibleFieldValue(form, 'event_special_price'),
+      currency: getVisibleFieldValue(form, 'event_special_currency'),
+      notes: getVisibleFieldValue(form, 'event_special_notes') || getVisibleFieldValue(form, 'message')
+    };
+  }
+
   function getVisibleFormData(form) {
     var serviceType;
     var airportHotelData;
     var tourPrivateData;
     var hourlyDailyData;
+    var eventSpecialData;
     var fallbackOrigin;
     var fallbackDestination;
     var fallbackPassengers;
@@ -231,6 +271,9 @@
       : null;
     hourlyDailyData = serviceType === 'hourly_daily'
       ? getHourlyDailyEditorData(form)
+      : null;
+    eventSpecialData = serviceType === 'event_special'
+      ? getEventSpecialEditorData(form)
       : null;
 
     return {
@@ -259,35 +302,62 @@
                     : getVisibleFieldValue(form, 'trip_time')
                 )
           ),
-      origin: airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin,
-      destination: airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination,
+      origin: eventSpecialData && eventSpecialData.originAddress
+        ? eventSpecialData.originAddress
+        : (airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin),
+      destination: eventSpecialData && eventSpecialData.destinationAddress
+        ? eventSpecialData.destinationAddress
+        : (airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination),
       serviceType: serviceType,
       zone: getVisibleFieldValue(form, 'zone'),
       fare: getVisibleFieldValue(form, 'fare'),
-      passengers: airportHotelData && airportHotelData.passengers
-        ? airportHotelData.passengers
-        : (tourPrivateData && tourPrivateData.passengers ? tourPrivateData.passengers : fallbackPassengers),
+      passengers: eventSpecialData && eventSpecialData.passengers
+        ? eventSpecialData.passengers
+        : (
+            airportHotelData && airportHotelData.passengers
+              ? airportHotelData.passengers
+              : (tourPrivateData && tourPrivateData.passengers ? tourPrivateData.passengers : fallbackPassengers)
+          ),
       luggage: getVisibleFieldValue(form, 'luggage'),
-      notes: hourlyDailyData && hourlyDailyData.mode
-        ? (getVisibleFieldValue(form, 'hourly_daily_notes') || getVisibleFieldValue(form, 'message'))
-        : getVisibleFieldValue(form, 'message'),
+      notes: eventSpecialData && eventSpecialData.notes
+        ? eventSpecialData.notes
+        : (
+            hourlyDailyData && hourlyDailyData.mode
+              ? (getVisibleFieldValue(form, 'hourly_daily_notes') || getVisibleFieldValue(form, 'message'))
+              : getVisibleFieldValue(form, 'message')
+          ),
       tourLabel: tourPrivateData && tourPrivateData.tourLabel ? tourPrivateData.tourLabel : '',
       pickup: tourPrivateData && tourPrivateData.pickup ? tourPrivateData.pickup : '',
       hasGuide: tourPrivateData && tourPrivateData.hasGuide ? tourPrivateData.hasGuide : '',
       guideLanguage: tourPrivateData && tourPrivateData.guideLanguage ? tourPrivateData.guideLanguage : '',
-      price: tourPrivateData && tourPrivateData.price
-        ? tourPrivateData.price
-        : (hourlyDailyData && hourlyDailyData.price ? hourlyDailyData.price : ''),
-      currency: tourPrivateData && tourPrivateData.currency
-        ? tourPrivateData.currency
-        : (hourlyDailyData && hourlyDailyData.currency ? hourlyDailyData.currency : ''),
+      price: eventSpecialData && eventSpecialData.price
+        ? eventSpecialData.price
+        : (
+            tourPrivateData && tourPrivateData.price
+              ? tourPrivateData.price
+              : (hourlyDailyData && hourlyDailyData.price ? hourlyDailyData.price : '')
+          ),
+      currency: eventSpecialData && eventSpecialData.currency
+        ? eventSpecialData.currency
+        : (
+            tourPrivateData && tourPrivateData.currency
+              ? tourPrivateData.currency
+              : (hourlyDailyData && hourlyDailyData.currency ? hourlyDailyData.currency : '')
+          ),
       hourlyDailyMode: hourlyDailyData && hourlyDailyData.mode ? hourlyDailyData.mode : '',
       hourlyDailyPickup: hourlyDailyData && hourlyDailyData.pickup ? hourlyDailyData.pickup : '',
       hourlyDailyDurationHours: hourlyDailyData && hourlyDailyData.durationHours ? hourlyDailyData.durationHours : '',
-      hourlyDailyCustomTerm: hourlyDailyData && hourlyDailyData.customTerm ? hourlyDailyData.customTerm : ''
+      hourlyDailyCustomTerm: hourlyDailyData && hourlyDailyData.customTerm ? hourlyDailyData.customTerm : '',
+      eventSpecialEventLabel: eventSpecialData && eventSpecialData.eventLabel ? eventSpecialData.eventLabel : '',
+      eventSpecialVenueLabel: eventSpecialData && eventSpecialData.venueLabel ? eventSpecialData.venueLabel : '',
+      eventSpecialVariantLabel: eventSpecialData && eventSpecialData.variantLabel ? eventSpecialData.variantLabel : '',
+      eventSpecialOriginPickupTime: eventSpecialData && eventSpecialData.originPickupTime ? eventSpecialData.originPickupTime : '',
+      eventSpecialReturnPickupLabel: eventSpecialData && eventSpecialData.returnPickupLabel ? eventSpecialData.returnPickupLabel : '',
+      eventSpecialEstimatedEventArrivalTime: eventSpecialData && eventSpecialData.estimatedEventArrivalTime ? eventSpecialData.estimatedEventArrivalTime : '',
+      eventSpecialEstimatedDestinationArrivalTime: eventSpecialData && eventSpecialData.estimatedDestinationArrivalTime ? eventSpecialData.estimatedDestinationArrivalTime : ''
     };
   }
-  
+
   function buildMessageLines(data) {
     var lines;
     var labels;
@@ -298,11 +368,12 @@
       serviceType: getI18nValue('contact.whatsappMessage.serviceType', 'Tipo de servicio'),
       serviceAirportHotel: getI18nValue('contact.services.airportHotel', 'Aeropuerto y hotel'),
       serviceTourPrivate: getI18nValue('contact.services.tourPrivate', 'Tours y visitas privadas'),
-      serviceHourlyDaily: getI18nValue('contact.services.hourlyDaily', 'Por horas o por día'),
+      serviceHourlyDaily: getI18nValue('contact.services.hourlyDaily', 'Por horas o por dÃ­a'),
+      serviceEventSpecial: getI18nValue('contact.services.eventSpecial.label', 'Eventos y ocasiones especiales'),
       serviceOther: getI18nValue('contact.services.other', 'Otro servicio'),
       name: getI18nValue('contact.whatsappMessage.name', 'Nombre'),
-      phone: getI18nValue('contact.whatsappMessage.phone', 'Teléfono'),
-      email: getI18nValue('contact.whatsappMessage.email', 'Correo electrónico'),
+      phone: getI18nValue('contact.whatsappMessage.phone', 'TelÃ©fono'),
+      email: getI18nValue('contact.whatsappMessage.email', 'Correo electrÃ³nico'),
       tripDate: getI18nValue('contact.whatsappMessage.tripDate', 'Fecha del traslado'),
       tripTime: getI18nValue('contact.whatsappMessage.tripTime', 'Hora del traslado'),
       origin: getI18nValue('contact.whatsappMessage.origin', 'Origen'),
@@ -314,21 +385,28 @@
       notes: getI18nValue('contact.whatsappMessage.notes', 'Notas'),
       tour: getI18nValue('contact.whatsappMessage.tour', 'Tour'),
       pickup: getI18nValue('contact.whatsappMessage.pickup', 'Recogida'),
-      guide: getI18nValue('contact.whatsappMessage.guide', 'Guía'),
-      guideLanguage: getI18nValue('contact.whatsappMessage.guideLanguage', 'Idioma del guía'),
+      guide: getI18nValue('contact.whatsappMessage.guide', 'GuÃ­a'),
+      guideLanguage: getI18nValue('contact.whatsappMessage.guideLanguage', 'Idioma del guÃ­a'),
       price: getI18nValue('contact.whatsappMessage.price', 'Precio final'),
-      yes: getI18nValue('ui.yes', 'Sí'),
+      yes: getI18nValue('ui.yes', 'SÃ­'),
       no: getI18nValue('ui.no', 'No'),
       hourlyDailyMode: getI18nValue('services.cards.hourly.panel.modeLabel', 'Modalidad'),
-      hourlyDailyDuration: getI18nValue('services.cards.hourly.panel.durationLabel', 'Duración'),
+      hourlyDailyDuration: getI18nValue('services.cards.hourly.panel.durationLabel', 'DuraciÃ³n'),
       hourlyDailyLongTerm: getI18nValue('services.cards.hourly.panel.longTermDurationLabel', 'Periodo solicitado'),
       hourlyTabHourly: getI18nValue('services.cards.hourly.panel.tabs.hourly', 'Por horas'),
-      hourlyTabFullDay: getI18nValue('services.cards.hourly.panel.tabs.fullDay', 'Día completo'),
+      hourlyTabFullDay: getI18nValue('services.cards.hourly.panel.tabs.fullDay', 'DÃ­a completo'),
       hourlyTabLongTerm: getI18nValue('services.cards.hourly.panel.tabs.longTerm', 'Planes largos'),
       hourlyLongTermWeek: getI18nValue('services.cards.hourly.panel.longTerm.week', 'Semana'),
-      hourlyLongTermFortnight: getI18nValue('services.cards.hourly.panel.longTerm.fortnight', '15 días'),
+      hourlyLongTermFortnight: getI18nValue('services.cards.hourly.panel.longTerm.fortnight', '15 dÃ­as'),
       hourlyLongTermMonthly: getI18nValue('services.cards.hourly.panel.longTerm.monthly', 'Mensual'),
-      hourlyLongTermCustom: getI18nValue('services.cards.hourly.panel.longTerm.custom', 'Otro periodo')
+      hourlyLongTermCustom: getI18nValue('services.cards.hourly.panel.longTerm.custom', 'Otro periodo'),
+      event: getI18nValue('contact.services.eventSpecial.eventLabel', 'Evento'),
+      venue: getI18nValue('contact.services.eventSpecial.venueLabel', 'Recinto'),
+      variant: getI18nValue('contact.services.eventSpecial.variantLabel', 'Modalidad'),
+      originPickupTime: getI18nValue('contact.services.eventSpecial.originPickupTimeLabel', 'Hora de recogida en origen'),
+      returnPickupTime: getI18nValue('contact.services.eventSpecial.returnPickupTimeLabel', 'Hora recogida tras evento'),
+      estimatedEventArrival: getI18nValue('contact.services.eventSpecial.estimatedEventArrivalLabel', 'Llegada al evento estimada'),
+      estimatedDestinationArrival: getI18nValue('contact.services.eventSpecial.estimatedDestinationArrivalLabel', 'Llegada a destino estimada')
     };
 
     lines = [labels.intro];
@@ -339,6 +417,8 @@
       lines.push(labels.serviceType + ': ' + labels.serviceTourPrivate);
     } else if (data.serviceType === 'hourly_daily') {
       lines.push(labels.serviceType + ': ' + labels.serviceHourlyDaily);
+    } else if (data.serviceType === 'event_special') {
+      lines.push(labels.serviceType + ': ' + labels.serviceEventSpecial);
     } else if (data.serviceType === 'other') {
       lines.push(labels.serviceType + ': ' + labels.serviceOther);
     }
@@ -386,7 +466,35 @@
     if (data.pickup) {
       lines.push(labels.pickup + ': ' + data.pickup);
     }
-	
+
+	    if (data.serviceType === 'event_special' && data.eventSpecialEventLabel) {
+      lines.push(labels.event + ': ' + data.eventSpecialEventLabel);
+    }
+
+    if (data.serviceType === 'event_special' && data.eventSpecialVenueLabel) {
+      lines.push(labels.venue + ': ' + data.eventSpecialVenueLabel);
+    }
+
+    if (data.serviceType === 'event_special' && data.eventSpecialVariantLabel) {
+      lines.push(labels.variant + ': ' + data.eventSpecialVariantLabel);
+    }
+
+    if (data.serviceType === 'event_special' && data.eventSpecialOriginPickupTime) {
+      lines.push(labels.originPickupTime + ': ' + data.eventSpecialOriginPickupTime);
+    }
+
+    if (data.serviceType === 'event_special' && data.eventSpecialReturnPickupLabel) {
+      lines.push(labels.returnPickupTime + ': ' + data.eventSpecialReturnPickupLabel);
+    }
+
+    if (data.serviceType === 'event_special' && data.eventSpecialEstimatedEventArrivalTime) {
+      lines.push(labels.estimatedEventArrival + ': ' + data.eventSpecialEstimatedEventArrivalTime);
+    }
+
+    if (data.serviceType === 'event_special' && data.eventSpecialEstimatedDestinationArrivalTime) {
+      lines.push(labels.estimatedDestinationArrival + ': ' + data.eventSpecialEstimatedDestinationArrivalTime);
+    }
+
 	if (data.serviceType === 'hourly_daily' && data.hourlyDailyMode) {
       if (data.hourlyDailyMode === 'hourly') {
         lines.push(labels.hourlyDailyMode + ': ' + labels.hourlyTabHourly);
@@ -484,6 +592,11 @@
       return '';
     }
 
+    link.setAttribute(
+      'aria-label',
+      getI18nValue('contact.whatsappCta', 'Hablar por WhatsApp')
+    );
+
     phoneNumber = getWhatsappPhoneNumber();
     mode = link.getAttribute('data-contact-whatsapp-mode');
 
@@ -520,6 +633,10 @@
     });
 
     form.addEventListener('change', function () {
+      updateWhatsappLink(link, form);
+    });
+
+    window.addEventListener('pixkuy:i18n-applied', function () {
       updateWhatsappLink(link, form);
     });
 

@@ -2,8 +2,8 @@
   "services": {
     "cards": {
       "hourly": {
-        "title": "Por horas o por día",
-        "text": "Un servicio flexible para agendas, reuniones y desplazamientos con varias paradas.",
+                "title": "Servicio de auto con conductor privado",
+        "text": "Reserva por horas o día completo para traslados, agenda privada o disponibilidad operativa en Ciudad de México.",
         "contact": {
           "helper": "Configura modalidad, recogida, fecha y hora para preparar la solicitud."
         },

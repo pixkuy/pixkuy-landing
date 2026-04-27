@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "currency": "MXN",
+  "hourlyReference": 2250,
+  "rounding": {
+    "mode": "ceil",
+    "step": 50
+  },
+  "variants": {
+    "arrival": {
+      "id": "arrival",
+      "labelKey": "services.cards.events.variants.arrival",
+      "durationFactor": 0.65,
+      "minimum": 1500,
+      "bufferMinutes": 0
+    },
+    "departure": {
+      "id": "departure",
+      "labelKey": "services.cards.events.variants.departure",
+      "durationFactor": 0.75,
+      "minimum": 2000,
+      "bufferMinutes": 30
+    },
+    "round_trip": {
+      "id": "round_trip",
+      "labelKey": "services.cards.events.variants.round_trip",
+      "durationFactor": 0.62,
+      "minimum": 3000,
+      "bufferMinutes": 30
+    }
+  },
+  "passengerFactors": {
+    "van_1_2": {
+      "labelKey": "services.cards.events.passengerBuckets.van_1_2",
+      "factor": 1
+    },
+    "van_3_4": {
+      "labelKey": "services.cards.events.passengerBuckets.van_3_4",
+      "factor": 1.15
+    },
+    "van_5_6": {
+      "labelKey": "services.cards.events.passengerBuckets.van_5_6",
+      "factor": 1.3
+    }
+  },
+  "defaultDurationsByTypeMinutes": {
+    "concert": 150,
+    "sport": 150,
+    "festival": 240,
+    "expo": 180,
+    "other": 150
+  },
+  "routing": {
+    "travelMode": "DRIVE",
+    "routingPreference": "TRAFFIC_AWARE_OPTIMAL",
+    "arrivalDepartureOffsetMinutes": 90,
+    "fieldMask": "routes.duration,routes.distanceMeters"
+  },
+  "publicFromPrice": {
+    "variant": "arrival",
+    "passengerFareKey": "van_1_2"
+  }
+}

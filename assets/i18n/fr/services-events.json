@@ -1,0 +1,188 @@
+{
+  "services": {
+    "cards": {
+      "events": {
+        "ctaClosed": "Voir les prochains événements",
+        "ctaOpen": "Masquer les événements",
+        "panel": {
+          "title": "Prochains événements à CDMX",
+          "intro": "Choisissez un événement mis en avant et demandez un transfert privé coordonné pour l’arrivée, la sortie ou l’aller-retour.",
+          "empty": "Aucun événement mis en avant n’est disponible à la réservation pour le moment.",
+          "selectedEventLabel": "Événement sélectionné",
+          "venueLabel": "Lieu",
+          "dateLabel": "Date et heure",
+          "variantLabel": "Modalité",
+          "addressLabel": "Adresse",
+          "addressOriginLabel": "Origine",
+          "addressDestinationLabel": "Destination",
+          "addressBaseLabel": "Adresse de base",
+          "addressReturnDestinationLabel": "Destination après l’événement",
+          "addressPlaceholder": "Saisissez une adresse à Mexico",
+          "addressOriginPlaceholder": "Saisissez votre adresse de prise en charge à Mexico pour le transfert vers l’événement",
+          "addressDestinationPlaceholder": "Saisissez l’adresse à Mexico où nous vous conduirons après l’événement",
+          "addressReturnDestinationPlaceholder": "Saisissez l’adresse à Mexico où nous vous conduirons après l’événement",
+          "pickupTimeOriginLabel": "Heure de prise en charge à l’origine",
+          "pickupTimeAfterEventLabel": "Heure de prise en charge après l’événement",
+          "pickupTimePlaceholder": "--:--",
+          "passengersLabel": "Passagers",
+          "priceFromLabel": "À partir de",
+          "finalPriceLabel": "Prix final",
+          "eventCta": "Configurer le transfert",
+          "continueCta": "Continuer la demande",
+          "posterAlt": "Affiche de l’événement",
+          "configurationTitle": "Configurez votre transfert",
+          "configurationIntro": "Sélectionnez la modalité, l’adresse et le nombre de passagers pour calculer le prix.",
+          "quotePending": "Complétez les informations pour calculer le prix.",
+          "quoteLoading": "Calcul du prix...",
+          "quoteUnavailable": "Nous ne pouvons pas calculer le prix pour cet itinéraire pour le moment.",
+          "estimatedEventArrivalLabel": "Arrivée estimée à l’événement",
+          "estimatedDestinationArrivalLabel": "Arrivée estimée à destination",
+          "estimatedArrivalPending": "En attente",
+          "routeUnavailable": "Nous n’avons pas pu calculer un itinéraire valide pour cette adresse.",
+          "outOfCoverage": "L’adresse se trouve en dehors de la zone opérationnelle disponible.",
+          "ctaDisabled": "Complétez les informations de l’événement pour continuer."
+        },
+        "variants": {
+          "arrival": "Transfert vers l’événement",
+          "departure": "Prise en charge à l’événement",
+          "round_trip": "Aller-retour coordonné"
+        },
+        "passengerBuckets": {
+          "van_1_2": "1–2 passagers",
+          "van_3_4": "3–4 passagers",
+          "van_5_6": "5–6 passagers"
+        },
+        "passengerBucketsMobile": {
+          "van_1_2": "1–2",
+          "van_3_4": "3–4",
+          "van_5_6": "5–6"
+        },
+        "states": {
+          "empty": "Aucun événement mis en avant n’est disponible à la réservation pour le moment.",
+          "loading": "Chargement des événements...",
+          "error": "Nous n’avons pas pu charger les événements mis en avant.",
+          "selectEvent": "Sélectionnez un événement pour configurer votre transfert.",
+          "priceUnavailable": "Prix non disponible.",
+          "ready": "Transfert prêt à continuer."
+        },
+        "spotlight": {
+          "label": "Événement avec transfert disponible",
+          "cta": "Voir le transfert",
+          "close": "Fermer la mise en avant",
+          "metaFallback": "Transfert privé disponible"
+        },
+        "types": {
+          "concert": "Concert",
+          "sport": "Sport",
+          "festival": "Festival",
+          "expo": "Expo",
+          "other": "Événement"
+        },
+        "venues": {
+          "estadio_gnp": {
+            "name": "Estadio GNP Seguros",
+            "address": "Viaducto Río de la Piedad, Mexico"
+          },
+          "palacio_de_los_deportes": {
+            "name": "Palacio de los Deportes",
+            "address": "Granjas México, Mexico"
+          },
+          "autodromo_hermanos_rodriguez": {
+            "name": "Autódromo Hermanos Rodríguez",
+            "address": "Granjas México, Mexico"
+          },
+          "auditorio_nacional": {
+            "name": "Auditorio Nacional",
+            "address": "Polanco, Mexico"
+          },
+          "arena_cdmx": {
+            "name": "Arena CDMX",
+            "address": "Azcapotzalco, Mexico"
+          },
+          "estadio_azteca": {
+            "name": "Estadio Azteca",
+            "address": "Coyoacán, Mexico"
+          },
+          "estadio_olimpico_universitario": {
+            "name": "Estadio Olímpico Universitario",
+            "address": "Ciudad Universitaria, Mexico"
+          },
+          "centro_banamex": {
+            "name": "Centro Banamex",
+            "address": "Hipódromo de las Américas, Mexico"
+          },
+          "expo_santa_fe": {
+            "name": "Expo Santa Fe",
+            "address": "Santa Fe, Mexico"
+          },
+          "zocalo_reforma": {
+            "name": "Zócalo / Reforma",
+            "address": "Centro / Reforma, Mexico"
+          }
+        },
+        "catalog": {
+          "bts_arirang_2026": {
+            "title": "BTS WORLD TOUR ‘ARIRANG’",
+            "dates": {
+              "2026_05_07": "Jeudi 7 mai · 20:00",
+              "2026_05_09": "Samedi 9 mai · 20:00",
+              "2026_05_10": "Dimanche 10 mai · 20:00"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "services": {
+      "eventSpecial": {
+        "label": "Prochains événements",
+        "helper": "Vérifiez l’événement, la modalité et les détails du transfert avant d’envoyer la demande.",
+        "summaryTitle": "Transfert pour événement",
+        "eventLabel": "Événement",
+        "dateLabel": "Date et heure",
+        "venueLabel": "Lieu",
+        "variantLabel": "Modalité",
+        "originLabel": "Origine",
+        "destinationLabel": "Destination après l’événement",
+        "destinationPlaceholder": "Adresse où nous vous conduirons après l’événement",
+        "originPickupTimeLabel": "Heure de prise en charge à l’origine",
+        "returnPickupTimeLabel": "Heure de prise en charge après l’événement",
+        "estimatedEventArrivalLabel": "Arrivée estimée à l’événement",
+        "estimatedDestinationPickupLead": "Prise en charge sur le lieu de l’événement",
+        "estimatedDestinationArrivalLabel": "Arrivée estimée à destination",
+        "passengersLabel": "Passagers",
+        "priceLabel": "Prix",
+        "notesLabel": "Notes"
+      }
+    },
+    "validation": {
+      "eventSpecialEventRequired": "Sélectionnez un événement.",
+      "eventSpecialVariantRequired": "Sélectionnez une modalité.",
+      "eventSpecialOriginRequired": "Sélectionnez une adresse d’origine valide.",
+      "eventSpecialDestinationRequired": "Sélectionnez une adresse de destination valide.",
+      "eventSpecialOriginPickupTimeRequired": "Sélectionnez l’heure de prise en charge à l’origine.",
+      "eventSpecialReturnPickupTimeRequired": "Sélectionnez l’heure de prise en charge après l’événement.",
+      "eventSpecialPassengersRequired": "Sélectionnez le nombre de passagers.",
+      "eventSpecialPriceRequired": "Calculez le prix avant de continuer."
+    },
+    "whatsappMessage": {
+      "eventSpecial": {
+        "serviceType": "Type de service",
+        "event": "Événement",
+        "date": "Date et heure",
+        "venue": "Lieu",
+        "variant": "Modalité",
+        "origin": "Origine",
+        "destination": "Destination après l’événement",
+        "originPickupTime": "Heure de prise en charge à l’origine",
+        "returnPickupTime": "Heure de prise en charge après l’événement",
+        "estimatedEventArrival": "Arrivée estimée à l’événement",
+        "estimatedDestinationArrival": "Arrivée estimée à destination",
+        "passengers": "Passagers",
+        "price": "Prix",
+        "notes": "Notes"
+      }
+    }
+  }
+}

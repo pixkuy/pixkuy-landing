@@ -1,0 +1,188 @@
+{
+  "services": {
+    "cards": {
+      "events": {
+        "ctaClosed": "查看近期活动",
+        "ctaOpen": "隐藏活动",
+        "panel": {
+          "title": "CDMX 近期活动",
+          "intro": "选择一个精选活动，并申请协调好的私人接送服务：前往活动、活动后接送，或往返接送。",
+          "empty": "目前没有可预订的精选活动。",
+          "selectedEventLabel": "已选活动",
+          "venueLabel": "场馆",
+          "dateLabel": "日期和时间",
+          "variantLabel": "服务方式",
+          "addressLabel": "地址",
+          "addressOriginLabel": "出发地",
+          "addressDestinationLabel": "目的地",
+          "addressBaseLabel": "基础地址",
+          "addressReturnDestinationLabel": "活动后目的地",
+          "addressPlaceholder": "请输入墨西哥城内的地址",
+          "addressOriginPlaceholder": "请输入我们接您前往活动的墨西哥城出发地址",
+          "addressDestinationPlaceholder": "请输入活动结束后我们送您前往的墨西哥城地址",
+          "addressReturnDestinationPlaceholder": "请输入活动结束后我们送您前往的墨西哥城地址",
+          "pickupTimeOriginLabel": "出发地接送时间",
+          "pickupTimeAfterEventLabel": "活动后接送时间",
+          "pickupTimePlaceholder": "--:--",
+          "passengersLabel": "乘客",
+          "priceFromLabel": "起价",
+          "finalPriceLabel": "最终价格",
+          "eventCta": "配置接送",
+          "continueCta": "继续申请",
+          "posterAlt": "活动海报",
+          "configurationTitle": "配置您的接送服务",
+          "configurationIntro": "选择服务方式、地址和乘客人数以计算价格。",
+          "quotePending": "请补全信息以计算价格。",
+          "quoteLoading": "正在计算价格...",
+          "quoteUnavailable": "目前无法为该路线计算价格。",
+          "estimatedEventArrivalLabel": "预计到达活动时间",
+          "estimatedDestinationArrivalLabel": "预计到达目的地时间",
+          "estimatedArrivalPending": "待定",
+          "routeUnavailable": "无法为该地址计算有效路线。",
+          "outOfCoverage": "该地址不在当前可用服务范围内。",
+          "ctaDisabled": "请补全活动信息以继续。"
+        },
+        "variants": {
+          "arrival": "前往活动",
+          "departure": "活动后接送",
+          "round_trip": "协调往返接送"
+        },
+        "passengerBuckets": {
+          "van_1_2": "1–2 位乘客",
+          "van_3_4": "3–4 位乘客",
+          "van_5_6": "5–6 位乘客"
+        },
+        "passengerBucketsMobile": {
+          "van_1_2": "1–2",
+          "van_3_4": "3–4",
+          "van_5_6": "5–6"
+        },
+        "states": {
+          "empty": "目前没有可预订的精选活动。",
+          "loading": "正在加载活动...",
+          "error": "无法加载精选活动。",
+          "selectEvent": "请选择一个活动以配置您的接送服务。",
+          "priceUnavailable": "价格不可用。",
+          "ready": "接送服务已准备好继续。"
+        },
+        "spotlight": {
+          "label": "可安排接送的活动",
+          "cta": "查看接送",
+          "close": "关闭推荐",
+          "metaFallback": "可提供私人接送"
+        },
+        "types": {
+          "concert": "演唱会",
+          "sport": "体育",
+          "festival": "音乐节",
+          "expo": "展会",
+          "other": "活动"
+        },
+        "venues": {
+          "estadio_gnp": {
+            "name": "Estadio GNP Seguros",
+            "address": "Viaducto Río de la Piedad，墨西哥城"
+          },
+          "palacio_de_los_deportes": {
+            "name": "Palacio de los Deportes",
+            "address": "Granjas México，墨西哥城"
+          },
+          "autodromo_hermanos_rodriguez": {
+            "name": "Autódromo Hermanos Rodríguez",
+            "address": "Granjas México，墨西哥城"
+          },
+          "auditorio_nacional": {
+            "name": "Auditorio Nacional",
+            "address": "Polanco，墨西哥城"
+          },
+          "arena_cdmx": {
+            "name": "Arena CDMX",
+            "address": "Azcapotzalco，墨西哥城"
+          },
+          "estadio_azteca": {
+            "name": "Estadio Azteca",
+            "address": "Coyoacán，墨西哥城"
+          },
+          "estadio_olimpico_universitario": {
+            "name": "Estadio Olímpico Universitario",
+            "address": "Ciudad Universitaria，墨西哥城"
+          },
+          "centro_banamex": {
+            "name": "Centro Banamex",
+            "address": "Hipódromo de las Américas，墨西哥城"
+          },
+          "expo_santa_fe": {
+            "name": "Expo Santa Fe",
+            "address": "Santa Fe，墨西哥城"
+          },
+          "zocalo_reforma": {
+            "name": "Zócalo / Reforma",
+            "address": "Centro / Reforma，墨西哥城"
+          }
+        },
+        "catalog": {
+          "bts_arirang_2026": {
+            "title": "BTS WORLD TOUR ‘ARIRANG’",
+            "dates": {
+              "2026_05_07": "5月7日，星期四 · 20:00",
+              "2026_05_09": "5月9日，星期六 · 20:00",
+              "2026_05_10": "5月10日，星期日 · 20:00"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "services": {
+      "eventSpecial": {
+        "label": "近期活动",
+        "helper": "提交申请前，请核对活动、服务方式和接送信息。",
+        "summaryTitle": "活动接送服务",
+        "eventLabel": "活动",
+        "dateLabel": "日期和时间",
+        "venueLabel": "场馆",
+        "variantLabel": "服务方式",
+        "originLabel": "出发地",
+        "destinationLabel": "活动后目的地",
+        "destinationPlaceholder": "活动结束后我们送您前往的地址",
+        "originPickupTimeLabel": "出发地接送时间",
+        "returnPickupTimeLabel": "活动后接送时间",
+        "estimatedEventArrivalLabel": "预计到达活动时间",
+        "estimatedDestinationPickupLead": "场馆接送",
+        "estimatedDestinationArrivalLabel": "预计到达目的地时间",
+        "passengersLabel": "乘客",
+        "priceLabel": "价格",
+        "notesLabel": "备注"
+      }
+    },
+    "validation": {
+      "eventSpecialEventRequired": "请选择一个活动。",
+      "eventSpecialVariantRequired": "请选择服务方式。",
+      "eventSpecialOriginRequired": "请选择有效的出发地址。",
+      "eventSpecialDestinationRequired": "请选择有效的目的地地址。",
+      "eventSpecialOriginPickupTimeRequired": "请选择出发地接送时间。",
+      "eventSpecialReturnPickupTimeRequired": "请选择活动后接送时间。",
+      "eventSpecialPassengersRequired": "请选择乘客人数。",
+      "eventSpecialPriceRequired": "请先计算价格再继续。"
+    },
+    "whatsappMessage": {
+      "eventSpecial": {
+        "serviceType": "服务类型",
+        "event": "活动",
+        "date": "日期和时间",
+        "venue": "场馆",
+        "variant": "服务方式",
+        "origin": "出发地",
+        "destination": "活动后目的地",
+        "originPickupTime": "出发地接送时间",
+        "returnPickupTime": "活动后接送时间",
+        "estimatedEventArrival": "预计到达活动时间",
+        "estimatedDestinationArrival": "预计到达目的地时间",
+        "passengers": "乘客",
+        "price": "价格",
+        "notes": "备注"
+      }
+    }
+  }
+}

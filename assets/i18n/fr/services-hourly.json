@@ -2,8 +2,8 @@
   "services": {
     "cards": {
       "hourly": {
-        "title": "À l’heure ou à la journée",
-        "text": "Un service flexible pour les agendas, les rendez-vous et les déplacements avec plusieurs arrêts.",
+        "title": "Chauffeur privé et service de voiture",
+        "text": "Réservez un service de voiture privée à Mexico, à l’heure ou à la journée, avec chauffeur dédié et véhicule premium.",
         "contact": {
           "helper": "Configurez le mode, la prise en charge, la date et l’heure pour préparer la demande."
         },

@@ -2,7 +2,7 @@
   "services": {
     "cards": {
       "hourly": {
-        "title": "By the hour or by the day",
+        "title": "Private driver & car service",
         "text": "A flexible service for schedules, meetings and journeys with multiple stops.",
         "contact": {
           "helper": "Set the mode, pickup, date and time to prepare the request."

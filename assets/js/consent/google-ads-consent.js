@@ -2,7 +2,10 @@
   'use strict';
 
   var GOOGLE_ADS_ID = 'AW-18114199280';
+  var GOOGLE_ADS_LEAD_CONVERSION_SEND_TO = 'AW-18114199280/JkAeCOvxvKEcEPD9wr1D';
   var STORAGE_KEY = 'pixkuy_google_ads_consent';
+  var LEAD_SUCCESS_SIGNAL_KEY = 'pixkuy_lead_success';
+  var LEAD_CONVERSION_STORAGE_KEY = 'pixkuy_google_ads_lead_conversion';
   var BANNER_ID = 'pixkuy-google-ads-consent';
   var ACCEPTED = 'accepted';
   var REJECTED = 'rejected';
@@ -45,6 +48,76 @@
     } catch (error) {
       // no-op
     }
+  }
+
+  function hasLeadSuccessParam() {
+    var params;
+
+    try {
+      params = new URLSearchParams(window.location.search);
+      return params.get('lead') === 'ok';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function hasLeadSuccessSignal() {
+    try {
+      return window.sessionStorage.getItem(LEAD_SUCCESS_SIGNAL_KEY) === '1';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function clearLeadSuccessSignal() {
+    try {
+      window.sessionStorage.removeItem(LEAD_SUCCESS_SIGNAL_KEY);
+    } catch (error) {
+      // no-op
+    }
+  }
+
+  function hasLeadSuccess() {
+    return hasLeadSuccessParam() || hasLeadSuccessSignal();
+  }
+
+  function getLeadConversionKey() {
+    return [
+      LEAD_CONVERSION_STORAGE_KEY,
+      window.location.pathname,
+      window.location.search
+    ].join(':');
+  }
+
+  function hasTrackedLeadConversion() {
+    try {
+      return window.sessionStorage.getItem(getLeadConversionKey()) === '1';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function markLeadConversionTracked() {
+    try {
+      window.sessionStorage.setItem(getLeadConversionKey(), '1');
+    } catch (error) {
+      // no-op
+    }
+  }
+
+  function trackLeadConversionIfNeeded() {
+    if (!hasLeadSuccess() || hasTrackedLeadConversion()) {
+      return;
+    }
+
+    ensureGtagBase();
+
+    window.gtag('event', 'conversion', {
+      send_to: GOOGLE_ADS_LEAD_CONVERSION_SEND_TO
+    });
+
+    markLeadConversionTracked();
+    clearLeadSuccessSignal();
   }
 
   function ensureGtagBase() {
@@ -163,6 +236,7 @@
       accept.addEventListener('click', function () {
         storeConsent(ACCEPTED);
         loadGoogleAdsTag();
+        trackLeadConversionIfNeeded();
         removeBanner();
       });
     }
@@ -235,6 +309,7 @@
 
     if (stored === ACCEPTED) {
       loadGoogleAdsTag();
+      trackLeadConversionIfNeeded();
       return;
     }
 

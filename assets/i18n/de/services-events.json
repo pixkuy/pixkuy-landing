@@ -1,0 +1,188 @@
+{
+  "services": {
+    "cards": {
+      "events": {
+        "ctaClosed": "Nächste Events ansehen",
+        "ctaOpen": "Events ausblenden",
+        "panel": {
+          "title": "Nächste Events in CDMX",
+          "intro": "Wähle ein ausgewähltes Event und fordere einen privaten Transfer für Ankunft, Abholung oder koordinierte Hin- und Rückfahrt an.",
+          "empty": "Zurzeit sind keine ausgewählten Events für Reservierungen verfügbar.",
+          "selectedEventLabel": "Ausgewähltes Event",
+          "venueLabel": "Veranstaltungsort",
+          "dateLabel": "Datum und Uhrzeit",
+          "variantLabel": "Modalität",
+          "addressLabel": "Adresse",
+          "addressOriginLabel": "Abholort",
+          "addressDestinationLabel": "Ziel",
+          "addressBaseLabel": "Basisadresse",
+          "addressReturnDestinationLabel": "Ziel nach dem Event",
+          "addressPlaceholder": "Gib eine Adresse in Mexiko-Stadt ein",
+          "addressOriginPlaceholder": "Gib deine Abholadresse in Mexiko-Stadt ein, von der wir dich zum Event bringen sollen",
+          "addressDestinationPlaceholder": "Gib die Adresse in Mexiko-Stadt ein, zu der wir dich nach dem Event bringen sollen",
+          "addressReturnDestinationPlaceholder": "Gib die Adresse in Mexiko-Stadt ein, zu der wir dich nach dem Event bringen sollen",
+          "pickupTimeOriginLabel": "Abholzeit am Ursprung",
+          "pickupTimeAfterEventLabel": "Abholzeit nach dem Event",
+          "pickupTimePlaceholder": "--:--",
+          "passengersLabel": "Passagiere",
+          "priceFromLabel": "Ab",
+          "finalPriceLabel": "Endpreis",
+          "eventCta": "Transfer konfigurieren",
+          "continueCta": "Anfrage fortsetzen",
+          "posterAlt": "Eventposter",
+          "configurationTitle": "Konfiguriere deinen Transfer",
+          "configurationIntro": "Wähle Modalität, Adresse und Passagiere aus, um den Preis zu berechnen.",
+          "quotePending": "Vervollständige die Angaben, um den Preis zu berechnen.",
+          "quoteLoading": "Preis wird berechnet...",
+          "quoteUnavailable": "Für diese Strecke können wir den Preis im Moment nicht berechnen.",
+          "estimatedEventArrivalLabel": "Geschätzte Ankunft beim Event",
+          "estimatedDestinationArrivalLabel": "Geschätzte Ankunft am Ziel",
+          "estimatedArrivalPending": "Ausstehend",
+          "routeUnavailable": "Für diese Adresse konnte keine gültige Route berechnet werden.",
+          "outOfCoverage": "Die Adresse liegt außerhalb des verfügbaren Einsatzgebiets.",
+          "ctaDisabled": "Vervollständige die Eventdaten, um fortzufahren."
+        },
+        "variants": {
+          "arrival": "Transfer zum Event",
+          "departure": "Abholung beim Event",
+          "round_trip": "Koordinierte Hin- und Rückfahrt"
+        },
+        "passengerBuckets": {
+          "van_1_2": "1–2 Passagiere",
+          "van_3_4": "3–4 Passagiere",
+          "van_5_6": "5–6 Passagiere"
+        },
+        "passengerBucketsMobile": {
+          "van_1_2": "1–2",
+          "van_3_4": "3–4",
+          "van_5_6": "5–6"
+        },
+        "states": {
+          "empty": "Zurzeit sind keine ausgewählten Events für Reservierungen verfügbar.",
+          "loading": "Events werden geladen...",
+          "error": "Die ausgewählten Events konnten nicht geladen werden.",
+          "selectEvent": "Wähle ein Event aus, um deinen Transfer zu konfigurieren.",
+          "priceUnavailable": "Preis nicht verfügbar.",
+          "ready": "Der Transfer ist bereit, um fortzufahren."
+        },
+        "spotlight": {
+          "label": "Event mit verfügbarem Transfer",
+          "cta": "Transfer ansehen",
+          "close": "Highlight schließen",
+          "metaFallback": "Privater Transfer verfügbar"
+        },
+        "types": {
+          "concert": "Konzert",
+          "sport": "Sport",
+          "festival": "Festival",
+          "expo": "Messe",
+          "other": "Event"
+        },
+        "venues": {
+          "estadio_gnp": {
+            "name": "Estadio GNP Seguros",
+            "address": "Viaducto Río de la Piedad, Mexiko-Stadt"
+          },
+          "palacio_de_los_deportes": {
+            "name": "Palacio de los Deportes",
+            "address": "Granjas México, Mexiko-Stadt"
+          },
+          "autodromo_hermanos_rodriguez": {
+            "name": "Autódromo Hermanos Rodríguez",
+            "address": "Granjas México, Mexiko-Stadt"
+          },
+          "auditorio_nacional": {
+            "name": "Auditorio Nacional",
+            "address": "Polanco, Mexiko-Stadt"
+          },
+          "arena_cdmx": {
+            "name": "Arena CDMX",
+            "address": "Azcapotzalco, Mexiko-Stadt"
+          },
+          "estadio_azteca": {
+            "name": "Estadio Azteca",
+            "address": "Coyoacán, Mexiko-Stadt"
+          },
+          "estadio_olimpico_universitario": {
+            "name": "Estadio Olímpico Universitario",
+            "address": "Ciudad Universitaria, Mexiko-Stadt"
+          },
+          "centro_banamex": {
+            "name": "Centro Banamex",
+            "address": "Hipódromo de las Américas, Mexiko-Stadt"
+          },
+          "expo_santa_fe": {
+            "name": "Expo Santa Fe",
+            "address": "Santa Fe, Mexiko-Stadt"
+          },
+          "zocalo_reforma": {
+            "name": "Zócalo / Reforma",
+            "address": "Centro / Reforma, Mexiko-Stadt"
+          }
+        },
+        "catalog": {
+          "bts_arirang_2026": {
+            "title": "BTS WORLD TOUR ‘ARIRANG’",
+            "dates": {
+              "2026_05_07": "Donnerstag, 7. Mai · 20:00",
+              "2026_05_09": "Samstag, 9. Mai · 20:00",
+              "2026_05_10": "Sonntag, 10. Mai · 20:00"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "services": {
+      "eventSpecial": {
+        "label": "Nächste Events",
+        "helper": "Prüfe Event, Modalität und Transferdaten, bevor du die Anfrage sendest.",
+        "summaryTitle": "Transfer für Event",
+        "eventLabel": "Event",
+        "dateLabel": "Datum und Uhrzeit",
+        "venueLabel": "Veranstaltungsort",
+        "variantLabel": "Modalität",
+        "originLabel": "Abholort",
+        "destinationLabel": "Ziel nach dem Event",
+        "destinationPlaceholder": "Adresse, zu der wir dich nach dem Event bringen sollen",
+        "originPickupTimeLabel": "Abholzeit am Ursprung",
+        "returnPickupTimeLabel": "Abholzeit nach dem Event",
+        "estimatedEventArrivalLabel": "Geschätzte Ankunft beim Event",
+        "estimatedDestinationPickupLead": "Abholung am Veranstaltungsort",
+        "estimatedDestinationArrivalLabel": "Geschätzte Ankunft am Ziel",
+        "passengersLabel": "Passagiere",
+        "priceLabel": "Preis",
+        "notesLabel": "Hinweise"
+      }
+    },
+    "validation": {
+      "eventSpecialEventRequired": "Wähle ein Event aus.",
+      "eventSpecialVariantRequired": "Wähle eine Modalität aus.",
+      "eventSpecialOriginRequired": "Wähle eine gültige Abholadresse aus.",
+      "eventSpecialDestinationRequired": "Wähle eine gültige Zieladresse aus.",
+      "eventSpecialOriginPickupTimeRequired": "Wähle die Abholzeit am Ursprung aus.",
+      "eventSpecialReturnPickupTimeRequired": "Wähle die Abholzeit nach dem Event aus.",
+      "eventSpecialPassengersRequired": "Wähle die Anzahl der Passagiere aus.",
+      "eventSpecialPriceRequired": "Berechne den Preis, bevor du fortfährst."
+    },
+    "whatsappMessage": {
+      "eventSpecial": {
+        "serviceType": "Servicetyp",
+        "event": "Event",
+        "date": "Datum und Uhrzeit",
+        "venue": "Veranstaltungsort",
+        "variant": "Modalität",
+        "origin": "Abholort",
+        "destination": "Ziel nach dem Event",
+        "originPickupTime": "Abholzeit am Ursprung",
+        "returnPickupTime": "Abholzeit nach dem Event",
+        "estimatedEventArrival": "Geschätzte Ankunft beim Event",
+        "estimatedDestinationArrival": "Geschätzte Ankunft am Ziel",
+        "passengers": "Passagiere",
+        "price": "Preis",
+        "notes": "Hinweise"
+      }
+    }
+  }
+}

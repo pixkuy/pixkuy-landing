@@ -94,7 +94,7 @@
       "priceValue": "일정에 따라"
     },
     "hourly": {
-      "title": "시간 또는 일 단위",
+      "title": "전용 기사 및 차량 서비스",
       "text": "일정, 미팅, 여러 정차가 있는 이동을 위한 유연한 서비스입니다.",
       "bullets": [
         "유연한 이용 가능 시간",
@@ -228,7 +228,7 @@
   "switcherAriaLabel": "서비스 유형 선택기",
   "airportHotel": "공항 및 호텔",
   "tourPrivate": "프라이빗 투어 및 방문",
-  "hourlyDaily": "시간 또는 일 단위",
+  "hourlyDaily": "전용 기사 및 차량 서비스",
   "other": "기타 서비스",
   "confirmChangeSpecificData": "서비스를 변경하면 현재 서비스의 전용 데이터가 사라집니다. 계속하시겠습니까?",
   "confirmAccept": "계속",

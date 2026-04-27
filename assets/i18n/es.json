@@ -94,7 +94,7 @@
       "priceValue": "Según itinerario"
     },
     "hourly": {
-      "title": "Por horas o por día",
+      "title": "Servicio de auto con conductor privado",
       "text": "Un servicio flexible para agendas, reuniones y desplazamientos con varias paradas.",
       "bullets": [
         "Disponibilidad flexible",
@@ -228,7 +228,7 @@
       "switcherAriaLabel": "Selector de tipo de servicio",
       "airportHotel": "Aeropuerto y hotel",
       "tourPrivate": "Tours y visitas privadas",
-      "hourlyDaily": "Por horas o por día",
+      "hourlyDaily": "Servicio de auto con conductor privado",
       "other": "Otro servicio",
       "confirmChangeSpecificData": "Si cambias de servicio, se perderán los datos específicos del servicio actual. ¿Quieres continuar?",
       "confirmAccept": "Continuar",

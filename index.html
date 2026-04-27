@@ -53,7 +53,11 @@
   <link rel="stylesheet" href="assets/css/38-services-hourly.css" />
   <link rel="stylesheet" href="assets/css/39-services-hourly-sheet-mobile.css" />
   <link rel="stylesheet" href="assets/css/40-contact-hourly-daily.css" />
+  <link rel="stylesheet" href="assets/css/44-contact-event-special.css" />
+  <link rel="stylesheet" href="assets/css/45-services-events-spotlight.css" />
   <link rel="stylesheet" href="assets/css/41-whatsapp-floating.css" />
+  <link rel="stylesheet" href="assets/css/42-services-events.css" />
+  <link rel="stylesheet" href="assets/css/43-services-events-sheet-mobile.css" />
   <link rel="stylesheet" href="assets/css/35-wc2026.css" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/90-a11y.css" />
@@ -683,7 +687,7 @@
         </div>
       </div>
 	  
-	        <div
+	   <div
         class="services-expand__panel"
         id="services-expand-hourly"
         data-service-panel="hourly"
@@ -707,6 +711,51 @@
           <div
             class="services-hourly-panel__config"
             data-services-hourly-config
+            hidden
+          ></div>
+        </div>
+      </div>
+
+      <div
+        class="services-expand__panel"
+        id="services-expand-events"
+        data-service-panel="events"
+        aria-hidden="true"
+        hidden
+      >
+        <h3
+          class="services-expand__title"
+          data-i18n="services.cards.events.panel.title"
+        ></h3>
+
+        <p
+          class="services-expand__text"
+          data-i18n="services.cards.events.panel.intro"
+        ></p>
+
+        <div
+          class="services-events-panel"
+          data-services-events-panel
+        >
+          <div
+            class="services-events-panel__catalog"
+            data-services-events-catalog
+            hidden
+          ></div>
+
+          <div
+            class="services-events-panel__empty"
+            data-services-events-empty
+          >
+            <p
+              class="muted small"
+              data-i18n="services.cards.events.panel.empty"
+            ></p>
+          </div>
+
+          <div
+            class="services-events-panel__config"
+            data-services-events-config
             hidden
           ></div>
         </div>
@@ -756,9 +805,20 @@
       <li data-i18n="services.cards.events.bullets.2"></li>
     </ul>
 
-    <div class="service-card__price">
-      <span class="service-card__price-label" data-i18n="services.cards.events.priceLabel"></span>
-      <strong class="service-card__price-value" data-i18n="services.cards.events.priceValue"></strong>
+    <div class="service-card__footer">
+      <div class="service-card__price">
+        <span class="service-card__price-label" data-i18n="services.cards.events.priceLabel"></span>
+        <strong class="service-card__price-value" data-i18n="services.cards.events.priceValue"></strong>
+      </div>
+
+      <div class="service-card__action" aria-hidden="true">
+        <span class="service-card__action-label" data-i18n="services.cards.events.ctaClosed"></span>
+        <span class="service-card__action-chevron" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
     </div>
   </article>
 
@@ -949,6 +1009,16 @@
         <input type="hidden" name="hourly_daily_mode_label" value="" />
         <input type="hidden" name="hourly_daily_duration_label" value="" />
         <input type="hidden" name="hourly_daily_price_label" value="" />
+		
+		<!-- Resumen operativo event_special -->
+        <input type="hidden" name="event_special_trip_summary" value="" />
+        <input type="hidden" name="event_special_event_label" value="" />
+        <input type="hidden" name="event_special_venue_label" value="" />
+        <input type="hidden" name="event_special_variant_label" value="" />
+        <input type="hidden" name="event_special_origin_label" value="" />
+        <input type="hidden" name="event_special_destination_label" value="" />
+        <input type="hidden" name="event_special_passenger_bucket_label" value="" />
+        <input type="hidden" name="event_special_price_label" value="" />
 
         <!-- Contexto y clasificación -->
         <input type="hidden" name="service_type" value="other" />
@@ -1004,6 +1074,29 @@
         <input type="hidden" name="hourly_daily_km_included" value="" />
         <input type="hidden" name="hourly_daily_extra_km_price" value="" />
         <input type="hidden" name="hourly_daily_out_of_zone_supplement" value="" />
+		
+		<!-- Payload semántico event_special -->
+        <input type="hidden" name="event_special_event_id" value="" />
+        <input type="hidden" name="event_special_event_type" value="" />
+        <input type="hidden" name="event_special_event_starts_at" value="" />
+        <input type="hidden" name="event_special_venue_id" value="" />
+        <input type="hidden" name="event_special_variant" value="" />
+        <input type="hidden" name="event_special_origin_address" value="" />
+        <input type="hidden" name="event_special_destination_address" value="" />
+        <input type="hidden" name="event_special_origin_pickup_time" value="" />
+        <input type="hidden" name="event_special_return_pickup_time" value="" />
+        <input type="hidden" name="event_special_return_pickup_day_offset" value="" />
+        <input type="hidden" name="event_special_return_pickup_label" value="" />
+        <input type="hidden" name="event_special_estimated_event_arrival_time" value="" />
+        <input type="hidden" name="event_special_estimated_destination_arrival_time" value="" />
+        <input type="hidden" name="event_special_outbound_duration_seconds" value="" />
+        <input type="hidden" name="event_special_return_duration_seconds" value="" />
+        <input type="hidden" name="event_special_outbound_distance_meters" value="" />
+        <input type="hidden" name="event_special_return_distance_meters" value="" />
+        <input type="hidden" name="event_special_passenger_fare_key" value="" />
+        <input type="hidden" name="event_special_price" value="" />
+        <input type="hidden" name="event_special_currency" value="" />
+        <input type="hidden" name="event_special_notes" value="" />
 
         <!-- Capa técnica de Places / coordenadas -->
         <input type="hidden" name="origin_place_id" value="" />
@@ -1018,6 +1111,12 @@
         <input type="hidden" name="hourly_daily_pickup_place_id" value="" />
         <input type="hidden" name="hourly_daily_pickup_lat" value="" />
         <input type="hidden" name="hourly_daily_pickup_lng" value="" />
+		<input type="hidden" name="event_special_origin_address_place_id" value="" />
+        <input type="hidden" name="event_special_origin_address_lat" value="" />
+        <input type="hidden" name="event_special_origin_address_lng" value="" />
+        <input type="hidden" name="event_special_destination_address_place_id" value="" />
+        <input type="hidden" name="event_special_destination_address_lat" value="" />
+        <input type="hidden" name="event_special_destination_address_lng" value="" />
 
         <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
           <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
@@ -1041,12 +1140,59 @@
         ></p>
 
         <div class="form-grid">
-          <div
+                    <div
             class="contact-service-switcher"
             data-contact-service-switcher
             data-contact-service-switcher-aria-label="contact.services.switcherAriaLabel"
             aria-label="Selector de tipo de servicio"
           >
+            <div
+              class="contact-service-switcher__mobile-field"
+              data-contact-service-mobile-field
+              hidden
+              aria-hidden="true"
+            >
+              <label
+                class="contact-service-switcher__mobile-label"
+                for="contact-service-mobile-select"
+                data-i18n="contact.services.switcherAriaLabel"
+              >
+                Selector de tipo de servicio
+              </label>
+
+              <select
+                id="contact-service-mobile-select"
+                class="contact-service-switcher__mobile-select"
+                data-contact-service-mobile-select
+                autocomplete="off"
+              >
+                <option
+                  value="airport_hotel"
+                  data-i18n="contact.services.airportHotel"
+                >
+                  Aeropuerto y hotel
+                </option>
+                <option
+                  value="tour_private"
+                  data-i18n="contact.services.tourPrivate"
+                ></option>
+                <option
+                  value="hourly_daily"
+                  data-i18n="contact.services.hourlyDaily"
+                ></option>
+                <option
+                  value="event_special"
+                  data-i18n="contact.services.eventSpecial.label"
+                ></option>
+                <option
+                  value="other"
+                  data-i18n="contact.services.other"
+                >
+                  Otro servicio
+                </option>
+              </select>
+            </div>
+
             <button
               type="button"
               class="contact-service-switcher__button"
@@ -1065,12 +1211,20 @@
               data-i18n="contact.services.tourPrivate"
             ></button>
 
-            <button
+                        <button
               type="button"
               class="contact-service-switcher__button"
               data-contact-service-trigger="hourly_daily"
               aria-pressed="false"
               data-i18n="contact.services.hourlyDaily"
+            ></button>
+
+            <button
+              type="button"
+              class="contact-service-switcher__button"
+              data-contact-service-trigger="event_special"
+              aria-pressed="false"
+              data-i18n="contact.services.eventSpecial.label"
             ></button>
 
             <button
@@ -2499,6 +2653,105 @@
             </div>
           </div>
 
+                    <div
+            class="contact-service-panel"
+            data-contact-service-panel="event_special"
+            aria-hidden="true"
+            hidden
+          >
+            <div
+              class="contact-event-special-editor"
+              data-contact-event-special-editor
+            >
+              <div class="contact-event-special-editor__header">
+                <p
+                  class="muted small"
+                  data-contact-event-special-helper
+                  data-i18n="contact.services.eventSpecial.helper"
+                ></p>
+              </div>
+
+              <div class="contact-event-special-editor__summary">
+                <p
+                  class="contact-event-special-editor__summary-title"
+                  data-i18n="contact.services.eventSpecial.summaryTitle"
+                ></p>
+
+                <dl class="contact-event-special-editor__summary-list">
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.eventLabel"></dt>
+                    <dd data-contact-event-special-event>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.dateLabel"></dt>
+                    <dd data-contact-event-special-date>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.venueLabel"></dt>
+                    <dd data-contact-event-special-venue>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.variantLabel"></dt>
+                    <dd data-contact-event-special-variant>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.originLabel"></dt>
+                    <dd data-contact-event-special-origin>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.destinationLabel"></dt>
+                    <dd data-contact-event-special-destination>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.originPickupTimeLabel"></dt>
+                    <dd data-contact-event-special-origin-pickup-time>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.returnPickupTimeLabel"></dt>
+                    <dd data-contact-event-special-return-pickup-time>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.estimatedEventArrivalLabel"></dt>
+                    <dd data-contact-event-special-estimated-event-arrival>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.estimatedDestinationArrivalLabel"></dt>
+                    <dd data-contact-event-special-estimated-destination-arrival>—</dd>
+                  </div>
+
+                  <div>
+                    <dt data-i18n="contact.services.eventSpecial.passengersLabel"></dt>
+                    <dd data-contact-event-special-passengers>—</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div
+                class="contact-panel-fare"
+                data-contact-event-special-price
+                hidden
+              >
+                <p
+                  class="contact-panel-fare__label"
+                  data-i18n="contact.services.eventSpecial.priceLabel"
+                ></p>
+                <strong
+                  class="contact-panel-fare__value"
+                  data-contact-event-special-price-value
+                ></strong>
+              </div>
+            </div>
+          </div>
+
           <div
             class="contact-service-panel"
             data-contact-service-panel="other"
@@ -2935,8 +3188,14 @@
 <script src="assets/js/forms/panel-handoff-summary.js"></script>
 <script src="assets/js/forms/contact-tour-private-editor.js?v=20260411-1"></script>
 <script src="assets/js/forms/contact-hourly-daily-editor.js"></script>
+<script src="assets/js/services/events-special-address.js"></script>
+<script src="assets/js/services/events-special-quote.js"></script>
+<script src="assets/js/forms/contact-event-special-editor.js"></script>
 <script src="assets/js/forms/index.js"></script>
+<script src="assets/js/services/events-special-panel.js"></script>
+<script src="assets/js/services/events-special-mobile-sheet.js"></script>
 <script src="assets/js/services-expand.js"></script>
+<script src="assets/js/services/events-special-spotlight.js"></script>
 <script src="assets/js/data/brand-collaborations-config.js"></script>
 <script src="assets/js/data/airport-zone-catalog.js"></script>
 <script src="assets/js/airport-tariff/airport-tariff-utils.js"></script>

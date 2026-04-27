@@ -1,0 +1,188 @@
+{
+  "services": {
+    "cards": {
+      "events": {
+        "ctaClosed": "Посмотреть ближайшие события",
+        "ctaOpen": "Скрыть события",
+        "panel": {
+          "title": "Ближайшие события в CDMX",
+          "intro": "Выберите рекомендованное событие и запросите частный трансфер: к месту проведения, после события или туда и обратно.",
+          "empty": "Сейчас нет рекомендованных событий, доступных для бронирования.",
+          "selectedEventLabel": "Выбранное событие",
+          "venueLabel": "Площадка",
+          "dateLabel": "Дата и время",
+          "variantLabel": "Формат",
+          "addressLabel": "Адрес",
+          "addressOriginLabel": "Откуда",
+          "addressDestinationLabel": "Куда",
+          "addressBaseLabel": "Базовый адрес",
+          "addressReturnDestinationLabel": "Куда после события",
+          "addressPlaceholder": "Введите адрес в Мехико",
+          "addressOriginPlaceholder": "Введите адрес в Мехико, где мы должны забрать вас для поездки на событие",
+          "addressDestinationPlaceholder": "Введите адрес в Мехико, куда мы отвезём вас после события",
+          "addressReturnDestinationPlaceholder": "Введите адрес в Мехико, куда мы отвезём вас после события",
+          "pickupTimeOriginLabel": "Время подачи в точке отправления",
+          "pickupTimeAfterEventLabel": "Время подачи после события",
+          "pickupTimePlaceholder": "--:--",
+          "passengersLabel": "Пассажиры",
+          "priceFromLabel": "От",
+          "finalPriceLabel": "Итоговая цена",
+          "eventCta": "Настроить трансфер",
+          "continueCta": "Продолжить заявку",
+          "posterAlt": "Афиша события",
+          "configurationTitle": "Настройте трансфер",
+          "configurationIntro": "Выберите формат, адрес и количество пассажиров, чтобы рассчитать цену.",
+          "quotePending": "Заполните данные, чтобы рассчитать цену.",
+          "quoteLoading": "Расчёт цены...",
+          "quoteUnavailable": "Сейчас мы не можем рассчитать цену для этого маршрута.",
+          "estimatedEventArrivalLabel": "Ориентировочное прибытие к событию",
+          "estimatedDestinationArrivalLabel": "Ориентировочное прибытие в пункт назначения",
+          "estimatedArrivalPending": "Ожидается",
+          "routeUnavailable": "Не удалось рассчитать корректный маршрут для этого адреса.",
+          "outOfCoverage": "Адрес находится вне доступной зоны обслуживания.",
+          "ctaDisabled": "Заполните данные события, чтобы продолжить."
+        },
+        "variants": {
+          "arrival": "Трансфер на событие",
+          "departure": "Подача после события",
+          "round_trip": "Координированная поездка туда и обратно"
+        },
+        "passengerBuckets": {
+          "van_1_2": "1–2 пассажира",
+          "van_3_4": "3–4 пассажира",
+          "van_5_6": "5–6 пассажиров"
+        },
+        "passengerBucketsMobile": {
+          "van_1_2": "1–2",
+          "van_3_4": "3–4",
+          "van_5_6": "5–6"
+        },
+        "states": {
+          "empty": "Сейчас нет рекомендованных событий, доступных для бронирования.",
+          "loading": "Загрузка событий...",
+          "error": "Не удалось загрузить рекомендованные события.",
+          "selectEvent": "Выберите событие, чтобы настроить трансфер.",
+          "priceUnavailable": "Цена недоступна.",
+          "ready": "Трансфер готов для продолжения."
+        },
+        "spotlight": {
+          "label": "Событие с доступным трансфером",
+          "cta": "Посмотреть трансфер",
+          "close": "Закрыть выделенное событие",
+          "metaFallback": "Доступен частный трансфер"
+        },
+        "types": {
+          "concert": "Концерт",
+          "sport": "Спорт",
+          "festival": "Фестиваль",
+          "expo": "Выставка",
+          "other": "Событие"
+        },
+        "venues": {
+          "estadio_gnp": {
+            "name": "Estadio GNP Seguros",
+            "address": "Viaducto Río de la Piedad, Мехико"
+          },
+          "palacio_de_los_deportes": {
+            "name": "Palacio de los Deportes",
+            "address": "Granjas México, Мехико"
+          },
+          "autodromo_hermanos_rodriguez": {
+            "name": "Autódromo Hermanos Rodríguez",
+            "address": "Granjas México, Мехико"
+          },
+          "auditorio_nacional": {
+            "name": "Auditorio Nacional",
+            "address": "Polanco, Мехико"
+          },
+          "arena_cdmx": {
+            "name": "Arena CDMX",
+            "address": "Azcapotzalco, Мехико"
+          },
+          "estadio_azteca": {
+            "name": "Estadio Azteca",
+            "address": "Coyoacán, Мехико"
+          },
+          "estadio_olimpico_universitario": {
+            "name": "Estadio Olímpico Universitario",
+            "address": "Ciudad Universitaria, Мехико"
+          },
+          "centro_banamex": {
+            "name": "Centro Banamex",
+            "address": "Hipódromo de las Américas, Мехико"
+          },
+          "expo_santa_fe": {
+            "name": "Expo Santa Fe",
+            "address": "Santa Fe, Мехико"
+          },
+          "zocalo_reforma": {
+            "name": "Zócalo / Reforma",
+            "address": "Centro / Reforma, Мехико"
+          }
+        },
+        "catalog": {
+          "bts_arirang_2026": {
+            "title": "BTS WORLD TOUR ‘ARIRANG’",
+            "dates": {
+              "2026_05_07": "Четверг, 7 мая · 20:00",
+              "2026_05_09": "Суббота, 9 мая · 20:00",
+              "2026_05_10": "Воскресенье, 10 мая · 20:00"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "services": {
+      "eventSpecial": {
+        "label": "Ближайшие события",
+        "helper": "Проверьте событие, формат и данные трансфера перед отправкой заявки.",
+        "summaryTitle": "Трансфер для события",
+        "eventLabel": "Событие",
+        "dateLabel": "Дата и время",
+        "venueLabel": "Площадка",
+        "variantLabel": "Формат",
+        "originLabel": "Откуда",
+        "destinationLabel": "Куда после события",
+        "destinationPlaceholder": "Адрес, куда мы отвезём вас после события",
+        "originPickupTimeLabel": "Время подачи в точке отправления",
+        "returnPickupTimeLabel": "Время подачи после события",
+        "estimatedEventArrivalLabel": "Ориентировочное прибытие к событию",
+        "estimatedDestinationPickupLead": "Подача у площадки",
+        "estimatedDestinationArrivalLabel": "Ориентировочное прибытие в пункт назначения",
+        "passengersLabel": "Пассажиры",
+        "priceLabel": "Цена",
+        "notesLabel": "Примечания"
+      }
+    },
+    "validation": {
+      "eventSpecialEventRequired": "Выберите событие.",
+      "eventSpecialVariantRequired": "Выберите формат.",
+      "eventSpecialOriginRequired": "Выберите корректный адрес отправления.",
+      "eventSpecialDestinationRequired": "Выберите корректный адрес назначения.",
+      "eventSpecialOriginPickupTimeRequired": "Выберите время подачи в точке отправления.",
+      "eventSpecialReturnPickupTimeRequired": "Выберите время подачи после события.",
+      "eventSpecialPassengersRequired": "Выберите количество пассажиров.",
+      "eventSpecialPriceRequired": "Рассчитайте цену, прежде чем продолжить."
+    },
+    "whatsappMessage": {
+      "eventSpecial": {
+        "serviceType": "Тип сервиса",
+        "event": "Событие",
+        "date": "Дата и время",
+        "venue": "Площадка",
+        "variant": "Формат",
+        "origin": "Откуда",
+        "destination": "Куда после события",
+        "originPickupTime": "Время подачи в точке отправления",
+        "returnPickupTime": "Время подачи после события",
+        "estimatedEventArrival": "Ориентировочное прибытие к событию",
+        "estimatedDestinationArrival": "Ориентировочное прибытие в пункт назначения",
+        "passengers": "Пассажиры",
+        "price": "Цена",
+        "notes": "Примечания"
+      }
+    }
+  }
+}

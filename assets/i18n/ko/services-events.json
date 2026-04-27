@@ -1,0 +1,188 @@
+{
+  "services": {
+    "cards": {
+      "events": {
+        "ctaClosed": "다가오는 이벤트 보기",
+        "ctaOpen": "이벤트 숨기기",
+        "panel": {
+          "title": "CDMX의 다가오는 이벤트",
+          "intro": "주요 이벤트를 선택하고 도착, 귀가 또는 왕복에 맞춘 프라이빗 이동 서비스를 요청하세요.",
+          "empty": "현재 예약 가능한 주요 이벤트가 없습니다.",
+          "selectedEventLabel": "선택한 이벤트",
+          "venueLabel": "장소",
+          "dateLabel": "날짜 및 시간",
+          "variantLabel": "이동 방식",
+          "addressLabel": "주소",
+          "addressOriginLabel": "출발지",
+          "addressDestinationLabel": "목적지",
+          "addressBaseLabel": "기준 주소",
+          "addressReturnDestinationLabel": "이벤트 후 목적지",
+          "addressPlaceholder": "멕시코시티 내 주소를 입력하세요",
+          "addressOriginPlaceholder": "이벤트 장소로 이동하기 위해 픽업할 멕시코시티 내 출발지 주소를 입력하세요",
+          "addressDestinationPlaceholder": "이벤트 후 이동할 멕시코시티 내 목적지 주소를 입력하세요",
+          "addressReturnDestinationPlaceholder": "이벤트 후 이동할 멕시코시티 내 목적지 주소를 입력하세요",
+          "pickupTimeOriginLabel": "출발지 픽업 시간",
+          "pickupTimeAfterEventLabel": "이벤트 후 픽업 시간",
+          "pickupTimePlaceholder": "--:--",
+          "passengersLabel": "승객",
+          "priceFromLabel": "최저",
+          "finalPriceLabel": "최종 요금",
+          "eventCta": "이동 설정",
+          "continueCta": "요청 계속하기",
+          "posterAlt": "이벤트 포스터",
+          "configurationTitle": "이동 서비스를 설정하세요",
+          "configurationIntro": "이동 방식, 주소, 승객 수를 선택해 요금을 계산하세요.",
+          "quotePending": "요금을 계산하려면 정보를 완료하세요.",
+          "quoteLoading": "요금 계산 중...",
+          "quoteUnavailable": "현재 이 경로의 요금을 계산할 수 없습니다.",
+          "estimatedEventArrivalLabel": "이벤트 도착 예상 시간",
+          "estimatedDestinationArrivalLabel": "목적지 도착 예상 시간",
+          "estimatedArrivalPending": "대기 중",
+          "routeUnavailable": "이 주소에 대한 유효한 경로를 계산할 수 없습니다.",
+          "outOfCoverage": "이 주소는 현재 운행 가능 지역 밖에 있습니다.",
+          "ctaDisabled": "계속하려면 이벤트 정보를 완료하세요."
+        },
+        "variants": {
+          "arrival": "이벤트 장소로 이동",
+          "departure": "이벤트 장소에서 픽업",
+          "round_trip": "왕복 이동"
+        },
+        "passengerBuckets": {
+          "van_1_2": "승객 1–2명",
+          "van_3_4": "승객 3–4명",
+          "van_5_6": "승객 5–6명"
+        },
+        "passengerBucketsMobile": {
+          "van_1_2": "1–2",
+          "van_3_4": "3–4",
+          "van_5_6": "5–6"
+        },
+        "states": {
+          "empty": "현재 예약 가능한 주요 이벤트가 없습니다.",
+          "loading": "이벤트 로딩 중...",
+          "error": "주요 이벤트를 불러올 수 없습니다.",
+          "selectEvent": "이동 서비스를 설정할 이벤트를 선택하세요.",
+          "priceUnavailable": "요금을 확인할 수 없습니다.",
+          "ready": "이동 서비스를 계속 진행할 준비가 되었습니다."
+        },
+        "spotlight": {
+          "label": "이동 서비스 이용 가능 이벤트",
+          "cta": "이동 보기",
+          "close": "추천 닫기",
+          "metaFallback": "프라이빗 이동 서비스 이용 가능"
+        },
+        "types": {
+          "concert": "콘서트",
+          "sport": "스포츠",
+          "festival": "페스티벌",
+          "expo": "엑스포",
+          "other": "이벤트"
+        },
+        "venues": {
+          "estadio_gnp": {
+            "name": "Estadio GNP Seguros",
+            "address": "Viaducto Río de la Piedad, 멕시코시티"
+          },
+          "palacio_de_los_deportes": {
+            "name": "Palacio de los Deportes",
+            "address": "Granjas México, 멕시코시티"
+          },
+          "autodromo_hermanos_rodriguez": {
+            "name": "Autódromo Hermanos Rodríguez",
+            "address": "Granjas México, 멕시코시티"
+          },
+          "auditorio_nacional": {
+            "name": "Auditorio Nacional",
+            "address": "Polanco, 멕시코시티"
+          },
+          "arena_cdmx": {
+            "name": "Arena CDMX",
+            "address": "Azcapotzalco, 멕시코시티"
+          },
+          "estadio_azteca": {
+            "name": "Estadio Azteca",
+            "address": "Coyoacán, 멕시코시티"
+          },
+          "estadio_olimpico_universitario": {
+            "name": "Estadio Olímpico Universitario",
+            "address": "Ciudad Universitaria, 멕시코시티"
+          },
+          "centro_banamex": {
+            "name": "Centro Banamex",
+            "address": "Hipódromo de las Américas, 멕시코시티"
+          },
+          "expo_santa_fe": {
+            "name": "Expo Santa Fe",
+            "address": "Santa Fe, 멕시코시티"
+          },
+          "zocalo_reforma": {
+            "name": "Zócalo / Reforma",
+            "address": "Centro / Reforma, 멕시코시티"
+          }
+        },
+        "catalog": {
+          "bts_arirang_2026": {
+            "title": "BTS WORLD TOUR ‘ARIRANG’",
+            "dates": {
+              "2026_05_07": "5월 7일 목요일 · 20:00",
+              "2026_05_09": "5월 9일 토요일 · 20:00",
+              "2026_05_10": "5월 10일 일요일 · 20:00"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "services": {
+      "eventSpecial": {
+        "label": "다가오는 이벤트",
+        "helper": "요청을 보내기 전에 이벤트, 이동 방식, 이동 정보를 확인하세요.",
+        "summaryTitle": "이벤트 이동 서비스",
+        "eventLabel": "이벤트",
+        "dateLabel": "날짜 및 시간",
+        "venueLabel": "장소",
+        "variantLabel": "이동 방식",
+        "originLabel": "출발지",
+        "destinationLabel": "이벤트 후 목적지",
+        "destinationPlaceholder": "이벤트 후 이동할 주소",
+        "originPickupTimeLabel": "출발지 픽업 시간",
+        "returnPickupTimeLabel": "이벤트 후 픽업 시간",
+        "estimatedEventArrivalLabel": "이벤트 도착 예상 시간",
+        "estimatedDestinationPickupLead": "장소에서 픽업",
+        "estimatedDestinationArrivalLabel": "목적지 도착 예상 시간",
+        "passengersLabel": "승객",
+        "priceLabel": "요금",
+        "notesLabel": "메모"
+      }
+    },
+    "validation": {
+      "eventSpecialEventRequired": "이벤트를 선택하세요.",
+      "eventSpecialVariantRequired": "이동 방식을 선택하세요.",
+      "eventSpecialOriginRequired": "유효한 출발지 주소를 선택하세요.",
+      "eventSpecialDestinationRequired": "유효한 목적지 주소를 선택하세요.",
+      "eventSpecialOriginPickupTimeRequired": "출발지 픽업 시간을 선택하세요.",
+      "eventSpecialReturnPickupTimeRequired": "이벤트 후 픽업 시간을 선택하세요.",
+      "eventSpecialPassengersRequired": "승객 수를 선택하세요.",
+      "eventSpecialPriceRequired": "계속하기 전에 요금을 계산하세요."
+    },
+    "whatsappMessage": {
+      "eventSpecial": {
+        "serviceType": "서비스 유형",
+        "event": "이벤트",
+        "date": "날짜 및 시간",
+        "venue": "장소",
+        "variant": "이동 방식",
+        "origin": "출발지",
+        "destination": "이벤트 후 목적지",
+        "originPickupTime": "출발지 픽업 시간",
+        "returnPickupTime": "이벤트 후 픽업 시간",
+        "estimatedEventArrival": "이벤트 도착 예상 시간",
+        "estimatedDestinationArrival": "목적지 도착 예상 시간",
+        "passengers": "승객",
+        "price": "요금",
+        "notes": "메모"
+      }
+    }
+  }
+}

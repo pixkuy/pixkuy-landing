@@ -13,6 +13,8 @@
 (function (window, document) {
   "use strict";
 
+  var LEAD_SUCCESS_SIGNAL_KEY = "pixkuy_lead_success";
+
   function getReservationRequestForm() {
     return document.querySelector('form[name="contact"]');
   }
@@ -68,6 +70,14 @@
   // It remains inert when wc2026 is "off".
   window.__pixkuyWc2026ApplyPrefill = applyWc2026Prefill;
 
+  function storeLeadSuccessSignal() {
+    try {
+      window.sessionStorage.setItem(LEAD_SUCCESS_SIGNAL_KEY, "1");
+    } catch (e) {
+      // no-op
+    }
+  }
+
   function lockReservationRequestForm(options) {
     var form = getReservationRequestForm();
     if (!form) return;
@@ -115,6 +125,7 @@
   try {
     var params = new window.URLSearchParams(window.location.search || "");
     if (params.get("lead") === "ok") {
+      storeLeadSuccessSignal();
       lockReservationRequestForm({ showStatus: true });
 
       params.delete("lead");

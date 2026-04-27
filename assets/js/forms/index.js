@@ -1,4 +1,4 @@
-(function (window, document) {
+﻿(function (window, document) {
   'use strict';
 
   function safeInit(fn, label) {
@@ -15,7 +15,7 @@
   }
 
   function logPlacesBoot() {}
-  
+
   function bootWhatsappHandoff() {
     if (!window.PixkuyForms) {
       return false;
@@ -95,7 +95,7 @@
       'initContactTourPrivateEditor'
     );
   }
-  
+
   function bootContactHourlyDailyEditor() {
     if (!window.PixkuyForms) {
       return false;
@@ -106,7 +106,18 @@
       'initContactHourlyDailyEditor'
     );
   }
-  
+
+  function bootContactEventSpecialEditor() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initContactEventSpecialEditor,
+      'initContactEventSpecialEditor'
+    );
+  }
+
   function bootPanelHandoffSummary() {
     if (!window.PixkuyForms) {
       return false;
@@ -189,8 +200,32 @@
 
     return true;
   }
-  
+
   function focusHourlyDailyPrimaryField(form) {
+    var target;
+
+    if (!form) {
+      return false;
+    }
+
+    target = form.querySelector('#contact-name');
+
+    if (!target || typeof target.focus !== 'function') {
+      return false;
+    }
+
+    window.setTimeout(function () {
+      target.focus();
+
+      if (typeof target.select === 'function') {
+        target.select();
+      }
+    }, 0);
+
+    return true;
+  }
+
+    function focusEventSpecialPrimaryField(form) {
     var target;
 
     if (!form) {
@@ -343,7 +378,66 @@
     formsNamespace.__hourlyDailyHandoffBound = true;
     return true;
   }
-  
+
+    function bindEventsSpecialPanelHandoff() {
+    var formsNamespace;
+    var serviceStateApi;
+
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    formsNamespace = window.PixkuyForms;
+    serviceStateApi = getContactServiceStateApi();
+
+    if (
+      !serviceStateApi ||
+      typeof serviceStateApi.setActiveServiceType !== 'function' ||
+      typeof formsNamespace.applyContactEventSpecialHandoff !== 'function'
+    ) {
+      return false;
+    }
+
+    if (formsNamespace.__eventSpecialHandoffBound === true) {
+      return true;
+    }
+
+    window.addEventListener('pixkuy:events-special-panel-submit', function (event) {
+      var detail;
+      var form;
+      var result;
+
+      detail = event && event.detail && typeof event.detail === 'object'
+        ? event.detail
+        : null;
+
+      if (!detail) {
+        return;
+      }
+
+      form = getReservationForm();
+
+      if (!form) {
+        return;
+      }
+
+      result = serviceStateApi.setActiveServiceType('event_special', {
+        source: 'events-special-panel-handoff'
+      });
+
+      if (!result || result.ok !== true) {
+        return;
+      }
+
+      formsNamespace.applyContactEventSpecialHandoff(detail);
+      scrollToContactSection(form);
+      focusEventSpecialPrimaryField(form);
+    });
+
+    formsNamespace.__eventSpecialHandoffBound = true;
+    return true;
+  }
+
   function getDocumentLanguage() {
     var language = document.documentElement && document.documentElement.lang;
 
@@ -720,9 +814,11 @@
     bootContactAirportHotelLodgingAdapter();
     bootContactTourPrivateEditor();
     bootContactHourlyDailyEditor();
+    bootContactEventSpecialEditor();
     bootPanelHandoffSummary();
     bindToursPanelHandoff();
     bindHourlyDailyPanelHandoff();
+    bindEventsSpecialPanelHandoff();
     bootWhatsappHandoff();
     bootGooglePlacesOnFocus();
 

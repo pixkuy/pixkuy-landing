@@ -1,0 +1,197 @@
+/* assets/css/45-services-events-spotlight.css
+   Event Spotlight flotante global.
+   Módulo visual aislado: no modal, no bloqueante, sin lógica de Events.
+*/
+
+.events-special-spotlight {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  z-index: 70;
+  width: min(380px, calc(100vw - 32px));
+  color: var(--fg);
+  background: color-mix(in srgb, var(--bg) 94%, #000 6%);
+  border: 1px solid rgba(244, 242, 238, 0.16);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+
+.events-special-spotlight[hidden] {
+  display: none;
+}
+
+.events-special-spotlight__inner {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+}
+
+.events-special-spotlight__media {
+  width: 108px;
+  min-height: 128px;
+  background: rgba(244, 242, 238, 0.06);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.events-special-spotlight__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 128px;
+  object-fit: cover;
+}
+
+.events-special-spotlight__body {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.events-special-spotlight__top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.events-special-spotlight__label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.events-special-spotlight__close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  line-height: 24px;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.events-special-spotlight__close:hover,
+.events-special-spotlight__close:focus-visible {
+  color: var(--fg);
+  background: rgba(244, 242, 238, 0.08);
+  outline: none;
+}
+
+.events-special-spotlight__title {
+  margin: 0;
+  color: var(--fg);
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 650;
+}
+
+.events-special-spotlight__meta,
+.events-special-spotlight__venue {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.events-special-spotlight__venue {
+  color: var(--fg);
+}
+
+.events-special-spotlight__cta {
+  justify-self: start;
+  appearance: none;
+  border: 1px solid rgba(31, 122, 109, 0.75);
+  background: var(--accent);
+  color: var(--fg);
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.events-special-spotlight__cta:hover,
+.events-special-spotlight__cta:focus-visible {
+  filter: brightness(1.08);
+  outline: none;
+}
+
+@media (max-width: 720px) {
+  .events-special-spotlight {
+    left: 12px;
+    right: 12px;
+    top: 58px;
+    bottom: auto;
+    width: auto;
+    border-radius: 10px;
+  }
+
+  .events-special-spotlight__inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+  }
+
+  .events-special-spotlight__media {
+    display: none;
+  }
+
+  .events-special-spotlight__image {
+    min-height: 0;
+  }
+
+  .events-special-spotlight__body {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .events-special-spotlight__top {
+    display: contents;
+  }
+
+  .events-special-spotlight__label,
+  .events-special-spotlight__venue {
+    display: none;
+  }
+
+  .events-special-spotlight__title {
+    min-width: 0;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .events-special-spotlight__meta {
+    display: none;
+  }
+
+  .events-special-spotlight__cta {
+    padding: 7px 9px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .events-special-spotlight__close {
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+  }
+}
