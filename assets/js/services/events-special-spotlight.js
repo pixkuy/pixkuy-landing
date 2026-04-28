@@ -431,9 +431,25 @@
     return true;
   }
 
+  function dispatchEventsOpenRequest(eventId) {
+    window.dispatchEvent(
+      new CustomEvent("pixkuy:services-events-open", {
+        detail: {
+          eventId: eventId,
+          source: "events_spotlight"
+        }
+      })
+    );
+  }
+
   function openEventsForEvent(eventId) {
+    const safeEventId = String(eventId || "").trim();
     const servicesSection = document.getElementById("services");
     const eventsTrigger = document.querySelector('[data-service-expand-trigger="events"]');
+
+    if (!safeEventId) {
+      return false;
+    }
 
     if (!isMobileViewport() && servicesSection && typeof servicesSection.scrollIntoView === "function") {
       servicesSection.scrollIntoView({
@@ -450,18 +466,27 @@
       eventsTrigger.click();
     }
 
-    window.dispatchEvent(
-      new CustomEvent("pixkuy:services-events-open", {
-        detail: {
-          eventId: eventId,
-          source: "events_spotlight"
-        }
-      })
-    );
+    dispatchEventsOpenRequest(safeEventId);
 
-    if (isMobileViewport()) {
-      scrollEventsTargetIntoView();
-    }
+    window.requestAnimationFrame(function retryAfterFirstRenderFrame() {
+      window.requestAnimationFrame(function retryAfterSecondRenderFrame() {
+        dispatchEventsOpenRequest(safeEventId);
+
+        if (isMobileViewport()) {
+          scrollEventsTargetIntoView();
+        }
+      });
+    });
+
+    window.setTimeout(function retryAfterPanelAnimation() {
+      dispatchEventsOpenRequest(safeEventId);
+
+      if (isMobileViewport()) {
+        scrollEventsTargetIntoView();
+      }
+    }, 260);
+
+    return true;
   }
 
   function buildSpotlightMarkup(event, venuesById, events) {

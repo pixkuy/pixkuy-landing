@@ -337,6 +337,51 @@
     return window.innerWidth <= 720;
   }
 
+  function getSelectedGroupIndex() {
+    if (!state.selectedGroupId) {
+      return -1;
+    }
+
+    return state.groups.findIndex((group) => group.id === state.selectedGroupId);
+  }
+
+  function placeConfigMountForCurrentLayout() {
+    if (!catalogMount || !configMount) {
+      return;
+    }
+
+    if (isMobileViewport()) {
+      return;
+    }
+
+    const selectedGroupIndex = getSelectedGroupIndex();
+
+    if (selectedGroupIndex === -1) {
+      if (configMount.parentElement !== panelRoot) {
+        panelRoot.appendChild(configMount);
+      }
+
+      return;
+    }
+
+    const cards = catalogMount.querySelectorAll("[data-services-events-group]");
+    if (!cards.length) {
+      return;
+    }
+
+    const rowStartIndex = Math.floor(selectedGroupIndex / 3) * 3;
+    const rowEndIndex = Math.min(rowStartIndex + 2, cards.length - 1);
+    const anchorCard = cards[rowEndIndex];
+
+    if (!anchorCard) {
+      return;
+    }
+
+    if (anchorCard.nextSibling !== configMount) {
+      anchorCard.insertAdjacentElement("afterend", configMount);
+    }
+  }
+
   function buildEventGroupCard(group) {
     const title = getEventTitle(group);
     const venue = state.venuesById[group.venueId];
@@ -1575,6 +1620,7 @@
       destroyAddressControllers();
       configMount.hidden = true;
       configMount.innerHTML = "";
+      placeConfigMountForCurrentLayout();
       return;
     }
 
@@ -1583,7 +1629,9 @@
     }
 
     configMount.hidden = false;
+    configMount.setAttribute("data-services-events-config-row", "");
     configMount.innerHTML = buildConfigMarkup();
+    placeConfigMountForCurrentLayout();
     mountAddressControllers();
     renderQuoteStatus();
     requestQuoteIfReady();
@@ -1698,6 +1746,52 @@
     return scrollEventGroupCardIntoView(targetGroup.id);
   }
 
+  function scrollExternalSelectedEventIntoView(groupId) {
+    const safeGroupId = String(groupId || "").trim();
+
+    if (!safeGroupId) {
+      return false;
+    }
+
+    if (isMobileViewport()) {
+      return scrollEventGroupCardIntoView(safeGroupId);
+    }
+
+    function runScroll() {
+      const card = catalogMount.querySelector(
+        '[data-services-events-group="' + safeGroupId + '"]'
+      );
+
+      if (!card || card.closest("[hidden]") || typeof card.getBoundingClientRect !== "function") {
+        return false;
+      }
+
+      const rect = card.getBoundingClientRect();
+
+      if (!rect.width && !rect.height) {
+        return false;
+      }
+
+      const targetTop = Math.max(window.scrollY + rect.top - 24, 0);
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: "smooth"
+      });
+
+      return true;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runScroll);
+    });
+
+    window.setTimeout(runScroll, 280);
+    window.setTimeout(runScroll, 520);
+
+    return true;
+  }
+
   function selectEventFromExternalRequest(eventId) {
     const safeEventId = String(eventId || "").trim();
     let targetGroup = null;
@@ -1729,6 +1823,7 @@
     state.quote = null;
 
     renderAll();
+    scrollExternalSelectedEventIntoView(targetGroup.id);
 
     return true;
   }

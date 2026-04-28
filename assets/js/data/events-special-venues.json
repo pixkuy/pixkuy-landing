@@ -136,7 +136,7 @@
         "type": "expo"
       }
     },
-    {
+        {
       "id": "zocalo_reforma",
       "nameKey": "services.cards.events.venues.zocalo_reforma.name",
       "addressKey": "services.cards.events.venues.zocalo_reforma.address",
@@ -144,6 +144,21 @@
       "operationalPoint": {
         "lat": 19.432608,
         "lng": -99.133209
+      },
+      "meta": {
+        "city": "cdmx",
+        "country": "mx",
+        "type": "public_area"
+      }
+    },
+    {
+      "id": "polanco_fyja",
+      "nameKey": "services.cards.events.venues.polanco_fyja.name",
+      "addressKey": "services.cards.events.venues.polanco_fyja.address",
+      "active": true,
+      "operationalPoint": {
+        "lat": 19.4296,
+        "lng": -99.1941
       },
       "meta": {
         "city": "cdmx",

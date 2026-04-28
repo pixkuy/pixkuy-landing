@@ -100,7 +100,7 @@
             "address": "Azcapotzalco, Mexiko-Stadt"
           },
           "estadio_azteca": {
-            "name": "Estadio Azteca",
+            "name": "Estadio Banorte · ehemals Estadio Azteca",
             "address": "Coyoacán, Mexiko-Stadt"
           },
           "estadio_olimpico_universitario": {
@@ -127,6 +127,61 @@
               "2026_05_07": "Donnerstag, 7. Mai · 20:00",
               "2026_05_09": "Samstag, 9. Mai · 20:00",
               "2026_05_10": "Sonntag, 10. Mai · 20:00"
+            }
+          },
+          "liga_mx_america_pumas_2026_05_03": {
+            "title": "Club América vs. Pumas UNAM",
+            "dates": {
+              "2026_05_03": "Sonntag, 3. Mai · 17:00"
+            }
+          },
+          "liga_mx_cruz_azul_atlas_2026_05_09": {
+            "title": "Cruz Azul vs. Atlas",
+            "dates": {
+              "2026_05_09": "Samstag, 9. Mai · 21:15"
+            }
+          },
+          "liga_mx_pumas_america_2026_05_10": {
+            "title": "Pumas UNAM vs. Club América",
+            "dates": {
+              "2026_05_10": "Sonntag, 10. Mai · 19:15"
+            }
+          },
+          "tecate_emblema_2026": {
+            "title": "Tecate Emblema 2026",
+            "dates": {
+              "2026_05_16": "Samstag, 16. Mai · 13:00",
+              "2026_05_17": "Sonntag, 17. Mai · 13:00"
+            }
+          },
+          "marco_antonio_solis_2026_05_23": {
+            "title": "Marco Antonio Solís",
+            "dates": {
+              "2026_05_23": "Samstag, 23. Mai · 21:00"
+            }
+          },
+          "megadeth_2026": {
+            "title": "Megadeth",
+            "dates": {
+              "2026_05_10": "Sonntag, 10. Mai · 21:00",
+              "2026_05_11": "Montag, 11. Mai · 21:00"
+            }
+          },
+          "fyja_polanco_2026": {
+            "title": "FYJA Polanco 2026",
+            "dates": {
+              "2026_04_30": "Donnerstag, 30. April · 11:00",
+              "2026_05_01": "Freitag, 1. Mai · 11:00",
+              "2026_05_02": "Samstag, 2. Mai · 11:00",
+              "2026_05_03": "Sonntag, 3. Mai · 11:00"
+            }
+          },
+          "emp_ampimm_2026": {
+            "title": "EMP AMPIMM 2026",
+            "dates": {
+              "2026_05_27": "Mittwoch, 27. Mai · 11:00",
+              "2026_05_28": "Donnerstag, 28. Mai · 11:00",
+              "2026_05_29": "Freitag, 29. Mai · 11:00"
             }
           }
         }

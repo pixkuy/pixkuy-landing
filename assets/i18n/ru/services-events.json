@@ -100,7 +100,7 @@
             "address": "Azcapotzalco, Мехико"
           },
           "estadio_azteca": {
-            "name": "Estadio Azteca",
+            "name": "Estadio Banorte · бывший Estadio Azteca",
             "address": "Coyoacán, Мехико"
           },
           "estadio_olimpico_universitario": {
@@ -116,8 +116,12 @@
             "address": "Santa Fe, Мехико"
           },
           "zocalo_reforma": {
-            "name": "Zócalo / Reforma",
+            "name": "Zócalо / Reforma",
             "address": "Centro / Reforma, Мехико"
+          },
+          "polanco_fyja": {
+            "name": "FYJA Polanco",
+            "address": "Polanco, Мехико"
           }
         },
         "catalog": {
@@ -127,6 +131,61 @@
               "2026_05_07": "Четверг, 7 мая · 20:00",
               "2026_05_09": "Суббота, 9 мая · 20:00",
               "2026_05_10": "Воскресенье, 10 мая · 20:00"
+            }
+          },
+          "liga_mx_america_pumas_2026_05_03": {
+            "title": "Club América vs. Pumas UNAM",
+            "dates": {
+              "2026_05_03": "Воскресенье, 3 мая · 17:00"
+            }
+          },
+          "liga_mx_cruz_azul_atlas_2026_05_09": {
+            "title": "Cruz Azul vs. Atlas",
+            "dates": {
+              "2026_05_09": "Суббота, 9 мая · 21:15"
+            }
+          },
+          "liga_mx_pumas_america_2026_05_10": {
+            "title": "Pumas UNAM vs. Club América",
+            "dates": {
+              "2026_05_10": "Воскресенье, 10 мая · 19:15"
+            }
+          },
+          "tecate_emblema_2026": {
+            "title": "Tecate Emblema 2026",
+            "dates": {
+              "2026_05_16": "Суббота, 16 мая · 13:00",
+              "2026_05_17": "Воскресенье, 17 мая · 13:00"
+            }
+          },
+          "marco_antonio_solis_2026_05_23": {
+            "title": "Marco Antonio Solís",
+            "dates": {
+              "2026_05_23": "Суббота, 23 мая · 21:00"
+            }
+          },
+          "megadeth_2026": {
+            "title": "Megadeth",
+            "dates": {
+              "2026_05_10": "Воскресенье, 10 мая · 21:00",
+              "2026_05_11": "Понедельник, 11 мая · 21:00"
+            }
+          },
+          "fyja_polanco_2026": {
+            "title": "FYJA Polanco 2026",
+            "dates": {
+              "2026_04_30": "Четверг, 30 апреля · 11:00",
+              "2026_05_01": "Пятница, 1 мая · 11:00",
+              "2026_05_02": "Суббота, 2 мая · 11:00",
+              "2026_05_03": "Воскресенье, 3 мая · 11:00"
+            }
+          },
+          "emp_ampimm_2026": {
+            "title": "EMP AMPIMM 2026",
+            "dates": {
+              "2026_05_27": "Среда, 27 мая · 11:00",
+              "2026_05_28": "Четверг, 28 мая · 11:00",
+              "2026_05_29": "Пятница, 29 мая · 11:00"
             }
           }
         }

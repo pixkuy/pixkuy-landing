@@ -100,7 +100,7 @@
             "address": "Azcapotzalco, Cidade do México"
           },
           "estadio_azteca": {
-            "name": "Estadio Azteca",
+            "name": "Estádio Banorte · antigo Estádio Azteca",
             "address": "Coyoacán, Cidade do México"
           },
           "estadio_olimpico_universitario": {
@@ -118,6 +118,10 @@
           "zocalo_reforma": {
             "name": "Zócalo / Reforma",
             "address": "Centro / Reforma, Cidade do México"
+          },
+          "polanco_fyja": {
+            "name": "FYJA Polanco",
+            "address": "Polanco, Cidade do México"
           }
         },
         "catalog": {
@@ -127,6 +131,61 @@
               "2026_05_07": "Quinta-feira, 7 de maio · 20:00",
               "2026_05_09": "Sábado, 9 de maio · 20:00",
               "2026_05_10": "Domingo, 10 de maio · 20:00"
+            }
+          },
+          "liga_mx_america_pumas_2026_05_03": {
+            "title": "Club América vs. Pumas UNAM",
+            "dates": {
+              "2026_05_03": "Domingo, 3 de maio · 17:00"
+            }
+          },
+          "liga_mx_cruz_azul_atlas_2026_05_09": {
+            "title": "Cruz Azul vs. Atlas",
+            "dates": {
+              "2026_05_09": "Sábado, 9 de maio · 21:15"
+            }
+          },
+          "liga_mx_pumas_america_2026_05_10": {
+            "title": "Pumas UNAM vs. Club América",
+            "dates": {
+              "2026_05_10": "Domingo, 10 de maio · 19:15"
+            }
+          },
+          "tecate_emblema_2026": {
+            "title": "Tecate Emblema 2026",
+            "dates": {
+              "2026_05_16": "Sábado, 16 de maio · 13:00",
+              "2026_05_17": "Domingo, 17 de maio · 13:00"
+            }
+          },
+          "marco_antonio_solis_2026_05_23": {
+            "title": "Marco Antonio Solís",
+            "dates": {
+              "2026_05_23": "Sábado, 23 de maio · 21:00"
+            }
+          },
+          "megadeth_2026": {
+            "title": "Megadeth",
+            "dates": {
+              "2026_05_10": "Domingo, 10 de maio · 21:00",
+              "2026_05_11": "Segunda-feira, 11 de maio · 21:00"
+            }
+          },
+          "fyja_polanco_2026": {
+            "title": "FYJA Polanco 2026",
+            "dates": {
+              "2026_04_30": "Quinta-feira, 30 de abril · 11:00",
+              "2026_05_01": "Sexta-feira, 1 de maio · 11:00",
+              "2026_05_02": "Sábado, 2 de maio · 11:00",
+              "2026_05_03": "Domingo, 3 de maio · 11:00"
+            }
+          },
+          "emp_ampimm_2026": {
+            "title": "EMP AMPIMM 2026",
+            "dates": {
+              "2026_05_27": "Quarta-feira, 27 de maio · 11:00",
+              "2026_05_28": "Quinta-feira, 28 de maio · 11:00",
+              "2026_05_29": "Sexta-feira, 29 de maio · 11:00"
             }
           }
         }

@@ -100,7 +100,7 @@
             "address": "Azcapotzalco，墨西哥城"
           },
           "estadio_azteca": {
-            "name": "Estadio Azteca",
+            "name": "Estadio Banorte · 原 Estadio Azteca",
             "address": "Coyoacán，墨西哥城"
           },
           "estadio_olimpico_universitario": {
@@ -118,6 +118,10 @@
           "zocalo_reforma": {
             "name": "Zócalo / Reforma",
             "address": "Centro / Reforma，墨西哥城"
+          },
+          "polanco_fyja": {
+            "name": "FYJA Polanco",
+            "address": "Polanco，墨西哥城"
           }
         },
         "catalog": {
@@ -127,6 +131,61 @@
               "2026_05_07": "5月7日，星期四 · 20:00",
               "2026_05_09": "5月9日，星期六 · 20:00",
               "2026_05_10": "5月10日，星期日 · 20:00"
+            }
+          },
+          "liga_mx_america_pumas_2026_05_03": {
+            "title": "Club América vs. Pumas UNAM",
+            "dates": {
+              "2026_05_03": "5月3日，星期日 · 17:00"
+            }
+          },
+          "liga_mx_cruz_azul_atlas_2026_05_09": {
+            "title": "Cruz Azul vs. Atlas",
+            "dates": {
+              "2026_05_09": "5月9日，星期六 · 21:15"
+            }
+          },
+          "liga_mx_pumas_america_2026_05_10": {
+            "title": "Pumas UNAM vs. Club América",
+            "dates": {
+              "2026_05_10": "5月10日，星期日 · 19:15"
+            }
+          },
+          "tecate_emblema_2026": {
+            "title": "Tecate Emblema 2026",
+            "dates": {
+              "2026_05_16": "5月16日，星期六 · 13:00",
+              "2026_05_17": "5月17日，星期日 · 13:00"
+            }
+          },
+          "marco_antonio_solis_2026_05_23": {
+            "title": "Marco Antonio Solís",
+            "dates": {
+              "2026_05_23": "5月23日，星期六 · 21:00"
+            }
+          },
+          "megadeth_2026": {
+            "title": "Megadeth",
+            "dates": {
+              "2026_05_10": "5月10日，星期日 · 21:00",
+              "2026_05_11": "5月11日，星期一 · 21:00"
+            }
+          },
+          "fyja_polanco_2026": {
+            "title": "FYJA Polanco 2026",
+            "dates": {
+              "2026_04_30": "4月30日，星期四 · 11:00",
+              "2026_05_01": "5月1日，星期五 · 11:00",
+              "2026_05_02": "5月2日，星期六 · 11:00",
+              "2026_05_03": "5月3日，星期日 · 11:00"
+            }
+          },
+          "emp_ampimm_2026": {
+            "title": "EMP AMPIMM 2026",
+            "dates": {
+              "2026_05_27": "5月27日，星期三 · 11:00",
+              "2026_05_28": "5月28日，星期四 · 11:00",
+              "2026_05_29": "5月29日，星期五 · 11:00"
             }
           }
         }
