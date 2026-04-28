@@ -1,0 +1,38 @@
+{
+  "inMotion": {
+    "title": "Pixkuy in Bewegung",
+    "subtitle": "Reale Services in Mexiko-Stadt: Flughafen, Hotels, Events, private Touren und Chauffeurservice nach Stunden.",
+    "cta": "Ähnlichen Service anfragen",
+    "instagram": "Mehr auf Instagram",
+    "months": {
+      "2026_03": "März 2026",
+      "2026_04": "April 2026"
+    },
+    "items": {
+      "conductorPrivadoJornadaCdmx": {
+        "title": "Privater Chauffeur",
+        "context": "Arbeitstag in Mexiko-Stadt",
+        "line": "Jedes Detail darauf ausgelegt, die Fahrt aufzuwerten.",
+        "alt": "Pixkuy-Fahrzeug vorbereitet für einen Arbeitstag in Mexiko-Stadt"
+      },
+      "teotihuacanGlobos": {
+        "title": "Private Touren",
+        "context": "Teotihuacán ab Mexiko-Stadt",
+        "line": "Über das Ziel hinaus.",
+        "alt": "Blick auf Teotihuacán mit Heißluftballons während einer privaten Tour ab Mexiko-Stadt"
+      },
+      "aicmSalidaTemprana": {
+        "title": "Flughafen & Hotel",
+        "context": "Frühe Fahrt zum AICM",
+        "line": "Zwischen Lichtern, Spiegelungen und Bewegung.",
+        "alt": "Pixkuy-Fahrzeug bei einer frühen Fahrt zum internationalen Flughafen Benito Juárez"
+      },
+      "sanMiguelAllende": {
+        "title": "Private Touren",
+        "context": "San Miguel de Allende",
+        "line": "Eleganz, die leise fließt.",
+        "alt": "Pixkuy-Fahrzeug während eines privaten Services nach San Miguel de Allende"
+      }
+    }
+  }
+}

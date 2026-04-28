@@ -1,0 +1,38 @@
+{
+  "inMotion": {
+    "title": "움직이는 Pixkuy",
+    "subtitle": "멕시코시티에서 실제로 운행된 서비스: 공항, 호텔, 이벤트, 프라이빗 투어, 시간제 기사 서비스.",
+    "cta": "비슷한 서비스 요청하기",
+    "instagram": "Instagram에서 더 보기",
+    "months": {
+      "2026_03": "2026년 3월",
+      "2026_04": "2026년 4월"
+    },
+    "items": {
+      "conductorPrivadoJornadaCdmx": {
+        "title": "프라이빗 기사 서비스",
+        "context": "멕시코시티 업무 일정",
+        "line": "이동의 품격을 높이기 위해 모든 디테일을 준비합니다.",
+        "alt": "멕시코시티 업무 일정에 맞춰 준비된 Pixkuy 차량"
+      },
+      "teotihuacanGlobos": {
+        "title": "프라이빗 투어",
+        "context": "멕시코시티 출발 테오티우아칸",
+        "line": "목적지를 넘어서는 경험.",
+        "alt": "멕시코시티 출발 프라이빗 투어 중 열기구가 보이는 테오티우아칸 전경"
+      },
+      "aicmSalidaTemprana": {
+        "title": "공항 & 호텔",
+        "context": "AICM으로 향하는 이른 출발",
+        "line": "빛, 반사, 움직임 사이에서.",
+        "alt": "베니토 후아레스 국제공항으로 이른 시간 이동 중인 Pixkuy 차량"
+      },
+      "sanMiguelAllende": {
+        "title": "프라이빗 투어",
+        "context": "산미겔 데 아옌데",
+        "line": "고요하게 흐르는 우아함.",
+        "alt": "산미겔 데 아옌데로 향하는 프라이빗 서비스 중인 Pixkuy 차량"
+      }
+    }
+  }
+}

@@ -55,6 +55,7 @@
   <link rel="stylesheet" href="assets/css/40-contact-hourly-daily.css" />
   <link rel="stylesheet" href="assets/css/44-contact-event-special.css" />
   <link rel="stylesheet" href="assets/css/45-services-events-spotlight.css" />
+  <link rel="stylesheet" href="assets/css/46-in-motion.css" />
   <link rel="stylesheet" href="assets/css/41-whatsapp-floating.css" />
   <link rel="stylesheet" href="assets/css/42-services-events.css" />
   <link rel="stylesheet" href="assets/css/43-services-events-sheet-mobile.css" />
@@ -185,28 +186,9 @@
       <p class="muted small" data-i18n="hero.note"></p>
     </div>
   </section>
-
-  <!-- PANTALLA 2 — LOCAL -->
-  <section class="screen local">
-    <div class="content">
-      <h2 data-i18n="local.title"></h2>
-      <p data-i18n="local.body"></p>
-    </div>
-  </section>
-
-  <!-- PANTALLA 3 — ESTÁNDAR -->
-  <section class="screen standard">
-    <div class="content">
-      <h2 data-i18n="standard.title"></h2>
-      <p class="subtitle" data-i18n="standard.subtitle">
-        <br>
-      </p>
-	  <p class="muted" data-i18n="standard.origin"></p>
-    </div>
-  </section>
-
-  <!-- PANTALLA 4 — ADAPTABILIDAD -->
-  <section id="services" class="screen services">
+  
+    <!-- PANTALLA 4 — ADAPTABILIDAD -->
+  <section id="services" class="screen services services--local-bg">
     <div class="content">
       <h2 data-i18n="services.title"></h2>
 
@@ -857,6 +839,52 @@
   </article>
 </div>
       <p class="muted small" data-i18n="services.bridge"></p>
+    </div>
+  </section>
+
+
+
+  <!-- PANTALLA 2 — PIXKUY EN MOVIMIENTO -->
+  <section
+    class="screen local local--services-bg in-motion"
+    id="pixkuy-in-motion"
+    data-in-motion-section
+    hidden
+  >
+    <div class="content">
+      <div class="in-motion__intro">
+        <h2 id="pixkuy-in-motion-title" data-i18n="inMotion.title"></h2>
+        <p class="subtitle in-motion__subtitle" data-i18n="inMotion.subtitle"></p>
+      </div>
+
+      <div
+        class="in-motion__gallery"
+        data-in-motion-gallery
+        aria-labelledby="pixkuy-in-motion-title"
+      ></div>
+
+      <div class="in-motion__actions">
+        <a class="cta in-motion__cta" href="#contact" data-i18n="inMotion.cta"></a>
+
+        <a
+          class="in-motion__instagram"
+          href="https://www.instagram.com/pixkuymobility/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-i18n="inMotion.instagram"
+        ></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA 3 — ESTÁNDAR -->
+  <section class="screen standard">
+    <div class="content">
+      <h2 data-i18n="standard.title"></h2>
+      <p class="subtitle" data-i18n="standard.subtitle">
+        <br>
+      </p>
+	  <p class="muted" data-i18n="standard.origin"></p>
     </div>
   </section>
 
@@ -3228,6 +3256,7 @@
 <script src="assets/js/services/airport-lodging-autocomplete.js"></script>
 <script src="assets/js/services/airport-lodging-places.js"></script>
 <script src="assets/js/services/brand-collaborations.js"></script>
+<script src="assets/js/services/in-motion-gallery.js"></script>
 <script src="assets/js/services/tours-temporal-pricing.js"></script>
 <script src="assets/js/services/tours-panel.js"></script>
 <script src="assets/js/services/tours-mobile-sheet.js"></script>

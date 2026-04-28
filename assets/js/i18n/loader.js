@@ -35,15 +35,15 @@
   // Registro centralizado de fragmentos opcionales por idioma.
   // Primera apertura: tours como nuevo dominio modular.
   var I18N_OPTIONAL_FRAGMENTS = {
-    es: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    en: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    ru: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    fr: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    pt: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    it: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    de: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    ko: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"],
-    "zh-hans": ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent"]
+    es: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    en: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    ru: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    fr: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    pt: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    it: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    de: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    ko: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"],
+    "zh-hans": ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion"]
   };
 
   function isDevHost() {

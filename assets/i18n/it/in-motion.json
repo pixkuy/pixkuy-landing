@@ -1,0 +1,38 @@
+{
+  "inMotion": {
+    "title": "Pixkuy in movimento",
+    "subtitle": "Servizi reali svolti a Città del Messico: aeroporto, hotel, eventi, tour privati e servizio con autista a ore.",
+    "cta": "Richiedi un servizio simile",
+    "instagram": "Vedi altro su Instagram",
+    "months": {
+      "2026_03": "Marzo 2026",
+      "2026_04": "Aprile 2026"
+    },
+    "items": {
+      "conductorPrivadoJornadaCdmx": {
+        "title": "Autista privato",
+        "context": "Giornata di lavoro a Città del Messico",
+        "line": "Ogni dettaglio pensato per elevare il tragitto.",
+        "alt": "Veicolo Pixkuy preparato per una giornata di lavoro a Città del Messico"
+      },
+      "teotihuacanGlobos": {
+        "title": "Tour privati",
+        "context": "Teotihuacán da Città del Messico",
+        "line": "Oltre la destinazione.",
+        "alt": "Vista di Teotihuacán con mongolfiere durante un tour privato da Città del Messico"
+      },
+      "aicmSalidaTemprana": {
+        "title": "Aeroporto & hotel",
+        "context": "Partenza mattutina verso AICM",
+        "line": "Tra luci, riflessi e movimento.",
+        "alt": "Veicolo Pixkuy durante una partenza mattutina verso l’Aeroporto Internazionale Benito Juárez"
+      },
+      "sanMiguelAllende": {
+        "title": "Tour privati",
+        "context": "San Miguel de Allende",
+        "line": "Eleganza che scorre in silenzio.",
+        "alt": "Veicolo Pixkuy durante un servizio privato verso San Miguel de Allende"
+      }
+    }
+  }
+}

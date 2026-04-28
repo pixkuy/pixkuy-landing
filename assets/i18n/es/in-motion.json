@@ -1,0 +1,38 @@
+{
+  "inMotion": {
+    "title": "Pixkuy en movimiento",
+    "subtitle": "Servicios reales realizados en Ciudad de México: aeropuerto, hoteles, eventos, tours privados y conductor por horas.",
+    "cta": "Solicitar un servicio similar",
+    "instagram": "Ver más en Instagram",
+    "months": {
+      "2026_03": "Marzo 2026",
+      "2026_04": "Abril 2026"
+    },
+    "items": {
+      "conductorPrivadoJornadaCdmx": {
+        "title": "Conductor privado",
+        "context": "Jornada de trabajo en CDMX",
+        "line": "Cada detalle pensado para elevar el trayecto.",
+        "alt": "Vehículo Pixkuy preparado para una jornada de trabajo en Ciudad de México"
+      },
+      "teotihuacanGlobos": {
+        "title": "Tours privados",
+        "context": "Teotihuacán desde CDMX",
+        "line": "Más allá del destino.",
+        "alt": "Vista de Teotihuacán con globos durante un tour privado desde Ciudad de México"
+      },
+      "aicmSalidaTemprana": {
+        "title": "Aeropuerto & hotel",
+        "context": "Salida temprana hacia AICM",
+        "line": "Entre luces, reflejos y movimiento.",
+        "alt": "Vehículo Pixkuy en una salida temprana hacia el Aeropuerto Internacional Benito Juárez"
+      },
+      "sanMiguelAllende": {
+        "title": "Tours privados",
+        "context": "San Miguel de Allende",
+        "line": "Elegancia que fluye en silencio.",
+        "alt": "Vehículo Pixkuy durante un servicio privado hacia San Miguel de Allende"
+      }
+    }
+  }
+}

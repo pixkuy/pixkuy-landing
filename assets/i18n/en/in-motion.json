@@ -1,0 +1,38 @@
+{
+  "inMotion": {
+    "title": "Pixkuy in motion",
+    "subtitle": "Real services operated in Mexico City: airport, hotels, events, private tours and hourly chauffeur service.",
+    "cta": "Request a similar service",
+    "instagram": "See more on Instagram",
+    "months": {
+      "2026_03": "March 2026",
+      "2026_04": "April 2026"
+    },
+    "items": {
+      "conductorPrivadoJornadaCdmx": {
+        "title": "Private chauffeur",
+        "context": "Workday in Mexico City",
+        "line": "Every detail designed to elevate the journey.",
+        "alt": "Pixkuy vehicle prepared for a workday in Mexico City"
+      },
+      "teotihuacanGlobos": {
+        "title": "Private tours",
+        "context": "Teotihuacán from Mexico City",
+        "line": "Beyond the destination.",
+        "alt": "View of Teotihuacán with hot-air balloons during a private tour from Mexico City"
+      },
+      "aicmSalidaTemprana": {
+        "title": "Airport & hotel",
+        "context": "Early departure to AICM",
+        "line": "Between lights, reflections and movement.",
+        "alt": "Pixkuy vehicle during an early departure to Benito Juárez International Airport"
+      },
+      "sanMiguelAllende": {
+        "title": "Private tours",
+        "context": "San Miguel de Allende",
+        "line": "Elegance flowing in silence.",
+        "alt": "Pixkuy vehicle during a private service to San Miguel de Allende"
+      }
+    }
+  }
+}

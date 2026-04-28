@@ -1,0 +1,38 @@
+{
+  "inMotion": {
+    "title": "Pixkuy en mouvement",
+    "subtitle": "Services réels réalisés à Mexico : aéroport, hôtels, événements, visites privées et chauffeur à l’heure.",
+    "cta": "Demander un service similaire",
+    "instagram": "Voir plus sur Instagram",
+    "months": {
+      "2026_03": "Mars 2026",
+      "2026_04": "Avril 2026"
+    },
+    "items": {
+      "conductorPrivadoJornadaCdmx": {
+        "title": "Chauffeur privé",
+        "context": "Journée de travail à Mexico",
+        "line": "Chaque détail pensé pour élever le trajet.",
+        "alt": "Véhicule Pixkuy préparé pour une journée de travail à Mexico"
+      },
+      "teotihuacanGlobos": {
+        "title": "Visites privées",
+        "context": "Teotihuacán depuis Mexico",
+        "line": "Au-delà de la destination.",
+        "alt": "Vue de Teotihuacán avec des montgolfières lors d’une visite privée depuis Mexico"
+      },
+      "aicmSalidaTemprana": {
+        "title": "Aéroport & hôtel",
+        "context": "Départ matinal vers l’AICM",
+        "line": "Entre lumières, reflets et mouvement.",
+        "alt": "Véhicule Pixkuy lors d’un départ matinal vers l’aéroport international Benito Juárez"
+      },
+      "sanMiguelAllende": {
+        "title": "Visites privées",
+        "context": "San Miguel de Allende",
+        "line": "Une élégance qui circule en silence.",
+        "alt": "Véhicule Pixkuy pendant un service privé vers San Miguel de Allende"
+      }
+    }
+  }
+}

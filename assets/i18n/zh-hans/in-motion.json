@@ -1,0 +1,38 @@
+{
+  "inMotion": {
+    "title": "行进中的 Pixkuy",
+    "subtitle": "在墨西哥城真实执行的服务：机场、酒店、活动、私人游览和按小时配备司机的用车服务。",
+    "cta": "申请类似服务",
+    "instagram": "在 Instagram 查看更多",
+    "months": {
+      "2026_03": "2026年3月",
+      "2026_04": "2026年4月"
+    },
+    "items": {
+      "conductorPrivadoJornadaCdmx": {
+        "title": "私人司机",
+        "context": "墨西哥城商务行程",
+        "line": "每一个细节，都是为了提升你的行程体验。",
+        "alt": "为墨西哥城商务行程准备好的 Pixkuy 车辆"
+      },
+      "teotihuacanGlobos": {
+        "title": "私人游览",
+        "context": "从墨西哥城前往特奥蒂瓦坎",
+        "line": "不止抵达目的地。",
+        "alt": "从墨西哥城出发的私人游览中，可见热气球的特奥蒂瓦坎景色"
+      },
+      "aicmSalidaTemprana": {
+        "title": "机场与酒店",
+        "context": "清晨前往 AICM",
+        "line": "在灯光、倒影与流动之间。",
+        "alt": "Pixkuy 车辆清晨前往贝尼托·华雷斯国际机场"
+      },
+      "sanMiguelAllende": {
+        "title": "私人游览",
+        "context": "圣米格尔-德阿连德",
+        "line": "静默流动的优雅。",
+        "alt": "Pixkuy 车辆执行前往圣米格尔-德阿连德的私人服务"
+      }
+    }
+  }
+}
