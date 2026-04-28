@@ -55,6 +55,14 @@
     );
   }
 
+  function roundUpToNearestFive(value) {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      return null;
+    }
+
+    return Math.ceil(value / 5) * 5;
+  }
+
   function applyTemporalPricing(basePrice, serviceDateLiteral) {
     if (typeof basePrice !== "number" || !Number.isFinite(basePrice)) {
       return null;
@@ -64,7 +72,7 @@
       return basePrice;
     }
 
-    return Math.round(basePrice * PRICE_MULTIPLIER);
+    return roundUpToNearestFive(basePrice * PRICE_MULTIPLIER);
   }
 
   window.PixkuyAirportTariffTemporalPricing = {

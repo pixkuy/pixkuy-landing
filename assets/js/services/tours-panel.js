@@ -1078,6 +1078,18 @@ function syncConfigComputedUi() {
   window.dispatchEvent(new CustomEvent('pixkuy:tours-panel-ui-sync'));
 }
 
+function syncPassengerChipsUi() {
+  const passengerButtons = configMount.querySelectorAll('[data-services-tours-passenger]');
+
+  passengerButtons.forEach((button) => {
+    const bucketKey = button.getAttribute('data-services-tours-passenger') || '';
+    const isActive = bucketKey === state.passengerFareKey;
+
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
   function applyTourSelection(nextTourId) {
     const nextTour = getTourById(nextTourId);
     const previousTour = getTourById(state.selectedTourId);
@@ -1185,7 +1197,11 @@ function syncConfigComputedUi() {
       if (passengerButton) {
         state.passengerFareKey = passengerButton.getAttribute('data-services-tours-passenger') || '';
         state.passengerFareKeyAuto = false;
-        renderAll();
+
+        syncDerivedState();
+        syncPassengerChipsUi();
+        syncConfigComputedUi();
+
         return;
       }
 
