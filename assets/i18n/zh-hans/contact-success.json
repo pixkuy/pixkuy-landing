@@ -1,0 +1,16 @@
+{
+  "contactSuccess": {
+    "title": "请求已收到",
+    "lead": "感谢您信任 Pixkuy Mobility。我们已成功收到您的出行服务信息。",
+    "nextTitle": "接下来会发生什么",
+    "steps": [
+      "我们将审核可用性、路线和运营细节。",
+      "我们将确认处理您请求的最佳方式。",
+      "我们会尽快联系您，确认下一步安排。"
+    ],
+    "note": "如果您希望获得更直接的协助，也可以通过 WhatsApp 继续沟通。",
+    "primary": "知道了",
+    "whatsapp": "通过 WhatsApp 联系",
+    "close": "关闭确认"
+  }
+}

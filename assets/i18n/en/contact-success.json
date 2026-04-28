@@ -1,0 +1,16 @@
+{
+  "contactSuccess": {
+    "title": "Request received",
+    "lead": "Thank you for trusting Pixkuy Mobility. We have successfully received the details of your transfer.",
+    "nextTitle": "What happens next",
+    "steps": [
+      "We will review availability, route and operational details.",
+      "We will validate the best way to handle your request.",
+      "We will contact you as soon as possible to confirm the next steps."
+    ],
+    "note": "If you prefer more direct assistance, you can also continue the conversation on WhatsApp.",
+    "primary": "Got it",
+    "whatsapp": "Chat on WhatsApp",
+    "close": "Close confirmation"
+  }
+}

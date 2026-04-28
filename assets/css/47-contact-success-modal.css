@@ -1,0 +1,264 @@
+/* assets/css/47-contact-success-modal.css
+   Confirmación transaccional post-submit.
+   Desktop: modal centrado.
+   Mobile: bottom sheet.
+   No incluye:
+   - validación de formulario
+   - Netlify Forms
+   - lógica de WhatsApp
+   - tracking/conversiones
+*/
+
+.contact-success-modal[hidden]{
+  display:none !important;
+}
+
+body.contact-success-modal-lock{
+  overflow:hidden !important;
+}
+
+.contact-success-modal{
+  position:fixed;
+  inset:0;
+  z-index:120;
+  display:block;
+}
+
+.contact-success-modal__backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.64);
+}
+
+.contact-success-modal__panel{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:min(520px, calc(100vw - 32px));
+  transform:translate(-50%, -50%);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  background:#111315;
+  color:var(--fg);
+  box-shadow:0 12px 34px rgba(0,0,0,.34);
+  outline:none;
+}
+
+.contact-success-modal__body{
+  position:relative;
+  padding:30px 30px 26px;
+}
+
+.contact-success-modal__close{
+  position:absolute;
+  z-index:2;
+  top:14px;
+  right:14px;
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  background:rgba(255,255,255,.04);
+  color:rgba(244,242,238,.86);
+  cursor:pointer;
+  font-size:22px;
+  line-height:1;
+}
+
+.contact-success-modal__close:hover{
+  background:rgba(255,255,255,.08);
+  color:var(--fg);
+}
+
+.contact-success-modal__close:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+}
+
+.contact-success-modal__brand{
+  margin:0 44px 18px 0;
+}
+
+.contact-success-modal__logo{
+  display:block;
+  width:96px;
+  height:auto;
+  opacity:.86;
+}
+
+.contact-success-modal__title{
+  margin:0 44px 14px 0;
+  color:var(--fg);
+  font-size:clamp(28px, 3.3vw, 38px);
+  line-height:1.08;
+  letter-spacing:-.02em;
+}
+
+.contact-success-modal__lead{
+  margin:0;
+  color:rgba(244,242,238,.88);
+  font-size:17px;
+  line-height:1.5;
+}
+
+.contact-success-modal__next{
+  margin-top:20px;
+  padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.10);
+}
+
+.contact-success-modal__next-title{
+  margin:0 0 10px;
+  color:var(--fg);
+  font-size:15px;
+  line-height:1.3;
+  font-weight:700;
+}
+
+.contact-success-modal__steps{
+  display:grid;
+  gap:8px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.contact-success-modal__steps li{
+  position:relative;
+  margin:0;
+  padding-left:18px;
+  color:rgba(244,242,238,.74);
+  font-size:14px;
+  line-height:1.45;
+}
+
+.contact-success-modal__steps li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.62em;
+  width:6px;
+  height:6px;
+  border-radius:999px;
+  background:rgba(255,224,140,.88);
+}
+
+.contact-success-modal__note{
+  margin:18px 0 0;
+  color:rgba(244,242,238,.62);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.contact-success-modal__actions{
+  margin-top:24px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.contact-success-modal .contact-success-modal__primary{
+  height:48px;
+  min-height:48px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:0;
+  padding:0 26px;
+  line-height:1;
+}
+
+.contact-success-modal__whatsapp{
+  height:48px;
+  min-height:48px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0 16px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  background:rgba(255,255,255,.03);
+  color:var(--fg);
+  text-decoration:none;
+  font-size:14px;
+  line-height:1;
+  font-weight:600;
+}
+
+.contact-success-modal__whatsapp:hover{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.22);
+}
+
+.contact-success-modal__whatsapp:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+}
+
+.contact-success-modal__whatsapp-icon{
+  width:18px;
+  height:18px;
+  display:block;
+  object-fit:contain;
+  flex:0 0 auto;
+}
+
+@media (max-width:720px){
+  .contact-success-modal__panel{
+    top:auto;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    transform:none;
+    border-right:0;
+    border-bottom:0;
+    border-left:0;
+    border-radius:16px 16px 0 0;
+  }
+
+  .contact-success-modal__body{
+    padding:28px 20px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .contact-success-modal__brand{
+    margin-bottom:16px;
+  }
+
+  .contact-success-modal__logo{
+    width:90px;
+  }
+
+  .contact-success-modal__title{
+    margin-right:42px;
+    font-size:30px;
+    line-height:1.08;
+  }
+
+  .contact-success-modal__lead{
+    font-size:16px;
+    line-height:1.55;
+  }
+
+  .contact-success-modal__next{
+    margin-top:18px;
+    padding-top:16px;
+  }
+
+  .contact-success-modal__actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .contact-success-modal__primary,
+  .contact-success-modal__whatsapp{
+    width:100%;
+  }
+}

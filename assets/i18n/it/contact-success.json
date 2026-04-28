@@ -1,0 +1,16 @@
+{
+  "contactSuccess": {
+    "title": "Richiesta ricevuta",
+    "lead": "Grazie per aver scelto Pixkuy Mobility. Abbiamo ricevuto correttamente i dati del tuo trasferimento.",
+    "nextTitle": "Cosa succede ora",
+    "steps": [
+      "Verificheremo disponibilità, percorso e dettagli operativi.",
+      "Valideremo il modo migliore per gestire la tua richiesta.",
+      "Ti contatteremo il prima possibile per confermare i prossimi passaggi."
+    ],
+    "note": "Se preferisci un’assistenza più diretta, puoi continuare la conversazione anche su WhatsApp.",
+    "primary": "Ho capito",
+    "whatsapp": "Scrivi su WhatsApp",
+    "close": "Chiudi conferma"
+  }
+}

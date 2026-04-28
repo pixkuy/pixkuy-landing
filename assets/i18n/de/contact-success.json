@@ -1,0 +1,16 @@
+{
+  "contactSuccess": {
+    "title": "Anfrage erhalten",
+    "lead": "Vielen Dank für Ihr Vertrauen in Pixkuy Mobility. Wir haben die Daten Ihrer Fahrt erfolgreich erhalten.",
+    "nextTitle": "Was jetzt passiert",
+    "steps": [
+      "Wir prüfen Verfügbarkeit, Route und operative Details.",
+      "Wir validieren die beste Möglichkeit, Ihre Anfrage zu betreuen.",
+      "Wir kontaktieren Sie so bald wie möglich, um die nächsten Schritte zu bestätigen."
+    ],
+    "note": "Wenn Sie eine direktere Betreuung bevorzugen, können Sie das Gespräch auch über WhatsApp fortsetzen.",
+    "primary": "Verstanden",
+    "whatsapp": "Per WhatsApp schreiben",
+    "close": "Bestätigung schließen"
+  }
+}

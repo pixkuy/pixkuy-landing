@@ -56,6 +56,7 @@
   <link rel="stylesheet" href="assets/css/44-contact-event-special.css" />
   <link rel="stylesheet" href="assets/css/45-services-events-spotlight.css" />
   <link rel="stylesheet" href="assets/css/46-in-motion.css" />
+  <link rel="stylesheet" href="assets/css/47-contact-success-modal.css" />
   <link rel="stylesheet" href="assets/css/41-whatsapp-floating.css" />
   <link rel="stylesheet" href="assets/css/42-services-events.css" />
   <link rel="stylesheet" href="assets/css/43-services-events-sheet-mobile.css" />
@@ -3186,6 +3187,113 @@
     </div>
   </footer>
 
+  <div
+    class="contact-success-modal"
+    data-contact-success-modal
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="contact-success-title"
+    aria-describedby="contact-success-description"
+    aria-hidden="true"
+    hidden
+  >
+    <div
+      class="contact-success-modal__backdrop"
+      data-contact-success-close
+      aria-hidden="true"
+    ></div>
+
+    <div
+      class="contact-success-modal__panel"
+      role="document"
+      tabindex="-1"
+      data-contact-success-panel
+    >
+      <button
+        type="button"
+        class="contact-success-modal__close"
+        data-contact-success-close
+        data-i18n-aria-label="contactSuccess.close"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+
+      <div class="contact-success-modal__body">
+        <div class="contact-success-modal__brand">
+          <img
+            class="contact-success-modal__logo"
+            src="assets/img/pixkuy-logo-white.webp"
+            alt="Pixkuy Mobility"
+            width="96"
+            height="28"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <h2
+          id="contact-success-title"
+          class="contact-success-modal__title"
+          data-i18n="contactSuccess.title"
+        ></h2>
+
+        <p
+          id="contact-success-description"
+          class="contact-success-modal__lead"
+          data-i18n="contactSuccess.lead"
+        ></p>
+
+        <div class="contact-success-modal__next">
+          <p
+            class="contact-success-modal__next-title"
+            data-i18n="contactSuccess.nextTitle"
+          ></p>
+
+          <ul class="contact-success-modal__steps">
+            <li data-i18n="contactSuccess.steps.0"></li>
+            <li data-i18n="contactSuccess.steps.1"></li>
+            <li data-i18n="contactSuccess.steps.2"></li>
+          </ul>
+        </div>
+
+        <p
+          class="contact-success-modal__note"
+          data-i18n="contactSuccess.note"
+        ></p>
+
+        <div class="contact-success-modal__actions">
+          <button
+            type="button"
+            class="cta contact-success-modal__primary"
+            data-contact-success-close
+            data-i18n="contactSuccess.primary"
+          ></button>
+
+          <a
+            class="contact-success-modal__whatsapp"
+            href="#contact"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-contact-whatsapp="1"
+            data-contact-whatsapp-mode="general"
+          >
+            <img
+              class="contact-success-modal__whatsapp-icon"
+              src="assets/img/icons/whatsapp-premium.png"
+              alt=""
+              width="18"
+              height="18"
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+            />
+            <span data-i18n="contactSuccess.whatsapp"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <!-- i18n internal modules (must load before i18n.js) -->
 <script src="assets/js/i18n/fallback.es.js"></script>
 <script src="assets/js/i18n/catalog.js"></script>
@@ -3233,6 +3341,7 @@
 <script src="assets/js/services/events-special-quote.js"></script>
 <script src="assets/js/forms/contact-event-special-editor.js"></script>
 <script src="assets/js/forms/index.js"></script>
+<script src="assets/js/forms/contact-success-modal.js"></script>
 <script src="assets/js/services/events-special-panel.js"></script>
 <script src="assets/js/services/events-special-mobile-sheet.js"></script>
 <script src="assets/js/services-expand.js"></script>
