@@ -219,3 +219,12 @@
     border:0 !important;
   }
 }
+
+@media (max-width: 720px){
+  body:has(.services-tours-panel__sheet.is-open) .whatsapp-floating,
+  body:has(.services-hourly-panel__sheet.is-open) .whatsapp-floating,
+  body:has(.services-events-panel__sheet.is-open) .whatsapp-floating,
+  body:has(.contact-success-modal[aria-hidden="false"]) .whatsapp-floating{
+    display:none;
+  }
+}
