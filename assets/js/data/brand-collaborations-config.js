@@ -1,9 +1,9 @@
 (function () {
   const config = {
-    enabled: false,
+    enabled: true,
     items: {
       casaDelAgua: {
-        enabled: false,
+        enabled: true,
         order: 10,
         brandName: 'Casa del Agua',
         logoSrc: 'assets/img/brand-collaborations/casa-del-agua-logo.png',
