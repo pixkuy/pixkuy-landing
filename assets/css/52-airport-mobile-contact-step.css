@@ -70,8 +70,8 @@
 
   .airport-mobile-route .airport-mobile-contact-step__summary-list{
     display:grid;
-    grid-template-columns:repeat(4, minmax(0, 1fr));
-    gap:7px 8px;
+    grid-template-columns:minmax(92px, 1.35fr) minmax(46px, .62fr) minmax(58px, .72fr) minmax(40px, .48fr);
+    gap:7px 6px;
     margin:0;
   }
 
