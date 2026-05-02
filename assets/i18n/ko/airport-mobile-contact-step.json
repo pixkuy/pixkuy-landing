@@ -1,0 +1,48 @@
+{
+  "airportMobileContactStep": {
+    "title": "고객 정보",
+    "helper": "이용 가능 여부를 확인하고 이동을 확정하기 위해 정보를 남겨 주세요.",
+    "fields": {
+      "name": "성명",
+      "phone": "국제 전화 접두사 포함 전화/WhatsApp",
+      "email": "이메일",
+      "notes": "여행 메모"
+    },
+    "placeholders": {
+      "name": "이름",
+      "phone": "예: +525512345678",
+      "email": "you@email.com",
+      "notes": "항공편, 호텔, 안내 사항 또는 중요한 세부 정보"
+    },
+    "summary": {
+      "title": "이동 요약:",
+      "direction": "이동",
+      "directionAirportToHotel": "공항 → 호텔",
+      "directionHotelToAirport": "호텔 → 공항",
+      "airport": "공항",
+      "hotel": "호텔",
+      "zone": "구역",
+      "date": "날짜",
+      "time": "시간",
+      "passengers": "승객",
+      "luggage": "수하물",
+      "fare": "요금"
+    },
+    "cta": {
+      "submit": "확인 요청"
+    },
+    "notesEditor": {
+      "title": "여행 메모",
+      "close": "뒤로",
+      "clear": "×",
+      "placeholder": "항공편, 호텔, 안내 사항 또는 중요한 세부 정보"
+    },
+    "validation": {
+      "name": "성명을 입력해 주세요.",
+      "phone": "국제 형식의 유효한 전화번호를 입력해 주세요.",
+      "email": "유효한 이메일을 입력해 주세요.",
+      "notes": "",
+      "formIncomplete": "계속하기 전에 표시된 정보를 확인해 주세요."
+    }
+  }
+}

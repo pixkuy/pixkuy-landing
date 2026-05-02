@@ -42,7 +42,7 @@
   "originAirportPlaceholder": "Selecciona aeropuerto",
   "originZonePlaceholder": "Selecciona zona",
   "destinationLabel": "Destino",
-  "hotelPlaceholder": "Busca tu hotel",
+  "hotelPlaceholder": "Busca tu hotel en la Ciudad de México",
   "hotelStatusLoading": "Buscando alojamientos…",
   "hotelStatusEmpty": "No se han encontrado alojamientos.",
   "hotelStatusError": "No se ha podido cargar la búsqueda.",
@@ -60,11 +60,12 @@
   "fareLabel": "Tarifa",
   "fareValue": "—",
   "cta": "Solicitar",
+"back": "Volver",
 "catalog": {
   "airports": {
-    "mex": "MEX — Aeropuerto Internacional de la Ciudad de México",
+    "mex": "AICM · Aeropuerto Internacional Ciudad de México",
     "nlu": "NLU — Aeropuerto Internacional Felipe Ángeles",
-    "tlc": "TLC — Aeropuerto Internacional Lic. Adolfo López Mateos",
+    "tlc": "TLC — Aeropuerto Internacional de Toluca",
     "pbc": "PBC — Aeropuerto Internacional Hermanos Serdán",
     "qro": "QRO — Aeropuerto Intercontinental de Querétaro"
   },

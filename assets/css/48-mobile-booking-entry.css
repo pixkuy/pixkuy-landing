@@ -1,0 +1,234 @@
+/* assets/css/48-mobile-booking-entry.css
+   Entrada rápida móvil de reserva.
+   Alcance:
+   - solo móvil
+   - solo hero
+   - no modifica desktop
+   - no toca #contact ni #services
+*/
+
+.hero-mobile-entry{
+  display:none;
+}
+
+@media (max-width:720px){
+  .hero > .content:not(.hero-mobile-entry){
+    display:none;
+  }
+
+  .hero-mobile-entry{
+    display:grid;
+  }
+
+  .screen.hero{
+    min-height:100svh;
+    align-items:flex-start;
+    justify-content:center;
+    padding:calc(60px + env(safe-area-inset-top)) 18px 28px;
+  }
+
+  .hero-mobile-entry{
+    width:100%;
+    max-width:420px;
+    margin:0 auto;
+    gap:18px;
+  }
+  
+  .hero-mobile-entry::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:19;
+    height:calc(64px + env(safe-area-inset-top));
+    pointer-events:none;
+    background:rgba(15,17,19,.12);
+    border-bottom:1px solid rgba(255,255,255,.035);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+  
+  .hero-mobile-entry__brand{
+    position:fixed;
+    top:calc(2px + env(safe-area-inset-top));
+    left:clamp(12px, 2vw, 16px);
+    z-index:21;
+
+    display:flex;
+    align-items:center;
+    min-height:36px;
+  }
+
+  .hero-mobile-entry__brand img{
+    display:block;
+    width:112px;
+    height:auto;
+  }
+
+  .hero-mobile-entry__intro{
+    display:grid;
+    gap:10px;
+  }
+
+  .hero-mobile-entry__intro h1{
+    margin:0;
+    max-width:100%;
+    font-size:clamp(25px, 6.8vw, 32px);
+    line-height:1.08;
+    letter-spacing:-0.02em;
+  }
+
+  .hero-mobile-entry__intro p{
+    margin:0;
+    max-width:100%;
+    font-size:15px;
+    line-height:1.45;
+    color:rgba(244,242,238,.76);
+  }
+
+  .hero-mobile-entry__actions{
+    display:grid;
+    gap:8px;
+    margin-top:2px;
+  }
+
+  .hero-mobile-entry__action{
+    display:grid;
+    grid-template-columns:34px minmax(0, 1fr) auto;
+    align-items:center;
+    gap:12px;
+
+    min-height:64px;
+    padding:12px 12px 12px 14px;
+
+    color:var(--fg);
+    text-decoration:none;
+
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    background:rgba(15,17,19,.72);
+  }
+
+  .hero-mobile-entry__action:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:3px;
+  }
+  
+  .hero-mobile-entry__icon{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:34px;
+    height:34px;
+
+    color:rgba(244,242,238,.78);
+  }
+
+  .hero-mobile-entry__icon svg{
+    display:block;
+    width:22px;
+    height:22px;
+  }
+
+  .hero-mobile-entry__action-copy{
+    display:grid;
+    gap:3px;
+    min-width:0;
+  }
+
+  .hero-mobile-entry__action-copy strong{
+    display:block;
+    color:var(--fg);
+    font-size:15px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .hero-mobile-entry__action-copy span{
+    display:block;
+    color:rgba(244,242,238,.62);
+    font-size:12px;
+    line-height:1.35;
+  }
+
+  .hero-mobile-entry__action-cta{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    min-width:74px;
+    min-height:34px;
+    padding:0 10px;
+
+    border-radius:8px;
+    border:1px solid rgba(31,122,109,.58);
+    background:rgba(31,122,109,.18);
+
+    color:var(--fg);
+    font-size:12px;
+    line-height:1;
+    font-weight:700;
+    white-space:nowrap;
+  }
+
+  .hero-mobile-entry__whatsapp{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    min-height:44px;
+    padding:0 14px;
+
+    color:var(--fg);
+    text-decoration:none;
+    font-size:14px;
+    font-weight:700;
+
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.04);
+  }
+
+  .hero-mobile-entry__whatsapp:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:3px;
+  }
+
+  .hero-mobile-entry__trust-card{
+    display:grid;
+    grid-template-columns:74px minmax(0, 1fr);
+    align-items:center;
+    gap:10px;
+
+    min-height:58px;
+    padding:8px 10px;
+
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    background:rgba(15,17,19,.56);
+  }
+
+  .hero-mobile-entry__trust-image{
+    display:block;
+    width:74px;
+    height:46px;
+    object-fit:cover;
+    object-position:center 140%;
+    border-radius:8px;
+  }
+
+  .hero-mobile-entry__trust{
+    margin:0;
+    max-width:none;
+
+    color:rgba(244,242,238,.66);
+    font-size:12px;
+    line-height:1.45;
+    word-break:normal;
+    overflow-wrap:normal;
+    hyphens:none;
+  }
+}

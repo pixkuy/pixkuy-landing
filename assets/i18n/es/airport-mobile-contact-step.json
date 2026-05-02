@@ -1,0 +1,48 @@
+{
+  "airportMobileContactStep": {
+    "title": "Tus datos",
+    "helper": "Déjanos tus datos para revisar disponibilidad y confirmar el traslado.",
+    "fields": {
+      "name": "Nombre completo",
+      "phone": "Teléfono/WhatsApp con prefijo internacional",
+      "email": "Email",
+      "notes": "Notas del viaje"
+    },
+    "placeholders": {
+      "name": "Tu nombre",
+      "phone": "Ej. +525512345678",
+      "email": "tu@email.com",
+      "notes": "Vuelo, hotel, instrucciones o detalles importantes"
+    },
+    "summary": {
+      "title": "Resumen del traslado:",
+      "direction": "Trayecto",
+      "directionAirportToHotel": "Aeropuerto → Hotel",
+      "directionHotelToAirport": "Hotel → Aeropuerto",
+      "airport": "Aeropuerto",
+      "hotel": "Hotel",
+      "zone": "Zona",
+      "date": "Fecha",
+      "time": "Hora",
+      "passengers": "Pasajeros",
+      "luggage": "Maletas",
+      "fare": "Tarifa"
+    },
+    "cta": {
+      "submit": "Solicitar confirmación"
+    },
+    "notesEditor": {
+      "title": "Notas del viaje",
+      "close": "Volver",
+      "clear": "×",
+      "placeholder": "Vuelo, hotel, instrucciones o detalles importantes"
+    },
+    "validation": {
+      "name": "Indica tu nombre completo.",
+      "phone": "Indica un teléfono válido con formato internacional.",
+      "email": "Indica un email válido.",
+      "notes": "",
+      "formIncomplete": "Revisa los datos marcados antes de continuar."
+    }
+  }
+}

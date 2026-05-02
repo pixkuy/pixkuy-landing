@@ -1,0 +1,28 @@
+{
+  "heroMobileEntry": {
+    "title": "Chauffeur privé à Mexico",
+    "text": "Mobilité premium avec chauffeur privé, flotte hybride et électrique. Le souci du détail.",
+    "airport": {
+      "title": "Aéroport / Hôtel",
+      "text": "Transfert privé depuis ou vers les aéroports et hôtels."
+    },
+    "hourly": {
+      "title": "Véhicule avec chauffeur",
+      "text": "Service à l’heure, à la journée ou pour agenda privé."
+    },
+    "tours": {
+      "title": "Tours privés",
+      "text": "Itinéraires sélectionnés avec transport privé."
+    },
+    "events": {
+      "title": "Événements à venir",
+      "text": "Transferts coordonnés pour concerts et événements."
+    },
+    "cta": {
+      "request": "Demander",
+      "tours": "Voir les tours",
+      "events": "Voir les événements"
+    },
+    "trust": "BYD M9 · jusqu’à 6 passagers · Wi-Fi · USB-C · sièges capitaine · climatisation individuelle"
+  }
+}

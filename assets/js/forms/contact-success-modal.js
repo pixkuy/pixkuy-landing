@@ -17,6 +17,7 @@
   var LOCK_CLASS = "contact-success-modal-lock";
   var MODAL_SUCCESS_SIGNAL_KEY = "pixkuy_contact_success_pending";
   var LEAD_SUCCESS_SIGNAL_KEY = "pixkuy_lead_success";
+  var MOBILE_QUERY = "(max-width: 720px)";
   var previousFocus = null;
 
   function hasLeadSuccessParam() {
@@ -30,6 +31,8 @@
     }
   }
   
+    
+    
   function hasModalSuccessSignal() {
     try {
       return window.sessionStorage.getItem(MODAL_SUCCESS_SIGNAL_KEY) === "1";
@@ -112,6 +115,44 @@
     return true;
   }
 
+  function isMobileViewport() {
+    return Boolean(
+      window.matchMedia &&
+      window.matchMedia(MOBILE_QUERY).matches
+    );
+  }
+
+  function getCleanSuccessUrl() {
+    var url;
+
+    try {
+      url = new URL(window.location.href);
+      url.searchParams.delete("lead");
+      url.searchParams.delete("pixkuyLocalSuccess");
+      url.hash = "";
+
+      return url.pathname + url.search + url.hash;
+    } catch (error) {
+      return window.location.pathname || "/";
+    }
+  }
+
+  function returnToMobileInitialScreen() {
+    var cleanUrl = getCleanSuccessUrl();
+
+    if (window.history && typeof window.history.replaceState === "function") {
+      window.history.replaceState(null, document.title, cleanUrl);
+    }
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+
+    return true;
+  }
+
   function focusContactSection() {
     var contact = document.getElementById("contact");
 
@@ -134,6 +175,12 @@
 
   function closeModal() {
     setOpen(getModal(), false);
+
+    if (isMobileViewport()) {
+      returnToMobileInitialScreen();
+      return;
+    }
+
     focusContactSection();
   }
 

@@ -1,6 +1,8 @@
 (function () {
   "use strict";
 
+  const MOBILE_QUERY = "(max-width: 720px)";
+
   function requireDeps(deps) {
     if (!deps || typeof deps !== "object") {
       throw new Error("PixkuyAirportTariffHandoff deps are required");
@@ -72,6 +74,15 @@
 
     return formsNamespace;
   }
+  
+  function isMobileViewport() {
+    return Boolean(
+      window &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia(MOBILE_QUERY).matches
+    );
+  }
+
 
   function getContactFields() {
     const formsApi = getReservationFormApi();
@@ -267,6 +278,10 @@
 
   function handoffPanelSelectionToContact(state, deps) {
     requireDeps(deps);
+
+    if (isMobileViewport()) {
+      return false;
+    }
 
     const fields = getContactFields();
     const prefill = buildPanelToContactPrefill(state, deps);

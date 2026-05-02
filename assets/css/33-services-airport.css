@@ -1036,3 +1036,130 @@
     box-shadow:none;
   }
 }
+
+/* -------------------------------------------------
+   AIRPORT PANEL — mobile app-like flow shell
+   ------------------------------------------------- */
+
+@media (max-width: 720px){
+  #services-expand-airport{
+    padding:16px 14px 14px;
+    border-radius:14px;
+    background:rgba(15,17,19,.82);
+    border-color:rgba(236,220,189,.18);
+    box-shadow:none;
+  }
+
+  #services-expand-airport .services-expand__eyebrow{
+    display:none;
+  }
+
+  #services-expand-airport .services-expand__title{
+    font-size:22px;
+    line-height:1.12;
+    letter-spacing:-0.02em;
+  }
+
+  #services-expand-airport .services-expand__text{
+    margin-top:6px;
+    font-size:13.5px;
+    line-height:1.45;
+    color:rgba(255,245,228,.72);
+  }
+
+  #services-expand-airport .services-expand__form{
+    margin-top:14px;
+    gap:10px;
+  }
+
+  #services-expand-airport .services-expand__field{
+    gap:6px;
+  }
+
+  #services-expand-airport .services-expand__label{
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+    color:rgba(255,245,228,.72);
+  }
+
+  #services-expand-airport .services-expand__control,
+  #services-expand-airport .services-expand__destination-resolved,
+  #services-expand-airport .services-expand__destination-search .place-autocomplete input{
+    min-height:48px;
+    border-radius:9px;
+    border-color:rgba(236,220,189,.20);
+    background:rgba(22,18,17,.54);
+    box-shadow:none;
+  }
+
+  #services-expand-airport .services-expand__swap{
+    margin:-2px 0;
+  }
+
+  #services-expand-airport .services-expand__swap-button{
+    width:38px;
+    height:38px;
+    border-radius:9px;
+    border-color:rgba(236,220,189,.18);
+    background:rgba(255,255,255,.03);
+  }
+
+  #services-expand-airport .services-expand__passengers-segmented{
+    gap:6px;
+  }
+
+  #services-expand-airport .services-expand__passenger-chip{
+    min-height:42px;
+    border-radius:9px;
+    border-color:rgba(236,220,189,.18);
+    background:rgba(22,18,17,.48);
+    box-shadow:none;
+  }
+
+  #services-expand-airport .services-expand__passenger-chip.is-active,
+  #services-expand-airport .services-expand__passenger-chip[aria-pressed="true"]{
+    border-color:rgba(31,122,109,.66);
+    background:rgba(31,122,109,.18);
+    box-shadow:none;
+  }
+
+  #services-expand-airport .services-expand__field--date,
+  #services-expand-airport .services-expand__field--time{
+    gap:6px;
+  }
+
+  #services-expand-airport .services-expand__field--date .services-expand__control,
+  #services-expand-airport .services-expand__field--time .services-expand__control{
+    min-height:48px;
+    height:48px;
+    line-height:48px;
+    border-radius:9px;
+  }
+
+  #services-expand-airport .services-expand__field--fare{
+    margin-top:2px;
+  }
+
+  #services-expand-airport .services-expand__fare{
+    min-height:50px;
+    padding:0 14px;
+    border-radius:9px;
+    border-color:rgba(247,226,170,.34);
+    background:rgba(255,242,214,.10);
+    box-shadow:none;
+    font-size:21px;
+    color:rgba(255,224,140,.96);
+  }
+
+  #services-expand-airport .services-expand__field--fare .services-expand__destination-zone{
+    margin-top:5px;
+  }
+
+  #services-expand-airport .services-expand__cta{
+    min-height:50px;
+    border-radius:9px;
+    background:rgba(31,122,109,.94);
+    box-shadow:none;
+  }
+}

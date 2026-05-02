@@ -1,0 +1,28 @@
+{
+  "heroMobileEntry": {
+    "title": "Privater Chauffeur in Mexiko-Stadt",
+    "text": "Premium-Mobilität mit privatem Fahrer, Hybrid- und Elektroflotte. Aufmerksamkeit für jedes Detail.",
+    "airport": {
+      "title": "Flughafen / Hotel",
+      "text": "Privater Transfer zum oder vom Flughafen und Hotel."
+    },
+    "hourly": {
+      "title": "Fahrzeug mit Chauffeur",
+      "text": "Service stundenweise, ganztägig oder für private Termine."
+    },
+    "tours": {
+      "title": "Private Touren",
+      "text": "Ausgewählte Routen mit privatem Transfer."
+    },
+    "events": {
+      "title": "Kommende Events",
+      "text": "Koordinierte Transfers für Konzerte und Veranstaltungen."
+    },
+    "cta": {
+      "request": "Anfragen",
+      "tours": "Touren ansehen",
+      "events": "Events ansehen"
+    },
+    "trust": "BYD M9 · bis zu 6 Fahrgäste · Wi-Fi · USB-C · Captain Seats · individuelle Klimatisierung"
+  }
+}

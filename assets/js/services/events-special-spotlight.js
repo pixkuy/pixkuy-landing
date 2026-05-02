@@ -390,7 +390,10 @@
       return false;
     }
 
-    root.hidden = isContactInViewport() || isEventsPanelOpen();
+    root.hidden =
+      shouldHoldMobileSpotlightUntilHeroPassed() ||
+      isContactInViewport() ||
+      isEventsPanelOpen();
 
     return true;
   }
@@ -405,6 +408,23 @@
 
   function isMobileViewport() {
     return Boolean(window.matchMedia && window.matchMedia(MOBILE_QUERY).matches);
+  }
+
+  function shouldHoldMobileSpotlightUntilHeroPassed() {
+    const hero = document.querySelector(".screen.hero");
+    let rect;
+
+    if (!isMobileViewport()) {
+      return false;
+    }
+
+    if (!hero || typeof hero.getBoundingClientRect !== "function") {
+      return false;
+    }
+
+    rect = hero.getBoundingClientRect();
+
+    return rect.bottom > 0;
   }
 
   function scrollEventsTargetIntoView() {

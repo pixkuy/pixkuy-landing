@@ -1,0 +1,48 @@
+{
+  "airportMobileContactStep": {
+    "title": "Your details",
+    "helper": "Leave us your details so we can review availability and confirm the transfer.",
+    "fields": {
+      "name": "Full name",
+      "phone": "Phone/WhatsApp with international prefix",
+      "email": "Email",
+      "notes": "Trip notes"
+    },
+    "placeholders": {
+      "name": "Your name",
+      "phone": "E.g. +525512345678",
+      "email": "you@email.com",
+      "notes": "Flight, hotel, instructions or important details"
+    },
+    "summary": {
+      "title": "Transfer summary:",
+      "direction": "Trip",
+      "directionAirportToHotel": "Airport → Hotel",
+      "directionHotelToAirport": "Hotel → Airport",
+      "airport": "Airport",
+      "hotel": "Hotel",
+      "zone": "Zone",
+      "date": "Date",
+      "time": "Time",
+      "passengers": "Passengers",
+      "luggage": "Luggage",
+      "fare": "Fare"
+    },
+    "cta": {
+      "submit": "Request confirmation"
+    },
+    "notesEditor": {
+      "title": "Trip notes",
+      "close": "Back",
+      "clear": "×",
+      "placeholder": "Flight, hotel, instructions or important details"
+    },
+    "validation": {
+      "name": "Enter your full name.",
+      "phone": "Enter a valid phone number in international format.",
+      "email": "Enter a valid email.",
+      "notes": "",
+      "formIncomplete": "Review the marked details before continuing."
+    }
+  }
+}

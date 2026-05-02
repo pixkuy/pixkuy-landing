@@ -1,0 +1,48 @@
+{
+  "airportMobileContactStep": {
+    "title": "您的信息",
+    "helper": "请留下您的信息，以便我们核查可用性并确认接送服务。",
+    "fields": {
+      "name": "姓名",
+      "phone": "带国际区号的电话/WhatsApp",
+      "email": "邮箱",
+      "notes": "行程备注"
+    },
+    "placeholders": {
+      "name": "您的姓名",
+      "phone": "例如 +525512345678",
+      "email": "you@email.com",
+      "notes": "航班、酒店、说明或重要细节"
+    },
+    "summary": {
+      "title": "接送摘要：",
+      "direction": "行程",
+      "directionAirportToHotel": "机场 → 酒店",
+      "directionHotelToAirport": "酒店 → 机场",
+      "airport": "机场",
+      "hotel": "酒店",
+      "zone": "区域",
+      "date": "日期",
+      "time": "时间",
+      "passengers": "乘客",
+      "luggage": "行李",
+      "fare": "价格"
+    },
+    "cta": {
+      "submit": "请求确认"
+    },
+    "notesEditor": {
+      "title": "行程备注",
+      "close": "返回",
+      "clear": "×",
+      "placeholder": "航班、酒店、说明或重要细节"
+    },
+    "validation": {
+      "name": "请输入您的姓名。",
+      "phone": "请输入有效的国际格式电话号码。",
+      "email": "请输入有效邮箱。",
+      "notes": "",
+      "formIncomplete": "继续前请检查标记的信息。"
+    }
+  }
+}

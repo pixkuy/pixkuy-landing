@@ -1,0 +1,29 @@
+{
+  "airportMobileFlow": {
+    "back": "返回",
+    "title": "机场与酒店",
+    "helper": "为到达和离开安排的接送服务，提供清晰且周到的体验。",
+    "note": "服务请求需经过运营审核并由人工确认。",
+    "cta": {
+      "continue": "继续"
+    },
+    "direction": {
+      "airportToHotel": "机场 → 酒店",
+      "hotelToAirport": "酒店 → 机场"
+    },
+    "fields": {
+      "passengers": "乘客",
+      "luggage": "行李"
+    },
+    "farePending": {
+      "template": "请填写{fields}以计算价格。",
+      "separator": "、",
+      "finalSeparator": "和",
+      "fields": {
+        "hotel": "酒店",
+        "date": "日期",
+        "time": "时间"
+      }
+    }
+  }
+}

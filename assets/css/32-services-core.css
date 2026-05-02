@@ -265,6 +265,10 @@
     max-width:none;
   }
 
+  .services-cards > .service-card:has([data-i18n="services.cards.airport.title"]){
+    display:none !important;
+  }
+
   .services-cards{
     grid-template-columns:1fr;
     gap:10px;

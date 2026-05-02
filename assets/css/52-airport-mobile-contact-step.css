@@ -1,0 +1,405 @@
+/* assets/css/52-airport-mobile-contact-step.css
+   Airport / Hotel mobile contact step.
+   Alcance:
+   - solo móvil
+   - segunda pantalla dentro de Airport Mobile Booking Flow
+   - reutiliza la route móvil existente
+   - no toca #contact visual
+   - no redefine el booking flow principal
+*/
+
+.airport-mobile-contact-step{
+  display:none;
+}
+
+.airport-mobile-contact-step[hidden]{
+  display:none !important;
+}
+
+@media (max-width: 720px){
+  body[data-airport-mobile-contact-step-active="true"] .airport-mobile-route #services-expand-airport[data-airport-mobile-primary-step-hidden="true"] > .airport-mobile-flow,
+  body[data-airport-mobile-contact-step-active="true"] .airport-mobile-route #services-expand-airport[data-airport-mobile-primary-step-hidden="true"] > .services-expand__form{
+    display:none !important;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step{
+    display:grid;
+    grid-template-rows:auto auto minmax(0, 1fr) auto auto;
+    gap:0px;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__header{
+    display:grid;
+    gap:4px;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__title{
+    margin:0;
+    color:rgba(255,249,238,.98);
+    font-size:22px;
+    line-height:1.12;
+    letter-spacing:-.02em;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__helper{
+    margin:0;
+    color:rgba(255,245,228,.76);
+    font-size:13.5px;
+    line-height:1.45;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary{
+    display:grid;
+    gap:8px;
+    padding:12px 12px 6px;
+    border:1px solid rgba(236,220,189,.22);
+    border-radius:10px;
+    background:rgba(15,17,19,.42);
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-title{
+    margin:0;
+    color:rgba(255,249,238,.94);
+    font-size:13px;
+    line-height:1.2;
+    font-weight:800;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-list{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+    gap:7px 8px;
+    margin:0;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-row{
+    min-width:0;
+    display:grid;
+    gap:2px;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="airport"],
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="hotel"],
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="zone"],
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="fare"]{
+    grid-column:1 / -1;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="date"],
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="time"],
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="passengers"],
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="luggage"]{
+    grid-column:auto;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-label{
+    margin:0;
+    color:rgba(255,245,228,.56);
+    font-size:11px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-value{
+    margin:0;
+    min-width:0;
+    color:rgba(255,249,238,.92);
+    font-size:12.5px;
+    line-height:1.25;
+    font-weight:750;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__summary-row[data-airport-mobile-contact-summary-row="fare"] .airport-mobile-contact-step__summary-value{
+    color:rgba(61,158,122,.98);
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__form{
+    min-height:0;
+    overflow:auto;
+    display:grid;
+    grid-template-columns:minmax(0, .42fr) minmax(0, .58fr);
+    gap:9px 8px;
+    padding-right:2px;
+    padding-bottom:5px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__field{
+    display:grid;
+    gap:6px;
+    min-width:0;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__field[data-airport-mobile-contact-field-wrapper="name"],
+  .airport-mobile-route .airport-mobile-contact-step__field[data-airport-mobile-contact-field-wrapper="phone"],
+  .airport-mobile-route .airport-mobile-contact-step__field[data-airport-mobile-contact-field-wrapper="email"],
+  .airport-mobile-route .airport-mobile-contact-step__field[data-airport-mobile-contact-field-wrapper="notes"]{
+    grid-column:1 / -1;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__label{
+    color:rgba(255,245,228,.74);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__control{
+    width:100%;
+    min-width:0;
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    padding:0 12px;
+    border:1px solid rgba(236,220,189,.38);
+    border-radius:9px;
+    background:rgba(15,17,19,.46);
+    color:rgba(255,249,238,.96);
+    box-shadow:none;
+    box-sizing:border-box;
+    font:inherit;
+    font-size:14px;
+    line-height:48px;
+    font-weight:650;
+    color-scheme:dark;
+  }
+
+  .airport-mobile-route textarea.airport-mobile-contact-step__control{
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    padding:0 12px;
+    line-height:48px;
+    resize:none;
+    overflow:hidden;
+  }
+  
+  .airport-mobile-route .airport-mobile-contact-step__control::placeholder{
+    color:rgba(255,245,228,.50);
+    opacity:1;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__control:focus-visible{
+    outline:none;
+    border-color:rgba(31,122,109,.78);
+    background-color:rgba(15,17,19,.62);
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__field.is-invalid .airport-mobile-contact-step__control{
+    border-color:rgba(212,94,74,.85);
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__error,
+  .airport-mobile-route .airport-mobile-contact-step__global-error{
+    margin:0;
+    color:rgba(255,188,166,.95);
+    font-size:12px;
+    line-height:1.3;
+    font-weight:650;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__error[hidden],
+  .airport-mobile-route .airport-mobile-contact-step__global-error[hidden]{
+    display:none !important;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__actions{
+    display:block;
+    align-self:end;
+    padding-top:4px;
+    margin-bottom:-4px;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__submit{
+    width:100%;
+    min-height:50px;
+    padding:0 16px;
+    border:0;
+    border-radius:9px;
+    background:rgba(31,122,109,.86);
+    color:rgba(255,249,238,.98);
+    box-shadow:none;
+    font:inherit;
+    font-size:14px;
+    line-height:1;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__submit:disabled,
+  .airport-mobile-route .airport-mobile-contact-step__submit[aria-disabled="true"]{
+    background:rgba(255,245,228,.14);
+    color:rgba(255,245,228,.38);
+    cursor:not-allowed;
+  }
+
+  .airport-mobile-route .airport-mobile-contact-step__submit:focus-visible{
+    outline:2px solid rgba(255,249,238,.88);
+    outline-offset:2px;
+  }
+
+  body[data-airport-mobile-notes-editor-active="true"]{
+    overflow:hidden;
+  }
+
+  .airport-mobile-notes-editor[hidden]{
+    display:none !important;
+  }
+
+  .airport-mobile-notes-editor{
+    position:fixed;
+    top:calc(64px + env(safe-area-inset-top));
+    right:0;
+    bottom:0;
+    left:0;
+    z-index:91;
+    display:block;
+    padding:0;
+    background:#0f1113;
+    overflow:hidden;
+    transform:translateY(0);
+    opacity:1;
+    transition:
+      transform .28s cubic-bezier(.2,.8,.2,1),
+      opacity .20s ease;
+  }
+
+  .airport-mobile-notes-editor[aria-hidden="true"]{
+    transform:translateY(28px);
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .airport-mobile-notes-editor__panel{
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+    border-top:1px solid rgba(236,220,189,.16);
+    background:#0f1113;
+  }
+
+  .airport-mobile-notes-editor__panel::before{
+    content:"";
+    display:block;
+    width:38px;
+    height:4px;
+    margin:10px auto 8px;
+    border-radius:999px;
+    background:rgba(255,245,228,.22);
+    flex:0 0 auto;
+  }
+
+  .airport-mobile-notes-editor__header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-height:40px;
+    padding:0 16px;
+    background:#0f1113;
+    flex:0 0 auto;
+  }
+
+  .airport-mobile-notes-editor__title{
+    margin:0;
+    color:rgba(255,249,238,.94);
+    font-size:14px;
+    line-height:1.2;
+    font-weight:750;
+    letter-spacing:-.01em;
+  }
+
+  .airport-mobile-notes-editor__close{
+    min-width:44px;
+    min-height:34px;
+    padding:0 8px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    font-weight:700;
+  }
+
+  .airport-mobile-notes-editor__close:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:0;
+  }
+
+  .airport-mobile-notes-editor__body{
+    position:relative;
+    display:block;
+    min-height:0;
+    flex:1 1 auto;
+    padding:8px 16px calc(16px + env(safe-area-inset-bottom));
+    background:#0f1113;
+  }
+
+  .airport-mobile-notes-editor__input{
+    width:100%;
+    height:100%;
+    min-height:220px;
+    padding:14px 42px 14px 14px;
+    border:1px solid rgba(236,220,189,.38);
+    border-radius:9px;
+    background-color:rgba(15,17,19,.68);
+    color:rgba(255,249,238,.96);
+    box-shadow:none;
+    box-sizing:border-box;
+    font:inherit;
+    font-size:14px;
+    line-height:1.45;
+    font-weight:650;
+    resize:none;
+    color-scheme:dark;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+
+  .airport-mobile-notes-editor__input::placeholder{
+    color:rgba(255,245,228,.50);
+    opacity:1;
+  }
+
+  .airport-mobile-notes-editor__input:focus{
+    outline:none;
+    border-color:rgba(31,122,109,.78);
+    background-color:rgba(15,17,19,.82);
+  }
+
+  .airport-mobile-notes-editor__input:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:0;
+  }
+
+  .airport-mobile-notes-editor__clear{
+    position:absolute;
+    right:26px;
+    top:20px;
+    width:30px;
+    height:30px;
+    border:0;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    color:rgba(255,245,228,.74);
+    font:inherit;
+    font-size:18px;
+    line-height:1;
+    font-weight:600;
+  }
+
+  .airport-mobile-notes-editor__clear[hidden]{
+    display:none !important;
+  }
+}

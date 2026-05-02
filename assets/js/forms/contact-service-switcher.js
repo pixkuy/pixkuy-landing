@@ -6,6 +6,10 @@
   }
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
+  const MOBILE_BLOCKED_SERVICE_TYPE = "airport_hotel";
+  const MOBILE_FALLBACK_SERVICE_TYPE = "hourly_daily";
+
+  let mobileBlockedOptionSnapshot = null;
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -179,6 +183,86 @@
       typeof window.matchMedia === "function" &&
       window.matchMedia("(max-width: 720px)").matches
     );
+  }
+
+  function isMobileBlockedServiceType(serviceType) {
+    return Boolean(
+      isMobileServiceSelectViewport() &&
+      normalizeText(serviceType) === MOBILE_BLOCKED_SERVICE_TYPE
+    );
+  }
+
+  function getMobileFallbackServiceType() {
+    return MOBILE_FALLBACK_SERVICE_TYPE;
+  }
+
+  function syncMobileSelectOptionsAvailability(mobileSelect) {
+    var blockedOption;
+    var insertBeforeOption;
+
+    if (!mobileSelect) {
+      return false;
+    }
+
+    blockedOption = Array.from(mobileSelect.options).find(function findBlockedOption(option) {
+      return normalizeText(option.value) === MOBILE_BLOCKED_SERVICE_TYPE;
+    });
+
+    if (isMobileServiceSelectViewport()) {
+      if (blockedOption) {
+        mobileBlockedOptionSnapshot = {
+          node: blockedOption,
+          nextValue: blockedOption.nextElementSibling
+            ? normalizeText(blockedOption.nextElementSibling.value)
+            : ""
+        };
+
+        blockedOption.remove();
+      }
+
+      return true;
+    }
+
+    if (
+      !blockedOption &&
+      mobileBlockedOptionSnapshot &&
+      mobileBlockedOptionSnapshot.node
+    ) {
+      insertBeforeOption = mobileBlockedOptionSnapshot.nextValue
+        ? Array.from(mobileSelect.options).find(function findInsertBeforeOption(option) {
+            return normalizeText(option.value) === mobileBlockedOptionSnapshot.nextValue;
+          })
+        : null;
+
+      mobileSelect.insertBefore(
+        mobileBlockedOptionSnapshot.node,
+        insertBeforeOption || mobileSelect.firstChild
+      );
+
+      mobileBlockedOptionSnapshot = null;
+    }
+
+    return true;
+  }
+
+  function enforceMobileServiceAvailability(form, serviceStateApi) {
+    const activeServiceType =
+      serviceStateApi && typeof serviceStateApi.getActiveServiceType === "function"
+        ? normalizeText(serviceStateApi.getActiveServiceType())
+        : "";
+
+    if (!isMobileBlockedServiceType(activeServiceType)) {
+      return activeServiceType;
+    }
+
+    const result = serviceStateApi.setActiveServiceType(getMobileFallbackServiceType(), {
+      source: "contact-service-mobile-exclusion",
+      skipConfirm: true
+    });
+
+    return result && result.ok === true
+      ? result.activeServiceType
+      : getMobileFallbackServiceType();
   }
 
   function syncMobileFieldVisibility(mobileField) {
@@ -489,6 +573,7 @@
 
     syncSwitcherAriaLabel(nodes.switcher);
     syncButtonState(nodes.buttons, activeServiceType);
+    syncMobileSelectOptionsAvailability(nodes.mobileSelect);
     syncMobileSelectState(nodes.mobileSelect, activeServiceType);
     syncMobileFieldVisibility(nodes.mobileField);
     syncPanelState(form, nodes.panels, activeServiceType);
@@ -565,7 +650,10 @@
       nodes.mobileSelect.addEventListener("change", function () {
         const nextServiceType = normalizeText(nodes.mobileSelect.value);
 
-        if (!isSupportedServiceType(nextServiceType)) {
+        if (
+          !isSupportedServiceType(nextServiceType) ||
+          isMobileBlockedServiceType(nextServiceType)
+        ) {
           syncMobileSelectState(
             nodes.mobileSelect,
             serviceStateApi.getActiveServiceType()
@@ -606,7 +694,11 @@
     });
 
     window.addEventListener("resize", function () {
-      syncMobileFieldVisibility(nodes.mobileField);
+      const activeServiceType = enforceMobileServiceAvailability(form, serviceStateApi);
+
+      renderActiveService(form, activeServiceType || serviceStateApi.getActiveServiceType(), {
+        focusPanel: false
+      });
     });
 
     return true;
@@ -629,6 +721,7 @@
     bindSwitcherEvents(form);
 
     activeServiceType = serviceStateApi.getActiveServiceType() || getDefaultServiceType();
+    activeServiceType = enforceMobileServiceAvailability(form, serviceStateApi) || activeServiceType;
 
         if (activeServiceType === "other") {
       const result = serviceStateApi.setActiveServiceType("hourly_daily", {
@@ -639,6 +732,8 @@
         activeServiceType = result.activeServiceType;
       }
     }
+
+    activeServiceType = enforceMobileServiceAvailability(form, serviceStateApi) || activeServiceType;
 
     return renderActiveService(
       form,

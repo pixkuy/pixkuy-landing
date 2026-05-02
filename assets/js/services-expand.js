@@ -93,6 +93,10 @@
       const params = new URLSearchParams(window.location.search || '');
       const rawService = String(params.get('service') || '').trim().toLowerCase();
 
+      if (mobileQuery.matches && rawService === 'airport_hotel') {
+        return null;
+      }
+
       const publicToInternalMap = {
         airport_hotel: 'airport',
         tour_private: 'tours',

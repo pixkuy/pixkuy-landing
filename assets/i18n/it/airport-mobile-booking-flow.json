@@ -1,0 +1,29 @@
+{
+  "airportMobileFlow": {
+    "back": "Indietro",
+    "title": "Aeroporto e hotel",
+    "helper": "Trasferimenti pianificati per arrivi e partenze, con un’esperienza chiara e curata.",
+    "note": "Richiesta di servizio soggetta a verifica operativa e conferma manuale.",
+    "cta": {
+      "continue": "Continua"
+    },
+    "direction": {
+      "airportToHotel": "Aeroporto → Hotel",
+      "hotelToAirport": "Hotel → Aeroporto"
+    },
+    "fields": {
+      "passengers": "Passeggeri",
+      "luggage": "Bagagli"
+    },
+    "farePending": {
+      "template": "Completa {fields} per calcolare la tariffa.",
+      "separator": ", ",
+      "finalSeparator": " e ",
+      "fields": {
+        "hotel": "hotel",
+        "date": "data",
+        "time": "ora"
+      }
+    }
+  }
+}

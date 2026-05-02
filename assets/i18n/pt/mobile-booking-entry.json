@@ -1,0 +1,28 @@
+{
+  "heroMobileEntry": {
+    "title": "Motorista privado na Cidade do México",
+    "text": "Mobilidade premium com motorista privado, frota híbrida e elétrica. Atenção a cada detalhe.",
+    "airport": {
+      "title": "Aeroporto / Hotel",
+      "text": "Transfer privado de ou para aeroportos e hotéis."
+    },
+    "hourly": {
+      "title": "Veículo com motorista",
+      "text": "Serviço por horas, dia completo ou agenda privada."
+    },
+    "tours": {
+      "title": "Tours privados",
+      "text": "Rotas selecionadas com transporte privado."
+    },
+    "events": {
+      "title": "Próximos eventos",
+      "text": "Transfers coordenados para shows e eventos."
+    },
+    "cta": {
+      "request": "Solicitar",
+      "tours": "Ver tours",
+      "events": "Ver eventos"
+    },
+    "trust": "BYD M9 · até 6 passageiros · Wi-Fi · USB-C · assentos captain · climatização individual"
+  }
+}

@@ -1,0 +1,102 @@
+/* assets/css/50-mobile-topbar.css
+   Mobile global topbar.
+   Alcance:
+   - solo móvil
+   - shell global persistente
+   - logo Pixkuy fijo
+   - convive con selector global de idioma
+   - no pertenece a hero, services, airport ni contact
+*/
+
+.mobile-topbar{
+  display:none;
+}
+
+@media (max-width:720px){
+  .mobile-topbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:90;
+
+    display:flex;
+    align-items:center;
+
+    min-height:calc(54px + env(safe-area-inset-top));
+    padding:calc(2px + env(safe-area-inset-top)) 16px 0;
+
+    pointer-events:none;
+    background:rgba(15,17,19,.12);
+    border-bottom:0;
+
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+
+  .mobile-topbar__brand{
+    position:fixed;
+    top:calc(-9px + env(safe-area-inset-top));
+    left:0;
+    z-index:91;
+
+    display:block;
+    width:336px;
+    height:52px;
+    overflow:hidden;
+    pointer-events:auto;
+  }
+
+  .mobile-topbar__brand img{
+    display:block;
+    width:336px;
+    height:auto;
+    transform:translateY(-17px);
+  }
+
+  .hero-mobile-entry::before{
+    display:none;
+  }
+
+  .hero-mobile-entry__brand{
+    display:none !important;
+  }
+
+  body .lang{
+    position:fixed;
+    top:calc(10px + env(safe-area-inset-top));
+    right:4px;
+    z-index:320;
+
+    display:inline-flex;
+    align-items:flex-start;
+
+    padding:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    overflow:visible;
+  }
+  body .lang-trigger{
+    position:relative;
+    z-index:321;
+
+    min-width:44px;
+    height:36px;
+
+    background:rgba(15,17,19,.94);
+    border:1px solid rgba(255,255,255,.16);
+    color:var(--fg);
+    box-shadow:none;
+  }
+
+  body .lang-menu{
+    z-index:322;
+  }
+
+  body[data-airport-mobile-screen="true"] #services > .content{
+    padding-top:calc(96px + env(safe-area-inset-top));
+  }
+}

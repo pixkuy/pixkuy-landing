@@ -1,0 +1,28 @@
+{
+  "heroMobileEntry": {
+    "title": "Chauffeur privato a Città del Messico",
+    "text": "Mobilità premium con autista privato, flotta ibrida ed elettrica. Cura di ogni dettaglio.",
+    "airport": {
+      "title": "Aeroporto / Hotel",
+      "text": "Transfer privato da o verso aeroporti e hotel."
+    },
+    "hourly": {
+      "title": "Veicolo con autista",
+      "text": "Servizio a ore, giornata intera o agenda privata."
+    },
+    "tours": {
+      "title": "Tour privati",
+      "text": "Percorsi selezionati con trasporto privato."
+    },
+    "events": {
+      "title": "Prossimi eventi",
+      "text": "Transfer coordinati per concerti ed eventi."
+    },
+    "cta": {
+      "request": "Richiedi",
+      "tours": "Vedi tour",
+      "events": "Vedi eventi"
+    },
+    "trust": "BYD M9 · fino a 6 passeggeri · Wi-Fi · USB-C · sedili captain · climatizzazione individuale"
+  }
+}

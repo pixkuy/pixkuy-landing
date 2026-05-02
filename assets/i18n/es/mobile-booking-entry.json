@@ -1,0 +1,28 @@
+{
+  "heroMobileEntry": {
+    "title": "Chófer en Ciudad de México",
+    "text": "Movilidad premium con conductor privado, flota híbrida y eléctrica. Atención en cada detalle.",
+    "airport": {
+      "title": "Aeropuerto / Hotel",
+      "text": "Traslado privado desde o hacia aeropuerto y hoteles."
+    },
+    "hourly": {
+      "title": "Vehículo con conductor",
+      "text": "Servicio por horas, día completo o agenda privada."
+    },
+    "tours": {
+      "title": "Tours privados",
+      "text": "Rutas seleccionadas con traslado privado."
+    },
+    "events": {
+      "title": "Próximos eventos",
+      "text": "Traslados coordinados para conciertos y eventos."
+    },
+    "cta": {
+      "request": "Solicitar",
+      "tours": "Ver tours",
+      "events": "Ver eventos"
+    },
+    "trust": "BYD M9 · hasta 6 pasajeros · Wi-Fi · USB-C Asientos capitán · Climatización individual"
+  }
+}

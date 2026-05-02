@@ -1,0 +1,28 @@
+{
+  "heroMobileEntry": {
+    "title": "Private driver in Mexico City",
+    "text": "Premium mobility with a private chauffeur, hybrid and electric fleet. Attention to every detail.",
+    "airport": {
+      "title": "Airport / Hotel",
+      "text": "Private transfer to or from airports and hotels."
+    },
+    "hourly": {
+      "title": "Chauffeured vehicle",
+      "text": "Hourly, full-day or private agenda service."
+    },
+    "tours": {
+      "title": "Private tours",
+      "text": "Selected routes with private transportation."
+    },
+    "events": {
+      "title": "Upcoming events",
+      "text": "Coordinated transfers for concerts and events."
+    },
+    "cta": {
+      "request": "Request",
+      "tours": "View tours",
+      "events": "View events"
+    },
+    "trust": "BYD M9 · up to 6 passengers · Wi\u2011Fi · USB\u2011C · captain seats · individual climate control"
+  }
+}

@@ -57,6 +57,20 @@ function getI18nValue(path, fallback) {
   return typeof cursor === "string" ? cursor : fallback;
 }
 
+function syncInputPlaceholder(input) {
+  if (!input) {
+    return false;
+  }
+
+  input.setAttribute("data-i18n-placeholder", I18N_KEYS.placeholder);
+  input.setAttribute(
+    "placeholder",
+    getI18nValue(I18N_KEYS.placeholder, "")
+  );
+
+  return true;
+}
+
 function getStatusText(kind) {
   if (kind === "loading") {
     return getI18nValue(I18N_KEYS.statusLoading, "");
@@ -77,6 +91,23 @@ function getStatusText(kind) {
   return "";
 }
 
+function dispatchLodgingAutocompleteUpdate(nodes, dom, kind) {
+  const detail = {
+    kind: normalizeText(kind),
+    rootId: nodes && nodes.rootId ? nodes.rootId : DEFAULT_ROOT_ID,
+    query: normalizeText(state.query),
+    items: Array.isArray(state.items) ? state.items.slice() : [],
+    activeIndex: state.activeIndex,
+    input:
+      dom && dom.input ? dom.input : null
+  };
+
+  window.dispatchEvent(
+    new CustomEvent("pixkuy:airport-lodging-autocomplete-updated", {
+      detail: detail
+    })
+  );
+}
   function getAirportDestinationBridge() {
     const bridge = window.PixkuyAirportDestination;
     if (!bridge || typeof bridge !== "object") {
@@ -247,6 +278,8 @@ function clearAllRootUis() {
       input.setAttribute("aria-haspopup", "listbox");
       nodes.mount.appendChild(input);
     }
+	
+    syncInputPlaceholder(input);
 
     let clearSearch = nodes.mount.querySelector(
       '[data-airport-lodging-clear-search="' + String(rootId) + '"]'
@@ -410,6 +443,8 @@ function clearAllRootUis() {
     if (state.activeIndex < 0 || state.activeIndex >= state.items.length) {
       state.activeIndex = 0;
     }
+
+    dispatchLodgingAutocompleteUpdate(nodes, dom, "results");
 
     for (let index = 0; index < state.items.length; index += 1) {
       dom.panel.appendChild(createItemNode(state.items[index], index));
@@ -951,6 +986,25 @@ function clearAllRootUis() {
     },
     getSelectedItem: function () {
       return state.selectedItem;
+    },
+    getItems: function () {
+      return Array.isArray(state.items) ? state.items.slice() : [];
+    },
+    selectItemAtIndex: function (index) {
+      const normalizedIndex = Number(index);
+      const item =
+        Number.isInteger(normalizedIndex) &&
+        normalizedIndex >= 0 &&
+        normalizedIndex < state.items.length
+          ? state.items[normalizedIndex]
+          : null;
+
+      if (!item || !activeNodes || !activeDom) {
+        return false;
+      }
+
+      applySelection(activeNodes, activeDom, item);
+      return true;
     }
   };
 }
@@ -980,6 +1034,17 @@ function clearAllRootUis() {
     bindResolvedClear(nodes, dom);
     renderFromTariffState(nodes, dom);
     syncSearchClearVisibility(dom);
+    syncInputPlaceholder(dom.input);
+
+    window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
+      const api = window.PixkuyAirportLodgingAutocomplete;
+      const activeDom =
+        api && typeof api.getActiveDom === "function" ? api.getActiveDom() : dom;
+
+      if (activeDom && activeDom.input) {
+        syncInputPlaceholder(activeDom.input);
+      }
+    });
 
     window.PixkuyAirportLodgingAutocomplete = getApi(nodes, dom);
   }

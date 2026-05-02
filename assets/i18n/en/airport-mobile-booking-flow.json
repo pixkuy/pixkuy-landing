@@ -1,0 +1,29 @@
+{
+  "airportMobileFlow": {
+    "back": "Back",
+    "title": "Airport and hotel",
+    "helper": "Planned transfers for arrivals and departures with a clear and carefully handled experience.",
+    "note": "Service request subject to operational review and manual confirmation.",
+    "cta": {
+      "continue": "Continue"
+    },
+    "direction": {
+      "airportToHotel": "Airport → Hotel",
+      "hotelToAirport": "Hotel → Airport"
+    },
+    "fields": {
+      "passengers": "Passengers",
+      "luggage": "Luggage"
+    },
+    "farePending": {
+      "template": "Complete {fields} to calculate the fare.",
+      "separator": ", ",
+      "finalSeparator": " and ",
+      "fields": {
+        "hotel": "hotel",
+        "date": "date",
+        "time": "time"
+      }
+    }
+  }
+}

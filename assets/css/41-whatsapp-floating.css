@@ -171,6 +171,12 @@
 }
 
 @media (max-width: 720px){
+  body:not([data-mobile-booking-entry-hero-passed="true"]) .whatsapp-floating{
+    display:none;
+  }
+}
+
+@media (max-width: 720px){
   .whatsapp-floating{
     position:fixed;
     right:16px;

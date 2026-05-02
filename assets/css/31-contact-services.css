@@ -715,8 +715,16 @@
     width:100%;
   }
 
+  .contact-service-switcher__mobile-select option[value="airport_hotel"]{
+    display:none;
+  }
+
   .contact-service-switcher__button{
     display:none;
+  }
+
+  .contact-service-panel[data-contact-service-panel="airport_hotel"]{
+    display:none !important;
   }
   
     .contact-tour-private-editor__header{
@@ -964,4 +972,162 @@
     transform:translateY(-50%) !important;
   }
   
+}
+
+/* -------------------------------------------------
+   AIRPORT HOTEL CONTACT — mobile app-like closing shell
+   ------------------------------------------------- */
+
+@media (max-width: 720px){
+  .contact-airport-hotel-editor{
+    gap:14px;
+    padding:16px 14px 14px;
+    border-radius:14px;
+    border-color:rgba(236,220,189,.16);
+    background:rgba(15,17,19,.72);
+    box-shadow:none;
+  }
+
+  .contact-airport-hotel-editor__header{
+    gap:5px;
+  }
+
+  .contact-airport-hotel-editor__header .muted.small{
+    font-size:13.5px;
+    line-height:1.45;
+    color:rgba(255,245,228,.72);
+  }
+
+  .contact-airport-hotel-editor__grid{
+    gap:10px;
+  }
+
+  .contact-airport-hotel-editor__field{
+    gap:6px;
+  }
+
+  .contact-airport-hotel-editor .services-expand__label{
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+    color:rgba(255,245,228,.72);
+  }
+
+  .contact-airport-hotel-editor .services-expand__control,
+  .contact-airport-hotel-editor [data-contact-airport-hotel-hotel-input]{
+    min-height:48px;
+    height:48px;
+    border-radius:9px;
+    border-color:rgba(236,220,189,.20);
+    background:rgba(22,18,17,.54);
+    box-shadow:none;
+  }
+
+  .contact-airport-hotel-editor [data-contact-airport-hotel-hotel-input]{
+    padding-left:14px;
+    padding-right:44px;
+  }
+
+  .contact-airport-hotel-editor__swap{
+    margin:-2px 0;
+  }
+
+  .contact-airport-hotel-editor [data-contact-airport-hotel-swap]{
+    width:38px;
+    height:38px;
+    border-radius:9px;
+    border-color:rgba(236,220,189,.18);
+    background:rgba(255,255,255,.03);
+    box-shadow:none;
+  }
+
+  .contact-airport-hotel-editor__config-row{
+    gap:10px;
+  }
+
+  .contact-airport-hotel-editor__passengers{
+    gap:6px;
+  }
+
+  .contact-airport-hotel-editor__passengers .services-expand__passengers-segmented{
+    gap:6px;
+  }
+
+  .contact-airport-hotel-editor .services-expand__passenger-chip{
+    min-height:42px;
+    border-radius:9px;
+    border-color:rgba(236,220,189,.18);
+    background:rgba(22,18,17,.48);
+    box-shadow:none;
+  }
+
+  .contact-airport-hotel-editor .services-expand__passenger-chip[aria-pressed="true"],
+  .contact-airport-hotel-editor .services-expand__passenger-chip.is-active{
+    border-color:rgba(31,122,109,.66);
+    background:rgba(31,122,109,.18);
+    box-shadow:none;
+  }
+
+  .contact-airport-hotel-editor .services-expand__passenger-chip-text{
+    font-size:13px;
+    line-height:1.1;
+  }
+
+  .contact-airport-hotel-editor__date,
+  .contact-airport-hotel-editor__time{
+    gap:6px;
+  }
+
+  .contact-airport-hotel-editor__date input[type="date"],
+  .contact-airport-hotel-editor__time input[type="time"]{
+    height:48px;
+    min-height:48px;
+    line-height:48px;
+    border-radius:9px;
+    border-color:rgba(236,220,189,.20);
+    background:rgba(22,18,17,.54);
+    box-shadow:none;
+  }
+
+  .contact-airport-hotel-editor__date .form-field-overlay--date,
+  .contact-airport-hotel-editor__time .form-field-overlay--time{
+    top:calc(100% - 24px);
+  }
+
+  .contact-airport-hotel-editor__date .form-field-icon--date,
+  .contact-airport-hotel-editor__time .form-field-icon--time{
+    top:calc(100% - 24px);
+  }
+
+  .contact-airport-hotel-editor .contact-panel-summary{
+    margin-top:0;
+    padding-top:4px;
+  }
+
+  .contact-airport-hotel-editor .contact-panel-summary__text{
+    font-size:12.5px;
+    line-height:1.4;
+    color:rgba(255,245,228,.72);
+  }
+
+  .contact-airport-hotel-editor .contact-panel-fare{
+    margin-top:0;
+    padding:12px 14px;
+    border-radius:9px;
+    border-color:rgba(247,226,170,.34);
+    background:rgba(255,242,214,.10);
+    box-shadow:none;
+  }
+
+  .contact-airport-hotel-editor .contact-panel-fare__label{
+    font-size:10.5px;
+    line-height:1.15;
+    color:rgba(255,245,228,.64);
+  }
+
+  .contact-airport-hotel-editor .contact-panel-fare__value{
+    font-size:22px;
+    line-height:1.05;
+    color:rgba(255,224,140,.96);
+  }
 }

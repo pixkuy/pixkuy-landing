@@ -1,0 +1,29 @@
+{
+  "airportMobileFlow": {
+    "back": "뒤로",
+    "title": "공항 및 호텔",
+    "helper": "도착과 출발을 위한 사전 예약 이동 서비스로, 명확하고 세심하게 설계된 경험을 제공합니다.",
+    "note": "서비스 요청은 운영 검토 및 수동 확인 후 확정됩니다.",
+    "cta": {
+      "continue": "계속"
+    },
+    "direction": {
+      "airportToHotel": "공항 → 호텔",
+      "hotelToAirport": "호텔 → 공항"
+    },
+    "fields": {
+      "passengers": "승객",
+      "luggage": "수하물"
+    },
+    "farePending": {
+      "template": "요금을 계산하려면 {fields} 항목을 입력해 주세요.",
+      "separator": ", ",
+      "finalSeparator": " 및 ",
+      "fields": {
+        "hotel": "호텔",
+        "date": "날짜",
+        "time": "시간"
+      }
+    }
+  }
+}

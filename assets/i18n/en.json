@@ -60,6 +60,7 @@
     "fareLabel": "Fare",
     "fareValue": "—",
     "cta": "Request",
+    "back": "Back",
     "catalog": {
       "airports": {
         "mex": "MEX — Mexico City International Airport",

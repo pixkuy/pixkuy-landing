@@ -35,15 +35,15 @@
   // Registro centralizado de fragmentos opcionales por idioma.
   // Primera apertura: tours como nuevo dominio modular.
   var I18N_OPTIONAL_FRAGMENTS = {
-    es: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    en: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    ru: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    fr: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    pt: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    it: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    de: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    ko: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"],
-    "zh-hans": ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success"]
+    es: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    en: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    ru: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    fr: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    pt: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    it: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    de: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    ko: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    "zh-hans": ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "contact-success", "mobile-booking-entry", "airport-mobile-booking-flow", "airport-mobile-contact-step"]
   };
 
   function isDevHost() {
