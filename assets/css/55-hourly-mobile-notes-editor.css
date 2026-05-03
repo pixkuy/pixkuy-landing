@@ -1,0 +1,169 @@
+/* assets/css/55-hourly-mobile-notes-editor.css
+   Hourly / Daily mobile notes editor.
+   Alcance:
+   - solo móvil
+   - sábana ampliada para Notas / Itinerario dentro de Hourly Mobile Route
+   - no toca desktop
+   - no toca #contact
+*/
+
+@media (max-width:720px){
+  body[data-hourly-mobile-notes-editor-active="true"]{
+    overflow:hidden;
+  }
+
+  .hourly-mobile-notes-editor[hidden]{
+    display:none !important;
+  }
+
+  .hourly-mobile-notes-editor{
+    position:fixed;
+    top:calc(64px + env(safe-area-inset-top));
+    right:0;
+    bottom:0;
+    left:0;
+    z-index:91;
+    display:block;
+    padding:0;
+    background:#0f1113;
+    overflow:hidden;
+    transform:translateY(0);
+    opacity:1;
+    transition:
+      transform .28s cubic-bezier(.2,.8,.2,1),
+      opacity .20s ease;
+  }
+
+  .hourly-mobile-notes-editor[aria-hidden="true"]{
+    transform:translateY(28px);
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .hourly-mobile-notes-editor__panel{
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+    border-top:1px solid rgba(236,220,189,.16);
+    background:#0f1113;
+  }
+
+  .hourly-mobile-notes-editor__panel::before{
+    content:"";
+    display:block;
+    width:38px;
+    height:4px;
+    margin:10px auto 8px;
+    border-radius:999px;
+    background:rgba(255,245,228,.22);
+    flex:0 0 auto;
+  }
+
+  .hourly-mobile-notes-editor__header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-height:40px;
+    padding:0 16px;
+    background:#0f1113;
+    flex:0 0 auto;
+  }
+
+  .hourly-mobile-notes-editor__title{
+    margin:0;
+    color:rgba(255,249,238,.94);
+    font-size:14px;
+    line-height:1.2;
+    font-weight:750;
+    letter-spacing:-.01em;
+  }
+
+  .hourly-mobile-notes-editor__close{
+    min-width:44px;
+    min-height:34px;
+    padding:0 8px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    font-weight:700;
+  }
+
+  .hourly-mobile-notes-editor__close:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:0;
+  }
+
+  .hourly-mobile-notes-editor__body{
+    position:relative;
+    display:block;
+    min-height:0;
+    flex:1 1 auto;
+    padding:8px 16px calc(16px + env(safe-area-inset-bottom));
+    background:#0f1113;
+  }
+
+  .hourly-mobile-notes-editor__input{
+    width:100%;
+    height:100%;
+    min-height:220px;
+    padding:14px 42px 14px 14px;
+    border:1px solid rgba(236,220,189,.38);
+    border-radius:9px;
+    background-color:rgba(15,17,19,.68);
+    color:rgba(255,249,238,.96);
+    box-shadow:none;
+    box-sizing:border-box;
+    font:inherit;
+    font-size:14px;
+    line-height:1.45;
+    font-weight:650;
+    resize:none;
+    color-scheme:dark;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+
+  .hourly-mobile-notes-editor__input::placeholder{
+    color:rgba(255,245,228,.50);
+    opacity:1;
+  }
+
+  .hourly-mobile-notes-editor__input:focus{
+    outline:none;
+    border-color:rgba(31,122,109,.78);
+    background-color:rgba(15,17,19,.82);
+  }
+
+  .hourly-mobile-notes-editor__input:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:0;
+  }
+
+  .hourly-mobile-notes-editor__clear{
+    position:absolute;
+    right:26px;
+    top:20px;
+    width:30px;
+    height:30px;
+    border:0;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    color:rgba(255,245,228,.74);
+    font:inherit;
+    font-size:18px;
+    line-height:1;
+    font-weight:600;
+  }
+
+  .hourly-mobile-notes-editor__clear[hidden]{
+    display:none !important;
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "vehicles": {
+    "byd_m9": {
+      "active": true,
+      "label": "Van Premium - ByD M9",
+      "openLabel": "Abrir galería del vehículo",
+      "closeLabel": "Cerrar galería del vehículo",
+      "previousLabel": "Foto anterior",
+      "nextLabel": "Foto siguiente",
+      "imageAlt": "BYD M9 de Pixkuy Mobility",
+      "images": [
+        {
+          "id": "byd_m9_main",
+          "active": true,
+          "src": "assets/img/fleet/bydm9_xhoras001d.jpeg"
+        },
+        {
+          "id": "byd_m9_interior",
+          "active": true,
+          "src": "assets/img/fleet/Pixkuy_2603_bydm9002.PNG"
+        },
+        {
+          "id": "byd_m9_passengers",
+          "active": true,
+          "src": "assets/img/fleet/Pixkuy_2603_bydm9003.PNG"
+        }
+      ]
+    }
+  }
+}

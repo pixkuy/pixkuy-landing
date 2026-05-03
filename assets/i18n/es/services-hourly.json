@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "Ver detalles",
         "ctaOpen": "Ocultar detalles",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "Elige fecha, hora de recogida y duración para ver la tarifa final del servicio por horas.",
+            "fullDay": "Reserva una jornada completa con conductor privado y margen para una agenda flexible en Ciudad de México.",
+            "longTerm": "Indica el periodo y los detalles operativos para preparar una propuesta personalizada."
+          },
+          "vehicleGallery": {
+            "open": "Ver galería del vehículo",
+            "close": "Cerrar",
+            "closePreview": "Cerrar previsualización",
+            "previous": "Imagen anterior",
+            "next": "Imagen siguiente",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — van ejecutiva",
+                "caption": "Van ejecutiva"
+              },
+              "interior": {
+                "alt": "BYD M9 — interior ejecutivo",
+                "caption": "Interior ejecutivo"
+              },
+              "passengers": {
+                "alt": "BYD M9 — espacio para pasajeros",
+                "caption": "Espacio para pasajeros"
+              }
+            }
+          },
+          "cta": {
+            "continue": "Continuar"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "Resumen del servicio:",
+              "mode": "Modalidad",
+              "pickup": "Recogida",
+              "date": "Fecha",
+              "time": "Hora",
+              "duration": "Duración",
+              "vehicle": "Vehículo",
+              "price": "Tarifa",
+              "notes": "Notas"
+            },
+            "fields": {
+              "name": "Nombre completo",
+              "phone": "Teléfono/WhatsApp con prefijo internacional",
+              "email": "Email",
+              "notes": "Notas del servicio"
+            },
+            "placeholders": {
+              "name": "Nombre y apellidos",
+              "phone": "+52...",
+              "email": "tu@email.com",
+              "notes": "Añade indicaciones, paradas, agenda o cualquier detalle relevante"
+            },
+            "cta": {
+              "submit": "Solicitar confirmación"
+            },
+            "notesEditor": {
+              "title": "Notas del servicio",
+              "close": "Volver",
+              "clear": "Borrar"
+            },
+            "validation": {
+              "name": "Indica tu nombre.",
+              "phone": "Indica un teléfono válido con prefijo internacional.",
+              "email": "Indica un email válido.",
+              "notes": "",
+              "formIncomplete": "Completa nombre, teléfono y email para solicitar la confirmación."
+            }
+          }
+        },
         "panel": {
           "title": "Conductor por horas / día completo",
           "text": "Configura modalidad, fecha y hora de recogida para ver el precio final del servicio.",

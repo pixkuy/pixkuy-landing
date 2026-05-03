@@ -3,7 +3,7 @@
     "cards": {
       "hourly": {
         "title": "전용 기사 및 차량 서비스",
-        "text": "멕시코시티에서 시간 단위 또는 하루 단위로 이용할 수 있는 전용 차량 서비스입니다. 전담 기사와 프리미엄 차량이 함께 제공됩니다.",
+        "text": "멕시코시티에서 이동, 개인 일정 또는 운영 대기를 위해 시간 단위 또는 하루 단위로 예약하세요.",
         "contact": {
           "helper": "요청을 준비할 수 있도록 모드, 픽업, 날짜와 시간을 설정하세요."
         },
@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "자세히 보기",
         "ctaOpen": "자세히 숨기기",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "시간 단위 서비스의 최종 요금을 보려면 날짜, 픽업 시간과 이용 시간을 선택하세요.",
+            "fullDay": "멕시코시티에서 유연한 일정을 위해 전용 기사와 함께 하루 전체 서비스를 예약하세요.",
+            "longTerm": "맞춤 제안을 준비할 수 있도록 기간과 운영 세부 사항을 입력하세요."
+          },
+          "vehicleGallery": {
+            "open": "차량 갤러리 보기",
+            "close": "닫기",
+            "closePreview": "미리보기 닫기",
+            "previous": "이전 이미지",
+            "next": "다음 이미지",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — 이그제큐티브 밴",
+                "caption": "이그제큐티브 밴"
+              },
+              "interior": {
+                "alt": "BYD M9 — 이그제큐티브 인테리어",
+                "caption": "이그제큐티브 인테리어"
+              },
+              "passengers": {
+                "alt": "BYD M9 — 승객 공간",
+                "caption": "승객 공간"
+              }
+            }
+          },
+          "cta": {
+            "continue": "계속"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "서비스 요약:",
+              "mode": "모드",
+              "pickup": "픽업",
+              "date": "날짜",
+              "time": "시간",
+              "duration": "기간",
+              "vehicle": "차량",
+              "price": "요금",
+              "notes": "메모"
+            },
+            "fields": {
+              "name": "성명",
+              "phone": "국제번호 포함 전화/WhatsApp",
+              "email": "이메일",
+              "notes": "서비스 메모"
+            },
+            "placeholders": {
+              "name": "이름과 성",
+              "phone": "+52...",
+              "email": "your@email.com",
+              "notes": "안내 사항, 정차 지점, 일정 또는 관련 세부 정보를 추가하세요"
+            },
+            "cta": {
+              "submit": "확인 요청"
+            },
+            "notesEditor": {
+              "title": "서비스 메모",
+              "close": "뒤로",
+              "clear": "지우기"
+            },
+            "validation": {
+              "name": "이름을 입력해 주세요.",
+              "phone": "국제번호가 포함된 유효한 전화번호를 입력해 주세요.",
+              "email": "유효한 이메일을 입력해 주세요.",
+              "notes": "",
+              "formIncomplete": "확인을 요청하려면 이름, 전화번호와 이메일을 완료해 주세요."
+            }
+          }
+        },
         "panel": {
           "title": "시간 단위 / 하루 단위 기사 서비스",
           "text": "서비스 최종 가격을 확인하려면 모드, 날짜, 픽업 시간을 설정하세요.",

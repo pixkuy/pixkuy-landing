@@ -1,0 +1,218 @@
+/* assets/css/58-hourly-mobile-contact-step.css
+   Hourly / Daily mobile contact step.
+   Alcance:
+   - solo móvil
+   - segunda pantalla dentro de Hourly Mobile Booking Flow
+   - reutiliza la route móvil existente
+   - no toca #contact visual
+   - no toca desktop
+   - no redefine el booking flow principal
+*/
+
+.hourly-mobile-contact-step{
+  display:none;
+}
+
+.hourly-mobile-contact-step[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  body[data-hourly-mobile-contact-step-active="true"] .hourly-mobile-route #services-expand-hourly[data-hourly-mobile-primary-step-hidden="true"]{
+    display:none !important;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step{
+    display:grid;
+    grid-template-rows:auto auto minmax(0, 1fr) auto auto;
+    gap:0;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary{
+    display:grid;
+    gap:8px;
+    padding:12px 12px 6px;
+    border:1px solid rgba(236,220,189,.22);
+    border-radius:10px;
+    background:rgba(15,17,19,.42);
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-title{
+    margin:0;
+    color:rgba(255,249,238,.94);
+    font-size:13px;
+    line-height:1.2;
+    font-weight:800;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-list{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:7px 6px;
+    margin:0;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-row{
+    min-width:0;
+    display:grid;
+    gap:2px;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-row[data-hourly-mobile-contact-summary-row="pickup"]{
+    grid-column:1 / -1;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-row[data-hourly-mobile-contact-summary-row="vehicle"],
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-row[data-hourly-mobile-contact-summary-row="price"],
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-row[data-hourly-mobile-contact-summary-row="notes"]{
+    grid-column:1 / -1;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-label{
+    margin:0;
+    color:rgba(255,245,228,.56);
+    font-size:11px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-value{
+    margin:0;
+    min-width:0;
+    color:rgba(255,249,238,.92);
+    font-size:12.5px;
+    line-height:1.25;
+    font-weight:750;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-row[data-hourly-mobile-contact-summary-row="notes"] .hourly-mobile-contact-step__summary-value{
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__form{
+    min-height:0;
+    overflow:auto;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:9px;
+    padding-top:10px;
+    padding-right:2px;
+    padding-bottom:5px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__field{
+    display:grid;
+    gap:6px;
+    min-width:0;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__label{
+    color:rgba(255,245,228,.74);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__control{
+    width:100%;
+    min-width:0;
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    padding:0 12px;
+    border:1px solid rgba(236,220,189,.38);
+    border-radius:9px;
+    background:rgba(15,17,19,.46);
+    color:rgba(255,249,238,.96);
+    box-shadow:none;
+    box-sizing:border-box;
+    font:inherit;
+    font-size:14px;
+    line-height:48px;
+    font-weight:650;
+    color-scheme:dark;
+  }
+
+  .hourly-mobile-route textarea.hourly-mobile-contact-step__control{
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    padding:0 12px;
+    line-height:48px;
+    resize:none;
+    overflow:hidden;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__control::placeholder{
+    color:rgba(255,245,228,.50);
+    opacity:1;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__control:focus-visible{
+    outline:none;
+    border-color:rgba(31,122,109,.78);
+    background-color:rgba(15,17,19,.62);
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__field.is-invalid .hourly-mobile-contact-step__control{
+    border-color:rgba(212,94,74,.85);
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__error,
+  .hourly-mobile-route .hourly-mobile-contact-step__global-error{
+    margin:0;
+    color:rgba(255,188,166,.95);
+    font-size:12px;
+    line-height:1.3;
+    font-weight:650;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__error[hidden],
+  .hourly-mobile-route .hourly-mobile-contact-step__global-error[hidden]{
+    display:none !important;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__actions{
+    display:block;
+    align-self:end;
+    padding-top:4px;
+    margin-bottom:-4px;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__submit{
+    width:100%;
+    min-height:50px;
+    padding:0 16px;
+    border:0;
+    border-radius:9px;
+    background:rgba(31,122,109,.86);
+    color:rgba(255,249,238,.98);
+    box-shadow:none;
+    font:inherit;
+    font-size:14px;
+    line-height:1;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__submit:disabled,
+  .hourly-mobile-route .hourly-mobile-contact-step__submit[aria-disabled="true"]{
+    background:rgba(255,245,228,.14);
+    color:rgba(255,245,228,.38);
+    cursor:not-allowed;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__submit:focus-visible{
+    outline:2px solid rgba(255,249,238,.88);
+    outline-offset:2px;
+  }
+}

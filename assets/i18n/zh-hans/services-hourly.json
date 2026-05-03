@@ -3,7 +3,7 @@
     "cards": {
       "hourly": {
         "title": "私人司机与专车服务",
-        "text": "在墨西哥城按小时或全天预订私人专车服务，配备专属司机与高端车辆。",
+        "text": "可按小时或全天预订，用于接送、私人日程或墨西哥城的运营待命。",
         "contact": {
           "helper": "请配置模式、接载点、日期和时间，以准备请求。"
         },
@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "查看详情",
         "ctaOpen": "隐藏详情",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "请选择日期、接载时间和时长，以查看按小时服务的最终价格。",
+            "fullDay": "可在墨西哥城预订全天私人司机服务，为灵活日程保留余地。",
+            "longTerm": "请说明周期和运营细节，以便准备个性化方案。"
+          },
+          "vehicleGallery": {
+            "open": "查看车辆图库",
+            "close": "关闭",
+            "closePreview": "关闭预览",
+            "previous": "上一张图片",
+            "next": "下一张图片",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — 高端行政 MPV",
+                "caption": "高端行政 MPV"
+              },
+              "interior": {
+                "alt": "BYD M9 — 高端行政内饰",
+                "caption": "高端行政内饰"
+              },
+              "passengers": {
+                "alt": "BYD M9 — 乘客空间",
+                "caption": "乘客空间"
+              }
+            }
+          },
+          "cta": {
+            "continue": "继续"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "服务摘要：",
+              "mode": "模式",
+              "pickup": "接载",
+              "date": "日期",
+              "time": "时间",
+              "duration": "时长",
+              "vehicle": "车辆",
+              "price": "价格",
+              "notes": "备注"
+            },
+            "fields": {
+              "name": "姓名",
+              "phone": "带国际区号的电话/WhatsApp",
+              "email": "电子邮箱",
+              "notes": "服务备注"
+            },
+            "placeholders": {
+              "name": "姓名",
+              "phone": "+52...",
+              "email": "your@email.com",
+              "notes": "添加说明、停靠点、日程或任何相关细节"
+            },
+            "cta": {
+              "submit": "请求确认"
+            },
+            "notesEditor": {
+              "title": "服务备注",
+              "close": "返回",
+              "clear": "清除"
+            },
+            "validation": {
+              "name": "请输入您的姓名。",
+              "phone": "请输入带国际区号的有效电话号码。",
+              "email": "请输入有效的电子邮箱。",
+              "notes": "",
+              "formIncomplete": "请填写姓名、电话和电子邮箱，以请求确认。"
+            }
+          }
+        },
         "panel": {
           "title": "按小时 / 全天司机服务",
           "text": "请配置模式、日期和接载时间，以查看服务最终价格。",

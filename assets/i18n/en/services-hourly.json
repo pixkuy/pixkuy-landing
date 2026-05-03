@@ -3,7 +3,7 @@
     "cards": {
       "hourly": {
         "title": "Private driver & car service",
-        "text": "A flexible service for schedules, meetings and journeys with multiple stops.",
+        "text": "Book by the hour or full day for transfers, private agendas or operational availability in Mexico City.",
         "contact": {
           "helper": "Set the mode, pickup, date and time to prepare the request."
         },
@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "View details",
         "ctaOpen": "Hide details",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "Choose date, pickup time and duration to see the final fare for the hourly service.",
+            "fullDay": "Book a full day with a private driver and room for a flexible agenda in Mexico City.",
+            "longTerm": "Indicate the period and operational details to prepare a personalised proposal."
+          },
+          "vehicleGallery": {
+            "open": "View vehicle gallery",
+            "close": "Close",
+            "closePreview": "Close preview",
+            "previous": "Previous image",
+            "next": "Next image",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — executive van",
+                "caption": "Executive van"
+              },
+              "interior": {
+                "alt": "BYD M9 — executive interior",
+                "caption": "Executive interior"
+              },
+              "passengers": {
+                "alt": "BYD M9 — passenger space",
+                "caption": "Passenger space"
+              }
+            }
+          },
+          "cta": {
+            "continue": "Continue"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "Service summary:",
+              "mode": "Mode",
+              "pickup": "Pickup",
+              "date": "Date",
+              "time": "Time",
+              "duration": "Duration",
+              "vehicle": "Vehicle",
+              "price": "Fare",
+              "notes": "Notes"
+            },
+            "fields": {
+              "name": "Full name",
+              "phone": "Phone/WhatsApp with international prefix",
+              "email": "Email",
+              "notes": "Service notes"
+            },
+            "placeholders": {
+              "name": "First and last name",
+              "phone": "+52...",
+              "email": "your@email.com",
+              "notes": "Add instructions, stops, agenda or any relevant detail"
+            },
+            "cta": {
+              "submit": "Request confirmation"
+            },
+            "notesEditor": {
+              "title": "Service notes",
+              "close": "Back",
+              "clear": "Clear"
+            },
+            "validation": {
+              "name": "Please enter your name.",
+              "phone": "Please enter a valid phone number with international prefix.",
+              "email": "Please enter a valid email address.",
+              "notes": "",
+              "formIncomplete": "Complete name, phone and email to request confirmation."
+            }
+          }
+        },
         "panel": {
           "title": "Driver by the hour / full day",
           "text": "Set the mode, date and pickup time to see the final service price.",

@@ -3,7 +3,7 @@
     "cards": {
       "hourly": {
         "title": "Serviço de carro com motorista privado",
-        "text": "Reserve um serviço de carro privado na Cidade do México, à hora ou ao dia, com motorista dedicado e veículo premium.",
+        "text": "Reserve à hora ou por dia completo para transfers, agenda privada ou disponibilidade operacional na Cidade do México.",
         "contact": {
           "helper": "Configure modalidade, recolha, data e hora para preparar o pedido."
         },
@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "Ver detalhes",
         "ctaOpen": "Ocultar detalhes",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "Escolha data, hora de recolha e duração para ver a tarifa final do serviço à hora.",
+            "fullDay": "Reserve uma jornada completa com motorista privado e margem para uma agenda flexível na Cidade do México.",
+            "longTerm": "Indique o período e os detalhes operacionais para preparar uma proposta personalizada."
+          },
+          "vehicleGallery": {
+            "open": "Ver galeria do veículo",
+            "close": "Fechar",
+            "closePreview": "Fechar pré-visualização",
+            "previous": "Imagem anterior",
+            "next": "Imagem seguinte",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — van executiva",
+                "caption": "Van executiva"
+              },
+              "interior": {
+                "alt": "BYD M9 — interior executivo",
+                "caption": "Interior executivo"
+              },
+              "passengers": {
+                "alt": "BYD M9 — espaço para passageiros",
+                "caption": "Espaço para passageiros"
+              }
+            }
+          },
+          "cta": {
+            "continue": "Continuar"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "Resumo do serviço:",
+              "mode": "Modalidade",
+              "pickup": "Recolha",
+              "date": "Data",
+              "time": "Hora",
+              "duration": "Duração",
+              "vehicle": "Veículo",
+              "price": "Tarifa",
+              "notes": "Notas"
+            },
+            "fields": {
+              "name": "Nome completo",
+              "phone": "Telefone/WhatsApp com prefixo internacional",
+              "email": "Email",
+              "notes": "Notas do serviço"
+            },
+            "placeholders": {
+              "name": "Nome e apelidos",
+              "phone": "+52...",
+              "email": "teu@email.com",
+              "notes": "Adicione indicações, paragens, agenda ou qualquer detalhe relevante"
+            },
+            "cta": {
+              "submit": "Solicitar confirmação"
+            },
+            "notesEditor": {
+              "title": "Notas do serviço",
+              "close": "Voltar",
+              "clear": "Limpar"
+            },
+            "validation": {
+              "name": "Indique o seu nome.",
+              "phone": "Indique um telefone válido com prefixo internacional.",
+              "email": "Indique um email válido.",
+              "notes": "",
+              "formIncomplete": "Complete nome, telefone e email para solicitar a confirmação."
+            }
+          }
+        },
         "panel": {
           "title": "Motorista por horas / dia completo",
           "text": "Configure modalidade, data e hora de recolha para ver o preço final do serviço.",

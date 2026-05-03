@@ -1051,6 +1051,18 @@
     });
   }
   
+  function syncLongTermSelectionUi() {
+    const longTermButtons = configMount.querySelectorAll('[data-services-hourly-long-term]');
+
+    longTermButtons.forEach((button) => {
+      const buttonOption = normalizeText(button.getAttribute('data-services-hourly-long-term'));
+      const isActive = buttonOption === state.longTermOption;
+
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+  }
+  
     function syncLiveFieldValues() {
     const pickupInput = configMount.querySelector('[data-services-hourly-pickup]');
     const dateInput = configMount.querySelector('[data-services-hourly-date]');
@@ -1165,7 +1177,15 @@
         }
 
         state.longTermOption = nextLongTerm;
-        renderAll();
+
+        if (isMobileHourlyViewport() && state.mode === MODES.LONG_TERM) {
+          syncDerivedState();
+          syncLongTermSelectionUi();
+          syncLiveFieldValues();
+        } else {
+          renderAll();
+        }
+
         return;
       }
 

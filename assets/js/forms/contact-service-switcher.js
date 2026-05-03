@@ -6,10 +6,10 @@
   }
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
-  const MOBILE_BLOCKED_SERVICE_TYPE = "airport_hotel";
-  const MOBILE_FALLBACK_SERVICE_TYPE = "hourly_daily";
+  const MOBILE_BLOCKED_SERVICE_TYPES = ["airport_hotel", "hourly_daily"];
+  const MOBILE_FALLBACK_SERVICE_TYPE = "tour_private";
 
-  let mobileBlockedOptionSnapshot = null;
+  let mobileBlockedOptionSnapshots = [];
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -188,7 +188,7 @@
   function isMobileBlockedServiceType(serviceType) {
     return Boolean(
       isMobileServiceSelectViewport() &&
-      normalizeText(serviceType) === MOBILE_BLOCKED_SERVICE_TYPE
+      MOBILE_BLOCKED_SERVICE_TYPES.indexOf(normalizeText(serviceType)) >= 0
     );
   }
 
@@ -197,50 +197,63 @@
   }
 
   function syncMobileSelectOptionsAvailability(mobileSelect) {
-    var blockedOption;
-    var insertBeforeOption;
+    var options;
 
     if (!mobileSelect) {
       return false;
     }
 
-    blockedOption = Array.from(mobileSelect.options).find(function findBlockedOption(option) {
-      return normalizeText(option.value) === MOBILE_BLOCKED_SERVICE_TYPE;
-    });
+    options = Array.from(mobileSelect.options);
 
     if (isMobileServiceSelectViewport()) {
-      if (blockedOption) {
-        mobileBlockedOptionSnapshot = {
+      MOBILE_BLOCKED_SERVICE_TYPES.forEach(function removeBlockedOption(serviceType) {
+        var blockedOption = options.find(function findBlockedOption(option) {
+          return normalizeText(option.value) === serviceType;
+        });
+
+        if (!blockedOption) {
+          return;
+        }
+
+        mobileBlockedOptionSnapshots.push({
+          serviceType: serviceType,
           node: blockedOption,
           nextValue: blockedOption.nextElementSibling
             ? normalizeText(blockedOption.nextElementSibling.value)
             : ""
-        };
+        });
 
         blockedOption.remove();
-      }
+      });
 
       return true;
     }
 
-    if (
-      !blockedOption &&
-      mobileBlockedOptionSnapshot &&
-      mobileBlockedOptionSnapshot.node
-    ) {
-      insertBeforeOption = mobileBlockedOptionSnapshot.nextValue
+    mobileBlockedOptionSnapshots.forEach(function restoreBlockedOption(snapshot) {
+      var existingOption;
+      var insertBeforeOption;
+
+      existingOption = Array.from(mobileSelect.options).find(function findExistingOption(option) {
+        return normalizeText(option.value) === snapshot.serviceType;
+      });
+
+      if (existingOption || !snapshot.node) {
+        return;
+      }
+
+      insertBeforeOption = snapshot.nextValue
         ? Array.from(mobileSelect.options).find(function findInsertBeforeOption(option) {
-            return normalizeText(option.value) === mobileBlockedOptionSnapshot.nextValue;
+            return normalizeText(option.value) === snapshot.nextValue;
           })
         : null;
 
       mobileSelect.insertBefore(
-        mobileBlockedOptionSnapshot.node,
+        snapshot.node,
         insertBeforeOption || mobileSelect.firstChild
       );
+    });
 
-      mobileBlockedOptionSnapshot = null;
-    }
+    mobileBlockedOptionSnapshots = [];
 
     return true;
   }
@@ -724,9 +737,12 @@
     activeServiceType = enforceMobileServiceAvailability(form, serviceStateApi) || activeServiceType;
 
         if (activeServiceType === "other") {
-      const result = serviceStateApi.setActiveServiceType("hourly_daily", {
-        source: "contact-service-default"
-      });
+      const result = serviceStateApi.setActiveServiceType(
+        isMobileServiceSelectViewport() ? getMobileFallbackServiceType() : "hourly_daily",
+        {
+          source: "contact-service-default"
+        }
+      );
 
       if (result && result.ok === true) {
         activeServiceType = result.activeServiceType;

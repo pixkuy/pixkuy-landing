@@ -942,6 +942,14 @@
     box-shadow:none;
   }
 
+  .airport-mobile-route #services-expand-airport .services-expand__cta:disabled,
+  .airport-mobile-route #services-expand-airport .services-expand__cta[aria-disabled="true"],
+  .airport-mobile-route #services-expand-airport .services-expand__cta[data-airport-mobile-continue-ready="false"]{
+    background:rgba(255,245,228,.14);
+    color:rgba(255,245,228,.38);
+    cursor:not-allowed;
+  }
+
   .airport-mobile-route .airport-mobile-flow__note{
     display:none !important;
   }

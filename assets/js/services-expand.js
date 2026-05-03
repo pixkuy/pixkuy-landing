@@ -93,7 +93,13 @@
       const params = new URLSearchParams(window.location.search || '');
       const rawService = String(params.get('service') || '').trim().toLowerCase();
 
-      if (mobileQuery.matches && rawService === 'airport_hotel') {
+      if (
+        mobileQuery.matches &&
+        (
+          rawService === 'airport_hotel' ||
+          rawService === 'hourly_daily'
+        )
+      ) {
         return null;
       }
 

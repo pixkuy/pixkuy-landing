@@ -3,7 +3,7 @@
     "cards": {
       "hourly": {
         "title": "Chauffeur privé et service de voiture",
-        "text": "Réservez un service de voiture privée à Mexico, à l’heure ou à la journée, avec chauffeur dédié et véhicule premium.",
+        "text": "Réservez à l’heure ou à la journée pour des transferts, un agenda privé ou une disponibilité opérationnelle à Mexico.",
         "contact": {
           "helper": "Configurez le mode, la prise en charge, la date et l’heure pour préparer la demande."
         },
@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "Voir les détails",
         "ctaOpen": "Masquer les détails",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "Choisissez la date, l’heure de prise en charge et la durée pour voir le tarif final du service à l’heure.",
+            "fullDay": "Réservez une journée complète avec chauffeur privé et une marge pour un agenda flexible à Mexico.",
+            "longTerm": "Indiquez la période et les détails opérationnels afin de préparer une proposition personnalisée."
+          },
+          "vehicleGallery": {
+            "open": "Voir la galerie du véhicule",
+            "close": "Fermer",
+            "closePreview": "Fermer la prévisualisation",
+            "previous": "Image précédente",
+            "next": "Image suivante",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — van exécutif",
+                "caption": "Van exécutif"
+              },
+              "interior": {
+                "alt": "BYD M9 — intérieur exécutif",
+                "caption": "Intérieur exécutif"
+              },
+              "passengers": {
+                "alt": "BYD M9 — espace passagers",
+                "caption": "Espace passagers"
+              }
+            }
+          },
+          "cta": {
+            "continue": "Continuer"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "Résumé du service :",
+              "mode": "Mode",
+              "pickup": "Prise en charge",
+              "date": "Date",
+              "time": "Heure",
+              "duration": "Durée",
+              "vehicle": "Véhicule",
+              "price": "Tarif",
+              "notes": "Notes"
+            },
+            "fields": {
+              "name": "Nom complet",
+              "phone": "Téléphone/WhatsApp avec préfixe international",
+              "email": "E-mail",
+              "notes": "Notes du service"
+            },
+            "placeholders": {
+              "name": "Prénom et nom",
+              "phone": "+52...",
+              "email": "votre@email.com",
+              "notes": "Ajoutez des indications, arrêts, agenda ou tout détail pertinent"
+            },
+            "cta": {
+              "submit": "Demander confirmation"
+            },
+            "notesEditor": {
+              "title": "Notes du service",
+              "close": "Retour",
+              "clear": "Effacer"
+            },
+            "validation": {
+              "name": "Indiquez votre nom.",
+              "phone": "Indiquez un téléphone valide avec préfixe international.",
+              "email": "Indiquez un e-mail valide.",
+              "notes": "",
+              "formIncomplete": "Complétez le nom, le téléphone et l’e-mail pour demander la confirmation."
+            }
+          }
+        },
         "panel": {
           "title": "Chauffeur à l’heure / journée complète",
           "text": "Configurez le mode, la date et l’heure de prise en charge pour voir le prix final du service.",

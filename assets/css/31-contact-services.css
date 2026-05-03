@@ -715,7 +715,8 @@
     width:100%;
   }
 
-  .contact-service-switcher__mobile-select option[value="airport_hotel"]{
+  .contact-service-switcher__mobile-select option[value="airport_hotel"],
+  .contact-service-switcher__mobile-select option[value="hourly_daily"]{
     display:none;
   }
 
@@ -723,7 +724,8 @@
     display:none;
   }
 
-  .contact-service-panel[data-contact-service-panel="airport_hotel"]{
+  .contact-service-panel[data-contact-service-panel="airport_hotel"],
+  .contact-service-panel[data-contact-service-panel="hourly_daily"]{
     display:none !important;
   }
   

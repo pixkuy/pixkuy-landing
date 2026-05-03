@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "Details ansehen",
         "ctaOpen": "Details ausblenden",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "Wählen Sie Datum, Abholzeit und Dauer, um den Endpreis des stundenweisen Services zu sehen.",
+            "fullDay": "Buchen Sie einen ganzen Tag mit privatem Fahrer und Spielraum für eine flexible Agenda in Mexiko-Stadt.",
+            "longTerm": "Geben Sie den Zeitraum und die operativen Details an, um ein individuelles Angebot vorzubereiten."
+          },
+          "vehicleGallery": {
+            "open": "Fahrzeuggalerie ansehen",
+            "close": "Schließen",
+            "closePreview": "Vorschau schließen",
+            "previous": "Vorheriges Bild",
+            "next": "Nächstes Bild",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — Executive-Van",
+                "caption": "Executive-Van"
+              },
+              "interior": {
+                "alt": "BYD M9 — Executive-Innenraum",
+                "caption": "Executive-Innenraum"
+              },
+              "passengers": {
+                "alt": "BYD M9 — Platz für Passagiere",
+                "caption": "Platz für Passagiere"
+              }
+            }
+          },
+          "cta": {
+            "continue": "Weiter"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "Serviceübersicht:",
+              "mode": "Modus",
+              "pickup": "Abholung",
+              "date": "Datum",
+              "time": "Uhrzeit",
+              "duration": "Dauer",
+              "vehicle": "Fahrzeug",
+              "price": "Tarif",
+              "notes": "Notizen"
+            },
+            "fields": {
+              "name": "Vollständiger Name",
+              "phone": "Telefon/WhatsApp mit internationaler Vorwahl",
+              "email": "E-Mail",
+              "notes": "Servicenotizen"
+            },
+            "placeholders": {
+              "name": "Vor- und Nachname",
+              "phone": "+52...",
+              "email": "deine@email.com",
+              "notes": "Fügen Sie Hinweise, Stopps, Agenda oder relevante Details hinzu"
+            },
+            "cta": {
+              "submit": "Bestätigung anfragen"
+            },
+            "notesEditor": {
+              "title": "Servicenotizen",
+              "close": "Zurück",
+              "clear": "Löschen"
+            },
+            "validation": {
+              "name": "Geben Sie Ihren Namen an.",
+              "phone": "Geben Sie eine gültige Telefonnummer mit internationaler Vorwahl an.",
+              "email": "Geben Sie eine gültige E-Mail-Adresse an.",
+              "notes": "",
+              "formIncomplete": "Vervollständigen Sie Name, Telefon und E-Mail, um die Bestätigung anzufragen."
+            }
+          }
+        },
         "panel": {
           "title": "Chauffeur stundenweise / ganztägig",
           "text": "Wählen Sie Modus, Datum und Abholzeit, um den Endpreis des Services zu sehen.",

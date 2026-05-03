@@ -3,9 +3,9 @@
     "cards": {
       "hourly": {
         "title": "Auto con autista privato",
-        "text": "Prenota un servizio di auto privata a Città del Messico, a ore o per l’intera giornata, con autista dedicato e veicolo premium.",
+        "text": "Prenota a ore o per l’intera giornata per trasferimenti, agenda privata o disponibilità operativa a Città del Messico.",
         "contact": {
-          "helper": "Configura modalità, raccolta, data e ora per preparare la richiesta."
+          "helper": "Configura modalità, punto di raccolta, data e ora per preparare la richiesta."
         },
         "bullets": [
           "Disponibilità flessibile",
@@ -16,6 +16,77 @@
         "priceValue": "4.500 MXN",
         "ctaClosed": "Vedi dettagli",
         "ctaOpen": "Nascondi dettagli",
+        "mobileFlow": {
+          "helper": {
+            "hourly": "Scegli data, ora di raccolta e durata per vedere la tariffa finale del servizio a ore.",
+            "fullDay": "Prenota una giornata completa con autista privato e margine per un’agenda flessibile a Città del Messico.",
+            "longTerm": "Indica il periodo e i dettagli operativi per preparare una proposta personalizzata."
+          },
+          "vehicleGallery": {
+            "open": "Vedi galleria del veicolo",
+            "close": "Chiudi",
+            "closePreview": "Chiudi anteprima",
+            "previous": "Immagine precedente",
+            "next": "Immagine successiva",
+            "slides": {
+              "main": {
+                "alt": "BYD M9 — van executive",
+                "caption": "Van executive"
+              },
+              "interior": {
+                "alt": "BYD M9 — interni executive",
+                "caption": "Interni executive"
+              },
+              "passengers": {
+                "alt": "BYD M9 — spazio per passeggeri",
+                "caption": "Spazio per passeggeri"
+              }
+            }
+          },
+          "cta": {
+            "continue": "Continua"
+          },
+          "contactStep": {
+            "summary": {
+              "title": "Riepilogo del servizio:",
+              "mode": "Modalità",
+              "pickup": "Raccolta",
+              "date": "Data",
+              "time": "Ora",
+              "duration": "Durata",
+              "vehicle": "Veicolo",
+              "price": "Tariffa",
+              "notes": "Note"
+            },
+            "fields": {
+              "name": "Nome completo",
+              "phone": "Telefono/WhatsApp con prefisso internazionale",
+              "email": "Email",
+              "notes": "Note del servizio"
+            },
+            "placeholders": {
+              "name": "Nome e cognome",
+              "phone": "+52...",
+              "email": "tuo@email.com",
+              "notes": "Aggiungi indicazioni, fermate, agenda o qualsiasi dettaglio rilevante"
+            },
+            "cta": {
+              "submit": "Richiedi conferma"
+            },
+            "notesEditor": {
+              "title": "Note del servizio",
+              "close": "Indietro",
+              "clear": "Cancella"
+            },
+            "validation": {
+              "name": "Indica il tuo nome.",
+              "phone": "Indica un telefono valido con prefisso internazionale.",
+              "email": "Indica un’email valida.",
+              "notes": "",
+              "formIncomplete": "Completa nome, telefono ed email per richiedere la conferma."
+            }
+          }
+        },
         "panel": {
           "title": "Autista a ore / giornata completa",
           "text": "Configura modalità, data e ora di raccolta per vedere il prezzo finale del servizio.",

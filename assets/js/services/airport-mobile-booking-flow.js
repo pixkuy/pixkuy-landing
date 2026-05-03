@@ -1014,6 +1014,20 @@
     return true;
   }
 
+  function setMobileContinueAvailability(panel, isReady) {
+    const cta = panel ? panel.querySelector(".services-expand__cta") : null;
+
+    if (!cta) {
+      return false;
+    }
+
+    cta.disabled = !isReady;
+    cta.setAttribute("aria-disabled", isReady ? "false" : "true");
+    cta.setAttribute("data-airport-mobile-continue-ready", isReady ? "true" : "false");
+
+    return true;
+  }
+
   function setMobileFarePendingState(panel, isPending) {
     const field = getMobileFareField(panel);
     const fare = getMobileFareNode(panel);
@@ -1038,6 +1052,8 @@
     }
 
     pending.textContent = isPending ? pendingText : "";
+
+    setMobileContinueAvailability(panel, !isPending);
 
     return true;
   }

@@ -13,6 +13,10 @@
 */
 
 @media (min-width: 721px){
+  body[data-hourly-desktop-vehicle-gallery-active="true"] .whatsapp-floating{
+    display:none;
+  }
+
   .whatsapp-floating{
     position:fixed;
     right:28px;
@@ -230,7 +234,8 @@
   body:has(.services-tours-panel__sheet.is-open) .whatsapp-floating,
   body:has(.services-hourly-panel__sheet.is-open) .whatsapp-floating,
   body:has(.services-events-panel__sheet.is-open) .whatsapp-floating,
-  body:has(.contact-success-modal[aria-hidden="false"]) .whatsapp-floating{
+  body:has(.contact-success-modal[aria-hidden="false"]) .whatsapp-floating,
+  body[data-airport-mobile-vehicle-gallery-active="true"] .whatsapp-floating{
     display:none;
   }
 }
