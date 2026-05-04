@@ -34,6 +34,7 @@
     "notesEditor": {
       "title": "Trip notes",
       "close": "Back",
+      "save": "Save notes",
       "clear": "×",
       "placeholder": "Flight, hotel, instructions or important details"
     },

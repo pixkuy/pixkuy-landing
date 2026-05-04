@@ -1,14 +1,13 @@
-/* WC2026 — Prefill & Reservation Request Lock
+/* WC2026 — Prefill & Lead Success Signal
  * Ruta: assets/js/wc2026/prefill.js
  * Responsabilidad única:
  * - applyWc2026Prefill
- * - lockReservationRequestForm
- * - submit lock
- * - success status handling
+ * - lead success signal
+ * - success status handling after Netlify redirect
  * Compatibilidad:
  * - mantiene form[name="contact"] por Netlify
  * - mantiene contact-message / contact-submit / contact-status
- * - no invade la capa assets/js/forms/*
+ * - no gobierna el submit lock global del formulario
  */
 (function (window, document) {
   "use strict";
@@ -103,24 +102,6 @@
   }
 
   applyWc2026Prefill();
-
-  (function bindSubmitLock() {
-    try {
-      var form = getReservationRequestForm();
-      if (!form) return;
-
-      form.addEventListener(
-        "submit",
-        function () {
-          if (form.dataset.submitted === "1") return;
-          lockReservationRequestForm({ showStatus: false });
-        },
-        { passive: true }
-      );
-    } catch (e) {
-      // no-op
-    }
-  })();
 
   try {
     var params = new window.URLSearchParams(window.location.search || "");

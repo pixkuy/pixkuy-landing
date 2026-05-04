@@ -1180,6 +1180,11 @@
         <input type="hidden" name="lead_source" value="" />
         <input type="hidden" name="lead_context" value="" />
 
+        <!-- Idempotencia y trazabilidad del envío -->
+        <input type="hidden" name="submission_id" value="" />
+        <input type="hidden" name="submitted_at_client" value="" />
+        <input type="hidden" name="form_client_version" value="" />
+
         <!-- Atribución propia de campañas -->
         <input type="hidden" name="campaign_gclid" value="" />
         <input type="hidden" name="campaign_utm_source" value="" />
@@ -3444,6 +3449,7 @@
 <script src="assets/js/forms/google-places.js"></script>
 <script src="https://unpkg.com/libphonenumber-js@1.12.15/bundle/libphonenumber-max.js"></script>
 <script src="assets/js/forms/reservation-request.js"></script>
+<script src="assets/js/forms/submission-guard.js"></script>
 <script src="assets/js/forms/contact-service-state.js"></script>
 <script src="assets/js/forms/contact-service-switcher.js"></script>
 <script src="assets/js/forms/contact-airport-hotel-editor.js"></script>

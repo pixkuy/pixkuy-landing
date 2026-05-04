@@ -76,6 +76,7 @@
             "notesEditor": {
               "title": "Примечания к сервису",
               "close": "Назад",
+              "save": "Сохранить примечания",
               "clear": "Очистить"
             },
             "validation": {
@@ -127,6 +128,7 @@
           },
           "disclaimers": {
             "includesTitle": "Включает",
+            "mobileIncludedTitle": "Включено",
             "supplementsTitle": "Возможные доплаты",
             "includesServiceKm": "40 км включено за каждый заказанный час",
             "fullDayIncludesKm": "До 12 часов сервиса и 500 км в день",

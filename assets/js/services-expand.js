@@ -237,6 +237,10 @@
 
     const nextService = openService === serviceKey ? null : serviceKey;
     setExpandedState(nextService);
+
+    if (nextService === 'hourly') {
+      scrollDesktopHourlyPanelIntoView(nextService);
+    }
   }
 
   function bindCard(entry) {
@@ -402,6 +406,42 @@
       if (attempts >= maxAttempts) return;
 
       window.setTimeout(runScroll, 140);
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runScroll);
+    });
+  }
+
+  function scrollDesktopHourlyPanelIntoView(serviceKey) {
+    if (mobileQuery.matches || serviceKey !== 'hourly') return;
+
+    const entry = services.hourly;
+    if (!entry || !entry.panel || entry.panel.hidden || expand.hidden) return;
+
+    let attempts = 0;
+    const maxAttempts = 4;
+
+    function runScroll() {
+      if (mobileQuery.matches || entry.panel.hidden || expand.hidden) return;
+
+      const targetRect = expand.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const panelHeight = Math.min(targetRect.height, viewportHeight - 48);
+      const targetTop = Math.max(
+        targetRect.top + window.scrollY - Math.max((viewportHeight - panelHeight) / 2, 18),
+        0
+      );
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: 'smooth'
+      });
+
+      attempts += 1;
+      if (attempts >= maxAttempts) return;
+
+      window.setTimeout(runScroll, 120);
     }
 
     window.requestAnimationFrame(() => {

@@ -76,6 +76,7 @@
             "notesEditor": {
               "title": "서비스 메모",
               "close": "뒤로",
+              "save": "메모 저장",
               "clear": "지우기"
             },
             "validation": {
@@ -127,6 +128,7 @@
           },
           "disclaimers": {
             "includesTitle": "포함 사항",
+            "mobileIncludedTitle": "포함됨",
             "supplementsTitle": "가능한 추가 요금",
             "includesServiceKm": "예약한 시간당 40km 포함",
             "fullDayIncludesKm": "하루 최대 12시간 서비스 및 500km 포함",

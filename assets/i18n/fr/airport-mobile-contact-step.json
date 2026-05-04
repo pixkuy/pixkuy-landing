@@ -34,6 +34,7 @@
     "notesEditor": {
       "title": "Notes du trajet",
       "close": "Retour",
+      "save": "Enregistrer les notes",
       "clear": "×",
       "placeholder": "Vol, hôtel, instructions ou détails importants"
     },

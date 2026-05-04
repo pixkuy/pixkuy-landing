@@ -80,6 +80,22 @@
     });
   }
 
+  function blurActiveElementInside(node) {
+    var activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === 'function' &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
+
   function buildAddressMarkup(options) {
     var safeOptions = isObject(options) ? options : {};
     var fieldName = getFieldName(safeOptions);
@@ -117,7 +133,6 @@
           ' class="place-autocomplete__mount"' +
           ' data-place-mount="' + fieldName + '"' +
           ' data-services-events-address-mount' +
-          ' aria-hidden="true"' +
         '></div>' +
       '</div>';
   }
@@ -181,6 +196,8 @@
       onSelection: function (selectedPlace, meta) {
         var safeMeta = isObject(meta) ? meta : {};
         var shouldPreserveVisibleInput = safeMeta.preserveInputValue === true;
+
+        blurActiveElementInside(mountNode);
 
         if (!selectedPlace) {
           if (!shouldPreserveVisibleInput) {

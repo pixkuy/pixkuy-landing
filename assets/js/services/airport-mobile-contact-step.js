@@ -199,6 +199,22 @@
     return true;
   }
 
+  function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
+
   function setText(node, value) {
     if (!node) {
       return false;
@@ -672,8 +688,11 @@
     setText(
       notesEditorClose,
       getI18nValue(
-        "airportMobileContactStep.notesEditor.close",
-        getI18nValue("airportMobileFlow.back", "")
+        "airportMobileContactStep.notesEditor.save",
+        getI18nValue(
+          "airportMobileContactStep.notesEditor.close",
+          getI18nValue("airportMobileFlow.back", "")
+        )
       )
     );
     setText(
@@ -808,6 +827,7 @@
     }
 
     syncNotesEditorToCompact();
+    blurActiveElementInside(editor);
 
     editor.hidden = true;
     editor.setAttribute("aria-hidden", "true");
@@ -1222,6 +1242,12 @@
     if (!contactStepNode) {
       return false;
     }
+
+    if (getNotesEditorNode() && getNotesEditorNode().hidden !== true) {
+      closeNotesEditor();
+    }
+
+    blurActiveElementInside(contactStepNode);
 
     if (currentPanel) {
       currentPanel.removeAttribute(PRIMARY_STEP_HIDDEN_ATTR);

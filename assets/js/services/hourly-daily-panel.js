@@ -170,6 +170,7 @@
       },
       disclaimers: {
         includesTitle: getI18nValue('services.cards.hourly.panel.disclaimers.includesTitle') || 'Incluye',
+        mobileIncludedTitle: getI18nValue('services.cards.hourly.panel.disclaimers.mobileIncludedTitle') || 'Incluido',
         supplementsTitle: getI18nValue('services.cards.hourly.panel.disclaimers.supplementsTitle') || 'Suplementos posibles',
         includesServiceKm: getI18nValue('services.cards.hourly.panel.disclaimers.includesServiceKm') || '40 km incluidos por hora contratada',
         fullDayIncludesKm: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayIncludesKm') || '500 km incluidos por día',
@@ -808,10 +809,14 @@
       `;
     }
 
+    const includesTitle = isMobileHourlyViewport()
+      ? labels.disclaimers.mobileIncludedTitle
+      : labels.disclaimers.includesTitle;
+
     return `
       <div class="services-hourly-panel__disclaimers-groups">
         <section class="services-hourly-panel__disclaimer-group services-hourly-panel__disclaimer-group--includes-wide">
-          <h4 class="services-hourly-panel__disclaimer-title">${labels.disclaimers.includesTitle}</h4>
+          <h4 class="services-hourly-panel__disclaimer-title">${includesTitle}</h4>
 
           <div class="services-hourly-panel__disclaimers-columns">
             <ul class="services-hourly-panel__disclaimers">

@@ -139,8 +139,11 @@
       ""
     );
     const closeText = getI18nValue(
-      "services.cards.airport.panel.back",
-      "Volver"
+      "services.cards.hourly.mobileFlow.contactStep.notesEditor.save",
+      getI18nValue(
+        "services.cards.hourly.mobileFlow.contactStep.notesEditor.close",
+        getI18nValue("services.cards.airport.panel.back", "Volver")
+      )
     );
     const clearText = getI18nValue(
       "services.cards.airport.panel.clearResolvedDestination",

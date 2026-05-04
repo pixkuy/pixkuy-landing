@@ -76,6 +76,7 @@
             "notesEditor": {
               "title": "Note del servizio",
               "close": "Indietro",
+              "save": "Salva note",
               "clear": "Cancella"
             },
             "validation": {
@@ -127,6 +128,7 @@
           },
           "disclaimers": {
             "includesTitle": "Include",
+            "mobileIncludedTitle": "Incluso",
             "supplementsTitle": "Possibili supplementi",
             "includesServiceKm": "40 km inclusi per ogni ora contrattata",
             "fullDayIncludesKm": "Fino a 12 ore di servizio e 500 km al giorno",

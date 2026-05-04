@@ -34,6 +34,7 @@
     "notesEditor": {
       "title": "여행 메모",
       "close": "뒤로",
+      "save": "메모 저장",
       "clear": "×",
       "placeholder": "항공편, 호텔, 안내 사항 또는 중요한 세부 정보"
     },

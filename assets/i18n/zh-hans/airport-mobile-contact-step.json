@@ -34,6 +34,7 @@
     "notesEditor": {
       "title": "行程备注",
       "close": "返回",
+      "save": "保存备注",
       "clear": "×",
       "placeholder": "航班、酒店、说明或重要细节"
     },

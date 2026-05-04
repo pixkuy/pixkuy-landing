@@ -877,6 +877,20 @@ function hasMinimumRequiredEventSpecialReservationData(data) {
     fields.submit.disabled = !enabled;
     fields.submit.setAttribute('aria-disabled', enabled ? 'false' : 'true');
   }
+
+  function getSubmissionGuard() {
+    var guard = window.PixkuySubmissionGuard;
+
+    if (!guard || typeof guard !== 'object') {
+      return null;
+    }
+
+    if (typeof guard.prepareSubmit !== 'function') {
+      return null;
+    }
+
+    return guard;
+  }
   
   function syncNativeRequiredState(fields, data) {
   var usesSpecificServiceModel;
@@ -1670,11 +1684,26 @@ function hasMinimumRequiredEventSpecialReservationData(data) {
     }
 
     fields.form.addEventListener('submit', function (event) {
+      var guard;
+      var data;
+      var serviceType;
+
       if (isFormLocked(fields.form)) {
+        event.preventDefault();
         return;
       }
 
       if (!refreshValidationUX(fields)) {
+        event.preventDefault();
+        return;
+      }
+
+      data = getReservationRequestData(fields);
+      serviceType = data && data.serviceType ? data.serviceType : '';
+
+      guard = getSubmissionGuard();
+
+      if (guard && !guard.prepareSubmit(fields.form, serviceType)) {
         event.preventDefault();
       }
     });

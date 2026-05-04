@@ -76,6 +76,7 @@
             "notesEditor": {
               "title": "服务备注",
               "close": "返回",
+              "save": "保存备注",
               "clear": "清除"
             },
             "validation": {
@@ -127,6 +128,7 @@
           },
           "disclaimers": {
             "includesTitle": "包含",
+            "mobileIncludedTitle": "已包含",
             "supplementsTitle": "可能附加费用",
             "includesServiceKm": "每预订 1 小时包含 40 公里",
             "fullDayIncludesKm": "每天最多 12 小时服务及 500 公里",
