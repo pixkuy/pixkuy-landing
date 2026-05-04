@@ -1,0 +1,230 @@
+/* assets/css/63-tours-mobile-pickup-search-sheet.css
+   Tours mobile pickup search sheet.
+   Alcance:
+   - solo móvil
+   - solo Tours Mobile Config Step
+   - búsqueda progresiva de punto de recogida bajo topbar móvil
+   - no duplica pricing, payload ni submit
+*/
+
+.tours-mobile-pickup-search-sheet{
+  display:none;
+}
+
+.tours-mobile-pickup-search-sheet[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  body[data-tours-mobile-pickup-search-open="true"]{
+    overflow:hidden;
+  }
+
+  .tours-mobile-pickup-search-sheet{
+    position:fixed;
+    top:calc(64px + env(safe-area-inset-top));
+    right:0;
+    bottom:0;
+    left:0;
+    z-index:89;
+    display:block;
+    padding:0;
+    background:#0f1113;
+    overflow:hidden;
+    transform:translateY(0);
+    opacity:1;
+    transition:
+      transform .28s cubic-bezier(.2,.8,.2,1),
+      opacity .20s ease;
+  }
+
+  .tours-mobile-pickup-search-sheet[aria-hidden="true"]{
+    transform:translateY(28px);
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .tours-mobile-pickup-search-sheet__panel{
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+    border-top:1px solid rgba(236,220,189,.16);
+    background:#0f1113;
+  }
+
+  .tours-mobile-pickup-search-sheet__panel::before{
+    content:"";
+    display:block;
+    width:38px;
+    height:4px;
+    margin:10px auto 8px;
+    border-radius:999px;
+    background:rgba(255,245,228,.22);
+    flex:0 0 auto;
+  }
+
+  .tours-mobile-pickup-search-sheet__header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-height:40px;
+    padding:0 16px;
+    background:#0f1113;
+    flex:0 0 auto;
+  }
+
+  .tours-mobile-pickup-search-sheet__title{
+    margin:0;
+    color:rgba(255,249,238,.94);
+    font-size:14px;
+    line-height:1.2;
+    font-weight:750;
+    letter-spacing:-.01em;
+  }
+
+  .tours-mobile-pickup-search-sheet__close{
+    min-width:44px;
+    min-height:34px;
+    padding:0 8px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    font-weight:700;
+  }
+
+  .tours-mobile-pickup-search-sheet__close:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:0;
+  }
+
+  .tours-mobile-pickup-search-sheet__search{
+    position:relative;
+    display:block;
+    padding:0 16px 8px;
+    border-bottom:1px solid rgba(236,220,189,.10);
+    background:#0f1113;
+    flex:0 0 auto;
+  }
+
+  .tours-mobile-pickup-search-sheet__input{
+    width:100%;
+    min-height:48px;
+    height:48px;
+    padding:0 42px 0 38px;
+    border:1px solid rgba(236,220,189,.38);
+    border-radius:9px;
+    background-color:rgba(15,17,19,.68);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='10.8' cy='10.8' r='5.8' stroke='%23fff9ee' stroke-width='2'/%3E%3Cpath d='M15.2 15.2 20 20' stroke='%23fff9ee' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:14px center;
+    background-size:18px 18px;
+    color:rgba(255,249,238,.96);
+    box-shadow:none;
+    box-sizing:border-box;
+    font:inherit;
+    font-size:14px;
+    line-height:48px;
+    font-weight:650;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+
+  .tours-mobile-pickup-search-sheet__input::placeholder{
+    color:transparent;
+    opacity:0;
+  }
+
+  .tours-mobile-pickup-search-sheet__input:focus{
+    outline:none;
+    border-color:rgba(31,122,109,.78);
+    background-color:rgba(15,17,19,.82);
+  }
+
+  .tours-mobile-pickup-search-sheet__input:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:0;
+  }
+
+  .tours-mobile-pickup-search-sheet__clear{
+    position:absolute;
+    right:26px;
+    top:50%;
+    width:30px;
+    height:30px;
+    transform:translateY(-50%);
+    border:0;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    color:rgba(255,245,228,.74);
+    font:inherit;
+    font-size:18px;
+    line-height:1;
+    font-weight:600;
+  }
+
+  .tours-mobile-pickup-search-sheet__clear[hidden]{
+    display:none !important;
+  }
+
+  .tours-mobile-pickup-search-sheet__mount{
+    display:grid;
+    align-content:start;
+    gap:4px;
+    min-height:0;
+    padding:8px 16px calc(16px + env(safe-area-inset-bottom));
+    overflow:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    flex:1 1 auto;
+  }
+
+  .tours-mobile-pickup-search-sheet__mount .place-autocomplete__panel{
+    position:static !important;
+    display:grid !important;
+    gap:4px !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  .tours-mobile-pickup-search-sheet__mount .place-autocomplete__panel[hidden],
+  .tours-mobile-pickup-search-sheet__mount .place-autocomplete__status{
+    display:none !important;
+  }
+
+  .tours-mobile-pickup-search-sheet__mount .place-autocomplete__item-button{
+    position:relative;
+    width:100%;
+    min-height:52px;
+    padding:0 12px;
+    border:1px solid transparent;
+    border-radius:10px;
+    background:transparent;
+    color:rgba(255,249,238,.92);
+    font:inherit;
+    font-size:14px;
+    line-height:1.25;
+    font-weight:650;
+    text-align:left;
+    transition:background-color .16s ease, border-color .16s ease, color .16s ease;
+  }
+
+  .tours-mobile-pickup-search-sheet__mount .place-autocomplete__item-button:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:-2px;
+  }
+}

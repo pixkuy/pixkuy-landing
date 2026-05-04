@@ -24,6 +24,7 @@
           "pickupHelp": "El punto de recogida valida operativa, pero no cambia el precio.",
           "dateLabel": "Fecha",
           "timeLabel": "Hora",
+          "departureTimeLabel": "Hora salida",
           "passengersLabel": "Pasajeros",
           "guideLabel": "Guía",
           "guideIncludedLabel": "Con guía",
@@ -109,6 +110,48 @@
           "summaryDurationLabel": "Duración",
           "summaryTicketsLabel": "Entradas",
           "summaryPriceLabel": "Precio final"
+        },
+        "mobileContactStep": {
+          "fields": {
+            "name": "Nombre completo",
+            "phone": "Teléfono/WhatsApp con prefijo internacional",
+            "email": "Email",
+            "notes": "Notas del tour"
+          },
+          "placeholders": {
+            "name": "Tu nombre",
+            "phone": "Ej. +525512345678",
+            "email": "tu@email.com",
+            "notes": "Hotel, punto exacto, horarios o detalles importantes"
+          },
+          "summary": {
+            "title": "Resumen del tour",
+            "tour": "Tour",
+            "duration": "Duración",
+            "pickup": "Recogida",
+            "date": "Fecha",
+            "time": "Hora salida",
+            "passengers": "Pasajeros",
+            "guide": "Guía",
+            "guideLanguage": "Idioma",
+            "price": "Precio final"
+          },
+          "cta": {
+            "submit": "Solicitar confirmación"
+          },
+          "notesEditor": {
+            "title": "Notas del tour",
+            "save": "Guardar notas",
+            "clear": "×",
+            "placeholder": "Hotel, punto exacto, horarios o detalles importantes"
+          },
+          "validation": {
+            "name": "Indica tu nombre completo.",
+            "phone": "Indica un teléfono válido con formato internacional.",
+            "email": "Indica un email válido.",
+            "notes": "",
+            "formIncomplete": "Revisa los datos marcados antes de continuar."
+          }
         },
         "whatsapp": {
           "tour": "Tour",

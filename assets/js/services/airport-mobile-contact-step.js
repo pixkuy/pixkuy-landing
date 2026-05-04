@@ -48,8 +48,44 @@
       .replace(/(?!^)\+/g, "");
   }
 
+  function getPhoneLibrary() {
+    return window.libphonenumber || null;
+  }
+
+  function parseInternationalPhoneNumber(value) {
+    const phoneLibrary = getPhoneLibrary();
+    const normalizedValue = normalizePhoneValue(value);
+    let parsedNumber;
+
+    if (!phoneLibrary || !normalizedValue || normalizedValue.charAt(0) !== "+") {
+      return null;
+    }
+
+    try {
+      parsedNumber = phoneLibrary.parsePhoneNumberFromString(normalizedValue);
+    } catch (error) {
+      return null;
+    }
+
+    if (!parsedNumber || !parsedNumber.isValid()) {
+      return null;
+    }
+
+    return parsedNumber;
+  }
+
   function isValidPhone(value) {
-    return /^\+[1-9]\d{6,14}$/.test(normalizePhoneValue(value));
+    const normalizedValue = normalizePhoneValue(value);
+
+    if (!/^\+[1-9]\d{6,14}$/.test(normalizedValue)) {
+      return false;
+    }
+
+    if (!getPhoneLibrary()) {
+      return true;
+    }
+
+    return Boolean(parseInternationalPhoneNumber(normalizedValue));
   }
 
   function isValidEmail(value) {
@@ -878,7 +914,18 @@
     return true;
   }
   
-    function hasRequiredContactData() {
+    function hasFilledContactData() {
+    const nameField = getContactField(FIELD_NAME);
+    const phoneField = getContactField(FIELD_PHONE);
+    const emailField = getContactField(FIELD_EMAIL);
+    const name = normalizeText(nameField && nameField.value);
+    const phone = normalizePhoneValue(phoneField && phoneField.value);
+    const email = normalizeText(emailField && emailField.value);
+
+    return Boolean(name && phone && email);
+  }
+
+  function hasRequiredContactData() {
     const nameField = getContactField(FIELD_NAME);
     const phoneField = getContactField(FIELD_PHONE);
     const emailField = getContactField(FIELD_EMAIL);
@@ -893,7 +940,7 @@
     const submit = contactStepNode
       ? contactStepNode.querySelector("[data-airport-mobile-contact-submit]")
       : null;
-    const isReady = hasRequiredContactData();
+    const isReady = hasFilledContactData();
 
     if (!submit) {
       return false;
@@ -1189,7 +1236,9 @@
       event.preventDefault();
 
       if (!hasRequiredContactData()) {
+        validateContactStep();
         syncSubmitAvailability();
+        showGlobalError();
         return;
       }
 

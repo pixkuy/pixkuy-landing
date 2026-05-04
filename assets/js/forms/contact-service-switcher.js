@@ -6,8 +6,8 @@
   }
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
-  const MOBILE_BLOCKED_SERVICE_TYPES = ["airport_hotel", "hourly_daily"];
-  const MOBILE_FALLBACK_SERVICE_TYPE = "tour_private";
+  const MOBILE_BLOCKED_SERVICE_TYPES = ["airport_hotel", "tour_private", "hourly_daily"];
+  const MOBILE_FALLBACK_SERVICE_TYPE = "other";
 
   let mobileBlockedOptionSnapshots = [];
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-wc2026="on">
+<html lang="es" data-wc2026="on" data-pixkuy-i18n-boot="pending">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
@@ -63,6 +63,11 @@
 <link rel="stylesheet" href="assets/css/57-hourly-mobile-vehicle-gallery.css" />
 <link rel="stylesheet" href="assets/css/58-hourly-mobile-contact-step.css" />
 <link rel="stylesheet" href="assets/css/60-hourly-desktop-vehicle-gallery.css" />
+<link rel="stylesheet" href="assets/css/61-tours-mobile-booking-flow.css" />
+<link rel="stylesheet" href="assets/css/62-tours-mobile-config-step.css" />
+<link rel="stylesheet" href="assets/css/63-tours-mobile-pickup-search-sheet.css" />
+<link rel="stylesheet" href="assets/css/64-tours-mobile-vehicle-gallery.css" />
+<link rel="stylesheet" href="assets/css/65-tours-mobile-contact-step.css" />
 <link rel="stylesheet" href="assets/css/40-contact-hourly-daily.css" />
   <link rel="stylesheet" href="assets/css/44-contact-event-special.css" />
   <link rel="stylesheet" href="assets/css/45-services-events-spotlight.css" />
@@ -78,6 +83,10 @@
 
   <!-- a11y helper: labels ocultos pero existentes -->
   <style>
+    html[data-pixkuy-i18n-boot="pending"] [data-i18n]{
+      visibility:hidden !important;
+    }
+
     .visually-hidden{
       position:absolute !important;
       width:1px !important;
@@ -90,6 +99,19 @@
       border:0 !important;
     }
   </style>
+
+  <script>
+    (function pixkuyI18nBootGuard(document, window) {
+      "use strict";
+
+      function releaseI18nBoot() {
+        document.documentElement.removeAttribute("data-pixkuy-i18n-boot");
+      }
+
+      window.addEventListener("pixkuy:i18n-applied", releaseI18nBoot, { once: true });
+      window.setTimeout(releaseI18nBoot, 1800);
+    })(document, window);
+  </script>
 
   <!-- Minimal structured data (no ContactPoint to avoid spam surface) -->
   <script type="application/ld+json">
@@ -214,8 +236,8 @@
 
     <div class="content hero-mobile-entry" aria-labelledby="hero-mobile-entry-title">
   <div class="hero-mobile-entry__intro">
-        <h1 id="hero-mobile-entry-title" data-i18n="heroMobileEntry.title">Solicita tu traslado</h1>
-        <p data-i18n="heroMobileEntry.text">Elige la opción que mejor encaja con tu trayecto en Ciudad de México.</p>
+        <h1 id="hero-mobile-entry-title" data-i18n="heroMobileEntry.title">Chófer en Ciudad de México</h1>
+        <p data-i18n="heroMobileEntry.text">Movilidad premium con conductor privado, flota híbrida y eléctrica. Atención en cada detalle.</p>
       </div>
 
       <nav class="hero-mobile-entry__actions" aria-label="Opciones de reserva rápida">
@@ -241,7 +263,7 @@
     </svg>
   </span>
   <span class="hero-mobile-entry__action-copy">
-            <strong data-i18n="heroMobileEntry.hourly.title">Auto con conductor</strong>
+            <strong data-i18n="heroMobileEntry.hourly.title">Vehículo con conductor</strong>
             <span data-i18n="heroMobileEntry.hourly.text">Servicio por horas, día completo o agenda privada.</span>
           </span>
           <span class="hero-mobile-entry__action-cta" data-i18n="heroMobileEntry.cta.request">Solicitar</span>
@@ -297,7 +319,7 @@
         />
 
         <p class="hero-mobile-entry__trust" data-i18n="heroMobileEntry.trust">
-          BYD M9 · hasta 6 pasajeros · Wi-Fi · USB-C · conductor profesional
+          BYD M9 · hasta 6 pasajeros · Wi-Fi · USB-C Asientos capitán · Climatización individual
         </p>
       </div>
     </div>
@@ -3494,6 +3516,11 @@
 <script src="assets/js/services/in-motion-gallery.js"></script>
 <script src="assets/js/services/tours-temporal-pricing.js"></script>
 <script src="assets/js/services/tours-panel.js"></script>
+<script src="assets/js/services/tours-mobile-config-step.js"></script>
+<script src="assets/js/services/tours-mobile-pickup-search-sheet.js"></script>
+<script src="assets/js/services/tours-mobile-booking-flow.js"></script>
+<script src="assets/js/services/tours-mobile-vehicle-gallery.js"></script>
+<script src="assets/js/services/tours-mobile-contact-step.js"></script>
 <script src="assets/js/services/tours-mobile-sheet.js"></script>
 <script src="assets/js/services/hourly-daily-temporal-pricing.js"></script>
 <script src="assets/js/services/hourly-daily-pickup.js"></script>

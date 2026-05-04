@@ -1,0 +1,280 @@
+/* assets/css/61-tours-mobile-booking-flow.css
+   Tours mobile booking flow.
+   Alcance:
+   - solo móvil
+   - route móvil dedicada para tour_private
+   - no toca desktop
+   - no toca #contact
+   - no redefine la sábana legacy Tours
+*/
+
+.tours-mobile-route,
+.tours-mobile-flow{
+  display:none;
+}
+
+.tours-mobile-route[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  html:has(body[data-tours-mobile-screen="true"]){
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  body[data-tours-mobile-screen="true"]{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100svh;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  .tours-mobile-route{
+    position:fixed;
+    inset:0;
+    z-index:76;
+    display:block;
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+    overscroll-behavior:none;
+    touch-action:manipulation;
+    background-color:#0f1113;
+    background-image:
+      linear-gradient(180deg, rgba(15,17,19,.84) 0%, rgba(15,17,19,.76) 38%, rgba(15,17,19,.92) 100%),
+      url("../img/cdmx-angel-night.webp");
+    background-position:
+      center top,
+      center top;
+    background-size:
+      100% 100%,
+      auto 100vh;
+    background-repeat:no-repeat;
+  }
+
+  .tours-mobile-route__screen{
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+  }
+
+  .tours-mobile-route__content{
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100svh;
+    min-height:0;
+    overflow:hidden;
+    padding:
+      calc(60px + env(safe-area-inset-top))
+      18px
+      calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .tours-mobile-route .tours-mobile-flow{
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    min-height:0;
+    gap:12px;
+  }
+
+  .tours-mobile-flow__back-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    min-height:28px;
+  }
+
+  .tours-mobile-flow__back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    min-height:28px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    cursor:pointer;
+  }
+
+  .tours-mobile-flow__back::before{
+    content:"←";
+    display:inline-block;
+    font-size:15px;
+    line-height:1;
+    transform:translateY(-.5px);
+  }
+
+  .tours-mobile-flow__header{
+    display:grid;
+    gap:5px;
+  }
+
+  .tours-mobile-flow__title{
+    margin:0;
+    color:#f4f2ee;
+    font-size:22px;
+    font-weight:680;
+    line-height:1.08;
+  }
+
+  .tours-mobile-flow__helper{
+    max-width:32rem;
+    margin:0;
+    color:rgba(244,242,238,.72);
+    font-size:13px;
+    line-height:1.38;
+  }
+
+  .tours-mobile-flow__stack{
+    display:grid;
+    flex:1 1 auto;
+    align-content:start;
+    gap:8px;
+    min-height:0;
+    overflow:auto;
+    padding:2px 0 6px;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .tours-mobile-stack-card{
+    display:grid;
+    grid-template-columns:76px minmax(0, 1fr);
+    gap:9px;
+    width:100%;
+    min-height:74px;
+    padding:7px;
+    border:1px solid rgba(244,242,238,.13);
+    border-radius:11px;
+    background:rgba(15,17,19,.62);
+    color:#f4f2ee;
+    text-align:left;
+    font:inherit;
+    cursor:pointer;
+  }
+
+  .tours-mobile-stack-card.is-active{
+    min-height:164px;
+    border-color:rgba(255,245,228,.32);
+    background:rgba(15,17,19,.78);
+  }
+
+  .tours-mobile-stack-card__media{
+    display:block;
+    min-width:0;
+  }
+
+  .tours-mobile-stack-card__image{
+    display:block;
+    width:76px;
+    height:60px;
+    border-radius:9px;
+    object-fit:cover;
+    object-position:center;
+  }
+
+  .tours-mobile-stack-card.is-active .tours-mobile-stack-card__image{
+    height:150px;
+  }
+
+  .tours-mobile-stack-card__body{
+    display:grid;
+    align-content:start;
+    min-width:0;
+    gap:1px;
+  }
+
+  .tours-mobile-stack-card.is-active .tours-mobile-stack-card__body{
+    height:100%;
+    align-content:stretch;
+    grid-template-rows:auto auto 1fr auto;
+  }
+  
+  .tours-mobile-stack-card__main{
+    display:grid;
+    min-width:0;
+    gap:3px;
+  }
+
+  .tours-mobile-stack-card__title{
+    display:block;
+    overflow:hidden;
+    color:#f4f2ee;
+    font-size:14px;
+    font-weight:680;
+    line-height:1.16;
+    text-overflow:ellipsis;
+  }
+
+  .tours-mobile-stack-card:not(.is-active) .tours-mobile-stack-card__title{
+    white-space:nowrap;
+  }
+
+  .tours-mobile-stack-card__duration{
+    display:block;
+    color:rgba(244,242,238,.66);
+    font-size:12px;
+    line-height:1.1;
+  }
+
+  .tours-mobile-stack-card__price{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    min-width:0;
+  }
+
+  .tours-mobile-stack-card__price-label{
+    color:rgba(244,242,238,.58);
+    font-size:11px;
+    line-height:1;
+  }
+
+  .tours-mobile-stack-card__price-value{
+    color:#f4f2ee;
+    font-size:13px;
+    font-weight:700;
+    line-height:1;
+  }
+
+  .tours-mobile-stack-card__description{
+    display:block;
+    color:rgba(244,242,238,.72);
+    font-size:12px;
+    line-height:1.35;
+  }
+
+  .tours-mobile-stack-card__action,
+  .tours-mobile-stack-card__action.cta{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    justify-self:end;
+    width:auto;
+    min-width:0;
+    min-height:0;
+    height:auto;
+    padding:2px 3px;
+    border-radius:4px;
+    font-size:12px;
+    font-weight:680;
+    line-height:1;
+  }
+  
+  .tours-mobile-stack-card.is-active .tours-mobile-stack-card__action{
+    align-self:end;
+    margin-top:5px;
+    margin-bottom:0;
+  }
+}

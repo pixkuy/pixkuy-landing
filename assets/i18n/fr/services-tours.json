@@ -3,9 +3,9 @@
     "cards": {
       "tours": {
         "title": "Tours et visites privées",
-        "text": "Des trajets privés vers des lieux emblématiques avec une configuration claire et une attention soignée du départ au retour.",
+        "text": "Parcours privés vers des lieux emblématiques avec une configuration claire et une attention soignée du départ au retour.",
         "bullets": [
-          "Tours fermés",
+          "Tours privatifs",
           "Configuration préalable",
           "Attention personnalisée"
         ],
@@ -15,15 +15,16 @@
         "ctaOpen": "Masquer les tours",
         "panel": {
           "title": "Choisissez votre tour",
-          "text": "Sélectionnez d’abord le parcours qui vous intéresse. Ensuite, vous pourrez configurer les passagers, la prise en charge, la date, l’heure et, le cas échéant, le guide et la langue.",
+          "text": "Sélectionnez d’abord le parcours qui vous intéresse. Vous pourrez ensuite configurer les passagers, le point de prise en charge, la date, l’heure et, le cas échéant, le guide et la langue.",
           "selectedTourLabel": "Tour sélectionné",
           "durationLabel": "Durée",
           "priceFromLabel": "Prix à partir de",
           "pickupLabel": "Prise en charge",
           "pickupPlaceholder": "Indiquez le point de prise en charge",
-          "pickupHelp": "Le point de prise en charge sert à la validation opérationnelle, mais ne modifie pas le prix.",
+          "pickupHelp": "Le point de prise en charge valide la faisabilité opérationnelle, mais ne change pas le prix.",
           "dateLabel": "Date",
           "timeLabel": "Heure",
+          "departureTimeLabel": "Heure de départ",
           "passengersLabel": "Passagers",
           "guideLabel": "Guide",
           "guideIncludedLabel": "Avec guide",
@@ -36,41 +37,41 @@
           "ctaDisabled": "Complétez la configuration",
           "emptyStateTitle": "Sélectionnez un tour",
           "emptyStateText": "Choisissez d’abord une option du catalogue pour voir sa configuration et son prix final.",
-          "changeTourConfirm": "Si vous changez de tour, nous réviserons la configuration actuelle et seules les données compatibles seront conservées. Voulez-vous continuer ?",
+          "changeTourConfirm": "Si vous changez de tour, nous vérifierons la configuration actuelle et ne conserverons que les données compatibles. Voulez-vous continuer ?",
           "confirmAccept": "Continuer",
           "confirmCancel": "Annuler",
           "catalog": {
             "teotihuacan": {
-              "title": "Pyramides de Teotihuacán",
-              "description": "Découvrez Teotihuacán dans une expérience privée avec transfert aller-retour, billets inclus et une visite à votre rythme.",
+              "title": "Pyramides de Teotihuacan",
+              "description": "Découvrez Teotihuacan lors d’une expérience privée avec transfert aller-retour, billets inclus et une visite à votre rythme.",
               "duration": "6 heures",
               "priceFrom": "4.000 MXN",
               "imageAlt": "Pyramides de Teotihuacán"
             },
             "teotihuacan_basilica": {
-              "title": "Pyramides de Teotihuacán + Basilique Santa María de Guadalupe",
-              "description": "Découvrez Teotihuacán et la Basilique dans une expérience privée d’une journée complète, avec transfert aller-retour, billets inclus et une visite bien optimisée.",
+              "title": "Pyramides de Teotihuacan + Basilique Sainte-Marie de Guadalupe",
+              "description": "Découvrez Teotihuacan et la Basilique lors d’une expérience privée d’une journée complète, avec transfert aller-retour, billets inclus et une visite bien organisée.",
               "duration": "9 heures",
               "priceFrom": "5.000 MXN",
               "imageAlt": "Pyramides de Teotihuacán et Basilique de Guadalupe"
             },
             "xochimilco_coyoacan": {
               "title": "Xochimilco + Coyoacán",
-              "description": "Profitez de Xochimilco et Coyoacán lors d’un parcours privé avec transfert aller-retour, conçu pour découvrir deux des lieux les plus emblématiques de Mexico avec calme et confort.",
+              "description": "Profitez de Xochimilco et Coyoacán lors d’un parcours privé avec transfert aller-retour, pensé pour découvrir deux lieux emblématiques de Mexico avec calme et confort.",
               "duration": "6 heures",
               "priceFrom": "4.500 MXN",
               "imageAlt": "Xochimilco et Coyoacán"
             },
             "cholula_puebla": {
               "title": "Cholula + Puebla",
-              "description": "Explorez Cholula et Puebla dans une expérience privée d’une journée complète, avec transfert depuis Mexico et suffisamment de temps pour profiter de la visite à votre rythme.",
+              "description": "Explorez Cholula et Puebla lors d’une expérience privée d’une journée complète, avec transfert depuis Mexico et suffisamment de temps pour profiter de la visite à votre rythme.",
               "duration": "9 heures",
               "priceFrom": "7.200 MXN",
               "imageAlt": "Cholula et Puebla"
             },
             "san_miguel_allende": {
               "title": "San Miguel de Allende",
-              "description": "Découvrez San Miguel de Allende lors d’un parcours privé avec transfert depuis Mexico, pensé pour profiter de la visite avec confort et sans précipitation inutile.",
+              "description": "Découvrez San Miguel de Allende lors d’un parcours privé avec transfert depuis Mexico, pensé pour profiter de la visite confortablement et sans précipitation inutile.",
               "duration": "10 heures",
               "priceFrom": "7.800 MXN",
               "imageAlt": "San Miguel de Allende"
@@ -109,6 +110,48 @@
           "summaryDurationLabel": "Durée",
           "summaryTicketsLabel": "Billets",
           "summaryPriceLabel": "Prix final"
+        },
+        "mobileContactStep": {
+          "fields": {
+            "name": "Nom complet",
+            "phone": "Téléphone/WhatsApp avec indicatif international",
+            "email": "Email",
+            "notes": "Notes du tour"
+          },
+          "placeholders": {
+            "name": "Votre nom",
+            "phone": "Ex. +525512345678",
+            "email": "vous@email.com",
+            "notes": "Hôtel, point exact, horaires ou détails importants"
+          },
+          "summary": {
+            "title": "Résumé du tour",
+            "tour": "Tour",
+            "duration": "Durée",
+            "pickup": "Prise en charge",
+            "date": "Date",
+            "time": "Heure de départ",
+            "passengers": "Passagers",
+            "guide": "Guide",
+            "guideLanguage": "Langue",
+            "price": "Prix final"
+          },
+          "cta": {
+            "submit": "Demander confirmation"
+          },
+          "notesEditor": {
+            "title": "Notes du tour",
+            "save": "Enregistrer les notes",
+            "clear": "×",
+            "placeholder": "Hôtel, point exact, horaires ou détails importants"
+          },
+          "validation": {
+            "name": "Indiquez votre nom complet.",
+            "phone": "Indiquez un téléphone valide au format international.",
+            "email": "Indiquez un email valide.",
+            "notes": "",
+            "formIncomplete": "Vérifiez les champs marqués avant de continuer."
+          }
         },
         "whatsapp": {
           "tour": "Tour",

@@ -1,0 +1,797 @@
+/* assets/css/62-tours-mobile-config-step.css
+   Tours mobile config step.
+   Alcance:
+   - solo móvil
+   - segunda pantalla de configuración tour_private
+   - no toca desktop
+   - no toca #contact
+*/
+
+.tours-mobile-config-step{
+  display:none;
+}
+
+.tours-mobile-config-step[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  body[data-tours-mobile-config-screen="true"] .tours-mobile-flow{
+    display:none !important;
+  }
+
+  .tours-mobile-config-step{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    display:block;
+    background-color:#0f1113;
+    background-image:
+      linear-gradient(180deg, rgba(15,17,19,.88) 0%, rgba(15,17,19,.78) 38%, rgba(15,17,19,.94) 100%),
+      url("../img/cdmx-angel-night.webp");
+    background-position:center top, center top;
+    background-size:100% 100%, auto 100vh;
+    background-repeat:no-repeat;
+  }
+
+  .tours-mobile-config-step__screen{
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+  }
+
+  .tours-mobile-config-step__content{
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100svh;
+    min-height:0;
+    overflow:hidden;
+    padding:
+      calc(60px + env(safe-area-inset-top))
+      18px
+      calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .tours-mobile-config-step__back-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    min-height:28px;
+    margin-bottom:8px;
+  }
+
+  .tours-mobile-config-step__back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    min-height:28px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    cursor:pointer;
+  }
+
+  .tours-mobile-config-step__back::before{
+    content:"←";
+    display:inline-block;
+    font-size:15px;
+    line-height:1;
+    transform:translateY(-.5px);
+  }
+
+  .tours-mobile-config-step__summary{
+    display:grid;
+    grid-template-columns:95px minmax(0, 1fr);
+    gap:10px;
+    align-items:start;
+    margin-bottom:12px;
+  }
+
+  .tours-mobile-config-step__image{
+    display:block;
+    width:95px;
+    height:75px;
+    border-radius:9px;
+    object-fit:cover;
+    object-position:center;
+    align-self:start;
+  }
+
+  .tours-mobile-config-step__summary-copy{
+    display:grid;
+    gap:4px;
+    min-width:0;
+  }
+
+  .tours-mobile-config-step__title{
+    margin:0;
+    color:#f4f2ee;
+    font-size:18px;
+    font-weight:680;
+    line-height:1.12;
+  }
+
+  .tours-mobile-config-step__meta{
+    margin:0;
+    color:rgba(244,242,238,.66);
+    font-size:12px;
+    line-height:1.2;
+  }
+
+  .tours-mobile-config__fields{
+    display:grid;
+    gap:9px;
+    min-height:0;
+    overflow:auto;
+    padding-bottom:10px;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .tours-mobile-config__row{
+    display:grid;
+    grid-template-columns:84px minmax(0, 1fr) 112px;
+    gap:9px;
+    align-items:start;
+  }
+
+  .tours-mobile-config__row--trip{
+    grid-template-columns:84px minmax(0, 1fr) 112px;
+  }
+
+  .tours-mobile-config__field{
+    display:grid;
+    gap:5px;
+    min-width:0;
+  }
+
+  .tours-mobile-config__label{
+    color:rgba(244,242,238,.68);
+    font-size:11px;
+    line-height:1.1;
+  }
+
+  .tours-mobile-config__control{
+    box-sizing:border-box;
+    width:100%;
+    min-height:42px;
+    border:1px solid rgba(244,242,238,.16);
+    border-radius:9px;
+    background:rgba(15,17,19,.72);
+    color:#f4f2ee;
+    font:inherit;
+    font-size:13px;
+    line-height:1.2;
+    padding:0 10px;
+  }
+
+  .tours-mobile-config__control:focus{
+    outline:0;
+    border-color:rgba(255,245,228,.38);
+    background:rgba(15,17,19,.86);
+  }
+
+  .tours-mobile-config__segmented{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+  }
+
+  .tours-mobile-config__chip{
+    min-height:36px;
+    border:1px solid rgba(244,242,238,.16);
+    border-radius:9px;
+    background:rgba(15,17,19,.68);
+    color:rgba(244,242,238,.78);
+    font:inherit;
+    font-size:13px;
+    cursor:pointer;
+  }
+
+  .tours-mobile-config__chip[aria-pressed="true"]{
+    border-color:rgba(255,245,228,.34);
+    background:rgba(255,245,228,.10);
+    color:#f4f2ee;
+  }
+
+  .tours-mobile-config-step__footer{
+    display:grid;
+    grid-template-columns:136px minmax(0, 1fr);
+    grid-template-areas:
+      "vehicle fare"
+      "cta cta";
+    gap:8px 10px;
+    align-items:start;
+    padding:8px 0 0;
+    border-top:0;
+    background:#0f1113;
+  }
+
+  .tours-mobile-config-step__vehicle{
+    grid-area:vehicle;
+    align-self:start;
+    justify-self:start;
+    width:136px;
+    max-width:136px;
+    min-width:136px;
+  }
+
+  .tours-mobile-config-step__vehicle-image{
+    display:block;
+    width:136px;
+    height:108px;
+    border-radius:9px;
+    object-fit:cover;
+    object-position:center 77%;
+  }
+
+  .tours-mobile-config-step__fare{
+    grid-area:fare;
+    width:100%;
+    min-width:0;
+    max-width:none;
+    min-height:112px;
+    height:112px;
+    max-height:112px;
+    margin:0;
+    padding:16px 12px;
+    border:0;
+    border-radius:0;
+    background:
+      linear-gradient(135deg, rgba(255,249,238,.04), rgba(31,122,109,.05) 48%, rgba(15,17,19,.60));
+    background-color:transparent;
+    box-shadow:none;
+    display:grid;
+    grid-template-rows:auto 1fr;
+    row-gap:6px;
+    align-items:center;
+    justify-content:start;
+    overflow:visible;
+  }
+
+  .tours-mobile-config-step__fare-label{
+    grid-row:1;
+    align-self:end;
+    justify-self:start;
+    margin:0;
+    color:rgba(247,226,170,.92);
+    font-size:13px;
+    line-height:1.1;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .tours-mobile-config-step__fare-value{
+    grid-row:2;
+    align-self:center;
+    justify-self:start;
+    min-height:0;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    color:rgba(255,249,238,.98);
+    line-height:.96;
+    white-space:normal;
+  }
+
+  .tours-mobile-config-step__fare-amount{
+    display:inline-block;
+    color:rgba(255,249,238,.98);
+    font-size:46px;
+    line-height:.96;
+    font-weight:500;
+    letter-spacing:-.045em;
+  }
+
+  .tours-mobile-config-step__fare-currency{
+    display:inline-block;
+    padding-bottom:0;
+    color:rgba(61,158,122,.98);
+    font-size:14px;
+    line-height:1;
+    font-weight:800;
+    letter-spacing:.02em;
+    transform:translateY(4px);
+  }
+
+  .tours-mobile-config-step__cta{
+    grid-area:cta;
+    width:100%;
+    min-height:50px;
+    padding:0 16px;
+    border:0;
+    border-radius:9px;
+    background:rgba(31,122,109,.86);
+    color:rgba(255,249,238,.98);
+    box-shadow:none;
+    font-size:14px;
+    line-height:1;
+    font-weight:800;
+    transform:none;
+    white-space:nowrap;
+  }
+
+  .tours-mobile-config-step__cta:hover{
+    background:rgba(31,122,109,.86);
+    box-shadow:none;
+    transform:none;
+  }
+
+  .tours-mobile-config-step__cta[disabled],
+  .tours-mobile-config-step__cta[aria-disabled="true"]{
+    background:rgba(255,245,228,.14);
+    color:rgba(255,245,228,.38);
+    border:0;
+    box-shadow:none;
+    opacity:1;
+    cursor:not-allowed;
+  }
+
+  .tours-mobile-config__pickup{
+    grid-column:auto !important;
+    grid-row:auto !important;
+    grid-area:auto !important;
+    position:static !important;
+    width:100% !important;
+    max-width:none !important;
+    min-width:0 !important;
+    margin:0 !important;
+    display:grid !important;
+    grid-template-rows:auto 48px !important;
+    gap:6px !important;
+    justify-self:stretch !important;
+    align-self:stretch !important;
+  }
+
+  .tours-mobile-config__pickup .services-hourly-panel__label{
+    margin:0;
+    color:rgba(255,245,228,.74);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .tours-mobile-config__pickup .place-autocomplete,
+  .tours-mobile-config__pickup .services-hourly-panel__pickup-autocomplete{
+    position:relative !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    max-height:48px !important;
+    overflow:visible !important;
+  }
+
+  .tours-mobile-config__pickup .place-autocomplete input,
+  .tours-mobile-config__pickup .services-hourly-panel__control{
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    max-height:48px !important;
+    padding:0 40px 0 38px !important;
+    border:1px solid rgba(236,220,189,.38) !important;
+    border-radius:9px !important;
+    background-color:rgba(15,17,19,.46) !important;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='10.8' cy='10.8' r='5.8' stroke='%23fff9ee' stroke-width='2'/%3E%3Cpath d='M15.2 15.2 20 20' stroke='%23fff9ee' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+    background-repeat:no-repeat !important;
+    background-position:14px center !important;
+    background-size:18px 18px !important;
+    color:rgba(255,249,238,.96) !important;
+    box-shadow:none !important;
+    box-sizing:border-box !important;
+    font:inherit !important;
+    font-size:14px !important;
+    line-height:48px !important;
+    font-weight:650 !important;
+    -webkit-appearance:none !important;
+    appearance:none !important;
+    cursor:text;
+  }
+
+  .tours-mobile-config__pickup .place-autocomplete input::placeholder,
+  .tours-mobile-config__pickup .services-hourly-panel__control::placeholder{
+    color:rgba(255,245,228,.58) !important;
+    opacity:1 !important;
+  }
+
+  .tours-mobile-config__pickup .place-autocomplete input:focus,
+  .tours-mobile-config__pickup .services-hourly-panel__control:focus{
+    outline:none !important;
+    border-color:rgba(31,122,109,.78) !important;
+    background-color:rgba(15,17,19,.62) !important;
+  }
+
+  .tours-mobile-config__pickup .place-autocomplete__clear{
+    position:absolute !important;
+    top:50% !important;
+    right:8px !important;
+    z-index:3 !important;
+    width:30px !important;
+    height:30px !important;
+    transform:translateY(-50%) !important;
+    border:0 !important;
+    border-radius:999px !important;
+    background:rgba(255,255,255,.05) !important;
+    color:rgba(255,245,228,.74) !important;
+    box-shadow:none !important;
+    font:inherit !important;
+    font-size:18px !important;
+    line-height:1 !important;
+    font-weight:600 !important;
+  }
+
+  .tours-mobile-config__pickup .place-autocomplete__clear[hidden]{
+    display:none !important;
+  }
+
+  .tours-mobile-config__pickup [data-tours-mobile-pickup-compact-mount],
+  .tours-mobile-config__pickup .place-autocomplete__panel,
+  .tours-mobile-config__pickup .place-autocomplete__status{
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+  }
+  
+    .tours-mobile-config__date,
+  .tours-mobile-config__time{
+    grid-column:auto !important;
+    grid-row:auto !important;
+    grid-area:auto !important;
+    position:static !important;
+    display:grid !important;
+    grid-template-rows:auto 48px !important;
+    gap:6px !important;
+    min-width:0 !important;
+    margin:0 !important;
+    justify-self:stretch !important;
+    align-self:start !important;
+  }
+
+  .tours-mobile-config__date{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .tours-mobile-config__time{
+    width:112px !important;
+    max-width:112px !important;
+    min-width:112px !important;
+    justify-self:end !important;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__label,
+  .tours-mobile-config__time .services-hourly-panel__label{
+    margin:0;
+    color:rgba(255,245,228,.74);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+    white-space:nowrap;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__date-wrap,
+  .tours-mobile-config__time .services-hourly-panel__date-wrap{
+    position:relative;
+    height:48px !important;
+    min-height:48px !important;
+    max-height:48px !important;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__control,
+  .tours-mobile-config__time .services-hourly-panel__control{
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    max-height:48px !important;
+    padding:0 34px 0 12px !important;
+    border:1px solid rgba(236,220,189,.38) !important;
+    border-radius:9px !important;
+    background:rgba(15,17,19,.46) !important;
+    color:rgba(255,249,238,.96) !important;
+    box-shadow:none !important;
+    box-sizing:border-box !important;
+    font:inherit !important;
+    font-size:13px !important;
+    line-height:48px !important;
+    font-weight:650 !important;
+    color-scheme:dark !important;
+    -webkit-appearance:none !important;
+    appearance:none !important;
+  }
+
+  .tours-mobile-config__time input[type="time"]{
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    max-height:48px !important;
+    margin:0 !important;
+    padding:0 28px 0 12px !important;
+    border:1px solid rgba(236,220,189,.38) !important;
+    border-radius:9px !important;
+    background-color:rgba(15,17,19,.46) !important;
+    color:rgba(255,249,238,.96) !important;
+    box-shadow:none !important;
+    box-sizing:border-box !important;
+    font:inherit !important;
+    font-size:13px !important;
+    line-height:normal !important;
+    font-weight:650 !important;
+    color-scheme:dark !important;
+    -webkit-appearance:none !important;
+    appearance:none !important;
+  }
+
+  .tours-mobile-config__time input[type="time"]::-webkit-datetime-edit{
+    height:48px !important;
+    min-height:48px !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+
+  .tours-mobile-config__time input[type="time"]::-webkit-datetime-edit-fields-wrapper{
+    display:flex !important;
+    align-items:center !important;
+    height:48px !important;
+    min-height:48px !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+
+  .tours-mobile-config__time input[type="time"]::-webkit-datetime-edit-hour-field,
+  .tours-mobile-config__time input[type="time"]::-webkit-datetime-edit-minute-field,
+  .tours-mobile-config__time input[type="time"]::-webkit-datetime-edit-text{
+    padding:0 !important;
+    margin:0 !important;
+    line-height:1 !important;
+  }
+
+  .tours-mobile-config__time input[type="time"]::-webkit-date-and-time-value{
+    min-height:48px !important;
+    height:48px !important;
+    line-height:48px !important;
+    padding:0 !important;
+    margin:0 !important;
+    text-align:left !important;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__control:focus,
+  .tours-mobile-config__time .services-hourly-panel__control:focus{
+    outline:none !important;
+    border-color:rgba(31,122,109,.78) !important;
+    background-color:rgba(15,17,19,.62) !important;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__date-overlay,
+  .tours-mobile-config__time .services-hourly-panel__date-overlay{
+    position:absolute;
+    top:50%;
+    left:12px;
+    transform:translateY(-50%);
+    color:rgba(255,245,228,.58);
+    font-size:13px;
+    line-height:1;
+    white-space:nowrap;
+    pointer-events:none;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__date-icon,
+  .tours-mobile-config__time .services-hourly-panel__date-icon{
+    position:absolute;
+    top:50%;
+    right:9px;
+    width:16px;
+    height:16px;
+    transform:translateY(-50%);
+    color:rgba(255,245,228,.68);
+    pointer-events:none;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__control::-webkit-calendar-picker-indicator,
+  .tours-mobile-config__time .services-hourly-panel__control::-webkit-calendar-picker-indicator{
+    position:absolute;
+    right:0;
+    width:24px;
+    height:48px;
+    opacity:0;
+    cursor:pointer;
+  }
+
+  .tours-mobile-config__date .services-hourly-panel__control:not(:placeholder-shown) + .services-hourly-panel__date-overlay,
+  .tours-mobile-config__time .services-hourly-panel__control:not(:placeholder-shown) + .services-hourly-panel__date-overlay{
+    display:none;
+  }
+  
+    .tours-mobile-config__passengers{
+    flex:0 0 auto;
+    width:auto;
+    min-width:0;
+    margin-right:2px !important;
+    display:grid;
+    grid-template-rows:auto 48px;
+    align-items:start;
+    gap:6px;
+  }
+
+  .tours-mobile-config__passengers .airport-mobile-passengers__label{
+    display:grid;
+    gap:6px;
+    min-width:0;
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+    color:rgba(255,245,228,.74);
+    white-space:nowrap;
+  }
+
+  .tours-mobile-config__passengers .airport-mobile-passengers__select{
+    width:84px;
+    max-width:84px;
+    min-width:84px;
+    min-height:48px;
+    height:48px;
+    padding:0 8px;
+    border-radius:9px;
+    border:1px solid rgba(236,220,189,.38);
+    background-color:rgba(15,17,19,.46);
+    color:rgba(255,249,238,.96);
+    font:inherit;
+    font-size:13px;
+    line-height:48px;
+    font-weight:700;
+    text-align:center;
+    text-align-last:center;
+    box-shadow:none;
+    color-scheme:dark;
+  }
+
+  .tours-mobile-config__passengers .airport-mobile-passengers__select:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+  
+  .tours-mobile-guide-inline{
+    display:grid;
+    grid-template-columns:116px minmax(0, 1fr);
+    gap:9px;
+    min-width:0;
+    margin-top:2px;
+    padding-top:2px;
+    align-items:end;
+  }
+
+  .tours-mobile-guide-inline__top{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:6px;
+    align-items:start;
+    min-width:0;
+  }
+
+  .tours-mobile-guide-inline__label{
+    color:rgba(255,245,228,.74);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .tours-mobile-guide-inline__choice{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:2px;
+    width:116px;
+    padding:2px;
+    border:1px solid rgba(236,220,189,.30);
+    border-radius:8px;
+    background:rgba(15,17,19,.34);
+    justify-self:start;
+  }
+
+  .tours-mobile-guide-inline__choice-option{
+    min-height:34px;
+    padding:0 8px;
+    border:0;
+    border-radius:6px;
+    background:transparent;
+    color:rgba(255,245,228,.72);
+    font:inherit;
+    font-size:12.5px;
+    line-height:1;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .tours-mobile-guide-inline__choice-option[aria-pressed="true"]{
+    background:rgba(31,122,109,.72);
+    color:rgba(255,249,238,.98);
+    box-shadow:none;
+  }
+
+  .tours-mobile-guide-inline__language{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:6px;
+    align-items:start;
+    min-width:0;
+  }
+
+  .tours-mobile-guide-inline__language[hidden]{
+    display:none !important;
+  }
+
+  .tours-mobile-guide-inline__language-label{
+    color:rgba(255,245,228,.64);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .tours-mobile-guide-inline__language-options{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:2px;
+    justify-self:stretch;
+    width:100%;
+    padding:2px;
+    border:1px solid rgba(236,220,189,.30);
+    border-radius:8px;
+    background:rgba(15,17,19,.34);
+    box-sizing:border-box;
+  }
+
+  .tours-mobile-guide-inline__language-option{
+    width:100%;
+    min-width:0;
+    min-height:34px;
+    padding:0 6px;
+    border:0;
+    border-radius:6px;
+    background:transparent;
+    color:rgba(255,245,228,.72);
+    box-shadow:none;
+    font:inherit;
+    font-size:11.5px;
+    line-height:1;
+    font-weight:750;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .tours-mobile-guide-inline__language-option[aria-pressed="true"]{
+    background:rgba(31,122,109,.72);
+    color:rgba(255,249,238,.98);
+  }
+
+  .tours-mobile-guide-inline__choice-option:focus-visible,
+  .tours-mobile-guide-inline__language-option:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+}

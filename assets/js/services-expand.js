@@ -97,6 +97,7 @@
         mobileQuery.matches &&
         (
           rawService === 'airport_hotel' ||
+          rawService === 'tour_private' ||
           rawService === 'hourly_daily'
         )
       ) {

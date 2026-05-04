@@ -3,27 +3,28 @@
     "cards": {
       "tours": {
         "title": "私人游览与参观",
-        "text": "前往标志性地点的私人行程，具有清晰的配置流程，并从出发到返回都提供细致周到的服务。",
+        "text": "前往标志性地点的私人行程，从出发到返回都提供清晰配置与细致服务。",
         "bullets": [
-          "固定游览方案",
-          "预先配置",
+          "私人行程",
+          "提前配置",
           "个性化服务"
         ],
-        "priceLabel": "价格起",
+        "priceLabel": "起价",
         "priceValue": "4.000 MXN",
-        "ctaClosed": "查看游览项目",
-        "ctaOpen": "隐藏游览项目",
+        "ctaClosed": "查看游览",
+        "ctaOpen": "隐藏游览",
         "panel": {
-          "title": "选择您的游览项目",
-          "text": "请先选择您感兴趣的路线。之后，您可以配置乘客人数、接载地点、日期、时间，以及在适用情况下配置导游和语言。",
-          "selectedTourLabel": "已选游览项目",
+          "title": "选择你的游览",
+          "text": "请先选择感兴趣的路线。随后可配置乘客、接送地点、日期、时间，以及适用时的导游和语言。",
+          "selectedTourLabel": "已选游览",
           "durationLabel": "时长",
-          "priceFromLabel": "价格起",
-          "pickupLabel": "接载",
-          "pickupPlaceholder": "请输入接载地点",
-          "pickupHelp": "接载地点用于运营可行性确认，但不会改变价格。",
+          "priceFromLabel": "起价",
+          "pickupLabel": "接送地点",
+          "pickupPlaceholder": "请输入接送地点",
+          "pickupHelp": "接送地点用于验证运营可行性，但不会改变价格。",
           "dateLabel": "日期",
           "timeLabel": "时间",
+          "departureTimeLabel": "出发时间",
           "passengersLabel": "乘客",
           "guideLabel": "导游",
           "guideIncludedLabel": "含导游",
@@ -32,46 +33,46 @@
           "guideLanguagePlaceholder": "选择语言",
           "priceLabel": "最终价格",
           "priceValuePending": "—",
-          "cta": "请求",
-          "ctaDisabled": "请完成配置",
-          "emptyStateTitle": "请选择一个游览项目",
-          "emptyStateText": "请先从目录中选择一个选项，以查看其配置和最终价格。",
-          "changeTourConfirm": "如果您更改游览项目，我们将重新检查当前配置，并仅保留兼容的数据。是否继续？",
+          "cta": "提交请求",
+          "ctaDisabled": "完成配置",
+          "emptyStateTitle": "选择游览",
+          "emptyStateText": "请先从目录中选择一个选项，以查看配置和最终价格。",
+          "changeTourConfirm": "如果更改游览，我们将检查当前配置并仅保留兼容的数据。是否继续？",
           "confirmAccept": "继续",
           "confirmCancel": "取消",
           "catalog": {
             "teotihuacan": {
               "title": "特奥蒂瓦坎金字塔",
-              "description": "通过含往返接送和门票的私人行程，以您自己的节奏探索特奥蒂瓦坎。",
-              "duration": "6小时",
+              "description": "通过私人体验探索特奥蒂瓦坎，包含往返接送、门票，并可按自己的节奏参观。",
+              "duration": "6 小时",
               "priceFrom": "4.000 MXN",
               "imageAlt": "特奥蒂瓦坎金字塔"
             },
             "teotihuacan_basilica": {
-              "title": "特奥蒂瓦坎金字塔 + 瓜达卢佩圣母大殿",
-              "description": "在含往返接送和门票的一日私人行程中，探索特奥蒂瓦坎和圣母大殿，充分利用参观时间。",
-              "duration": "9小时",
+              "title": "特奥蒂瓦坎金字塔 + 瓜达卢佩圣母大教堂",
+              "description": "通过全天私人体验探索特奥蒂瓦坎和大教堂，包含往返接送、门票，并安排充足参观时间。",
+              "duration": "9 小时",
               "priceFrom": "5.000 MXN",
-              "imageAlt": "特奥蒂瓦坎金字塔和瓜达卢佩圣母大殿"
+              "imageAlt": "特奥蒂瓦坎金字塔和瓜达卢佩大教堂"
             },
             "xochimilco_coyoacan": {
-              "title": "索奇米尔科 + 科约阿坎",
-              "description": "通过含往返接送的私人行程，以从容舒适的方式体验墨西哥城两个最具代表性的地方：索奇米尔科和科约阿坎。",
-              "duration": "6小时",
+              "title": "霍奇米尔科 + 科约阿坎",
+              "description": "通过含往返接送的私人行程游览霍奇米尔科和科约阿坎，舒适从容地体验墨西哥城两个标志性地点。",
+              "duration": "6 小时",
               "priceFrom": "4.500 MXN",
-              "imageAlt": "索奇米尔科和科约阿坎"
+              "imageAlt": "霍奇米尔科和科约阿坎"
             },
             "cholula_puebla": {
               "title": "乔卢拉 + 普埃布拉",
-              "description": "从墨西哥城出发，享受一整天的私人行程前往乔卢拉和普埃布拉，并拥有充足时间按自己的节奏参观。",
-              "duration": "9小时",
+              "description": "通过从墨西哥城出发的全天私人体验探索乔卢拉和普埃布拉，并拥有足够时间按自己的节奏参观。",
+              "duration": "9 小时",
               "priceFrom": "7.200 MXN",
               "imageAlt": "乔卢拉和普埃布拉"
             },
             "san_miguel_allende": {
               "title": "圣米格尔-德阿连德",
-              "description": "从墨西哥城出发的私人行程，旨在让您以舒适且不慌不忙的方式体验圣米格尔-德阿连德。",
-              "duration": "10小时",
+              "description": "通过从墨西哥城出发的私人行程探索圣米格尔-德阿连德，舒适参观，无需不必要的匆忙。",
+              "duration": "10 小时",
               "priceFrom": "7.800 MXN",
               "imageAlt": "圣米格尔-德阿连德"
             }
@@ -93,26 +94,68 @@
         },
         "contact": {
           "serviceLabel": "私人游览与参观",
-          "helper": "请选择游览项目，并在发送请求前完成运营配置。",
-          "tourLabel": "游览项目",
-          "tourPlaceholder": "选择游览项目",
+          "helper": "请选择游览并完成运营配置后再发送请求。",
+          "tourLabel": "游览",
+          "tourPlaceholder": "选择游览",
           "passengersLabel": "乘客",
-          "pickupLabel": "接载",
-          "pickupPlaceholder": "请输入接载地点",
+          "pickupLabel": "接送地点",
+          "pickupPlaceholder": "请输入接送地点",
           "dateLabel": "游览日期",
           "timeLabel": "出发时间",
           "timePlaceholder": "出发时间",
           "guideLabel": "导游",
           "guideLanguageLabel": "导游语言",
           "guideLanguagePlaceholder": "选择语言",
-          "summaryTourLabel": "游览项目",
+          "summaryTourLabel": "游览",
           "summaryDurationLabel": "时长",
           "summaryTicketsLabel": "门票",
           "summaryPriceLabel": "最终价格"
         },
+        "mobileContactStep": {
+          "fields": {
+            "name": "全名",
+            "phone": "带国际区号的电话/WhatsApp",
+            "email": "电子邮箱",
+            "notes": "游览备注"
+          },
+          "placeholders": {
+            "name": "你的姓名",
+            "phone": "例如 +525512345678",
+            "email": "you@email.com",
+            "notes": "酒店、准确接送点、时间或重要细节"
+          },
+          "summary": {
+            "title": "游览摘要",
+            "tour": "游览",
+            "duration": "时长",
+            "pickup": "接送地点",
+            "date": "日期",
+            "time": "出发时间",
+            "passengers": "乘客",
+            "guide": "导游",
+            "guideLanguage": "语言",
+            "price": "最终价格"
+          },
+          "cta": {
+            "submit": "请求确认"
+          },
+          "notesEditor": {
+            "title": "游览备注",
+            "save": "保存备注",
+            "clear": "×",
+            "placeholder": "酒店、准确接送点、时间或重要细节"
+          },
+          "validation": {
+            "name": "请输入全名。",
+            "phone": "请输入有效的国际格式电话号码。",
+            "email": "请输入有效的电子邮箱。",
+            "notes": "",
+            "formIncomplete": "继续前请检查标记的字段。"
+          }
+        },
         "whatsapp": {
-          "tour": "游览项目",
-          "pickup": "接载",
+          "tour": "游览",
+          "pickup": "接送地点",
           "guide": "导游",
           "guideLanguage": "导游语言",
           "price": "最终价格",

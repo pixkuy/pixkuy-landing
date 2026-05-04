@@ -2,11 +2,11 @@
   "services": {
     "cards": {
       "tours": {
-        "title": "Private Touren und Besuche",
-        "text": "Private Fahrten zu emblematischen Orten mit klarer Konfiguration und sorgfältiger Betreuung vom Start bis zur Rückkehr.",
+        "title": "Private Touren und Besichtigungen",
+        "text": "Private Fahrten zu bekannten Orten mit klarer Konfiguration und sorgfältiger Betreuung von der Abfahrt bis zur Rückkehr.",
         "bullets": [
-          "Vorgegebene Touren",
-          "Vorkonfiguration",
+          "Geschlossene Touren",
+          "Vorabkonfiguration",
           "Persönliche Betreuung"
         ],
         "priceLabel": "Preis ab",
@@ -15,15 +15,16 @@
         "ctaOpen": "Touren ausblenden",
         "panel": {
           "title": "Wähle deine Tour",
-          "text": "Wähle zuerst die Route, die dich interessiert. Danach kannst du Passagiere, Abholung, Datum, Uhrzeit und, wenn zutreffend, Guide und Sprache konfigurieren.",
+          "text": "Wähle zuerst die Route aus, die dich interessiert. Danach kannst du Passagiere, Abholung, Datum, Uhrzeit und, falls zutreffend, Guide und Sprache konfigurieren.",
           "selectedTourLabel": "Ausgewählte Tour",
           "durationLabel": "Dauer",
           "priceFromLabel": "Preis ab",
           "pickupLabel": "Abholung",
           "pickupPlaceholder": "Abholpunkt angeben",
-          "pickupHelp": "Der Abholpunkt dient der operativen Prüfung, ändert jedoch nicht den Preis.",
+          "pickupHelp": "Der Abholpunkt dient der operativen Prüfung, ändert aber nicht den Preis.",
           "dateLabel": "Datum",
           "timeLabel": "Uhrzeit",
+          "departureTimeLabel": "Abfahrtszeit",
           "passengersLabel": "Passagiere",
           "guideLabel": "Guide",
           "guideIncludedLabel": "Mit Guide",
@@ -34,43 +35,43 @@
           "priceValuePending": "—",
           "cta": "Anfragen",
           "ctaDisabled": "Konfiguration abschließen",
-          "emptyStateTitle": "Wähle eine Tour",
-          "emptyStateText": "Wähle zuerst eine Option aus dem Katalog, um ihre Konfiguration und den Endpreis zu sehen.",
+          "emptyStateTitle": "Tour auswählen",
+          "emptyStateText": "Wähle zuerst eine Option aus dem Katalog, um Konfiguration und Endpreis zu sehen.",
           "changeTourConfirm": "Wenn du die Tour änderst, prüfen wir die aktuelle Konfiguration und behalten nur kompatible Daten bei. Möchtest du fortfahren?",
-          "confirmAccept": "Fortfahren",
+          "confirmAccept": "Weiter",
           "confirmCancel": "Abbrechen",
           "catalog": {
             "teotihuacan": {
-              "title": "Pyramiden von Teotihuacán",
-              "description": "Entdecke Teotihuacán in einem privaten Erlebnis mit Hin- und Rücktransfer, inkludierten Eintrittskarten und einem Besuch in deinem eigenen Tempo.",
+              "title": "Pyramiden von Teotihuacan",
+              "description": "Entdecke Teotihuacan in einem privaten Erlebnis mit Hin- und Rücktransfer, inklusive Eintrittskarten und Besuch in deinem eigenen Tempo.",
               "duration": "6 Stunden",
               "priceFrom": "4.000 MXN",
               "imageAlt": "Pyramiden von Teotihuacán"
             },
             "teotihuacan_basilica": {
-              "title": "Pyramiden von Teotihuacán + Basilika Santa María de Guadalupe",
-              "description": "Entdecke Teotihuacán und die Basilika in einem privaten Ganztageserlebnis mit Hin- und Rücktransfer, inkludierten Eintrittskarten und einem gut genutzten Besuch.",
+              "title": "Pyramiden von Teotihuacan + Basilika Santa María de Guadalupe",
+              "description": "Entdecke Teotihuacan und die Basilika in einem privaten Ganztagserlebnis mit Hin- und Rücktransfer, inklusive Eintrittskarten und gut genutzter Besuchszeit.",
               "duration": "9 Stunden",
               "priceFrom": "5.000 MXN",
               "imageAlt": "Pyramiden von Teotihuacán und Basilika von Guadalupe"
             },
             "xochimilco_coyoacan": {
               "title": "Xochimilco + Coyoacán",
-              "description": "Genieße Xochimilco und Coyoacán in einer privaten Tour mit Hin- und Rücktransfer, konzipiert, um zwei der emblematischsten Orte von Mexiko-Stadt mit Ruhe und Komfort zu erleben.",
+              "description": "Genieße Xochimilco und Coyoacán auf einer privaten Tour mit Hin- und Rücktransfer, gedacht für zwei der bekanntesten Orte von Mexiko-Stadt in Ruhe und Komfort.",
               "duration": "6 Stunden",
               "priceFrom": "4.500 MXN",
               "imageAlt": "Xochimilco und Coyoacán"
             },
             "cholula_puebla": {
               "title": "Cholula + Puebla",
-              "description": "Erkunde Cholula und Puebla in einem privaten Ganztageserlebnis mit Transfer ab Mexiko-Stadt und ausreichend Zeit, den Besuch in deinem eigenen Tempo zu genießen.",
+              "description": "Entdecke Cholula und Puebla in einem privaten Ganztagserlebnis mit Transfer ab Mexiko-Stadt und genügend Zeit für einen Besuch in deinem eigenen Tempo.",
               "duration": "9 Stunden",
               "priceFrom": "7.200 MXN",
               "imageAlt": "Cholula und Puebla"
             },
             "san_miguel_allende": {
               "title": "San Miguel de Allende",
-              "description": "Entdecke San Miguel de Allende in einer privaten Tour mit Transfer ab Mexiko-Stadt, konzipiert, um den Besuch komfortabel und ohne unnötige Eile zu genießen.",
+              "description": "Entdecke San Miguel de Allende auf einer privaten Tour mit Transfer ab Mexiko-Stadt, gedacht für einen komfortablen Besuch ohne unnötige Eile.",
               "duration": "10 Stunden",
               "priceFrom": "7.800 MXN",
               "imageAlt": "San Miguel de Allende"
@@ -92,8 +93,8 @@
           }
         },
         "contact": {
-          "serviceLabel": "Private Touren und Besuche",
-          "helper": "Wähle die Tour aus und vervollständige die operative Konfiguration, bevor du die Anfrage absendest.",
+          "serviceLabel": "Private Touren und Besichtigungen",
+          "helper": "Wähle die Tour aus und vervollständige die operative Konfiguration, bevor du die Anfrage sendest.",
           "tourLabel": "Tour",
           "tourPlaceholder": "Tour auswählen",
           "passengersLabel": "Passagiere",
@@ -109,6 +110,48 @@
           "summaryDurationLabel": "Dauer",
           "summaryTicketsLabel": "Eintrittskarten",
           "summaryPriceLabel": "Endpreis"
+        },
+        "mobileContactStep": {
+          "fields": {
+            "name": "Vollständiger Name",
+            "phone": "Telefon/WhatsApp mit internationaler Vorwahl",
+            "email": "E-Mail",
+            "notes": "Hinweise zur Tour"
+          },
+          "placeholders": {
+            "name": "Dein Name",
+            "phone": "Z. B. +525512345678",
+            "email": "du@email.com",
+            "notes": "Hotel, genauer Abholpunkt, Uhrzeiten oder wichtige Details"
+          },
+          "summary": {
+            "title": "Tour-Zusammenfassung",
+            "tour": "Tour",
+            "duration": "Dauer",
+            "pickup": "Abholung",
+            "date": "Datum",
+            "time": "Abfahrtszeit",
+            "passengers": "Passagiere",
+            "guide": "Guide",
+            "guideLanguage": "Sprache",
+            "price": "Endpreis"
+          },
+          "cta": {
+            "submit": "Bestätigung anfragen"
+          },
+          "notesEditor": {
+            "title": "Hinweise zur Tour",
+            "save": "Hinweise speichern",
+            "clear": "×",
+            "placeholder": "Hotel, genauer Abholpunkt, Uhrzeiten oder wichtige Details"
+          },
+          "validation": {
+            "name": "Gib deinen vollständigen Namen ein.",
+            "phone": "Gib eine gültige Telefonnummer im internationalen Format ein.",
+            "email": "Gib eine gültige E-Mail-Adresse ein.",
+            "notes": "",
+            "formIncomplete": "Prüfe die markierten Felder, bevor du fortfährst."
+          }
         },
         "whatsapp": {
           "tour": "Tour",
