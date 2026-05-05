@@ -75,6 +75,22 @@
     return Array.from(modal.querySelectorAll("[data-contact-success-close]"));
   }
 
+  function blurActiveElementInside(node) {
+    var activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
+
   function setOpen(modal, open) {
     var panel;
 
@@ -98,6 +114,8 @@
 
       return true;
     }
+
+    blurActiveElementInside(modal);
 
     modal.hidden = true;
     modal.setAttribute("aria-hidden", "true");

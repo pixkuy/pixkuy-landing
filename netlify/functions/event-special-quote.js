@@ -462,8 +462,8 @@ exports.handler = async function handler(event) {
     return fail(400, "EVENT_VENUE_MISMATCH", "services.cards.events.states.priceUnavailable");
   }
 
-  if (!isEventEligible(selectedEvent, selectedVenue)) {
-    return fail(409, "EVENT_NOT_ELIGIBLE", "services.cards.events.states.priceUnavailable");
+  if (selectedEvent.active !== true) {
+    return fail(409, "EVENT_INACTIVE", "services.cards.events.states.priceUnavailable");
   }
 
   const venueWaypoint = buildWaypointFromVenue(selectedVenue);

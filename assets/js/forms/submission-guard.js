@@ -336,7 +336,7 @@
 
   function lockForm(form) {
     const buttons = form
-      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-hourly-mobile-contact-submit], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit]'))
+      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-hourly-mobile-contact-submit], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit], [data-events-mobile-contact-submit]'))
       : [];
 
     if (!form) {

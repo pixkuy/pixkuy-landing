@@ -30,6 +30,11 @@
           "eventCta": "Configurar transfer",
           "continueCta": "Continuar solicitação",
           "posterAlt": "Cartaz do evento",
+          "posterCloseLabel": "Fechar cartaz do evento",
+          "addressOriginPickupLabel": "Digite sua origem e a hora de retirada para o evento",
+          "addressReturnDestinationPickupLabel": "Digite seu destino e a hora de retirada após o evento",
+          "addressOriginSearchSheetLabel": "Digite o endereço onde vamos buscá-lo",
+          "addressDestinationSearchSheetLabel": "Digite o destino para onde vamos levá-lo após o evento",
           "configurationTitle": "Configure seu transfer",
           "configurationIntro": "Selecione a modalidade, o endereço e os passageiros para calcular o preço.",
           "quotePending": "Complete os dados para calcular o preço.",
@@ -64,6 +69,28 @@
           "selectEvent": "Selecione um evento para configurar seu transfer.",
           "priceUnavailable": "Preço indisponível.",
           "ready": "Transfer pronto para continuar."
+        },
+        "mobileFlow": {
+          "continue": "Continuar",
+          "back": "Voltar",
+          "title": "Próximos eventos",
+          "loading": "Carregando eventos...",
+          "empty": "No momento, não há eventos em destaque disponíveis para reserva."
+        },
+        "mobileContact": {
+          "notesSave": "Salvar",
+          "notesClear": "Limpar observações"
+        },
+        "mobileFarePending": {
+          "template": "Complete {fields} para calcular o preço.",
+          "separator": ",",
+          "finalSeparator": "e",
+          "fields": {
+            "origin": "origem",
+            "originTime": "hora de retirada na origem",
+            "destination": "destino após o evento",
+            "returnTime": "hora de retirada após o evento"
+          }
         },
         "spotlight": {
           "label": "Evento com transfer disponível",

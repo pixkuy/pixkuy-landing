@@ -267,7 +267,8 @@
 
   .services-cards > .service-card:has([data-i18n="services.cards.airport.title"]),
   .services-cards > .service-card:has([data-i18n="services.cards.tours.title"]),
-  .services-cards > .service-card:has([data-i18n="services.cards.hourly.title"]){
+  .services-cards > .service-card:has([data-i18n="services.cards.hourly.title"]),
+  .services-cards > .service-card:has([data-i18n="services.cards.events.title"]){
     display:none !important;
   }
 

@@ -30,6 +30,11 @@
           "eventCta": "Transfer konfigurieren",
           "continueCta": "Anfrage fortsetzen",
           "posterAlt": "Eventposter",
+          "posterCloseLabel": "Eventposter schließen",
+          "addressOriginPickupLabel": "Gib deinen Abholort und die Abholzeit für das Event ein",
+          "addressReturnDestinationPickupLabel": "Gib dein Ziel und die Abholzeit nach dem Event ein",
+          "addressOriginSearchSheetLabel": "Gib die Adresse ein, an der wir dich abholen",
+          "addressDestinationSearchSheetLabel": "Gib das Ziel ein, zu dem wir dich nach dem Event bringen",
           "configurationTitle": "Konfiguriere deinen Transfer",
           "configurationIntro": "Wähle Modalität, Adresse und Passagiere aus, um den Preis zu berechnen.",
           "quotePending": "Vervollständige die Angaben, um den Preis zu berechnen.",
@@ -64,6 +69,28 @@
           "selectEvent": "Wähle ein Event aus, um deinen Transfer zu konfigurieren.",
           "priceUnavailable": "Preis nicht verfügbar.",
           "ready": "Der Transfer ist bereit, um fortzufahren."
+        },
+        "mobileFlow": {
+          "continue": "Weiter",
+          "back": "Zurück",
+          "title": "Nächste Events",
+          "loading": "Events werden geladen...",
+          "empty": "Zurzeit sind keine ausgewählten Events für Reservierungen verfügbar."
+        },
+        "mobileContact": {
+          "notesSave": "Speichern",
+          "notesClear": "Hinweise löschen"
+        },
+        "mobileFarePending": {
+          "template": "Vervollständige {fields}, um den Preis zu berechnen.",
+          "separator": ",",
+          "finalSeparator": "und",
+          "fields": {
+            "origin": "Abholort",
+            "originTime": "Abholzeit am Ursprung",
+            "destination": "Ziel nach dem Event",
+            "returnTime": "Abholzeit nach dem Event"
+          }
         },
         "spotlight": {
           "label": "Event mit verfügbarem Transfer",
@@ -118,6 +145,10 @@
           "zocalo_reforma": {
             "name": "Zócalo / Reforma",
             "address": "Centro / Reforma, Mexiko-Stadt"
+          },
+          "polanco_fyja": {
+            "name": "FYJA Polanco",
+            "address": "Polanco, Mexiko-Stadt"
           }
         },
         "catalog": {

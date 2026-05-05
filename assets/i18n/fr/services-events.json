@@ -30,6 +30,11 @@
           "eventCta": "Configurer le transfert",
           "continueCta": "Continuer la demande",
           "posterAlt": "Affiche de l’événement",
+          "posterCloseLabel": "Fermer l’affiche de l’événement",
+          "addressOriginPickupLabel": "Saisissez votre origine et l’heure de prise en charge pour l’événement",
+          "addressReturnDestinationPickupLabel": "Saisissez votre destination et l’heure de prise en charge après l’événement",
+          "addressOriginSearchSheetLabel": "Saisissez l’adresse où nous viendrons vous chercher",
+          "addressDestinationSearchSheetLabel": "Saisissez la destination où nous vous conduirons après l’événement",
           "configurationTitle": "Configurez votre transfert",
           "configurationIntro": "Sélectionnez la modalité, l’adresse et le nombre de passagers pour calculer le prix.",
           "quotePending": "Complétez les informations pour calculer le prix.",
@@ -64,6 +69,28 @@
           "selectEvent": "Sélectionnez un événement pour configurer votre transfert.",
           "priceUnavailable": "Prix non disponible.",
           "ready": "Transfert prêt à continuer."
+        },
+        "mobileFlow": {
+          "continue": "Continuer",
+          "back": "Retour",
+          "title": "Prochains événements",
+          "loading": "Chargement des événements...",
+          "empty": "Aucun événement mis en avant n’est disponible à la réservation pour le moment."
+        },
+        "mobileContact": {
+          "notesSave": "Enregistrer",
+          "notesClear": "Effacer les notes"
+        },
+        "mobileFarePending": {
+          "template": "Complétez {fields} pour calculer le prix.",
+          "separator": ",",
+          "finalSeparator": "et",
+          "fields": {
+            "origin": "l’origine",
+            "originTime": "l’heure de prise en charge à l’origine",
+            "destination": "la destination après l’événement",
+            "returnTime": "l’heure de prise en charge après l’événement"
+          }
         },
         "spotlight": {
           "label": "Événement avec transfert disponible",

@@ -30,6 +30,11 @@
           "eventCta": "Configure transfer",
           "continueCta": "Continue request",
           "posterAlt": "Event poster",
+          "posterCloseLabel": "Close event poster",
+          "addressOriginPickupLabel": "Enter your origin and pickup time for the event",
+          "addressReturnDestinationPickupLabel": "Enter your destination and pickup time after the event",
+          "addressOriginSearchSheetLabel": "Enter the address where we will pick you up",
+          "addressDestinationSearchSheetLabel": "Enter the destination where we will take you after the event",
           "configurationTitle": "Configure your transfer",
           "configurationIntro": "Select the mode, address, and passengers to calculate the price.",
           "quotePending": "Complete the details to calculate the price.",
@@ -64,6 +69,28 @@
           "selectEvent": "Select an event to configure your transfer.",
           "priceUnavailable": "Price not available.",
           "ready": "Transfer ready to continue."
+        },
+        "mobileFlow": {
+          "continue": "Continue",
+          "back": "Back",
+          "title": "Upcoming events",
+          "loading": "Loading events...",
+          "empty": "There are no featured events available for booking at this time."
+        },
+        "mobileContact": {
+          "notesSave": "Save",
+          "notesClear": "Clear notes"
+        },
+        "mobileFarePending": {
+          "template": "Complete {fields} to calculate the price.",
+          "separator": ",",
+          "finalSeparator": "and",
+          "fields": {
+            "origin": "origin",
+            "originTime": "pickup time at origin",
+            "destination": "destination after the event",
+            "returnTime": "pickup time after the event"
+          }
         },
         "spotlight": {
           "label": "Event with transfer available",

@@ -30,6 +30,11 @@
           "eventCta": "Configurar traslado",
           "continueCta": "Continuar solicitud",
           "posterAlt": "Cartel del evento",
+          "posterCloseLabel": "Cerrar cartel del evento",
+          "addressOriginPickupLabel": "Introduce tu origen y hora de recogida para el evento",
+          "addressReturnDestinationPickupLabel": "Introduce tu destino y hora de recogida tras el evento",
+          "addressOriginSearchSheetLabel": "Introduce la dirección donde te recogeremos",
+          "addressDestinationSearchSheetLabel": "Introduce el destino al que quieres que te llevemos tras el evento",
           "configurationTitle": "Configura tu traslado",
           "configurationIntro": "Selecciona la modalidad, dirección y pasajeros para calcular el precio.",
           "quotePending": "Completa los datos para calcular el precio.",
@@ -64,6 +69,28 @@
           "selectEvent": "Selecciona un evento para configurar tu traslado.",
           "priceUnavailable": "Precio no disponible.",
           "ready": "Traslado listo para continuar."
+        },
+        "mobileFlow": {
+          "continue": "Continuar",
+          "back": "Volver",
+          "title": "Próximos eventos",
+          "loading": "Cargando eventos...",
+          "empty": "No hay eventos destacados disponibles para reserva en este momento."
+        },
+        "mobileContact": {
+          "notesSave": "Guardar",
+          "notesClear": "Borrar notas"
+        },
+        "mobileFarePending": {
+          "template": "Completa {fields} para calcular el precio.",
+          "separator": ",",
+          "finalSeparator": "y",
+          "fields": {
+            "origin": "origen",
+            "originTime": "hora de recogida en origen",
+            "destination": "destino tras el evento",
+            "returnTime": "hora de recogida tras el evento"
+          }
         },
         "spotlight": {
           "label": "Evento con traslado disponible",

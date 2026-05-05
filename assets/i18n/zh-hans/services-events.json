@@ -30,6 +30,11 @@
           "eventCta": "配置接送",
           "continueCta": "继续申请",
           "posterAlt": "活动海报",
+          "posterCloseLabel": "关闭活动海报",
+          "addressOriginPickupLabel": "请输入活动出发地和接送时间",
+          "addressReturnDestinationPickupLabel": "请输入活动后目的地和接送时间",
+          "addressOriginSearchSheetLabel": "请输入我们接您的地址",
+          "addressDestinationSearchSheetLabel": "请输入活动后我们送您前往的目的地",
           "configurationTitle": "配置您的接送服务",
           "configurationIntro": "选择服务方式、地址和乘客人数以计算价格。",
           "quotePending": "请补全信息以计算价格。",
@@ -64,6 +69,28 @@
           "selectEvent": "请选择一个活动以配置您的接送服务。",
           "priceUnavailable": "价格不可用。",
           "ready": "接送服务已准备好继续。"
+        },
+        "mobileFlow": {
+          "continue": "继续",
+          "back": "返回",
+          "title": "近期活动",
+          "loading": "正在加载活动...",
+          "empty": "目前没有可预订的精选活动。"
+        },
+        "mobileContact": {
+          "notesSave": "保存",
+          "notesClear": "清除备注"
+        },
+        "mobileFarePending": {
+          "template": "请补全{fields}以计算价格。",
+          "separator": "、",
+          "finalSeparator": "和",
+          "fields": {
+            "origin": "出发地",
+            "originTime": "出发地接送时间",
+            "destination": "活动后目的地",
+            "returnTime": "活动后接送时间"
+          }
         },
         "spotlight": {
           "label": "可安排接送的活动",

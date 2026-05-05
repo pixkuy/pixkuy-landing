@@ -56,7 +56,8 @@
   }
 
   async function fetchJson(url) {
-    var res = await fetch(url, { cache: "no-store" });
+    var fetchOptions = isDevHost() ? { cache: "no-store" } : { cache: "default" };
+    var res = await fetch(url, fetchOptions);
     if (!res.ok) throw new Error("HTTP " + res.status);
     return res.json();
   }
@@ -192,9 +193,14 @@
 
     var finalDict = cloneDict(baseDict);
 
-    for (var i = 0; i < requestedFragments.length; i++) {
-      var fragmentName = requestedFragments[i];
-      var fragmentDict = await tryLoadOptionalFragment(lang, fragmentName);
+    var fragmentResults = await Promise.all(
+      requestedFragments.map(function (fragmentName) {
+        return tryLoadOptionalFragment(lang, fragmentName);
+      })
+    );
+
+    for (var i = 0; i < fragmentResults.length; i++) {
+      var fragmentDict = fragmentResults[i];
 
       if (fragmentDict) {
         finalDict = deepMerge(finalDict, fragmentDict);

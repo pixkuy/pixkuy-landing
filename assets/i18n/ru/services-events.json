@@ -30,6 +30,11 @@
           "eventCta": "Настроить трансфер",
           "continueCta": "Продолжить заявку",
           "posterAlt": "Афиша события",
+          "posterCloseLabel": "Закрыть афишу события",
+          "addressOriginPickupLabel": "Введите точку отправления и время подачи для события",
+          "addressReturnDestinationPickupLabel": "Введите пункт назначения и время подачи после события",
+          "addressOriginSearchSheetLabel": "Введите адрес, где мы вас заберём",
+          "addressDestinationSearchSheetLabel": "Введите пункт назначения, куда мы отвезём вас после события",
           "configurationTitle": "Настройте трансфер",
           "configurationIntro": "Выберите формат, адрес и количество пассажиров, чтобы рассчитать цену.",
           "quotePending": "Заполните данные, чтобы рассчитать цену.",
@@ -64,6 +69,28 @@
           "selectEvent": "Выберите событие, чтобы настроить трансфер.",
           "priceUnavailable": "Цена недоступна.",
           "ready": "Трансфер готов для продолжения."
+        },
+        "mobileFlow": {
+          "continue": "Продолжить",
+          "back": "Назад",
+          "title": "Ближайшие события",
+          "loading": "Загрузка событий...",
+          "empty": "Сейчас нет рекомендованных событий, доступных для бронирования."
+        },
+        "mobileContact": {
+          "notesSave": "Сохранить",
+          "notesClear": "Очистить примечания"
+        },
+        "mobileFarePending": {
+          "template": "Заполните {fields}, чтобы рассчитать цену.",
+          "separator": ",",
+          "finalSeparator": "и",
+          "fields": {
+            "origin": "точку отправления",
+            "originTime": "время подачи в точке отправления",
+            "destination": "пункт назначения после события",
+            "returnTime": "время подачи после события"
+          }
         },
         "spotlight": {
           "label": "Событие с доступным трансфером",
