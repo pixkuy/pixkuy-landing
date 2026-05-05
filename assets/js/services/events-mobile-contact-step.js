@@ -609,6 +609,7 @@
     clear.type = "button";
     clear.className = "events-mobile-notes-editor__clear";
     clear.setAttribute("data-events-mobile-notes-editor-clear", "1");
+    clear.textContent = "×";
     clear.hidden = true;
     clear.setAttribute("aria-hidden", "true");
 
@@ -901,10 +902,12 @@
       notesEditorClose,
       getI18nValue("services.cards.events.mobileContact.notesSave", "")
     );
-    setText(
-      notesEditorClear,
-      getI18nValue("services.cards.events.mobileContact.notesClear", "")
-    );
+    if (notesEditorClear) {
+      notesEditorClear.setAttribute(
+        "aria-label",
+        getI18nValue("services.cards.events.mobileContact.notesClear", "")
+      );
+    }
 
     if (notesEditorInput) {
       notesEditorInput.setAttribute(
