@@ -10,6 +10,10 @@
       "title": "Vehículo con conductor",
       "text": "Servicio por horas, día completo o agenda privada."
     },
+    "direct": {
+      "title": "Traslados directos",
+      "text": "Viajes privados punto a punto dentro de CDMX."
+    },
     "tours": {
       "title": "Tours privados",
       "text": "Rutas seleccionadas con traslado privado."

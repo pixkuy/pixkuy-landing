@@ -1,0 +1,106 @@
+{
+  "directTransferMobileFlow": {
+    "back": "Zurück",
+    "title": "Direkttransfers",
+    "helper": "Fahre von einem Punkt zum anderen mit privatem Chauffeur, sofortiger Fahrpreisschätzung und Premium-Fahrzeug.",
+    "fields": {
+      "origin": "Startpunkt",
+      "originPlaceholder": "Startpunkt auswählen",
+      "destination": "Ziel",
+      "destinationPlaceholder": "Zielpunkt auswählen",
+      "date": "Datum",
+      "time": "Uhrzeit",
+      "passengers": "Fahrgäste"
+    },
+    "addressSearch": {
+      "originTitle": "Startpunkt eingeben",
+      "destinationTitle": "Zielpunkt eingeben",
+      "close": "Zurück",
+      "clear": "Adresse löschen"
+    },
+    "validation": {
+      "sameRoute": "Startpunkt und Ziel dürfen nicht identisch sein.",
+      "airportRoute": "Für Transfers von oder zu den von uns abgedeckten Flughäfen nutze bitte den Service Flughafen / Hotel.",
+      "outOfCoverage": "Diese Strecke liegt außerhalb unseres Einsatzgebiets für Direkttransfers."
+    },
+    "passengerBuckets": {
+      "van_1_2": "1–2",
+      "van_3_4": "3–4",
+      "van_5_6": "5–6"
+    },
+    "fare": {
+      "label": "Preis",
+      "pending": "Vervollständige Startpunkt, Ziel, Datum, Uhrzeit und Fahrgäste, um den Preis zu berechnen.",
+      "pendingTemplate": "Vervollständige {fields}, um den Preis zu berechnen.",
+      "pendingReady": "Preisberechnung wird vorbereitet…",
+      "separator": ", ",
+      "finalSeparator": " und ",
+      "loading": "Preis wird berechnet…",
+      "unavailable": "Wir konnten den Preis für diese Strecke nicht berechnen.",
+      "airportTransfer": "Diese Strecke muss als Flughafen / Hotel verwaltet werden.",
+      "outOfCoverage": "Für diese Strecke können wir dir per WhatsApp oder mit einem Fahrzeug-mit-Chauffeur-Service helfen.",
+      "readySuffix": "MXN"
+    },
+    "vehicle": {
+      "title": "BYD M9",
+      "alt": "BYD M9 — elektrische Executive-Van"
+    },
+    "cta": {
+      "continue": "Weiter",
+      "airport": "Zu Flughafen / Hotel",
+      "whatsapp": "WhatsApp",
+      "hourly": "Fahrzeug mit Chauffeur"
+    },
+    "whatsapp": {
+      "intro": "Hallo, ich möchte einen Direkttransfer mit Pixkuy anfragen.",
+      "serviceType": "Serviceart",
+      "serviceLabel": "Direkttransfer",
+      "origin": "Startpunkt",
+      "destination": "Ziel",
+      "date": "Datum",
+      "time": "Uhrzeit",
+      "passengers": "Fahrgäste",
+      "price": "Geschätzter Preis",
+      "restriction": "Grund"
+    },
+    "contactStep": {
+      "summary": {
+        "title": "Transferübersicht",
+        "origin": "Startpunkt",
+        "destination": "Ziel",
+        "date": "Datum",
+        "time": "Uhrzeit",
+        "passengers": "Fahrgäste",
+        "vehicle": "Fahrzeug",
+        "price": "Preis"
+      },
+      "fields": {
+        "name": "Name",
+        "phone": "Telefon",
+        "email": "E-Mail",
+        "notes": "Notizen"
+      },
+      "placeholders": {
+        "name": "Vollständiger Name",
+        "phone": "+52...",
+        "email": "du@email.com",
+        "notes": "Optionale Notizen"
+      },
+      "validation": {
+        "name": "Gib deinen Namen ein.",
+        "phone": "Gib eine gültige Telefonnummer im internationalen Format ein.",
+        "email": "Gib eine gültige E-Mail-Adresse ein.",
+        "formIncomplete": "Prüfe die Angaben vor dem Absenden."
+      },
+      "notesEditor": {
+        "title": "Notizen zum Transfer",
+        "save": "Speichern",
+        "clear": "Notizen löschen",
+        "placeholder": "Füge nützliche Details für den Transfer hinzu."
+      },
+      "cta": {
+        "submit": "Anfrage senden"
+      }
+    }
+  }
+}

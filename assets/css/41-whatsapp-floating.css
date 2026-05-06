@@ -235,7 +235,9 @@
   body:has(.services-hourly-panel__sheet.is-open) .whatsapp-floating,
   body:has(.services-events-panel__sheet.is-open) .whatsapp-floating,
   body:has(.contact-success-modal[aria-hidden="false"]) .whatsapp-floating,
-  body[data-airport-mobile-vehicle-gallery-active="true"] .whatsapp-floating{
+  body[data-airport-mobile-vehicle-gallery-active="true"] .whatsapp-floating,
+  body[data-direct-transfer-mobile-screen="true"] .whatsapp-floating,
+  body[data-direct-transfer-mobile-address-search-open="true"] .whatsapp-floating{
     display:none;
   }
 }

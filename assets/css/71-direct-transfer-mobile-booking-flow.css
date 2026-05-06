@@ -1,0 +1,134 @@
+/* assets/css/71-direct-transfer-mobile-booking-flow.css
+   Direct transfer mobile booking flow.
+   Alcance:
+   - solo móvil
+   - route shell inicial para direct_transfer
+   - no toca desktop
+   - no toca #contact
+   - no llama a Google Places ni quote todavía
+*/
+
+.direct-transfer-mobile-route{
+  display:none;
+}
+
+.direct-transfer-mobile-route[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  body[data-direct-transfer-mobile-screen="true"]{
+    overflow:hidden;
+  }
+
+  body[data-direct-transfer-mobile-screen="true"] .screen.hero{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-route{
+    position:fixed;
+    inset:0;
+    z-index:80;
+    display:block;
+    background-color:#0f1113;
+    background-image:
+      linear-gradient(180deg, rgba(15,17,19,.92) 0%, rgba(15,17,19,.82) 42%, rgba(15,17,19,.96) 100%),
+      url("../img/cdmx-angel-night.webp");
+    background-position:center top, center top;
+    background-size:100% 100%, auto 100vh;
+    background-repeat:no-repeat;
+  }
+
+  .direct-transfer-mobile-route__screen{
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+  }
+
+  .direct-transfer-mobile-route__content{
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100svh;
+    min-height:0;
+    overflow:hidden;
+    padding:
+      calc(60px + env(safe-area-inset-top))
+      18px
+      calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .direct-transfer-mobile-flow{
+    display:grid;
+    gap:16px;
+    min-height:0;
+  }
+
+  .direct-transfer-mobile-flow__back-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    min-height:28px;
+  }
+
+  .direct-transfer-mobile-flow__back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    min-height:28px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    cursor:pointer;
+  }
+
+  .direct-transfer-mobile-flow__back::before{
+    content:"←";
+    display:inline-block;
+    font-size:15px;
+    line-height:1;
+    transform:translateY(-.5px);
+  }
+
+  .direct-transfer-mobile-flow__back:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:3px;
+  }
+
+  .direct-transfer-mobile-flow__header{
+    display:grid;
+    gap:8px;
+  }
+
+  .direct-transfer-mobile-flow__title{
+    margin:0;
+    color:#f4f2ee;
+    font-size:24px;
+    line-height:1.1;
+    font-weight:720;
+    letter-spacing:-.025em;
+  }
+
+  .direct-transfer-mobile-flow__helper{
+    margin:0;
+    max-width:28rem;
+    color:rgba(244,242,238,.70);
+    font-size:14px;
+    line-height:1.45;
+  }
+
+  .direct-transfer-mobile-flow__placeholder{
+    margin:4px 0 0;
+    padding:14px 0;
+    border-top:1px solid rgba(255,255,255,.10);
+    color:rgba(244,242,238,.58);
+    font-size:13px;
+    line-height:1.4;
+  }
+}

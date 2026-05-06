@@ -81,17 +81,16 @@
 
 @media (max-width:720px){
   .services.services--local-bg{
-    background-color:#101316;
-    background-image:
-      linear-gradient(180deg, rgba(15,17,19,.54) 0%, rgba(15,17,19,.76) 42%, rgba(20,24,27,.96) 100%),
-      url("../img/cdmx-angel-night.webp");
-    background-position:
-      center top,
-      center top;
-    background-size:
-      100% 100%,
-      auto 100vh;
-    background-repeat:no-repeat;
+    position:absolute !important;
+    width:1px !important;
+    height:1px !important;
+    min-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    clip:rect(0, 0, 0, 0) !important;
+    white-space:nowrap !important;
+    border:0 !important;
   }
 }
 

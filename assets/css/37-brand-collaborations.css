@@ -197,7 +197,19 @@
 
 @media (max-width: 720px) {
   .brand-collaborations {
+    margin-top: 0;
     padding: 44px 0 56px;
+    background-color:#101316;
+    background-image:
+      linear-gradient(180deg, rgba(15,17,19,.54) 0%, rgba(15,17,19,.76) 42%, rgba(20,24,27,.96) 100%),
+      url("../img/cdmx-angel-night.webp");
+    background-position:
+      center top,
+      center top;
+    background-size:
+      100% 100%,
+      auto 100vh;
+    background-repeat:no-repeat;
   }
 
   .brand-collaborations .content {

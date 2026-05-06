@@ -10,6 +10,10 @@
       "title": "Chauffeured vehicle",
       "text": "Hourly, full-day or private agenda service."
     },
+    "direct": {
+      "title": "Direct transfers",
+      "text": "Private point-to-point rides within Mexico City."
+    },
     "tours": {
       "title": "Private tours",
       "text": "Selected routes with private transportation."

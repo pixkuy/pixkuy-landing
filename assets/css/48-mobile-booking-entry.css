@@ -31,7 +31,7 @@
     width:100%;
     max-width:420px;
     margin:0 auto;
-    gap:18px;
+    gap:14px;
   }
   
   .hero-mobile-entry::before{
@@ -89,8 +89,8 @@
 
   .hero-mobile-entry__actions{
     display:grid;
-    gap:8px;
-    margin-top:2px;
+    gap:6px;
+    margin-top:0;
   }
 
   .hero-mobile-entry__action{

@@ -1,0 +1,106 @@
+{
+  "directTransferMobileFlow": {
+    "back": "Voltar",
+    "title": "Transfers diretos",
+    "helper": "Vá de um ponto a outro com motorista privado, tarifa estimada na hora e veículo premium.",
+    "fields": {
+      "origin": "Origem",
+      "originPlaceholder": "Selecione o ponto de origem",
+      "destination": "Destino",
+      "destinationPlaceholder": "Selecione o ponto de destino",
+      "date": "Data",
+      "time": "Hora",
+      "passengers": "Passageiros"
+    },
+    "addressSearch": {
+      "originTitle": "Informe o ponto de origem",
+      "destinationTitle": "Informe o ponto de destino",
+      "close": "Voltar",
+      "clear": "Limpar endereço"
+    },
+    "validation": {
+      "sameRoute": "A origem e o destino não podem ser iguais.",
+      "airportRoute": "Para transfers de ou para os aeroportos que atendemos, use o serviço Aeroporto / Hotel.",
+      "outOfCoverage": "Este trajeto fica fora da nossa área operacional para transfers diretos."
+    },
+    "passengerBuckets": {
+      "van_1_2": "1–2",
+      "van_3_4": "3–4",
+      "van_5_6": "5–6"
+    },
+    "fare": {
+      "label": "Preço",
+      "pending": "Complete origem, destino, data, hora e passageiros para calcular o preço.",
+      "pendingTemplate": "Complete {fields} para calcular o preço.",
+      "pendingReady": "Preparando cálculo do preço…",
+      "separator": ", ",
+      "finalSeparator": " e ",
+      "loading": "Calculando preço…",
+      "unavailable": "Não conseguimos calcular o preço para este trajeto.",
+      "airportTransfer": "Este trajeto deve ser gerenciado como Aeroporto / Hotel.",
+      "outOfCoverage": "Para este trajeto, podemos ajudar por WhatsApp ou com serviço de veículo com motorista.",
+      "readySuffix": "MXN"
+    },
+    "vehicle": {
+      "title": "BYD M9",
+      "alt": "BYD M9 — van executiva elétrica"
+    },
+    "cta": {
+      "continue": "Continuar",
+      "airport": "Ir para Aeroporto / Hotel",
+      "whatsapp": "WhatsApp",
+      "hourly": "Veículo com motorista"
+    },
+    "whatsapp": {
+      "intro": "Olá, quero consultar um transfer direto com a Pixkuy.",
+      "serviceType": "Tipo de serviço",
+      "serviceLabel": "Transfer direto",
+      "origin": "Origem",
+      "destination": "Destino",
+      "date": "Data",
+      "time": "Hora",
+      "passengers": "Passageiros",
+      "price": "Preço estimado",
+      "restriction": "Motivo"
+    },
+    "contactStep": {
+      "summary": {
+        "title": "Resumo do transfer",
+        "origin": "Origem",
+        "destination": "Destino",
+        "date": "Data",
+        "time": "Hora",
+        "passengers": "Passageiros",
+        "vehicle": "Veículo",
+        "price": "Preço"
+      },
+      "fields": {
+        "name": "Nome",
+        "phone": "Telefone",
+        "email": "Email",
+        "notes": "Notas"
+      },
+      "placeholders": {
+        "name": "Nome completo",
+        "phone": "+52...",
+        "email": "voce@email.com",
+        "notes": "Notas opcionais"
+      },
+      "validation": {
+        "name": "Informe seu nome.",
+        "phone": "Informe um telefone válido em formato internacional.",
+        "email": "Informe um email válido.",
+        "formIncomplete": "Revise os dados antes de enviar."
+      },
+      "notesEditor": {
+        "title": "Notas para o transfer",
+        "save": "Salvar",
+        "clear": "Limpar notas",
+        "placeholder": "Adicione detalhes úteis para o transfer."
+      },
+      "cta": {
+        "submit": "Enviar solicitação"
+      }
+    }
+  }
+}

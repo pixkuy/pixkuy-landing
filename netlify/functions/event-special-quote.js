@@ -13,7 +13,14 @@ const DATA_DIR_CANDIDATES = [
 
 const VALID_VARIANTS = new Set(["arrival", "departure", "round_trip"]);
 const VALID_PASSENGER_KEYS = new Set(["van_1_2", "van_3_4", "van_5_6"]);
-const CDMX_UTC_OFFSET = "-06:00";
+
+/*
+  Events opera en CDMX/ZMVM.
+  Las horas del evento y de recogida se tratan como horas locales literales.
+  Este offset no convierte la hora: solo serializa esa hora local en formato RFC3339 para Google Routes.
+*/
+const OPERATIONAL_CDMX_UTC_OFFSET = "-06:00";
+
 const MIN_LEAD_HOURS = 6;
 const HORIZON_DAYS = 30;
 
@@ -262,7 +269,7 @@ function buildDepartureTime(event, pickupTime, dayOffset) {
     return "";
   }
 
-  return `${date}T${time}:00${CDMX_UTC_OFFSET}`;
+  return `${date}T${time}:00${OPERATIONAL_CDMX_UTC_OFFSET}`;
 }
 
 function parseDurationSeconds(value) {

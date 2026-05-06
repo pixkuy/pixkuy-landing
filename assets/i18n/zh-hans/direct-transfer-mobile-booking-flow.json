@@ -1,0 +1,106 @@
+{
+  "directTransferMobileFlow": {
+    "back": "返回",
+    "title": "直达接送",
+    "helper": "通过私人司机、即时预估价格和高端车辆，从一个地点前往另一个地点。",
+    "fields": {
+      "origin": "出发地",
+      "originPlaceholder": "选择出发地点",
+      "destination": "目的地",
+      "destinationPlaceholder": "选择目的地点",
+      "date": "日期",
+      "time": "时间",
+      "passengers": "乘客"
+    },
+    "addressSearch": {
+      "originTitle": "输入出发地点",
+      "destinationTitle": "输入目的地点",
+      "close": "返回",
+      "clear": "清除地址"
+    },
+    "validation": {
+      "sameRoute": "出发地和目的地不能相同。",
+      "airportRoute": "如需往返我们覆盖的机场，请使用机场 / 酒店服务。",
+      "outOfCoverage": "该行程超出直达接送的运营范围。"
+    },
+    "passengerBuckets": {
+      "van_1_2": "1–2",
+      "van_3_4": "3–4",
+      "van_5_6": "5–6"
+    },
+    "fare": {
+      "label": "价格",
+      "pending": "请填写出发地、目的地、日期、时间和乘客人数以计算价格。",
+      "pendingTemplate": "请填写 {fields} 以计算价格。",
+      "pendingReady": "正在准备价格计算…",
+      "separator": "，",
+      "finalSeparator": "和",
+      "loading": "正在计算价格…",
+      "unavailable": "无法计算该行程的价格。",
+      "airportTransfer": "该行程应作为机场 / 酒店服务处理。",
+      "outOfCoverage": "对于该行程，我们可以通过 WhatsApp 或带司机车辆服务为您提供帮助。",
+      "readySuffix": "MXN"
+    },
+    "vehicle": {
+      "title": "BYD M9",
+      "alt": "BYD M9 — 电动商务厢式车"
+    },
+    "cta": {
+      "continue": "继续",
+      "airport": "前往机场 / 酒店",
+      "whatsapp": "WhatsApp",
+      "hourly": "带司机车辆"
+    },
+    "whatsapp": {
+      "intro": "您好，我想咨询 Pixkuy 的直达接送服务。",
+      "serviceType": "服务类型",
+      "serviceLabel": "直达接送",
+      "origin": "出发地",
+      "destination": "目的地",
+      "date": "日期",
+      "time": "时间",
+      "passengers": "乘客",
+      "price": "预估价格",
+      "restriction": "原因"
+    },
+    "contactStep": {
+      "summary": {
+        "title": "接送摘要",
+        "origin": "出发地",
+        "destination": "目的地",
+        "date": "日期",
+        "time": "时间",
+        "passengers": "乘客",
+        "vehicle": "车辆",
+        "price": "价格"
+      },
+      "fields": {
+        "name": "姓名",
+        "phone": "电话",
+        "email": "邮箱",
+        "notes": "备注"
+      },
+      "placeholders": {
+        "name": "姓名全称",
+        "phone": "+52...",
+        "email": "you@email.com",
+        "notes": "可选备注"
+      },
+      "validation": {
+        "name": "请输入您的姓名。",
+        "phone": "请输入有效的国际格式电话号码。",
+        "email": "请输入有效的邮箱地址。",
+        "formIncomplete": "发送前请检查信息。"
+      },
+      "notesEditor": {
+        "title": "接送备注",
+        "save": "保存",
+        "clear": "清除备注",
+        "placeholder": "添加对接送有用的详细信息。"
+      },
+      "cta": {
+        "submit": "发送请求"
+      }
+    }
+  }
+}

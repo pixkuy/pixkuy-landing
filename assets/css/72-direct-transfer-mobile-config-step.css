@@ -1,0 +1,662 @@
+/* assets/css/72-direct-transfer-mobile-config-step.css
+   Direct transfer mobile config step.
+   Alcance:
+   - solo móvil
+   - pantalla de configuración de direct_transfer
+   - no toca desktop
+   - no toca #contact
+   - no solicita quote todavía
+*/
+
+.direct-transfer-mobile-config-step{
+  display:none;
+}
+
+.direct-transfer-mobile-config-step[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  body[data-direct-transfer-mobile-config-screen="true"] .direct-transfer-mobile-flow{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-config-step{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    display:block;
+    background-color:#0f1113;
+    background-image:
+      linear-gradient(180deg, rgba(15,17,19,.88) 0%, rgba(15,17,19,.78) 38%, rgba(15,17,19,.94) 100%),
+      url("../img/cdmx-angel-night.webp");
+    background-position:center top, center top;
+    background-size:100% 100%, auto 100vh;
+    background-repeat:no-repeat;
+  }
+
+  .direct-transfer-mobile-config-step__screen{
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+  }
+
+  .direct-transfer-mobile-config-step__content{
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100svh;
+    min-height:0;
+    overflow:hidden;
+    padding:
+      calc(60px + env(safe-area-inset-top))
+      18px
+      calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .direct-transfer-mobile-config-step__back-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    min-height:28px;
+    margin-bottom:8px;
+  }
+
+  .direct-transfer-mobile-config-step__back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    min-height:28px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    cursor:pointer;
+  }
+
+  .direct-transfer-mobile-config-step__back::before{
+    content:"←";
+    display:inline-block;
+    font-size:15px;
+    line-height:1;
+    transform:translateY(-.5px);
+  }
+
+  .direct-transfer-mobile-config-step__back:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+
+  .direct-transfer-mobile-config-step__header{
+    display:grid;
+    gap:6px;
+    margin-bottom:12px;
+  }
+
+  .direct-transfer-mobile-config-step__title{
+    margin:0;
+    color:#f4f2ee;
+    font-size:22px;
+    line-height:1.1;
+    font-weight:720;
+    letter-spacing:-.025em;
+  }
+
+  .direct-transfer-mobile-config-step__helper{
+    margin:0;
+    color:rgba(244,242,238,.70);
+    font-size:14px;
+    line-height:1.4;
+  }
+
+  .direct-transfer-mobile-config-step__fields{
+    display:grid;
+    gap:9px;
+    min-height:0;
+    overflow:auto;
+    padding-bottom:10px;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .direct-transfer-mobile-config-step__route-group,
+  .direct-transfer-mobile-config-step__field{
+    display:grid;
+    gap:6px;
+    min-width:0;
+  }
+
+  .direct-transfer-mobile-config-step__label{
+    margin:0;
+    color:rgba(255,245,228,.74);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .direct-transfer-mobile-config-step__control{
+    box-sizing:border-box;
+    display:block;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    padding:0 12px;
+    border:1px solid rgba(236,220,189,.38);
+    border-radius:9px;
+    background:rgba(15,17,19,.46);
+    color:rgba(255,249,238,.96);
+    box-shadow:none;
+    font:inherit;
+    font-size:13px;
+    line-height:48px;
+    font-weight:650;
+    color-scheme:dark;
+  }
+
+  .direct-transfer-mobile-config-step__control:focus{
+    outline:none;
+    border-color:rgba(31,122,109,.78);
+    background:rgba(15,17,19,.62);
+  }
+
+  .direct-transfer-mobile-config-step__control:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+
+  .direct-transfer-mobile-address-compact{
+    position:relative;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    overflow:visible;
+  }
+
+  .direct-transfer-mobile-config-step__control--address{
+    padding:0 40px 0 38px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='10.8' cy='10.8' r='5.8' stroke='%23fff9ee' stroke-width='2'/%3E%3Cpath d='M15.2 15.2 20 20' stroke='%23fff9ee' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:14px center;
+    background-size:18px 18px;
+    text-overflow:ellipsis;
+    cursor:pointer;
+  }
+
+  .direct-transfer-mobile-config-step__control--address::placeholder{
+    color:rgba(255,245,228,.58);
+    opacity:1;
+  }
+
+  .direct-transfer-mobile-address-compact .place-autocomplete__clear{
+    position:absolute;
+    top:50%;
+    right:8px;
+    z-index:3;
+    width:30px;
+    height:30px;
+    transform:translateY(-50%);
+    border:0;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    color:rgba(255,245,228,.74);
+    box-shadow:none;
+    font:inherit;
+    font-size:18px;
+    line-height:1;
+    font-weight:600;
+  }
+
+  .direct-transfer-mobile-address-compact .place-autocomplete__clear[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-address-compact [data-direct-transfer-mobile-address-compact-mount],
+  .direct-transfer-mobile-address-compact .place-autocomplete__panel,
+  .direct-transfer-mobile-address-compact .place-autocomplete__status{
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+  }
+
+  .direct-transfer-mobile-config-step__error{
+    margin:-2px 0 0;
+    color:rgba(255,182,153,.88);
+    font-size:12px;
+    line-height:1.3;
+    font-weight:650;
+  }
+
+  .direct-transfer-mobile-config-step__error[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-config-step__restriction{
+    display:grid;
+    gap:8px;
+    margin:-1px 0 0;
+    padding:10px 11px;
+    border:1px solid rgba(255,182,153,.24);
+    border-radius:9px;
+    background:rgba(255,182,153,.07);
+  }
+
+  .direct-transfer-mobile-config-step__restriction[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-config-step__restriction-text{
+    margin:0;
+    color:rgba(255,226,210,.90);
+    font-size:12px;
+    line-height:1.35;
+    font-weight:650;
+  }
+
+  .direct-transfer-mobile-config-step__restriction-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    align-items:center;
+  }
+
+  .direct-transfer-mobile-config-step__restriction-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:34px;
+    padding:0 10px;
+    border:1px solid rgba(236,220,189,.24);
+    border-radius:8px;
+    background:rgba(255,249,238,.07);
+    color:rgba(255,249,238,.90);
+    font-size:12px;
+    line-height:1;
+    font-weight:760;
+    text-decoration:none;
+  }
+
+  .direct-transfer-mobile-config-step__restriction-link--primary{
+    border-color:rgba(31,122,109,.58);
+    background:rgba(31,122,109,.74);
+    color:rgba(255,249,238,.98);
+  }
+
+  .direct-transfer-mobile-config-step__row{
+    display:grid;
+    gap:9px;
+    align-items:start;
+  }
+
+  .direct-transfer-mobile-config-step__row--trip{
+    grid-template-columns:84px minmax(0, 1fr) 86px;
+  }
+
+  .direct-transfer-mobile-config-step__field--passengers .direct-transfer-mobile-config-step__control{
+    width:84px;
+    min-width:84px;
+    max-width:84px;
+    padding:0 8px;
+    font-weight:700;
+    text-align:center;
+    text-align-last:center;
+  }
+
+  .direct-transfer-mobile-config-step__field--time{
+    width:86px;
+    min-width:86px;
+    max-width:86px;
+    justify-self:end;
+  }
+
+  .direct-transfer-mobile-config-step__date-wrap,
+  .direct-transfer-mobile-config-step__time-wrap{
+    position:relative;
+    height:48px;
+    min-height:48px;
+    max-height:48px;
+  }
+
+  .direct-transfer-mobile-config-step__field--date .direct-transfer-mobile-config-step__control,
+  .direct-transfer-mobile-config-step__field--time .direct-transfer-mobile-config-step__control{
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    padding:0 34px 0 12px;
+    border-radius:9px;
+    box-sizing:border-box;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+
+  .direct-transfer-mobile-config-step__field--time input[type="time"]{
+    display:block;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    min-height:48px;
+    height:48px;
+    max-height:48px;
+    margin:0;
+    padding:0 28px 0 12px;
+    border:1px solid rgba(236,220,189,.38);
+    border-radius:9px;
+    background-color:rgba(15,17,19,.46);
+    color:rgba(255,249,238,.96);
+    box-shadow:none;
+    box-sizing:border-box;
+    font:inherit;
+    font-size:13px;
+    line-height:normal;
+    font-weight:650;
+    color-scheme:dark;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+
+  .direct-transfer-mobile-config-step__field--time input[type="time"]::-webkit-datetime-edit{
+    height:48px;
+    min-height:48px;
+    padding:0;
+    margin:0;
+  }
+
+  .direct-transfer-mobile-config-step__field--time input[type="time"]::-webkit-datetime-edit-fields-wrapper{
+    display:flex;
+    align-items:center;
+    height:48px;
+    min-height:48px;
+    padding:0;
+    margin:0;
+  }
+
+  .direct-transfer-mobile-config-step__field--time input[type="time"]::-webkit-datetime-edit-hour-field,
+  .direct-transfer-mobile-config-step__field--time input[type="time"]::-webkit-datetime-edit-minute-field,
+  .direct-transfer-mobile-config-step__field--time input[type="time"]::-webkit-datetime-edit-text{
+    padding:0;
+    margin:0;
+    line-height:1;
+  }
+
+  .direct-transfer-mobile-config-step__field--time input[type="time"]::-webkit-date-and-time-value{
+    min-height:48px;
+    height:48px;
+    line-height:48px;
+    padding:0;
+    margin:0;
+    text-align:left;
+  }
+
+  .direct-transfer-mobile-config-step__field--date .direct-transfer-mobile-config-step__control::-webkit-calendar-picker-indicator,
+  .direct-transfer-mobile-config-step__field--time .direct-transfer-mobile-config-step__control::-webkit-calendar-picker-indicator{
+    position:absolute;
+    right:0;
+    width:24px;
+    height:48px;
+    opacity:0;
+    cursor:pointer;
+  }
+
+  .direct-transfer-mobile-config-step__date-overlay,
+  .direct-transfer-mobile-config-step__time-overlay{
+    position:absolute;
+    top:50%;
+    left:12px;
+    transform:translateY(-50%);
+    color:rgba(255,245,228,.58);
+    font-size:13px;
+    line-height:1;
+    white-space:nowrap;
+    pointer-events:none;
+  }
+
+  .direct-transfer-mobile-config-step__date-wrap[data-direct-transfer-mobile-date-state="value"] .direct-transfer-mobile-config-step__date-overlay,
+  .direct-transfer-mobile-config-step__time-wrap[data-direct-transfer-mobile-time-state="value"] .direct-transfer-mobile-config-step__time-overlay{
+    display:none;
+  }
+
+  .direct-transfer-mobile-config-step__date-wrap[data-direct-transfer-mobile-date-state="empty"] .direct-transfer-mobile-config-step__date-overlay,
+  .direct-transfer-mobile-config-step__time-wrap[data-direct-transfer-mobile-time-state="empty"] .direct-transfer-mobile-config-step__time-overlay{
+    display:block;
+  }
+
+  .direct-transfer-mobile-config-step__date-icon,
+  .direct-transfer-mobile-config-step__time-icon{
+    position:absolute;
+    top:50%;
+    right:9px;
+    width:16px;
+    height:16px;
+    transform:translateY(-50%);
+    color:rgba(255,245,228,.68);
+    pointer-events:none;
+  }
+
+  .direct-transfer-mobile-config-step__date-icon svg,
+  .direct-transfer-mobile-config-step__time-icon svg{
+    display:block;
+    width:16px;
+    height:16px;
+  }
+
+  .direct-transfer-mobile-config-step__footer{
+    display:grid;
+    grid-template-columns:136px minmax(0, 1fr);
+    grid-template-areas:
+      "vehicle fare"
+      "cta cta";
+    gap:8px 10px;
+    align-items:start;
+    padding:8px 0 0;
+    border-top:0;
+    background:#0f1113;
+  }
+
+  .direct-transfer-mobile-config-step__vehicle{
+    grid-area:vehicle;
+    position:relative;
+    align-self:start;
+    justify-self:start;
+    width:136px;
+    max-width:136px;
+    min-width:136px;
+    cursor:pointer;
+  }
+
+  .direct-transfer-mobile-config-step__vehicle::after{
+    content:"";
+    position:absolute;
+    top:7px;
+    right:7px;
+    z-index:2;
+    width:24px;
+    height:24px;
+    border:1px solid rgba(236,220,189,.42);
+    border-radius:999px;
+    background:
+      rgba(15,17,19,.72)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4.5' y='6.5' width='13' height='11' rx='2' stroke='%23fff5e4' stroke-width='1.7'/%3E%3Cpath d='M7.5 15l2.8-3 2.1 2 1.3-1.4 2.8 2.4' stroke='%23fff5e4' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 4.5h11.5v10' stroke='%23fff5e4' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")
+      center / 15px 15px
+      no-repeat;
+    box-shadow:0 4px 14px rgba(0,0,0,.28);
+    pointer-events:none;
+  }
+
+  .direct-transfer-mobile-config-step__vehicle:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+
+  .direct-transfer-mobile-config-step__vehicle-image{
+    display:block;
+    width:136px;
+    height:108px;
+    border-radius:9px;
+    object-fit:cover;
+    object-position:center 77%;
+  }
+
+  .direct-transfer-mobile-config-step__fare{
+    grid-area:fare;
+    width:100%;
+    min-width:0;
+    max-width:none;
+    min-height:112px;
+    height:112px;
+    max-height:112px;
+    margin:0;
+    padding:16px 12px;
+    border:0;
+    border-radius:0;
+    background:
+      linear-gradient(135deg, rgba(255,249,238,.04), rgba(31,122,109,.05) 48%, rgba(15,17,19,.60));
+    background-color:transparent;
+    box-shadow:none;
+    display:grid;
+    grid-template-rows:auto 1fr;
+    row-gap:6px;
+    align-items:center;
+    justify-content:start;
+    overflow:visible;
+  }
+
+  .direct-transfer-mobile-config-step__fare[data-direct-transfer-mobile-fare-state="pending"],
+  .direct-transfer-mobile-config-step__fare[data-direct-transfer-mobile-fare-state="loading"],
+  .direct-transfer-mobile-config-step__fare[data-direct-transfer-mobile-fare-state="error"]{
+    min-height:108px;
+    height:108px;
+    max-height:108px;
+    display:grid;
+    grid-template-rows:auto 1fr;
+    row-gap:6px;
+    align-items:center;
+    justify-content:start;
+    padding:12px 12px;
+    background:transparent;
+  }
+
+  .direct-transfer-mobile-config-step__fare-label{
+    grid-row:1;
+    align-self:end;
+    justify-self:start;
+    margin:0;
+    color:rgba(247,226,170,.92);
+    font-size:13px;
+    line-height:1.1;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .direct-transfer-mobile-config-step__fare-pending{
+    grid-row:2;
+    align-self:center;
+    justify-self:start;
+    margin:0;
+    width:100%;
+    max-width:300px;
+    color:rgba(255,245,228,.76);
+    font-size:13px;
+    line-height:1.35;
+    font-weight:650;
+    text-align:center;
+  }
+
+  .direct-transfer-mobile-config-step__fare[data-direct-transfer-mobile-fare-state="ready"] .direct-transfer-mobile-config-step__fare-pending{
+    display:flex;
+    align-items:baseline;
+    justify-content:flex-start;
+    gap:6px;
+    color:rgba(255,249,238,.98);
+    line-height:.96;
+    text-align:left;
+    white-space:normal;
+  }
+
+  .direct-transfer-mobile-config-step__fare-amount{
+    display:inline-block;
+    color:rgba(255,249,238,.98);
+    font-size:46px;
+    line-height:.96;
+    font-weight:500;
+    letter-spacing:-.045em;
+  }
+
+  .direct-transfer-mobile-config-step__fare-currency{
+    display:inline-block;
+    color:rgba(61,158,122,.98);
+    font-size:14px;
+    line-height:1;
+    font-weight:800;
+    letter-spacing:.02em;
+    transform:translateY(4px);
+  }
+
+  .direct-transfer-mobile-config-step .direct-transfer-mobile-config-step__cta.cta{
+    grid-area:cta;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    min-height:50px;
+    margin-top:0;
+    padding:0 16px;
+    border:0;
+    border-radius:9px;
+    background:rgba(31,122,109,.86);
+    color:rgba(255,249,238,.98);
+    box-shadow:none;
+    font-size:14px;
+    line-height:1;
+    font-weight:800;
+    transform:none;
+    filter:none;
+    white-space:nowrap;
+  }
+
+  .direct-transfer-mobile-config-step .direct-transfer-mobile-config-step__cta.cta:hover{
+    background:rgba(31,122,109,.86);
+    box-shadow:none;
+    transform:none;
+    filter:none;
+  }
+
+  .direct-transfer-mobile-config-step .direct-transfer-mobile-config-step__cta.cta[disabled],
+  .direct-transfer-mobile-config-step .direct-transfer-mobile-config-step__cta.cta[aria-disabled="true"]{
+    background:rgba(255,245,228,.14);
+    color:rgba(255,245,228,.38);
+    border:0;
+    box-shadow:none;
+    opacity:1;
+    cursor:not-allowed;
+    transform:none;
+    filter:none;
+  }
+
+  .direct-transfer-mobile-config-step .direct-transfer-mobile-config-step__cta.cta:focus-visible{
+    outline:2px solid rgba(255,249,238,.88);
+    outline-offset:2px;
+    box-shadow:none;
+  }
+
+  .direct-transfer-mobile-config-step .direct-transfer-mobile-config-step__cta.cta:active{
+    transform:none;
+    box-shadow:none;
+    filter:none;
+  }
+}

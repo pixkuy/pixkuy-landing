@@ -10,6 +10,10 @@
       "title": "Fahrzeug mit Chauffeur",
       "text": "Service stundenweise, ganztägig oder für private Termine."
     },
+    "direct": {
+      "title": "Direkttransfers",
+      "text": "Private Punkt-zu-Punkt-Fahrten innerhalb von Mexiko-Stadt."
+    },
     "tours": {
       "title": "Private Touren",
       "text": "Ausgewählte Routen mit privatem Transfer."

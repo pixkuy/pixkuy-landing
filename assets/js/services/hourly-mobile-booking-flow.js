@@ -348,6 +348,41 @@
 
     return api && typeof api === "object" ? api : null;
   }
+  
+    function shouldReturnToDirectTransfer() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+
+      return normalizeText(params.get("return_to")).toLowerCase() === "direct_transfer";
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function returnToDirectTransferRoute() {
+    const api = window.PixkuyDirectTransferMobileBookingFlow;
+
+    try {
+      const url = new URL(window.location.href);
+
+      url.searchParams.set("service", "direct_transfer");
+      url.searchParams.delete("return_to");
+      url.hash = "";
+
+      window.history.replaceState(
+        { directTransferMobileRoute: true },
+        document.title,
+        url.pathname + url.search + url.hash
+      );
+    } catch (error) {}
+
+    if (api && typeof api.open === "function") {
+      api.open();
+      return true;
+    }
+
+    return false;
+  }
 
   function isHourlyMobileContactStepOpen() {
     const contactStep = getHourlyMobileContactStepApi();
@@ -379,6 +414,12 @@
         typeof contactStep.close === "function"
       ) {
         contactStep.close();
+        return;
+      }
+
+      if (shouldReturnToDirectTransfer()) {
+        closeHourlyRoute({ collapsePanel: true, updateUrl: false });
+        returnToDirectTransferRoute();
         return;
       }
 

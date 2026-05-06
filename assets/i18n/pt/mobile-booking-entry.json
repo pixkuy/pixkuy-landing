@@ -10,6 +10,10 @@
       "title": "Veículo com motorista",
       "text": "Serviço por horas, dia completo ou agenda privada."
     },
+    "direct": {
+      "title": "Transfers diretos",
+      "text": "Viagens privadas ponto a ponto dentro da Cidade do México."
+    },
     "tours": {
       "title": "Tours privados",
       "text": "Rotas selecionadas com transporte privado."

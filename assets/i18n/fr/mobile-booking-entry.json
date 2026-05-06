@@ -10,6 +10,10 @@
       "title": "Véhicule avec chauffeur",
       "text": "Service à l’heure, à la journée ou pour agenda privé."
     },
+    "direct": {
+      "title": "Transferts directs",
+      "text": "Trajets privés point à point dans Mexico."
+    },
     "tours": {
       "title": "Tours privés",
       "text": "Itinéraires sélectionnés avec transport privé."

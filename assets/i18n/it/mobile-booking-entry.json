@@ -10,6 +10,10 @@
       "title": "Veicolo con autista",
       "text": "Servizio a ore, giornata intera o agenda privata."
     },
+    "direct": {
+      "title": "Transfer diretti",
+      "text": "Viaggi privati punto a punto all’interno di Città del Messico."
+    },
     "tours": {
       "title": "Tour privati",
       "text": "Percorsi selezionati con trasporto privato."

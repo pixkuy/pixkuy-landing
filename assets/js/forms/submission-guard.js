@@ -125,6 +125,32 @@
       "event_special_destination_address_place_id",
       "event_special_destination_address_lat",
       "event_special_destination_address_lng"
+    ],
+
+    direct_transfer: [
+      "direct_transfer_trip_summary",
+      "direct_transfer_origin_label",
+      "direct_transfer_destination_label",
+      "direct_transfer_passenger_bucket_label",
+      "direct_transfer_price_label",
+      "direct_transfer_origin_address",
+      "direct_transfer_origin_place_id",
+      "direct_transfer_origin_lat",
+      "direct_transfer_origin_lng",
+      "direct_transfer_destination_address",
+      "direct_transfer_destination_place_id",
+      "direct_transfer_destination_lat",
+      "direct_transfer_destination_lng",
+      "direct_transfer_date",
+      "direct_transfer_time",
+      "direct_transfer_passenger_fare_key",
+      "direct_transfer_passenger_bucket_label",
+      "direct_transfer_price",
+      "direct_transfer_currency",
+      "direct_transfer_duration_seconds",
+      "direct_transfer_distance_meters",
+      "direct_transfer_vehicle_label",
+      "direct_transfer_notes"
     ]
   };
 
@@ -336,7 +362,7 @@
 
   function lockForm(form) {
     const buttons = form
-      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-hourly-mobile-contact-submit], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit], [data-events-mobile-contact-submit]'))
+      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-hourly-mobile-contact-submit], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit], [data-events-mobile-contact-submit], [data-direct-transfer-mobile-contact-submit]'))
       : [];
 
     if (!form) {

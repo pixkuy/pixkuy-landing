@@ -526,6 +526,47 @@
 
     return api && typeof api === "object" ? api : null;
   }
+  
+    function getAirportPrefillFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      const airportId = normalizeText(params.get("airport_id"));
+      const direction = normalizeText(params.get("airport_direction"));
+
+      return {
+        airportId,
+        direction
+      };
+    } catch (error) {
+      return {
+        airportId: "",
+        direction: ""
+      };
+    }
+  }
+
+  function applyAirportPrefillFromUrl(panel) {
+    const api = getAirportTariffApi();
+    const prefill = getAirportPrefillFromUrl();
+
+    if (
+      !panel ||
+      !api ||
+      typeof api.setAirportSelection !== "function" ||
+      !prefill.airportId
+    ) {
+      return false;
+    }
+
+    api.setAirportSelection({
+      airportId: prefill.airportId,
+      direction: prefill.direction || getCurrentDirection(panel)
+    });
+
+    syncDirectionButtons(panel);
+
+    return true;
+  }
 
   function getMobilePassengersNode(panel) {
     return panel ? panel.querySelector(MOBILE_PASSENGERS_SELECTOR) : null;
@@ -1491,6 +1532,43 @@
 
     return api && typeof api === "object" ? api : null;
   }
+  
+    function shouldReturnToDirectTransfer() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+
+      return normalizeText(params.get("return_to")).toLowerCase() === "direct_transfer";
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function returnToDirectTransferRoute() {
+    const api = window.PixkuyDirectTransferMobileBookingFlow;
+
+    try {
+      const url = new URL(window.location.href);
+
+      url.searchParams.set("service", "direct_transfer");
+      url.searchParams.delete("return_to");
+      url.searchParams.delete("airport_id");
+      url.searchParams.delete("airport_direction");
+      url.hash = "";
+
+      window.history.replaceState(
+        { directTransferMobileRoute: true },
+        document.title,
+        url.pathname + url.search + url.hash
+      );
+    } catch (error) {}
+
+    if (api && typeof api.open === "function") {
+      api.open();
+      return true;
+    }
+
+    return false;
+  }
 
   function bindBack(panel) {
     const back = panel.querySelector("[data-airport-mobile-flow-back]");
@@ -1511,6 +1589,12 @@
         typeof contactStep.close === "function"
       ) {
         contactStep.close();
+        return;
+      }
+
+      if (shouldReturnToDirectTransfer()) {
+        closeAirportRoute({ collapsePanel: true, updateUrl: false });
+        returnToDirectTransferRoute();
         return;
       }
 
@@ -1666,6 +1750,7 @@
     bindBack(panel);
     bindContinue(panel);
     bindAirportMobilePicker(panel);
+    applyAirportPrefillFromUrl(panel);
     syncDirectionButtons(panel);
 
     if (!movePanelToRoute(panel)) {

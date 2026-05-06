@@ -173,6 +173,18 @@
     -webkit-box-orient:vertical;
   }
 
+  .events-mobile-config-step__venue-address{
+    margin:0;
+    overflow:hidden;
+    color:rgba(244,242,238,.54);
+    font-size:11px;
+    line-height:1.25;
+    font-weight:560;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+  }
+
   .events-mobile-config-step__meta{
     margin:0;
     color:rgba(244,242,238,.66);
@@ -475,6 +487,19 @@
     grid-template-columns:minmax(0, 1fr) 72px;
     gap:9px;
     align-items:start;
+  }
+
+  .events-mobile-config-step__route-eta{
+    margin:2px 0 0;
+    color:rgba(255,245,228,.62);
+    font-size:11.5px;
+    line-height:1.25;
+    font-weight:600;
+    font-style:italic;
+  }
+
+  .events-mobile-config-step__route-eta[hidden]{
+    display:none !important;
   }
 
   .events-mobile-config-step__address{

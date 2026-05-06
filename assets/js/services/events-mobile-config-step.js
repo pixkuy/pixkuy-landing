@@ -133,6 +133,14 @@
     return normalizeText(currentPayload && currentPayload.venueName);
   }
 
+  function getVenueAddress() {
+    const venueId = getSelectedVenueId();
+
+    return venueId
+      ? getI18nValue("services.cards.events.venues." + venueId + ".address", "")
+      : "";
+  }
+
   function getEventTitle(entity) {
     if (!entity) {
       return "";
@@ -537,6 +545,54 @@
       cta.disabled = !hasReadyPrice;
       cta.setAttribute("aria-disabled", hasReadyPrice ? "false" : "true");
     }
+
+    syncRouteEtaUi();
+
+    return true;
+  }
+
+  function getRouteEtaText(role) {
+    const quote = getQuotePayload(currentQuoteResult);
+    let label;
+    let time;
+
+    if (currentQuoteState !== "ready") {
+      return "";
+    }
+
+    if (role === "destination") {
+      label = getI18nValue("services.cards.events.panel.estimatedDestinationArrivalLabel", "");
+      time = buildEstimatedArrivalTime(
+        normalizeReturnPickupTimeValue(state.returnPickupTime),
+        quote.returnDurationSeconds
+      );
+
+      return label && time ? label + ": " + time : "";
+    }
+
+    label = getI18nValue("services.cards.events.panel.estimatedEventArrivalLabel", "");
+    time = buildEstimatedArrivalTime(
+      state.originPickupTime,
+      quote.outboundDurationSeconds
+    );
+
+    return label && time ? label + ": " + time : "";
+  }
+
+  function syncRouteEtaUi() {
+    const step = getStep();
+
+    if (!step) {
+      return false;
+    }
+
+    step.querySelectorAll("[data-events-mobile-route-eta]").forEach(function syncEta(node) {
+      const role = normalizeText(node.getAttribute("data-events-mobile-route-eta"));
+      const text = getRouteEtaText(role);
+
+      node.textContent = text;
+      node.hidden = !text;
+    });
 
     return true;
   }
@@ -1173,6 +1229,7 @@
       '</div>',
       buildTimeFieldMarkup(role),
       '</div>',
+      '<p class="events-mobile-config-step__route-eta" data-events-mobile-route-eta="' + escapeHtml(role) + '" hidden></p>',
       '</div>'
     ].join("");
   }
@@ -1183,6 +1240,7 @@
     const title = getEventTitle(group);
     const selectedDate = getEventDateLabel(selectedEvent);
     const venueName = getVenueName();
+    const venueAddress = getVenueAddress();
     const poster = group ? group.posterMobileSrc || group.posterSrc || "" : "";
     const posterAlt = getI18nValue("services.cards.events.panel.posterAlt", "");
     const backText = getI18nValue("services.cards.events.mobileFlow.back", "");
@@ -1211,6 +1269,9 @@
       '<div class="events-mobile-config-step__summary-copy">',
       '<h3 class="events-mobile-config-step__title">' + escapeHtml(title) + '</h3>',
       '<p class="events-mobile-config-step__venue">' + escapeHtml(venueName) + '</p>',
+      venueAddress
+        ? '<p class="events-mobile-config-step__venue-address">' + escapeHtml(venueAddress) + '</p>'
+        : '',
       '</div>',
       buildDateCardMarkup(selectedEvent, dateLabel),
       '</div>',

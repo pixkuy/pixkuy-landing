@@ -1,0 +1,106 @@
+{
+  "directTransferMobileFlow": {
+    "back": "Volver",
+    "title": "Traslados directos",
+    "helper": "Muévete de un punto a otro con conductor privado, tarifa estimada al momento y vehículo premium.",
+    "fields": {
+      "origin": "Origen",
+      "originPlaceholder": "Selecciona punto de origen",
+      "destination": "Destino",
+      "destinationPlaceholder": "Selecciona punto de destino",
+      "date": "Fecha",
+      "time": "Hora",
+      "passengers": "Pasajeros"
+    },
+    "addressSearch": {
+      "originTitle": "Introduce el punto de origen",
+      "destinationTitle": "Introduce el punto de destino",
+      "close": "Volver",
+      "clear": "Borrar dirección"
+    },
+    "validation": {
+      "sameRoute": "El origen y el destino no pueden ser iguales.",
+      "airportRoute": "Para traslados desde o hacia los aeropuertos que cubrimos, usa el servicio Aeropuerto / Hotel.",
+      "outOfCoverage": "Este trayecto queda fuera de nuestra zona operativa para traslados directos."
+    },
+    "passengerBuckets": {
+      "van_1_2": "1–2",
+      "van_3_4": "3–4",
+      "van_5_6": "5–6"
+    },
+    "fare": {
+      "label": "Precio",
+      "pending": "Completa origen, destino, fecha, hora y pasajeros para calcular el precio.",
+      "pendingTemplate": "Completa {fields} para calcular el precio.",
+      "pendingReady": "Preparando cálculo del precio…",
+      "separator": ", ",
+      "finalSeparator": " y ",
+      "loading": "Calculando precio…",
+      "unavailable": "No pudimos calcular el precio para este trayecto.",
+      "airportTransfer": "Este trayecto debe gestionarse como Aeropuerto / Hotel.",
+      "outOfCoverage": "Para este trayecto, podemos ayudarte por WhatsApp o con servicio de vehículo con conductor.",
+      "readySuffix": "MXN"
+    },
+    "vehicle": {
+      "title": "BYD M9",
+      "alt": "BYD M9 — van ejecutiva eléctrica"
+    },
+    "cta": {
+      "continue": "Continuar",
+      "airport": "Ir a Aeropuerto / Hotel",
+      "whatsapp": "WhatsApp",
+      "hourly": "Vehículo con conductor"
+    },
+    "whatsapp": {
+      "intro": "Hola, quiero consultar un traslado directo con Pixkuy.",
+      "serviceType": "Tipo de servicio",
+      "serviceLabel": "Traslado directo",
+      "origin": "Origen",
+      "destination": "Destino",
+      "date": "Fecha",
+      "time": "Hora",
+      "passengers": "Pasajeros",
+      "price": "Precio estimado",
+      "restriction": "Motivo"
+    },
+    "contactStep": {
+      "summary": {
+        "title": "Resumen del traslado",
+        "origin": "Origen",
+        "destination": "Destino",
+        "date": "Fecha",
+        "time": "Hora",
+        "passengers": "Pasajeros",
+        "vehicle": "Vehículo",
+        "price": "Precio"
+      },
+      "fields": {
+        "name": "Nombre",
+        "phone": "Teléfono",
+        "email": "Email",
+        "notes": "Notas"
+      },
+      "placeholders": {
+        "name": "Nombre completo",
+        "phone": "+52...",
+        "email": "tu@email.com",
+        "notes": "Notas opcionales"
+      },
+      "validation": {
+        "name": "Indica tu nombre.",
+        "phone": "Indica un teléfono válido en formato internacional.",
+        "email": "Indica un email válido.",
+        "formIncomplete": "Revisa los datos antes de enviar."
+      },
+      "notesEditor": {
+        "title": "Notas para el traslado",
+        "save": "Guardar",
+        "clear": "Borrar notas",
+        "placeholder": "Añade detalles útiles para el traslado."
+      },
+      "cta": {
+        "submit": "Enviar solicitud"
+      }
+    }
+  }
+}

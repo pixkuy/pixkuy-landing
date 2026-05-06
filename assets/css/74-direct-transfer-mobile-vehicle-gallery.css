@@ -1,0 +1,149 @@
+/* assets/css/74-direct-transfer-mobile-vehicle-gallery.css
+   Direct Transfer mobile vehicle gallery.
+   Alcance:
+   - solo móvil
+   - lightbox/modal para fotos del vehículo en Direct Transfer Mobile
+   - preparado para varias fotos
+   - no toca desktop
+   - no toca quote, CTA ni payload
+*/
+
+.direct-transfer-mobile-vehicle-gallery[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  body[data-direct-transfer-mobile-vehicle-gallery-active="true"]{
+    overflow:hidden !important;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery{
+    position:fixed;
+    inset:0;
+    z-index:96;
+    display:grid;
+    place-items:center;
+    padding:calc(68px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
+    background:rgba(0,0,0,.72);
+    overflow:hidden;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__backdrop{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    display:block;
+    width:100%;
+    height:100%;
+    border:0;
+    padding:0;
+    background:transparent;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__panel{
+    position:relative;
+    z-index:1;
+    width:min(100%, 430px);
+    max-height:100%;
+    display:grid;
+    grid-template-rows:minmax(0, 1fr) auto;
+    gap:10px;
+    overflow:hidden;
+    border:1px solid rgba(236,220,189,.18);
+    border-radius:14px;
+    background:#0f1113;
+    box-shadow:0 24px 70px rgba(0,0,0,.52);
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__close{
+    position:absolute;
+    top:8px;
+    right:8px;
+    z-index:3;
+    width:36px;
+    height:36px;
+    border:0;
+    border-radius:999px;
+    background:rgba(15,17,19,.72);
+    color:rgba(255,249,238,.94);
+    font:inherit;
+    font-size:24px;
+    line-height:1;
+    font-weight:500;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__close:focus-visible,
+  .direct-transfer-mobile-vehicle-gallery__nav:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__image-wrap{
+    width:100%;
+    min-height:0;
+    background:#090a0b;
+    overflow:hidden;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__image{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:68svh;
+    object-fit:contain;
+    background:#090a0b;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__footer{
+    display:grid;
+    gap:3px;
+    padding:0 14px 14px;
+    background:#0f1113;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__label{
+    margin:0;
+    color:rgba(255,249,238,.94);
+    font-size:14px;
+    line-height:1.2;
+    font-weight:760;
+    letter-spacing:-.01em;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__counter{
+    margin:0;
+    color:rgba(255,245,228,.54);
+    font-size:11.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__nav{
+    position:absolute;
+    top:50%;
+    z-index:3;
+    width:38px;
+    height:44px;
+    border:0;
+    border-radius:10px;
+    background:rgba(15,17,19,.62);
+    color:rgba(255,249,238,.92);
+    font:inherit;
+    font-size:34px;
+    line-height:1;
+    font-weight:300;
+    transform:translateY(-50%);
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__nav[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__nav--prev{
+    left:8px;
+  }
+
+  .direct-transfer-mobile-vehicle-gallery__nav--next{
+    right:8px;
+  }
+}

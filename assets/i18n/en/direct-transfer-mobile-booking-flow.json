@@ -1,0 +1,106 @@
+{
+  "directTransferMobileFlow": {
+    "back": "Back",
+    "title": "Direct transfers",
+    "helper": "Move from one point to another with a private driver, an instant estimated fare and a premium vehicle.",
+    "fields": {
+      "origin": "Origin",
+      "originPlaceholder": "Select pickup point",
+      "destination": "Destination",
+      "destinationPlaceholder": "Select destination point",
+      "date": "Date",
+      "time": "Time",
+      "passengers": "Passengers"
+    },
+    "addressSearch": {
+      "originTitle": "Enter the pickup point",
+      "destinationTitle": "Enter the destination point",
+      "close": "Back",
+      "clear": "Clear address"
+    },
+    "validation": {
+      "sameRoute": "Origin and destination cannot be the same.",
+      "airportRoute": "For transfers to or from the airports we cover, use the Airport / Hotel service.",
+      "outOfCoverage": "This route is outside our operating area for direct transfers."
+    },
+    "passengerBuckets": {
+      "van_1_2": "1–2",
+      "van_3_4": "3–4",
+      "van_5_6": "5–6"
+    },
+    "fare": {
+      "label": "Price",
+      "pending": "Complete origin, destination, date, time and passengers to calculate the price.",
+      "pendingTemplate": "Complete {fields} to calculate the price.",
+      "pendingReady": "Preparing price calculation…",
+      "separator": ", ",
+      "finalSeparator": " and ",
+      "loading": "Calculating price…",
+      "unavailable": "We could not calculate the price for this route.",
+      "airportTransfer": "This route must be handled as Airport / Hotel.",
+      "outOfCoverage": "For this route, we can help you through WhatsApp or with a chauffeured vehicle service.",
+      "readySuffix": "MXN"
+    },
+    "vehicle": {
+      "title": "BYD M9",
+      "alt": "BYD M9 — electric executive van"
+    },
+    "cta": {
+      "continue": "Continue",
+      "airport": "Go to Airport / Hotel",
+      "whatsapp": "WhatsApp",
+      "hourly": "Chauffeured vehicle"
+    },
+    "whatsapp": {
+      "intro": "Hello, I would like to ask about a direct transfer with Pixkuy.",
+      "serviceType": "Service type",
+      "serviceLabel": "Direct transfer",
+      "origin": "Origin",
+      "destination": "Destination",
+      "date": "Date",
+      "time": "Time",
+      "passengers": "Passengers",
+      "price": "Estimated price",
+      "restriction": "Reason"
+    },
+    "contactStep": {
+      "summary": {
+        "title": "Transfer summary",
+        "origin": "Origin",
+        "destination": "Destination",
+        "date": "Date",
+        "time": "Time",
+        "passengers": "Passengers",
+        "vehicle": "Vehicle",
+        "price": "Price"
+      },
+      "fields": {
+        "name": "Name",
+        "phone": "Phone",
+        "email": "Email",
+        "notes": "Notes"
+      },
+      "placeholders": {
+        "name": "Full name",
+        "phone": "+52...",
+        "email": "you@email.com",
+        "notes": "Optional notes"
+      },
+      "validation": {
+        "name": "Enter your name.",
+        "phone": "Enter a valid phone number in international format.",
+        "email": "Enter a valid email address.",
+        "formIncomplete": "Review the details before sending."
+      },
+      "notesEditor": {
+        "title": "Transfer notes",
+        "save": "Save",
+        "clear": "Clear notes",
+        "placeholder": "Add useful details for the transfer."
+      },
+      "cta": {
+        "submit": "Send request"
+      }
+    }
+  }
+}

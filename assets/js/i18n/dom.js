@@ -84,8 +84,11 @@
           return;
         }
 
-        // Contrato actual: se permite HTML en strings i18n
-        el.innerHTML = v;
+        // Contrato actual: se permite HTML en strings i18n.
+        // Evita escrituras DOM innecesarias en cambios de idioma, especialmente en móvil.
+        if (el.innerHTML !== v) {
+          el.innerHTML = v;
+        }
         return;
       }
 
@@ -108,7 +111,9 @@
       var v = getValue(finalDict, key);
 
       if (typeof v === "string") {
-        el.placeholder = v;
+        if (el.placeholder !== v) {
+          el.placeholder = v;
+        }
         return;
       }
 

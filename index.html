@@ -73,6 +73,11 @@
 <link rel="stylesheet" href="assets/css/68-events-mobile-address-search-sheet.css" />
 <link rel="stylesheet" href="assets/css/69-events-mobile-vehicle-gallery.css" />
 <link rel="stylesheet" href="assets/css/70-events-mobile-contact-step.css" />
+<link rel="stylesheet" href="assets/css/71-direct-transfer-mobile-booking-flow.css" />
+<link rel="stylesheet" href="assets/css/72-direct-transfer-mobile-config-step.css" />
+<link rel="stylesheet" href="assets/css/73-direct-transfer-mobile-address-search-sheet.css" />
+<link rel="stylesheet" href="assets/css/74-direct-transfer-mobile-vehicle-gallery.css" />
+<link rel="stylesheet" href="assets/css/75-direct-transfer-mobile-contact-step.css" />
 <link rel="stylesheet" href="assets/css/40-contact-hourly-daily.css" />
   <link rel="stylesheet" href="assets/css/44-contact-event-special.css" />
   <link rel="stylesheet" href="assets/css/45-services-events-spotlight.css" />
@@ -246,19 +251,6 @@
       </div>
 
       <nav class="hero-mobile-entry__actions" aria-label="Opciones de reserva rápida">
-        <a class="hero-mobile-entry__action" href="?service=airport_hotel#services">
-  <span class="hero-mobile-entry__icon" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none" focusable="false">
-      <path d="M3 16.5 10.2 14l4-8.5a1.4 1.4 0 0 1 2.6 1L14.2 15l5.4 2a1 1 0 0 1-.3 1.9h-4.4l-2.4 3a.9.9 0 0 1-1.6-.5v-3.9l-7.2-1.6a.75.75 0 0 1-.7-.7.8.8 0 0 1 0-.2Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </span>
-  <span class="hero-mobile-entry__action-copy">
-            <strong data-i18n="heroMobileEntry.airport.title">Aeropuerto / Hotel</strong>
-            <span data-i18n="heroMobileEntry.airport.text">Traslado privado desde o hacia aeropuerto y hoteles.</span>
-          </span>
-          <span class="hero-mobile-entry__action-cta" data-i18n="heroMobileEntry.cta.request">Solicitar</span>
-        </a>
-
         <a class="hero-mobile-entry__action" href="?service=hourly_daily#services">
   <span class="hero-mobile-entry__icon" aria-hidden="true">
     <svg viewBox="0 0 24 24" fill="none" focusable="false">
@@ -286,6 +278,35 @@
             <span data-i18n="heroMobileEntry.tours.text">Rutas seleccionadas con traslado privado.</span>
           </span>
           <span class="hero-mobile-entry__action-cta" data-i18n="heroMobileEntry.cta.tours">Ver tours</span>
+        </a>
+
+        <a class="hero-mobile-entry__action" href="?service=airport_hotel#services">
+  <span class="hero-mobile-entry__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" focusable="false">
+      <path d="M3 16.5 10.2 14l4-8.5a1.4 1.4 0 0 1 2.6 1L14.2 15l5.4 2a1 1 0 0 1-.3 1.9h-4.4l-2.4 3a.9.9 0 0 1-1.6-.5v-3.9l-7.2-1.6a.75.75 0 0 1-.7-.7.8.8 0 0 1 0-.2Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+  <span class="hero-mobile-entry__action-copy">
+            <strong data-i18n="heroMobileEntry.airport.title">Aeropuerto / Hotel</strong>
+            <span data-i18n="heroMobileEntry.airport.text">Traslado privado desde o hacia aeropuerto y hoteles.</span>
+          </span>
+          <span class="hero-mobile-entry__action-cta" data-i18n="heroMobileEntry.cta.request">Solicitar</span>
+        </a>
+
+        <a class="hero-mobile-entry__action" href="?service=direct_transfer#services">
+  <span class="hero-mobile-entry__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" focusable="false">
+      <path d="M5 12h13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M14.5 7.5 19 12l-4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="5" cy="12" r="2.1" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="19" cy="12" r="2.1" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
+  </span>
+  <span class="hero-mobile-entry__action-copy">
+            <strong data-i18n="heroMobileEntry.direct.title">Traslados directos</strong>
+            <span data-i18n="heroMobileEntry.direct.text">Viajes privados punto a punto dentro de CDMX.</span>
+          </span>
+          <span class="hero-mobile-entry__action-cta" data-i18n="heroMobileEntry.cta.request">Solicitar</span>
         </a>
 
         <a class="hero-mobile-entry__action" href="?service=event_special#services">
@@ -1202,6 +1223,13 @@
         <input type="hidden" name="event_special_passenger_bucket_label" value="" />
         <input type="hidden" name="event_special_price_label" value="" />
 
+        <!-- Resumen operativo direct_transfer -->
+        <input type="hidden" name="direct_transfer_trip_summary" value="" />
+        <input type="hidden" name="direct_transfer_origin_label" value="" />
+        <input type="hidden" name="direct_transfer_destination_label" value="" />
+        <input type="hidden" name="direct_transfer_passenger_bucket_label" value="" />
+        <input type="hidden" name="direct_transfer_price_label" value="" />
+
         <!-- Contexto y clasificación -->
         <input type="hidden" name="service_type" value="other" />
         <input type="hidden" name="lead_source" value="" />
@@ -1284,6 +1312,26 @@
         <input type="hidden" name="event_special_price" value="" />
         <input type="hidden" name="event_special_currency" value="" />
         <input type="hidden" name="event_special_notes" value="" />
+
+        <!-- Payload semántico direct_transfer -->
+        <input type="hidden" name="direct_transfer_origin_address" value="" />
+        <input type="hidden" name="direct_transfer_origin_place_id" value="" />
+        <input type="hidden" name="direct_transfer_origin_lat" value="" />
+        <input type="hidden" name="direct_transfer_origin_lng" value="" />
+        <input type="hidden" name="direct_transfer_destination_address" value="" />
+        <input type="hidden" name="direct_transfer_destination_place_id" value="" />
+        <input type="hidden" name="direct_transfer_destination_lat" value="" />
+        <input type="hidden" name="direct_transfer_destination_lng" value="" />
+        <input type="hidden" name="direct_transfer_date" value="" />
+        <input type="hidden" name="direct_transfer_time" value="" />
+        <input type="hidden" name="direct_transfer_passenger_fare_key" value="" />
+        <input type="hidden" name="direct_transfer_passenger_bucket_label" value="" />
+        <input type="hidden" name="direct_transfer_price" value="" />
+        <input type="hidden" name="direct_transfer_currency" value="" />
+        <input type="hidden" name="direct_transfer_duration_seconds" value="" />
+        <input type="hidden" name="direct_transfer_distance_meters" value="" />
+        <input type="hidden" name="direct_transfer_vehicle_label" value="" />
+        <input type="hidden" name="direct_transfer_notes" value="" />
 
         <!-- Capa técnica de Places / coordenadas -->
         <input type="hidden" name="origin_place_id" value="" />
@@ -3498,6 +3546,12 @@
 <script src="assets/js/services/events-mobile-vehicle-gallery.js"></script>
 <script src="assets/js/services/events-mobile-contact-step.js"></script>
 <script src="assets/js/services/events-mobile-booking-flow.js"></script>
+<script src="assets/js/services/direct-transfer-quote.js"></script>
+<script src="assets/js/services/direct-transfer-mobile-config-step.js"></script>
+<script src="assets/js/services/direct-transfer-mobile-address-search-sheet.js"></script>
+<script src="assets/js/services/direct-transfer-mobile-vehicle-gallery.js"></script>
+<script src="assets/js/services/direct-transfer-mobile-contact-step.js"></script>
+<script src="assets/js/services/direct-transfer-mobile-booking-flow.js"></script>
 <script src="assets/js/services-expand.js"></script>
 <script src="assets/js/services/events-special-spotlight.js"></script>
 <script src="assets/js/data/brand-collaborations-config.js"></script>
