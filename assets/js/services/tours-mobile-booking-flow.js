@@ -43,11 +43,14 @@
     san_miguel_allende: "assets/img/tours/san_miguel_allende_mobile.jpg"
   };
 
+  const IN_MOTION_RETURN_CONTEXT_KEY = "pixkuy_in_motion_scroll_cinema_return";
+
   const mobileQuery = window.matchMedia ? window.matchMedia(MOBILE_QUERY) : null;
 
   let routeNode = null;
   let routeContent = null;
   let isRouteOpen = false;
+  let inMotionReturnContext = null;
   let selectedTourId = TOUR_IDS[0];
 
   function isMobileViewport() {
@@ -200,6 +203,108 @@
     const api = window.PixkuyToursMobileConfigStep;
 
     return api && typeof api === "object" ? api : null;
+  }
+  
+    function getTourFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      const tourId = normalizeText(params.get("tour"));
+
+      return TOUR_IDS.indexOf(tourId) !== -1 ? tourId : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function getInMotionReturnContextFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      const returnTo = normalizeText(params.get("return_to")).toLowerCase();
+
+      if (returnTo !== "in_motion_scroll_cinema") {
+        return null;
+      }
+
+      return {
+        chapter: normalizeText(params.get("return_chapter")),
+        time: normalizeText(params.get("return_time"))
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function getStoredInMotionReturnContext() {
+    try {
+      const raw = window.sessionStorage.getItem(IN_MOTION_RETURN_CONTEXT_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+
+      if (!parsed || typeof parsed !== "object") {
+        return null;
+      }
+
+      return {
+        chapter: normalizeText(parsed.chapter),
+        time: normalizeText(String(parsed.time || "")),
+        scrollY: parsed.scrollY
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function getResolvedInMotionReturnContext() {
+    return (
+      inMotionReturnContext ||
+      getInMotionReturnContextFromUrl() ||
+      getStoredInMotionReturnContext()
+    );
+  }
+
+  function shouldReturnToInMotionScrollCinema() {
+    return Boolean(getResolvedInMotionReturnContext());
+  }
+
+  function returnToInMotionScrollCinema() {
+    const context = getResolvedInMotionReturnContext();
+    const api = window.PixkuyInMotionScrollCinema;
+    const target =
+      document.querySelector("[data-in-motion-scroll-cinema]") ||
+      document.querySelector("#pixkuy-in-motion");
+
+    try {
+      const url = new URL(window.location.href);
+
+      url.searchParams.delete("service");
+      url.searchParams.delete("step");
+      url.searchParams.delete("tour");
+      url.searchParams.delete("return_to");
+      url.searchParams.delete("return_chapter");
+      url.searchParams.delete("return_time");
+      url.hash = "pixkuy-in-motion";
+
+      window.history.replaceState(
+        { inMotionScrollCinema: true },
+        document.title,
+        url.pathname + url.search + url.hash
+      );
+    } catch (error) {}
+
+    inMotionReturnContext = null;
+
+    if (api && typeof api.returnTo === "function") {
+      return api.returnTo(context || {});
+    }
+
+    if (target && typeof target.scrollIntoView === "function") {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+      return true;
+    }
+
+    return false;
   }
 
   function pushToursConfigStepUrl(tourId) {
@@ -451,8 +556,16 @@
   }
 
   function openToursRoute() {
+    const tourFromUrl = getTourFromUrl();
+
     if (!isMobileViewport()) {
       return false;
+    }
+
+    inMotionReturnContext = getResolvedInMotionReturnContext();
+
+    if (tourFromUrl) {
+      selectedTourId = tourFromUrl;
     }
 
     runWithViewTransition(function updateToursRoute() {
@@ -479,6 +592,18 @@
     if (settings.updateUrl === true) {
       removeToursServiceFromUrl();
     }
+
+    return true;
+  }
+  
+    function closeToursRouteForInMotionReturn() {
+    const configStep = getToursMobileConfigStepApi();
+
+    if (configStep && typeof configStep.close === "function") {
+      configStep.close();
+    }
+
+    setRouteVisibility(false);
 
     return true;
   }
@@ -526,6 +651,23 @@
     back.dataset.toursMobileBackBound = "1";
 
     back.addEventListener("click", function onBackClick() {
+      if (shouldReturnToInMotionScrollCinema()) {
+        inMotionReturnContext = getResolvedInMotionReturnContext();
+
+        closeToursRouteForInMotionReturn();
+
+        window.requestAnimationFrame(function returnAfterToursClose() {
+          returnToInMotionScrollCinema();
+        });
+
+        return;
+      }
+	  
+      if (isToursConfigStepOpen()) {
+        closeToursConfigStep();
+        return;
+      }
+
       closeToursRoute({ updateUrl: true });
     });
 
@@ -599,6 +741,18 @@
     window.addEventListener("pageshow", syncActiveState);
     window.addEventListener("hashchange", syncActiveState);
     window.addEventListener("popstate", function onPopState() {
+      if (isRouteOpen && shouldReturnToInMotionScrollCinema()) {
+        inMotionReturnContext = getResolvedInMotionReturnContext();
+
+        closeToursRouteForInMotionReturn();
+
+        window.requestAnimationFrame(function returnAfterToursClose() {
+          returnToInMotionScrollCinema();
+        });
+
+        return;
+      }
+
       if (isToursConfigStepOpen()) {
         closeToursConfigStep();
         return;
@@ -624,6 +778,14 @@
 
     return true;
   }
+
+  window.PixkuyToursMobileBookingFlow = {
+    open: openToursRoute,
+    close: closeToursRoute,
+    isOpen: function isOpen() {
+      return isRouteOpen;
+    }
+  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });

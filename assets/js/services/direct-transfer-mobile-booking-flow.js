@@ -30,8 +30,9 @@
   const mobileQuery = window.matchMedia ? window.matchMedia(MOBILE_QUERY) : null;
 
   let routeNode = null;
-  let routeContent = null;
-  let isRouteOpen = false;
+let routeContent = null;
+let isRouteOpen = false;
+let inMotionReturnContext = null;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -80,6 +81,64 @@
     const api = window.PixkuyDirectTransferMobileContactStep;
 
     return api && typeof api === "object" ? api : null;
+  }
+  
+    function getInMotionReturnContextFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      const returnTo = normalizeText(params.get("return_to")).toLowerCase();
+
+      if (returnTo !== "in_motion_scroll_cinema") {
+        return null;
+      }
+
+      return {
+        chapter: normalizeText(params.get("return_chapter")),
+        time: normalizeText(params.get("return_time"))
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function returnToInMotionScrollCinema() {
+    const context = inMotionReturnContext || getInMotionReturnContextFromUrl();
+    const api = window.PixkuyInMotionScrollCinema;
+    const target =
+      document.querySelector("[data-in-motion-scroll-cinema]") ||
+      document.querySelector("#pixkuy-in-motion");
+
+    try {
+      const url = new URL(window.location.href);
+
+      url.searchParams.delete("service");
+      url.searchParams.delete("return_to");
+      url.searchParams.delete("return_chapter");
+      url.searchParams.delete("return_time");
+      url.hash = "pixkuy-in-motion";
+
+      window.history.replaceState(
+        { inMotionScrollCinema: true },
+        document.title,
+        url.pathname + url.search + url.hash
+      );
+    } catch (error) {}
+
+    inMotionReturnContext = null;
+
+    if (api && typeof api.returnTo === "function") {
+      return api.returnTo(context || {});
+    }
+
+    if (target && typeof target.scrollIntoView === "function") {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+      return true;
+    }
+
+    return false;
   }
 
   function buildRouteNode() {
@@ -254,6 +313,8 @@
       return false;
     }
 
+    inMotionReturnContext = getInMotionReturnContextFromUrl();
+
     ensureRoute();
     syncCopy();
     setRouteVisibility(true);
@@ -319,6 +380,12 @@
     back.dataset.directTransferMobileBackBound = "1";
 
     back.addEventListener("click", function onBackClick() {
+      if (inMotionReturnContext) {
+        closeDirectTransferRoute({ updateUrl: false });
+        returnToInMotionScrollCinema();
+        return;
+      }
+
       closeDirectTransferRoute({ updateUrl: true });
     });
 
@@ -392,7 +459,15 @@
 
     window.addEventListener("popstate", function onPopState() {
       if (isRouteOpen) {
+        const shouldReturnToInMotion = Boolean(inMotionReturnContext);
+
         closeDirectTransferRoute({ updateUrl: false });
+
+        if (shouldReturnToInMotion) {
+          returnToInMotionScrollCinema();
+          return;
+        }
+
         return;
       }
 

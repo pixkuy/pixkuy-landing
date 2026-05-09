@@ -38,6 +38,7 @@
   let originalPanelParent = null;
   let originalPanelNextSibling = null;
   let isRouteOpen = false;
+  let inMotionReturnContext = null;
   let hasDirectMobilePanelOpen = false;
 
   function isMobileViewport() {
@@ -359,6 +360,34 @@
     }
   }
 
+  function shouldReturnToInMotionScrollCinema() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+
+      return normalizeText(params.get("return_to")).toLowerCase() === "in_motion_scroll_cinema";
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function getInMotionReturnContextFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      const returnTo = normalizeText(params.get("return_to")).toLowerCase();
+
+      if (returnTo !== "in_motion_scroll_cinema") {
+        return null;
+      }
+
+      return {
+        chapter: normalizeText(params.get("return_chapter")),
+        time: normalizeText(params.get("return_time"))
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
   function returnToDirectTransferRoute() {
     const api = window.PixkuyDirectTransferMobileBookingFlow;
 
@@ -367,6 +396,8 @@
 
       url.searchParams.set("service", "direct_transfer");
       url.searchParams.delete("return_to");
+      url.searchParams.delete("return_chapter");
+      url.searchParams.delete("return_time");
       url.hash = "";
 
       window.history.replaceState(
@@ -378,6 +409,46 @@
 
     if (api && typeof api.open === "function") {
       api.open();
+      return true;
+    }
+
+    return false;
+  }
+
+  function returnToInMotionScrollCinema() {
+    const context = inMotionReturnContext || getInMotionReturnContextFromUrl();
+    const api = window.PixkuyInMotionScrollCinema;
+    const target =
+      document.querySelector("[data-in-motion-scroll-cinema]") ||
+      document.querySelector("#pixkuy-in-motion");
+
+    try {
+      const url = new URL(window.location.href);
+
+      url.searchParams.delete("service");
+      url.searchParams.delete("return_to");
+      url.searchParams.delete("return_chapter");
+      url.searchParams.delete("return_time");
+      url.hash = "pixkuy-in-motion";
+
+      window.history.replaceState(
+        { inMotionScrollCinema: true },
+        document.title,
+        url.pathname + url.search + url.hash
+      );
+    } catch (error) {}
+
+    inMotionReturnContext = null;
+
+    if (api && typeof api.returnTo === "function") {
+      return api.returnTo(context || {});
+    }
+
+    if (target && typeof target.scrollIntoView === "function") {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
       return true;
     }
 
@@ -420,6 +491,13 @@
       if (shouldReturnToDirectTransfer()) {
         closeHourlyRoute({ collapsePanel: true, updateUrl: false });
         returnToDirectTransferRoute();
+        return;
+      }
+
+      if (shouldReturnToInMotionScrollCinema()) {
+        inMotionReturnContext = inMotionReturnContext || getInMotionReturnContextFromUrl();
+        closeHourlyRoute({ collapsePanel: true, updateUrl: false });
+        returnToInMotionScrollCinema();
         return;
       }
 
@@ -946,6 +1024,8 @@
       return false;
     }
 
+    inMotionReturnContext = getInMotionReturnContextFromUrl();
+
      /*
       Hourly tiene una sábana legacy; Airport no.
       Activamos el atributo antes de abrir el panel para que la sábana no robe el configMount.
@@ -1277,7 +1357,15 @@
     window.addEventListener("hashchange", syncActiveState);
     window.addEventListener("popstate", function onPopState() {
       if (isRouteOpen) {
+        const shouldReturnToInMotion = Boolean(inMotionReturnContext || getInMotionReturnContextFromUrl());
+
         closeHourlyRoute({ collapsePanel: true, updateUrl: false });
+
+        if (shouldReturnToInMotion) {
+          returnToInMotionScrollCinema();
+          return;
+        }
+
         return;
       }
 
@@ -1330,6 +1418,14 @@
 
     return true;
   }
+
+  window.PixkuyHourlyMobileBookingFlow = {
+    open: openHourlyRoute,
+    close: closeHourlyRoute,
+    isOpen: function isOpen() {
+      return isRouteOpen;
+    }
+  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });

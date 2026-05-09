@@ -1,0 +1,66 @@
+{
+  "inMotionScrollCinema": {
+    "label": "Pixkuy 滚动影院",
+    "ariaLabel": "Pixkuy Mobility 互动旅程故事",
+    "videoLabel": "Pixkuy Mobility 在墨西哥城的视频",
+    "progressLabel": "视频章节",
+    "play": "播放",
+    "pause": "暂停",
+    "chapters": {
+      "arrival": {
+        "label": "抵达墨西哥",
+        "title": "欢迎来到墨西哥",
+        "text": "您的行程从机场开始。",
+        "cta": "预订机场接送"
+      },
+      "driver": {
+        "label": "您的司机",
+        "title": "您的司机正在等候",
+        "text": "从第一分钟开始的私人司机服务。",
+        "cta": "查看车队"
+      },
+      "cityRide": {
+        "label": "前往市区",
+        "title": "前往市区",
+        "text": "直接、舒适且有序地抵达目的地。",
+        "cta": "申请点到点接送"
+      },
+      "cdmx": {
+        "label": "探索 CDMX",
+        "title": "探索墨西哥城",
+        "text": "以细致可靠的私人服务在城市中出行。",
+        "cta": "查看 CDMX 出行"
+      },
+      "teotihuacan": {
+        "label": "特奥蒂瓦坎",
+        "title": "特奥蒂瓦坎",
+        "text": "从墨西哥城出发的私人旅行，按您的节奏进行。",
+        "cta": "查看私人旅行"
+      },
+      "xochimilco": {
+        "label": "霍奇米尔科",
+        "title": "霍奇米尔科",
+        "text": "通过私人行程探索城市的另一面。",
+        "cta": "查看私人旅行"
+      },
+      "wc2026": {
+        "label": "2026 世界杯",
+        "title": "2026 世界杯",
+        "text": "为墨西哥城比赛和活动提供私人接送。",
+        "cta": "查看 2026 世界杯"
+      },
+      "returnHome": {
+        "label": "返程",
+        "title": "返程",
+        "text": "从酒店返回或前往机场，无需临时安排。",
+        "cta": "预订酒店 / 机场"
+      },
+      "final": {
+        "label": "行程结束",
+        "title": "您的旅程从这里开始",
+        "text": "通过 Pixkuy Mobility 申请私人接送。",
+        "cta": "申请接送"
+      }
+    }
+  }
+}

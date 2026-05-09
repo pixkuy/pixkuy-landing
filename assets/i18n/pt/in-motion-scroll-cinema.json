@@ -1,0 +1,66 @@
+{
+  "inMotionScrollCinema": {
+    "label": "Scroll-cinema Pixkuy",
+    "ariaLabel": "História interativa de Pixkuy em movimento",
+    "videoLabel": "Vídeo da Pixkuy Mobility na Cidade do México",
+    "progressLabel": "Capítulos do vídeo",
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "chapters": {
+      "arrival": {
+        "label": "Chegada ao México",
+        "title": "Bem-vindo ao México",
+        "text": "Sua viagem começa no aeroporto.",
+        "cta": "Reservar traslado aeroporto"
+      },
+      "driver": {
+        "label": "Seu motorista",
+        "title": "Seu motorista espera por você",
+        "text": "Serviço privado com motorista desde o primeiro minuto.",
+        "cta": "Ver frota de veículos"
+      },
+      "cityRide": {
+        "label": "Rumo à cidade",
+        "title": "Rumo à cidade",
+        "text": "Traslado direto, confortável e coordenado até seu destino.",
+        "cta": "Solicitar traslado direto"
+      },
+      "cdmx": {
+        "label": "Explore a CDMX",
+        "title": "Explore a Cidade do México",
+        "text": "Movimente-se pela cidade com um serviço privado e cuidadoso.",
+        "cta": "Ver traslados na CDMX"
+      },
+      "teotihuacan": {
+        "label": "Teotihuacán",
+        "title": "Teotihuacán",
+        "text": "Tours privados saindo da Cidade do México, no seu ritmo.",
+        "cta": "Ver tours privados"
+      },
+      "xochimilco": {
+        "label": "Xochimilco",
+        "title": "Xochimilco",
+        "text": "Trajetos privados para descobrir outro lado da cidade.",
+        "cta": "Ver tours privados"
+      },
+      "wc2026": {
+        "label": "Copa do Mundo 2026",
+        "title": "Copa do Mundo 2026",
+        "text": "Traslados privados para jogos e eventos na Cidade do México.",
+        "cta": "Ver Copa do Mundo 2026"
+      },
+      "returnHome": {
+        "label": "Volta para casa",
+        "title": "Volta para casa",
+        "text": "Volte ao seu hotel ou conecte-se ao aeroporto sem improvisar.",
+        "cta": "Reservar hotel / aeroporto"
+      },
+      "final": {
+        "label": "Fim da viagem",
+        "title": "Sua viagem começa aqui",
+        "text": "Solicite um traslado privado com a Pixkuy Mobility.",
+        "cta": "Solicitar traslado"
+      }
+    }
+  }
+}

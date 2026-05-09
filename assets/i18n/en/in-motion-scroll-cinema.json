@@ -1,0 +1,66 @@
+{
+  "inMotionScrollCinema": {
+    "label": "Pixkuy scroll-cinema",
+    "ariaLabel": "Interactive Pixkuy in motion story",
+    "videoLabel": "Pixkuy Mobility video in Mexico City",
+    "progressLabel": "Video chapters",
+    "play": "Play",
+    "pause": "Pause",
+    "chapters": {
+      "arrival": {
+        "label": "Arrival in Mexico",
+        "title": "Welcome to Mexico",
+        "text": "Your trip starts at the airport.",
+        "cta": "Book airport transfer"
+      },
+      "driver": {
+        "label": "Your driver",
+        "title": "Your driver is waiting",
+        "text": "Private chauffeur service from the first minute.",
+        "cta": "View vehicle fleet"
+      },
+      "cityRide": {
+        "label": "Into the city",
+        "title": "Into the city",
+        "text": "A direct, comfortable and coordinated ride to your destination.",
+        "cta": "Request direct transfer"
+      },
+      "cdmx": {
+        "label": "Explore CDMX",
+        "title": "Explore Mexico City",
+        "text": "Move around the city with a private, carefully managed service.",
+        "cta": "View CDMX rides"
+      },
+      "teotihuacan": {
+        "label": "Teotihuacan",
+        "title": "Teotihuacan",
+        "text": "Private tours from Mexico City, at your own pace.",
+        "cta": "View private tours"
+      },
+      "xochimilco": {
+        "label": "Xochimilco",
+        "title": "Xochimilco",
+        "text": "Private rides to discover another side of the city.",
+        "cta": "View private tours"
+      },
+      "wc2026": {
+        "label": "World Cup 2026",
+        "title": "World Cup 2026",
+        "text": "Private transfers for matches and events in Mexico City.",
+        "cta": "View World Cup 2026"
+      },
+      "returnHome": {
+        "label": "Back home",
+        "title": "Back home",
+        "text": "Return to your hotel or connect with the airport without improvising.",
+        "cta": "Book hotel / airport"
+      },
+      "final": {
+        "label": "End of the ride",
+        "title": "Your ride starts here",
+        "text": "Request a private transfer with Pixkuy Mobility.",
+        "cta": "Request transfer"
+      }
+    }
+  }
+}

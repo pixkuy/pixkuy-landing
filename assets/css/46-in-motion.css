@@ -80,7 +80,7 @@
 
 .in-motion__card:not(.in-motion__card--primary){
   grid-template-columns:220px minmax(0, 1fr);
-}@
+}
 
 .in-motion__card:nth-child(3):not(.in-motion__card--primary){
   grid-template-columns:minmax(0, 1fr) 220px;

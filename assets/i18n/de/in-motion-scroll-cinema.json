@@ -1,0 +1,66 @@
+{
+  "inMotionScrollCinema": {
+    "label": "Pixkuy Scroll-Cinema",
+    "ariaLabel": "Interaktive Geschichte von Pixkuy in Bewegung",
+    "videoLabel": "Video von Pixkuy Mobility in Mexiko-Stadt",
+    "progressLabel": "Videokapitel",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "chapters": {
+      "arrival": {
+        "label": "Ankunft in Mexiko",
+        "title": "Willkommen in Mexiko",
+        "text": "Ihre Reise beginnt am Flughafen.",
+        "cta": "Flughafentransfer buchen"
+      },
+      "driver": {
+        "label": "Ihr Fahrer",
+        "title": "Ihr Fahrer wartet",
+        "text": "Privater Chauffeurservice ab der ersten Minute.",
+        "cta": "Fahrzeugflotte ansehen"
+      },
+      "cityRide": {
+        "label": "In die Stadt",
+        "title": "In die Stadt",
+        "text": "Direkt, komfortabel und koordiniert zu Ihrem Ziel.",
+        "cta": "Direkttransfer anfragen"
+      },
+      "cdmx": {
+        "label": "CDMX entdecken",
+        "title": "Mexiko-Stadt entdecken",
+        "text": "Bewegen Sie sich mit einem privaten, sorgfältig betreuten Service durch die Stadt.",
+        "cta": "Transfers in CDMX ansehen"
+      },
+      "teotihuacan": {
+        "label": "Teotihuacán",
+        "title": "Teotihuacán",
+        "text": "Private Touren ab Mexiko-Stadt, in Ihrem Tempo.",
+        "cta": "Private Touren ansehen"
+      },
+      "xochimilco": {
+        "label": "Xochimilco",
+        "title": "Xochimilco",
+        "text": "Private Fahrten, um eine andere Seite der Stadt zu entdecken.",
+        "cta": "Private Touren ansehen"
+      },
+      "wc2026": {
+        "label": "WM 2026",
+        "title": "WM 2026",
+        "text": "Private Transfers zu Spielen und Events in Mexiko-Stadt.",
+        "cta": "WM 2026 ansehen"
+      },
+      "returnHome": {
+        "label": "Zurück nach Hause",
+        "title": "Zurück nach Hause",
+        "text": "Zurück zum Hotel oder weiter zum Flughafen, ohne Improvisation.",
+        "cta": "Hotel / Flughafen buchen"
+      },
+      "final": {
+        "label": "Ende der Fahrt",
+        "title": "Ihre Fahrt beginnt hier",
+        "text": "Fordern Sie einen privaten Transfer mit Pixkuy Mobility an.",
+        "cta": "Transfer anfragen"
+      }
+    }
+  }
+}

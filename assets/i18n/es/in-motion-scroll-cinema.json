@@ -1,0 +1,66 @@
+{
+  "inMotionScrollCinema": {
+    "label": "Scroll-cinema Pixkuy",
+    "ariaLabel": "Historia interactiva de Pixkuy en movimiento",
+    "videoLabel": "Vídeo de Pixkuy Mobility en Ciudad de México",
+    "progressLabel": "Capítulos del vídeo",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "chapters": {
+      "arrival": {
+        "label": "Llegada a México",
+        "title": "Bienvenido a México",
+        "text": "Tu viaje comienza desde el aeropuerto.",
+        "cta": "Reservar aeropuerto"
+      },
+      "driver": {
+  "label": "Tu conductor",
+  "title": "Tu conductor te espera",
+  "text": "Servicio privado con conductor desde el primer minuto.",
+  "cta": "Ver flota de vehículos"
+},
+      "cityRide": {
+        "label": "Rumbo a la ciudad",
+        "title": "Rumbo a la ciudad",
+        "text": "Traslado directo, cómodo y coordinado a tu destino.",
+        "cta": "Solicitar traslado directo"
+      },
+      "cdmx": {
+        "label": "Explora CDMX",
+        "title": "Explora Ciudad de México",
+        "text": "Muévete por la ciudad con un servicio privado y cuidado.",
+        "cta": "Ver traslados en CDMX"
+      },
+      "teotihuacan": {
+        "label": "Teotihuacán",
+        "title": "Teotihuacán",
+        "text": "Tours privados desde Ciudad de México, a tu ritmo.",
+        "cta": "Ver tours privados"
+      },
+      "xochimilco": {
+        "label": "Xochimilco",
+        "title": "Xochimilco",
+        "text": "Recorridos privados para descubrir otra cara de la ciudad.",
+        "cta": "Ver tours privados"
+      },
+      "wc2026": {
+        "label": "Mundial 2026",
+        "title": "Mundial 2026",
+        "text": "Traslados privados para partidos y eventos en Ciudad de México.",
+        "cta": "Ver Mundial 2026"
+      },
+      "returnHome": {
+        "label": "Vuelta a casa",
+        "title": "Vuelta a casa",
+        "text": "Regresa a tu hotel o conecta con el aeropuerto sin improvisar.",
+        "cta": "Reservar hotel / aeropuerto"
+      },
+      "final": {
+        "label": "Final del viaje",
+        "title": "Tu viaje empieza aquí",
+        "text": "Solicita un traslado privado con Pixkuy Mobility.",
+        "cta": "Solicitar traslado"
+      }
+    }
+  }
+}

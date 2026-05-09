@@ -33,6 +33,7 @@
 
   const DIRECTION_AIRPORT_TO_HOTEL = "airport_to_hotel";
   const DIRECTION_HOTEL_TO_AIRPORT = "hotel_to_airport";
+  const IN_MOTION_RETURN_CONTEXT_KEY = "pixkuy_in_motion_scroll_cinema_return";
 
   const mobileQuery = window.matchMedia ? window.matchMedia(MOBILE_QUERY) : null;
 
@@ -44,6 +45,7 @@
   let originalDestinationZoneParent = null;
   let originalDestinationZoneNextSibling = null;
   let isRouteOpen = false;
+  let inMotionReturnContext = null;
   let hasDirectMobilePanelOpen = false;
   let mobileLuggageValue = "0";
   let mobileFareObserver = null;
@@ -562,6 +564,29 @@
       airportId: prefill.airportId,
       direction: prefill.direction || getCurrentDirection(panel)
     });
+
+    syncDirectionButtons(panel);
+
+    return true;
+  }
+
+  function applyAirportDirectionPrefillFromUrl(panel) {
+    const prefill = getAirportPrefillFromUrl();
+    const direction = normalizeText(prefill.direction);
+
+    if (
+      !panel ||
+      (
+        direction !== DIRECTION_AIRPORT_TO_HOTEL &&
+        direction !== DIRECTION_HOTEL_TO_AIRPORT
+      )
+    ) {
+      return false;
+    }
+
+    if (getCurrentDirection(panel) !== direction) {
+      clickSwap(panel);
+    }
 
     syncDirectionButtons(panel);
 
@@ -1542,6 +1567,55 @@
       return false;
     }
   }
+  
+  function getInMotionReturnContextFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      const returnTo = normalizeText(params.get("return_to")).toLowerCase();
+
+      if (returnTo !== "in_motion_scroll_cinema") {
+        return null;
+      }
+
+      return {
+        chapter: normalizeText(params.get("return_chapter")),
+        time: normalizeText(params.get("return_time"))
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function getStoredInMotionReturnContext() {
+    try {
+      const raw = window.sessionStorage.getItem(IN_MOTION_RETURN_CONTEXT_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+
+      if (!parsed || typeof parsed !== "object") {
+        return null;
+      }
+
+      return {
+        chapter: normalizeText(parsed.chapter),
+        time: normalizeText(String(parsed.time || "")),
+        scrollY: parsed.scrollY
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function getResolvedInMotionReturnContext() {
+    return (
+      inMotionReturnContext ||
+      getInMotionReturnContextFromUrl() ||
+      getStoredInMotionReturnContext()
+    );
+  }
+
+  function shouldReturnToInMotionScrollCinema() {
+    return Boolean(getResolvedInMotionReturnContext());
+  }
 
   function returnToDirectTransferRoute() {
     const api = window.PixkuyDirectTransferMobileBookingFlow;
@@ -1564,6 +1638,48 @@
 
     if (api && typeof api.open === "function") {
       api.open();
+      return true;
+    }
+
+    return false;
+  }
+  
+    function returnToInMotionScrollCinema() {
+    const context = getResolvedInMotionReturnContext();
+    const api = window.PixkuyInMotionScrollCinema;
+    const target =
+      document.querySelector("[data-in-motion-scroll-cinema]") ||
+      document.querySelector("#pixkuy-in-motion");
+
+    try {
+      const url = new URL(window.location.href);
+
+      url.searchParams.delete("service");
+      url.searchParams.delete("return_to");
+      url.searchParams.delete("return_chapter");
+      url.searchParams.delete("return_time");
+      url.searchParams.delete("airport_id");
+      url.searchParams.delete("airport_direction");
+      url.hash = "pixkuy-in-motion";
+
+      window.history.replaceState(
+        { inMotionScrollCinema: true },
+        document.title,
+        url.pathname + url.search + url.hash
+      );
+    } catch (error) {}
+
+    inMotionReturnContext = null;
+
+    if (api && typeof api.returnTo === "function") {
+      return api.returnTo(context || {});
+    }
+
+    if (target && typeof target.scrollIntoView === "function") {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
       return true;
     }
 
@@ -1595,6 +1711,18 @@
       if (shouldReturnToDirectTransfer()) {
         closeAirportRoute({ collapsePanel: true, updateUrl: false });
         returnToDirectTransferRoute();
+        return;
+      }
+
+      if (shouldReturnToInMotionScrollCinema()) {
+        inMotionReturnContext = getResolvedInMotionReturnContext();
+
+        closeAirportRoute({ collapsePanel: true, updateUrl: false });
+
+        window.requestAnimationFrame(function returnAfterAirportClose() {
+          returnToInMotionScrollCinema();
+        });
+
         return;
       }
 
@@ -1741,6 +1869,8 @@
       return false;
     }
 
+    inMotionReturnContext = getResolvedInMotionReturnContext();
+
     if (!openAirportPanelEngine(panel)) {
       return false;
     }
@@ -1750,6 +1880,7 @@
     bindBack(panel);
     bindContinue(panel);
     bindAirportMobilePicker(panel);
+    applyAirportDirectionPrefillFromUrl(panel);
     applyAirportPrefillFromUrl(panel);
     syncDirectionButtons(panel);
 
@@ -1953,6 +2084,18 @@
     window.addEventListener("pageshow", syncActiveState);
     window.addEventListener("hashchange", syncActiveState);
     window.addEventListener("popstate", function onPopState() {
+      if (isRouteOpen && shouldReturnToInMotionScrollCinema()) {
+        inMotionReturnContext = getResolvedInMotionReturnContext();
+
+        closeAirportRoute({ collapsePanel: true, updateUrl: false });
+
+        window.requestAnimationFrame(function returnAfterAirportClose() {
+          returnToInMotionScrollCinema();
+        });
+
+        return;
+      }
+
       if (isRouteOpen) {
         closeAirportRoute({ collapsePanel: true, updateUrl: false });
         return;
@@ -1978,6 +2121,14 @@
 
     return true;
   }
+
+  window.PixkuyAirportMobileBookingFlow = {
+    open: openAirportRoute,
+    close: closeAirportRoute,
+    isOpen: function isOpen() {
+      return isRouteOpen;
+    }
+  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });

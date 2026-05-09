@@ -1,0 +1,301 @@
+/* assets/css/76-in-motion-scroll-cinema.css
+   Pixkuy en movimiento — Scroll-cinema.
+   Alcance:
+   - solo móvil
+   - vídeo narrativo con capítulos accionables
+   - CTA dinámico por capítulo
+   - no modifica la galería existente
+   - no modifica desktop
+*/
+
+.in-motion-scroll-cinema{
+  display:none;
+}
+
+@media (max-width:720px){
+  .in-motion-scroll-cinema{
+    display:block;
+    min-height:155svh;
+    margin-top:24px;
+    padding:0;
+  }
+
+  .in-motion-scroll-cinema[hidden]{
+    display:none !important;
+  }
+  
+    body[data-in-motion-scroll-cinema-active="true"] .whatsapp-floating,
+  body[data-in-motion-scroll-cinema-active="true"] .events-special-spotlight{
+    display:none !important;
+  }
+
+  .in-motion-scroll-cinema__frame{
+    position:sticky;
+    top:0;
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+
+    border:0;
+    border-radius:0;
+    background:#0f1113;
+  }
+
+  .in-motion-scroll-cinema__video{
+    position:absolute;
+    inset:0;
+
+    display:block;
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+    object-position:center;
+
+    background:#0f1113;
+  }
+
+  .in-motion-scroll-cinema__shade{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(90deg, rgba(15,17,19,.06), rgba(15,17,19,.04) 44%, rgba(15,17,19,.52) 100%),
+      linear-gradient(180deg, rgba(15,17,19,.08) 0%, rgba(15,17,19,0) 44%, rgba(15,17,19,.58) 100%);
+  }
+
+  .in-motion-scroll-cinema__scrub{
+    position:absolute;
+    top:calc(78px + env(safe-area-inset-top));
+    right:10px;
+    bottom:118px;
+    z-index:2;
+
+    display:grid;
+    align-content:space-between;
+    gap:5px;
+
+    width:78px;
+    margin:0;
+    padding:0;
+
+    list-style:none;
+  }
+
+  .in-motion-scroll-cinema__scrub::before{
+    content:"";
+    position:absolute;
+    top:8px;
+    bottom:8px;
+    right:8px;
+    width:1px;
+    background:rgba(244,242,238,.26);
+  }
+
+  .in-motion-scroll-cinema__chapter{
+    position:relative;
+    z-index:1;
+
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) 17px;
+    align-items:center;
+    gap:7px;
+
+    width:100%;
+    min-height:28px;
+    padding:0;
+
+    border:0;
+    background:transparent;
+    color:rgba(244,242,238,.64);
+
+    font:inherit;
+    text-align:right;
+    cursor:pointer;
+  }
+
+  .in-motion-scroll-cinema__chapter-label{
+    display:block;
+    min-width:0;
+
+    font-size:10px;
+    line-height:1.12;
+    letter-spacing:-0.01em;
+  }
+
+  .in-motion-scroll-cinema__chapter-dot{
+    display:block;
+    width:9px;
+    height:9px;
+    justify-self:end;
+
+    border-radius:50%;
+    border:1px solid rgba(244,242,238,.45);
+    background:rgba(15,17,19,.62);
+  }
+
+  .in-motion-scroll-cinema__chapter[aria-pressed="true"]{
+    color:var(--fg);
+  }
+
+  .in-motion-scroll-cinema__chapter[aria-pressed="true"] .in-motion-scroll-cinema__chapter-dot{
+    width:13px;
+    height:13px;
+    border-color:rgba(31,122,109,.95);
+    background:var(--accent);
+    box-shadow:0 0 0 3px rgba(31,122,109,.24);
+  }
+
+  .in-motion-scroll-cinema__chapter:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:3px;
+  }
+
+  .in-motion-scroll-cinema__panel{
+    position:absolute;
+    left:10px;
+    right:10px;
+    bottom:calc(10px + env(safe-area-inset-bottom));
+    z-index:3;
+
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) 34px;
+    gap:8px;
+    align-items:end;
+
+    padding:8px;
+
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:10px;
+    background:rgba(15,17,19,.68);
+  }
+
+  .in-motion-scroll-cinema__copy{
+    min-width:0;
+  }
+
+  .in-motion-scroll-cinema__title{
+    margin:0;
+    color:var(--fg);
+    font-size:13px;
+    line-height:1.12;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+
+  .in-motion-scroll-cinema__text{
+    display:none;
+  }
+
+  .in-motion-scroll-cinema__cta{
+    width:100%;
+    min-height:32px;
+    margin-top:6px;
+    padding:0 10px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:10px;
+    background:var(--accent);
+    color:#fff;
+
+    text-decoration:none;
+    font-size:11px;
+    line-height:1;
+    font-weight:700;
+  }
+
+  .in-motion-scroll-cinema__cta::after{
+    content:"→";
+    flex:0 0 auto;
+    font-size:17px;
+    line-height:1;
+  }
+
+  .in-motion-scroll-cinema__cta:focus-visible{
+    outline:2px solid rgba(244,242,238,.95);
+    outline-offset:3px;
+  }
+
+  .in-motion-scroll-cinema__toggle{
+    width:34px;
+    height:34px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(15,17,19,.58);
+    color:var(--fg);
+
+    font-size:0;
+    line-height:0;
+    cursor:pointer;
+  }
+
+  .in-motion-scroll-cinema__toggle::before{
+    content:"";
+    display:block;
+    width:10px;
+    height:13px;
+
+    border-left:3px solid currentColor;
+    border-right:3px solid currentColor;
+  }
+
+  .in-motion-scroll-cinema__toggle[data-state="paused"]::before{
+    width:0;
+    height:0;
+
+    border-left:11px solid currentColor;
+    border-right:0;
+    border-top:7px solid transparent;
+    border-bottom:7px solid transparent;
+  }
+
+  .in-motion-scroll-cinema__toggle:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:3px;
+  }
+
+  .in-motion-scroll-cinema + .in-motion__gallery{
+    margin-top:18px;
+  }
+}
+
+@media (max-width:380px){
+  .in-motion-scroll-cinema{
+    min-height:150svh;
+  }
+
+  .in-motion-scroll-cinema__frame{
+    height:100svh;
+    min-height:100svh;
+  }
+
+  .in-motion-scroll-cinema__scrub{
+    top:calc(70px + env(safe-area-inset-top));
+    bottom:108px;
+    width:72px;
+  }
+
+  .in-motion-scroll-cinema__chapter-label{
+    font-size:9px;
+  }
+
+  .in-motion-scroll-cinema__title{
+    font-size:12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .in-motion-scroll-cinema__video{
+    animation:none !important;
+  }
+}
