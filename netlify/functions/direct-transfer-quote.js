@@ -47,13 +47,23 @@ const CATALOGUED_AIRPORT_KEYWORDS = [
 
 const PRICING = {
   currency: "MXN",
-  kmRate: 10,
-  minuteRate: 11,
   roundingStep: 50,
-  passengerFactors: {
-    van_1_2: 1,
-    van_3_4: 1.15,
-    van_5_6: 1.3
+  baseFee: 125,
+  kmRate: 6.9,
+  minuteRate: 4.25,
+  minimum: 150,
+  referenceMinutesPerKm: 2.35,
+  congestionSoftCapMinutes: 18,
+  capacityPremiums: {
+    van_1_2: {
+      minimum: 150
+    },
+    van_3_4: {
+      minimum: 200
+    },
+    van_5_6: {
+      minimum: 300
+    }
   }
 };
 
@@ -303,38 +313,139 @@ function ceilToStep(value, step) {
   return Math.ceil(value / safeStep) * safeStep;
 }
 
+function clamp(value, min, max) {
+  const number = Number(value);
+  const minValue = Number(min);
+  const maxValue = Number(max);
+
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+
+  if (!Number.isFinite(minValue) || !Number.isFinite(maxValue) || minValue > maxValue) {
+    return number;
+  }
+
+  return Math.min(Math.max(number, minValue), maxValue);
+}
+
+function smoothstep(value) {
+  const number = clamp(value, 0, 1);
+
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+
+  return number * number * (3 - (2 * number));
+}
+
 function calculatePrice(options) {
   const distanceKm = Number(options.distanceMeters) / 1000;
   const durationMinutes = Number(options.durationSeconds) / 60;
-  const passengerFactor = PRICING.passengerFactors[options.passengerFareKey];
+  const capacityPricing = PRICING.capacityPremiums[options.passengerFareKey];
 
   if (
+    !capacityPricing ||
     !Number.isFinite(distanceKm) ||
-    !Number.isFinite(durationMinutes) ||
-    !Number.isFinite(passengerFactor)
+    !Number.isFinite(durationMinutes)
   ) {
     return null;
   }
 
-  const base = (distanceKm * PRICING.kmRate) + (durationMinutes * PRICING.minuteRate);
-  const withPassengers = base * passengerFactor;
+  const referenceMinutes = distanceKm * PRICING.referenceMinutesPerKm;
+  const structuralMinutes = Math.min(durationMinutes, referenceMinutes);
+  const congestionMinutes = Math.max(0, durationMinutes - referenceMinutes);
+  const softenedCongestionMinutes = PRICING.congestionSoftCapMinutes *
+    (1 - Math.exp(-congestionMinutes / PRICING.congestionSoftCapMinutes));
+  const effectiveMinutes = structuralMinutes + softenedCongestionMinutes;
 
-  return ceilToStep(withPassengers, PRICING.roundingStep);
+  const baseRaw =
+    PRICING.baseFee +
+    (distanceKm * PRICING.kmRate) +
+    (effectiveMinutes * PRICING.minuteRate);
+
+  const congestionStress = congestionMinutes / (congestionMinutes + 14);
+  const fareScale = 1 - Math.exp(-baseRaw / 650);
+  const congestionSignal = smoothstep(congestionStress);
+  const fareSignal = smoothstep(fareScale);
+
+  if (!Number.isFinite(congestionSignal) || !Number.isFinite(fareSignal)) {
+    return null;
+  }
+
+  const marketStress = clamp(
+    (0.78 * congestionSignal) + (0.22 * fareSignal),
+    0,
+    1
+  );
+
+  if (!Number.isFinite(marketStress)) {
+    return null;
+  }
+
+  const premiumFiveSix = clamp(
+    105 + (110 * Math.pow(marketStress, 0.85)),
+    115,
+    225
+  );
+  const premiumThreeFour = clamp(
+    25 + (0.26 * premiumFiveSix),
+    45,
+    85
+  );
+
+  if (!Number.isFinite(premiumFiveSix) || !Number.isFinite(premiumThreeFour)) {
+    return null;
+  }
+
+  let capacityPremium = 0;
+
+  if (options.passengerFareKey === "van_3_4") {
+    capacityPremium = premiumThreeFour;
+  }
+
+  if (options.passengerFareKey === "van_5_6") {
+    capacityPremium = premiumFiveSix;
+  }
+
+  const withCapacity = baseRaw + capacityPremium;
+  const withMinimum = Math.max(withCapacity, capacityPricing.minimum);
+
+  return {
+    price: ceilToStep(withMinimum, PRICING.roundingStep),
+    baseRaw,
+    referenceMinutes,
+    congestionMinutes,
+    softenedCongestionMinutes,
+    effectiveMinutes,
+    capacityPremium,
+    marketStress
+  };
 }
 
 function buildQuotePayload(options) {
+  const capacityPricing = PRICING.capacityPremiums[options.passengerFareKey];
+
   return {
     ok: true,
     quote: {
-      price: options.price,
+      price: options.price.price,
       currency: PRICING.currency,
       passengerFareKey: options.passengerFareKey,
       durationSeconds: options.route.durationSeconds,
       distanceMeters: options.route.distanceMeters,
+      baseFee: PRICING.baseFee,
       kmRate: PRICING.kmRate,
       minuteRate: PRICING.minuteRate,
-      passengerFactor: PRICING.passengerFactors[options.passengerFareKey],
-      roundingStep: PRICING.roundingStep
+      minimum: capacityPricing.minimum,
+      roundingStep: PRICING.roundingStep,
+      referenceMinutes: Math.round(options.price.referenceMinutes * 100) / 100,
+      congestionMinutes: Math.round(options.price.congestionMinutes * 100) / 100,
+      softenedCongestionMinutes: Math.round(options.price.softenedCongestionMinutes * 100) / 100,
+      effectiveMinutes: Math.round(options.price.effectiveMinutes * 100) / 100,
+      capacityPremium: Math.round(options.price.capacityPremium * 100) / 100,
+      marketStress: Math.round(options.price.marketStress * 1000) / 1000,
+      baseRaw: Math.round(options.price.baseRaw * 100) / 100
     }
   };
 }
@@ -404,7 +515,7 @@ exports.handler = async function handler(event) {
     passengerFareKey
   });
 
-  if (!price) {
+  if (!price || !Number.isFinite(Number(price.price))) {
     return fail(503, "QUOTE_UNAVAILABLE", "directTransferMobileFlow.fare.unavailable");
   }
 

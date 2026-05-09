@@ -13,7 +13,7 @@
           "连续服务"
         ],
         "priceLabel": "价格起",
-        "priceValue": "4.500 MXN",
+        "priceValue": "3.500 MXN",
         "ctaClosed": "查看详情",
         "ctaOpen": "隐藏详情",
         "mobileFlow": {
@@ -137,7 +137,7 @@
             "includesVanPassengers": "最多 6 位乘客",
             "includesVanUsb": "USB 和 USB-C 接口",
             "includesVanSeats": "第二排独立空调行政座椅",
-            "extraHourExtension": "按完整 1 小时延长服务：1.300 MXN",
+            "extraHourExtension": "按完整 1 小时延长服务：1.000 MXN",
             "fullDayExtraKm": "每天超过 500 公里后，每增加 1 公里加收 35 MXN",
             "fullDayExtensionPolicy": "延长服务需视可用性并经运营审核",
             "extraKm": "每增加 1 公里加收 35 MXN",

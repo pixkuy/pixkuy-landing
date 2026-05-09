@@ -13,7 +13,7 @@
           "연속 서비스"
         ],
         "priceLabel": "가격 시작",
-        "priceValue": "4.500 MXN",
+        "priceValue": "3.500 MXN",
         "ctaClosed": "자세히 보기",
         "ctaOpen": "자세히 숨기기",
         "mobileFlow": {
@@ -137,7 +137,7 @@
             "includesVanPassengers": "최대 6명 탑승",
             "includesVanUsb": "USB 및 USB-C 포트",
             "includesVanSeats": "2열 독립 공조가 있는 캡틴 시트",
-            "extraHourExtension": "서비스 연장(1시간 단위): 1.300 MXN",
+            "extraHourExtension": "서비스 연장(1시간 단위): 1.000 MXN",
             "fullDayExtraKm": "하루 500km 초과 시 추가 km당 35 MXN",
             "fullDayExtensionPolicy": "연장은 이용 가능 여부와 운영 검토에 따릅니다",
             "extraKm": "추가 km당 35 MXN",

@@ -345,71 +345,220 @@ function ceilToStep(value, step) {
   return Math.ceil(value / safeStep) * safeStep;
 }
 
+function clamp(value, min, max) {
+  const number = Number(value);
+  const minValue = Number(min);
+  const maxValue = Number(max);
+
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+
+  if (!Number.isFinite(minValue) || !Number.isFinite(maxValue) || minValue > maxValue) {
+    return number;
+  }
+
+  return Math.min(Math.max(number, minValue), maxValue);
+}
+
+function smoothstep(value) {
+  const number = clamp(value, 0, 1);
+
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+
+  return number * number * (3 - (2 * number));
+}
+
+function buildRouteTiming(durationSeconds, distanceMeters) {
+  const durationMinutes = Number(durationSeconds) / 60;
+  const distanceKm = Number(distanceMeters) / 1000;
+
+  if (!Number.isFinite(durationMinutes) || !Number.isFinite(distanceKm)) {
+    return null;
+  }
+
+  const referenceMinutes = distanceKm * 2.2;
+  const structuralMinutes = Math.min(durationMinutes, referenceMinutes);
+  const congestionMinutes = Math.max(0, durationMinutes - referenceMinutes);
+  const softenedCongestionMinutes = 22 * (1 - Math.exp(-congestionMinutes / 22));
+  const effectiveMinutes = structuralMinutes + softenedCongestionMinutes;
+
+  return {
+    durationMinutes,
+    distanceKm,
+    referenceMinutes,
+    congestionMinutes,
+    softenedCongestionMinutes,
+    effectiveMinutes
+  };
+}
+
+function getEmptyRouteTiming() {
+  return {
+    durationMinutes: 0,
+    distanceKm: 0,
+    referenceMinutes: 0,
+    congestionMinutes: 0,
+    softenedCongestionMinutes: 0,
+    effectiveMinutes: 0
+  };
+}
+
 function calculatePrice(options) {
   const pricing = options.pricing;
   const variantId = options.variant;
   const passengerFareKey = options.passengerFareKey;
   const variant = pricing.variants && pricing.variants[variantId];
-  const passengerFactor = pricing.passengerFactors && pricing.passengerFactors[passengerFareKey];
 
-  if (!variant || !passengerFactor) {
+  if (!variant) {
     return null;
   }
 
   const hourlyReference = Number(pricing.hourlyReference);
   const durationFactor = Number(variant.durationFactor);
   const minimum = Number(variant.minimum);
-  const passengerMultiplier = Number(passengerFactor.factor);
   const bufferMinutes = Number(variant.bufferMinutes || 0);
   const roundingStep = pricing.rounding ? Number(pricing.rounding.step) : 50;
 
   if (
     !Number.isFinite(hourlyReference) ||
     !Number.isFinite(durationFactor) ||
-    !Number.isFinite(minimum) ||
-    !Number.isFinite(passengerMultiplier)
+    !Number.isFinite(minimum)
   ) {
     return null;
   }
 
-  let billableHours;
+  let outboundTiming = getEmptyRouteTiming();
+  let returnTiming = getEmptyRouteTiming();
 
-  if (variantId === "round_trip") {
-    billableHours =
-      ((options.outboundDurationSeconds || 0) / 3600) +
-      ((options.returnDurationSeconds || 0) / 3600) +
-      (bufferMinutes / 60);
-  } else if (variantId === "departure") {
-    billableHours =
-      ((options.returnDurationSeconds || 0) / 3600) +
-      (bufferMinutes / 60);
-  } else {
-    billableHours = (options.outboundDurationSeconds || 0) / 3600;
+  if (options.outboundDurationSeconds) {
+    outboundTiming = buildRouteTiming(
+      options.outboundDurationSeconds,
+      options.outboundDistanceMeters
+    );
+
+    if (!outboundTiming) {
+      return null;
+    }
   }
 
-  if (!Number.isFinite(billableHours) || billableHours <= 0) {
+  if (options.returnDurationSeconds) {
+    returnTiming = buildRouteTiming(
+      options.returnDurationSeconds,
+      options.returnDistanceMeters
+    );
+
+    if (!returnTiming) {
+      return null;
+    }
+  }
+
+  let operationalMinutes;
+  let operationalCongestionMinutes;
+
+  if (variantId === "round_trip") {
+    operationalMinutes =
+      outboundTiming.effectiveMinutes +
+      returnTiming.effectiveMinutes +
+      bufferMinutes;
+    operationalCongestionMinutes =
+      outboundTiming.congestionMinutes +
+      returnTiming.congestionMinutes;
+  } else if (variantId === "departure") {
+    operationalMinutes =
+      returnTiming.effectiveMinutes +
+      bufferMinutes;
+    operationalCongestionMinutes = returnTiming.congestionMinutes;
+  } else {
+    operationalMinutes = outboundTiming.effectiveMinutes;
+    operationalCongestionMinutes = outboundTiming.congestionMinutes;
+  }
+
+  if (!Number.isFinite(operationalMinutes) || operationalMinutes <= 0) {
     return null;
   }
 
-  const basePrice = billableHours * hourlyReference * durationFactor;
-  const withMinimum = Math.max(basePrice, minimum);
-  const withPassengerFactor = withMinimum * passengerMultiplier;
+  const operationalHours = operationalMinutes / 60;
+  const routeBase = operationalHours * hourlyReference * durationFactor;
+  const basePrice = Math.max(routeBase, minimum);
 
-  return ceilToStep(withPassengerFactor, roundingStep);
+  const congestionStress = operationalCongestionMinutes / (operationalCongestionMinutes + 18);
+  const durationStress = operationalMinutes / (operationalMinutes + 90);
+  const variantStress = variantId === "round_trip"
+    ? 0.75
+    : (variantId === "departure" ? 0.55 : 0.3);
+  const eventStressInput =
+    (0.5 * congestionStress) +
+    (0.25 * durationStress) +
+    (0.25 * variantStress);
+  const eventStress = smoothstep(eventStressInput);
+
+  if (!Number.isFinite(eventStress)) {
+    return null;
+  }
+
+  const premiumThreeFour = clamp(
+    90 + (0.025 * basePrice) + (80 * eventStress),
+    150,
+    320
+  );
+  const premiumFiveSix = clamp(
+    220 + (0.055 * basePrice) + (180 * eventStress),
+    350,
+    760
+  );
+
+  if (!Number.isFinite(premiumThreeFour) || !Number.isFinite(premiumFiveSix)) {
+    return null;
+  }
+
+  let capacityPremium = 0;
+
+  if (passengerFareKey === "van_3_4") {
+    capacityPremium = premiumThreeFour;
+  }
+
+  if (passengerFareKey === "van_5_6") {
+    capacityPremium = premiumFiveSix;
+  }
+
+  const finalPrice = ceilToStep(basePrice + capacityPremium, roundingStep);
+
+  return {
+    price: finalPrice,
+    basePrice,
+    routeBase,
+    operationalMinutes,
+    operationalCongestionMinutes,
+    eventStress,
+    capacityPremium,
+    outboundEffectiveMinutes: outboundTiming.effectiveMinutes,
+    returnEffectiveMinutes: returnTiming.effectiveMinutes
+  };
 }
 
 function buildQuotePayload(options) {
   return {
     ok: true,
     quote: {
-      price: options.price,
+      price: options.price.price,
       currency: options.pricing.currency || "MXN",
       variant: options.variant,
       passengerFareKey: options.passengerFareKey,
       outboundDurationSeconds: options.outboundRoute ? options.outboundRoute.durationSeconds : null,
       returnDurationSeconds: options.returnRoute ? options.returnRoute.durationSeconds : null,
       outboundDistanceMeters: options.outboundRoute ? options.outboundRoute.distanceMeters : null,
-      returnDistanceMeters: options.returnRoute ? options.returnRoute.distanceMeters : null
+      returnDistanceMeters: options.returnRoute ? options.returnRoute.distanceMeters : null,
+      basePrice: Math.round(options.price.basePrice * 100) / 100,
+      routeBase: Math.round(options.price.routeBase * 100) / 100,
+      operationalMinutes: Math.round(options.price.operationalMinutes * 100) / 100,
+      operationalCongestionMinutes: Math.round(options.price.operationalCongestionMinutes * 100) / 100,
+      eventStress: Math.round(options.price.eventStress * 1000) / 1000,
+      capacityPremium: Math.round(options.price.capacityPremium * 100) / 100,
+      outboundEffectiveMinutes: Math.round(options.price.outboundEffectiveMinutes * 100) / 100,
+      returnEffectiveMinutes: Math.round(options.price.returnEffectiveMinutes * 100) / 100
     }
   };
 }
@@ -548,10 +697,12 @@ exports.handler = async function handler(event) {
     variant,
     passengerFareKey,
     outboundDurationSeconds: outboundRoute ? outboundRoute.durationSeconds : 0,
-    returnDurationSeconds: returnRoute ? returnRoute.durationSeconds : 0
+    returnDurationSeconds: returnRoute ? returnRoute.durationSeconds : 0,
+    outboundDistanceMeters: outboundRoute ? outboundRoute.distanceMeters : 0,
+    returnDistanceMeters: returnRoute ? returnRoute.distanceMeters : 0
   });
 
-  if (!price) {
+  if (!price || !Number.isFinite(Number(price.price))) {
     return fail(503, "QUOTE_UNAVAILABLE", "services.cards.events.states.priceUnavailable");
   }
 

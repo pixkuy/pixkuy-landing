@@ -72,6 +72,7 @@
   var rootNode = null;
   var videoNode = null;
   var toggleNode = null;
+  var soundNode = null;
   var titleNode = null;
   var textNode = null;
   var ctaNode = null;
@@ -149,6 +150,16 @@
 
     return node;
   }
+  
+  function setSoundState() {
+    if (!soundNode || !videoNode) {
+      return;
+    }
+
+    soundNode.setAttribute("data-state", videoNode.muted ? "muted" : "on");
+    soundNode.setAttribute("aria-label", videoNode.muted ? "Activar audio" : "Silenciar audio");
+  }
+
 
   function setToggleState() {
     if (!toggleNode || !videoNode) {
@@ -413,6 +424,11 @@
 
     toggleNode = createNode("button", "in-motion-scroll-cinema__toggle");
     toggleNode.type = "button";
+	
+	soundNode = createNode("button", "in-motion-scroll-cinema__sound");
+    soundNode.type = "button";
+    soundNode.setAttribute("data-state", "muted");
+    soundNode.setAttribute("aria-label", "Activar audio");
 
     copy.appendChild(titleNode);
     copy.appendChild(textNode);
@@ -423,6 +439,7 @@
 
     frame.appendChild(videoNode);
     frame.appendChild(shade);
+    frame.appendChild(soundNode);
     frame.appendChild(scrub);
     frame.appendChild(panel);
 
@@ -439,6 +456,14 @@
         return;
       }
 
+      if (videoNode.muted) {
+        videoNode.muted = false;
+        videoNode.volume = 1;
+        tryPlayVideo();
+        setToggleState();
+        return;
+      }
+
       if (videoNode.paused) {
         tryPlayVideo();
         return;
@@ -446,6 +471,22 @@
 
       pauseVideo();
     });
+	
+	    soundNode.addEventListener("click", function onSoundClick() {
+      if (!videoNode) {
+        return;
+      }
+
+      videoNode.muted = !videoNode.muted;
+      videoNode.volume = videoNode.muted ? 0 : 1;
+
+      if (!videoNode.muted) {
+        tryPlayVideo();
+      }
+
+      setSoundState();
+    });
+
 	
 	    ctaNode.addEventListener("click", function onCtaClick(event) {
       var chapter = CHAPTERS[activeIndex] || CHAPTERS[0];
@@ -460,6 +501,7 @@
 
     updateActiveChapter(0);
     setToggleState();
+    setSoundState();
     setupObserver();
 
     return rootNode;
@@ -481,6 +523,7 @@
     rootNode = null;
     videoNode = null;
     toggleNode = null;
+    soundNode = null;
     titleNode = null;
     textNode = null;
     ctaNode = null;

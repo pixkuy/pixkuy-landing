@@ -179,7 +179,7 @@
         includesVanPassengers: getI18nValue('services.cards.hourly.panel.disclaimers.includesVanPassengers') || 'Hasta 6 pasajeros',
         includesVanUsb: getI18nValue('services.cards.hourly.panel.disclaimers.includesVanUsb') || 'Conectores USB y USB-C',
         includesVanSeats: getI18nValue('services.cards.hourly.panel.disclaimers.includesVanSeats') || 'Asientos capitán en segunda fila con climatización independiente',
-        extraHourExtension: getI18nValue('services.cards.hourly.panel.disclaimers.extraHourExtension') || 'Ampliación del servicio en bloques completos de 1 hora: 1.300 MXN',
+        extraHourExtension: getI18nValue('services.cards.hourly.panel.disclaimers.extraHourExtension') || 'Ampliación del servicio en bloques completos de 1 hora: 1.000 MXN',
         fullDayExtraKm: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayExtraKm') || '35 MXN por km adicional a partir de 500 km',
         fullDayExtensionPolicy: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayExtensionPolicy') || 'Extensiones sujetas a disponibilidad y validación operativa',
         extraKm: getI18nValue('services.cards.hourly.panel.disclaimers.extraKm') || '35 MXN por km adicional',
@@ -317,14 +317,14 @@
   function getBasePrice() {
     if (state.mode === MODES.HOURLY) {
       if (state.durationHours <= 2) {
-        return 4500;
+        return 3500;
       }
 
-      return 4500 + ((state.durationHours - 2) * 1300);
+      return 3500 + ((state.durationHours - 2) * 1000);
     }
 
     if (state.mode === MODES.FULL_DAY) {
-      return 15000;
+      return 12500;
     }
 
     return null;
