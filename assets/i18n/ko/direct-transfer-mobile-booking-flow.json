@@ -1,27 +1,29 @@
 {
   "directTransferMobileFlow": {
-    "back": "돌아가기",
-    "title": "직행 이동",
-    "helper": "전용 기사, 즉시 예상 요금, 프리미엄 차량으로 한 지점에서 다른 지점까지 이동하세요.",
+    "back": "뒤로",
+    "title": "직행 이동 서비스",
+    "helper": "프라이빗 기사, 즉시 예상 요금, 프리미엄 차량으로 한 지점에서 다른 지점까지 이동하세요.",
     "fields": {
       "origin": "출발지",
-      "originPlaceholder": "출발 지점 선택",
+      "originPlaceholder": "출발지를 선택하세요",
       "destination": "도착지",
-      "destinationPlaceholder": "도착 지점 선택",
+      "destinationPlaceholder": "도착지를 선택하세요",
       "date": "날짜",
       "time": "시간",
-      "passengers": "승객"
+      "passengers": "승객",
+      "datePlaceholder": "일/월/년",
+      "timePlaceholder": "--:--"
     },
     "addressSearch": {
-      "originTitle": "출발 지점 입력",
-      "destinationTitle": "도착 지점 입력",
-      "close": "돌아가기",
+      "originTitle": "출발지를 입력하세요",
+      "destinationTitle": "도착지를 입력하세요",
+      "close": "뒤로",
       "clear": "주소 지우기"
     },
     "validation": {
       "sameRoute": "출발지와 도착지는 같을 수 없습니다.",
-      "airportRoute": "지원하는 공항을 오가는 이동은 공항 / 호텔 서비스를 이용해 주세요.",
-      "outOfCoverage": "이 경로는 직행 이동 서비스 운영 지역 밖에 있습니다."
+      "airportRoute": "지원되는 공항 출발 또는 도착 이동은 공항 / 호텔 서비스를 이용해 주세요.",
+      "outOfCoverage": "이 경로는 직행 이동 서비스 운영 지역 밖입니다."
     },
     "passengerBuckets": {
       "van_1_2": "1–2",
@@ -30,16 +32,26 @@
     },
     "fare": {
       "label": "요금",
-      "pending": "요금을 계산하려면 출발지, 도착지, 날짜, 시간, 승객 정보를 입력하세요.",
-      "pendingTemplate": "요금을 계산하려면 {fields} 정보를 입력하세요.",
+      "pending": "요금을 계산하려면 출발지, 도착지, 날짜, 시간, 승객을 입력하세요.",
+      "pendingTemplate": "요금을 계산하려면 {fields}을(를) 입력하세요.",
       "pendingReady": "요금 계산을 준비 중입니다…",
       "separator": ", ",
       "finalSeparator": " 및 ",
-      "loading": "요금 계산 중…",
+      "loading": "요금을 계산 중입니다…",
       "unavailable": "이 경로의 요금을 계산할 수 없습니다.",
-      "airportTransfer": "이 경로는 공항 / 호텔 서비스로 처리해야 합니다.",
-      "outOfCoverage": "이 경로는 WhatsApp 또는 기사 포함 차량 서비스로 도와드릴 수 있습니다.",
+      "airportTransfer": "이 경로는 공항 / 호텔 서비스로 진행해야 합니다.",
+      "outOfCoverage": "이 경로는 WhatsApp 또는 전용 기사 차량 서비스로 도와드릴 수 있습니다.",
       "readySuffix": "MXN"
+    },
+    "estimate": {
+      "distanceLabel": "거리",
+      "durationLabel": "소요 시간",
+      "durationLongLabel": "예상 소요 시간",
+      "summaryLabel": "경로",
+      "distanceUnit": "km",
+      "minutesApprox": "약 {minutes}분",
+      "minutesApproxShort": "약 {minutes}분",
+      "separator": " · "
     },
     "vehicle": {
       "title": "BYD M9",
@@ -49,10 +61,10 @@
       "continue": "계속",
       "airport": "공항 / 호텔로 이동",
       "whatsapp": "WhatsApp",
-      "hourly": "기사 포함 차량"
+      "hourly": "전용 기사 차량"
     },
     "whatsapp": {
-      "intro": "안녕하세요, Pixkuy 직행 이동을 문의하고 싶습니다.",
+      "intro": "안녕하세요, Pixkuy 직행 이동 서비스를 문의하고 싶습니다.",
       "serviceType": "서비스 유형",
       "serviceLabel": "직행 이동",
       "origin": "출발지",
@@ -72,6 +84,7 @@
         "time": "시간",
         "passengers": "승객",
         "vehicle": "차량",
+        "estimate": "경로",
         "price": "요금"
       },
       "fields": {
@@ -81,19 +94,19 @@
         "notes": "메모"
       },
       "placeholders": {
-        "name": "전체 이름",
+        "name": "성명",
         "phone": "+52...",
         "email": "you@email.com",
-        "notes": "선택 사항 메모"
+        "notes": "선택 메모"
       },
       "validation": {
         "name": "이름을 입력하세요.",
         "phone": "국제 형식의 유효한 전화번호를 입력하세요.",
-        "email": "유효한 이메일 주소를 입력하세요.",
-        "formIncomplete": "전송 전 정보를 확인하세요."
+        "email": "유효한 이메일을 입력하세요.",
+        "formIncomplete": "보내기 전에 정보를 확인하세요."
       },
       "notesEditor": {
-        "title": "이동 메모",
+        "title": "이동 관련 메모",
         "save": "저장",
         "clear": "메모 지우기",
         "placeholder": "이동에 필요한 세부 정보를 추가하세요."

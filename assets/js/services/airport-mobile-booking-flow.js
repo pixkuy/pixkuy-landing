@@ -1030,24 +1030,60 @@
 
     return missing;
   }
+  
+    function normalizeListSeparatorValue(value, fallback) {
+    const raw = typeof value === "string" ? value : "";
+    const separator = raw.trim();
+    const spacedWordSeparators = [
+      "y",
+      "and",
+      "und",
+      "et",
+      "e",
+      "и",
+      "및"
+    ];
+
+    if (!separator) {
+      return fallback;
+    }
+
+    if (separator === ",") {
+      return ", ";
+    }
+
+    if (separator === "、") {
+      return "、";
+    }
+
+    if (spacedWordSeparators.indexOf(separator) >= 0) {
+      return " " + separator + " ";
+    }
+
+    return separator;
+  }
 
   function joinMobileFareMissingLabels(labels) {
     const safeLabels = Array.isArray(labels) ? labels.filter(Boolean) : [];
-    const separator = getI18nValue("airportMobileFlow.farePending.separator", "");
-    const finalSeparator = getI18nValue("airportMobileFlow.farePending.finalSeparator", "");
-    const spacedSeparator = separator ? separator + " " : "";
-    const spacedFinalSeparator = finalSeparator ? " " + finalSeparator + " " : "";
+    const separator = normalizeListSeparatorValue(
+      getI18nValue("airportMobileFlow.farePending.separator", ", "),
+      ", "
+    );
+    const finalSeparator = normalizeListSeparatorValue(
+      getI18nValue("airportMobileFlow.farePending.finalSeparator", " y "),
+      " y "
+    );
 
     if (safeLabels.length <= 1) {
       return safeLabels[0] || "";
     }
 
     if (safeLabels.length === 2) {
-      return safeLabels[0] + spacedFinalSeparator + safeLabels[1];
+      return safeLabels[0] + finalSeparator + safeLabels[1];
     }
 
-    return safeLabels.slice(0, -1).join(spacedSeparator) +
-      spacedFinalSeparator +
+    return safeLabels.slice(0, -1).join(separator) +
+      finalSeparator +
       safeLabels[safeLabels.length - 1];
   }
 

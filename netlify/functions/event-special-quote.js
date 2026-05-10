@@ -24,6 +24,81 @@ const OPERATIONAL_CDMX_UTC_OFFSET = "-06:00";
 const MIN_LEAD_HOURS = 6;
 const HORIZON_DAYS = 30;
 
+const DIRECT_TRANSFER_EQUIVALENT_PRICING = {
+  currency: "MXN",
+  roundingStep: 50,
+  baseFee: 125,
+  kmRate: 6.9,
+  minuteRate: 4.25,
+  referenceMinutesPerKm: 2.35,
+  congestionSoftCapMinutes: 18,
+  capacityPremiums: {
+    van_1_2: {
+      minimum: 150
+    },
+    van_3_4: {
+      minimum: 200
+    },
+    van_5_6: {
+      minimum: 300
+    }
+  }
+};
+
+const EVENT_PRICING_RULES = {
+  arrival: {
+    van_1_2: {
+      multiplier: 1.25,
+      surcharge: 100,
+      minimum: 550
+    },
+    van_3_4: {
+      multiplier: 1.22,
+      surcharge: 125,
+      minimum: 650
+    },
+    van_5_6: {
+      multiplier: 1.18,
+      surcharge: 150,
+      minimum: 750
+    }
+  },
+  departure: {
+    van_1_2: {
+      multiplier: 1.55,
+      surcharge: 300,
+      minimum: 850
+    },
+    van_3_4: {
+      multiplier: 1.45,
+      surcharge: 325,
+      minimum: 950
+    },
+    van_5_6: {
+      multiplier: 1.35,
+      surcharge: 350,
+      minimum: 1100
+    }
+  },
+  round_trip: {
+    van_1_2: {
+      multiplier: 1.3,
+      surcharge: 400,
+      minimum: 1250
+    },
+    van_3_4: {
+      multiplier: 1.25,
+      surcharge: 450,
+      minimum: 1450
+    },
+    van_5_6: {
+      multiplier: 1.2,
+      surcharge: 500,
+      minimum: 1650
+    }
+  }
+};
+
 function buildResponse(statusCode, payload) {
   return {
     statusCode,
@@ -137,6 +212,7 @@ function getCdmxNowParts() {
 
 function getCdmxNowMinutes() {
   const now = getCdmxNowParts();
+
   return (((now.year * 12 + now.month) * 31 + now.day) * 24 + now.hour) * 60 + now.minute;
 }
 
@@ -371,6 +447,135 @@ function smoothstep(value) {
   return number * number * (3 - (2 * number));
 }
 
+function calculateDirectTransferEquivalentPrice(options) {
+  const distanceKm = Number(options.distanceMeters) / 1000;
+  const durationMinutes = Number(options.durationSeconds) / 60;
+  const capacityPricing = DIRECT_TRANSFER_EQUIVALENT_PRICING.capacityPremiums[options.passengerFareKey];
+
+  if (
+    !capacityPricing ||
+    !Number.isFinite(distanceKm) ||
+    !Number.isFinite(durationMinutes)
+  ) {
+    return null;
+  }
+
+  const referenceMinutes = distanceKm * DIRECT_TRANSFER_EQUIVALENT_PRICING.referenceMinutesPerKm;
+  const structuralMinutes = Math.min(durationMinutes, referenceMinutes);
+  const congestionMinutes = Math.max(0, durationMinutes - referenceMinutes);
+  const softenedCongestionMinutes = DIRECT_TRANSFER_EQUIVALENT_PRICING.congestionSoftCapMinutes *
+    (1 - Math.exp(-congestionMinutes / DIRECT_TRANSFER_EQUIVALENT_PRICING.congestionSoftCapMinutes));
+  const effectiveMinutes = structuralMinutes + softenedCongestionMinutes;
+
+  const baseRaw =
+    DIRECT_TRANSFER_EQUIVALENT_PRICING.baseFee +
+    (distanceKm * DIRECT_TRANSFER_EQUIVALENT_PRICING.kmRate) +
+    (effectiveMinutes * DIRECT_TRANSFER_EQUIVALENT_PRICING.minuteRate);
+
+  const congestionStress = congestionMinutes / (congestionMinutes + 14);
+  const fareScale = 1 - Math.exp(-baseRaw / 650);
+  const congestionSignal = smoothstep(congestionStress);
+  const fareSignal = smoothstep(fareScale);
+
+  if (!Number.isFinite(congestionSignal) || !Number.isFinite(fareSignal)) {
+    return null;
+  }
+
+  const marketStress = clamp(
+    (0.78 * congestionSignal) + (0.22 * fareSignal),
+    0,
+    1
+  );
+
+  if (!Number.isFinite(marketStress)) {
+    return null;
+  }
+
+  const premiumFiveSix = clamp(
+    105 + (110 * Math.pow(marketStress, 0.85)),
+    115,
+    225
+  );
+  const premiumThreeFour = clamp(
+    25 + (0.26 * premiumFiveSix),
+    45,
+    85
+  );
+
+  if (!Number.isFinite(premiumFiveSix) || !Number.isFinite(premiumThreeFour)) {
+    return null;
+  }
+
+  let capacityPremium = 0;
+
+  if (options.passengerFareKey === "van_3_4") {
+    capacityPremium = premiumThreeFour;
+  }
+
+  if (options.passengerFareKey === "van_5_6") {
+    capacityPremium = premiumFiveSix;
+  }
+
+  const withCapacity = baseRaw + capacityPremium;
+  const withMinimum = Math.max(withCapacity, capacityPricing.minimum);
+
+  return {
+    price: ceilToStep(withMinimum, DIRECT_TRANSFER_EQUIVALENT_PRICING.roundingStep),
+    baseRaw,
+    referenceMinutes,
+    congestionMinutes,
+    softenedCongestionMinutes,
+    effectiveMinutes,
+    capacityPremium,
+    marketStress
+  };
+}
+
+function getEventPricingRule(variant, passengerFareKey) {
+  const variantRules = EVENT_PRICING_RULES[variant];
+
+  if (!variantRules) {
+    return null;
+  }
+
+  return variantRules[passengerFareKey] || null;
+}
+
+function applyEventPricingRule(options) {
+  const rule = getEventPricingRule(options.variant, options.passengerFareKey);
+  const roundingStep = options.roundingStep;
+  const directTransferBasePrice = Number(options.directTransferBasePrice);
+
+  if (!rule || !Number.isFinite(directTransferBasePrice)) {
+    return null;
+  }
+
+  const multiplier = Number(rule.multiplier);
+  const surcharge = Number(rule.surcharge);
+  const minimum = Number(rule.minimum);
+
+  if (
+    !Number.isFinite(multiplier) ||
+    !Number.isFinite(surcharge) ||
+    !Number.isFinite(minimum)
+  ) {
+    return null;
+  }
+
+  const multipliedPrice = directTransferBasePrice * multiplier;
+  const surchargePrice = directTransferBasePrice + surcharge;
+  const rawEventPrice = Math.max(multipliedPrice, surchargePrice, minimum);
+
+  return {
+    price: ceilToStep(rawEventPrice, roundingStep),
+    directTransferBasePrice,
+    eventPricingMultiplier: multiplier,
+    eventPricingSurcharge: surcharge,
+    eventPricingMinimum: minimum,
+    eventPricingRaw: rawEventPrice
+  };
+}
+
 function buildRouteTiming(durationSeconds, distanceMeters) {
   const durationMinutes = Number(durationSeconds) / 60;
   const distanceKm = Number(distanceMeters) / 1000;
@@ -411,27 +616,16 @@ function calculatePrice(options) {
   const variantId = options.variant;
   const passengerFareKey = options.passengerFareKey;
   const variant = pricing.variants && pricing.variants[variantId];
-
-  if (!variant) {
-    return null;
-  }
-
-  const hourlyReference = Number(pricing.hourlyReference);
-  const durationFactor = Number(variant.durationFactor);
-  const minimum = Number(variant.minimum);
-  const bufferMinutes = Number(variant.bufferMinutes || 0);
   const roundingStep = pricing.rounding ? Number(pricing.rounding.step) : 50;
 
-  if (
-    !Number.isFinite(hourlyReference) ||
-    !Number.isFinite(durationFactor) ||
-    !Number.isFinite(minimum)
-  ) {
+  if (!variant || !getEventPricingRule(variantId, passengerFareKey)) {
     return null;
   }
 
   let outboundTiming = getEmptyRouteTiming();
   let returnTiming = getEmptyRouteTiming();
+  let outboundDirectTransferPrice = null;
+  let returnDirectTransferPrice = null;
 
   if (options.outboundDurationSeconds) {
     outboundTiming = buildRouteTiming(
@@ -440,6 +634,16 @@ function calculatePrice(options) {
     );
 
     if (!outboundTiming) {
+      return null;
+    }
+
+    outboundDirectTransferPrice = calculateDirectTransferEquivalentPrice({
+      distanceMeters: options.outboundDistanceMeters,
+      durationSeconds: options.outboundDurationSeconds,
+      passengerFareKey
+    });
+
+    if (!outboundDirectTransferPrice) {
       return null;
     }
   }
@@ -453,25 +657,57 @@ function calculatePrice(options) {
     if (!returnTiming) {
       return null;
     }
+
+    returnDirectTransferPrice = calculateDirectTransferEquivalentPrice({
+      distanceMeters: options.returnDistanceMeters,
+      durationSeconds: options.returnDurationSeconds,
+      passengerFareKey
+    });
+
+    if (!returnDirectTransferPrice) {
+      return null;
+    }
   }
 
+  let directTransferBasePrice;
   let operationalMinutes;
   let operationalCongestionMinutes;
+  let directTransferOutboundPrice = 0;
+  let directTransferReturnPrice = 0;
 
   if (variantId === "round_trip") {
+    if (!outboundDirectTransferPrice || !returnDirectTransferPrice) {
+      return null;
+    }
+
+    directTransferOutboundPrice = outboundDirectTransferPrice.price;
+    directTransferReturnPrice = returnDirectTransferPrice.price;
+    directTransferBasePrice = directTransferOutboundPrice + directTransferReturnPrice;
     operationalMinutes =
       outboundTiming.effectiveMinutes +
       returnTiming.effectiveMinutes +
-      bufferMinutes;
+      Number(variant.bufferMinutes || 0);
     operationalCongestionMinutes =
       outboundTiming.congestionMinutes +
       returnTiming.congestionMinutes;
   } else if (variantId === "departure") {
+    if (!returnDirectTransferPrice) {
+      return null;
+    }
+
+    directTransferReturnPrice = returnDirectTransferPrice.price;
+    directTransferBasePrice = directTransferReturnPrice;
     operationalMinutes =
       returnTiming.effectiveMinutes +
-      bufferMinutes;
+      Number(variant.bufferMinutes || 0);
     operationalCongestionMinutes = returnTiming.congestionMinutes;
   } else {
+    if (!outboundDirectTransferPrice) {
+      return null;
+    }
+
+    directTransferOutboundPrice = outboundDirectTransferPrice.price;
+    directTransferBasePrice = directTransferOutboundPrice;
     operationalMinutes = outboundTiming.effectiveMinutes;
     operationalCongestionMinutes = outboundTiming.congestionMinutes;
   }
@@ -480,62 +716,34 @@ function calculatePrice(options) {
     return null;
   }
 
-  const operationalHours = operationalMinutes / 60;
-  const routeBase = operationalHours * hourlyReference * durationFactor;
-  const basePrice = Math.max(routeBase, minimum);
+  const eventPrice = applyEventPricingRule({
+    variant: variantId,
+    passengerFareKey,
+    directTransferBasePrice,
+    roundingStep
+  });
 
-  const congestionStress = operationalCongestionMinutes / (operationalCongestionMinutes + 18);
-  const durationStress = operationalMinutes / (operationalMinutes + 90);
-  const variantStress = variantId === "round_trip"
-    ? 0.75
-    : (variantId === "departure" ? 0.55 : 0.3);
-  const eventStressInput =
-    (0.5 * congestionStress) +
-    (0.25 * durationStress) +
-    (0.25 * variantStress);
-  const eventStress = smoothstep(eventStressInput);
-
-  if (!Number.isFinite(eventStress)) {
+  if (!eventPrice) {
     return null;
   }
-
-  const premiumThreeFour = clamp(
-    90 + (0.025 * basePrice) + (80 * eventStress),
-    150,
-    320
-  );
-  const premiumFiveSix = clamp(
-    220 + (0.055 * basePrice) + (180 * eventStress),
-    350,
-    760
-  );
-
-  if (!Number.isFinite(premiumThreeFour) || !Number.isFinite(premiumFiveSix)) {
-    return null;
-  }
-
-  let capacityPremium = 0;
-
-  if (passengerFareKey === "van_3_4") {
-    capacityPremium = premiumThreeFour;
-  }
-
-  if (passengerFareKey === "van_5_6") {
-    capacityPremium = premiumFiveSix;
-  }
-
-  const finalPrice = ceilToStep(basePrice + capacityPremium, roundingStep);
 
   return {
-    price: finalPrice,
-    basePrice,
-    routeBase,
+    price: eventPrice.price,
+    basePrice: directTransferBasePrice,
+    routeBase: eventPrice.eventPricingRaw,
     operationalMinutes,
     operationalCongestionMinutes,
-    eventStress,
-    capacityPremium,
+    eventStress: 0,
+    capacityPremium: 0,
     outboundEffectiveMinutes: outboundTiming.effectiveMinutes,
-    returnEffectiveMinutes: returnTiming.effectiveMinutes
+    returnEffectiveMinutes: returnTiming.effectiveMinutes,
+    directTransferBasePrice: eventPrice.directTransferBasePrice,
+    directTransferOutboundPrice,
+    directTransferReturnPrice,
+    eventPricingMultiplier: eventPrice.eventPricingMultiplier,
+    eventPricingSurcharge: eventPrice.eventPricingSurcharge,
+    eventPricingMinimum: eventPrice.eventPricingMinimum,
+    eventPricingRaw: eventPrice.eventPricingRaw
   };
 }
 
@@ -558,7 +766,14 @@ function buildQuotePayload(options) {
       eventStress: Math.round(options.price.eventStress * 1000) / 1000,
       capacityPremium: Math.round(options.price.capacityPremium * 100) / 100,
       outboundEffectiveMinutes: Math.round(options.price.outboundEffectiveMinutes * 100) / 100,
-      returnEffectiveMinutes: Math.round(options.price.returnEffectiveMinutes * 100) / 100
+      returnEffectiveMinutes: Math.round(options.price.returnEffectiveMinutes * 100) / 100,
+      directTransferBasePrice: Math.round(options.price.directTransferBasePrice * 100) / 100,
+      directTransferOutboundPrice: Math.round(options.price.directTransferOutboundPrice * 100) / 100,
+      directTransferReturnPrice: Math.round(options.price.directTransferReturnPrice * 100) / 100,
+      eventPricingMultiplier: Math.round(options.price.eventPricingMultiplier * 1000) / 1000,
+      eventPricingSurcharge: Math.round(options.price.eventPricingSurcharge * 100) / 100,
+      eventPricingMinimum: Math.round(options.price.eventPricingMinimum * 100) / 100,
+      eventPricingRaw: Math.round(options.price.eventPricingRaw * 100) / 100
     }
   };
 }

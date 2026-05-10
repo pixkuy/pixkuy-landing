@@ -28,6 +28,9 @@
   const RESTRICTION_NOTICE_SELECTOR = "[data-direct-transfer-mobile-restriction-notice]";
   const FARE_SELECTOR = "[data-direct-transfer-mobile-fare]";
   const FARE_VALUE_SELECTOR = "[data-direct-transfer-mobile-fare-value]";
+  const ESTIMATE_SELECTOR = "[data-direct-transfer-mobile-estimate]";
+  const ESTIMATE_DISTANCE_SELECTOR = "[data-direct-transfer-mobile-estimate-distance]";
+  const ESTIMATE_DURATION_SELECTOR = "[data-direct-transfer-mobile-estimate-duration]";
 
   const BODY_CONFIG_ATTR = "data-direct-transfer-mobile-config-screen";
 
@@ -43,8 +46,10 @@
   let state = {
     origin: "",
     originPlace: null,
+    originCoverage: null,
     destination: "",
     destinationPlace: null,
+    destinationCoverage: null,
     date: "",
     time: "",
     passengerFareKey: "van_1_2",
@@ -135,6 +140,30 @@
     }
 
     return coverage.getCoverageDecision(place);
+  }
+  
+    function getDirectTransferCoverageApi() {
+    const api = window.PixkuyDirectTransferCoverage;
+
+    return api && typeof api === "object" ? api : null;
+  }
+
+  async function resolveDirectTransferCoverage(place) {
+    const api = getDirectTransferCoverageApi();
+    const address = normalizeQuoteAddress(place, "");
+
+    if (!api || typeof api.resolveCoverageFromPoint !== "function" || !address) {
+      return null;
+    }
+
+    try {
+      return await api.resolveCoverageFromPoint({
+        lat: address.lat,
+        lng: address.lng
+      });
+    } catch (error) {
+      return null;
+    }
   }
 
   function getPlaceSearchText(place) {
@@ -237,10 +266,12 @@
     };
   }
 
-  function isDirectTransferCoveredPlace(place) {
-    const decision = getCoverageDecision(place);
+  function isDirectTransferCoveredPlace(role) {
+    const coverage = role === "destination"
+      ? state.destinationCoverage
+      : state.originCoverage;
 
-    return Boolean(decision && decision.isAllowedPrimaryArea === true);
+    return Boolean(coverage && coverage.isWithinCoverage === true);
   }
 
   function getDirectTransferRestrictionType() {
@@ -255,8 +286,8 @@
     }
 
     if (
-      (hasOriginPlace && !isDirectTransferCoveredPlace(state.originPlace)) ||
-      (hasDestinationPlace && !isDirectTransferCoveredPlace(state.destinationPlace))
+      (hasOriginPlace && !isDirectTransferCoveredPlace("origin")) ||
+      (hasDestinationPlace && !isDirectTransferCoveredPlace("destination"))
     ) {
       return "out_of_coverage";
     }
@@ -276,20 +307,34 @@
 
   function normalizeListSeparator(value, fallback) {
     const raw = typeof value === "string" ? value : "";
+    const separator = raw.trim();
+    const spacedWordSeparators = [
+      "y",
+      "and",
+      "und",
+      "et",
+      "e",
+      "и",
+      "및"
+    ];
 
-    if (!raw.trim()) {
+    if (!separator) {
       return fallback;
     }
 
-    if (raw.trim() === ",") {
+    if (separator === ",") {
       return ", ";
     }
 
-    if (raw.trim() === "y") {
-      return " y ";
+    if (separator === "、") {
+      return "、";
     }
 
-    return raw;
+    if (spacedWordSeparators.indexOf(separator) >= 0) {
+      return " " + separator + " ";
+    }
+
+    return separator;
   }
 
   function buildNaturalList(items) {
@@ -667,6 +712,77 @@
       return String(Math.round(amount));
     }
   }
+  
+    function getQuoteNumberValue(keys) {
+    const quote = state.quote && typeof state.quote === "object" ? state.quote : {};
+    const candidates = Array.isArray(keys) ? keys : [];
+    let index;
+
+    for (index = 0; index < candidates.length; index += 1) {
+      const key = candidates[index];
+      const value = quote[key];
+      const number = Number(value);
+
+      if (Number.isFinite(number) && number > 0) {
+        return number;
+      }
+    }
+
+    if (quote.route && typeof quote.route === "object") {
+      for (index = 0; index < candidates.length; index += 1) {
+        const key = candidates[index];
+        const value = quote.route[key];
+        const number = Number(value);
+
+        if (Number.isFinite(number) && number > 0) {
+          return number;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function formatDistanceLabel() {
+    const meters = getQuoteNumberValue([
+      "distanceMeters",
+      "distance_meters",
+      "distance"
+    ]);
+
+    if (!meters) {
+      return "";
+    }
+
+    const kilometers = meters / 1000;
+    const roundedKilometers = kilometers >= 10
+      ? Math.round(kilometers)
+      : Math.round(kilometers * 10) / 10;
+
+    return [
+      String(roundedKilometers).replace(".", ","),
+      getI18nValue("directTransferMobileFlow.estimate.distanceUnit", "km")
+    ].filter(Boolean).join(" ");
+  }
+
+  function formatDurationLabel() {
+    const seconds = getQuoteNumberValue([
+      "durationSeconds",
+      "duration_seconds",
+      "duration"
+    ]);
+
+    if (!seconds) {
+      return "";
+    }
+
+    const minutes = Math.max(1, Math.round(seconds / 60));
+
+    return getI18nValue(
+      "directTransferMobileFlow.estimate.minutesApprox",
+      "{minutes} minutos aprox."
+    ).replace("{minutes}", String(minutes));
+  }
 
   function getTodayDateValue() {
     const now = new Date();
@@ -869,9 +985,41 @@
     const step = getStep();
     const fare = step ? step.querySelector(FARE_SELECTOR) : null;
     const fareValue = step ? step.querySelector(FARE_VALUE_SELECTOR) : null;
+    const estimate = step ? step.querySelector(ESTIMATE_SELECTOR) : null;
+    const estimateDistance = step ? step.querySelector(ESTIMATE_DISTANCE_SELECTOR) : null;
+    const estimateDuration = step ? step.querySelector(ESTIMATE_DURATION_SELECTOR) : null;
+    const isReady = state.quoteStatus === "ready" && state.quote && state.quote.price;
 
     if (fare) {
       fare.setAttribute("data-direct-transfer-mobile-fare-state", state.quoteStatus);
+    }
+
+    if (estimate) {
+      const distanceLabel = isReady ? formatDistanceLabel() : "";
+      const durationLabel = isReady ? formatDurationLabel() : "";
+      const hasEstimate = Boolean(distanceLabel || durationLabel);
+
+      estimate.hidden = !hasEstimate;
+
+      if (estimateDistance) {
+        const valueNode = estimateDistance.querySelector("strong");
+
+        estimateDistance.hidden = !distanceLabel;
+
+        if (valueNode) {
+          valueNode.textContent = distanceLabel;
+        }
+      }
+
+      if (estimateDuration) {
+        const valueNode = estimateDuration.querySelector("strong");
+
+        estimateDuration.hidden = !durationLabel;
+
+        if (valueNode) {
+          valueNode.textContent = durationLabel;
+        }
+      }
     }
 
     if (fareValue) {
@@ -884,7 +1032,7 @@
 
     return true;
   }
-
+  
   function syncCta() {
     const step = getStep();
     const cta = step ? step.querySelector(CONFIG_CTA_SELECTOR) : null;
@@ -1013,28 +1161,33 @@
     if (role === "destination") {
       state.destination = normalizeText(value);
       state.destinationPlace = null;
+      state.destinationCoverage = null;
       resetQuote();
       return true;
     }
 
     state.origin = normalizeText(value);
     state.originPlace = null;
+    state.originCoverage = null;
     resetQuote();
     return true;
   }
 
-  function setAddressPlace(role, selectedPlace) {
+  async function setAddressPlace(role, selectedPlace) {
     const label = getSelectedPlaceLabel(selectedPlace, "");
+    const coverage = await resolveDirectTransferCoverage(selectedPlace);
 
     if (role === "destination") {
       state.destination = label || state.destination;
       state.destinationPlace = selectedPlace || null;
+      state.destinationCoverage = coverage;
       requestQuoteIfReady();
       return true;
     }
 
     state.origin = label || state.origin;
     state.originPlace = selectedPlace || null;
+    state.originCoverage = coverage;
     requestQuoteIfReady();
     return true;
   }
@@ -1120,7 +1273,7 @@
       '<label class="direct-transfer-mobile-config-step__label" for="direct-transfer-mobile-date">' + escapeHtml(dateLabel) + '</label>',
       '<div class="direct-transfer-mobile-config-step__date-wrap" data-direct-transfer-mobile-date-state="' + (state.date ? 'value' : 'empty') + '">',
       '<input id="direct-transfer-mobile-date" type="date" class="direct-transfer-mobile-config-step__control" data-direct-transfer-mobile-config-field="date" min="' + escapeHtml(getTodayDateValue()) + '" value="' + escapeHtml(state.date) + '" />',
-      '<span class="direct-transfer-mobile-config-step__date-overlay" aria-hidden="true">dd/mm/aaaa</span>',
+      '<span class="direct-transfer-mobile-config-step__date-overlay" aria-hidden="true">' + escapeHtml(getI18nValue("directTransferMobileFlow.fields.datePlaceholder", "dd/mm/aaaa")) + '</span>',
       '<span class="direct-transfer-mobile-config-step__date-icon" aria-hidden="true">',
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">',
       '<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>',
@@ -1140,7 +1293,7 @@
       '<label class="direct-transfer-mobile-config-step__label" for="direct-transfer-mobile-time">' + escapeHtml(timeLabel) + '</label>',
       '<div class="direct-transfer-mobile-config-step__time-wrap" data-direct-transfer-mobile-time-state="' + (state.time ? 'value' : 'empty') + '">',
       '<input id="direct-transfer-mobile-time" type="time" class="direct-transfer-mobile-config-step__control" data-direct-transfer-mobile-config-field="time" value="' + escapeHtml(state.time) + '" />',
-      '<span class="direct-transfer-mobile-config-step__time-overlay" aria-hidden="true">--:--</span>',
+      '<span class="direct-transfer-mobile-config-step__time-overlay" aria-hidden="true">' + escapeHtml(getI18nValue("directTransferMobileFlow.fields.timePlaceholder", "--:--")) + '</span>',
       '<span class="direct-transfer-mobile-config-step__time-icon" aria-hidden="true">',
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">',
       '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>',
@@ -1200,6 +1353,10 @@
       '<img class="direct-transfer-mobile-config-step__vehicle-image" src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="' + escapeHtml(vehicleAlt) + '" loading="lazy" decoding="async" />',
       '</div>',
       '<div class="direct-transfer-mobile-config-step__fare" data-direct-transfer-mobile-fare data-direct-transfer-mobile-fare-state="' + escapeHtml(state.quoteStatus) + '">',
+      '<div class="direct-transfer-mobile-config-step__estimate" data-direct-transfer-mobile-estimate hidden>',
+      '<p data-direct-transfer-mobile-estimate-distance hidden><span>' + escapeHtml(getI18nValue("directTransferMobileFlow.estimate.distanceLabel", "Distancia")) + ':</span> <strong></strong></p>',
+      '<p data-direct-transfer-mobile-estimate-duration hidden><span>' + escapeHtml(getI18nValue("directTransferMobileFlow.estimate.durationLabel", "Duración")) + ':</span> <strong></strong></p>',
+      '</div>',
       '<span class="direct-transfer-mobile-config-step__fare-label">' + escapeHtml(fareLabel) + '</span>',
       '<p class="direct-transfer-mobile-config-step__fare-pending" data-direct-transfer-mobile-fare-value>' + escapeHtml(getFareText()) + '</p>',
       '</div>',
@@ -1387,9 +1544,10 @@
         return;
       }
 
-      setAddressPlace(role, selectedPlace);
-      syncAddressClearState(role);
-      syncCta();
+      setAddressPlace(role, selectedPlace).then(function onAddressPlaceApplied() {
+        syncAddressClearState(role);
+        syncCta();
+      });
     });
 
     step.addEventListener("input", function onConfigInput(event) {

@@ -118,6 +118,17 @@
     );
   }
   
+    function bootContactDirectTransferEditor() {
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    return safeInit(
+      window.PixkuyForms.initContactDirectTransferEditor,
+      'initContactDirectTransferEditor'
+    );
+  }
+  
   function bootPanelHandoffSummary() {
     if (!window.PixkuyForms) {
       return false;
@@ -254,6 +265,30 @@
         }
       }, 120);
     }, 260);
+
+    return true;
+  }
+  
+    function focusDirectTransferPrimaryField(form) {
+    var target;
+
+    if (!form) {
+      return false;
+    }
+
+    target = form.querySelector('#contact-name');
+
+    if (!target || typeof target.focus !== 'function') {
+      return false;
+    }
+
+    window.setTimeout(function () {
+      target.focus();
+
+      if (typeof target.select === 'function') {
+        target.select();
+      }
+    }, 0);
 
     return true;
   }
@@ -444,6 +479,65 @@
     });
 
     formsNamespace.__eventSpecialHandoffBound = true;
+    return true;
+  }
+  
+    function bindDirectTransferPanelHandoff() {
+    var formsNamespace;
+    var serviceStateApi;
+
+    if (!window.PixkuyForms) {
+      return false;
+    }
+
+    formsNamespace = window.PixkuyForms;
+    serviceStateApi = getContactServiceStateApi();
+
+    if (
+      !serviceStateApi ||
+      typeof serviceStateApi.setActiveServiceType !== 'function' ||
+      typeof formsNamespace.applyContactDirectTransferHandoff !== 'function'
+    ) {
+      return false;
+    }
+
+    if (formsNamespace.__directTransferHandoffBound === true) {
+      return true;
+    }
+
+    window.addEventListener('pixkuy:direct-transfer-panel-submit', function (event) {
+      var detail;
+      var form;
+      var result;
+
+      detail = event && event.detail && typeof event.detail === 'object'
+        ? event.detail
+        : null;
+
+      if (!detail) {
+        return;
+      }
+
+      form = getReservationForm();
+
+      if (!form) {
+        return;
+      }
+
+      result = serviceStateApi.setActiveServiceType('direct_transfer', {
+        source: 'direct-transfer-panel-handoff'
+      });
+
+      if (!result || result.ok !== true) {
+        return;
+      }
+
+      formsNamespace.applyContactDirectTransferHandoff(detail);
+      scrollToContactSection(form);
+      focusDirectTransferPrimaryField(form);
+    });
+
+    formsNamespace.__directTransferHandoffBound = true;
     return true;
   }
   
@@ -824,10 +918,12 @@
     bootContactTourPrivateEditor();
     bootContactHourlyDailyEditor();
     bootContactEventSpecialEditor();
+    bootContactDirectTransferEditor();
     bootPanelHandoffSummary();
     bindToursPanelHandoff();
     bindHourlyDailyPanelHandoff();
     bindEventsSpecialPanelHandoff();
+    bindDirectTransferPanelHandoff();
     bootWhatsappHandoff();
     bootGooglePlacesOnFocus();
 

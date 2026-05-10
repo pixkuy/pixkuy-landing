@@ -2,26 +2,28 @@
   "directTransferMobileFlow": {
     "back": "Retour",
     "title": "Transferts directs",
-    "helper": "Déplacez-vous d’un point à un autre avec chauffeur privé, tarif estimé immédiatement et véhicule premium.",
+    "helper": "Déplacez-vous d’un point à un autre avec chauffeur privé, estimation immédiate du tarif et véhicule premium.",
     "fields": {
-      "origin": "Origine",
+      "origin": "Départ",
       "originPlaceholder": "Sélectionnez le point de départ",
       "destination": "Destination",
-      "destinationPlaceholder": "Sélectionnez le point d’arrivée",
+      "destinationPlaceholder": "Sélectionnez la destination",
       "date": "Date",
       "time": "Heure",
-      "passengers": "Passagers"
+      "passengers": "Passagers",
+      "datePlaceholder": "jj/mm/aaaa",
+      "timePlaceholder": "--:--"
     },
     "addressSearch": {
       "originTitle": "Indiquez le point de départ",
-      "destinationTitle": "Indiquez le point d’arrivée",
+      "destinationTitle": "Indiquez la destination",
       "close": "Retour",
       "clear": "Effacer l’adresse"
     },
     "validation": {
-      "sameRoute": "L’origine et la destination ne peuvent pas être identiques.",
-      "airportRoute": "Pour les transferts depuis ou vers les aéroports que nous couvrons, utilisez le service Aéroport / Hôtel.",
-      "outOfCoverage": "Ce trajet se trouve en dehors de notre zone opérationnelle pour les transferts directs."
+      "sameRoute": "Le point de départ et la destination ne peuvent pas être identiques.",
+      "airportRoute": "Pour les transferts depuis ou vers les aéroports que nous desservons, utilisez le service Aéroport / Hôtel.",
+      "outOfCoverage": "Ce trajet se trouve hors de notre zone opérationnelle pour les transferts directs."
     },
     "passengerBuckets": {
       "van_1_2": "1–2",
@@ -30,16 +32,26 @@
     },
     "fare": {
       "label": "Prix",
-      "pending": "Complétez l’origine, la destination, la date, l’heure et les passagers pour calculer le prix.",
+      "pending": "Complétez le départ, la destination, la date, l’heure et les passagers pour calculer le prix.",
       "pendingTemplate": "Complétez {fields} pour calculer le prix.",
       "pendingReady": "Préparation du calcul du prix…",
       "separator": ", ",
       "finalSeparator": " et ",
       "loading": "Calcul du prix…",
       "unavailable": "Nous n’avons pas pu calculer le prix de ce trajet.",
-      "airportTransfer": "Ce trajet doit être géré comme Aéroport / Hôtel.",
+      "airportTransfer": "Ce trajet doit être traité comme Aéroport / Hôtel.",
       "outOfCoverage": "Pour ce trajet, nous pouvons vous aider par WhatsApp ou avec un service de véhicule avec chauffeur.",
       "readySuffix": "MXN"
+    },
+    "estimate": {
+      "distanceLabel": "Distance",
+      "durationLabel": "Durée",
+      "durationLongLabel": "Temps estimé",
+      "summaryLabel": "Trajet",
+      "distanceUnit": "km",
+      "minutesApprox": "{minutes} min env.",
+      "minutesApproxShort": "{minutes} min env.",
+      "separator": " · "
     },
     "vehicle": {
       "title": "BYD M9",
@@ -55,7 +67,7 @@
       "intro": "Bonjour, je souhaite demander un transfert direct avec Pixkuy.",
       "serviceType": "Type de service",
       "serviceLabel": "Transfert direct",
-      "origin": "Origine",
+      "origin": "Départ",
       "destination": "Destination",
       "date": "Date",
       "time": "Heure",
@@ -66,12 +78,13 @@
     "contactStep": {
       "summary": {
         "title": "Résumé du transfert",
-        "origin": "Origine",
+        "origin": "Départ",
         "destination": "Destination",
         "date": "Date",
         "time": "Heure",
         "passengers": "Passagers",
         "vehicle": "Véhicule",
+        "estimate": "Trajet",
         "price": "Prix"
       },
       "fields": {
@@ -90,7 +103,7 @@
         "name": "Indiquez votre nom.",
         "phone": "Indiquez un numéro de téléphone valide au format international.",
         "email": "Indiquez une adresse email valide.",
-        "formIncomplete": "Vérifiez les informations avant l’envoi."
+        "formIncomplete": "Vérifiez les informations avant d’envoyer."
       },
       "notesEditor": {
         "title": "Notes pour le transfert",

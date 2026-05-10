@@ -663,12 +663,32 @@
 
     return true;
   }
+  
+  function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
 
   function setRouteVisibility(isVisible) {
     ensureRoute();
 
     if (!routeNode) {
       return false;
+    }
+
+    if (!isVisible) {
+      blurActiveElementInside(routeNode);
     }
 
     routeNode.hidden = !isVisible;

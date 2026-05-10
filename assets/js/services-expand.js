@@ -66,6 +66,13 @@
         panel: document.getElementById('services-expand-events'),
         closedLabel: 'services.cards.events.ctaClosed',
         openLabel: 'services.cards.events.ctaOpen'
+      },
+      direct: {
+        key: 'direct',
+        card: findCardByI18nKey('services.cards.direct.title'),
+        panel: document.getElementById('services-expand-direct'),
+        closedLabel: 'directTransferMobileFlow.cta.continue',
+        openLabel: 'directTransferMobileFlow.back'
       }
     };
 
@@ -98,7 +105,8 @@
         (
           rawService === 'airport_hotel' ||
           rawService === 'tour_private' ||
-          rawService === 'hourly_daily'
+          rawService === 'hourly_daily' ||
+          rawService === 'direct_transfer'
         )
       ) {
         return null;
@@ -108,7 +116,8 @@
         airport_hotel: 'airport',
         tour_private: 'tours',
         hourly_daily: 'hourly',
-        event_special: 'events'
+        event_special: 'events',
+        direct_transfer: 'direct'
       };
 
       return publicToInternalMap[rawService] || null;
@@ -157,6 +166,11 @@
     const eventsEntry = services.events;
     if (openService === 'events' && eventsEntry && eventsEntry.card) {
       return cards[cards.length - 1] || eventsEntry.card;
+    }
+
+    const directEntry = services.direct;
+    if (openService === 'direct' && directEntry && directEntry.card) {
+      return cards[cards.length - 1] || directEntry.card;
     }
 
     if (!primaryCard) return null;
@@ -241,6 +255,10 @@
 
     if (nextService === 'hourly') {
       scrollDesktopHourlyPanelIntoView(nextService);
+    }
+
+    if (nextService === 'direct') {
+      scrollDesktopDirectPanelIntoView(nextService);
     }
   }
 
@@ -450,6 +468,144 @@
     });
   }
   
+    function scrollDesktopDirectPanelIntoView(serviceKey) {
+    if (mobileQuery.matches || serviceKey !== 'direct') return;
+
+    const entry = services.direct;
+    if (!entry || !entry.panel || entry.panel.hidden || expand.hidden) return;
+
+    let attempts = 0;
+    const maxAttempts = 4;
+
+    function runScroll() {
+      if (mobileQuery.matches || entry.panel.hidden || expand.hidden) return;
+
+      const targetRect = expand.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const panelHeight = Math.min(targetRect.height, viewportHeight - 48);
+      const targetTop = Math.max(
+        targetRect.top + window.scrollY - Math.max((viewportHeight - panelHeight) / 2, 18),
+        0
+      );
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: 'smooth'
+      });
+
+      attempts += 1;
+      if (attempts >= maxAttempts) return;
+
+      window.setTimeout(runScroll, 120);
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runScroll);
+    });
+  }
+
+  function getDesktopServiceDeepLinkTarget(serviceKey) {
+    if (mobileQuery.matches || !serviceKey) return null;
+
+    if (serviceKey === 'direct') {
+      return document.querySelector('[data-services-direct-transfer-config]') ||
+        (services.direct && services.direct.panel) ||
+        expand;
+    }
+
+    if (serviceKey === 'hourly') {
+      return document.querySelector('[data-services-hourly-config]') ||
+        (services.hourly && services.hourly.panel) ||
+        expand;
+    }
+
+    if (serviceKey === 'tours') {
+      return document.querySelector('[data-services-tours-config]:not([hidden])') ||
+        document.querySelector('[data-services-tours-panel]') ||
+        (services.tours && services.tours.panel) ||
+        expand;
+    }
+
+    if (serviceKey === 'airport') {
+      return document.querySelector('#services-expand-airport .services-expand__form') ||
+        (services.airport && services.airport.panel) ||
+        expand;
+    }
+
+    return null;
+  }
+
+  function scrollDesktopServiceDeepLinkTargetIntoView(serviceKey) {
+    if (mobileQuery.matches || !serviceKey) return;
+
+    let attempts = 0;
+    const maxAttempts = 12;
+
+    function runScroll() {
+      if (mobileQuery.matches || expand.hidden) return;
+
+      const target = getDesktopServiceDeepLinkTarget(serviceKey);
+      if (!target || target.hidden || target.offsetHeight <= 0) {
+        attempts += 1;
+        if (attempts >= maxAttempts) return;
+        window.setTimeout(runScroll, 120);
+        return;
+      }
+
+      const targetRect = target.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const topOffset = Math.min(96, Math.max(56, Math.round(viewportHeight * 0.1)));
+      const targetTop = Math.max(targetRect.top + window.scrollY - topOffset, 0);
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: 'smooth'
+      });
+
+      attempts += 1;
+      if (attempts >= maxAttempts) return;
+
+      window.setTimeout(runScroll, 120);
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runScroll);
+    });
+  }
+  
+    function openServicePanel(serviceKey, options) {
+    const safeServiceKey = String(serviceKey || '').trim();
+    const safeOptions = options && typeof options === 'object' ? options : {};
+    const entry = services[safeServiceKey];
+
+    if (!entry || !entry.panel) {
+      return false;
+    }
+
+    setExpandedState(safeServiceKey);
+
+    if (!mobileQuery.matches && safeOptions.scroll !== false) {
+      window.requestAnimationFrame(() => {
+        const targetRect = expand.getBoundingClientRect();
+        const targetTop = Math.max(targetRect.top + window.scrollY - 18, 0);
+
+        window.scrollTo({
+          top: targetTop,
+          behavior: safeOptions.behavior || 'smooth'
+        });
+      });
+    }
+
+    return true;
+  }
+
+  window.PixkuyServicesExpand = {
+    open: openServicePanel,
+    getOpenService: function () {
+      return openService;
+    }
+  };
+  
   serviceKeys.forEach((serviceKey) => {
     bindCard(services[serviceKey]);
   });
@@ -467,17 +623,20 @@
     setExpandedState(requestedService);
 
     scrollDesktopEventsDeepLinkPanelIntoView(requestedService);
+    scrollDesktopServiceDeepLinkTargetIntoView(requestedService);
 
     if (!shouldSkipMobileDeepLinkFraming(requestedService)) {
       scrollMobileDeepLinkedPanelIntoView(requestedService);
 
       window.addEventListener('load', () => {
         scrollDesktopEventsDeepLinkPanelIntoView(requestedService);
+        scrollDesktopServiceDeepLinkTargetIntoView(requestedService);
         scrollMobileDeepLinkedPanelIntoView(requestedService);
       }, { once: true });
 
       window.addEventListener('pageshow', () => {
         scrollDesktopEventsDeepLinkPanelIntoView(requestedService);
+        scrollDesktopServiceDeepLinkTargetIntoView(requestedService);
         scrollMobileDeepLinkedPanelIntoView(requestedService);
       }, { once: true });
     }

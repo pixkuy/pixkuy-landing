@@ -35,7 +35,7 @@
   // Registro centralizado de fragmentos opcionales por idioma.
   // Primera apertura: tours como nuevo dominio modular.
   var I18N_OPTIONAL_FRAGMENTS = {
-    es: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "in-motion-scroll-cinema", "contact-success", "mobile-booking-entry", "direct-transfer-mobile-booking-flow", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
+    es: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "in-motion-scroll-cinema", "in-motion-desktop-cinema", "contact-success", "mobile-booking-entry", "direct-transfer-mobile-booking-flow", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
     en: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "in-motion-scroll-cinema", "contact-success", "mobile-booking-entry", "direct-transfer-mobile-booking-flow", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
     ru: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "in-motion-scroll-cinema", "contact-success", "mobile-booking-entry", "direct-transfer-mobile-booking-flow", "airport-mobile-booking-flow", "airport-mobile-contact-step"],
     fr: ["services-tours", "services-hourly", "services-events", "brand-collaborations", "consent", "in-motion", "in-motion-scroll-cinema", "contact-success", "mobile-booking-entry", "direct-transfer-mobile-booking-flow", "airport-mobile-booking-flow", "airport-mobile-contact-step"],

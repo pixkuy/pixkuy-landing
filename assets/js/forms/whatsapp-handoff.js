@@ -248,6 +248,69 @@
       notes: getVisibleFieldValue(form, 'event_special_notes') || getVisibleFieldValue(form, 'message')
     };
   }
+  
+    function getDirectTransferEditorData(form) {
+    if (!form) {
+      return {
+        originAddress: '',
+        destinationAddress: '',
+        tripDate: '',
+        tripTime: '',
+        passengers: '',
+        vehicle: '',
+        distanceMeters: '',
+        durationSeconds: '',
+        price: '',
+        currency: '',
+        notes: ''
+      };
+    }
+
+    return {
+      originAddress: getVisibleFieldValue(form, 'direct_transfer_origin_address'),
+      destinationAddress: getVisibleFieldValue(form, 'direct_transfer_destination_address'),
+      tripDate: getVisibleFieldValue(form, 'direct_transfer_date'),
+      tripTime: getVisibleFieldValue(form, 'direct_transfer_time'),
+      passengers: getVisibleFieldValue(form, 'direct_transfer_passenger_bucket_label'),
+      vehicle: getVisibleFieldValue(form, 'direct_transfer_vehicle_label'),
+      distanceMeters: getVisibleFieldValue(form, 'direct_transfer_distance_meters'),
+      durationSeconds: getVisibleFieldValue(form, 'direct_transfer_duration_seconds'),
+      price: getVisibleFieldValue(form, 'direct_transfer_price'),
+      currency: getVisibleFieldValue(form, 'direct_transfer_currency'),
+      notes: getVisibleFieldValue(form, 'direct_transfer_notes') || getVisibleFieldValue(form, 'message')
+    };
+  }
+
+  function formatDirectTransferDistance(value) {
+    var meters;
+    var kilometers;
+    var roundedKilometers;
+
+    meters = Number(value);
+
+    if (!Number.isFinite(meters) || meters <= 0) {
+      return '';
+    }
+
+    kilometers = meters / 1000;
+    roundedKilometers = kilometers >= 10
+      ? Math.round(kilometers)
+      : Math.round(kilometers * 10) / 10;
+
+    return String(roundedKilometers).replace('.', ',') + ' km';
+  }
+
+  function formatDirectTransferDuration(value) {
+    var seconds;
+
+    seconds = Number(value);
+
+    if (!Number.isFinite(seconds) || seconds <= 0) {
+      return '';
+    }
+
+    return String(Math.max(1, Math.round(seconds / 60))) + ' min aprox.';
+  }
 
   function getVisibleFormData(form) {
     var serviceType;
@@ -255,6 +318,7 @@
     var tourPrivateData;
     var hourlyDailyData;
     var eventSpecialData;
+    var directTransferData;
     var fallbackOrigin;
     var fallbackDestination;
     var fallbackPassengers;
@@ -275,74 +339,109 @@
     eventSpecialData = serviceType === 'event_special'
       ? getEventSpecialEditorData(form)
       : null;
+    directTransferData = serviceType === 'direct_transfer'
+      ? getDirectTransferEditorData(form)
+      : null;
 
     return {
       name: getVisibleFieldValue(form, 'name'),
       phone: getVisibleFieldValue(form, 'phone'),
       email: getVisibleFieldValue(form, 'email'),
-      tripDate: airportHotelData && airportHotelData.tripDate
-        ? airportHotelData.tripDate
+      tripDate: directTransferData && directTransferData.tripDate
+        ? directTransferData.tripDate
         : (
-            tourPrivateData && tourPrivateData.tripDate
-              ? tourPrivateData.tripDate
+            airportHotelData && airportHotelData.tripDate
+              ? airportHotelData.tripDate
               : (
-                  hourlyDailyData && hourlyDailyData.tripDate
-                    ? hourlyDailyData.tripDate
-                    : getVisibleFieldValue(form, 'trip_date')
+                  tourPrivateData && tourPrivateData.tripDate
+                    ? tourPrivateData.tripDate
+                    : (
+                        hourlyDailyData && hourlyDailyData.tripDate
+                          ? hourlyDailyData.tripDate
+                          : getVisibleFieldValue(form, 'trip_date')
+                      )
                 )
           ),
-      tripTime: airportHotelData && airportHotelData.tripTime
-        ? airportHotelData.tripTime
+      tripTime: directTransferData && directTransferData.tripTime
+        ? directTransferData.tripTime
         : (
-            tourPrivateData && tourPrivateData.tripTime
-              ? tourPrivateData.tripTime
+            airportHotelData && airportHotelData.tripTime
+              ? airportHotelData.tripTime
               : (
-                  hourlyDailyData && hourlyDailyData.tripTime
-                    ? hourlyDailyData.tripTime
-                    : getVisibleFieldValue(form, 'trip_time')
+                  tourPrivateData && tourPrivateData.tripTime
+                    ? tourPrivateData.tripTime
+                    : (
+                        hourlyDailyData && hourlyDailyData.tripTime
+                          ? hourlyDailyData.tripTime
+                          : getVisibleFieldValue(form, 'trip_time')
+                      )
                 )
           ),
-      origin: eventSpecialData && eventSpecialData.originAddress
-        ? eventSpecialData.originAddress
-        : (airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin),
-      destination: eventSpecialData && eventSpecialData.destinationAddress
-        ? eventSpecialData.destinationAddress
-        : (airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination),
+      origin: directTransferData && directTransferData.originAddress
+        ? directTransferData.originAddress
+        : (
+            eventSpecialData && eventSpecialData.originAddress
+              ? eventSpecialData.originAddress
+              : (airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin)
+          ),
+      destination: directTransferData && directTransferData.destinationAddress
+        ? directTransferData.destinationAddress
+        : (
+            eventSpecialData && eventSpecialData.destinationAddress
+              ? eventSpecialData.destinationAddress
+              : (airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination)
+          ),
       serviceType: serviceType,
       zone: getVisibleFieldValue(form, 'zone'),
       fare: getVisibleFieldValue(form, 'fare'),
-      passengers: eventSpecialData && eventSpecialData.passengers
-        ? eventSpecialData.passengers
+      passengers: directTransferData && directTransferData.passengers
+        ? directTransferData.passengers
         : (
-            airportHotelData && airportHotelData.passengers
-              ? airportHotelData.passengers
-              : (tourPrivateData && tourPrivateData.passengers ? tourPrivateData.passengers : fallbackPassengers)
+            eventSpecialData && eventSpecialData.passengers
+              ? eventSpecialData.passengers
+              : (
+                  airportHotelData && airportHotelData.passengers
+                    ? airportHotelData.passengers
+                    : (tourPrivateData && tourPrivateData.passengers ? tourPrivateData.passengers : fallbackPassengers)
+                )
           ),
       luggage: getVisibleFieldValue(form, 'luggage'),
-      notes: eventSpecialData && eventSpecialData.notes
-        ? eventSpecialData.notes
+      notes: directTransferData && directTransferData.notes
+        ? directTransferData.notes
         : (
-            hourlyDailyData && hourlyDailyData.mode
-              ? (getVisibleFieldValue(form, 'hourly_daily_notes') || getVisibleFieldValue(form, 'message'))
-              : getVisibleFieldValue(form, 'message')
+            eventSpecialData && eventSpecialData.notes
+              ? eventSpecialData.notes
+              : (
+                  hourlyDailyData && hourlyDailyData.mode
+                    ? (getVisibleFieldValue(form, 'hourly_daily_notes') || getVisibleFieldValue(form, 'message'))
+                    : getVisibleFieldValue(form, 'message')
+                )
           ),
       tourLabel: tourPrivateData && tourPrivateData.tourLabel ? tourPrivateData.tourLabel : '',
       pickup: tourPrivateData && tourPrivateData.pickup ? tourPrivateData.pickup : '',
       hasGuide: tourPrivateData && tourPrivateData.hasGuide ? tourPrivateData.hasGuide : '',
       guideLanguage: tourPrivateData && tourPrivateData.guideLanguage ? tourPrivateData.guideLanguage : '',
-      price: eventSpecialData && eventSpecialData.price
-        ? eventSpecialData.price
+      price: directTransferData && directTransferData.price
+        ? directTransferData.price
         : (
-            tourPrivateData && tourPrivateData.price
-              ? tourPrivateData.price
-              : (hourlyDailyData && hourlyDailyData.price ? hourlyDailyData.price : '')
+            eventSpecialData && eventSpecialData.price
+              ? eventSpecialData.price
+              : (
+                  tourPrivateData && tourPrivateData.price
+                    ? tourPrivateData.price
+                    : (hourlyDailyData && hourlyDailyData.price ? hourlyDailyData.price : '')
+                )
           ),
-      currency: eventSpecialData && eventSpecialData.currency
-        ? eventSpecialData.currency
+      currency: directTransferData && directTransferData.currency
+        ? directTransferData.currency
         : (
-            tourPrivateData && tourPrivateData.currency
-              ? tourPrivateData.currency
-              : (hourlyDailyData && hourlyDailyData.currency ? hourlyDailyData.currency : '')
+            eventSpecialData && eventSpecialData.currency
+              ? eventSpecialData.currency
+              : (
+                  tourPrivateData && tourPrivateData.currency
+                    ? tourPrivateData.currency
+                    : (hourlyDailyData && hourlyDailyData.currency ? hourlyDailyData.currency : '')
+                )
           ),
       hourlyDailyMode: hourlyDailyData && hourlyDailyData.mode ? hourlyDailyData.mode : '',
       hourlyDailyPickup: hourlyDailyData && hourlyDailyData.pickup ? hourlyDailyData.pickup : '',
@@ -354,7 +453,10 @@
       eventSpecialOriginPickupTime: eventSpecialData && eventSpecialData.originPickupTime ? eventSpecialData.originPickupTime : '',
       eventSpecialReturnPickupLabel: eventSpecialData && eventSpecialData.returnPickupLabel ? eventSpecialData.returnPickupLabel : '',
       eventSpecialEstimatedEventArrivalTime: eventSpecialData && eventSpecialData.estimatedEventArrivalTime ? eventSpecialData.estimatedEventArrivalTime : '',
-      eventSpecialEstimatedDestinationArrivalTime: eventSpecialData && eventSpecialData.estimatedDestinationArrivalTime ? eventSpecialData.estimatedDestinationArrivalTime : ''
+      eventSpecialEstimatedDestinationArrivalTime: eventSpecialData && eventSpecialData.estimatedDestinationArrivalTime ? eventSpecialData.estimatedDestinationArrivalTime : '',
+      directTransferVehicle: directTransferData && directTransferData.vehicle ? directTransferData.vehicle : '',
+      directTransferDistance: directTransferData && directTransferData.distanceMeters ? formatDirectTransferDistance(directTransferData.distanceMeters) : '',
+      directTransferDuration: directTransferData && directTransferData.durationSeconds ? formatDirectTransferDuration(directTransferData.durationSeconds) : ''
     };
   }
   
@@ -370,6 +472,7 @@
       serviceTourPrivate: getI18nValue('contact.services.tourPrivate', 'Tours y visitas privadas'),
       serviceHourlyDaily: getI18nValue('contact.services.hourlyDaily', 'Por horas o por día'),
       serviceEventSpecial: getI18nValue('contact.services.eventSpecial.label', 'Eventos y ocasiones especiales'),
+      serviceDirectTransfer: getI18nValue('directTransferMobileFlow.whatsapp.serviceLabel', 'Traslado directo'),
       serviceOther: getI18nValue('contact.services.other', 'Otro servicio'),
       name: getI18nValue('contact.whatsappMessage.name', 'Nombre'),
       phone: getI18nValue('contact.whatsappMessage.phone', 'Teléfono'),
@@ -406,7 +509,10 @@
       originPickupTime: getI18nValue('contact.services.eventSpecial.originPickupTimeLabel', 'Hora de recogida en origen'),
       returnPickupTime: getI18nValue('contact.services.eventSpecial.returnPickupTimeLabel', 'Hora recogida tras evento'),
       estimatedEventArrival: getI18nValue('contact.services.eventSpecial.estimatedEventArrivalLabel', 'Llegada al evento estimada'),
-      estimatedDestinationArrival: getI18nValue('contact.services.eventSpecial.estimatedDestinationArrivalLabel', 'Llegada a destino estimada')
+      estimatedDestinationArrival: getI18nValue('contact.services.eventSpecial.estimatedDestinationArrivalLabel', 'Llegada a destino estimada'),
+      vehicle: getI18nValue('directTransferMobileFlow.contactStep.summary.vehicle', 'Vehículo'),
+      distance: 'Distancia',
+      duration: 'Tiempo estimado'
     };
 
     lines = [labels.intro];
@@ -419,6 +525,8 @@
       lines.push(labels.serviceType + ': ' + labels.serviceHourlyDaily);
     } else if (data.serviceType === 'event_special') {
       lines.push(labels.serviceType + ': ' + labels.serviceEventSpecial);
+    } else if (data.serviceType === 'direct_transfer') {
+      lines.push(labels.serviceType + ': ' + labels.serviceDirectTransfer);
     } else if (data.serviceType === 'other') {
       lines.push(labels.serviceType + ': ' + labels.serviceOther);
     }
@@ -523,6 +631,18 @@
       } else if (data.hourlyDailyCustomTerm === 'custom') {
         lines.push(labels.hourlyDailyLongTerm + ': ' + labels.hourlyLongTermCustom);
       }
+    }
+
+    if (data.serviceType === 'direct_transfer' && data.directTransferVehicle) {
+      lines.push(labels.vehicle + ': ' + data.directTransferVehicle);
+    }
+
+    if (data.serviceType === 'direct_transfer' && data.directTransferDistance) {
+      lines.push(labels.distance + ': ' + data.directTransferDistance);
+    }
+
+    if (data.serviceType === 'direct_transfer' && data.directTransferDuration) {
+      lines.push(labels.duration + ': ' + data.directTransferDuration);
     }
 
     if (data.passengers) {

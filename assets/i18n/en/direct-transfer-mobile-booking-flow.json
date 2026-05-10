@@ -2,7 +2,7 @@
   "directTransferMobileFlow": {
     "back": "Back",
     "title": "Direct transfers",
-    "helper": "Move from one point to another with a private driver, an instant estimated fare and a premium vehicle.",
+    "helper": "Move from one point to another with a private driver, instant estimated fare and a premium vehicle.",
     "fields": {
       "origin": "Origin",
       "originPlaceholder": "Select pickup point",
@@ -10,17 +10,19 @@
       "destinationPlaceholder": "Select destination point",
       "date": "Date",
       "time": "Time",
-      "passengers": "Passengers"
+      "passengers": "Passengers",
+      "datePlaceholder": "dd/mm/yyyy",
+      "timePlaceholder": "--:--"
     },
     "addressSearch": {
-      "originTitle": "Enter the pickup point",
-      "destinationTitle": "Enter the destination point",
+      "originTitle": "Enter pickup point",
+      "destinationTitle": "Enter destination point",
       "close": "Back",
       "clear": "Clear address"
     },
     "validation": {
       "sameRoute": "Origin and destination cannot be the same.",
-      "airportRoute": "For transfers to or from the airports we cover, use the Airport / Hotel service.",
+      "airportRoute": "For transfers from or to the airports we cover, please use the Airport / Hotel service.",
       "outOfCoverage": "This route is outside our operating area for direct transfers."
     },
     "passengerBuckets": {
@@ -38,21 +40,31 @@
       "loading": "Calculating price…",
       "unavailable": "We could not calculate the price for this route.",
       "airportTransfer": "This route must be handled as Airport / Hotel.",
-      "outOfCoverage": "For this route, we can help you through WhatsApp or with a chauffeured vehicle service.",
+      "outOfCoverage": "For this route, we can help you via WhatsApp or with a private driver service.",
       "readySuffix": "MXN"
+    },
+    "estimate": {
+      "distanceLabel": "Distance",
+      "durationLabel": "Duration",
+      "durationLongLabel": "Estimated time",
+      "summaryLabel": "Route",
+      "distanceUnit": "km",
+      "minutesApprox": "{minutes} min approx.",
+      "minutesApproxShort": "{minutes} min approx.",
+      "separator": " · "
     },
     "vehicle": {
       "title": "BYD M9",
-      "alt": "BYD M9 — electric executive van"
+      "alt": "BYD M9 — executive electric van"
     },
     "cta": {
       "continue": "Continue",
       "airport": "Go to Airport / Hotel",
       "whatsapp": "WhatsApp",
-      "hourly": "Chauffeured vehicle"
+      "hourly": "Private driver service"
     },
     "whatsapp": {
-      "intro": "Hello, I would like to ask about a direct transfer with Pixkuy.",
+      "intro": "Hi, I’d like to request a direct transfer with Pixkuy.",
       "serviceType": "Service type",
       "serviceLabel": "Direct transfer",
       "origin": "Origin",
@@ -72,6 +84,7 @@
         "time": "Time",
         "passengers": "Passengers",
         "vehicle": "Vehicle",
+        "estimate": "Route",
         "price": "Price"
       },
       "fields": {
@@ -90,7 +103,7 @@
         "name": "Enter your name.",
         "phone": "Enter a valid phone number in international format.",
         "email": "Enter a valid email address.",
-        "formIncomplete": "Review the details before sending."
+        "formIncomplete": "Check your details before sending."
       },
       "notesEditor": {
         "title": "Transfer notes",

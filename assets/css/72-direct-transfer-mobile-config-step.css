@@ -549,6 +549,45 @@
     padding:12px 12px;
     background:transparent;
   }
+  
+    .direct-transfer-mobile-config-step__estimate{
+    display:grid;
+    gap:2px;
+    margin:0 0 4px;
+  }
+
+  .direct-transfer-mobile-config-step__estimate[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-config-step__estimate p{
+    margin:0;
+    color:rgba(255,245,228,.70);
+    font-size:11.5px;
+    line-height:1.25;
+    font-weight:600;
+  }
+
+  .direct-transfer-mobile-config-step__estimate p[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-config-step__estimate span{
+    color:rgba(255,245,228,.56);
+    font-weight:600;
+  }
+
+  .direct-transfer-mobile-config-step__estimate strong{
+    color:rgba(255,249,238,.90);
+    font-weight:750;
+  }
+
+  .direct-transfer-mobile-config-step__fare[data-direct-transfer-mobile-fare-state="ready"]{
+    grid-template-rows:auto auto 1fr;
+    row-gap:4px;
+    align-items:start;
+    padding:10px 12px;
+  }
 
   .direct-transfer-mobile-config-step__fare-label{
     grid-row:1;

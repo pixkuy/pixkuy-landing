@@ -8,6 +8,14 @@
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
   }
+
+  function isDesktopViewport() {
+    return !(
+      window &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(max-width: 720px)").matches
+    );
+  }
   
   function debugTrace() {
     return;
@@ -600,6 +608,38 @@ function setHidden(node, shouldHide) {
   node.hidden = false;
 }
 
+function ensureDesktopActiveLodgingFieldVisible(activeNodes) {
+  if (!isDesktopViewport() || !activeNodes) {
+    return;
+  }
+
+  const field = activeNodes.root
+    ? activeNodes.root.closest('[data-airport-tariff-role]')
+    : null;
+
+  if (field) {
+    field.hidden = false;
+    field.removeAttribute("aria-hidden");
+    field.style.display = "";
+  }
+
+  if (activeNodes.root) {
+    activeNodes.root.hidden = false;
+    activeNodes.root.style.display = "";
+  }
+
+  if (activeNodes.search) {
+    activeNodes.search.hidden = false;
+    activeNodes.search.style.display = "";
+  }
+
+  if (activeNodes.mount) {
+    activeNodes.mount.hidden = false;
+    activeNodes.mount.style.display = "";
+    activeNodes.mount.setAttribute("aria-hidden", "false");
+  }
+}
+
 function bindAirportMirrorProxy(rootId) {
   const airportNodes = getAirportShellNodes(rootId);
   if (!airportNodes || airportNodes.rootId !== "1") {
@@ -718,6 +758,10 @@ function renderDestinationUi() {
   setHidden(activeNodes.search, !showSearch);
   setHidden(activeNodes.mount, !showSearch);
   setHidden(activeNodes.resolved, !hasResolved);
+
+  if (!hasResolved && activeSide === "origin") {
+    ensureDesktopActiveLodgingFieldVisible(activeNodes);
+  }
 
   if (activeNodes.manualControl) {
     activeNodes.manualControl.hidden = true;

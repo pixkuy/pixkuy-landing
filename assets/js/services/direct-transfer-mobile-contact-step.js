@@ -187,6 +187,78 @@
 
     return Number.isFinite(number) ? String(Math.round(number)) : "";
   }
+  
+    function getQuoteNumberValue(quote, keys) {
+    const safeQuote = quote && typeof quote === "object" ? quote : {};
+    const candidates = Array.isArray(keys) ? keys : [];
+    let index;
+
+    for (index = 0; index < candidates.length; index += 1) {
+      const key = candidates[index];
+      const value = safeQuote[key];
+      const number = Number(value);
+
+      if (Number.isFinite(number) && number > 0) {
+        return number;
+      }
+    }
+
+    if (safeQuote.route && typeof safeQuote.route === "object") {
+      for (index = 0; index < candidates.length; index += 1) {
+        const key = candidates[index];
+        const value = safeQuote.route[key];
+        const number = Number(value);
+
+        if (Number.isFinite(number) && number > 0) {
+          return number;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function formatDistanceSummaryLabel(snapshot) {
+    const meters = Number(snapshot && snapshot.direct_transfer_distance_meters);
+
+    if (!Number.isFinite(meters) || meters <= 0) {
+      return "";
+    }
+
+    const kilometers = meters / 1000;
+    const roundedKilometers = kilometers >= 10
+      ? Math.round(kilometers)
+      : Math.round(kilometers * 10) / 10;
+
+    return [
+      String(roundedKilometers).replace(".", ","),
+      getI18nValue("directTransferMobileFlow.estimate.distanceUnit", "km")
+    ].filter(Boolean).join(" ");
+  }
+
+  function formatDurationSummaryLabel(snapshot) {
+    const seconds = Number(snapshot && snapshot.direct_transfer_duration_seconds);
+
+    if (!Number.isFinite(seconds) || seconds <= 0) {
+      return "";
+    }
+
+    const minutes = Math.max(1, Math.round(seconds / 60));
+
+    return getI18nValue(
+      "directTransferMobileFlow.estimate.minutesApproxShort",
+      "{minutes} min aprox."
+    ).replace("{minutes}", String(minutes));
+  }
+
+  function buildEstimateSummaryLabel(snapshot) {
+    return [
+      formatDistanceSummaryLabel(snapshot),
+      formatDurationSummaryLabel(snapshot)
+    ].filter(Boolean).join(
+      getI18nValue("directTransferMobileFlow.estimate.separator", " · ")
+    );
+  }
 
   function buildSnapshotFromPayload(payload) {
     const safePayload = payload && typeof payload === "object" ? payload : {};
@@ -203,6 +275,16 @@
       typeof quote.price === "number" ? String(quote.price) : quote.price
     );
     const currency = normalizeText(quote.currency) || "MXN";
+    const durationSeconds = getQuoteNumberValue(quote, [
+      "durationSeconds",
+      "duration_seconds",
+      "duration"
+    ]);
+    const distanceMeters = getQuoteNumberValue(quote, [
+      "distanceMeters",
+      "distance_meters",
+      "distance"
+    ]);
 
     return {
       serviceType: "direct_transfer",
@@ -229,8 +311,8 @@
         normalizeText(safePayload.priceLabel) ||
         formatCurrencyValue(price, currency),
 
-      direct_transfer_duration_seconds: normalizeSnapshotNumber(quote.durationSeconds),
-      direct_transfer_distance_meters: normalizeSnapshotNumber(quote.distanceMeters),
+      direct_transfer_duration_seconds: normalizeSnapshotNumber(durationSeconds),
+      direct_transfer_distance_meters: normalizeSnapshotNumber(distanceMeters),
       direct_transfer_vehicle_label: normalizeText(safePayload.vehicleLabel) || "BYD M9",
       direct_transfer_notes: normalizeText(safePayload.notes)
     };
@@ -606,6 +688,7 @@
       "time",
       "passengers",
       "vehicle",
+      "estimate",
       "price"
     ].forEach(function appendRow(key) {
       summaryList.appendChild(buildSummaryRow(key));
@@ -680,6 +763,14 @@
         )
       : null;
   }
+  
+    function getSummaryRowNode(key) {
+    return contactStepNode
+      ? contactStepNode.querySelector(
+          '[data-direct-transfer-mobile-contact-summary-row="' + key + '"]'
+        )
+      : null;
+  }
 
   function getSummaryLabelNode(key) {
     return contactStepNode
@@ -701,6 +792,7 @@
       time: safeSnapshot.direct_transfer_time || "",
       passengers: safeSnapshot.direct_transfer_passenger_bucket_label || "",
       vehicle: safeSnapshot.direct_transfer_vehicle_label || "",
+      estimate: buildEstimateSummaryLabel(safeSnapshot),
       price: safeSnapshot.direct_transfer_price_label || ""
     };
 
@@ -711,6 +803,7 @@
 
     Object.keys(values).forEach(function syncValue(key) {
       setText(getSummaryValueNode(key), values[key]);
+      setHidden(getSummaryRowNode(key), key === "estimate" && !values[key]);
     });
 
     return true;
@@ -782,11 +875,16 @@
       );
     }
 
-    ["origin", "destination", "date", "time", "passengers", "vehicle", "price"]
+    ["origin", "destination", "date", "time", "passengers", "vehicle", "estimate", "price"]
       .forEach(function syncSummaryLabel(key) {
         setText(
           getSummaryLabelNode(key),
-          getI18nValue("directTransferMobileFlow.contactStep.summary." + key, "")
+          getI18nValue(
+            "directTransferMobileFlow.contactStep.summary." + key,
+            key === "estimate"
+              ? getI18nValue("directTransferMobileFlow.estimate.summaryLabel", "Ruta")
+              : ""
+          )
         );
       });
 
@@ -953,6 +1051,10 @@
       time: getI18nValue("directTransferMobileFlow.contactStep.summary.time", ""),
       passengers: getI18nValue("directTransferMobileFlow.contactStep.summary.passengers", ""),
       vehicle: getI18nValue("directTransferMobileFlow.contactStep.summary.vehicle", ""),
+      estimate: getI18nValue(
+        "directTransferMobileFlow.contactStep.summary.estimate",
+        getI18nValue("directTransferMobileFlow.estimate.summaryLabel", "Ruta")
+      ),
       price: getI18nValue("directTransferMobileFlow.contactStep.summary.price", "")
     };
     const parts = [];
@@ -979,6 +1081,10 @@
 
     if (safeSnapshot.direct_transfer_vehicle_label) {
       parts.push(labels.vehicle + ": " + safeSnapshot.direct_transfer_vehicle_label);
+    }
+
+    if (buildEstimateSummaryLabel(safeSnapshot)) {
+      parts.push(labels.estimate + ": " + buildEstimateSummaryLabel(safeSnapshot));
     }
 
     if (safeSnapshot.direct_transfer_price_label) {

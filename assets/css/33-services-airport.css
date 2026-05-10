@@ -204,6 +204,17 @@
     box-sizing:border-box;
   }
 
+  .services-expand__field[data-airport-tariff-role="origin"] > .services-expand__destination,
+  .services-expand__field[data-airport-tariff-role="origin"] > .services-expand__destination .services-expand__destination-search,
+  .services-expand__field[data-airport-tariff-role="origin"] > .services-expand__destination .place-autocomplete,
+  .services-expand__field[data-airport-tariff-role="origin"] > .services-expand__destination .place-autocomplete input,
+  .services-expand__field[data-airport-tariff-role="origin"] > .services-expand__destination .services-expand__destination-resolved{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+
   .services-expand__field[data-airport-tariff-role="destination"] > .services-expand__destination,
   .services-expand__field[data-airport-tariff-role="destination"] > .services-expand__airport-shell{
     width:calc(100% - 24px);

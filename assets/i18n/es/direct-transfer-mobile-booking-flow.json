@@ -10,7 +10,9 @@
       "destinationPlaceholder": "Selecciona punto de destino",
       "date": "Fecha",
       "time": "Hora",
-      "passengers": "Pasajeros"
+      "passengers": "Pasajeros",
+      "datePlaceholder": "dd/mm/aaaa",
+      "timePlaceholder": "--:--"
     },
     "addressSearch": {
       "originTitle": "Introduce el punto de origen",
@@ -40,6 +42,16 @@
       "airportTransfer": "Este trayecto debe gestionarse como Aeropuerto / Hotel.",
       "outOfCoverage": "Para este trayecto, podemos ayudarte por WhatsApp o con servicio de vehículo con conductor.",
       "readySuffix": "MXN"
+    },
+    "estimate": {
+      "distanceLabel": "Distancia",
+      "durationLabel": "Duración",
+      "durationLongLabel": "Tiempo estimado",
+      "summaryLabel": "Ruta",
+      "distanceUnit": "km",
+      "minutesApprox": "{minutes} minutos aprox.",
+      "minutesApproxShort": "{minutes} min aprox.",
+      "separator": " · "
     },
     "vehicle": {
       "title": "BYD M9",
@@ -72,6 +84,7 @@
         "time": "Hora",
         "passengers": "Pasajeros",
         "vehicle": "Vehículo",
+        "estimate": "Ruta",
         "price": "Precio"
       },
       "fields": {

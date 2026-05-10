@@ -12,6 +12,7 @@
     TOUR_PRIVATE: "tour_private",
     HOURLY_DAILY: "hourly_daily",
     EVENT_SPECIAL: "event_special",
+    DIRECT_TRANSFER: "direct_transfer",
     OTHER: "other"
   });
 
@@ -33,6 +34,7 @@
       value === SERVICE_TYPES.TOUR_PRIVATE ||
       value === SERVICE_TYPES.HOURLY_DAILY ||
       value === SERVICE_TYPES.EVENT_SPECIAL ||
+      value === SERVICE_TYPES.DIRECT_TRANSFER ||
       value === SERVICE_TYPES.OTHER
     );
   }

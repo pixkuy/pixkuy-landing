@@ -1,0 +1,190 @@
+/* assets/css/78-direct-transfer-desktop-vehicle-gallery.css
+   Direct Transfer desktop vehicle gallery.
+   Alcance:
+   - solo desktop
+   - modal simple para fotos del BYD M9 en Direct Transfer desktop
+   - reutiliza fleet-gallery.json
+   NO incluir:
+   - móvil
+   - quote
+   - contacto
+*/
+
+.direct-transfer-desktop-vehicle-gallery[hidden]{
+  display:none !important;
+}
+
+@media (min-width:721px){
+  body[data-direct-transfer-desktop-vehicle-gallery-active="true"]{
+    overflow:hidden !important;
+  }
+
+  .services-direct-transfer-panel__vehicle{
+    position:relative;
+    cursor:pointer;
+  }
+
+  .services-direct-transfer-panel__vehicle::after{
+    content:"";
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:2;
+    width:34px;
+    height:34px;
+    border:1px solid rgba(255,249,238,.34);
+    border-radius:8px;
+    background:
+      rgba(15,17,19,.72)
+      url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='4' y='5' width='16' height='14' rx='2' stroke='rgb(255,249,238)' stroke-width='1.8'/%3E%3Cpath d='M7.5 15.5l3.1-3.1 2.4 2.4 2.1-2.1 2.9 2.8' stroke='rgb(255,249,238)' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='15.8' cy='9.2' r='1.2' fill='rgb(255,249,238)'/%3E%3C/svg%3E")
+      center / 18px 18px
+      no-repeat;
+    pointer-events:none;
+  }
+
+  .services-direct-transfer-panel__vehicle:hover::after,
+  .services-direct-transfer-panel__vehicle:focus-visible::after{
+    border-color:rgba(255,249,238,.54);
+    background-color:rgba(15,17,19,.88);
+  }
+
+  .services-direct-transfer-panel__vehicle:focus-visible{
+    outline:2px solid rgba(236,220,189,.58);
+    outline-offset:4px;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery{
+    position:fixed;
+    inset:0;
+    z-index:96;
+    display:grid;
+    place-items:center;
+    padding:32px;
+    background:rgba(0,0,0,.72);
+    overflow:hidden;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__backdrop{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    display:block;
+    width:100%;
+    height:100%;
+    border:0;
+    padding:0;
+    background:transparent;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__panel{
+    position:relative;
+    z-index:1;
+    width:min(100%, 920px);
+    max-height:calc(100vh - 64px);
+    display:grid;
+    grid-template-rows:minmax(0, 1fr) auto;
+    gap:10px;
+    overflow:hidden;
+    border:1px solid rgba(236,220,189,.18);
+    border-radius:12px;
+    background:#0f1113;
+    box-shadow:0 12px 34px rgba(0,0,0,.42);
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__close{
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:3;
+    width:36px;
+    height:36px;
+    border:0;
+    border-radius:8px;
+    background:rgba(15,17,19,.76);
+    color:rgba(255,249,238,.94);
+    font:inherit;
+    font-size:24px;
+    line-height:1;
+    font-weight:500;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__close:focus-visible,
+  .direct-transfer-desktop-vehicle-gallery__nav:focus-visible{
+    outline:2px solid rgba(236,220,189,.58);
+    outline-offset:2px;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__image-wrap{
+    width:100%;
+    min-height:0;
+    background:#090a0b;
+    overflow:hidden;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__image{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:calc(100vh - 150px);
+    object-fit:contain;
+    background:#090a0b;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__footer{
+    display:grid;
+    gap:3px;
+    padding:0 16px 16px;
+    background:#0f1113;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__label{
+    margin:0;
+    color:rgba(255,249,238,.94);
+    font-size:14px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__counter{
+    margin:0;
+    color:rgba(255,245,228,.54);
+    font-size:12px;
+    line-height:1.2;
+    font-weight:650;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__nav{
+    position:absolute;
+    top:50%;
+    z-index:3;
+    width:40px;
+    height:48px;
+    border:0;
+    border-radius:8px;
+    background:rgba(15,17,19,.66);
+    color:rgba(255,249,238,.92);
+    font:inherit;
+    font-size:34px;
+    line-height:1;
+    font-weight:300;
+    transform:translateY(-50%);
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__nav[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__nav--prev{
+    left:10px;
+  }
+
+  .direct-transfer-desktop-vehicle-gallery__nav--next{
+    right:10px;
+  }
+}
+
+@media (max-width:720px){
+  .direct-transfer-desktop-vehicle-gallery{
+    display:none !important;
+  }
+}

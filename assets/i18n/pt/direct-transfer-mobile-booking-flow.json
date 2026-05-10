@@ -1,7 +1,7 @@
 {
   "directTransferMobileFlow": {
     "back": "Voltar",
-    "title": "Transfers diretos",
+    "title": "Traslados diretos",
     "helper": "Vá de um ponto a outro com motorista privado, tarifa estimada na hora e veículo premium.",
     "fields": {
       "origin": "Origem",
@@ -10,18 +10,20 @@
       "destinationPlaceholder": "Selecione o ponto de destino",
       "date": "Data",
       "time": "Hora",
-      "passengers": "Passageiros"
+      "passengers": "Passageiros",
+      "datePlaceholder": "dd/mm/aaaa",
+      "timePlaceholder": "--:--"
     },
     "addressSearch": {
       "originTitle": "Informe o ponto de origem",
       "destinationTitle": "Informe o ponto de destino",
       "close": "Voltar",
-      "clear": "Limpar endereço"
+      "clear": "Apagar endereço"
     },
     "validation": {
       "sameRoute": "A origem e o destino não podem ser iguais.",
-      "airportRoute": "Para transfers de ou para os aeroportos que atendemos, use o serviço Aeroporto / Hotel.",
-      "outOfCoverage": "Este trajeto fica fora da nossa área operacional para transfers diretos."
+      "airportRoute": "Para traslados de ou para os aeroportos que atendemos, use o serviço Aeroporto / Hotel.",
+      "outOfCoverage": "Este trajeto está fora da nossa área operacional para traslados diretos."
     },
     "passengerBuckets": {
       "van_1_2": "1–2",
@@ -32,14 +34,24 @@
       "label": "Preço",
       "pending": "Complete origem, destino, data, hora e passageiros para calcular o preço.",
       "pendingTemplate": "Complete {fields} para calcular o preço.",
-      "pendingReady": "Preparando cálculo do preço…",
+      "pendingReady": "Preparando o cálculo do preço…",
       "separator": ", ",
       "finalSeparator": " e ",
       "loading": "Calculando preço…",
-      "unavailable": "Não conseguimos calcular o preço para este trajeto.",
-      "airportTransfer": "Este trajeto deve ser gerenciado como Aeroporto / Hotel.",
-      "outOfCoverage": "Para este trajeto, podemos ajudar por WhatsApp ou com serviço de veículo com motorista.",
+      "unavailable": "Não foi possível calcular o preço para este trajeto.",
+      "airportTransfer": "Este trajeto deve ser tratado como Aeroporto / Hotel.",
+      "outOfCoverage": "Para este trajeto, podemos ajudar por WhatsApp ou com um serviço de carro com motorista.",
       "readySuffix": "MXN"
+    },
+    "estimate": {
+      "distanceLabel": "Distância",
+      "durationLabel": "Duração",
+      "durationLongLabel": "Tempo estimado",
+      "summaryLabel": "Rota",
+      "distanceUnit": "km",
+      "minutesApprox": "{minutes} min aprox.",
+      "minutesApproxShort": "{minutes} min aprox.",
+      "separator": " · "
     },
     "vehicle": {
       "title": "BYD M9",
@@ -49,12 +61,12 @@
       "continue": "Continuar",
       "airport": "Ir para Aeroporto / Hotel",
       "whatsapp": "WhatsApp",
-      "hourly": "Veículo com motorista"
+      "hourly": "Carro com motorista"
     },
     "whatsapp": {
-      "intro": "Olá, quero consultar um transfer direto com a Pixkuy.",
+      "intro": "Olá, quero solicitar um traslado direto com a Pixkuy.",
       "serviceType": "Tipo de serviço",
-      "serviceLabel": "Transfer direto",
+      "serviceLabel": "Traslado direto",
       "origin": "Origem",
       "destination": "Destino",
       "date": "Data",
@@ -65,13 +77,14 @@
     },
     "contactStep": {
       "summary": {
-        "title": "Resumo do transfer",
+        "title": "Resumo do traslado",
         "origin": "Origem",
         "destination": "Destino",
         "date": "Data",
         "time": "Hora",
         "passengers": "Passageiros",
         "vehicle": "Veículo",
+        "estimate": "Rota",
         "price": "Preço"
       },
       "fields": {
@@ -93,10 +106,10 @@
         "formIncomplete": "Revise os dados antes de enviar."
       },
       "notesEditor": {
-        "title": "Notas para o transfer",
+        "title": "Notas para o traslado",
         "save": "Salvar",
-        "clear": "Limpar notas",
-        "placeholder": "Adicione detalhes úteis para o transfer."
+        "clear": "Apagar notas",
+        "placeholder": "Adicione detalhes úteis para o traslado."
       },
       "cta": {
         "submit": "Enviar solicitação"

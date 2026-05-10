@@ -1084,6 +1084,51 @@ function shouldUsePassengerChipUi(nodes) {
       destinationControlHidden: destinationControlHidden
     });
   }
+  
+    function getAirportDeepLinkPayloadFromUrl() {
+    var params;
+    var service;
+    var airportId;
+    var direction;
+    var isMobileViewport;
+
+    try {
+      isMobileViewport = Boolean(
+        window &&
+          typeof window.matchMedia === "function" &&
+          window.matchMedia("(max-width: 720px)").matches
+      );
+
+      if (isMobileViewport) {
+        return null;
+      }
+
+      params = new URLSearchParams(window.location.search || "");
+      service = normalizeText(params.get("service")).toLowerCase();
+
+      if (service !== "airport_hotel") {
+        return null;
+      }
+
+      airportId = normalizeText(params.get("airport_id"));
+      direction = normalizeText(params.get("airport_direction"));
+
+      if (!airportId) {
+        return null;
+      }
+
+      if (direction !== "hotel_to_airport") {
+        direction = "airport_to_hotel";
+      }
+
+      return {
+        airportId: airportId,
+        direction: direction
+      };
+    } catch (error) {
+      return null;
+    }
+  }
 
   function seedInitialState(state) {
     const airports = getActiveItemsByType("airport");
@@ -1733,6 +1778,17 @@ function shouldUsePassengerChipUi(nodes) {
 
     buildDropdownDom(nodes);
     seedInitialState(state);
+
+    (function applyInitialAirportDeepLink() {
+      var payload = getAirportDeepLinkPayloadFromUrl();
+
+      if (!payload) {
+        return;
+      }
+
+      applyAirportSelectionState(state, payload);
+    })();
+
     renderPanel(nodes, state);
     bindEvents(nodes, state);
     scheduleI18nLabelHydration(nodes, state);

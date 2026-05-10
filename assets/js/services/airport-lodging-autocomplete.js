@@ -31,6 +31,49 @@
     return typeof value === "string" ? value : "";
   }
 
+  function isDesktopViewport() {
+    return !(
+      window &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(max-width: 720px)").matches
+    );
+  }
+
+  function getAirportTariffBridge() {
+    const bridge = window.PixkuyAirportZoneTariff;
+
+    return bridge && typeof bridge === "object" ? bridge : null;
+  }
+
+  function getInitialRootIdFromTariffState() {
+    const bridge = getAirportTariffBridge();
+    let tariffState = null;
+    let side = "";
+
+    if (!isDesktopViewport()) {
+      return DEFAULT_ROOT_ID;
+    }
+
+    if (!bridge || typeof bridge.getState !== "function") {
+      return DEFAULT_ROOT_ID;
+    }
+
+    try {
+      tariffState = bridge.getState();
+    } catch (error) {
+      return DEFAULT_ROOT_ID;
+    }
+
+    side = normalizeText(
+      tariffState && (
+        tariffState.lodgingEndpointSide ||
+        tariffState.lodgingSearchSide
+      )
+    ).trim();
+
+    return side === "origin" ? "0" : DEFAULT_ROOT_ID;
+  }
+
   function debugTrace() {
     return;
   }
@@ -1010,7 +1053,7 @@ function clearAllRootUis() {
 }
 
   function initAirportLodgingAutocomplete() {
-    const nodes = getPanelNodes();
+    const nodes = getPanelNodes(getInitialRootIdFromTariffState());
     if (!nodes) {
       return;
     }
@@ -1047,6 +1090,25 @@ function clearAllRootUis() {
     });
 
     window.PixkuyAirportLodgingAutocomplete = getApi(nodes, dom);
+
+    if (isDesktopViewport()) {
+      window.requestAnimationFrame(function syncInitialDesktopRoot() {
+        const api = window.PixkuyAirportLodgingAutocomplete;
+        const nextRootId = getInitialRootIdFromTariffState();
+        const destinationBridge = getAirportDestinationBridge();
+
+        if (api && typeof api.setActiveRoot === "function") {
+          api.setActiveRoot(nextRootId);
+        }
+
+        if (
+          destinationBridge &&
+          typeof destinationBridge.renderDestinationUi === "function"
+        ) {
+          destinationBridge.renderDestinationUi();
+        }
+      });
+    }
   }
 
   if (document.readyState === "loading") {

@@ -103,6 +103,16 @@
       ? window.PixkuyForms.googlePlaces
       : null;
   }
+  
+  function getNeutralSheetCoverageApi() {
+    return {
+      getCoverageDecision: function getCoverageDecision() {
+        return {
+          isWithinCoverage: true
+        };
+      }
+    };
+  }
 
   function getSheet() {
     return document.querySelector(SELECTORS.sheet);
@@ -410,7 +420,10 @@
       language: normalizeGoogleLanguage(getDocumentLanguage()),
       region: "mx",
       includedRegionCodes: ["mx"],
+      coverageApi: getNeutralSheetCoverageApi(),
       onSelection: function onAddressSheetSelection(selectedPlace) {
+        blurActiveElementInside(mountNode);
+
         const label = normalizeText(
           selectedPlace &&
             (

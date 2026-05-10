@@ -1,0 +1,370 @@
+/* assets/css/77-services-direct-transfer.css
+   Panel desktop Direct Transfer dentro de #services.
+   Alcance:
+   - superficie desktop de Traslados directos
+   - origen/destino
+   - fecha/hora/pasajeros
+   - restricciones
+   - quote real
+   NO incluir:
+   - route móvil Direct Transfer
+   - contact editor
+*/
+
+.services-direct-transfer-panel{
+  display:grid;
+  gap:18px;
+}
+
+.services-direct-transfer-panel__config{
+  display:grid;
+  gap:18px;
+}
+
+.services-direct-transfer-panel__config-inner{
+  display:grid;
+  gap:18px;
+}
+
+#services-expand-direct .services-expand__text{
+  margin-bottom:14px;
+}
+
+/* Ruta principal: mismo peso visual para origen/destino */
+.services-direct-transfer-panel__route{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:16px;
+  align-items:end;
+}
+
+/* Fila operativa: pasajeros / fecha / hora */
+.services-direct-transfer-panel__trip-row{
+  display:grid;
+  grid-template-columns:minmax(360px, 1.45fr) minmax(170px, .72fr) minmax(150px, .64fr);
+  gap:16px;
+  align-items:end;
+}
+
+.services-direct-transfer-panel__passengers{
+  display:flex;
+  flex-wrap:nowrap;
+  min-width:0;
+}
+
+.services-direct-transfer-panel__passenger-chip{
+  flex:1 1 0;
+  white-space:nowrap;
+}
+
+/* Resultado: vehículo / precio / acción */
+.services-direct-transfer-panel__summary{
+  display:grid;
+  grid-template-columns:296px minmax(0, 1fr);
+  gap:16px;
+  align-items:start;
+  padding-top:2px;
+}
+
+/* Campo base local: no fuerza layout global de Airport */
+.services-direct-transfer-panel__field{
+  display:grid;
+  gap:8px;
+  min-width:0;
+}
+
+.services-direct-transfer-panel [data-direct-transfer-panel-time-field]{
+  display:grid;
+  gap:8px;
+  min-width:0;
+}
+
+.services-direct-transfer-panel__field--place{
+  position:relative;
+}
+
+.services-direct-transfer-panel__place{
+  position:relative;
+  min-width:0;
+}
+
+.services-direct-transfer-panel__place .services-expand__control{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  min-height:46px;
+  padding-right:52px;
+  box-sizing:border-box;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.services-direct-transfer-panel__place .place-autocomplete__clear{
+  position:absolute;
+  top:50%;
+  right:12px;
+  z-index:64;
+  width:30px;
+  height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transform:translateY(-50%);
+  border-radius:999px;
+  background:rgba(22,18,17,.86);
+  backdrop-filter:blur(4px);
+}
+
+.services-direct-transfer-panel__place .place-autocomplete__clear[hidden]{
+  display:none !important;
+}
+
+.services-direct-transfer-panel__date-wrap{
+  width:100%;
+}
+
+.services-direct-transfer-panel__trip-row > .services-expand__field--date,
+.services-direct-transfer-panel__trip-row > .services-expand__field--time{
+  grid-column:auto;
+  flex:none;
+  width:auto;
+  min-width:0;
+  max-width:none;
+  margin:0;
+  padding-top:0;
+  align-self:end;
+  transform:none;
+}
+
+.services-direct-transfer-panel [data-direct-transfer-panel-time-field] .services-expand__time-wrap{
+  width:100%;
+}
+
+.services-direct-transfer-panel [data-direct-transfer-panel-time-field] .services-expand__control{
+  display:flex;
+  align-items:center;
+  width:100%;
+  min-width:0;
+  min-height:48px;
+  height:48px;
+  padding:0 34px 0 16px;
+  border-radius:13px;
+  box-sizing:border-box;
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+.services-direct-transfer-panel [data-direct-transfer-panel-time-field] .services-expand__control::-webkit-calendar-picker-indicator{
+  position:absolute;
+  top:50%;
+  right:0;
+  transform:translateY(-50%);
+  width:34px;
+  height:48px;
+  margin:0;
+  opacity:0;
+  cursor:pointer;
+}
+
+.services-direct-transfer-panel [data-direct-transfer-panel-time-field] .services-expand__time-overlay{
+  display:none !important;
+}
+
+.services-direct-transfer-panel [data-direct-transfer-panel-time-field] .services-expand__time-icon{
+  right:12px;
+  width:18px;
+  height:18px;
+}
+
+.services-direct-transfer-panel__passengers{
+  min-height:46px;
+  align-items:center;
+}
+
+.services-direct-transfer-panel__passenger-chip{
+  min-height:40px;
+}
+
+/* Mensajes */
+.services-direct-transfer-panel__same-route{
+  margin:0;
+  color:rgba(255,205,190,.92);
+  font-size:.9rem;
+  line-height:1.45;
+}
+
+.services-direct-transfer-panel__notice{
+  display:grid;
+  gap:10px;
+  padding:12px 14px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+
+.services-direct-transfer-panel__notice p{
+  margin:0;
+  color:rgba(255,245,228,.84);
+  font-size:.92rem;
+  line-height:1.5;
+}
+
+.services-direct-transfer-panel__notice-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.services-direct-transfer-panel__link{
+  color:rgba(255,249,238,.96);
+  font-size:.92rem;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+
+/* Vehículo */
+.services-direct-transfer-panel__vehicle{
+  display:grid;
+  grid-template-columns:296px;
+  gap:8px;
+  align-items:start;
+  justify-content:start;
+  min-width:0;
+  min-height:0;
+  grid-column:1;
+  grid-row:1;
+}
+
+.services-direct-transfer-panel__vehicle-image{
+  width:296px;
+  height:192px;
+  object-fit:cover;
+  object-position:center 84%;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.10);
+}
+
+.services-direct-transfer-panel__vehicle span{
+  display:block;
+  color:rgba(255,249,238,.9);
+  font-size:.94rem;
+  line-height:1.35;
+}
+
+/* Precio: copia formato visual de tarifa Airport */
+.services-direct-transfer-panel__summary > .services-expand__field--fare.services-direct-transfer-panel__fare{
+  grid-column:2;
+  grid-row:1;
+  order:initial;
+  flex:none;
+  min-width:0;
+  max-width:none;
+  margin:0;
+  transform:none;
+  align-self:end;
+  margin-bottom:28px;
+}
+
+.services-direct-transfer-panel__estimate{
+  display:grid;
+  gap:4px;
+  margin-bottom:10px;
+}
+
+.services-direct-transfer-panel__estimate p{
+  margin:0;
+  color:rgba(255,245,228,.76);
+  font-size:.9rem;
+  line-height:1.35;
+}
+
+.services-direct-transfer-panel__estimate span{
+  color:rgba(255,245,228,.62);
+}
+
+.services-direct-transfer-panel__estimate strong{
+  color:rgba(255,249,238,.92);
+  font-weight:650;
+}
+
+.services-direct-transfer-panel__fare .services-expand__label{
+  margin-bottom:6px;
+}
+
+.services-direct-transfer-panel__fare .services-expand__fare{
+  width:100%;
+  min-height:56px;
+  justify-content:flex-start;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.services-direct-transfer-panel__airport-action{
+  margin-top:10px;
+}
+
+.services-direct-transfer-panel__airport-action[hidden]{
+  display:none !important;
+}
+
+.services-direct-transfer-panel__airport-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:40px;
+  padding:0 18px;
+  border:1px solid rgba(31,122,109,.78);
+  border-radius:999px;
+  color:rgba(255,249,238,.98);
+  font-size:.9rem;
+  font-weight:800;
+  line-height:1;
+  text-decoration:none;
+  background:linear-gradient(180deg, rgba(39,151,133,.98), rgba(24,101,91,.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 10px 22px rgba(0,0,0,.18);
+}
+
+.services-direct-transfer-panel__airport-link:hover{
+  border-color:rgba(48,171,151,.92);
+  background:linear-gradient(180deg, rgba(45,169,149,.98), rgba(28,116,103,.98));
+}
+
+.services-direct-transfer-panel__fare[data-direct-transfer-panel-fare-state="loading"] .services-expand__fare{
+  color:rgba(255,245,228,.78);
+}
+
+.services-direct-transfer-panel__fare[data-direct-transfer-panel-fare-state="error"] .services-expand__fare{
+  color:rgba(255,205,190,.92);
+}
+
+/* CTA alineado con el resultado */
+.services-direct-transfer-panel__cta{
+  grid-column:1 / -1;
+  grid-row:2;
+  width:100%;
+  min-height:46px;
+  white-space:nowrap;
+  align-self:start;
+  margin-top:8px;
+}
+
+@media (max-width:980px){
+  .services-direct-transfer-panel__route,
+  .services-direct-transfer-panel__trip-row,
+  .services-direct-transfer-panel__summary{
+    grid-template-columns:1fr;
+  }
+
+  .services-direct-transfer-panel__cta{
+    width:100%;
+  }
+}
+
+@media (max-width:720px){
+  .services-direct-transfer-panel{
+    display:none !important;
+  }
+}

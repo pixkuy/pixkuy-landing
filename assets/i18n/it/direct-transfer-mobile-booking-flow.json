@@ -2,25 +2,27 @@
   "directTransferMobileFlow": {
     "back": "Indietro",
     "title": "Transfer diretti",
-    "helper": "Spostati da un punto a un altro con autista privato, tariffa stimata al momento e veicolo premium.",
+    "helper": "Spostati da un punto all’altro con autista privato, tariffa stimata al momento e veicolo premium.",
     "fields": {
-      "origin": "Origine",
-      "originPlaceholder": "Seleziona punto di partenza",
+      "origin": "Partenza",
+      "originPlaceholder": "Seleziona il punto di partenza",
       "destination": "Destinazione",
-      "destinationPlaceholder": "Seleziona punto di arrivo",
+      "destinationPlaceholder": "Seleziona la destinazione",
       "date": "Data",
       "time": "Ora",
-      "passengers": "Passeggeri"
+      "passengers": "Passeggeri",
+      "datePlaceholder": "gg/mm/aaaa",
+      "timePlaceholder": "--:--"
     },
     "addressSearch": {
       "originTitle": "Inserisci il punto di partenza",
-      "destinationTitle": "Inserisci il punto di arrivo",
+      "destinationTitle": "Inserisci la destinazione",
       "close": "Indietro",
       "clear": "Cancella indirizzo"
     },
     "validation": {
-      "sameRoute": "Origine e destinazione non possono essere uguali.",
-      "airportRoute": "Per transfer da o verso gli aeroporti coperti, usa il servizio Aeroporto / Hotel.",
+      "sameRoute": "La partenza e la destinazione non possono coincidere.",
+      "airportRoute": "Per i transfer da o verso gli aeroporti coperti, usa il servizio Aeroporto / Hotel.",
       "outOfCoverage": "Questo tragitto è fuori dalla nostra area operativa per i transfer diretti."
     },
     "passengerBuckets": {
@@ -30,16 +32,26 @@
     },
     "fare": {
       "label": "Prezzo",
-      "pending": "Completa origine, destinazione, data, ora e passeggeri per calcolare il prezzo.",
+      "pending": "Completa partenza, destinazione, data, ora e passeggeri per calcolare il prezzo.",
       "pendingTemplate": "Completa {fields} per calcolare il prezzo.",
       "pendingReady": "Preparazione del calcolo del prezzo…",
       "separator": ", ",
       "finalSeparator": " e ",
       "loading": "Calcolo del prezzo…",
-      "unavailable": "Non abbiamo potuto calcolare il prezzo per questo tragitto.",
+      "unavailable": "Non è stato possibile calcolare il prezzo per questo tragitto.",
       "airportTransfer": "Questo tragitto deve essere gestito come Aeroporto / Hotel.",
-      "outOfCoverage": "Per questo tragitto possiamo aiutarti via WhatsApp o con un servizio di veicolo con autista.",
+      "outOfCoverage": "Per questo tragitto possiamo aiutarti via WhatsApp o con un servizio auto con autista.",
       "readySuffix": "MXN"
+    },
+    "estimate": {
+      "distanceLabel": "Distanza",
+      "durationLabel": "Durata",
+      "durationLongLabel": "Tempo stimato",
+      "summaryLabel": "Percorso",
+      "distanceUnit": "km",
+      "minutesApprox": "{minutes} min circa",
+      "minutesApproxShort": "{minutes} min circa",
+      "separator": " · "
     },
     "vehicle": {
       "title": "BYD M9",
@@ -47,15 +59,15 @@
     },
     "cta": {
       "continue": "Continua",
-      "airport": "Vai a Aeroporto / Hotel",
+      "airport": "Vai ad Aeroporto / Hotel",
       "whatsapp": "WhatsApp",
-      "hourly": "Veicolo con autista"
+      "hourly": "Auto con autista"
     },
     "whatsapp": {
       "intro": "Ciao, vorrei richiedere un transfer diretto con Pixkuy.",
       "serviceType": "Tipo di servizio",
       "serviceLabel": "Transfer diretto",
-      "origin": "Origine",
+      "origin": "Partenza",
       "destination": "Destinazione",
       "date": "Data",
       "time": "Ora",
@@ -66,12 +78,13 @@
     "contactStep": {
       "summary": {
         "title": "Riepilogo del transfer",
-        "origin": "Origine",
+        "origin": "Partenza",
         "destination": "Destinazione",
         "date": "Data",
         "time": "Ora",
         "passengers": "Passeggeri",
         "vehicle": "Veicolo",
+        "estimate": "Percorso",
         "price": "Prezzo"
       },
       "fields": {

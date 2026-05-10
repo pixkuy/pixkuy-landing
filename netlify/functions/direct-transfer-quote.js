@@ -11,11 +11,11 @@ const VALID_PASSENGER_KEYS = new Set(["van_1_2", "van_3_4", "van_5_6"]);
 */
 const DIRECT_TRANSFER_OPERATIONAL_UTC_OFFSET = "-06:00";
 
-const DIRECT_TRANSFER_BOUNDS = {
-  minLat: 19.0,
-  maxLat: 19.85,
-  minLng: -99.45,
-  maxLng: -98.85
+const DIRECT_TRANSFER_COVERAGE = {
+  centerLat: 19.36,
+  centerLng: -99.16,
+  primaryRadiusKm: 38,
+  outerRadiusKm: 78
 };
 
 const CATALOGUED_AIRPORT_CODES = new Set(["MEX", "NLU", "TLC", "PBC", "QRO"]);
@@ -179,14 +179,82 @@ function getAddressSearchText(address) {
   ].map(normalizeComparisonText).filter(Boolean).join(" | ");
 }
 
-function isInsideDirectTransferBounds(address) {
-  return Boolean(
-    address &&
-      address.lat >= DIRECT_TRANSFER_BOUNDS.minLat &&
-      address.lat <= DIRECT_TRANSFER_BOUNDS.maxLat &&
-      address.lng >= DIRECT_TRANSFER_BOUNDS.minLng &&
-      address.lng <= DIRECT_TRANSFER_BOUNDS.maxLng
+function getDistanceKmBetweenCoordinates(left, right) {
+  const earthRadiusKm = 6371;
+  const leftLat = Number(left && left.lat);
+  const leftLng = Number(left && left.lng);
+  const rightLat = Number(right && right.lat);
+  const rightLng = Number(right && right.lng);
+
+  if (
+    !Number.isFinite(leftLat) ||
+    !Number.isFinite(leftLng) ||
+    !Number.isFinite(rightLat) ||
+    !Number.isFinite(rightLng)
+  ) {
+    return null;
+  }
+
+  const toRadians = Math.PI / 180;
+  const deltaLat = (rightLat - leftLat) * toRadians;
+  const deltaLng = (rightLng - leftLng) * toRadians;
+  const lat1 = leftLat * toRadians;
+  const lat2 = rightLat * toRadians;
+
+  const haversine =
+    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+    Math.cos(lat1) *
+      Math.cos(lat2) *
+      Math.sin(deltaLng / 2) *
+      Math.sin(deltaLng / 2);
+
+  return 2 * earthRadiusKm * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+}
+
+function getDirectTransferCoverage(address) {
+  const distanceKm = getDistanceKmBetweenCoordinates(
+    {
+      lat: DIRECT_TRANSFER_COVERAGE.centerLat,
+      lng: DIRECT_TRANSFER_COVERAGE.centerLng
+    },
+    address
   );
+
+  if (!Number.isFinite(distanceKm)) {
+    return {
+      isWithinCoverage: false,
+      coverageId: "",
+      pricingMode: ""
+    };
+  }
+
+  if (distanceKm <= DIRECT_TRANSFER_COVERAGE.primaryRadiusKm) {
+    return {
+      isWithinCoverage: true,
+      coverageId: "primary_area",
+      pricingMode: "standard"
+    };
+  }
+
+  if (distanceKm <= DIRECT_TRANSFER_COVERAGE.outerRadiusKm) {
+    return {
+      isWithinCoverage: true,
+      coverageId: "extended_ring",
+      pricingMode: "extended"
+    };
+  }
+
+  return {
+    isWithinCoverage: false,
+    coverageId: "",
+    pricingMode: ""
+  };
+}
+
+function isInsideDirectTransferCoverage(address) {
+  const coverage = getDirectTransferCoverage(address);
+
+  return Boolean(coverage && coverage.isWithinCoverage === true);
 }
 
 function isCataloguedAirportAddress(address) {
@@ -211,7 +279,7 @@ function getDirectTransferServerRestriction(originAddress, destinationAddress) {
     return "DIRECT_TRANSFER_AIRPORT_ROUTE_NOT_ALLOWED";
   }
 
-  if (!isInsideDirectTransferBounds(originAddress) || !isInsideDirectTransferBounds(destinationAddress)) {
+  if (!isInsideDirectTransferCoverage(originAddress) || !isInsideDirectTransferCoverage(destinationAddress)) {
     return "DIRECT_TRANSFER_OUT_OF_COVERAGE";
   }
 
@@ -339,6 +407,90 @@ function smoothstep(value) {
   return number * number * (3 - (2 * number));
 }
 
+function getExtendedPricingContext(originAddress, destinationAddress) {
+  const originCoverage = getDirectTransferCoverage(originAddress);
+  const destinationCoverage = getDirectTransferCoverage(destinationAddress);
+  const isExtended = Boolean(
+    (originCoverage && originCoverage.pricingMode === "extended") ||
+      (destinationCoverage && destinationCoverage.pricingMode === "extended")
+  );
+
+  return {
+    pricingMode: isExtended ? "extended" : "standard",
+    originCoverage,
+    destinationCoverage
+  };
+}
+
+function isWeekdayMorningExtendedScarcitySlot(pickupDate, pickupTime) {
+  const date = normalizeText(pickupDate);
+  const time = normalizeText(pickupTime);
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
+    return false;
+  }
+
+  const day = new Date(date + "T12:00:00Z").getUTCDay();
+  const minutes = Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
+
+  return day >= 1 && day <= 5 && minutes >= 390 && minutes <= 570;
+}
+
+function isWestExtendedCorridor(originAddress, destinationAddress) {
+  const originCoverage = getDirectTransferCoverage(originAddress);
+  const destinationCoverage = getDirectTransferCoverage(destinationAddress);
+  const extendedAddress =
+    originCoverage && originCoverage.pricingMode === "extended"
+      ? originAddress
+      : destinationCoverage && destinationCoverage.pricingMode === "extended"
+        ? destinationAddress
+        : null;
+
+  if (!extendedAddress) {
+    return false;
+  }
+
+  return Number(extendedAddress.lng) < DIRECT_TRANSFER_COVERAGE.centerLng;
+}
+
+function applyExtendedPricing(options) {
+  const price = options.price;
+  const passengerFareKey = normalizeText(options.passengerFareKey);
+  const distanceKm = Number(options.route.distanceMeters) / 1000;
+  const basePrice = Number(price && price.price);
+  const scarcity =
+    passengerFareKey === "van_5_6" &&
+    isWestExtendedCorridor(options.originAddress, options.destinationAddress) &&
+    isWeekdayMorningExtendedScarcitySlot(options.pickupDate, options.pickupTime)
+      ? 1
+      : 0;
+
+  let extendedRaw = basePrice;
+
+  if (!Number.isFinite(basePrice) || !Number.isFinite(distanceKm)) {
+    return price;
+  }
+
+  if (passengerFareKey === "van_1_2") {
+    extendedRaw = 775 + (0.30 * basePrice) + (4.00 * distanceKm);
+  }
+
+  if (passengerFareKey === "van_3_4") {
+    extendedRaw = 1000 + (0.55 * basePrice) + (2.75 * distanceKm);
+  }
+
+  if (passengerFareKey === "van_5_6") {
+    extendedRaw = 750 + (0.30 * basePrice) + (14.00 * distanceKm) + (450 * scarcity);
+  }
+
+  return Object.assign({}, price, {
+    price: ceilToStep(extendedRaw, PRICING.roundingStep),
+    extendedRaw: extendedRaw,
+    extendedDistanceKm: distanceKm,
+    extendedScarcity: scarcity
+  });
+}
+
 function calculatePrice(options) {
   const distanceKm = Number(options.distanceMeters) / 1000;
   const durationMinutes = Number(options.durationSeconds) / 60;
@@ -445,7 +597,19 @@ function buildQuotePayload(options) {
       effectiveMinutes: Math.round(options.price.effectiveMinutes * 100) / 100,
       capacityPremium: Math.round(options.price.capacityPremium * 100) / 100,
       marketStress: Math.round(options.price.marketStress * 1000) / 1000,
-      baseRaw: Math.round(options.price.baseRaw * 100) / 100
+      baseRaw: Math.round(options.price.baseRaw * 100) / 100,
+      pricingMode: options.pricingContext && options.pricingContext.pricingMode
+        ? options.pricingContext.pricingMode
+        : "standard",
+      extendedRaw: Number.isFinite(Number(options.price.extendedRaw))
+        ? Math.round(options.price.extendedRaw * 100) / 100
+        : null,
+      extendedDistanceKm: Number.isFinite(Number(options.price.extendedDistanceKm))
+        ? Math.round(options.price.extendedDistanceKm * 100) / 100
+        : null,
+      extendedScarcity: Number.isFinite(Number(options.price.extendedScarcity))
+        ? Number(options.price.extendedScarcity)
+        : 0
     }
   };
 }
@@ -509,11 +673,24 @@ exports.handler = async function handler(event) {
     return fail(503, "ROUTE_UNAVAILABLE", "directTransferMobileFlow.fare.unavailable");
   }
 
-  const price = calculatePrice({
+  const pricingContext = getExtendedPricingContext(originAddress, destinationAddress);
+  let price = calculatePrice({
     distanceMeters: route.distanceMeters,
     durationSeconds: route.durationSeconds,
     passengerFareKey
   });
+
+  if (pricingContext.pricingMode === "extended") {
+    price = applyExtendedPricing({
+      price,
+      route,
+      passengerFareKey,
+      originAddress,
+      destinationAddress,
+      pickupDate,
+      pickupTime
+    });
+  }
 
   if (!price || !Number.isFinite(Number(price.price))) {
     return fail(503, "QUOTE_UNAVAILABLE", "directTransferMobileFlow.fare.unavailable");
@@ -522,6 +699,7 @@ exports.handler = async function handler(event) {
   return buildResponse(200, buildQuotePayload({
     route,
     price,
-    passengerFareKey
+    passengerFareKey,
+    pricingContext
   }));
 };

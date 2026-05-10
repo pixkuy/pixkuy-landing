@@ -72,8 +72,8 @@
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary{
     display:grid;
-    gap:8px;
-    padding:12px 12px 6px;
+    gap:6px;
+    padding:10px 11px 5px;
     border:1px solid rgba(236,220,189,.22);
     border-radius:10px;
     background:rgba(15,17,19,.42);
@@ -90,7 +90,7 @@
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-list{
     display:grid;
     grid-template-columns:minmax(0, 1.25fr) minmax(112px, .75fr);
-    gap:7px 8px;
+    gap:5px 8px;
     margin:0;
   }
 
@@ -102,6 +102,7 @@
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="origin"],
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="destination"],
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="estimate"],
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="price"]{
     grid-column:1 / -1;
   }
@@ -140,6 +141,14 @@
     text-overflow:clip;
   }
 
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="estimate"]{
+    padding-top:1px;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="estimate"] .direct-transfer-mobile-contact-step__summary-value{
+    color:rgba(255,249,238,.88);
+  }
+
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="price"] .direct-transfer-mobile-contact-step__summary-value{
     color:rgba(61,158,122,.98);
   }
@@ -150,32 +159,32 @@
     overscroll-behavior:none;
     display:grid;
     grid-template-columns:1fr;
-    gap:9px;
-    padding-top:10px;
+    gap:6px;
+    padding-top:7px;
     padding-right:2px;
-    padding-bottom:5px;
+    padding-bottom:3px;
     -webkit-overflow-scrolling:touch;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__field{
     display:grid;
-    gap:6px;
+    gap:4px;
     min-width:0;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__label{
     color:rgba(255,245,228,.74);
-    font-size:11.5px;
-    line-height:1.2;
+    font-size:11px;
+    line-height:1.15;
     font-weight:700;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__control{
     width:100%;
     min-width:0;
-    min-height:48px;
-    height:48px;
-    max-height:48px;
+    min-height:44px;
+    height:44px;
+    max-height:44px;
     padding:0 12px;
     border:1px solid rgba(236,220,189,.38);
     border-radius:9px;
@@ -184,18 +193,18 @@
     box-shadow:none;
     box-sizing:border-box;
     font:inherit;
-    font-size:14px;
-    line-height:48px;
+    font-size:13.5px;
+    line-height:44px;
     font-weight:650;
     color-scheme:dark;
   }
 
   .direct-transfer-mobile-route textarea.direct-transfer-mobile-contact-step__control{
-    min-height:48px;
-    height:48px;
-    max-height:48px;
+    min-height:44px;
+    height:44px;
+    max-height:44px;
     padding:0 12px;
-    line-height:48px;
+    line-height:44px;
     resize:none;
     overflow:hidden;
   }
@@ -232,7 +241,7 @@
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__actions{
     display:block;
     align-self:end;
-    padding-top:4px;
+    padding-top:2px;
     margin-bottom:-4px;
   }
 
