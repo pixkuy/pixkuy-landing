@@ -17,6 +17,7 @@
 
   const STORAGE_PREFIX = "pixkuy_form_submission_sent:";
   const FORM_CLIENT_VERSION = "pixkuy-contact-v1";
+  const ENHANCED_CONVERSION_DATA_STORAGE_KEY = "pixkuy_google_ads_enhanced_conversion_data";
   const DUPLICATE_NAME_FIELDS = [
     "tour_private_pickup",
     "hourly_daily_pickup"
@@ -183,6 +184,72 @@
     });
 
     return fields.length > 0;
+  }
+  
+    function normalizeEmailValue(value) {
+    return normalizeText(value).toLowerCase();
+  }
+
+  function normalizePhoneValue(value) {
+    return String(value || "")
+      .trim()
+      .replace(/[^\d+]/g, "")
+      .replace(/(?!^)\+/g, "");
+  }
+
+  function getNameParts(value) {
+    const fullName = normalizeText(value);
+    const parts = fullName.split(/\s+/).filter(Boolean);
+
+    if (!parts.length) {
+      return {
+        fullName: "",
+        firstName: "",
+        lastName: ""
+      };
+    }
+
+    return {
+      fullName: fullName,
+      firstName: parts[0] || "",
+      lastName: parts.length > 1 ? parts.slice(1).join(" ") : ""
+    };
+  }
+
+  function getEnhancedConversionData(form) {
+    const nameParts = getNameParts(getFieldValue(form, "name"));
+    const email = normalizeEmailValue(getFieldValue(form, "email"));
+    const phone = normalizePhoneValue(getFieldValue(form, "phone"));
+
+    if (!nameParts.fullName && !email && !phone) {
+      return null;
+    }
+
+    return {
+      full_name: nameParts.fullName,
+      first_name: nameParts.firstName,
+      last_name: nameParts.lastName,
+      email: email,
+      phone_number: phone
+    };
+  }
+
+  function storeEnhancedConversionData(form) {
+    const data = getEnhancedConversionData(form);
+
+    if (!data) {
+      return false;
+    }
+
+    try {
+      window.sessionStorage.setItem(
+        ENHANCED_CONVERSION_DATA_STORAGE_KEY,
+        JSON.stringify(data)
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   function ensureHiddenField(form, name) {
@@ -412,6 +479,7 @@
     restoreGuardDisabledFields(form);
     cleanInactiveServicePayload(form, activeServiceType);
     normalizeDuplicateNameFields(form);
+    storeEnhancedConversionData(form);
 
     storeSubmission(submissionId);
     lockForm(form);

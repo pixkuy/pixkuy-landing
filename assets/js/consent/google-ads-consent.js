@@ -3,9 +3,11 @@
 
   var GOOGLE_ADS_ID = 'AW-18114199280';
   var GOOGLE_ADS_LEAD_CONVERSION_SEND_TO = 'AW-18114199280/JkAeCOvxvKEcEPD9wr1D';
+  var GOOGLE_ADS_WHATSAPP_CONVERSION_SEND_TO = 'AW-18114199280/yfbjCPOSl6scEPD9wr1D';
   var STORAGE_KEY = 'pixkuy_google_ads_consent';
   var LEAD_SUCCESS_SIGNAL_KEY = 'pixkuy_lead_success';
   var LEAD_CONVERSION_STORAGE_KEY = 'pixkuy_google_ads_lead_conversion';
+  var ENHANCED_CONVERSION_DATA_STORAGE_KEY = 'pixkuy_google_ads_enhanced_conversion_data';
   var BANNER_ID = 'pixkuy-google-ads-consent';
   var ACCEPTED = 'accepted';
   var REJECTED = 'rejected';
@@ -104,6 +106,93 @@
       // no-op
     }
   }
+  
+    function getEnhancedConversionData() {
+    var raw;
+    var parsed;
+
+    try {
+      raw = window.sessionStorage.getItem(ENHANCED_CONVERSION_DATA_STORAGE_KEY);
+    } catch (error) {
+      return null;
+    }
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (error) {
+      return null;
+    }
+
+    if (!parsed || typeof parsed !== 'object') {
+      return null;
+    }
+
+    return {
+      email: typeof parsed.email === 'string' ? parsed.email.trim().toLowerCase() : '',
+      phone_number: typeof parsed.phone_number === 'string' ? parsed.phone_number.trim() : '',
+      first_name: typeof parsed.first_name === 'string' ? parsed.first_name.trim() : '',
+      last_name: typeof parsed.last_name === 'string' ? parsed.last_name.trim() : ''
+    };
+  }
+
+  function hasEnhancedConversionData(data) {
+    return Boolean(
+      data &&
+      (
+        data.email ||
+        data.phone_number ||
+        data.first_name ||
+        data.last_name
+      )
+    );
+  }
+
+  function clearEnhancedConversionData() {
+    try {
+      window.sessionStorage.removeItem(ENHANCED_CONVERSION_DATA_STORAGE_KEY);
+    } catch (error) {
+      // no-op
+    }
+  }
+
+  function applyEnhancedConversionData() {
+    var data = getEnhancedConversionData();
+    var userData;
+
+    if (!hasEnhancedConversionData(data)) {
+      return false;
+    }
+
+    userData = {};
+
+    if (data.email) {
+      userData.email = data.email;
+    }
+
+    if (data.phone_number) {
+      userData.phone_number = data.phone_number;
+    }
+
+    if (data.first_name || data.last_name) {
+      userData.address = {};
+
+      if (data.first_name) {
+        userData.address.first_name = data.first_name;
+      }
+
+      if (data.last_name) {
+        userData.address.last_name = data.last_name;
+      }
+    }
+
+    window.gtag('set', 'user_data', userData);
+
+    return true;
+  }
 
   function trackLeadConversionIfNeeded() {
     if (!hasLeadSuccess() || hasTrackedLeadConversion()) {
@@ -111,6 +200,7 @@
     }
 
     ensureGtagBase();
+    applyEnhancedConversionData();
 
     window.gtag('event', 'conversion', {
       send_to: GOOGLE_ADS_LEAD_CONVERSION_SEND_TO
@@ -118,6 +208,23 @@
 
     markLeadConversionTracked();
     clearLeadSuccessSignal();
+    clearEnhancedConversionData();
+  }
+  
+    function trackWhatsappConversion() {
+    if (getStoredConsent() !== ACCEPTED) {
+      return false;
+    }
+
+    ensureGtagBase();
+
+    window.gtag('event', 'conversion', {
+      send_to: GOOGLE_ADS_WHATSAPP_CONVERSION_SEND_TO,
+      value: 1.0,
+      currency: 'EUR'
+    });
+
+    return true;
   }
 
   function ensureGtagBase() {
@@ -276,6 +383,27 @@
   function isDesktopViewport() {
     return !isMobileViewport();
   }
+  
+  function bindWhatsappConversionTracking() {
+    if (document.documentElement.dataset.googleAdsWhatsappTrackingBound === '1') {
+      return false;
+    }
+
+    document.addEventListener('click', function (event) {
+      var link = event.target && typeof event.target.closest === 'function'
+        ? event.target.closest('[data-contact-whatsapp="1"]')
+        : null;
+
+      if (!link) {
+        return;
+      }
+
+      trackWhatsappConversion();
+    }, true);
+
+    document.documentElement.dataset.googleAdsWhatsappTrackingBound = '1';
+    return true;
+  }
 
   function bindI18nRefresh() {
     window.addEventListener('pixkuy:i18n-applied', function () {
@@ -306,6 +434,7 @@
     var stored = getStoredConsent();
 
     bindI18nRefresh();
+    bindWhatsappConversionTracking();
 
     if (stored === ACCEPTED) {
       loadGoogleAdsTag();
