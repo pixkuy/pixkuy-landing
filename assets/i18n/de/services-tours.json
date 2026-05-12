@@ -75,6 +75,13 @@
               "duration": "10 Stunden",
               "priceFrom": "7.800 MXN",
               "imageAlt": "San Miguel de Allende"
+            },
+            "valquirico": {
+              "title": "Val’Quirico",
+              "description": "Besuche Val’Quirico auf einer privaten Tour ab Mexiko-Stadt, mit Zeit für einen Spaziergang durch die Straßen, ein entspanntes Mittagessen und die Rückfahrt ohne geteilte Transfers.",
+              "duration": "9 Stunden",
+              "priceFrom": "5.500 MXN",
+              "imageAlt": "Val’Quirico"
             }
           },
           "guideLanguages": {

@@ -75,6 +75,13 @@
               "duration": "10 часов",
               "priceFrom": "7.800 MXN",
               "imageAlt": "Сан-Мигель-де-Альенде"
+            },
+            "valquirico": {
+              "title": "Val’Quirico",
+              "description": "Посетите Val’Quirico в частном туре из Мехико: будет время прогуляться по его улицам, спокойно пообедать и вернуться без зависимости от групповых трансферов.",
+              "duration": "9 часов",
+              "priceFrom": "5.500 MXN",
+              "imageAlt": "Val’Quirico"
             }
           },
           "guideLanguages": {

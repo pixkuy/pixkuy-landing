@@ -7,11 +7,22 @@
         order: 10,
         brandName: 'Casa del Agua',
         logoSrc: 'assets/img/brand-collaborations/casa-del-agua-logo.png',
-logoAlt: 'Casa del Agua',
+        logoAlt: 'Casa del Agua',
         imageSrc: 'assets/img/brand-collaborations/casa-del-agua-hero.png',
         imageAlt: 'Casa del Agua',
         href: 'https://casadelagua.com.mx/?utm_source=pixkuy.com&utm_medium=referral&utm_campaign=brand-collaborations',
         copyKey: 'brandCollaborations.items.casaDelAgua.copy'
+      },
+      rodasTs: {
+        enabled: true,
+        order: 20,
+        brandName: 'Rodas TS',
+        logoSrc: 'assets/img/icons/instagram.svg',
+        logoAlt: 'Instagram de Rodas TS',
+        imageSrc: 'assets/img/brand-collaborations/rodas-ts-hero.png',
+        imageAlt: 'Rodas TS — creación audiovisual para Pixkuy Mobility',
+        href: 'https://www.instagram.com/rodas.ts/',
+        copyKey: 'brandCollaborations.items.rodasTs.copy'
       }
     }
   };

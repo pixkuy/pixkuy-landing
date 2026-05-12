@@ -35,7 +35,8 @@
     "teotihuacan_basilica",
     "xochimilco_coyoacan",
     "cholula_puebla",
-    "san_miguel_allende"
+    "san_miguel_allende",
+    "valquirico"
   ];
 
   const PASSENGER_BUCKETS = ["van_1_2", "van_3_4", "van_5_6"];
@@ -107,6 +108,17 @@
         van_1_2: { no: 7800 },
         van_3_4: { no: 9300 },
         van_5_6: { no: 11200 }
+      }
+    },
+    valquirico: {
+      durationHours: 9,
+      includesTickets: false,
+      supportsGuide: false,
+      image: "assets/img/tours/valquirico_mobile.jpg",
+      fares: {
+        van_1_2: { no: 5500 },
+        van_3_4: { no: 6900 },
+        van_5_6: { no: 8300 }
       }
     }
   };

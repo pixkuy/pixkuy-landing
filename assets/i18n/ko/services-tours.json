@@ -75,6 +75,13 @@
               "duration": "10시간",
               "priceFrom": "7.800 MXN",
               "imageAlt": "산미겔 데 아옌데"
+            },
+            "valquirico": {
+              "title": "Val’Quirico",
+              "description": "멕시코시티에서 출발하는 프라이빗 투어로 Val’Quirico를 방문하고, 거리 산책과 여유로운 식사 후 공유 이동편에 의존하지 않고 돌아옵니다.",
+              "duration": "9시간",
+              "priceFrom": "5.500 MXN",
+              "imageAlt": "Val’Quirico"
             }
           },
           "guideLanguages": {

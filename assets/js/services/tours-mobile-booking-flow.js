@@ -32,7 +32,8 @@
     "teotihuacan_basilica",
     "xochimilco_coyoacan",
     "cholula_puebla",
-    "san_miguel_allende"
+    "san_miguel_allende",
+    "valquirico"
   ];
 
   const TOUR_IMAGES = {
@@ -40,7 +41,8 @@
     teotihuacan_basilica: "assets/img/tours/teotihuacan_basilica_mobile.jpg",
     xochimilco_coyoacan: "assets/img/tours/xochimilco_coyoacan_mobile.jpg",
     cholula_puebla: "assets/img/tours/cholula_puebla_mobile.jpg",
-    san_miguel_allende: "assets/img/tours/san_miguel_allende_mobile.jpg"
+    san_miguel_allende: "assets/img/tours/san_miguel_allende_mobile.jpg",
+    valquirico: "assets/img/tours/valquirico_mobile.jpg"
   };
 
   const IN_MOTION_RETURN_CONTEXT_KEY = "pixkuy_in_motion_scroll_cinema_return";

@@ -106,6 +106,25 @@
         van_3_4: { no: 9300 },
         van_5_6: { no: 11200 }
       }
+    },
+    valquirico: {
+      id: 'valquirico',
+      durationHours: 9,
+      includesTickets: false,
+      supportsGuide: false,
+      imageDesktop: 'assets/img/tours/valquirico_desktop.jpg',
+      imageMobile: 'assets/img/tours/valquirico_mobile.jpg',
+      fallback: {
+        title: 'Val’Quirico',
+        description: 'Visita Val’Quirico en un tour privado desde Ciudad de México, con tiempo para recorrer sus calles, comer con calma y volver sin depender de traslados compartidos.',
+        duration: '9 horas',
+        priceFrom: '5.500 MXN'
+      },
+      fares: {
+        van_1_2: { no: 5500 },
+        van_3_4: { no: 6900 },
+        van_5_6: { no: 8300 }
+      }
     }
   };
 
@@ -377,10 +396,14 @@
   function buildCatalogMarkup() {
     const labels = getLabels();
     const tourIds = Object.keys(TOURS);
+    const remainder = tourIds.length % 3;
+    const bottomRowStartIndex = remainder === 0
+      ? tourIds.length
+      : tourIds.length - remainder;
 
     return tourIds.map((tourId, index) => {
       const meta = getTourMeta(tourId);
-      const isBottomRowTour = index >= 3;
+      const isBottomRowTour = index >= bottomRowStartIndex;
 
       const mediaMarkup = meta.imageSrc
         ? `

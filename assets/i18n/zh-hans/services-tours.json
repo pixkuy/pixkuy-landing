@@ -75,6 +75,13 @@
               "duration": "10 小时",
               "priceFrom": "7.800 MXN",
               "imageAlt": "圣米格尔-德阿连德"
+            },
+            "valquirico": {
+              "title": "Val’Quirico",
+              "description": "从墨西哥城出发参加 Val’Quirico 私人游览，有时间漫步街区、从容用餐，并无需依赖拼车接送返回。",
+              "duration": "9 小时",
+              "priceFrom": "5.500 MXN",
+              "imageAlt": "Val’Quirico"
             }
           },
           "guideLanguages": {
