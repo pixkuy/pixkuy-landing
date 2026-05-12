@@ -378,7 +378,74 @@
 
     return Boolean(state.longTermOption);
   }
+  
+    function getHourlyAnalyticsSurface() {
+    const isMobileRoute = Boolean(
+      document.body &&
+        document.body.getAttribute('data-hourly-mobile-screen') === 'true' &&
+        isMobileHourlyViewport()
+    );
 
+    return isMobileRoute ? 'mobile_route' : 'desktop_panel';
+  }
+  
+    function trackHourlyContinueClick() {
+    const analytics = window.PixkuyAnalytics;
+
+    if (
+      !analytics ||
+      typeof analytics.track !== 'function' ||
+      !isConfigComplete()
+    ) {
+      return false;
+    }
+
+    return analytics.track('pixkuy_continue_click', {
+      service_type: 'hourly_daily',
+      flow_surface: getHourlyAnalyticsSurface(),
+      mode: state.mode,
+      duration_hours: state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY
+        ? String(state.durationHours)
+        : '',
+      price: typeof state.price === 'number' ? state.price : '',
+      currency: state.currency || 'MXN'
+    });
+  }
+
+  function trackHourlyQuoteReady() {
+    const analytics = window.PixkuyAnalytics;
+    const dedupeKey = [
+      'hourly_daily',
+      getHourlyAnalyticsSurface(),
+      state.mode,
+      state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY
+        ? String(state.durationHours)
+        : '',
+      state.price,
+      state.currency || 'MXN'
+    ].join('|');
+
+    if (
+      !analytics ||
+      typeof analytics.trackOnce !== 'function' ||
+      !isConfigComplete() ||
+      typeof state.price !== 'number'
+    ) {
+      return false;
+    }
+
+    return analytics.trackOnce('pixkuy_quote_ready', {
+      service_type: 'hourly_daily',
+      flow_surface: getHourlyAnalyticsSurface(),
+      mode: state.mode,
+      duration_hours: state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY
+        ? String(state.durationHours)
+        : '',
+      price: state.price,
+      currency: state.currency || 'MXN'
+    }, dedupeKey);
+  }
+  
   function formatCurrency(value, currency) {
     const labels = getLabels();
     const currencyCode = currency || 'MXN';
@@ -1037,6 +1104,7 @@
     configMount.setAttribute('data-services-hourly-mode-active', state.mode);
     configMount.innerHTML = buildConfigMarkup();
     mountPickupController();
+    trackHourlyQuoteReady();
   }
 
   function renderAll() {
@@ -1117,6 +1185,8 @@
       ctaButton.textContent = ctaDisabled ? labels.ctaDisabled : labels.cta;
     }
 
+    trackHourlyQuoteReady();
+
     window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
   }
 
@@ -1196,6 +1266,8 @@
 
       const ctaButton = event.target.closest('[data-services-hourly-cta]');
       if (ctaButton && !ctaButton.disabled) {
+        trackHourlyContinueClick();
+
         window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-submit', {
           detail: {
             serviceType: 'hourly_daily',

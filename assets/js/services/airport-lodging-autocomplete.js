@@ -392,6 +392,40 @@ function clearAllRootUis() {
     const hasValue = normalizeText(dom.input.value).trim().length > 0;
     dom.clearSearch.hidden = !hasValue;
   }
+  
+    function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
+
+  function blurAutocompleteFocus(nodes, dom) {
+    if (dom) {
+      if (blurActiveElementInside(dom.panel)) {
+        return true;
+      }
+
+      if (blurActiveElementInside(dom.input)) {
+        return true;
+      }
+
+      if (blurActiveElementInside(dom.clearSearch)) {
+        return true;
+      }
+    }
+
+    return nodes ? blurActiveElementInside(nodes.mount) : false;
+  }
 
   function closePanel(nodes, dom) {
     if (!nodes || !dom) {
@@ -578,6 +612,8 @@ function clearAllRootUis() {
     if (!bridge || typeof bridge.resolveAndApplyDestination !== "function") {
       return;
     }
+
+    blurAutocompleteFocus(nodes, dom);
 
     const result = await bridge.resolveAndApplyDestination({
       placeLabel: item.label,

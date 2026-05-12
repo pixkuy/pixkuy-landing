@@ -536,12 +536,33 @@
 
     return true;
   }
+  
+    function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
+
 
   function setRouteVisibility(isVisible) {
     ensureRoute();
 
     if (!routeNode) {
       return false;
+    }
+
+    if (!isVisible) {
+      blurActiveElementInside(routeNode);
     }
 
     routeNode.hidden = !isVisible;
@@ -573,6 +594,14 @@
       syncCopy();
       setRouteVisibility(true);
     });
+
+    if (window.PixkuyAnalytics && typeof window.PixkuyAnalytics.track === "function") {
+      window.PixkuyAnalytics.track("pixkuy_mobile_route_open", {
+        service_type: "tour_private",
+        flow_surface: "mobile_route",
+        entry_point: "mobile_home_or_deeplink"
+      });
+    }
 
     return true;
   }

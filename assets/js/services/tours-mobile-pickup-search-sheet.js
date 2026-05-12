@@ -148,7 +148,6 @@
 
     mount.className = "tours-mobile-pickup-search-sheet__mount";
     mount.setAttribute("data-tours-mobile-pickup-search-mount", "1");
-    mount.setAttribute("aria-hidden", "true");
 
     header.appendChild(title);
     header.appendChild(close);
@@ -301,6 +300,22 @@
 
     return true;
   }
+  
+  function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
 
   function destroyController() {
     if (activeController && typeof activeController.destroy === "function") {
@@ -406,6 +421,8 @@
       setInternalValue(openingValue);
       syncSourceInputValue(openingValue);
     }
+
+    blurActiveElementInside(sheet);
 
     sheet.setAttribute("aria-hidden", "true");
     document.body.removeAttribute("data-tours-mobile-pickup-search-open");

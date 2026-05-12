@@ -736,6 +736,20 @@
     return true;
   }
   
+    function syncLongTermSelectWithSourceButton(panel, value) {
+    const safeValue = normalizeText(value);
+    const button = getLongTermButtons(panel).find(function findButton(item) {
+      return normalizeText(item.getAttribute("data-services-hourly-long-term")) === safeValue;
+    });
+
+    if (!button || typeof button.click !== "function") {
+      return false;
+    }
+
+    button.click();
+    return true;
+  }
+  
   function bindMobileLongTermSelect(panel) {
     const select = buildMobileLongTermSelect(panel);
 
@@ -747,16 +761,12 @@
 
     select.addEventListener("change", function onMobileLongTermChange() {
       const value = normalizeText(select.value);
-      const button = getLongTermButtons(panel).find(function findButton(item) {
-        return normalizeText(item.getAttribute("data-services-hourly-long-term")) === value;
-      });
 
-      if (button && typeof button.click === "function") {
-        button.click();
-      }
+      syncLongTermSelectWithSourceButton(panel, value);
 
       window.requestAnimationFrame(function syncAfterLongTermClick() {
         syncMobileLongTermSelect(panel);
+        syncMobileLongTermCta(panel);
       });
     });
 
@@ -1062,6 +1072,14 @@
     restoreHourlyConfig(panel);
     setRouteVisibility(true);
 
+    if (window.PixkuyAnalytics && typeof window.PixkuyAnalytics.track === "function") {
+      window.PixkuyAnalytics.track("pixkuy_mobile_route_open", {
+        service_type: "hourly_daily",
+        flow_surface: "mobile_route",
+        entry_point: "mobile_home_or_deeplink"
+      });
+    }
+
     window.requestAnimationFrame(function syncAfterOpen() {
       restoreHourlyConfig(panel);
       syncCopy(panel);
@@ -1109,6 +1127,98 @@
       hourly_daily_extra_km_price: normalizeText(safeDetail.hourly_daily_extra_km_price) || "35",
       hourly_daily_out_of_zone_supplement: normalizeText(safeDetail.hourly_daily_out_of_zone_supplement) || "4500"
     });
+  }
+  
+    function trackMobileLongTermContinueClick(panel) {
+    const analytics = window.PixkuyAnalytics;
+
+    if (
+      !analytics ||
+      typeof analytics.track !== "function" ||
+      getActiveHourlyMode(panel) !== "custom_long_term"
+    ) {
+      return false;
+    }
+
+    return analytics.track("pixkuy_continue_click", {
+      service_type: "hourly_daily",
+      flow_surface: "mobile_route",
+      mode: "custom_long_term",
+      duration_hours: "",
+      price: "",
+      currency: "MXN"
+    });
+  }
+  
+    function openMobileLongTermContactStep(panel) {
+    const contactStep = getHourlyMobileContactStepApi();
+    const cta = panel ? panel.querySelector("[data-services-hourly-cta]") : null;
+    const mode = getActiveHourlyMode(panel);
+    const detail = buildMobileHourlySubmitPayload(panel, {
+      serviceType: "hourly_daily"
+    });
+
+    if (
+      mode !== "custom_long_term" ||
+      !panel ||
+      !contactStep ||
+      !cta ||
+      cta.disabled ||
+      cta.getAttribute("aria-disabled") === "true"
+    ) {
+      return false;
+    }
+
+    if (
+      typeof contactStep.canOpen === "function" &&
+      !contactStep.canOpen(detail)
+    ) {
+      syncActiveState();
+      return false;
+    }
+
+    if (typeof contactStep.open === "function") {
+      return contactStep.open(panel, detail);
+    }
+
+    return false;
+  }
+  
+    function bindMobileLongTermContinue(panel) {
+    const cta = panel ? panel.querySelector("[data-services-hourly-cta]") : null;
+
+    if (!panel || !cta || cta.dataset.hourlyMobileLongTermContinueBound === "1") {
+      return false;
+    }
+
+    cta.dataset.hourlyMobileLongTermContinueBound = "1";
+
+    cta.addEventListener("click", function onLongTermContinueClick(event) {
+      if (
+        !isMobileViewport() ||
+        !isRouteOpen ||
+        getActiveHourlyMode(panel) !== "custom_long_term"
+      ) {
+        return;
+      }
+
+      if (cta.disabled || cta.getAttribute("aria-disabled") === "true") {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (typeof event.stopImmediatePropagation === "function") {
+        event.stopImmediatePropagation();
+      }
+
+      if (openMobileLongTermContactStep(panel)) {
+        trackMobileLongTermContinueClick(panel);
+      }
+    }, true);
+
+    return true;
   }
 
     function bindMobileHourlySubmitIntercept() {
@@ -1294,6 +1404,7 @@
     ensureFlow(panel);
     bindBack(panel);
     bindMobileHourlySubmitIntercept();
+    bindMobileLongTermContinue(panel);
     ensureMobileDurationSelect(panel);
     ensureMobileLongTermSelect(panel);
     bindMobileLongTermCtaSync(panel);
@@ -1306,6 +1417,7 @@
 
     return true;
   }
+
 
   function observePanel(panel) {
     if (!panel || observer) {

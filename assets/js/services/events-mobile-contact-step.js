@@ -1250,6 +1250,64 @@
 
     return true;
   }
+  
+    function parsePositiveAnalyticsNumber(value) {
+    const numericValue = Number(normalizeText(value));
+
+    return Number.isFinite(numericValue) && numericValue > 0
+      ? numericValue
+      : NaN;
+  }
+  
+    function trackEventMobileContactRequest(snapshot) {
+    const analytics = window.PixkuyAnalytics;
+    const safeSnapshot = snapshot || {};
+    const price = parsePositiveAnalyticsNumber(safeSnapshot.event_special_price);
+    const outboundDistanceMeters = parsePositiveAnalyticsNumber(safeSnapshot.event_special_outbound_distance_meters);
+    const returnDistanceMeters = parsePositiveAnalyticsNumber(safeSnapshot.event_special_return_distance_meters);
+    const outboundDurationSeconds = parsePositiveAnalyticsNumber(safeSnapshot.event_special_outbound_duration_seconds);
+    const returnDurationSeconds = parsePositiveAnalyticsNumber(safeSnapshot.event_special_return_duration_seconds);
+    const payload = {
+      service_type: "event_special",
+      event_id: normalizeText(safeSnapshot.event_special_event_id),
+      venue_id: normalizeText(safeSnapshot.event_special_venue_id),
+      variant: normalizeText(safeSnapshot.event_special_variant),
+      passenger_fare_key: normalizeText(safeSnapshot.event_special_passenger_fare_key),
+      currency: normalizeText(safeSnapshot.event_special_currency),
+      flow_surface: "mobile_route"
+    };
+
+    if (Number.isFinite(price)) {
+      payload.price = price;
+    }
+
+    if (Number.isFinite(outboundDistanceMeters)) {
+      payload.outbound_distance_meters = outboundDistanceMeters;
+    }
+
+    if (Number.isFinite(returnDistanceMeters)) {
+      payload.return_distance_meters = returnDistanceMeters;
+    }
+
+    if (Number.isFinite(outboundDurationSeconds)) {
+      payload.outbound_duration_seconds = outboundDurationSeconds;
+    }
+
+    if (Number.isFinite(returnDurationSeconds)) {
+      payload.return_duration_seconds = returnDurationSeconds;
+    }
+
+    if (!analytics || typeof analytics.track !== "function") {
+      return false;
+    }
+
+    if (typeof analytics.hasConsent === "function" && !analytics.hasConsent()) {
+      return false;
+    }
+
+    analytics.track("pixkuy_contact_request", payload);
+    return true;
+  }
 
   function submitContactStep() {
     const formsApi = getReservationFormsApi();
@@ -1276,6 +1334,7 @@
     }
 
     if (form && typeof form.requestSubmit === "function") {
+      trackEventMobileContactRequest(snapshot);
       form.requestSubmit();
       return true;
     }

@@ -993,6 +993,43 @@
       currency: "MXN"
     };
   }
+  
+    function trackAirportMobileQuoteReady(panel, parts) {
+    const analytics = window.PixkuyAnalytics;
+    const direction = getCurrentDirection(panel);
+    const passengerFareKey = getSelectedPassengerFareKey();
+    const amount = parts && parts.amount ? normalizeText(parts.amount) : "";
+    const currency = parts && parts.currency ? normalizeText(parts.currency) : "";
+    const dedupeKey = [
+      "airport_hotel",
+      direction,
+      passengerFareKey,
+      mobileLuggageValue,
+      amount,
+      currency
+    ].join("|");
+
+    if (
+      !analytics ||
+      typeof analytics.trackOnce !== "function" ||
+      !isMobileViewport() ||
+      !isRouteOpen ||
+      !amount ||
+      !currency
+    ) {
+      return false;
+    }
+
+    return analytics.trackOnce("pixkuy_mobile_quote_ready", {
+      service_type: "airport_hotel",
+      flow_surface: "mobile_route",
+      direction: direction,
+      passenger_fare_key: passengerFareKey,
+      luggage: mobileLuggageValue,
+      price_label: amount,
+      currency: currency
+    }, dedupeKey);
+  }
 
   function hasMobileHotelSelection(panel) {
     const zone = getDestinationZoneNode(panel);
@@ -1185,6 +1222,7 @@
     }
 
     setMobileFarePendingState(panel, false);
+    trackAirportMobileQuoteReady(panel, parts);
 
     if (
       currentAmount &&
@@ -1436,12 +1474,30 @@
     return true;
   }
 
+  function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
+
   function closeAirportMobilePicker() {
     const picker = getAirportMobilePicker();
 
     if (!picker) {
       return false;
     }
+
+    blurActiveElementInside(picker);
 
     picker.hidden = true;
     picker.setAttribute("aria-hidden", "true");
@@ -1767,6 +1823,29 @@
 
     return true;
   }
+  
+    function trackAirportMobileContinueClick(panel) {
+    const analytics = window.PixkuyAnalytics;
+
+    if (
+      !analytics ||
+      typeof analytics.track !== "function" ||
+      !isMobileViewport() ||
+      !isRouteOpen
+    ) {
+      return false;
+    }
+
+    return analytics.track("pixkuy_continue_click", {
+      service_type: "airport_hotel",
+      flow_surface: "mobile_route",
+      direction: getCurrentDirection(panel),
+      passenger_fare_key: getSelectedPassengerFareKey(),
+      luggage: mobileLuggageValue,
+      currency: "MXN"
+    });
+  }
+
 
   function bindContinue(panel) {
     const cta = panel.querySelector(".services-expand__cta");
@@ -1811,7 +1890,9 @@
       }
 
       if (typeof contactStep.open === "function") {
-        contactStep.open(panel);
+        if (contactStep.open(panel)) {
+          trackAirportMobileContinueClick(panel);
+        }
       }
     }, true);
 
@@ -1928,6 +2009,14 @@
     ensureMobileLuggage(panel);
 
     setRouteVisibility(true);
+
+    if (window.PixkuyAnalytics && typeof window.PixkuyAnalytics.track === "function") {
+      window.PixkuyAnalytics.track("pixkuy_mobile_route_open", {
+        service_type: "airport_hotel",
+        flow_surface: "mobile_route",
+        entry_point: "mobile_home_or_deeplink"
+      });
+    }
 
     window.requestAnimationFrame(function syncAfterOpen() {
       syncCopy(panel);

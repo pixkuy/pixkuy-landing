@@ -414,6 +414,34 @@ function getFocusableLodgingInput(nodes) {
   );
 }
 
+function blurActiveElementInside(node) {
+  const activeElement = document.activeElement;
+
+  if (
+    node &&
+    activeElement &&
+    typeof activeElement.blur === "function" &&
+    node.contains(activeElement)
+  ) {
+    activeElement.blur();
+    return true;
+  }
+
+  return false;
+}
+
+function blurAirportDestinationNodes(nodes) {
+  if (!nodes) {
+    return false;
+  }
+
+  return (
+    blurActiveElementInside(nodes.mount) ||
+    blurActiveElementInside(nodes.search) ||
+    blurActiveElementInside(nodes.root)
+  );
+}
+
 function focusActiveLodgingInputIfNeeded(activeNodes, options) {
   const settings = options && typeof options === "object" ? options : {};
   const shouldFocus = settings.shouldFocus === true;
@@ -601,11 +629,14 @@ function setHidden(node, shouldHide) {
   if (!node) return;
 
   if (shouldHide) {
+    blurActiveElementInside(node);
     node.hidden = true;
+    node.setAttribute("aria-hidden", "true");
     return;
   }
 
   node.hidden = false;
+  node.setAttribute("aria-hidden", "false");
 }
 
 function ensureDesktopActiveLodgingFieldVisible(activeNodes) {
@@ -755,6 +786,10 @@ function renderDestinationUi() {
     : "hotel-search";
   activeNodes.root.dataset.airportDestinationActiveSide = activeSide;
 
+  if (!showSearch) {
+    blurAirportDestinationNodes(activeNodes);
+  }
+
   setHidden(activeNodes.search, !showSearch);
   setHidden(activeNodes.mount, !showSearch);
   setHidden(activeNodes.resolved, !hasResolved);
@@ -778,6 +813,8 @@ function renderDestinationUi() {
   }
 
   if (inactiveNodes) {
+    blurAirportDestinationNodes(inactiveNodes);
+
     inactiveNodes.root.hidden = true;
     inactiveNodes.root.dataset.airportDestinationMode = "inactive";
     inactiveNodes.root.dataset.airportDestinationActiveSide =

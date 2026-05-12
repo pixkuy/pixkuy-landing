@@ -1093,6 +1093,40 @@
       quote: state.quote
     };
   }
+  
+    function trackDirectTransferMobileQuoteReady() {
+    const analytics = window.PixkuyAnalytics;
+    const quote = state.quote && typeof state.quote === "object" ? state.quote : {};
+    const price = Number(quote.price);
+    const currency = normalizeText(quote.currency) || "MXN";
+    const dedupeKey = [
+      "direct_transfer",
+      state.passengerFareKey,
+      price,
+      currency
+    ].join("|");
+
+    if (
+      !analytics ||
+      typeof analytics.trackOnce !== "function" ||
+      !isMobileViewport() ||
+      state.quoteStatus !== "ready" ||
+      !Number.isFinite(price) ||
+      price <= 0
+    ) {
+      return false;
+    }
+
+    return analytics.trackOnce("pixkuy_mobile_quote_ready", {
+      service_type: "direct_transfer",
+      flow_surface: "mobile_route",
+      passenger_fare_key: state.passengerFareKey,
+      price: price,
+      currency: currency,
+      distance_meters: getQuoteNumberValue(["distanceMeters", "distance_meters", "distance"]) || "",
+      duration_seconds: getQuoteNumberValue(["durationSeconds", "duration_seconds", "duration"]) || ""
+    }, dedupeKey);
+  }
 
   function requestQuoteIfReady() {
     const quoteApi = getQuoteApi();
@@ -1141,6 +1175,7 @@
           state.quote = result.quote;
           state.quoteErrorCode = "";
           syncCta();
+          trackDirectTransferMobileQuoteReady();
         })
         .catch(function onQuoteError(error) {
           if (requestId !== quoteRequestId) {
@@ -1461,6 +1496,34 @@
         step.getAttribute("aria-hidden") !== "true"
     );
   }
+  
+    function trackDirectTransferMobileContinueClick() {
+    const analytics = window.PixkuyAnalytics;
+    const quote = state.quote && typeof state.quote === "object" ? state.quote : {};
+    const price = Number(quote.price);
+    const currency = normalizeText(quote.currency) || "MXN";
+
+    if (
+      !analytics ||
+      typeof analytics.track !== "function" ||
+      !isMobileViewport() ||
+      state.quoteStatus !== "ready" ||
+      !Number.isFinite(price) ||
+      price <= 0
+    ) {
+      return false;
+    }
+
+    return analytics.track("pixkuy_continue_click", {
+      service_type: "direct_transfer",
+      flow_surface: "mobile_route",
+      passenger_fare_key: state.passengerFareKey,
+      price: price,
+      currency: currency,
+      distance_meters: getQuoteNumberValue(["distanceMeters", "distance_meters", "distance"]) || "",
+      duration_seconds: getQuoteNumberValue(["durationSeconds", "duration_seconds", "duration"]) || ""
+    });
+  }
 
   function bindStepEvents() {
     const step = getStep();
@@ -1530,7 +1593,9 @@
         }
 
         if (contactStepApi && typeof contactStepApi.open === "function") {
-          contactStepApi.open(step, buildContactStepPayload());
+          if (contactStepApi.open(step, buildContactStepPayload())) {
+            trackDirectTransferMobileContinueClick();
+          }
         }
       }
     });

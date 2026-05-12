@@ -2,6 +2,7 @@
   'use strict';
 
   var GOOGLE_ADS_ID = 'AW-18114199280';
+  var GOOGLE_ANALYTICS_ID = 'G-1N23WLB73N';
   var GOOGLE_ADS_LEAD_CONVERSION_SEND_TO = 'AW-18114199280/JkAeCOvxvKEcEPD9wr1D';
   var GOOGLE_ADS_WHATSAPP_CONVERSION_SEND_TO = 'AW-18114199280/yfbjCPOSl6scEPD9wr1D';
   var STORAGE_KEY = 'pixkuy_google_ads_consent';
@@ -195,7 +196,13 @@
   }
 
   function trackLeadConversionIfNeeded() {
-    if (!hasLeadSuccess() || hasTrackedLeadConversion()) {
+    if (!hasLeadSuccess()) {
+      return;
+    }
+
+    if (hasTrackedLeadConversion()) {
+      clearLeadSuccessSignal();
+      clearEnhancedConversionData();
       return;
     }
 
@@ -254,6 +261,16 @@
 
     window.gtag('js', new Date());
     window.gtag('config', GOOGLE_ADS_ID);
+    window.gtag('config', GOOGLE_ANALYTICS_ID);
+
+    window.dispatchEvent(
+      new CustomEvent('pixkuy:analytics-consent-ready', {
+        detail: {
+          source: 'google_ads_consent',
+          status: ACCEPTED
+        }
+      })
+    );
   }
 
   function removeBanner() {

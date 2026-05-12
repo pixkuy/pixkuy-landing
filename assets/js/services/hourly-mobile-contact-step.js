@@ -874,6 +874,45 @@
 
     return true;
   }
+  
+    function trackHourlyMobileContactRequest(snapshot) {
+    const analytics = window.PixkuyAnalytics;
+    const safeSnapshot = snapshot || {};
+    const mode = normalizeText(safeSnapshot.hourly_daily_mode);
+    const rawDurationHours = normalizeText(safeSnapshot.hourly_daily_duration_hours);
+    const rawPrice = normalizeText(safeSnapshot.hourly_daily_price);
+    const durationHours = rawDurationHours ? Number(rawDurationHours) : NaN;
+    const price = rawPrice ? Number(rawPrice) : NaN;
+    const currency = normalizeText(safeSnapshot.hourly_daily_currency);
+    const payload = {
+      service_type: "hourly_daily",
+      mode: mode,
+      flow_surface: "mobile_route"
+    };
+
+    if (Number.isFinite(durationHours)) {
+      payload.duration_hours = durationHours;
+    }
+
+    if (Number.isFinite(price)) {
+      payload.price = price;
+    }
+
+    if (currency) {
+      payload.currency = currency;
+    }
+
+    if (!analytics || typeof analytics.track !== "function") {
+      return false;
+    }
+
+    if (typeof analytics.hasConsent === "function" && !analytics.hasConsent()) {
+      return false;
+    }
+
+    analytics.track("pixkuy_contact_request", payload);
+    return true;
+  }
 
   function submitContactStep() {
     const formsApi = getReservationFormsApi();
@@ -900,6 +939,7 @@
     }
 
     if (form && typeof form.requestSubmit === "function") {
+      trackHourlyMobileContactRequest(snapshot);
       form.requestSubmit();
       return true;
     }
@@ -1005,6 +1045,22 @@
 
     return true;
   }
+  
+    function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
 
   function close() {
     if (!contactStepNode) {
@@ -1014,6 +1070,8 @@
     if (currentPanel) {
       currentPanel.removeAttribute(PRIMARY_STEP_HIDDEN_ATTR);
     }
+
+    blurActiveElementInside(contactStepNode);
 
     contactStepNode.hidden = true;
     contactStepNode.setAttribute("aria-hidden", "true");

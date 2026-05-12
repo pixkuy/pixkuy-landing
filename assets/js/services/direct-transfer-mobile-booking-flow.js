@@ -320,6 +320,14 @@ let inMotionReturnContext = null;
     setRouteVisibility(true);
     openConfigStep();
 
+    if (window.PixkuyAnalytics && typeof window.PixkuyAnalytics.track === "function") {
+      window.PixkuyAnalytics.track("pixkuy_mobile_route_open", {
+        service_type: "direct_transfer",
+        flow_surface: "mobile_route",
+        entry_point: "mobile_home_or_deeplink"
+      });
+    }
+
     return true;
   }
 

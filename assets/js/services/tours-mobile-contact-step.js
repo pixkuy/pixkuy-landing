@@ -688,7 +688,7 @@
     );
 
     const values = {
-      tour: "",
+      tour: safeSnapshot.tour_private_tour_label || "",
       duration: safeSnapshot.tour_private_duration_hours
         ? safeSnapshot.tour_private_duration_hours + " h"
         : "",
@@ -1057,6 +1057,35 @@
 
     return true;
   }
+  
+    function trackTourMobileContactRequest(snapshot) {
+    const analytics = window.PixkuyAnalytics;
+    const safeSnapshot = snapshot || {};
+    const price = Number(normalizeText(safeSnapshot.tour_private_price));
+    const payload = {
+      service_type: "tour_private",
+      tour_id: normalizeText(safeSnapshot.tour_private_tour_id),
+      passenger_fare_key: normalizeText(safeSnapshot.tour_private_passenger_fare_key),
+      has_guide: safeSnapshot.tour_private_has_guide === true,
+      currency: normalizeText(safeSnapshot.tour_private_currency),
+      flow_surface: "mobile_route"
+    };
+
+    if (Number.isFinite(price)) {
+      payload.price = price;
+    }
+
+    if (!analytics || typeof analytics.track !== "function") {
+      return false;
+    }
+
+    if (typeof analytics.hasConsent === "function" && !analytics.hasConsent()) {
+      return false;
+    }
+
+    analytics.track("pixkuy_contact_request", payload);
+    return true;
+  }
 
   function submitContactStep() {
     const formsApi = getReservationFormsApi();
@@ -1083,6 +1112,7 @@
     }
 
     if (form && typeof form.requestSubmit === "function") {
+      trackTourMobileContactRequest(snapshot);
       form.requestSubmit();
       return true;
     }
@@ -1251,6 +1281,8 @@
     if (currentConfigStep) {
       currentConfigStep.removeAttribute(PRIMARY_STEP_HIDDEN_ATTR);
     }
+
+    blurActiveElementInside(contactStepNode);
 
     contactStepNode.hidden = true;
     contactStepNode.setAttribute("aria-hidden", "true");

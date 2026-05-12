@@ -18,6 +18,7 @@
   const STORAGE_PREFIX = "pixkuy_form_submission_sent:";
   const FORM_CLIENT_VERSION = "pixkuy-contact-v1";
   const ENHANCED_CONVERSION_DATA_STORAGE_KEY = "pixkuy_google_ads_enhanced_conversion_data";
+  const LEAD_SUCCESS_CONTEXT_STORAGE_KEY = "pixkuy_lead_success_context";
   const DUPLICATE_NAME_FIELDS = [
     "tour_private_pickup",
     "hourly_daily_pickup"
@@ -232,6 +233,134 @@
       email: email,
       phone_number: phone
     };
+  }
+  
+    function parsePositiveContextNumber(value) {
+    const normalizedValue = normalizeText(value).replace(/[^\d.]/g, "");
+    const numericValue = Number(normalizedValue);
+
+    return Number.isFinite(numericValue) && numericValue > 0
+      ? numericValue
+      : null;
+  }
+
+  function setContextValue(context, key, value) {
+    const normalizedValue = normalizeText(value);
+
+    if (!context || !key || !normalizedValue) {
+      return false;
+    }
+
+    context[key] = normalizedValue;
+    return true;
+  }
+
+  function setContextNumber(context, key, value) {
+    const numericValue = parsePositiveContextNumber(value);
+
+    if (!context || !key || numericValue === null) {
+      return false;
+    }
+
+    context[key] = numericValue;
+    return true;
+  }
+
+  function getViewportContext() {
+    return window.matchMedia && window.matchMedia("(max-width: 720px)").matches
+      ? "mobile"
+      : "desktop";
+  }
+
+  function getFlowSurfaceContext() {
+    const body = document.body;
+
+    if (
+      body &&
+      (
+        body.getAttribute("data-airport-mobile-screen") === "true" ||
+        body.getAttribute("data-hourly-mobile-screen") === "true" ||
+        body.getAttribute("data-tours-mobile-screen") === "true" ||
+        body.getAttribute("data-events-mobile-screen") === "true" ||
+        body.getAttribute("data-direct-transfer-mobile-screen") === "true"
+      )
+    ) {
+      return "mobile_route";
+    }
+
+    return "";
+  }
+
+  function getLeadSuccessContext(form, activeServiceType) {
+    const serviceType = normalizeText(activeServiceType);
+    const context = {
+      service_type: serviceType || "other",
+      viewport: getViewportContext()
+    };
+    const flowSurface = getFlowSurfaceContext();
+
+    if (flowSurface) {
+      context.flow_surface = flowSurface;
+    }
+
+    if (serviceType === "airport_hotel") {
+      setContextValue(context, "direction", getFieldValue(form, "airport_hotel_direction"));
+      setContextValue(context, "passenger_fare_key", getFieldValue(form, "passenger_fare_key"));
+      setContextNumber(context, "price", getFieldValue(form, "fare"));
+      setContextValue(context, "currency", "MXN");
+    }
+
+    if (serviceType === "tour_private") {
+      setContextValue(context, "tour_id", getFieldValue(form, "tour_private_tour_id"));
+      setContextValue(context, "passenger_fare_key", getFieldValue(form, "tour_private_passenger_fare_key"));
+      setContextValue(context, "has_guide", getFieldValue(form, "tour_private_has_guide"));
+      setContextNumber(context, "price", getFieldValue(form, "tour_private_price"));
+      setContextValue(context, "currency", getFieldValue(form, "tour_private_currency"));
+    }
+
+    if (serviceType === "hourly_daily") {
+      setContextValue(context, "mode", getFieldValue(form, "hourly_daily_mode"));
+      setContextNumber(context, "duration_hours", getFieldValue(form, "hourly_daily_duration_hours"));
+      setContextNumber(context, "price", getFieldValue(form, "hourly_daily_price"));
+      setContextValue(context, "currency", getFieldValue(form, "hourly_daily_currency"));
+    }
+
+    if (serviceType === "direct_transfer") {
+      setContextValue(context, "passenger_fare_key", getFieldValue(form, "direct_transfer_passenger_fare_key"));
+      setContextNumber(context, "price", getFieldValue(form, "direct_transfer_price"));
+      setContextValue(context, "currency", getFieldValue(form, "direct_transfer_currency"));
+      setContextNumber(context, "distance_meters", getFieldValue(form, "direct_transfer_distance_meters"));
+      setContextNumber(context, "duration_seconds", getFieldValue(form, "direct_transfer_duration_seconds"));
+    }
+
+    if (serviceType === "event_special") {
+      setContextValue(context, "event_id", getFieldValue(form, "event_special_event_id"));
+      setContextValue(context, "venue_id", getFieldValue(form, "event_special_venue_id"));
+      setContextValue(context, "variant", getFieldValue(form, "event_special_variant"));
+      setContextValue(context, "passenger_fare_key", getFieldValue(form, "event_special_passenger_fare_key"));
+      setContextNumber(context, "price", getFieldValue(form, "event_special_price"));
+      setContextValue(context, "currency", getFieldValue(form, "event_special_currency"));
+      setContextNumber(context, "outbound_distance_meters", getFieldValue(form, "event_special_outbound_distance_meters"));
+      setContextNumber(context, "return_distance_meters", getFieldValue(form, "event_special_return_distance_meters"));
+      setContextNumber(context, "outbound_duration_seconds", getFieldValue(form, "event_special_outbound_duration_seconds"));
+      setContextNumber(context, "return_duration_seconds", getFieldValue(form, "event_special_return_duration_seconds"));
+    }
+
+    return context;
+  }
+
+  function storeLeadSuccessContext(form, activeServiceType) {
+    const context = getLeadSuccessContext(form, activeServiceType);
+
+    try {
+      window.sessionStorage.setItem(
+        LEAD_SUCCESS_CONTEXT_STORAGE_KEY,
+        JSON.stringify(context)
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   function storeEnhancedConversionData(form) {
@@ -480,6 +609,7 @@
     cleanInactiveServicePayload(form, activeServiceType);
     normalizeDuplicateNameFields(form);
     storeEnhancedConversionData(form);
+    storeLeadSuccessContext(form, activeServiceType);
 
     storeSubmission(submissionId);
     lockForm(form);

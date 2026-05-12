@@ -492,6 +492,49 @@
 
     return Number.isFinite(value) && value > 0 ? value : 0;
   }
+  
+    function trackEventMobileQuoteReady() {
+    const analytics = window.PixkuyAnalytics;
+    const group = getGroup();
+    const selectedEvent = getSelectedEvent();
+    const quote = getQuotePayload(currentQuoteResult);
+    const price = getQuotePrice(currentQuoteResult);
+    const currency = normalizeText(quote.currency) || normalizeText(getPricing().currency) || "MXN";
+    const dedupeKey = [
+      "event_special",
+      selectedEvent ? selectedEvent.id || "" : "",
+      state.selectedVariant,
+      state.selectedPassengerFareKey,
+      state.originAddress,
+      state.destinationAddress,
+      state.originPickupTime,
+      state.returnPickupTime,
+      price,
+      currency
+    ].join("|");
+
+    if (
+      !analytics ||
+      typeof analytics.trackOnce !== "function" ||
+      !isMobileViewport() ||
+      currentQuoteState !== "ready" ||
+      !price
+    ) {
+      return false;
+    }
+
+    return analytics.trackOnce("pixkuy_mobile_quote_ready", {
+      service_type: "event_special",
+      flow_surface: "mobile_route",
+      event_id: selectedEvent ? selectedEvent.id || "" : "",
+      event_group_id: group ? group.id || "" : "",
+      venue_id: getSelectedVenueId(),
+      variant: state.selectedVariant,
+      passenger_fare_key: state.selectedPassengerFareKey,
+      price: price,
+      currency: currency
+    }, dedupeKey);
+  }
 
   function renderQuoteUi() {
     const step = getStep();
@@ -649,6 +692,7 @@
         currentQuoteState = "ready";
         currentQuoteResult = result;
         renderQuoteUi();
+        trackEventMobileQuoteReady();
       })
       .catch(function onQuoteError() {
         if (quoteRequestId !== requestId) {
@@ -878,6 +922,37 @@
       event_special_currency: normalizeText(quote.currency) || normalizeText(getPricing().currency) || "MXN",
       event_special_notes: ""
     };
+  }
+  
+    function trackEventMobileContinueClick() {
+    const analytics = window.PixkuyAnalytics;
+    const group = getGroup();
+    const selectedEvent = getSelectedEvent();
+    const quote = getQuotePayload(currentQuoteResult);
+    const price = getQuotePrice(currentQuoteResult);
+    const currency = normalizeText(quote.currency) || normalizeText(getPricing().currency) || "MXN";
+
+    if (
+      !analytics ||
+      typeof analytics.track !== "function" ||
+      !isMobileViewport() ||
+      currentQuoteState !== "ready" ||
+      !price
+    ) {
+      return false;
+    }
+
+    return analytics.track("pixkuy_continue_click", {
+      service_type: "event_special",
+      flow_surface: "mobile_route",
+      event_id: selectedEvent ? selectedEvent.id || "" : "",
+      event_group_id: group ? group.id || "" : "",
+      venue_id: getSelectedVenueId(),
+      variant: state.selectedVariant,
+      passenger_fare_key: state.selectedPassengerFareKey,
+      price: price,
+      currency: currency
+    });
   }
 
   function openContactStep() {
@@ -1822,7 +1897,10 @@
           return;
         }
 
-        openContactStep();
+        if (openContactStep()) {
+          trackEventMobileContinueClick();
+        }
+
         return;
       }
 

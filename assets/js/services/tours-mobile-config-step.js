@@ -207,6 +207,21 @@
       '<span class="tours-mobile-config-step__fare-currency">MXN</span>'
     ].join("");
   }
+  
+    function buildPendingPriceMarkup() {
+    return escapeHtml(
+      getI18nValue(
+        "services.cards.tours.panel.priceValuePending",
+        "—"
+      )
+    );
+  }
+
+  function buildVisiblePriceMarkup() {
+    return canContinue()
+      ? buildMoneyMarkup(getPrice())
+      : buildPendingPriceMarkup();
+  }
 
   function getGuideKey() {
     const tour = getTour(activeTourId);
@@ -247,6 +262,41 @@
     }
 
     return true;
+  }
+  
+    function trackTourMobileQuoteReady() {
+    const analytics = window.PixkuyAnalytics;
+    const price = getPrice();
+    const dedupeKey = [
+      "tour_private",
+      activeTourId,
+      state.passengerFareKey,
+      state.hasGuide,
+      state.guideLanguage,
+      price,
+      "MXN"
+    ].join("|");
+
+    if (
+      !analytics ||
+      typeof analytics.trackOnce !== "function" ||
+      !isMobileViewport() ||
+      !canContinue() ||
+      !price
+    ) {
+      return false;
+    }
+
+    return analytics.trackOnce("pixkuy_mobile_quote_ready", {
+      service_type: "tour_private",
+      flow_surface: "mobile_route",
+      tour_id: activeTourId,
+      passenger_fare_key: state.passengerFareKey,
+      has_guide: state.hasGuide === "yes",
+      guide_language: state.guideLanguage,
+      price: price,
+      currency: "MXN"
+    }, dedupeKey);
   }
 
   function getPassengerBucketLabel(fareKey) {
@@ -361,6 +411,32 @@
           snapshot.tour_private_guide_language
         )
     );
+  }
+  
+    function trackTourMobileContinueClick() {
+    const analytics = window.PixkuyAnalytics;
+    const price = getPrice();
+
+    if (
+      !analytics ||
+      typeof analytics.track !== "function" ||
+      !isMobileViewport() ||
+      !canContinue() ||
+      !price
+    ) {
+      return false;
+    }
+
+    return analytics.track("pixkuy_continue_click", {
+      service_type: "tour_private",
+      flow_surface: "mobile_route",
+      tour_id: activeTourId,
+      passenger_fare_key: state.passengerFareKey,
+      has_guide: state.hasGuide === "yes",
+      guide_language: state.guideLanguage,
+      price: price,
+      currency: "MXN"
+    });
   }
 
   function openContactStep() {
@@ -639,7 +715,7 @@
       '</div>',
       '<div class="tours-mobile-config-step__fare">',
       '<span class="tours-mobile-config-step__fare-label">' + escapeHtml(priceLabel) + '</span>',
-      '<strong class="tours-mobile-config-step__fare-value" data-tours-mobile-config-price>' + buildMoneyMarkup(getPrice()) + '</strong>',
+      '<strong class="tours-mobile-config-step__fare-value" data-tours-mobile-config-price>' + buildVisiblePriceMarkup() + '</strong>',
       '</div>',
       '<button type="button" class="cta tours-mobile-config-step__cta" data-tours-mobile-config-cta>' + escapeHtml(ctaText) + '</button>',
       '</div>',
@@ -693,13 +769,15 @@
     const isReady = canContinue();
 
     if (price) {
-      price.innerHTML = buildMoneyMarkup(getPrice());
+      price.innerHTML = buildVisiblePriceMarkup();
     }
 
     if (cta) {
       cta.disabled = !isReady;
       cta.setAttribute("aria-disabled", isReady ? "false" : "true");
     }
+
+    trackTourMobileQuoteReady();
 
     return true;
   }
@@ -731,12 +809,32 @@
 
     return true;
   }
+  
+  function blurActiveElementInside(node) {
+    const activeElement = document.activeElement;
+
+    if (
+      node &&
+      activeElement &&
+      typeof activeElement.blur === "function" &&
+      node.contains(activeElement)
+    ) {
+      activeElement.blur();
+      return true;
+    }
+
+    return false;
+  }
 
   function setStepVisibility(isVisible) {
     const step = getStep();
 
     if (!step) {
       return false;
+    }
+
+    if (!isVisible) {
+      blurActiveElementInside(step);
     }
 
     step.hidden = !isVisible;
@@ -803,7 +901,10 @@
           return;
         }
 
-        openContactStep();
+        if (openContactStep()) {
+          trackTourMobileContinueClick();
+        }
+
         return;
       }
 

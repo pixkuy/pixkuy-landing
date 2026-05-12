@@ -1106,6 +1106,44 @@
 
     return true;
   }
+  
+    function parseFareAmount(value) {
+    const normalizedValue = normalizeText(value)
+      .replace(/[^\d.,]/g, "")
+      .replace(/,/g, "");
+    const numericValue = Number(normalizedValue);
+
+    return Number.isFinite(numericValue) ? numericValue : NaN;
+  }
+
+  function trackAirportMobileContactRequest(snapshot) {
+    const analytics = window.PixkuyAnalytics;
+    const safeSnapshot = snapshot || {};
+    const price = parseFareAmount(safeSnapshot.fare);
+    const payload = {
+      service_type: "airport_hotel",
+      direction: normalizeText(safeSnapshot.direction),
+      passenger_fare_key: normalizeText(safeSnapshot.passengerFareKey),
+      luggage: normalizeText(safeSnapshot.luggage),
+      currency: "MXN",
+      flow_surface: "mobile_route"
+    };
+
+    if (Number.isFinite(price)) {
+      payload.price = price;
+    }
+
+    if (!analytics || typeof analytics.track !== "function") {
+      return false;
+    }
+
+    if (typeof analytics.hasConsent === "function" && !analytics.hasConsent()) {
+      return false;
+    }
+
+    analytics.track("pixkuy_contact_request", payload);
+    return true;
+  }
 
   function submitContactStep() {
     const formsApi = getReservationFormsApi();
@@ -1132,6 +1170,7 @@
     }
 
     if (form && typeof form.requestSubmit === "function") {
+      trackAirportMobileContactRequest(snapshot);
       form.requestSubmit();
       return true;
     }

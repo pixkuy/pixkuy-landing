@@ -1164,6 +1164,43 @@
 
     return true;
   }
+  
+    function trackDirectTransferMobileContactRequest(snapshot) {
+    const analytics = window.PixkuyAnalytics;
+    const safeSnapshot = snapshot || {};
+    const price = Number(normalizeText(safeSnapshot.direct_transfer_price));
+    const distanceMeters = Number(normalizeText(safeSnapshot.direct_transfer_distance_meters));
+    const durationSeconds = Number(normalizeText(safeSnapshot.direct_transfer_duration_seconds));
+    const payload = {
+      service_type: "direct_transfer",
+      passenger_fare_key: normalizeText(safeSnapshot.direct_transfer_passenger_fare_key),
+      currency: normalizeText(safeSnapshot.direct_transfer_currency),
+      flow_surface: "mobile_route"
+    };
+
+    if (Number.isFinite(price)) {
+      payload.price = price;
+    }
+
+    if (Number.isFinite(distanceMeters)) {
+      payload.distance_meters = distanceMeters;
+    }
+
+    if (Number.isFinite(durationSeconds)) {
+      payload.duration_seconds = durationSeconds;
+    }
+
+    if (!analytics || typeof analytics.track !== "function") {
+      return false;
+    }
+
+    if (typeof analytics.hasConsent === "function" && !analytics.hasConsent()) {
+      return false;
+    }
+
+    analytics.track("pixkuy_contact_request", payload);
+    return true;
+  }
 
   function submitContactStep() {
     const formsApi = getReservationFormsApi();
@@ -1190,6 +1227,7 @@
     }
 
     if (form && typeof form.requestSubmit === "function") {
+      trackDirectTransferMobileContactRequest(snapshot);
       form.requestSubmit();
       return true;
     }
