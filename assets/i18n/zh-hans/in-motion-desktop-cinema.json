@@ -1,0 +1,98 @@
+{
+  "inMotionDesktopCinema": {
+    "ariaLabel": "Pixkuy 在路上的电影式体验",
+    "videoLabel": "Pixkuy Mobility 在墨西哥城的视频",
+    "typeMask": "在路上",
+    "scrollHint": "向下滚动继续探索",
+    "play": "播放",
+    "pause": "暂停",
+    "soundOn": "开启声音",
+    "soundOff": "静音",
+    "timelineLabel": "视频章节",
+    "primaryCta": "立即预订",
+    "secondaryCta": "查看服务",
+    "chapters": {
+      "arrival": {
+        "index": "01",
+        "time": "00:00",
+        "label": "抵达墨西哥",
+        "title": "欢迎来到墨西哥",
+        "text": "你的旅程从机场开始。",
+        "primary": "预订机场接送",
+        "secondary": "查看服务"
+      },
+      "driver": {
+        "index": "02",
+        "time": "00:04",
+        "label": "你的司机",
+        "title": "司机正在等候",
+        "text": "从第一刻起享受私人司机服务。",
+        "primary": "查看车辆",
+        "secondary": "查看车队"
+      },
+      "cityRide": {
+        "index": "03",
+        "time": "00:10",
+        "label": "前往城市",
+        "title": "前往城市",
+        "text": "直接、舒适且安排妥当的行程，送你抵达目的地。",
+        "primary": "申请直接接送",
+        "secondary": "查看服务"
+      },
+      "cdmx": {
+        "index": "04",
+        "time": "00:18",
+        "label": "探索墨西哥城",
+        "title": "探索墨西哥城",
+        "text": "以注重细节的私人服务在城市中移动。",
+        "primary": "查看墨西哥城接送",
+        "secondary": "查看服务"
+      },
+      "teotihuacan": {
+        "index": "05",
+        "time": "00:23",
+        "label": "特奥蒂瓦坎",
+        "title": "特奥蒂瓦坎",
+        "text": "从墨西哥城出发的私人游览，按你的节奏进行。",
+        "primary": "查看私人游览",
+        "secondary": "查看服务"
+      },
+      "xochimilco": {
+        "index": "06",
+        "time": "00:28",
+        "label": "霍奇米尔科",
+        "title": "霍奇米尔科",
+        "text": "通过私人路线发现城市的另一面。",
+        "primary": "查看私人游览",
+        "secondary": "查看服务"
+      },
+      "wc2026": {
+        "index": "07",
+        "time": "00:33",
+        "label": "2026 世界杯",
+        "title": "2026 世界杯",
+        "text": "为墨西哥城的比赛和活动提供私人接送。",
+        "primary": "查看 2026 世界杯",
+        "secondary": "查看服务"
+      },
+      "returnHome": {
+        "index": "08",
+        "time": "00:37",
+        "label": "返程",
+        "title": "返回酒店或前往机场",
+        "text": "无需临时安排，轻松返回酒店或衔接机场。",
+        "primary": "预订酒店 / 机场",
+        "secondary": "查看服务"
+      },
+      "final": {
+        "index": "09",
+        "time": "00:45",
+        "label": "旅程结束",
+        "title": "你的旅程从这里开始",
+        "text": "向 Pixkuy Mobility 申请私人接送。",
+        "primary": "申请接送",
+        "secondary": "查看服务"
+      }
+    }
+  }
+}

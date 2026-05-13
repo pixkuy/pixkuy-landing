@@ -1,0 +1,98 @@
+{
+  "inMotionDesktopCinema": {
+    "ariaLabel": "Pixkuy in motion cinematic experience",
+    "videoLabel": "Pixkuy Mobility video in Mexico City",
+    "typeMask": "IN MOTION",
+    "scrollHint": "Scroll to explore",
+    "play": "Play",
+    "pause": "Pause",
+    "soundOn": "Turn sound on",
+    "soundOff": "Mute sound",
+    "timelineLabel": "Video chapters",
+    "primaryCta": "Book now",
+    "secondaryCta": "View service",
+    "chapters": {
+      "arrival": {
+        "index": "01",
+        "time": "00:00",
+        "label": "Arrival in Mexico",
+        "title": "Welcome to Mexico",
+        "text": "Your journey starts the moment you land.",
+        "primary": "Book your airport transfer",
+        "secondary": "View service"
+      },
+      "driver": {
+        "index": "02",
+        "time": "00:04",
+        "label": "Your driver",
+        "title": "Your driver is waiting",
+        "text": "Private chauffeur service from the first minute.",
+        "primary": "See our vehicles",
+        "secondary": "View fleet"
+      },
+      "cityRide": {
+        "index": "03",
+        "time": "00:10",
+        "label": "Into the city",
+        "title": "Into the city",
+        "text": "A direct, comfortable and coordinated ride to your destination.",
+        "primary": "Request a direct transfer",
+        "secondary": "View service"
+      },
+      "cdmx": {
+        "index": "04",
+        "time": "00:18",
+        "label": "Explore Mexico City",
+        "title": "Explore Mexico City",
+        "text": "Move through the city with a private service that takes care of the details.",
+        "primary": "See transfers in Mexico City",
+        "secondary": "View service"
+      },
+      "teotihuacan": {
+        "index": "05",
+        "time": "00:23",
+        "label": "Teotihuacan",
+        "title": "Teotihuacan",
+        "text": "Private tours from Mexico City, at your own pace.",
+        "primary": "View private tours",
+        "secondary": "View service"
+      },
+      "xochimilco": {
+        "index": "06",
+        "time": "00:28",
+        "label": "Xochimilco",
+        "title": "Xochimilco",
+        "text": "Private routes to discover another side of the city.",
+        "primary": "View private tours",
+        "secondary": "View service"
+      },
+      "wc2026": {
+        "index": "07",
+        "time": "00:33",
+        "label": "World Cup 2026",
+        "title": "World Cup 2026",
+        "text": "Private transfers for matches and events in Mexico City.",
+        "primary": "View World Cup 2026",
+        "secondary": "View service"
+      },
+      "returnHome": {
+        "index": "08",
+        "time": "00:37",
+        "label": "Back home",
+        "title": "Back home",
+        "text": "Return to your hotel or connect with the airport without improvising.",
+        "primary": "Book hotel / airport",
+        "secondary": "View service"
+      },
+      "final": {
+        "index": "09",
+        "time": "00:45",
+        "label": "End of the journey",
+        "title": "Your journey starts here",
+        "text": "Request a private transfer with Pixkuy Mobility.",
+        "primary": "Request a transfer",
+        "secondary": "View service"
+      }
+    }
+  }
+}

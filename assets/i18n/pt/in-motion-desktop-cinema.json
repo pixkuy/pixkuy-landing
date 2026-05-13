@@ -1,0 +1,98 @@
+{
+  "inMotionDesktopCinema": {
+    "ariaLabel": "Experiência cinematográfica da Pixkuy em movimento",
+    "videoLabel": "Vídeo da Pixkuy Mobility na Cidade do México",
+    "typeMask": "EM MOVIMENTO",
+    "scrollHint": "Role para descobrir",
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "soundOn": "Ativar áudio",
+    "soundOff": "Silenciar áudio",
+    "timelineLabel": "Capítulos do vídeo",
+    "primaryCta": "Reservar agora",
+    "secondaryCta": "Ver serviço",
+    "chapters": {
+      "arrival": {
+        "index": "01",
+        "time": "00:00",
+        "label": "Chegada ao México",
+        "title": "Bem-vindo ao México",
+        "text": "A sua viagem começa no aeroporto.",
+        "primary": "Reservar transfer do aeroporto",
+        "secondary": "Ver serviço"
+      },
+      "driver": {
+        "index": "02",
+        "time": "00:04",
+        "label": "O seu motorista",
+        "title": "O seu motorista está à espera",
+        "text": "Serviço privado com motorista desde o primeiro minuto.",
+        "primary": "Ver veículos",
+        "secondary": "Conhecer a frota"
+      },
+      "cityRide": {
+        "index": "03",
+        "time": "00:10",
+        "label": "Rumo à cidade",
+        "title": "Rumo à cidade",
+        "text": "Um transfer direto, confortável e coordenado até ao seu destino.",
+        "primary": "Solicitar transfer direto",
+        "secondary": "Ver serviço"
+      },
+      "cdmx": {
+        "index": "04",
+        "time": "00:18",
+        "label": "Explorar a Cidade do México",
+        "title": "Explorar a Cidade do México",
+        "text": "Mova-se pela cidade com um serviço privado atento aos detalhes.",
+        "primary": "Ver transfers na Cidade do México",
+        "secondary": "Ver serviço"
+      },
+      "teotihuacan": {
+        "index": "05",
+        "time": "00:23",
+        "label": "Teotihuacan",
+        "title": "Teotihuacan",
+        "text": "Tours privados a partir da Cidade do México, ao seu ritmo.",
+        "primary": "Ver tours privados",
+        "secondary": "Ver serviço"
+      },
+      "xochimilco": {
+        "index": "06",
+        "time": "00:28",
+        "label": "Xochimilco",
+        "title": "Xochimilco",
+        "text": "Percursos privados para descobrir outro lado da cidade.",
+        "primary": "Ver tours privados",
+        "secondary": "Ver serviço"
+      },
+      "wc2026": {
+        "index": "07",
+        "time": "00:33",
+        "label": "Mundial 2026",
+        "title": "Mundial 2026",
+        "text": "Transfers privados para jogos e eventos na Cidade do México.",
+        "primary": "Ver Mundial 2026",
+        "secondary": "Ver serviço"
+      },
+      "returnHome": {
+        "index": "08",
+        "time": "00:37",
+        "label": "Regresso",
+        "title": "Regresso ao hotel ou aeroporto",
+        "text": "Volte ao hotel ou conecte com o aeroporto sem improvisar.",
+        "primary": "Reservar hotel / aeroporto",
+        "secondary": "Ver serviço"
+      },
+      "final": {
+        "index": "09",
+        "time": "00:45",
+        "label": "Fim da viagem",
+        "title": "A sua viagem começa aqui",
+        "text": "Solicite um transfer privado com a Pixkuy Mobility.",
+        "primary": "Solicitar transfer",
+        "secondary": "Ver serviço"
+      }
+    }
+  }
+}
