@@ -232,10 +232,10 @@
 
     if (state.mode === MODES.HOURLY) {
       basePrice = state.durationHours <= 2
-        ? 4500
-        : 4500 + ((state.durationHours - 2) * 1300);
+        ? 3500
+        : 3500 + ((state.durationHours - 2) * 1000);
     } else if (state.mode === MODES.FULL_DAY) {
-      basePrice = 15000;
+      basePrice = 12500;
     }
 
     if (typeof basePrice !== "number" || !Number.isFinite(basePrice)) {
