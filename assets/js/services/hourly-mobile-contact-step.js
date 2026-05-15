@@ -817,11 +817,12 @@
     return parts.filter(Boolean).join(" | ");
   }
 
-  function fillReservationForm(snapshot, contactData) {
+  function fillReservationForm(snapshot, contactData, options) {
     const formsApi = getReservationFormsApi();
     const form = formsApi ? formsApi.getReservationForm() : null;
     const fields = form && formsApi ? formsApi.getReservationRequestFields(form) : null;
     const summary = buildRequestSummary(snapshot);
+    const safeOptions = options && typeof options === "object" ? options : {};
 
     if (!form || !fields) {
       return false;
@@ -868,6 +869,10 @@
 
     formsApi.syncReservationRequestState(fields);
 
+    if (safeOptions.skipLegacyValidation === true) {
+      return true;
+    }
+
     if (typeof formsApi.refreshReservationRequestValidationUX === "function") {
       return formsApi.refreshReservationRequestValidationUX(fields);
     }
@@ -913,6 +918,34 @@
     analytics.track("pixkuy_contact_request", payload);
     return true;
   }
+  
+    function isTransactionalHourlySnapshot(snapshot) {
+    const mode = normalizeText(snapshot && snapshot.hourly_daily_mode);
+
+    return mode === MODE_HOURLY || mode === MODE_FULL_DAY;
+  }
+
+  function isHourlyBookingApiCheckoutBridgeReady() {
+    return Boolean(
+      document.documentElement &&
+      document.documentElement.dataset.hourlyBookingApiCheckoutBound === "1"
+    );
+  }
+
+  function dispatchTransactionalCheckoutSubmit(form) {
+    if (!form || !isHourlyBookingApiCheckoutBridgeReady()) {
+      return false;
+    }
+
+    form.dispatchEvent(
+      new window.Event("submit", {
+        bubbles: true,
+        cancelable: true
+      })
+    );
+
+    return true;
+  }
 
   function submitContactStep() {
     const formsApi = getReservationFormsApi();
@@ -931,15 +964,27 @@
       return false;
     }
 
-    isFormValid = fillReservationForm(snapshot, contactData);
+    isFormValid = fillReservationForm(snapshot, contactData, {
+      skipLegacyValidation: isTransactionalHourlySnapshot(snapshot)
+    });
 
     if (!isFormValid) {
       showGlobalError();
       return false;
     }
 
+    trackHourlyMobileContactRequest(snapshot);
+
+    if (isTransactionalHourlySnapshot(snapshot)) {
+      if (dispatchTransactionalCheckoutSubmit(form)) {
+        return true;
+      }
+
+      showGlobalError();
+      return false;
+    }
+
     if (form && typeof form.requestSubmit === "function") {
-      trackHourlyMobileContactRequest(snapshot);
       form.requestSubmit();
       return true;
     }
@@ -947,6 +992,8 @@
     showGlobalError();
     return false;
   }
+
+
 
   function bindContactStepEvents() {
     if (!contactStepNode || contactStepNode.dataset.hourlyMobileContactBound === "1") {
