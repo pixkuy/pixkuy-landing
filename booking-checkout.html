@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" data-booking-checkout-i18n="pending">
+<head>
+  <meta charset="utf-8">
+  <title>Abriendo pago — Pixkuy Mobility</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0f1113">
+  <meta name="color-scheme" content="dark light">
+
+  <link rel="stylesheet" href="assets/css/00-tokens.css">
+  <link rel="stylesheet" href="assets/css/10-base.css">
+  <link rel="stylesheet" href="assets/css/20-components.css">
+  <link rel="stylesheet" href="assets/css/30-sections.css">
+  <link rel="stylesheet" href="assets/css/81-booking-status-page.css">
+  <link rel="stylesheet" href="assets/css/90-a11y.css">
+</head>
+
+<body>
+  <main class="booking-status-page" data-booking-checkout-page>
+    <section
+      class="booking-status"
+      aria-labelledby="booking-checkout-title"
+      data-booking-checkout
+    >
+      <div class="booking-status__brand">
+        <img
+          class="booking-status__logo"
+          src="assets/img/pixkuy-logo-white.webp"
+          alt="Pixkuy Mobility"
+          width="154"
+          height="45"
+          loading="eager"
+          decoding="async"
+        >
+      </div>
+
+      <div class="booking-status__content">
+        <p
+          class="booking-status__state"
+          data-booking-checkout-state
+        ></p>
+
+        <h1
+          id="booking-checkout-title"
+          class="booking-status__title"
+          data-booking-checkout-title
+        ></h1>
+
+        <p
+          class="booking-status__lead"
+          data-booking-checkout-lead
+        ></p>
+
+        <div
+          class="booking-status__notice"
+          data-booking-checkout-notice
+          data-booking-status-tone="warning"
+          hidden
+        ></div>
+
+        <div class="booking-status__actions">
+          <a
+            class="cta booking-status__primary"
+            href="/?service=hourly_daily#services"
+            data-booking-checkout-new
+            hidden
+          ></a>
+
+          <a
+            class="booking-status__secondary"
+            href="https://wa.me/5215528837400"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-booking-checkout-whatsapp
+            hidden
+          ></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/forms/booking-checkout-handoff.js"></script>
+</body>
+</html>

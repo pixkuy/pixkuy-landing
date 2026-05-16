@@ -15,10 +15,12 @@
   }
 
   var DEFAULT_BOOKING_API_BASE_URL = "http://localhost:3002";
-  var DEFAULT_PUBLIC_SITE_KEY = "local_pixkuy_site_key";
-  var CHECKOUT_ENDPOINT = "/v1/public/reservations/checkout";
-  var RECAPTCHA_ACTION = "hourly_checkout";
-  var DEFAULT_HOURLY_PASSENGERS = 6;
+var DEFAULT_PUBLIC_SITE_KEY = "local_pixkuy_site_key";
+var CHECKOUT_ENDPOINT = "/v1/public/reservations/checkout";
+var RECAPTCHA_ACTION = "hourly_checkout";
+var DEFAULT_HOURLY_PASSENGERS = 6;
+var BOOKING_CHECKOUT_HANDOFF_PATH = "/booking-checkout.html";
+var BOOKING_CHECKOUT_STORAGE_PREFIX = "pixkuy_booking_checkout:";
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -397,16 +399,57 @@
     });
   }
 
-  function redirectToCheckout(checkoutUrl) {
-    var url = normalizeText(checkoutUrl);
+  function getBookingCheckoutStorageKey(token) {
+  return BOOKING_CHECKOUT_STORAGE_PREFIX + token;
+}
 
-    if (!url) {
-      return false;
-    }
+function storeBookingCheckoutHandoff(input) {
+  var token = normalizeText(input && input.bookingStatusToken);
+  var checkoutUrl = normalizeText(input && input.checkoutUrl);
 
-    window.location.assign(url);
-    return true;
+  if (!token || !checkoutUrl) {
+    return false;
   }
+
+  try {
+    window.sessionStorage.setItem(
+      getBookingCheckoutStorageKey(token),
+      JSON.stringify({
+        token: token,
+        checkoutUrl: checkoutUrl,
+        redirected: false,
+        createdAt: new Date().toISOString()
+      })
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function redirectToCheckout(checkoutUrl, bookingStatusToken) {
+  var url = normalizeText(checkoutUrl);
+  var token = normalizeText(bookingStatusToken);
+  var handoffUrl;
+
+  if (!url || !token) {
+    return false;
+  }
+
+  if (!storeBookingCheckoutHandoff({
+    bookingStatusToken: token,
+    checkoutUrl: url
+  })) {
+    return false;
+  }
+
+  handoffUrl = BOOKING_CHECKOUT_HANDOFF_PATH +
+    "?token=" +
+    encodeURIComponent(token);
+
+  window.location.replace(handoffUrl);
+  return true;
+}
 
   function handleSubmit(event) {
     var form = event.target;
@@ -473,18 +516,21 @@
         });
       })
       .then(function (result) {
-        var checkoutUrl = result && result.body ? result.body.checkoutUrl : "";
+  var checkoutUrl = result && result.body ? result.body.checkoutUrl : "";
+  var bookingStatusToken = result && result.body ? result.body.bookingStatusToken : "";
 
-        if (!result.ok || !checkoutUrl) {
-          throw new Error(
-            result && result.body && result.body.code
-              ? result.body.code
-              : "BOOKING_API_CHECKOUT_FAILED"
-          );
-        }
-        
-        redirectToCheckout(checkoutUrl);
-      })
+  if (!result.ok || !checkoutUrl || !bookingStatusToken) {
+    throw new Error(
+      result && result.body && result.body.code
+        ? result.body.code
+        : "BOOKING_API_CHECKOUT_FAILED"
+    );
+  }
+
+  if (!redirectToCheckout(checkoutUrl, bookingStatusToken)) {
+    throw new Error("BOOKING_CHECKOUT_HANDOFF_FAILED");
+  }
+})
       .catch(function (error) {        
         setFormBusy(form, false);
         showCheckoutError(form);

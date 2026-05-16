@@ -1,13 +1,20 @@
 {
   "bookingStatus": {
     "meta": {
-      "successTitle": "Reserva recibida — Pixkuy Mobility"
+      "successTitle": "Reserva recibida — Pixkuy Mobility",
+      "cancelledTitle": "Pago no completado — Pixkuy Mobility"
     },
-    "loading": {
-      "state": "Consultando estado de la reserva",
-      "title": "Estamos verificando tu pago",
-      "lead": "Estamos consultando el estado actualizado de tu reserva. Esta pantalla no confirma el pago por sí sola."
-    },
+    "checkout": {
+  "meta": {
+    "title": "Abriendo pago — Pixkuy Mobility"
+  },
+  "state": "Pago seguro",
+  "title": "Estamos abriendo Stripe",
+  "lead": "Te llevaremos a una pantalla segura de Stripe para completar el pago.",
+  "notice": "No se ha podido abrir el pago automáticamente. Inicia una nueva reserva o contacta con Pixkuy.",
+  "errorTitle": "No pudimos abrir el pago",
+  "errorLead": "La sesión de pago no está disponible o ha caducado."
+},
     "details": {
       "publicCode": "Código de reserva",
       "payment": "Estado del pago",
@@ -23,6 +30,10 @@
       "payment_mismatch": "Pago en revisión",
       "payment_after_expiry": "Pago recibido fuera de ventana",
       "pending_manual_review": "Revisión manual",
+      "pending": "Pendiente",
+      "failed": "Fallido",
+      "expired": "Caducado",
+      "mismatch": "Pago en revisión",
       "notAvailable": "No disponible"
     },
     "confirmed": {
@@ -75,12 +86,87 @@
       "lead": "Ha ocurrido un problema al conectar con Booking API. Inténtalo de nuevo en unos instantes.",
       "notice": "No se ha confirmado ninguna reserva desde esta pantalla."
     },
+    "cancelled": {
+      "pending": {
+        "state": "Pago no completado",
+        "title": "El pago no se ha completado",
+        "lead": "Tu reserva temporal puede seguir activa durante unos minutos. Si quieres mantener esta solicitud, puedes volver a abrir el pago.",
+        "notice": "Solo se confirmará la reserva si Stripe confirma el pago y Booking API procesa el webhook correctamente."
+      },
+      "confirmed": {
+        "state": "Reserva confirmada",
+        "title": "Tu reserva ya está confirmada",
+        "lead": "Aunque hayas vuelto desde una pantalla de pago cancelado, Booking API indica que la reserva está confirmada.",
+        "notice": "No es necesario reintentar el pago. Conserva el código de reserva para cualquier coordinación con Pixkuy."
+      },
+      "manualReview": {
+        "state": "Revisión manual",
+        "title": "Esta reserva requiere revisión",
+        "lead": "No podemos abrir un nuevo pago automáticamente porque la reserva requiere revisión operativa.",
+        "defaultNotice": "Contacta con Pixkuy para revisar el caso.",
+        "paymentMismatchNotice": "El importe pagado no coincide con el importe esperado. No se ha confirmado la reserva automáticamente.",
+        "paymentAfterExpiryNotice": "El pago llegó cuando la ventana temporal de la reserva ya no estaba vigente. Revisaremos el caso manualmente."
+      },
+      "expired": {
+        "state": "Reserva temporal caducada",
+        "title": "La reserva temporal ha caducado",
+        "lead": "La ventana de pago ya no está activa. Para reservar, inicia una nueva solicitud.",
+        "notice": "No reactivamos reservas caducadas desde esta pantalla."
+      },
+      "unknown": {
+        "state": "Estado no disponible",
+        "title": "No hemos podido confirmar el estado",
+        "lead": "La respuesta recibida no permite saber si puedes reintentar el pago.",
+        "notice": "Contacta con Pixkuy si necesitas revisar esta reserva."
+      },
+      "missingToken": {
+        "state": "Token no disponible",
+        "title": "No podemos consultar esta reserva",
+        "lead": "Falta el token público de la reserva en la URL.",
+        "notice": "No se puede reintentar el pago sin un token válido."
+      },
+      "notFound": {
+        "state": "Reserva no encontrada",
+        "title": "No encontramos esta reserva",
+        "lead": "El enlace no corresponde a una reserva pública disponible o ya no es válido.",
+        "notice": "Revisa el enlace o inicia una nueva solicitud."
+      },
+      "requestError": {
+        "state": "Error de consulta",
+        "title": "No pudimos consultar el estado",
+        "lead": "Ha ocurrido un problema al conectar con Booking API.",
+        "notice": "No podemos habilitar el reintento de pago hasta consultar el estado real."
+      },
+      "actions": {
+        "retry": "Reintentar pago",
+        "newBooking": "Nueva reserva"
+      },
+      "retry": {
+        "loading": "Abriendo pago",
+        "loadingNotice": "Estamos solicitando un nuevo enlace de pago para esta reserva temporal.",
+        "error": "No se pudo abrir un nuevo pago. La ventana temporal puede haber caducado. Intenta crear una nueva reserva o contacta con Pixkuy."
+      },
+      "mobile": {
+        "pending": {
+          "state": "Pago no completado",
+          "title": "El pago no se completó",
+          "lead": "Si la reserva temporal sigue activa, puedes volver a abrir el pago.",
+          "notice": "La reserva solo se confirma cuando Stripe y Booking API confirman el pago."
+        },
+        "expired": {
+          "state": "Reserva caducada",
+          "title": "La reserva temporal caducó",
+          "lead": "La ventana de pago ya no está activa. Inicia una nueva solicitud.",
+          "notice": "No se ha confirmado ninguna reserva."
+        }
+      }
+    },
     "actions": {
-  "primary": "Volver al inicio",
-  "whatsapp": "Hablar por WhatsApp"
-},
-"mobile": {
-  "close": "Cerrar"
-}
+      "primary": "Volver al inicio",
+      "whatsapp": "Hablar por WhatsApp"
+    },
+    "mobile": {
+      "close": "Cerrar"
+    }
   }
 }
