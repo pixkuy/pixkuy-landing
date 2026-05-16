@@ -1108,9 +1108,52 @@
   }
 
   function renderAll() {
-    renderConfig();
-    window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
+  renderConfig();
+  window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
+}
+
+function applyContactHourlyDailySync(snapshot) {
+  const safeSnapshot = snapshot && typeof snapshot === 'object' ? snapshot : {};
+  const nextMode = normalizeText(safeSnapshot.mode);
+  const nextDuration = Number(safeSnapshot.durationHours);
+  const nextCustomTerm = normalizeText(safeSnapshot.customTerm);
+
+  if (
+    nextMode !== MODES.HOURLY &&
+    nextMode !== MODES.FULL_DAY &&
+    nextMode !== MODES.LONG_TERM
+  ) {
+    return false;
   }
+
+  state.mode = nextMode;
+  state.vehicleType = normalizeText(safeSnapshot.vehicleType) || 'executive_van';
+  state.pickup = normalizeText(safeSnapshot.pickup);
+  state.tripDate = normalizeText(safeSnapshot.tripDate);
+  state.startTime = normalizeText(safeSnapshot.startTime);
+  state.notes = normalizeText(safeSnapshot.notes);
+  state.currency = normalizeText(safeSnapshot.currency) || 'MXN';
+
+  if (state.mode === MODES.FULL_DAY) {
+    state.durationHours = 12;
+  } else if (
+    state.mode === MODES.HOURLY &&
+    HOURLY_DURATION_OPTIONS.indexOf(nextDuration) >= 0
+  ) {
+    state.durationHours = nextDuration;
+  } else if (state.mode === MODES.HOURLY) {
+    state.durationHours = 2;
+  }
+
+  state.longTermOption =
+    state.mode === MODES.LONG_TERM &&
+    LONG_TERM_OPTIONS.indexOf(nextCustomTerm) >= 0
+      ? nextCustomTerm
+      : '';
+
+  renderAll();
+  return true;
+}
 
   function syncHourlyDurationSelectionUi() {
     const durationButtons = configMount.querySelectorAll('[data-services-hourly-duration]');
@@ -1349,8 +1392,13 @@
     return true;
   }
 
-  bindEvents();
-  renderAll();
+  window.addEventListener('pixkuy:contact-hourly-daily-sync', (event) => {
+  const detail = event && event.detail ? event.detail : {};
+  applyContactHourlyDailySync(detail.snapshot);
+});
+
+bindEvents();
+renderAll();
 
   if (document.readyState === 'complete') {
     applyDeepLinkedHourlyPanelScrollWhenReady(0, null);

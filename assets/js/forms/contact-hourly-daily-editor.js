@@ -859,50 +859,57 @@
   }
 
   function syncView(nodes, options) {
-    const safeOptions = options && typeof options === "object" ? options : {};
-    const shouldSyncReservationState = safeOptions.syncReservationState !== false;
+  const safeOptions = options && typeof options === "object" ? options : {};
+  const shouldSyncReservationState = safeOptions.syncReservationState !== false;
+  const shouldEmitPanelSync = safeOptions.emitPanelSync === true;
 
-    syncDerivedState();
-    syncDateMinimum(nodes);
-    syncModePicker(nodes);
-    syncModeSpecificVisibility(nodes);
-    syncDurationButtons(nodes);
-    syncLongTermButtons(nodes);
-    syncInputs(nodes);
-    syncPrice(nodes);
-    syncDisclaimers(nodes);
-    syncHiddenFields(nodes);
+  syncDerivedState();
+  syncDateMinimum(nodes);
+  syncModePicker(nodes);
+  syncModeSpecificVisibility(nodes);
+  syncDurationButtons(nodes);
+  syncLongTermButtons(nodes);
+  syncInputs(nodes);
+  syncPrice(nodes);
+  syncDisclaimers(nodes);
+  syncHiddenFields(nodes);
 
-    if (shouldSyncReservationState) {
-      syncReservationRequestUiState({
-        skipValidation: false
-      });
-    }
-
-    return true;
-  }
-
-  function syncViewWithoutValidation(nodes) {
-    const form = getReservationForm();
-    const fields =
-      form &&
-      typeof NAMESPACE.getReservationRequestFields === "function"
-        ? NAMESPACE.getReservationRequestFields(form)
-        : null;
-
-    syncView(nodes, {
-      syncReservationState: false
+  if (shouldSyncReservationState) {
+    syncReservationRequestUiState({
+      skipValidation: false
     });
-
-    if (
-      fields &&
-      typeof NAMESPACE.syncReservationRequestState === "function"
-    ) {
-      NAMESPACE.syncReservationRequestState(fields);
-    }
-
-    return true;
   }
+
+  if (shouldEmitPanelSync) {
+    emitContactHourlyDailySync();
+  }
+
+  return true;
+}
+
+  function syncViewWithoutValidation(nodes, options) {
+  const safeOptions = options && typeof options === "object" ? options : {};
+  const form = getReservationForm();
+  const fields =
+    form &&
+    typeof NAMESPACE.getReservationRequestFields === "function"
+      ? NAMESPACE.getReservationRequestFields(form)
+      : null;
+
+  syncView(nodes, {
+    syncReservationState: false,
+    emitPanelSync: safeOptions.emitPanelSync === true
+  });
+
+  if (
+    fields &&
+    typeof NAMESPACE.syncReservationRequestState === "function"
+  ) {
+    NAMESPACE.syncReservationRequestState(fields);
+  }
+
+  return true;
+}
 
   function resetState() {
     state.mode = DEFAULT_MODE;
@@ -957,6 +964,17 @@
       currency: state.currency
     };
   }
+  
+  function emitContactHourlyDailySync() {
+  window.dispatchEvent(new CustomEvent("pixkuy:contact-hourly-daily-sync", {
+    detail: {
+      source: "contact-hourly-daily-editor",
+      snapshot: getTripSnapshot()
+    }
+  }));
+
+  return true;
+}
 
   function applyHandoff(payload) {
     const form = getReservationForm();
@@ -1013,48 +1031,358 @@
   }
 
   function mountPickupController(nodes) {
-    const googlePlacesApi =
-      NAMESPACE.googlePlaces &&
-      typeof NAMESPACE.googlePlaces.createAutocompleteController === "function"
-        ? NAMESPACE.googlePlaces
-        : null;
+  const googlePlacesApi =
+    NAMESPACE.googlePlaces &&
+    typeof NAMESPACE.googlePlaces.createAutocompleteController === "function"
+      ? NAMESPACE.googlePlaces
+      : null;
 
-    destroyPickupController();
+  destroyPickupController();
 
-    if (!nodes || !nodes.pickupInput || !nodes.pickupMount || !googlePlacesApi) {
-      return false;
+  if (!nodes || !nodes.pickupInput || !nodes.pickupMount || !googlePlacesApi) {
+    return false;
+  }
+
+  pickupController = googlePlacesApi.createAutocompleteController({
+    fieldName: "hourly_daily_pickup",
+    input: nodes.pickupInput,
+    mountNode: nodes.pickupMount,
+    hiddenFields: {
+      placeId: nodes.hiddenPickupPlaceId,
+      lat: nodes.hiddenPickupLat,
+      lng: nodes.hiddenPickupLng
+    },
+    language: normalizeText(document.documentElement && document.documentElement.lang) || "es",
+    region: "mx",
+    includedRegionCodes: ["mx"],
+    onSelection: function (selectedPlace, meta) {
+      const fields =
+        typeof NAMESPACE.getReservationRequestFields === "function"
+          ? NAMESPACE.getReservationRequestFields(getReservationForm())
+          : null;
+      const safeMeta = meta && typeof meta === "object" ? meta : {};
+      const shouldPreserveVisibleInput = safeMeta.preserveInputValue === true;
+
+      if (!selectedPlace) {
+        if (shouldPreserveVisibleInput) {
+          return;
+        }
+
+        state.pickup = "";
+        clearPickupPlaceSelection();
+
+        syncView(nodes, {
+          syncReservationState: false,
+          emitPanelSync: true
+        });
+
+        if (
+          fields &&
+          typeof NAMESPACE.syncReservationRequestState === "function"
+        ) {
+          NAMESPACE.syncReservationRequestState(fields);
+        }
+
+        return;
+      }
+
+      applyPickupPlaceSelection(selectedPlace);
+
+      syncView(nodes, {
+        syncReservationState: false,
+        emitPanelSync: true
+      });
+
+      if (
+        fields &&
+        typeof NAMESPACE.syncReservationRequestState === "function"
+      ) {
+        NAMESPACE.syncReservationRequestState(fields);
+      }
+    },
+    onCoverageReject: function () {},
+    onManualFallback: function () {},
+    onError: function () {}
+  });
+
+  pickupController.mount();
+  return true;
+}
+
+  function bindEvents(nodes) {
+  if (nodes.root.dataset.contactHourlyDailyEditorBound === "1") {
+    return false;
+  }
+
+  nodes.root.dataset.contactHourlyDailyEditorBound = "1";
+
+  nodes.modeTrigger.addEventListener("click", function () {
+    const isOpen = nodes.modeTrigger.getAttribute("aria-expanded") === "true";
+
+    if (isOpen) {
+      closeModePicker(nodes);
+      return;
     }
 
-    pickupController = googlePlacesApi.createAutocompleteController({
-      fieldName: "hourly_daily_pickup",
-      input: nodes.pickupInput,
-      mountNode: nodes.pickupMount,
-      hiddenFields: {
-        placeId: nodes.hiddenPickupPlaceId,
-        lat: nodes.hiddenPickupLat,
-        lng: nodes.hiddenPickupLng
-      },
-      language: normalizeText(document.documentElement && document.documentElement.lang) || "es",
-      region: "mx",
-      includedRegionCodes: ["mx"],
-      onSelection: function (selectedPlace, meta) {
-        const fields =
-          typeof NAMESPACE.getReservationRequestFields === "function"
-            ? NAMESPACE.getReservationRequestFields(getReservationForm())
-            : null;
-        const safeMeta = meta && typeof meta === "object" ? meta : {};
-        const shouldPreserveVisibleInput = safeMeta.preserveInputValue === true;
+    openModePicker(nodes);
+  });
 
-        if (!selectedPlace) {
-          if (shouldPreserveVisibleInput) {
-            return;
-          }
+  nodes.modeOptions.forEach(function (option) {
+    option.addEventListener("click", function () {
+      const fields =
+        typeof NAMESPACE.getReservationRequestFields === "function"
+          ? NAMESPACE.getReservationRequestFields(getReservationForm())
+          : null;
 
-          state.pickup = "";
-          clearPickupPlaceSelection();
+      const nextValue = normalizeText(
+        option.getAttribute("data-contact-hourly-daily-mode-option")
+      );
+
+      if (
+        nextValue !== MODES.HOURLY &&
+        nextValue !== MODES.FULL_DAY &&
+        nextValue !== MODES.LONG_TERM
+      ) {
+        return;
+      }
+
+      state.mode = nextValue;
+
+      if (state.mode !== MODES.LONG_TERM) {
+        state.longTermOption = "";
+      }
+
+      if (state.mode === MODES.FULL_DAY) {
+        state.durationHours = 12;
+      } else if (
+        state.mode === MODES.HOURLY &&
+        HOURLY_DURATION_OPTIONS.indexOf(Number(state.durationHours)) === -1
+      ) {
+        state.durationHours = DEFAULT_DURATION_HOURS;
+      }
+
+      closeModePicker(nodes);
+
+      syncView(nodes, {
+        syncReservationState: false,
+        emitPanelSync: true
+      });
+
+      if (
+        fields &&
+        typeof NAMESPACE.syncReservationRequestState === "function"
+      ) {
+        NAMESPACE.syncReservationRequestState(fields);
+      }
+    });
+  });
+
+  nodes.durationButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      const nextValue = Number(
+        button.getAttribute("data-contact-hourly-daily-duration-option")
+      );
+
+      if (HOURLY_DURATION_OPTIONS.indexOf(nextValue) === -1) {
+        return;
+      }
+
+      state.durationHours = nextValue;
+
+      syncViewWithoutValidation(nodes, {
+        emitPanelSync: true
+      });
+    });
+  });
+
+  nodes.longTermButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      const nextValue = normalizeText(
+        button.getAttribute("data-contact-hourly-daily-long-term-option")
+      );
+
+      if (LONG_TERM_OPTIONS.indexOf(nextValue) === -1) {
+        return;
+      }
+
+      state.longTermOption = nextValue;
+
+      syncViewWithoutValidation(nodes, {
+        emitPanelSync: true
+      });
+    });
+  });
+
+  nodes.pickupInput.addEventListener("input", function () {
+    const fields =
+      typeof NAMESPACE.getReservationRequestFields === "function"
+        ? NAMESPACE.getReservationRequestFields(getReservationForm())
+        : null;
+
+    state.pickup = typeof nodes.pickupInput.value === "string"
+      ? nodes.pickupInput.value
+      : "";
+    clearPickupPlaceSelection();
+
+    syncView(nodes, {
+      syncReservationState: false,
+      emitPanelSync: true
+    });
+
+    if (
+      fields &&
+      typeof NAMESPACE.syncReservationRequestState === "function"
+    ) {
+      NAMESPACE.syncReservationRequestState(fields);
+    }
+  });
+
+  nodes.dateInput.addEventListener("input", function () {
+    const fields =
+      typeof NAMESPACE.getReservationRequestFields === "function"
+        ? NAMESPACE.getReservationRequestFields(getReservationForm())
+        : null;
+
+    state.tripDate = normalizeText(nodes.dateInput.value);
+    syncDateMinimum(nodes);
+    state.tripDate = normalizeText(nodes.dateInput.value);
+
+    syncView(nodes, {
+      syncReservationState: false,
+      emitPanelSync: true
+    });
+
+    if (
+      fields &&
+      typeof NAMESPACE.syncReservationRequestState === "function"
+    ) {
+      NAMESPACE.syncReservationRequestState(fields);
+    }
+  });
+
+  nodes.dateInput.addEventListener("change", function () {
+    const fields =
+      typeof NAMESPACE.getReservationRequestFields === "function"
+        ? NAMESPACE.getReservationRequestFields(getReservationForm())
+        : null;
+
+    state.tripDate = normalizeText(nodes.dateInput.value);
+    syncDateMinimum(nodes);
+    state.tripDate = normalizeText(nodes.dateInput.value);
+
+    syncView(nodes, {
+      syncReservationState: false,
+      emitPanelSync: true
+    });
+
+    if (
+      fields &&
+      typeof NAMESPACE.syncReservationRequestState === "function"
+    ) {
+      NAMESPACE.syncReservationRequestState(fields);
+    }
+  });
+
+  nodes.timeInput.addEventListener("input", function () {
+    const fields =
+      typeof NAMESPACE.getReservationRequestFields === "function"
+        ? NAMESPACE.getReservationRequestFields(getReservationForm())
+        : null;
+
+    state.startTime = normalizeText(nodes.timeInput.value);
+
+    syncView(nodes, {
+      syncReservationState: false,
+      emitPanelSync: true
+    });
+
+    if (
+      fields &&
+      typeof NAMESPACE.syncReservationRequestState === "function"
+    ) {
+      NAMESPACE.syncReservationRequestState(fields);
+    }
+  });
+
+  nodes.timeInput.addEventListener("change", function () {
+    const fields =
+      typeof NAMESPACE.getReservationRequestFields === "function"
+        ? NAMESPACE.getReservationRequestFields(getReservationForm())
+        : null;
+
+    state.startTime = normalizeText(nodes.timeInput.value);
+
+    syncView(nodes, {
+      syncReservationState: false,
+      emitPanelSync: true
+    });
+
+    if (
+      fields &&
+      typeof NAMESPACE.syncReservationRequestState === "function"
+    ) {
+      NAMESPACE.syncReservationRequestState(fields);
+    }
+  });
+
+  nodes.notesInput.addEventListener("input", function () {
+    const fields =
+      typeof NAMESPACE.getReservationRequestFields === "function"
+        ? NAMESPACE.getReservationRequestFields(getReservationForm())
+        : null;
+
+    state.notes = typeof nodes.notesInput.value === "string"
+      ? nodes.notesInput.value
+      : "";
+
+    syncView(nodes, {
+      syncReservationState: false,
+      emitPanelSync: true
+    });
+
+    if (
+      fields &&
+      typeof NAMESPACE.syncReservationRequestState === "function"
+    ) {
+      NAMESPACE.syncReservationRequestState(fields);
+    }
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!event.target) {
+      return;
+    }
+
+    if (
+      nodes.modePickerRoot &&
+      nodes.modePickerRoot.contains(event.target)
+    ) {
+      return;
+    }
+
+    closeModePicker(nodes);
+  });
+
+  const form = getReservationForm();
+  if (form) {
+    form.addEventListener("pixkuy:contact-service-change", function (event) {
+      const detail = event && event.detail ? event.detail : {};
+      const previousServiceType = normalizeText(detail.previousServiceType);
+      const nextServiceType = normalizeText(detail.nextServiceType);
+
+      if (
+        previousServiceType !== "hourly_daily" &&
+        nextServiceType === "hourly_daily"
+      ) {
+        window.setTimeout(function () {
+          const fields =
+            typeof NAMESPACE.getReservationRequestFields === "function"
+              ? NAMESPACE.getReservationRequestFields(form)
+              : null;
 
           syncView(nodes, {
-            syncReservationState: false
+            syncReservationState: false,
+            emitPanelSync: true
           });
 
           if (
@@ -1063,307 +1391,13 @@
           ) {
             NAMESPACE.syncReservationRequestState(fields);
           }
-
-          return;
-        }
-
-        applyPickupPlaceSelection(selectedPlace);
-
-        syncView(nodes, {
-          syncReservationState: false
-        });
-
-        if (
-          fields &&
-          typeof NAMESPACE.syncReservationRequestState === "function"
-        ) {
-          NAMESPACE.syncReservationRequestState(fields);
-        }
-      },
-      onCoverageReject: function () {},
-      onManualFallback: function () {},
-      onError: function () {}
+        }, 0);
+      }
     });
-
-    pickupController.mount();
-    return true;
   }
 
-  function bindEvents(nodes) {
-    if (nodes.root.dataset.contactHourlyDailyEditorBound === "1") {
-      return false;
-    }
-
-    nodes.root.dataset.contactHourlyDailyEditorBound = "1";
-
-    nodes.modeTrigger.addEventListener("click", function () {
-      const isOpen = nodes.modeTrigger.getAttribute("aria-expanded") === "true";
-
-      if (isOpen) {
-        closeModePicker(nodes);
-        return;
-      }
-
-      openModePicker(nodes);
-    });
-
-    nodes.modeOptions.forEach(function (option) {
-      option.addEventListener("click", function () {
-        const fields =
-          typeof NAMESPACE.getReservationRequestFields === "function"
-            ? NAMESPACE.getReservationRequestFields(getReservationForm())
-            : null;
-
-        const nextValue = normalizeText(
-          option.getAttribute("data-contact-hourly-daily-mode-option")
-        );
-
-        if (
-          nextValue !== MODES.HOURLY &&
-          nextValue !== MODES.FULL_DAY &&
-          nextValue !== MODES.LONG_TERM
-        ) {
-          return;
-        }
-
-        state.mode = nextValue;
-
-        if (state.mode !== MODES.LONG_TERM) {
-          state.longTermOption = "";
-        }
-
-        if (state.mode === MODES.FULL_DAY) {
-          state.durationHours = 12;
-        } else if (
-          state.mode === MODES.HOURLY &&
-          HOURLY_DURATION_OPTIONS.indexOf(Number(state.durationHours)) === -1
-        ) {
-          state.durationHours = DEFAULT_DURATION_HOURS;
-        }
-
-        closeModePicker(nodes);
-
-        syncView(nodes, {
-          syncReservationState: false
-        });
-
-        if (
-          fields &&
-          typeof NAMESPACE.syncReservationRequestState === "function"
-        ) {
-          NAMESPACE.syncReservationRequestState(fields);
-        }
-      });
-    });
-
-    nodes.durationButtons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        const nextValue = Number(
-          button.getAttribute("data-contact-hourly-daily-duration-option")
-        );
-
-        if (HOURLY_DURATION_OPTIONS.indexOf(nextValue) === -1) {
-          return;
-        }
-
-        state.durationHours = nextValue;
-        syncViewWithoutValidation(nodes);
-      });
-    });
-
-    nodes.longTermButtons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        const nextValue = normalizeText(
-          button.getAttribute("data-contact-hourly-daily-long-term-option")
-        );
-
-        if (LONG_TERM_OPTIONS.indexOf(nextValue) === -1) {
-          return;
-        }
-
-        state.longTermOption = nextValue;
-        syncViewWithoutValidation(nodes);
-      });
-    });
-
-        nodes.pickupInput.addEventListener("input", function () {
-      const fields =
-        typeof NAMESPACE.getReservationRequestFields === "function"
-          ? NAMESPACE.getReservationRequestFields(getReservationForm())
-          : null;
-
-      state.pickup = typeof nodes.pickupInput.value === "string"
-        ? nodes.pickupInput.value
-        : "";
-      clearPickupPlaceSelection();
-
-      syncView(nodes, {
-        syncReservationState: false
-      });
-
-      if (
-        fields &&
-        typeof NAMESPACE.syncReservationRequestState === "function"
-      ) {
-        NAMESPACE.syncReservationRequestState(fields);
-      }
-    });
-
-    nodes.dateInput.addEventListener("input", function () {
-      const fields =
-        typeof NAMESPACE.getReservationRequestFields === "function"
-          ? NAMESPACE.getReservationRequestFields(getReservationForm())
-          : null;
-
-      state.tripDate = normalizeText(nodes.dateInput.value);
-      syncDateMinimum(nodes);
-      state.tripDate = normalizeText(nodes.dateInput.value);
-
-      syncView(nodes, {
-        syncReservationState: false
-      });
-
-      if (
-        fields &&
-        typeof NAMESPACE.syncReservationRequestState === "function"
-      ) {
-        NAMESPACE.syncReservationRequestState(fields);
-      }
-    });
-
-    nodes.dateInput.addEventListener("change", function () {
-      const fields =
-        typeof NAMESPACE.getReservationRequestFields === "function"
-          ? NAMESPACE.getReservationRequestFields(getReservationForm())
-          : null;
-
-      state.tripDate = normalizeText(nodes.dateInput.value);
-      syncDateMinimum(nodes);
-      state.tripDate = normalizeText(nodes.dateInput.value);
-
-      syncView(nodes, {
-        syncReservationState: false
-      });
-
-      if (
-        fields &&
-        typeof NAMESPACE.syncReservationRequestState === "function"
-      ) {
-        NAMESPACE.syncReservationRequestState(fields);
-      }
-    });
-
-    nodes.timeInput.addEventListener("input", function () {
-      const fields =
-        typeof NAMESPACE.getReservationRequestFields === "function"
-          ? NAMESPACE.getReservationRequestFields(getReservationForm())
-          : null;
-
-      state.startTime = normalizeText(nodes.timeInput.value);
-
-      syncView(nodes, {
-        syncReservationState: false
-      });
-
-      if (
-        fields &&
-        typeof NAMESPACE.syncReservationRequestState === "function"
-      ) {
-        NAMESPACE.syncReservationRequestState(fields);
-      }
-    });
-
-    nodes.timeInput.addEventListener("change", function () {
-      const fields =
-        typeof NAMESPACE.getReservationRequestFields === "function"
-          ? NAMESPACE.getReservationRequestFields(getReservationForm())
-          : null;
-
-      state.startTime = normalizeText(nodes.timeInput.value);
-
-      syncView(nodes, {
-        syncReservationState: false
-      });
-
-      if (
-        fields &&
-        typeof NAMESPACE.syncReservationRequestState === "function"
-      ) {
-        NAMESPACE.syncReservationRequestState(fields);
-      }
-    });
-
-    nodes.notesInput.addEventListener("input", function () {
-      const fields =
-        typeof NAMESPACE.getReservationRequestFields === "function"
-          ? NAMESPACE.getReservationRequestFields(getReservationForm())
-          : null;
-
-      state.notes = typeof nodes.notesInput.value === "string"
-        ? nodes.notesInput.value
-        : "";
-
-      syncView(nodes, {
-        syncReservationState: false
-      });
-
-      if (
-        fields &&
-        typeof NAMESPACE.syncReservationRequestState === "function"
-      ) {
-        NAMESPACE.syncReservationRequestState(fields);
-      }
-    });
-
-    document.addEventListener("click", function (event) {
-      if (!event.target) {
-        return;
-      }
-
-      if (
-        nodes.modePickerRoot &&
-        nodes.modePickerRoot.contains(event.target)
-      ) {
-        return;
-      }
-
-      closeModePicker(nodes);
-    });
-
-    const form = getReservationForm();
-    if (form) {
-      form.addEventListener("pixkuy:contact-service-change", function (event) {
-        const detail = event && event.detail ? event.detail : {};
-        const previousServiceType = normalizeText(detail.previousServiceType);
-        const nextServiceType = normalizeText(detail.nextServiceType);
-
-        if (
-          previousServiceType !== "hourly_daily" &&
-          nextServiceType === "hourly_daily"
-        ) {
-          window.setTimeout(function () {
-            const fields =
-              typeof NAMESPACE.getReservationRequestFields === "function"
-                ? NAMESPACE.getReservationRequestFields(form)
-                : null;
-
-            syncView(nodes, {
-              syncReservationState: false
-            });
-
-            if (
-              fields &&
-              typeof NAMESPACE.syncReservationRequestState === "function"
-            ) {
-              NAMESPACE.syncReservationRequestState(fields);
-            }
-          }, 0);
-        }
-      });
-    }
-
-    return true;
-  }
+  return true;
+}
 
   function bindI18nLanguageSync(nodes) {
     if (!nodes || !nodes.root || !window) {
