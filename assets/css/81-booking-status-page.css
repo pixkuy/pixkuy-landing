@@ -1,0 +1,170 @@
+/* assets/css/81-booking-status-page.css
+   Página pública de estado post-pago Booking API.
+   Desktop first.
+   No incluye:
+   - submit de formularios
+   - Netlify Forms
+   - modal legacy
+   - retry checkout
+   - lógica móvil app-like
+*/
+
+.booking-status-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8vh 6vw;
+  background:#0f1113;
+}
+
+.booking-status{
+  width:min(760px, 100%);
+}
+
+.booking-status__brand{
+  margin-bottom:28px;
+}
+
+.booking-status__logo{
+  display:block;
+  width:154px;
+  height:auto;
+}
+
+.booking-status__content{
+  padding:28px 0 0;
+  border-top:1px solid rgba(255,255,255,.12);
+}
+
+.booking-status__state{
+  margin:0 0 12px;
+  color:rgba(244,242,238,.68);
+  font-size:14px;
+  line-height:1.4;
+}
+
+.booking-status__title{
+  margin:0 0 16px;
+  max-width:680px;
+  color:var(--fg);
+  font-size:clamp(36px, 5vw, 56px);
+  line-height:1.05;
+  letter-spacing:-.03em;
+}
+
+.booking-status__lead{
+  margin:0;
+  max-width:680px;
+  color:rgba(244,242,238,.78);
+  font-size:18px;
+  line-height:1.55;
+}
+
+.booking-status__details{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:1px;
+  margin:28px 0 0;
+  padding:0;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:10px;
+  background:rgba(255,255,255,.10);
+}
+
+.booking-status__details[hidden]{
+  display:none !important;
+}
+
+.booking-status__detail{
+  margin:0;
+  padding:16px;
+  background:#111315;
+}
+
+.booking-status__detail dt{
+  margin:0 0 6px;
+  color:rgba(244,242,238,.58);
+  font-size:13px;
+  line-height:1.3;
+}
+
+.booking-status__detail dd{
+  margin:0;
+  color:var(--fg);
+  font-size:16px;
+  line-height:1.35;
+  font-weight:600;
+}
+
+.booking-status__notice{
+  margin-top:24px;
+  padding:14px 16px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  background:rgba(255,255,255,.03);
+  color:rgba(244,242,238,.78);
+  font-size:15px;
+  line-height:1.5;
+}
+
+.booking-status__notice[hidden]{
+  display:none !important;
+}
+
+.booking-status__notice[data-booking-status-tone="success"]{
+  border-color:rgba(31,122,109,.48);
+  background:rgba(31,122,109,.12);
+  color:rgba(244,242,238,.88);
+}
+
+.booking-status__notice[data-booking-status-tone="warning"]{
+  border-color:rgba(255,224,140,.36);
+  background:rgba(255,224,140,.08);
+  color:rgba(244,242,238,.88);
+}
+
+.booking-status__notice[data-booking-status-tone="error"]{
+  border-color:rgba(212,106,106,.38);
+  background:rgba(212,106,106,.08);
+  color:#ffd0d0;
+}
+
+.booking-status__actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:28px;
+}
+
+.booking-status__primary{
+  margin-top:0;
+}
+
+.booking-status__secondary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:0 18px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:8px;
+  background:transparent;
+  color:var(--fg);
+  text-decoration:none;
+  font-size:14px;
+  line-height:1;
+  font-weight:600;
+}
+
+.booking-status__secondary:hover{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.22);
+}
+
+.booking-status__secondary:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+}

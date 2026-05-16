@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" data-booking-status-i18n="pending">
+<head>
+  <meta charset="utf-8">
+  <title>Pixkuy Mobility</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0f1113">
+  <meta name="color-scheme" content="dark light">
+
+  <link rel="stylesheet" href="assets/css/00-tokens.css">
+  <link rel="stylesheet" href="assets/css/10-base.css">
+  <link rel="stylesheet" href="assets/css/20-components.css">
+  <link rel="stylesheet" href="assets/css/30-sections.css">
+  <link rel="stylesheet" href="assets/css/81-booking-status-page.css">
+  <link rel="stylesheet" href="assets/css/90-a11y.css">
+</head>
+
+<body>
+  <main class="booking-status-page" data-booking-status-page="success">
+    <section
+      class="booking-status"
+      aria-labelledby="booking-status-title"
+      data-booking-status-root
+    >
+      <div class="booking-status__brand">
+        <img
+          class="booking-status__logo"
+          src="assets/img/pixkuy-logo-white.webp"
+          alt="Pixkuy Mobility"
+          width="154"
+          height="45"
+          loading="eager"
+          decoding="async"
+        >
+      </div>
+
+      <div class="booking-status__content">
+        <p
+          class="booking-status__state"
+          data-booking-status-state
+        ></p>
+
+        <h1
+          id="booking-status-title"
+          class="booking-status__title"
+          data-booking-status-title
+        ></h1>
+
+        <p
+          class="booking-status__lead"
+          data-booking-status-lead
+        ></p>
+
+        <dl
+          class="booking-status__details"
+          data-booking-status-details
+          hidden
+        >
+          <div class="booking-status__detail">
+            <dt data-booking-status-label="publicCode"></dt>
+            <dd data-booking-status-public-code></dd>
+          </div>
+
+          <div class="booking-status__detail">
+            <dt data-booking-status-label="payment"></dt>
+            <dd data-booking-status-payment></dd>
+          </div>
+
+          <div class="booking-status__detail">
+            <dt data-booking-status-label="date"></dt>
+            <dd data-booking-status-date></dd>
+          </div>
+
+          <div class="booking-status__detail">
+            <dt data-booking-status-label="time"></dt>
+            <dd data-booking-status-time></dd>
+          </div>
+        </dl>
+
+        <div
+          class="booking-status__notice"
+          data-booking-status-notice
+          hidden
+        ></div>
+
+        <div class="booking-status__actions">
+          <a
+            class="cta booking-status__primary"
+            href="/"
+            data-booking-status-primary
+          ></a>
+
+          <a
+            class="booking-status__secondary"
+            href="https://wa.me/525562148704"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-booking-status-whatsapp
+          ></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.PIXKUY_BOOKING_STATUS_CONFIG = {
+      apiBaseUrl: "",
+      publicSiteKey: "local_pixkuy_site_key"
+    };
+  </script>
+  <script src="assets/js/forms/booking-status-page.js"></script>
+</body>
+</html>

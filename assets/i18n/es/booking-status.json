@@ -1,0 +1,83 @@
+{
+  "bookingStatus": {
+    "meta": {
+      "successTitle": "Reserva recibida — Pixkuy Mobility"
+    },
+    "loading": {
+      "state": "Consultando estado de la reserva",
+      "title": "Estamos verificando tu pago",
+      "lead": "Estamos consultando el estado actualizado de tu reserva. Esta pantalla no confirma el pago por sí sola."
+    },
+    "details": {
+      "publicCode": "Código de reserva",
+      "payment": "Estado del pago",
+      "date": "Fecha del servicio",
+      "time": "Hora del servicio",
+      "empty": "—"
+    },
+    "paymentLabels": {
+      "confirmed": "Confirmada",
+      "pending_payment": "Pago pendiente",
+      "paid": "Pagado",
+      "hold_expired": "Reserva temporal caducada",
+      "payment_mismatch": "Pago en revisión",
+      "payment_after_expiry": "Pago recibido fuera de ventana",
+      "pending_manual_review": "Revisión manual",
+      "notAvailable": "No disponible"
+    },
+    "confirmed": {
+      "state": "Reserva confirmada",
+      "title": "Tu reserva está confirmada",
+      "lead": "Hemos recibido el pago correctamente. El equipo de Pixkuy revisará los detalles operativos y continuará la coordinación contigo.",
+      "notice": "La fecha y hora mostradas corresponden a Ciudad de México. No se convierten a la zona horaria del dispositivo."
+    },
+    "pending": {
+      "state": "Pago en verificación",
+      "title": "Estamos verificando tu pago",
+      "lead": "Stripe puede tardar unos instantes en notificar el resultado. Si ya pagaste, espera un momento y actualiza esta página.",
+      "notice": "Esta pantalla solo muestra el estado recibido desde Booking API. La reserva se confirma únicamente cuando el webhook de Stripe queda procesado."
+    },
+    "manualReview": {
+      "state": "Revisión manual",
+      "title": "Tu reserva requiere revisión",
+      "lead": "Hemos detectado una situación que debe revisar el equipo de Pixkuy antes de confirmar la reserva.",
+      "defaultNotice": "Contacta con Pixkuy si necesitas aclarar el estado de esta reserva.",
+      "paymentMismatchNotice": "El importe pagado no coincide con el importe esperado. No se ha confirmado la reserva automáticamente.",
+      "paymentAfterExpiryNotice": "El pago llegó cuando la ventana temporal de la reserva ya no estaba vigente. Revisaremos el caso manualmente."
+    },
+    "expired": {
+      "state": "Reserva temporal caducada",
+      "title": "La reserva temporal ha caducado",
+      "lead": "La ventana temporal de pago ya no está activa. Para reservar, vuelve a iniciar el proceso o contacta con Pixkuy.",
+      "notice": "No se ha confirmado ninguna reserva con este estado."
+    },
+    "unknown": {
+      "state": "Estado no disponible",
+      "title": "No hemos podido confirmar el estado",
+      "lead": "La respuesta recibida no permite mostrar una confirmación clara. Contacta con Pixkuy para revisar tu caso.",
+      "notice": "No se ha confirmado ninguna reserva desde esta pantalla."
+    },
+    "missingToken": {
+      "state": "Token no disponible",
+      "title": "No podemos consultar esta reserva",
+      "lead": "Falta el token público de la reserva en la URL. Abre de nuevo el enlace recibido tras el pago.",
+      "notice": "No se ha realizado ninguna consulta al backend."
+    },
+    "notFound": {
+      "state": "Reserva no encontrada",
+      "title": "No encontramos esta reserva",
+      "lead": "El enlace no corresponde a una reserva pública disponible o ya no es válido.",
+      "notice": "Revisa el enlace o contacta con Pixkuy."
+    },
+    "requestError": {
+      "state": "Error de consulta",
+      "title": "No pudimos consultar el estado",
+      "lead": "Ha ocurrido un problema al conectar con Booking API. Inténtalo de nuevo en unos instantes.",
+      "notice": "No se ha confirmado ninguna reserva desde esta pantalla."
+    },
+    "actions": {
+      "primary": "Volver a Pixkuy",
+      "whatsapp": "Hablar por WhatsApp"
+    }
+  }
+}
