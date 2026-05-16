@@ -76,8 +76,11 @@
       "notice": "No se ha confirmado ninguna reserva desde esta pantalla."
     },
     "actions": {
-      "primary": "Volver a Pixkuy",
-      "whatsapp": "Hablar por WhatsApp"
-    }
+  "primary": "Volver al inicio",
+  "whatsapp": "Hablar por WhatsApp"
+},
+"mobile": {
+  "close": "Cerrar"
+}
   }
 }

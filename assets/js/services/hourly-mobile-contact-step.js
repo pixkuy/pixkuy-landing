@@ -44,7 +44,7 @@
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
   }
-
+  
   function normalizePhoneValue(value) {
     return String(value || "")
       .trim()
@@ -955,11 +955,11 @@
     const isContactValid = validateContactStep();
     let isFormValid;
 
-    if (!isContactValid) {
+    if (!isContactValid) {      
       return false;
     }
 
-    if (!hasCompleteHourlySnapshot(snapshot)) {
+    if (!hasCompleteHourlySnapshot(snapshot)) {      
       showGlobalError();
       return false;
     }
@@ -976,10 +976,9 @@
     trackHourlyMobileContactRequest(snapshot);
 
     if (isTransactionalHourlySnapshot(snapshot)) {
-      if (dispatchTransactionalCheckoutSubmit(form)) {
+      if (dispatchTransactionalCheckoutSubmit(form)) {        
         return true;
       }
-
       showGlobalError();
       return false;
     }

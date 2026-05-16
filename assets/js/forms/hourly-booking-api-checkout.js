@@ -23,7 +23,7 @@
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
   }
-
+  
   function getConfig() {
     var config = window.PIXKUY_BOOKING_API_CONFIG;
     var hasExplicitApiBaseUrl;
@@ -448,7 +448,7 @@
       return;
     }
 
-    if (!api.refreshReservationRequestValidationUX(fields)) {
+    if (!api.refreshReservationRequestValidationUX(fields)) {      
       return;
     }
 
@@ -462,7 +462,7 @@
       .then(function (recaptchaToken) {
         var payload = buildCheckoutPayload(form, data, recaptchaToken);
 
-        if (!payload) {
+        if (!payload) {          
           throw new Error("INVALID_HOURLY_CHECKOUT_PAYLOAD");
         }
 
@@ -482,10 +482,10 @@
               : "BOOKING_API_CHECKOUT_FAILED"
           );
         }
-
+        
         redirectToCheckout(checkoutUrl);
       })
-      .catch(function () {
+      .catch(function (error) {        
         setFormBusy(form, false);
         showCheckoutError(form);
       });

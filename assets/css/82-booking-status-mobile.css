@@ -1,0 +1,307 @@
+/* assets/css/82-booking-status-mobile.css
+   Booking success mobile UX.
+   Alcance:
+   - solo móvil
+   - página post-pago Booking API
+   - replica comportamiento visual tipo success sheet móvil
+   - no toca desktop
+   - no toca contact-success-modal
+   - no toca Netlify Forms
+*/
+
+.booking-status-mobile{
+  display:none;
+}
+
+.booking-status-mobile[hidden]{
+  display:none !important;
+}
+
+body.booking-status-mobile-lock{
+  overflow:hidden !important;
+}
+
+@media (max-width:720px){
+  html:has(body.booking-status-mobile-lock){
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  body.booking-status-mobile-lock{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100svh;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  .booking-status-page{
+    min-height:100svh;
+    height:100svh;
+    display:block;
+    padding:0;
+    overflow:hidden;
+    background:#0f1113;
+  }
+
+  .booking-status--desktop{
+    display:none !important;
+  }
+
+  .booking-status-mobile{
+    position:fixed;
+    inset:0;
+    z-index:120;
+    display:block;
+    background:rgba(0,0,0,.64);
+    overscroll-behavior:none;
+  }
+
+  .booking-status-mobile[aria-hidden="true"]{
+    pointer-events:none;
+  }
+
+  .booking-status-mobile[aria-hidden="false"]{
+    pointer-events:auto;
+  }
+
+  .booking-status-mobile__backdrop{
+    position:absolute;
+    inset:0;
+  }
+
+  .booking-status-mobile__panel{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+
+    box-sizing:border-box;
+    width:100%;
+    max-height:calc(100svh - env(safe-area-inset-top));
+
+    display:grid;
+    grid-template-rows:auto auto auto auto auto auto;
+    gap:0;
+
+    padding:
+      18px
+      18px
+      calc(14px + env(safe-area-inset-bottom));
+
+    border:1px solid rgba(255,255,255,.12);
+    border-right:0;
+    border-bottom:0;
+    border-left:0;
+    border-radius:16px 16px 0 0;
+
+    background:#111315;
+    color:var(--fg);
+    box-shadow:0 -12px 34px rgba(0,0,0,.34);
+    outline:none;
+    overflow:hidden;
+  }
+
+  .booking-status-mobile__close{
+    position:absolute;
+    top:11px;
+    right:12px;
+    z-index:2;
+
+    width:36px;
+    height:36px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:999px;
+
+    background:rgba(255,255,255,.04);
+    color:rgba(244,242,238,.86);
+    box-shadow:none;
+
+    font:inherit;
+    font-size:22px;
+    line-height:1;
+    font-weight:500;
+
+    cursor:pointer;
+  }
+
+  .booking-status-mobile__close:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:3px;
+  }
+
+  .booking-status-mobile__brand{
+    margin:0 44px 10px 0;
+  }
+
+  .booking-status-mobile__logo{
+    display:block;
+    width:90px;
+    height:auto;
+    opacity:.86;
+  }
+
+  .booking-status-mobile__state{
+    margin:0 44px 7px 0;
+    color:rgba(244,242,238,.62);
+    font-size:12px;
+    line-height:1.25;
+    font-weight:700;
+  }
+
+  .booking-status-mobile__title{
+    margin:0 44px 9px 0;
+    color:var(--fg);
+    font-size:29px;
+    line-height:1.04;
+    letter-spacing:-.035em;
+  }
+
+  .booking-status-mobile__lead{
+    margin:0;
+    color:rgba(244,242,238,.82);
+    font-size:14px;
+    line-height:1.34;
+  }
+
+  .booking-status-mobile__details{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:1px;
+
+    margin:12px 0 0;
+    padding:0;
+
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:10px;
+
+    background:rgba(255,255,255,.10);
+  }
+
+  .booking-status-mobile__details[hidden]{
+    display:none !important;
+  }
+
+  .booking-status-mobile__detail{
+    min-width:0;
+    margin:0;
+    padding:9px 10px;
+    background:#111315;
+  }
+
+  .booking-status-mobile__detail dt{
+    margin:0 0 4px;
+    color:rgba(244,242,238,.56);
+    font-size:10.5px;
+    line-height:1.2;
+    font-weight:700;
+  }
+
+  .booking-status-mobile__detail dd{
+    margin:0;
+    min-width:0;
+
+    color:var(--fg);
+    font-size:13.5px;
+    line-height:1.2;
+    font-weight:750;
+
+    overflow-wrap:anywhere;
+  }
+
+  .booking-status-mobile__notice{
+    margin-top:11px;
+    padding:9px 10px;
+
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+
+    background:rgba(255,255,255,.03);
+    color:rgba(244,242,238,.78);
+
+    font-size:12px;
+    line-height:1.32;
+  }
+
+  .booking-status-mobile__notice[hidden]{
+    display:none !important;
+  }
+
+  .booking-status-mobile__notice[data-booking-status-tone="success"]{
+    border-color:rgba(31,122,109,.48);
+    background:rgba(31,122,109,.12);
+    color:rgba(244,242,238,.88);
+  }
+
+  .booking-status-mobile__notice[data-booking-status-tone="warning"]{
+    border-color:rgba(255,224,140,.36);
+    background:rgba(255,224,140,.08);
+    color:rgba(244,242,238,.88);
+  }
+
+  .booking-status-mobile__notice[data-booking-status-tone="error"]{
+    border-color:rgba(212,106,106,.38);
+    background:rgba(212,106,106,.08);
+    color:#ffd0d0;
+  }
+
+  .booking-status-mobile__actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+
+    margin-top:12px;
+  }
+
+  .booking-status-mobile__primary,
+  .booking-status-mobile__secondary{
+    box-sizing:border-box;
+    width:100%;
+    min-width:0;
+    min-height:44px;
+    height:44px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    margin:0;
+    padding:0 10px;
+    border-radius:9px;
+
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    font-weight:800;
+    text-align:center;
+    text-decoration:none;
+    white-space:nowrap;
+  }
+
+  .booking-status-mobile__primary{
+    border:0;
+    background:rgba(31,122,109,.86);
+    color:rgba(255,249,238,.98);
+  }
+
+  .booking-status-mobile__secondary{
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.03);
+    color:var(--fg);
+  }
+
+  .booking-status-mobile__primary:focus-visible,
+  .booking-status-mobile__secondary:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+}

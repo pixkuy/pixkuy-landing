@@ -14,15 +14,16 @@
   <link rel="stylesheet" href="assets/css/20-components.css">
   <link rel="stylesheet" href="assets/css/30-sections.css">
   <link rel="stylesheet" href="assets/css/81-booking-status-page.css">
+  <link rel="stylesheet" href="assets/css/82-booking-status-mobile.css">
   <link rel="stylesheet" href="assets/css/90-a11y.css">
 </head>
 
 <body>
   <main class="booking-status-page" data-booking-status-page="success">
     <section
-      class="booking-status"
+      class="booking-status booking-status--desktop"
       aria-labelledby="booking-status-title"
-      data-booking-status-root
+      data-booking-status-desktop
     >
       <div class="booking-status__brand">
         <img
@@ -94,7 +95,112 @@
 
           <a
             class="booking-status__secondary"
-            href="https://wa.me/525562148704"
+            href="https://wa.me/5215528837400"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-booking-status-whatsapp
+          ></a>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="booking-status-mobile"
+      aria-labelledby="booking-status-mobile-title"
+      aria-hidden="true"
+      hidden
+      data-booking-status-mobile
+    >
+      <div
+        class="booking-status-mobile__backdrop"
+        aria-hidden="true"
+        data-booking-status-mobile-close
+      ></div>
+
+      <div
+        class="booking-status-mobile__panel"
+        role="document"
+        tabindex="-1"
+        data-booking-status-mobile-panel
+      >
+        <button
+          type="button"
+          class="booking-status-mobile__close"
+          data-booking-status-mobile-close
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+
+        <div class="booking-status-mobile__brand">
+          <img
+            class="booking-status-mobile__logo"
+            src="assets/img/pixkuy-logo-white.webp"
+            alt="Pixkuy Mobility"
+            width="96"
+            height="28"
+            loading="eager"
+            decoding="async"
+          >
+        </div>
+
+        <p
+          class="booking-status-mobile__state"
+          data-booking-status-state
+        ></p>
+
+        <h1
+          id="booking-status-mobile-title"
+          class="booking-status-mobile__title"
+          data-booking-status-title
+        ></h1>
+
+        <p
+          class="booking-status-mobile__lead"
+          data-booking-status-lead
+        ></p>
+
+        <dl
+          class="booking-status-mobile__details"
+          data-booking-status-details
+          hidden
+        >
+          <div class="booking-status-mobile__detail">
+            <dt data-booking-status-label="publicCode"></dt>
+            <dd data-booking-status-public-code></dd>
+          </div>
+
+          <div class="booking-status-mobile__detail">
+            <dt data-booking-status-label="payment"></dt>
+            <dd data-booking-status-payment></dd>
+          </div>
+
+          <div class="booking-status-mobile__detail">
+            <dt data-booking-status-label="date"></dt>
+            <dd data-booking-status-date></dd>
+          </div>
+
+          <div class="booking-status-mobile__detail">
+            <dt data-booking-status-label="time"></dt>
+            <dd data-booking-status-time></dd>
+          </div>
+        </dl>
+
+        <div
+          class="booking-status-mobile__notice"
+          data-booking-status-notice
+          hidden
+        ></div>
+
+        <div class="booking-status-mobile__actions">
+          <a
+            class="booking-status-mobile__primary"
+            href="/"
+            data-booking-status-primary
+          ></a>
+
+          <a
+            class="booking-status-mobile__secondary"
+            href="https://wa.me/5215528837400"
             target="_blank"
             rel="noopener noreferrer"
             data-booking-status-whatsapp
@@ -110,6 +216,8 @@
       publicSiteKey: "local_pixkuy_site_key"
     };
   </script>
-  <script src="assets/js/forms/booking-status-page.js"></script>
+  <script src="assets/js/forms/booking-status-state.js"></script>
+  <script src="assets/js/forms/booking-status-desktop.js"></script>
+  <script src="assets/js/forms/booking-status-mobile.js"></script>
 </body>
 </html>
