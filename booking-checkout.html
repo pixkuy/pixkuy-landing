@@ -14,10 +14,42 @@
   <link rel="stylesheet" href="assets/css/20-components.css">
   <link rel="stylesheet" href="assets/css/30-sections.css">
   <link rel="stylesheet" href="assets/css/81-booking-status-page.css">
-  <link rel="stylesheet" href="assets/css/90-a11y.css">
+<link rel="stylesheet" href="assets/css/50-mobile-topbar.css">
+<link rel="stylesheet" href="assets/css/90-a11y.css">
 </head>
 
-<body>
+<body class="booking-status-shell">
+  <div class="mobile-topbar" data-mobile-topbar>
+    <div class="mobile-topbar__brand">
+      <img
+        src="assets/img/pixkuy-logo_only words-white.webp"
+        alt="Pixkuy Mobility"
+        width="224"
+        height="64"
+        loading="eager"
+        decoding="async"
+      >
+    </div>
+  </div>
+    <nav class="lang" aria-label="Language selector">
+    <button
+      class="lang-trigger"
+      id="lang-trigger"
+      type="button"
+      aria-haspopup="menu"
+      aria-expanded="false"
+    >
+      <span class="lang-current" aria-hidden="true"></span>
+      <span class="visually-hidden" data-i18n="ui.language"></span>
+    </button>
+
+    <ul
+      class="lang-menu"
+      role="menu"
+      aria-labelledby="lang-trigger"
+      hidden
+    ></ul>
+  </nav>
   <main class="booking-status-page" data-booking-checkout-page>
     <section
       class="booking-status"
@@ -81,6 +113,13 @@
     </section>
   </main>
 
-  <script src="assets/js/forms/booking-checkout-handoff.js"></script>
+  <script src="assets/js/i18n/fallback.es.js"></script>
+<script src="assets/js/i18n/catalog.js"></script>
+<script src="assets/js/i18n/loader.js"></script>
+<script src="assets/js/i18n/dom.js"></script>
+<script src="assets/js/i18n/selector.js"></script>
+<script src="assets/js/i18n.js"></script>
+
+<script src="assets/js/forms/booking-checkout-handoff.js"></script>
 </body>
 </html>

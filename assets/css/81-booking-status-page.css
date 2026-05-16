@@ -174,3 +174,33 @@
   outline:2px solid rgba(31,122,109,.95);
   outline-offset:3px;
 }
+
+@media (max-width:720px){
+  .booking-status-page{
+    padding-top:calc(72px + env(safe-area-inset-top));
+  }
+
+  .booking-status__brand{
+    display:none;
+  }
+}
+.booking-status-shell .lang{
+  display:none;
+}
+
+@media (max-width:720px){
+  .booking-status-shell .lang{
+    display:inline-flex;
+  }
+}
+.booking-status-shell .visually-hidden{
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  padding:0 !important;
+  margin:-1px !important;
+  overflow:hidden !important;
+  clip:rect(0, 0, 0, 0) !important;
+  white-space:nowrap !important;
+  border:0 !important;
+}

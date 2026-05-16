@@ -22,6 +22,10 @@ body.booking-status-mobile-lock{
 }
 
 @media (max-width:720px){
+  .mobile-topbar{
+    z-index:140;
+  }
+  
   html:has(body.booking-status-mobile-lock){
     height:100%;
     overflow:hidden;
@@ -52,7 +56,10 @@ body.booking-status-mobile-lock{
 
   .booking-status-mobile{
     position:fixed;
-    inset:0;
+    top:calc(54px + env(safe-area-inset-top));
+    right:0;
+    bottom:0;
+    left:0;
     z-index:120;
     display:block;
     background:rgba(0,0,0,.64);
@@ -139,7 +146,7 @@ body.booking-status-mobile-lock{
   }
 
   .booking-status-mobile__brand{
-    margin:0 44px 10px 0;
+    display:none;
   }
 
   .booking-status-mobile__logo{
