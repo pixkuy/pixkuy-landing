@@ -603,23 +603,6 @@ function getDeepLinkedToursScrollTarget() {
   return panelRoot || null;
 }
 
-function ensureDeepLinkedTourConfigVisible() {
-  const targetNode = getDeepLinkedToursScrollTarget();
-  if (!targetNode) return;
-
-  const requestedTourId = getRequestedTourFromUrl();
-  const topSafeOffset = requestedTourId ? 24 : 8;
-  const targetRect = targetNode.getBoundingClientRect();
-  const targetTop = Math.max(0, window.scrollY + targetRect.top - topSafeOffset);
-
-  if (Math.abs(targetTop - window.scrollY) < 4) return;
-
-  window.scrollTo({
-    top: targetTop,
-    behavior: 'smooth'
-  });
-}
-
 function applyDeepLinkedToursScrollWhenReady(attempt, previousTop) {
   if (deepLinkedTourScrollDone) return;
 

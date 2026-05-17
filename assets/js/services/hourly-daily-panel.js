@@ -30,17 +30,20 @@
   ]);
 
   const state = {
-    mode: MODES.HOURLY,
-    vehicleType: 'executive_van',
-    pickup: '',
-    tripDate: '',
-    startTime: '',
-    durationHours: 2,
-    longTermOption: '',
-    notes: '',
-    price: null,
-    currency: 'MXN'
-  };
+  mode: MODES.HOURLY,
+  vehicleType: 'executive_van',
+  pickup: '',
+  pickupPlaceId: '',
+  pickupLat: '',
+  pickupLng: '',
+  tripDate: '',
+  startTime: '',
+  durationHours: 2,
+  longTermOption: '',
+  notes: '',
+  price: null,
+  currency: 'MXN'
+};
   
   let pickupControllerHandle = null;
 
@@ -234,27 +237,80 @@
       input: input,
       mountNode: mountNode,
       onManualInput: function (value) {
-        state.pickup = typeof value === 'string' ? value : '';
-        syncDerivedState();
-        syncLiveFieldValues();
-      },
-      onPlaceSelected: function (selectedPlace) {
-        state.pickup = normalizeText(
-          selectedPlace &&
-          (selectedPlace.label || selectedPlace.formattedAddress || selectedPlace.displayName)
-        );
-        syncDerivedState();
-        syncLiveFieldValues();
-      },
-      onClearSelection: function () {
-        state.pickup = '';
-        syncDerivedState();
-        syncLiveFieldValues();
-      },
+  state.pickup = typeof value === 'string' ? value : '';
+  state.pickupPlaceId = '';
+  state.pickupLat = '';
+  state.pickupLng = '';
+  syncDerivedState();
+  syncLiveFieldValues();
+},
+onPlaceSelected: function (selectedPlace) {
+  state.pickup = normalizeText(
+    selectedPlace &&
+    (selectedPlace.label || selectedPlace.formattedAddress || selectedPlace.displayName)
+  );
+  state.pickupPlaceId = normalizeText(selectedPlace && selectedPlace.placeId);
+  state.pickupLat = normalizeText(
+    selectedPlace && selectedPlace.lat !== undefined && selectedPlace.lat !== null
+      ? String(selectedPlace.lat)
+      : ''
+  );
+  state.pickupLng = normalizeText(
+    selectedPlace && selectedPlace.lng !== undefined && selectedPlace.lng !== null
+      ? String(selectedPlace.lng)
+      : ''
+  );
+  syncDerivedState();
+  syncLiveFieldValues();
+},
+onClearSelection: function () {
+  state.pickup = '';
+  state.pickupPlaceId = '';
+  state.pickupLat = '';
+  state.pickupLng = '';
+  syncDerivedState();
+  syncLiveFieldValues();
+},
       onError: function () {}
     });
 
-    return Boolean(pickupControllerHandle);
+    input.addEventListener("pixkuy:hourly-daily-pickup-selected", function (event) {
+  const selectedPlace =
+    event && event.detail && event.detail.selectedPlace
+      ? event.detail.selectedPlace
+      : null;
+  const label =
+    event && event.detail && event.detail.label
+      ? event.detail.label
+      : "";
+
+  if (!selectedPlace) {
+    return;
+  }
+
+  state.pickup = normalizeText(
+    label ||
+      selectedPlace.label ||
+      selectedPlace.formattedAddress ||
+      selectedPlace.displayName
+  );
+  state.pickupPlaceId = normalizeText(selectedPlace.placeId);
+  state.pickupLat = normalizeText(
+    selectedPlace.lat !== undefined && selectedPlace.lat !== null
+      ? String(selectedPlace.lat)
+      : ""
+  );
+  state.pickupLng = normalizeText(
+    selectedPlace.lng !== undefined && selectedPlace.lng !== null
+      ? String(selectedPlace.lng)
+      : ""
+  );
+
+  syncDerivedState();
+  syncLiveFieldValues();
+});
+	
+	return Boolean(pickupControllerHandle);
   }
 
   function getTemporalPricingApi() {
@@ -1128,8 +1184,11 @@ function applyContactHourlyDailySync(snapshot) {
 
   state.mode = nextMode;
   state.vehicleType = normalizeText(safeSnapshot.vehicleType) || 'executive_van';
-  state.pickup = normalizeText(safeSnapshot.pickup);
-  state.tripDate = normalizeText(safeSnapshot.tripDate);
+state.pickup = normalizeText(safeSnapshot.pickup);
+state.pickupPlaceId = normalizeText(safeSnapshot.pickupPlaceId);
+state.pickupLat = normalizeText(safeSnapshot.pickupLat);
+state.pickupLng = normalizeText(safeSnapshot.pickupLng);
+state.tripDate = normalizeText(safeSnapshot.tripDate);
   state.startTime = normalizeText(safeSnapshot.startTime);
   state.notes = normalizeText(safeSnapshot.notes);
   state.currency = normalizeText(safeSnapshot.currency) || 'MXN';
@@ -1316,8 +1375,11 @@ function applyContactHourlyDailySync(snapshot) {
             serviceType: 'hourly_daily',
             hourly_daily_mode: state.mode,
             hourly_daily_vehicle_type: state.vehicleType,
-            hourly_daily_pickup: state.pickup,
-            hourly_daily_date: state.tripDate,
+hourly_daily_pickup: state.pickup,
+hourly_daily_pickup_place_id: state.pickupPlaceId,
+hourly_daily_pickup_lat: state.pickupLat,
+hourly_daily_pickup_lng: state.pickupLng,
+hourly_daily_date: state.tripDate,
             hourly_daily_start_time: state.startTime,
             hourly_daily_duration_hours: state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY
               ? String(state.durationHours)

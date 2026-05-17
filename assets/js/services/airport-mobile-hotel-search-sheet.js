@@ -73,6 +73,17 @@
       ? api.getActiveDom()
       : null;
   }
+  
+  function getActiveSourceInput() {
+  const dom = getActiveDom();
+  const input = dom && dom.input ? dom.input : null;
+
+  if (input) {
+    return input;
+  }
+
+  return document.querySelector(SELECTORS.sourceInput);
+}
 
   function getCurrentSelectedLabel() {
     const api = getAutocompleteApi();

@@ -42,6 +42,15 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
 
     return ui;
   }
+  
+  function getDestinationBridge() {
+  const bridge = window.PixkuyAirportDestination;
+  if (!bridge || typeof bridge !== "object") {
+    return null;
+  }
+
+  return bridge;
+}
 
   function getLodgingPolicy() {
     const policy = window.PixkuyAirportLodgingTypes;

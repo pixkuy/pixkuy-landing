@@ -282,11 +282,11 @@
 
     if (typeof location !== "undefined" && String(location.pathname).indexOf("/legal/") !== -1) return;
 
-    var mode = getModeFromHref(href);
-    if (!mode) return;
+    var linkMode = getModeFromHref(href);
+if (!linkMode) return;
 
-    e.preventDefault();
-    openOverlayForHref(href);
+e.preventDefault();
+openOverlayForHref(href);
   }
 
   function init() {

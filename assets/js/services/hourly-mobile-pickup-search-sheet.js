@@ -285,6 +285,29 @@
 
     return true;
   }
+  
+  function dispatchSourcePlaceSelection(selectedPlace, label) {
+  const sourceInput = activeSourceInput;
+  const normalizedLabel = normalizeText(label);
+
+  if (!sourceInput || !selectedPlace || !normalizedLabel) {
+    return false;
+  }
+
+  sourceInput.value = normalizedLabel;
+
+  sourceInput.dispatchEvent(
+    new CustomEvent("pixkuy:hourly-daily-pickup-selected", {
+      bubbles: true,
+      detail: {
+        selectedPlace: selectedPlace,
+        label: normalizedLabel
+      }
+    })
+  );
+
+  return true;
+}
 
   function resetSourceInputScroll() {
     const sourceInput = activeSourceInput;
@@ -406,11 +429,11 @@
         }
 
         hasCommittedSelection = true;
-        setInternalValue(label);
-        syncSourceInputValue(label);
-        resetSourceInputScroll();
-        closeSheet({ refocus: false });
-        collapseSourceAutocomplete();
+setInternalValue(label);
+dispatchSourcePlaceSelection(selectedPlace, label);
+resetSourceInputScroll();
+closeSheet({ refocus: false });
+collapseSourceAutocomplete();
       },
       onError: function onPickupSheetError() {}
     });

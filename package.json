@@ -1,0 +1,22 @@
+{
+  "name": "pixkuy-landing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pixkuy Mobility public landing validation tooling.",
+  "scripts": {
+    "check": "npm run lint:js && npm run validate:json",
+    "lint:js": "eslint \"assets/js/**/*.js\"",
+    "format:check": "prettier --check \"**/*.{html,css,js,json,md}\" --ignore-path .gitignore",
+    "validate:json": "node -e \"const fs=require('fs');const path=require('path');const roots=['assets/i18n','assets/js/data'];let ok=true;function walk(dir){if(!fs.existsSync(dir))return;for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,entry.name);if(entry.isDirectory())walk(full);else if(entry.isFile()&&entry.name.endsWith('.json')){try{JSON.parse(fs.readFileSync(full,'utf8'));}catch(error){ok=false;console.error(full);console.error(error.message);}}}}roots.forEach(walk);process.exit(ok?0:1);\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-pixkuy:pixkuy/pixkuy-landing.git"
+  },
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "eslint": "^10.4.0",
+    "prettier": "^3.8.3"
+  }
+}
