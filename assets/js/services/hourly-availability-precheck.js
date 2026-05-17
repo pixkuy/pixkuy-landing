@@ -149,12 +149,16 @@
       normalizeText(body && body.code) ||
       normalizeText(availability && availability.code) ||
       "";
+    var nextAvailableStartLocal = normalizeText(
+      availability && availability.nextAvailableStartLocal
+    );
 
     return {
       ok: Boolean(response && response.ok),
       statusCode: response ? response.status : 0,
       raw: body || {},
       code: code,
+      nextAvailableStartLocal: nextAvailableStartLocal,
       available: Boolean(
         response &&
           response.ok &&

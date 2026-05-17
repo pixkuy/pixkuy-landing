@@ -116,6 +116,7 @@
   "checking": "Comprobando disponibilidad...",
   "available": "Disponibilidad confirmada. Puedes continuar.",
   "unavailable": "No hay disponibilidad para esa fecha y hora. Elige otra opción.",
+  "nextAvailableSlot": "Siguiente hora disponible: {time}",
   "minimumLeadTime": "Necesitamos al menos 24 horas de antelación para confirmar este servicio.",
   "priceMismatch": "La tarifa ha cambiado. Actualiza la configuración antes de continuar.",
   "error": "No pudimos confirmar disponibilidad. Revisa fecha, hora y recogida."

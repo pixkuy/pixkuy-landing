@@ -164,6 +164,7 @@ availability: {
   checking: getI18nValue('services.cards.hourly.panel.availability.checking') || 'Comprobando disponibilidad...',
   available: getI18nValue('services.cards.hourly.panel.availability.available') || 'Disponibilidad confirmada. Puedes continuar.',
   unavailable: getI18nValue('services.cards.hourly.panel.availability.unavailable') || 'No hay disponibilidad para esa fecha y hora. Elige otra opción.',
+  nextAvailableSlot: getI18nValue('services.cards.hourly.panel.availability.nextAvailableSlot') || 'Siguiente hora disponible: {time}',
   minimumLeadTime: getI18nValue('services.cards.hourly.panel.availability.minimumLeadTime') || 'Necesitamos al menos 24 horas de antelación para confirmar este servicio.',
   priceMismatch: getI18nValue('services.cards.hourly.panel.availability.priceMismatch') || 'La tarifa ha cambiado. Actualiza la configuración antes de continuar.',
   error: getI18nValue('services.cards.hourly.panel.availability.error') || 'No pudimos confirmar disponibilidad. Revisa fecha, hora y recogida.'
@@ -1352,6 +1353,30 @@ function isTransactionalHourlyMode() {
   return state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY;
 }
 
+function getNextAvailableTimeLabel(result) {
+  const value = normalizeText(result && result.nextAvailableStartLocal);
+
+  if (!value) {
+    return '';
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
+    return value.slice(11, 16);
+  }
+
+  return value;
+}
+
+function getNextAvailableMessage(result, labels) {
+  const time = getNextAvailableTimeLabel(result);
+
+  if (!time) {
+    return '';
+  }
+
+  return labels.availability.nextAvailableSlot.replace('{time}', time);
+}
+
 function getAvailabilityMessage(result) {
   const labels = getLabels();
   const code = normalizeText(result && result.code);
@@ -1366,6 +1391,12 @@ function getAvailabilityMessage(result) {
 
   if (code === 'PRECHECK_REQUEST_FAILED' || code === 'INVALID_PRECHECK_PAYLOAD') {
     return labels.availability.error;
+  }
+
+  const nextAvailableMessage = getNextAvailableMessage(result, labels);
+
+  if (nextAvailableMessage) {
+    return labels.availability.unavailable + ' ' + nextAvailableMessage;
   }
 
   return labels.availability.unavailable;
