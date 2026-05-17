@@ -671,6 +671,31 @@
   transform:none;
 }
 
+.services-hourly-panel__availability{
+  margin:0;
+  min-height:18px;
+  font-size:13px;
+  line-height:1.35;
+  font-weight:650;
+  color:rgba(255,245,228,.72);
+}
+
+.services-hourly-panel__availability[hidden]{
+  display:none !important;
+}
+
+.services-hourly-panel__availability[data-availability-tone="checking"]{
+  color:rgba(255,245,228,.78);
+}
+
+.services-hourly-panel__availability[data-availability-tone="success"]{
+  color:rgba(166,224,204,.94);
+}
+
+.services-hourly-panel__availability[data-availability-tone="error"]{
+  color:rgba(255,188,166,.96);
+}
+
 @media (max-width: 1024px){
   .services-hourly-panel__row--top{
     grid-template-columns:repeat(2, minmax(0, 1fr));

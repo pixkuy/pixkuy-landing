@@ -46,6 +46,7 @@
 };
   
   let pickupControllerHandle = null;
+  let availabilityBlockReason = '';
 
   function getI18nValue(path) {
     const dict = window.__pixkuyI18nDict;
@@ -158,8 +159,16 @@
       longTermPriceValue: getI18nValue('services.cards.hourly.panel.longTermPriceValue') || 'Según operación',
       pricePending: getI18nValue('services.cards.hourly.panel.priceValuePending') || '—',
       cta: getI18nValue('services.cards.hourly.panel.cta') || 'Solicitar',
-      ctaDisabled: getI18nValue('services.cards.hourly.panel.ctaDisabled') || 'Completa la configuración',
-      tabs: {
+ctaDisabled: getI18nValue('services.cards.hourly.panel.ctaDisabled') || 'Completa la configuración',
+availability: {
+  checking: getI18nValue('services.cards.hourly.panel.availability.checking') || 'Comprobando disponibilidad...',
+  available: getI18nValue('services.cards.hourly.panel.availability.available') || 'Disponibilidad confirmada. Puedes continuar.',
+  unavailable: getI18nValue('services.cards.hourly.panel.availability.unavailable') || 'No hay disponibilidad para esa fecha y hora. Elige otra opción.',
+  minimumLeadTime: getI18nValue('services.cards.hourly.panel.availability.minimumLeadTime') || 'Necesitamos al menos 24 horas de antelación para confirmar este servicio.',
+  priceMismatch: getI18nValue('services.cards.hourly.panel.availability.priceMismatch') || 'La tarifa ha cambiado. Actualiza la configuración antes de continuar.',
+  error: getI18nValue('services.cards.hourly.panel.availability.error') || 'No pudimos confirmar disponibilidad. Revisa fecha, hora y recogida.'
+},
+tabs: {
         hourly: getI18nValue('services.cards.hourly.panel.tabs.hourly') || 'Por horas',
         fullDay: getI18nValue('services.cards.hourly.panel.tabs.fullDay') || 'Día completo',
         longTerm: getI18nValue('services.cards.hourly.panel.tabs.longTerm') || 'Planes largos'
@@ -435,6 +444,31 @@ onClearSelection: function () {
     return Boolean(state.longTermOption);
   }
   
+    function isHourlyContinueBlockedByAvailability() {
+    return Boolean(availabilityBlockReason);
+  }
+
+  function shouldDisableHourlyContinue() {
+    return !isConfigComplete() || isHourlyContinueBlockedByAvailability();
+  }
+
+  function setAvailabilityBlock(reason) {
+    availabilityBlockReason = normalizeText(reason) || 'availability_unavailable';
+  }
+
+  function clearAvailabilityBlock() {
+    availabilityBlockReason = '';
+    clearAvailabilityStatus();
+  }
+
+  function getHourlyCtaText(labels) {
+    if (isConfigComplete() || isHourlyContinueBlockedByAvailability()) {
+      return labels.cta;
+    }
+
+    return labels.ctaDisabled;
+  }
+  
     function getHourlyAnalyticsSurface() {
     const isMobileRoute = Boolean(
       document.body &&
@@ -653,7 +687,7 @@ onClearSelection: function () {
     const priceValue = configMount.querySelector('.services-hourly-panel__price-value');
     const priceLabel = configMount.querySelector('.services-hourly-panel__price-label');
     const ctaButton = configMount.querySelector('[data-services-hourly-cta]');
-    const ctaDisabled = !isConfigComplete();
+    const ctaDisabled = shouldDisableHourlyContinue();
     const priceText = formatCurrency(state.price, state.currency);
     const priceLabelText = state.mode === MODES.FULL_DAY
       ? labels.fullDayPriceLabel
@@ -670,7 +704,7 @@ onClearSelection: function () {
     if (ctaButton) {
       ctaButton.disabled = ctaDisabled;
       ctaButton.setAttribute('aria-disabled', ctaDisabled ? 'true' : 'false');
-      ctaButton.textContent = ctaDisabled ? labels.ctaDisabled : labels.cta;
+      ctaButton.textContent = getHourlyCtaText(labels);
     }
   }
 
@@ -893,6 +927,14 @@ onClearSelection: function () {
         >
           ${ctaDisabled ? labels.ctaDisabled : labels.cta}
         </button>
+
+        <p
+          class="services-hourly-panel__availability"
+          data-services-hourly-availability
+          role="status"
+          aria-live="polite"
+          hidden
+        ></p>
       </div>
     </div>
   `;
@@ -1149,6 +1191,14 @@ onClearSelection: function () {
           >
             ${ctaDisabled ? labels.ctaDisabled : labels.cta}
           </button>
+
+          <p
+            class="services-hourly-panel__availability"
+            data-services-hourly-availability
+            role="status"
+            aria-live="polite"
+            hidden
+          ></p>
         </div>
       </div>
     `;
@@ -1248,7 +1298,7 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
     const priceValue = configMount.querySelector('.services-hourly-panel__price-value');
     const ctaButton = configMount.querySelector('[data-services-hourly-cta]');
     const labels = getLabels();
-    const ctaDisabled = !isConfigComplete();
+    const ctaDisabled = shouldDisableHourlyContinue();
     const priceText = state.mode === MODES.LONG_TERM
       ? labels.longTermPriceValue
       : formatCurrency(state.price, state.currency);
@@ -1284,13 +1334,175 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
     if (ctaButton) {
       ctaButton.disabled = ctaDisabled;
       ctaButton.setAttribute('aria-disabled', ctaDisabled ? 'true' : 'false');
-      ctaButton.textContent = ctaDisabled ? labels.ctaDisabled : labels.cta;
+      ctaButton.textContent = getHourlyCtaText(labels);
     }
 
     trackHourlyQuoteReady();
 
     window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
   }
+  
+  function getHourlyAvailabilityPrecheckApi() {
+  const api = window.PixkuyHourlyAvailabilityPrecheck;
+
+  return api && typeof api === 'object' ? api : null;
+}
+
+function isTransactionalHourlyMode() {
+  return state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY;
+}
+
+function getAvailabilityMessage(result) {
+  const labels = getLabels();
+  const code = normalizeText(result && result.code);
+
+  if (code === 'HOURLY_MINIMUM_LEAD_TIME_NOT_MET') {
+    return labels.availability.minimumLeadTime;
+  }
+
+  if (code === 'PRICE_MISMATCH') {
+    return labels.availability.priceMismatch;
+  }
+
+  if (code === 'PRECHECK_REQUEST_FAILED' || code === 'INVALID_PRECHECK_PAYLOAD') {
+    return labels.availability.error;
+  }
+
+  return labels.availability.unavailable;
+}
+
+function setAvailabilityStatus(message, tone) {
+  const statusNode = configMount.querySelector('[data-services-hourly-availability]');
+
+  if (!statusNode) {
+    return false;
+  }
+
+  statusNode.textContent = message || '';
+  statusNode.hidden = !message;
+  statusNode.setAttribute('data-availability-tone', tone || '');
+
+  return true;
+}
+
+function clearAvailabilityStatus() {
+  const statusNode = configMount.querySelector('[data-services-hourly-availability]');
+
+  if (!statusNode) {
+    return false;
+  }
+
+  statusNode.textContent = '';
+  statusNode.hidden = true;
+  statusNode.removeAttribute('data-availability-tone');
+
+  return true;
+}
+
+function setHourlyContinueBusy(isBusy) {
+  const labels = getLabels();
+  const ctaButton = configMount.querySelector('[data-services-hourly-cta]');
+
+  if (!ctaButton) {
+    return false;
+  }
+
+  if (isBusy) {
+    ctaButton.disabled = true;
+    ctaButton.setAttribute('aria-disabled', 'true');
+    ctaButton.textContent = labels.availability.checking;
+    return true;
+  }
+
+  ctaButton.disabled = shouldDisableHourlyContinue();
+  ctaButton.setAttribute('aria-disabled', shouldDisableHourlyContinue() ? 'true' : 'false');
+  ctaButton.textContent = getHourlyCtaText(labels);
+
+  return true;
+}
+
+function buildHourlySubmitDetail() {
+  return {
+    serviceType: 'hourly_daily',
+    hourly_daily_mode: state.mode,
+    hourly_daily_vehicle_type: state.vehicleType,
+    hourly_daily_pickup: state.pickup,
+    hourly_daily_pickup_place_id: state.pickupPlaceId,
+    hourly_daily_pickup_lat: state.pickupLat,
+    hourly_daily_pickup_lng: state.pickupLng,
+    hourly_daily_date: state.tripDate,
+    hourly_daily_start_time: state.startTime,
+    hourly_daily_duration_hours: state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY
+      ? String(state.durationHours)
+      : '',
+    hourly_daily_custom_term: state.mode === MODES.LONG_TERM
+      ? state.longTermOption
+      : '',
+    hourly_daily_notes: state.notes,
+    hourly_daily_price: typeof state.price === 'number' ? state.price : '',
+    hourly_daily_currency: state.currency,
+    hourly_daily_km_included:
+      state.mode === MODES.LONG_TERM
+        ? ''
+        : (
+            state.mode === MODES.FULL_DAY
+              ? '500'
+              : String((state.durationHours || 0) * 40)
+          ),
+    hourly_daily_extra_km_price: '35',
+    hourly_daily_out_of_zone_supplement: '4500'
+  };
+}
+
+function dispatchHourlySubmit(detail) {
+  window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-submit', {
+    detail: detail
+  }));
+
+  return true;
+}
+
+function handleHourlyContinue() {
+  const precheckApi = getHourlyAvailabilityPrecheckApi();
+  const detail = buildHourlySubmitDetail();
+  const labels = getLabels();
+
+  clearAvailabilityStatus();
+
+  if (!isTransactionalHourlyMode()) {
+    trackHourlyContinueClick();
+    dispatchHourlySubmit(detail);
+    return Promise.resolve(true);
+  }
+
+  if (!precheckApi || typeof precheckApi.precheck !== 'function') {
+    setAvailabilityStatus(labels.availability.error, 'error');
+    return Promise.resolve(false);
+  }
+
+  setAvailabilityStatus(labels.availability.checking, 'checking');
+  setHourlyContinueBusy(true);
+
+  return precheckApi.precheck(detail)
+    .then(function (result) {
+      if (result && result.available === true) {
+        setAvailabilityStatus(labels.availability.available, 'success');
+        trackHourlyContinueClick();
+        dispatchHourlySubmit(detail);
+        return true;
+      }
+
+      setAvailabilityBlock(result && result.code);
+      setAvailabilityStatus(getAvailabilityMessage(result), 'error');
+      setHourlyContinueBusy(false);
+      return false;
+    })
+    .catch(function () {
+      setAvailabilityStatus(labels.availability.error, 'error');
+      setHourlyContinueBusy(false);
+      return false;
+    });
+}
 
   function bindEvents() {
     if (panelRoot.dataset.servicesHourlyPanelBound === '1') {
@@ -1367,48 +1579,18 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
       }
 
       const ctaButton = event.target.closest('[data-services-hourly-cta]');
-      if (ctaButton && !ctaButton.disabled) {
-        trackHourlyContinueClick();
+if (ctaButton && !ctaButton.disabled) {
+  event.preventDefault();
 
-        window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-submit', {
-          detail: {
-            serviceType: 'hourly_daily',
-            hourly_daily_mode: state.mode,
-            hourly_daily_vehicle_type: state.vehicleType,
-hourly_daily_pickup: state.pickup,
-hourly_daily_pickup_place_id: state.pickupPlaceId,
-hourly_daily_pickup_lat: state.pickupLat,
-hourly_daily_pickup_lng: state.pickupLng,
-hourly_daily_date: state.tripDate,
-            hourly_daily_start_time: state.startTime,
-            hourly_daily_duration_hours: state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY
-              ? String(state.durationHours)
-              : '',
-            hourly_daily_custom_term: state.mode === MODES.LONG_TERM
-              ? state.longTermOption
-              : '',
-            hourly_daily_notes: state.notes,
-            hourly_daily_price: typeof state.price === 'number' ? state.price : '',
-            hourly_daily_currency: state.currency,
-            hourly_daily_km_included:
-  state.mode === MODES.LONG_TERM
-    ? ''
-    : (
-        state.mode === MODES.FULL_DAY
-          ? '500'
-          : String((state.durationHours || 0) * 40)
-      ),
-            hourly_daily_extra_km_price: '35',
-            hourly_daily_out_of_zone_supplement: '4500'
-          }
-        }));
-      }
+  handleHourlyContinue();
+}
     });
 
     configMount.addEventListener('input', (event) => {
       const target = event.target;
 
       if (target.matches('[data-services-hourly-date]')) {
+        clearAvailabilityBlock();
         state.tripDate = target.value || '';
 
         if (state.tripDate && !isServicesDateAtOrAfterMinimum(state.tripDate)) {
@@ -1418,10 +1600,12 @@ hourly_daily_date: state.tripDate,
 
         syncDerivedState();
         syncLiveFieldValues();
+
         return;
       }
 
       if (target.matches('[data-services-hourly-time]')) {
+        clearAvailabilityBlock();
         state.startTime = target.value || '';
         syncDerivedState();
         syncLiveFieldValues();
@@ -1439,6 +1623,7 @@ hourly_daily_date: state.tripDate,
       const target = event.target;
 
       if (target.matches('[data-services-hourly-date]')) {
+        clearAvailabilityBlock();
         state.tripDate = target.value || '';
 
         if (state.tripDate && !isServicesDateAtOrAfterMinimum(state.tripDate)) {

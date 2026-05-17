@@ -3887,10 +3887,19 @@
 <script src="assets/js/forms/submission-guard.js"></script>
 <script>
   window.PIXKUY_BOOKING_API_CONFIG = {
-    apiBaseUrl: "",
-    publicSiteKey: "local_pixkuy_site_key",
-    recaptchaSiteKey: ""
-  };
+  apiBaseUrl:
+    window.location.hostname === "192.168.0.14"
+      ? "http://192.168.0.14:3002"
+      : (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1" ||
+          window.location.hostname === "local.pixkuy.test"
+            ? "http://localhost:3002"
+            : ""
+        ),
+  publicSiteKey: "local_pixkuy_site_key",
+  recaptchaSiteKey: ""
+};
 </script>
 <script src="assets/js/forms/hourly-booking-api-checkout.js"></script>
 <script src="assets/js/forms/contact-service-state.js"></script>
@@ -3962,6 +3971,7 @@
 <script src="assets/js/services/tours-mobile-sheet.js"></script>
 <script src="assets/js/services/hourly-daily-temporal-pricing.js"></script>
 <script src="assets/js/services/hourly-daily-pickup.js"></script>
+<script src="assets/js/services/hourly-availability-precheck.js"></script>
 <script src="assets/js/services/hourly-daily-panel.js"></script>
 <script src="assets/js/services/hourly-mobile-contact-step.js"></script>
 <script src="assets/js/services/hourly-mobile-booking-flow.js"></script>
