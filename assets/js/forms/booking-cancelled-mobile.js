@@ -135,6 +135,10 @@
       return "expired";
     }
 
+    if (view === "cancelled") {
+      return "cancelled";
+    }
+
     return "unknown";
   }
 
