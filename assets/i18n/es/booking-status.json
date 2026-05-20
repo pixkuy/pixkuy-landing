@@ -17,10 +17,24 @@
 },
     "details": {
       "publicCode": "Código de reserva",
-      "payment": "Estado del pago",
+      "service": "Servicio",
+      "pickup": "Recogida",
+      "vehicle": "Vehículo",
       "date": "Fecha del servicio",
       "time": "Hora del servicio",
+      "duration": "Duración",
+      "passengers": "Pasajeros",
+      "payment": "Estado del pago",
+      "amount": "Importe pagado",
+      "durationOneHour": "1 hora",
+      "durationHours": "horas",
+      "passengerOne": "1 pasajero",
+      "passengerMany": "pasajeros",
       "empty": "—"
+    },
+	"serviceLabels": {
+      "hourly_daily": "Vehículo privado con conductor",
+      "notAvailable": "Servicio Pixkuy"
     },
     "paymentLabels": {
       "confirmed": "Confirmada",
@@ -40,7 +54,7 @@
     "confirmed": {
       "state": "Reserva confirmada",
       "title": "Tu reserva está confirmada",
-      "lead": "Hemos recibido el pago correctamente. El equipo de Pixkuy revisará los detalles operativos y continuará la coordinación contigo.",
+      "lead": "Tu vehículo queda reservado. Revisa el resumen y conserva el código de reserva para cualquier coordinación con Pixkuy.",
       "notice": "La fecha y hora mostradas corresponden a Ciudad de México. No se convierten a la zona horaria del dispositivo."
     },
     "pending": {
@@ -181,7 +195,7 @@
       }
     },
     "actions": {
-      "primary": "Volver al inicio",
+      "primary": "Reservar otro servicio",
       "whatsapp": "Hablar por WhatsApp"
     },
     "mobile": {

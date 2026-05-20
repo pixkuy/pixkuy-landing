@@ -97,6 +97,64 @@
       t(dictionary, "paymentLabels.notAvailable") ||
       emptyValue(dictionary);
   }
+  
+    function serviceLabel(dictionary, serviceType) {
+    return t(dictionary, "serviceLabels." + serviceType) ||
+      t(dictionary, "serviceLabels.notAvailable") ||
+      emptyValue(dictionary);
+  }
+
+  function formatMoney(dictionary, amountMinor, currency) {
+    var formatter;
+
+    if (typeof amountMinor !== "number" || !currency) {
+      return emptyValue(dictionary);
+    }
+
+    try {
+      formatter = new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: currency,
+        maximumFractionDigits: 0
+      });
+
+      return formatter.format(amountMinor / 100) + " " + currency;
+    } catch (error) {
+      return String(amountMinor / 100) + " " + currency;
+    }
+  }
+
+  function amountLabel(dictionary, result) {
+    if (typeof result.paymentAmountPaid === "number") {
+      return formatMoney(dictionary, result.paymentAmountPaid, result.paymentCurrency);
+    }
+
+    return formatMoney(dictionary, result.paymentAmountExpected, result.paymentCurrency);
+  }
+  
+    function durationLabel(dictionary, value) {
+    if (typeof value !== "number") {
+      return emptyValue(dictionary);
+    }
+
+    if (value === 1) {
+      return t(dictionary, "details.durationOneHour") || "1 hora";
+    }
+
+    return String(value) + " " + (t(dictionary, "details.durationHours") || "horas");
+  }
+
+  function passengerLabel(dictionary, value) {
+    if (typeof value !== "number") {
+      return emptyValue(dictionary);
+    }
+
+    if (value === 1) {
+      return t(dictionary, "details.passengerOne") || "1 pasajero";
+    }
+
+    return String(value) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
+  }
 
   function getCommonCopyPath(view) {
     if (view === "missingToken") {
@@ -311,8 +369,18 @@
     );
     setText(
       root,
-      "[data-booking-status-payment]",
-      paymentLabel(dictionary, result.paymentStatus)
+      "[data-booking-status-service]",
+      serviceLabel(dictionary, result.serviceType)
+    );
+    setText(
+      root,
+      "[data-booking-status-pickup]",
+      result.pickupAddress || emptyValue(dictionary)
+    );
+    setText(
+      root,
+      "[data-booking-status-vehicle]",
+      result.vehicleDisplayName || emptyValue(dictionary)
     );
     setText(
       root,
@@ -323,6 +391,26 @@
       root,
       "[data-booking-status-time]",
       result.serviceStartLocalTime || emptyValue(dictionary)
+    );
+    setText(
+      root,
+      "[data-booking-status-duration]",
+      durationLabel(dictionary, result.durationHours)
+    );
+    setText(
+      root,
+      "[data-booking-status-passengers]",
+      passengerLabel(dictionary, result.passengerCount)
+    );
+    setText(
+      root,
+      "[data-booking-status-payment]",
+      paymentLabel(dictionary, result.paymentStatus)
+    );
+    setText(
+      root,
+      "[data-booking-status-amount]",
+      amountLabel(dictionary, result)
     );
     setHidden(root, "[data-booking-status-details]", false);
   }
@@ -349,8 +437,18 @@
     );
     setText(
       root,
-      '[data-booking-status-label="payment"]',
-      tFallback(dictionary, "mobile.details.payment", "details.payment")
+      '[data-booking-status-label="service"]',
+      tFallback(dictionary, "mobile.details.service", "details.service")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="pickup"]',
+      tFallback(dictionary, "mobile.details.pickup", "details.pickup")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="vehicle"]',
+      tFallback(dictionary, "mobile.details.vehicle", "details.vehicle")
     );
     setText(
       root,
@@ -361,6 +459,26 @@
       root,
       '[data-booking-status-label="time"]',
       tFallback(dictionary, "mobile.details.time", "details.time")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="duration"]',
+      tFallback(dictionary, "mobile.details.duration", "details.duration")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="passengers"]',
+      tFallback(dictionary, "mobile.details.passengers", "details.passengers")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="payment"]',
+      tFallback(dictionary, "mobile.details.payment", "details.payment")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="amount"]',
+      tFallback(dictionary, "mobile.details.amount", "details.amount")
     );
 
     setText(root, "[data-booking-status-primary]", t(dictionary, "actions.primary"));

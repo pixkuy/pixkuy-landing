@@ -210,6 +210,42 @@
 
     return "";
   }
+  
+    function getServiceType(body) {
+    if (body && body.reservation && typeof body.reservation.serviceType === "string") {
+      return body.reservation.serviceType;
+    }
+
+    if (body && typeof body.serviceType === "string") {
+      return body.serviceType;
+    }
+
+    return "";
+  }
+
+  function getPaymentAmountPaid(body) {
+    if (body && body.payment && typeof body.payment.amountPaid === "number") {
+      return body.payment.amountPaid;
+    }
+
+    return null;
+  }
+
+  function getPaymentAmountExpected(body) {
+    if (body && body.payment && typeof body.payment.amountExpected === "number") {
+      return body.payment.amountExpected;
+    }
+
+    return null;
+  }
+
+  function getPaymentCurrency(body) {
+    if (body && body.payment && typeof body.payment.currency === "string") {
+      return body.payment.currency;
+    }
+
+    return "";
+  }
 
   function getPublicCode(body) {
     if (body && body.reservation && typeof body.reservation.publicCode === "string") {
@@ -230,6 +266,38 @@
 
     if (body && typeof body.serviceStartLocalDate === "string") {
       return body.serviceStartLocalDate;
+    }
+
+    return "";
+  }
+  
+    function getPickupAddress(body) {
+    if (body && body.reservation && typeof body.reservation.pickupAddress === "string") {
+      return body.reservation.pickupAddress;
+    }
+
+    return "";
+  }
+
+  function getDurationHours(body) {
+    if (body && body.reservation && typeof body.reservation.durationHours === "number") {
+      return body.reservation.durationHours;
+    }
+
+    return null;
+  }
+
+  function getPassengerCount(body) {
+    if (body && body.reservation && typeof body.reservation.passengerCount === "number") {
+      return body.reservation.passengerCount;
+    }
+
+    return null;
+  }
+
+  function getVehicleDisplayName(body) {
+    if (body && body.reservation && typeof body.reservation.vehicleDisplayName === "string") {
+      return body.reservation.vehicleDisplayName;
     }
 
     return "";
@@ -291,9 +359,17 @@
       view: resolveView(reservationStatus, input.statusCode, input.ok),
       reservationStatus: reservationStatus,
       paymentStatus: getPaymentStatus(body),
+      serviceType: getServiceType(body),
+      paymentAmountPaid: getPaymentAmountPaid(body),
+      paymentAmountExpected: getPaymentAmountExpected(body),
+      paymentCurrency: getPaymentCurrency(body),
       publicCode: getPublicCode(body),
       serviceStartLocalDate: getServiceStartLocalDate(body),
       serviceStartLocalTime: getServiceStartLocalTime(body),
+      pickupAddress: getPickupAddress(body),
+      durationHours: getDurationHours(body),
+      passengerCount: getPassengerCount(body),
+      vehicleDisplayName: getVehicleDisplayName(body),
       raw: body
     };
   }
@@ -329,9 +405,17 @@
       view: "missingToken",
       reservationStatus: "",
       paymentStatus: "",
+      serviceType: "",
+      paymentAmountPaid: null,
+      paymentAmountExpected: null,
+      paymentCurrency: "",
       publicCode: "",
       serviceStartLocalDate: "",
       serviceStartLocalTime: "",
+      pickupAddress: "",
+      durationHours: null,
+      passengerCount: null,
+      vehicleDisplayName: "",
       raw: {}
     };
   }
@@ -341,9 +425,17 @@
       view: "requestError",
       reservationStatus: "",
       paymentStatus: "",
+      serviceType: "",
+      paymentAmountPaid: null,
+      paymentAmountExpected: null,
+      paymentCurrency: "",
       publicCode: "",
       serviceStartLocalDate: "",
       serviceStartLocalTime: "",
+      pickupAddress: "",
+      durationHours: null,
+      passengerCount: null,
+      vehicleDisplayName: "",
       raw: {}
     };
   }
