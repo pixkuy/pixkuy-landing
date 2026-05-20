@@ -29,6 +29,7 @@
       "hold_expired": "Reserva temporal caducada",
       "payment_mismatch": "Pago en revisión",
       "payment_after_expiry": "Pago recibido fuera de ventana",
+      "cancelled_manual": "Cancelada manualmente",
       "pending_manual_review": "Revisión manual",
       "pending": "Pendiente",
       "failed": "Fallido",
@@ -61,6 +62,12 @@
       "title": "La reserva temporal ha caducado",
       "lead": "La ventana temporal de pago ya no está activa. Para reservar, vuelve a iniciar el proceso o contacta con Pixkuy.",
       "notice": "No se ha confirmado ninguna reserva con este estado."
+    },
+	"cancelled": {
+      "state": "Reserva cancelada",
+      "title": "Esta reserva ha sido cancelada",
+      "lead": "Esta reserva ya no está activa. Si necesitas un nuevo servicio, inicia una nueva solicitud o contacta con Pixkuy.",
+      "notice": "No se puede reactivar esta reserva ni reutilizar su disponibilidad anterior."
     },
     "unknown": {
       "state": "Estado no disponible",
@@ -113,6 +120,12 @@
         "lead": "La ventana de pago ya no está activa. Para reservar, inicia una nueva solicitud.",
         "notice": "No reactivamos reservas caducadas desde esta pantalla."
       },
+	  "cancelled": {
+        "state": "Reserva cancelada",
+        "title": "Esta reserva ha sido cancelada",
+        "lead": "La reserva anterior ya no está activa. Si necesitas el servicio, inicia una nueva solicitud.",
+        "notice": "No reactivamos reservas canceladas ni conservamos el horario anterior."
+      },
       "unknown": {
         "state": "Estado no disponible",
         "title": "No hemos podido confirmar el estado",
@@ -158,6 +171,12 @@
           "title": "La reserva temporal caducó",
           "lead": "La ventana de pago ya no está activa. Inicia una nueva solicitud.",
           "notice": "No se ha confirmado ninguna reserva."
+        },
+        "cancelled": {
+          "state": "Reserva cancelada",
+          "title": "Reserva cancelada",
+          "lead": "Esta reserva ya no está activa. Inicia una nueva solicitud si necesitas el servicio.",
+          "notice": "No se conserva el horario anterior."
         }
       }
     },

@@ -276,6 +276,10 @@
       return "expired";
     }
 
+    if (status === "cancelled_manual") {
+      return "cancelled";
+    }
+
     return "unknown";
   }
 
