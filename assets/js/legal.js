@@ -5,7 +5,7 @@
  * - Desktop: right drawer
  * - No iframes (compatible with X-Frame-Options: DENY)
  * - No literals: all labels/aria from i18n keys (legalOverlay.*)
- * - One reusable overlay with modes: notice | privacy | cookies
+ * - One reusable overlay with modes: notice | privacy | cookies | cancellations
  */
 
 (function () {
@@ -19,6 +19,7 @@
     if (href.indexOf("legal/aviso-legal") !== -1) return "notice";
     if (href.indexOf("legal/privacy") !== -1) return "privacy";
     if (href.indexOf("legal/cookies") !== -1) return "cookies";
+    if (href.indexOf("legal/cancellations") !== -1) return "cancellations";
     return null;
   }
 
@@ -53,11 +54,14 @@
       "#" + OVERLAY_ID + " .pxk-legal-close{ appearance:none; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:rgba(255,255,255,.92); border-radius:999px; padding:8px 12px; font-size:13px; cursor:pointer; }",
       "#" + OVERLAY_ID + " .pxk-legal-close:hover{ background:rgba(255,255,255,.10); }",
 
-      "#" + OVERLAY_ID + " .pxk-legal-tabs{ display:flex; gap:10px; padding:12px 16px 0; }",
-      "#" + OVERLAY_ID + " .pxk-legal-tab{ appearance:none; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:rgba(255,255,255,.90); border-radius:999px; padding:8px 12px; font-size:13px; cursor:pointer; opacity:.78; }",
+      "#" + OVERLAY_ID + " .pxk-legal-tabs{ display:flex; gap:10px; padding:12px 16px 0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }",
+      "#" + OVERLAY_ID + " .pxk-legal-tabs::-webkit-scrollbar{ display:none; }",
+      "#" + OVERLAY_ID + " .pxk-legal-tab{ flex:0 0 auto; appearance:none; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:rgba(255,255,255,.90); border-radius:999px; padding:8px 12px; font-size:13px; cursor:pointer; opacity:.78; }",
       "#" + OVERLAY_ID + " .pxk-legal-tab[aria-selected='true']{ opacity:1; background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); }",
 
-      "#" + OVERLAY_ID + " .pxk-legal-body{ padding:16px; overflow:auto; -webkit-overflow-scrolling:touch; }",
+      "#" + OVERLAY_ID + " .pxk-legal-bar{ flex:0 0 auto; }",
+      "#" + OVERLAY_ID + " .pxk-legal-tabs{ flex:0 0 auto; }",
+      "#" + OVERLAY_ID + " .pxk-legal-body{ flex:1 1 auto; min-height:0; padding:16px; overflow:auto; -webkit-overflow-scrolling:touch; }",
       "#" + OVERLAY_ID + " .pxk-legal-body h2{ margin:16px 0 8px; }",
       "#" + OVERLAY_ID + " .pxk-legal-body p{ margin:0 0 10px; }",
 
@@ -72,6 +76,11 @@
       "  clip:rect(0,0,0,0) !important;",
       "  white-space:nowrap !important;",
       "  border:0 !important;",
+      "}",
+
+      "@media (max-width:859px){",
+      "  #" + OVERLAY_ID + " .pxk-legal-tabs{ display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px 16px 0; overflow:visible; }",
+      "  #" + OVERLAY_ID + " .pxk-legal-tab{ width:100%; justify-content:center; text-align:center; min-height:38px; padding:9px 10px; }",
       "}",
 
       "@media (min-width:860px){",
@@ -112,6 +121,7 @@
       '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="notice" aria-selected="true" data-i18n="legalOverlay.tabs.notice"></button>',
       '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="privacy" aria-selected="false" data-i18n="legalOverlay.tabs.privacy"></button>',
       '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="cookies" aria-selected="false" data-i18n="legalOverlay.tabs.cookies"></button>',
+      '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="cancellations" aria-selected="false" data-i18n="legalOverlay.tabs.cancellations"></button>',
       "  </div>",
 
       '  <div class="pxk-legal-body" data-legal-body="1">',
@@ -147,6 +157,66 @@
       "      <p data-i18n='cookies.body1'></p>",
       "      <p data-i18n='cookies.body2'></p>",
       "      <p data-i18n='cookies.body3'></p>",
+      "    </section>",
+
+      "    <section data-legal-section='cancellations' hidden>",
+      "      <h1 data-i18n='cancellations.title'></h1>",
+      "      <p data-i18n='cancellations.intro'></p>",
+      "      <h2 data-i18n='cancellations.timeZoneTitle'></h2>",
+      "      <p data-i18n='cancellations.timeZoneBody'></p>",
+      "      <h2 data-i18n='cancellations.cancellationTitle'></h2>",
+      "      <p data-i18n='cancellations.cancellationBody1'></p>",
+      "      <p data-i18n='cancellations.cancellationBody2'></p>",
+      "      <p data-i18n='cancellations.cancellationBody3'></p>",
+      "      <h2 data-i18n='cancellations.channelsTitle'></h2>",
+      "      <p data-i18n='cancellations.channelsBody1'></p>",
+      "      <ul>",
+      "        <li data-i18n='cancellations.channelsList.whatsapp'></li>",
+      "        <li data-i18n='cancellations.channelsList.email'></li>",
+      "        <li data-i18n='cancellations.channelsList.phone'></li>",
+      "      </ul>",
+      "      <p data-i18n='cancellations.channelsBody2'></p>",
+      "      <h2 data-i18n='cancellations.changesTitle'></h2>",
+      "      <p data-i18n='cancellations.changesBody1'></p>",
+      "      <p data-i18n='cancellations.changesBody2'></p>",
+      "      <p data-i18n='cancellations.changesBody3'></p>",
+      "      <h2 data-i18n='cancellations.waitingTitle'></h2>",
+      "      <p data-i18n='cancellations.waitingBody1'></p>",
+      "      <p data-i18n='cancellations.waitingBody2'></p>",
+      "      <p data-i18n='cancellations.waitingBody3'></p>",
+      "      <h2 data-i18n='cancellations.hourlyTitle'></h2>",
+      "      <p data-i18n='cancellations.hourlyBody'></p>",
+      "      <h2 data-i18n='cancellations.noShowTitle'></h2>",
+      "      <p data-i18n='cancellations.noShowBody1'></p>",
+      "      <p data-i18n='cancellations.noShowBody2'></p>",
+      "      <h2 data-i18n='cancellations.conductTitle'></h2>",
+      "      <p data-i18n='cancellations.conductBody1'></p>",
+      "      <ul>",
+      "        <li data-i18n='cancellations.conductList.illegalSubstances'></li>",
+      "        <li data-i18n='cancellations.conductList.intoxication'></li>",
+      "        <li data-i18n='cancellations.conductList.aggressiveBehavior'></li>",
+      "        <li data-i18n='cancellations.conductList.safetyInstructions'></li>",
+      "        <li data-i18n='cancellations.conductList.capacity'></li>",
+      "        <li data-i18n='cancellations.conductList.damageRisk'></li>",
+      "        <li data-i18n='cancellations.conductList.cleaning'></li>",
+      "        <li data-i18n='cancellations.conductList.illegalRequests'></li>",
+      "      </ul>",
+      "      <h2 data-i18n='cancellations.chargesTitle'></h2>",
+      "      <p data-i18n='cancellations.chargesBody'></p>",
+      "      <h2 data-i18n='cancellations.forgottenItemsTitle'></h2>",
+      "      <p data-i18n='cancellations.forgottenItemsBody'></p>",
+      "      <h2 data-i18n='cancellations.pixkuyCancellationTitle'></h2>",
+      "      <p data-i18n='cancellations.pixkuyCancellationBody'></p>",
+      "      <h2 data-i18n='cancellations.forceMajeureTitle'></h2>",
+      "      <p data-i18n='cancellations.forceMajeureBody'></p>",
+      "      <h2 data-i18n='cancellations.thirdPartiesTitle'></h2>",
+      "      <p data-i18n='cancellations.thirdPartiesBody1'></p>",
+      "      <p data-i18n='cancellations.thirdPartiesBody2'></p>",
+      "      <p data-i18n='cancellations.thirdPartiesBody3'></p>",
+      "      <h2 data-i18n='cancellations.refundsTitle'></h2>",
+      "      <p data-i18n='cancellations.refundsBody'></p>",
+      "      <h2 data-i18n='cancellations.acceptanceTitle'></h2>",
+      "      <p data-i18n='cancellations.acceptanceBody'></p>",
       "    </section>",
       "  </div>",
       "</div>"
