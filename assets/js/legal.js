@@ -5,7 +5,7 @@
  * - Desktop: right drawer
  * - No iframes (compatible with X-Frame-Options: DENY)
  * - No literals: all labels/aria from i18n keys (legalOverlay.*)
- * - One reusable overlay with modes: notice | privacy | cookies | cancellations
+ * - One reusable overlay with modes: notice | privacy | cookies | terms | cancellations
  */
 
 (function () {
@@ -13,12 +13,15 @@
 
   var OVERLAY_ID = "pixkuy-legal-overlay";
   var BODY_LOCK_CLASS = "pixkuy-legal-lock";
+  var LEGAL_JSON_URL = "/assets/i18n/es/legal.json";
+  var lastLegalTrigger = null;
 
   function getModeFromHref(href) {
     if (typeof href !== "string") return null;
     if (href.indexOf("legal/aviso-legal") !== -1) return "notice";
     if (href.indexOf("legal/privacy") !== -1) return "privacy";
     if (href.indexOf("legal/cookies") !== -1) return "cookies";
+    if (href.indexOf("legal/terms") !== -1) return "terms";
     if (href.indexOf("legal/cancellations") !== -1) return "cancellations";
     return null;
   }
@@ -121,6 +124,7 @@
       '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="notice" aria-selected="true" data-i18n="legalOverlay.tabs.notice"></button>',
       '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="privacy" aria-selected="false" data-i18n="legalOverlay.tabs.privacy"></button>',
       '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="cookies" aria-selected="false" data-i18n="legalOverlay.tabs.cookies"></button>',
+      '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="terms" aria-selected="false" data-i18n="legalOverlay.tabs.terms"></button>',
       '    <button type="button" class="pxk-legal-tab" role="tab" data-legal-mode="cancellations" aria-selected="false" data-i18n="legalOverlay.tabs.cancellations"></button>',
       "  </div>",
 
@@ -157,6 +161,13 @@
       "      <p data-i18n='cookies.body1'></p>",
       "      <p data-i18n='cookies.body2'></p>",
       "      <p data-i18n='cookies.body3'></p>",
+      "    </section>",
+
+      "    <section data-legal-section='terms' hidden>",
+      "      <h1 data-i18n='terms.title'></h1>",
+      "      <p data-i18n='terms.lastUpdated'></p>",
+      "      <p data-i18n='terms.intro'></p>",
+      "      <div data-legal-terms-sections='1'></div>",
       "    </section>",
 
       "    <section data-legal-section='cancellations' hidden>",
@@ -231,13 +242,135 @@
     // We do not invent: we rely on what i18n.js actually exposes.
     return window.__pixkuyI18nRuntime || null;
   }
+  
+    function getCurrentI18nDict(rt) {
+    var runtime = rt || getI18nRuntime();
+    var lang = runtime && typeof runtime.getCurrentLang === "function"
+      ? runtime.getCurrentLang()
+      : "";
+    var runtimeDict = runtime && typeof runtime.getDict === "function"
+      ? runtime.getDict(lang)
+      : null;
+
+    if (
+      window.__pixkuyI18nDict &&
+      typeof window.__pixkuyI18nDict === "object"
+    ) {
+      return window.__pixkuyI18nDict;
+    }
+
+    return runtimeDict || null;
+  }
+  
+    function clearNode(node) {
+    if (!node) return false;
+
+    while (node.firstChild) {
+      node.removeChild(node.firstChild);
+    }
+
+    return true;
+  }
+
+  function appendTermsSectionBody(sectionNode, sectionData) {
+    var bodyKeys;
+
+    if (!sectionNode || !sectionData || typeof sectionData !== "object") {
+      return false;
+    }
+
+    bodyKeys = Object.keys(sectionData)
+      .filter(function isBodyKey(key) {
+        return /^body\d+$/.test(key);
+      })
+      .sort(function sortBodyKeys(a, b) {
+        return Number(a.replace("body", "")) - Number(b.replace("body", ""));
+      });
+
+    bodyKeys.forEach(function appendBody(key) {
+      var value = sectionData[key];
+      var paragraph;
+
+      if (typeof value !== "string" || !value.trim()) {
+        return;
+      }
+
+      paragraph = document.createElement("p");
+      paragraph.textContent = value.trim();
+      sectionNode.appendChild(paragraph);
+    });
+
+    return true;
+  }
+
+  function renderTermsSectionsFromData(overlay, data) {
+    var host = overlay ? overlay.querySelector("[data-legal-terms-sections='1']") : null;
+    var terms = data && data.terms && typeof data.terms === "object" ? data.terms : null;
+    var sections = terms && terms.sections && typeof terms.sections === "object"
+      ? terms.sections
+      : null;
+
+    if (!host || !sections) {
+      return false;
+    }
+
+    clearNode(host);
+
+    Object.keys(sections).forEach(function appendSection(sectionKey) {
+      var sectionData = sections[sectionKey];
+      var sectionNode;
+      var title;
+
+      if (!sectionData || typeof sectionData !== "object") {
+        return;
+      }
+
+      sectionNode = document.createElement("section");
+      sectionNode.className = "pxk-legal-terms-section";
+
+      if (typeof sectionData.title === "string" && sectionData.title.trim()) {
+        title = document.createElement("h2");
+        title.textContent = sectionData.title.trim();
+        sectionNode.appendChild(title);
+      }
+
+      appendTermsSectionBody(sectionNode, sectionData);
+      host.appendChild(sectionNode);
+    });
+
+    return true;
+  }
+
+  function renderTermsSections(overlay, dict) {
+    if (renderTermsSectionsFromData(overlay, dict)) {
+      return true;
+    }
+
+    if (typeof window.fetch !== "function") {
+      return false;
+    }
+
+    window.fetch(LEGAL_JSON_URL, { cache: "no-store" })
+      .then(function onResponse(response) {
+        if (!response || !response.ok) {
+          throw new Error("LEGAL_JSON_FAILED");
+        }
+
+        return response.json();
+      })
+      .then(function onLegalJson(data) {
+        renderTermsSectionsFromData(overlay, data);
+      })
+      .catch(function onError() {});
+
+    return true;
+  }
 
   function applyI18nToOverlay(overlay) {
     var rt = getI18nRuntime();
     if (!rt || typeof rt.getCurrentLang !== "function" || typeof rt.getDict !== "function") return;
 
-    var lang = rt.getCurrentLang();
-    var dict = rt.getDict(lang);
+    var dict = getCurrentI18nDict(rt);
     if (!dict) return;
 
     // Apply aria-label from i18n key (no literals)
@@ -251,6 +384,8 @@
     if (typeof rt.applyToRoot === "function") {
       rt.applyToRoot(overlay);
     }
+
+    renderTermsSections(overlay, dict);
   }
 
   function setOpen(overlay, open) {
@@ -264,6 +399,21 @@
       var closeBtn = overlay.querySelector("button[data-legal-close='1']");
       if (closeBtn) closeBtn.focus();
     } else {
+      if (
+        document.activeElement &&
+        overlay.contains(document.activeElement) &&
+        lastLegalTrigger &&
+        typeof lastLegalTrigger.focus === "function"
+      ) {
+        lastLegalTrigger.focus();
+      } else if (
+        document.activeElement &&
+        overlay.contains(document.activeElement) &&
+        typeof document.activeElement.blur === "function"
+      ) {
+        document.activeElement.blur();
+      }
+
       overlay.removeAttribute("data-open");
       overlay.setAttribute("aria-hidden", "true");
       document.body.classList.remove(BODY_LOCK_CLASS);
@@ -289,6 +439,10 @@
       var tab = tabs[j];
       var tabMode = tab.getAttribute("data-legal-mode");
       tab.setAttribute("aria-selected", tabMode === mode ? "true" : "false");
+    }
+
+    if (mode === "terms") {
+      renderTermsSections(overlay, window.__pixkuyI18nDict || null);
     }
 
     // Reset scroll to top for the legal body
@@ -355,6 +509,7 @@
     var linkMode = getModeFromHref(href);
 if (!linkMode) return;
 
+lastLegalTrigger = link;
 e.preventDefault();
 openOverlayForHref(href);
   }

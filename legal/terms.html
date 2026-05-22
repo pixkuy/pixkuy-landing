@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="terms.title"></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Styles: same base stack as landing -->
+  <link rel="stylesheet" href="../assets/css/00-tokens.css" />
+  <link rel="stylesheet" href="../assets/css/10-base.css" />
+  <link rel="stylesheet" href="../assets/css/20-components.css" />
+  <link rel="stylesheet" href="../assets/css/30-sections.css" />
+  <link rel="stylesheet" href="../assets/css/90-a11y.css" />
+</head>
+
+<body>
+  <main class="screen legal">
+    <div class="content">
+      <h1 data-i18n="terms.title"></h1>
+
+      <p class="muted small" data-i18n="terms.lastUpdated"></p>
+      <p data-i18n="terms.intro"></p>
+
+      <div data-terms-sections="1"></div>
+
+      <p class="small">
+        <a href="../index.html" data-i18n="terms.back"></a>
+      </p>
+    </div>
+  </main>
+
+  <!-- i18n internal modules (must load before i18n.js) -->
+  <script src="../assets/js/i18n/fallback.es.js"></script>
+  <script src="../assets/js/i18n/catalog.js"></script>
+  <script src="../assets/js/i18n/loader.js"></script>
+  <script src="../assets/js/i18n/dom.js"></script>
+  <script src="../assets/js/i18n/selector.js"></script>
+
+  <script>
+    (function renderTermsPage(window, document) {
+      "use strict";
+
+      var LEGAL_JSON_URL = "../assets/i18n/es/legal.json";
+
+      function clearNode(node) {
+        if (!node) return false;
+
+        while (node.firstChild) {
+          node.removeChild(node.firstChild);
+        }
+
+        return true;
+      }
+
+      function appendTermsSectionBody(sectionNode, sectionData) {
+        var bodyKeys;
+
+        if (!sectionNode || !sectionData || typeof sectionData !== "object") {
+          return false;
+        }
+
+        bodyKeys = Object.keys(sectionData)
+          .filter(function isBodyKey(key) {
+            return /^body\d+$/.test(key);
+          })
+          .sort(function sortBodyKeys(a, b) {
+            return Number(a.replace("body", "")) - Number(b.replace("body", ""));
+          });
+
+        bodyKeys.forEach(function appendBody(key) {
+          var value = sectionData[key];
+          var paragraph;
+
+          if (typeof value !== "string" || !value.trim()) {
+            return;
+          }
+
+          paragraph = document.createElement("p");
+          paragraph.textContent = value.trim();
+          sectionNode.appendChild(paragraph);
+        });
+
+        return true;
+      }
+
+      function renderTermsSectionsFromData(data) {
+        var host = document.querySelector("[data-terms-sections='1']");
+        var terms = data && data.terms && typeof data.terms === "object"
+          ? data.terms
+          : null;
+        var sections = terms && terms.sections && typeof terms.sections === "object"
+          ? terms.sections
+          : null;
+
+        if (!host || !sections) {
+          return false;
+        }
+
+        clearNode(host);
+
+        Object.keys(sections).forEach(function appendSection(sectionKey) {
+          var sectionData = sections[sectionKey];
+          var sectionNode;
+          var title;
+
+          if (!sectionData || typeof sectionData !== "object") {
+            return;
+          }
+
+          sectionNode = document.createElement("section");
+
+          if (typeof sectionData.title === "string" && sectionData.title.trim()) {
+            title = document.createElement("h2");
+            title.textContent = sectionData.title.trim();
+            sectionNode.appendChild(title);
+          }
+
+          appendTermsSectionBody(sectionNode, sectionData);
+          host.appendChild(sectionNode);
+        });
+
+        return true;
+      }
+
+      function loadAndRenderTermsSections() {
+        if (typeof window.fetch !== "function") {
+          return false;
+        }
+
+        window.fetch(LEGAL_JSON_URL, { cache: "no-store" })
+          .then(function onResponse(response) {
+            if (!response || !response.ok) {
+              throw new Error("TERMS_LEGAL_JSON_FAILED");
+            }
+
+            return response.json();
+          })
+          .then(renderTermsSectionsFromData)
+          .catch(function onError() {});
+
+        return true;
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadAndRenderTermsSections, { once: true });
+      } else {
+        loadAndRenderTermsSections();
+      }
+
+      window.addEventListener("pixkuy:i18n-applied", loadAndRenderTermsSections);
+    })(window, document);
+  </script>
+
+  <!-- i18n entrypoint -->
+  <script src="../assets/js/i18n.js"></script>
+</body>
+</html>

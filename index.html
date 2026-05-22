@@ -1286,6 +1286,13 @@
         <input type="hidden" name="submitted_at_client" value="" />
         <input type="hidden" name="form_client_version" value="" />
 
+        <!-- Aceptación de políticas -->
+        <input type="hidden" name="cancellation_policy_accepted" value="" />
+        <input type="hidden" name="cancellation_policy_version" value="" />
+        <input type="hidden" name="cancellation_policy_accepted_at" value="" />
+        <input type="hidden" name="cancellation_policy_channel" value="" />
+        <input type="hidden" name="cancellation_policy_url" value="" />
+
         <!-- Atribución propia de campañas -->
         <input type="hidden" name="campaign_gclid" value="" />
         <input type="hidden" name="campaign_utm_source" value="" />
@@ -3739,6 +3746,8 @@
         <span aria-hidden="true">·</span>
         <a href="legal/cookies.html" data-i18n="legal.links.cookies"></a>
         <span aria-hidden="true">·</span>
+        <a href="legal/terms.html" data-i18n="legal.links.terms"></a>
+        <span aria-hidden="true">·</span>
         <a href="legal/cancellations.html" data-i18n="legal.links.cancellations"></a>
       </nav>
     </div>
@@ -3862,7 +3871,7 @@
 <script src="assets/js/i18n.js"></script>
 
 <!-- Legal overlay entrypoint -->
-<script src="assets/js/legal.js"></script>
+<script src="assets/js/legal.js?v=20260521-terms-1"></script>
 
 <!-- WC2026 internal modules (must load before wc2026.js) -->
 <script src="assets/js/wc2026/env.js"></script>
