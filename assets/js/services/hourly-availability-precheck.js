@@ -20,13 +20,14 @@
   var DEFAULT_PUBLIC_SITE_KEY = "local_pixkuy_site_key";
   var PRECHECK_ENDPOINT = "/v1/public/reservations/hourly-availability-precheck";
   var DEFAULT_HOURLY_PASSENGERS = 6;
-
+  
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
   }
 
   function getConfig() {
     var config = window.PIXKUY_BOOKING_API_CONFIG;
+    var hasExplicitApiBaseUrl;
 
     if (!config || typeof config !== "object") {
       return {
@@ -35,8 +36,14 @@
       };
     }
 
+    hasExplicitApiBaseUrl =
+      Object.prototype.hasOwnProperty.call(config, "apiBaseUrl") &&
+      typeof config.apiBaseUrl === "string";
+
     return {
-      apiBaseUrl: normalizeText(config.apiBaseUrl) || DEFAULT_BOOKING_API_BASE_URL,
+      apiBaseUrl: hasExplicitApiBaseUrl
+        ? normalizeText(config.apiBaseUrl)
+        : DEFAULT_BOOKING_API_BASE_URL,
       publicSiteKey: normalizeText(config.publicSiteKey) || DEFAULT_PUBLIC_SITE_KEY
     };
   }
@@ -44,7 +51,7 @@
   function buildPrecheckUrl(config) {
     return config.apiBaseUrl.replace(/\/+$/, "") + PRECHECK_ENDPOINT;
   }
-
+  
   function parsePositiveInteger(value) {
     var normalized = normalizeText(value).replace(/[^\d]/g, "");
     var parsed = Number(normalized);
@@ -205,7 +212,7 @@
       }).then(function handleBody(body) {
         return normalizeResult(response, body);
       });
-    }).catch(function () {
+    }).catch(function (error) {
       return {
         available: false,
         skipped: false,

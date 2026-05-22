@@ -1286,12 +1286,16 @@
         <input type="hidden" name="submitted_at_client" value="" />
         <input type="hidden" name="form_client_version" value="" />
 
-        <!-- Aceptación de políticas -->
-        <input type="hidden" name="cancellation_policy_accepted" value="" />
-        <input type="hidden" name="cancellation_policy_version" value="" />
-        <input type="hidden" name="cancellation_policy_accepted_at" value="" />
-        <input type="hidden" name="cancellation_policy_channel" value="" />
-        <input type="hidden" name="cancellation_policy_url" value="" />
+        <!-- Aceptación legal -->
+        <input type="hidden" name="legal_acceptance_accepted" value="" />
+        <input type="hidden" name="legal_acceptance_terms_version" value="" />
+        <input type="hidden" name="legal_acceptance_cancellation_policy_version" value="" />
+        <input type="hidden" name="legal_acceptance_privacy_version" value="" />
+        <input type="hidden" name="legal_acceptance_accepted_at" value="" />
+        <input type="hidden" name="legal_acceptance_channel" value="" />
+        <input type="hidden" name="legal_acceptance_terms_url" value="" />
+        <input type="hidden" name="legal_acceptance_cancellations_url" value="" />
+        <input type="hidden" name="legal_acceptance_privacy_url" value="" />
 
         <!-- Atribución propia de campañas -->
         <input type="hidden" name="campaign_gclid" value="" />
@@ -3897,21 +3901,29 @@
 <script src="assets/js/forms/reservation-request.js"></script>
 <script src="assets/js/forms/submission-guard.js"></script>
 <script>
-  window.PIXKUY_BOOKING_API_CONFIG = {
-  apiBaseUrl:
-    window.location.hostname === "192.168.0.14"
-      ? "http://192.168.0.14:3002"
-      : (
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1" ||
-          window.location.hostname === "local.pixkuy.test"
-            ? "http://localhost:3002"
-            : ""
-        ),
-  publicSiteKey: "local_pixkuy_site_key",
-  recaptchaSiteKey: ""
-};
+  (function configurePixkuyBookingApi(window) {
+    "use strict";
+
+    var hostname = window.location.hostname;
+    var apiBaseUrl = "";
+
+    if (hostname === "192.168.0.14") {
+      apiBaseUrl = "http://192.168.0.14:3002";
+    } else if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1"
+    ) {
+      apiBaseUrl = "http://localhost:3002";
+    }
+
+    window.PIXKUY_BOOKING_API_CONFIG = {
+      apiBaseUrl: apiBaseUrl,
+      publicSiteKey: "local_pixkuy_site_key",
+      recaptchaSiteKey: ""
+    };
+  })(window);
 </script>
+<script src="assets/js/forms/legal-acceptance.js"></script>
 <script src="assets/js/forms/hourly-booking-api-checkout.js"></script>
 <script src="assets/js/forms/contact-service-state.js"></script>
 <script src="assets/js/forms/contact-service-switcher.js"></script>

@@ -21,6 +21,7 @@
   const CONTACT_STEP_SELECTOR = "[data-hourly-mobile-contact-step]";
   const CONTACT_STEP_ACTIVE_ATTR = "data-hourly-mobile-contact-step-active";
   const PRIMARY_STEP_HIDDEN_ATTR = "data-hourly-mobile-primary-step-hidden";
+  const LEGAL_ACCEPTANCE_SELECTOR = "[data-hourly-mobile-legal-acceptance]";
 
   const FIELD_NAME = "name";
   const FIELD_PHONE = "phone";
@@ -36,6 +37,7 @@
   let contactStepNode = null;
   let currentPanel = null;
   let currentSnapshot = null;
+  let legalAcceptanceInstance = null;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -435,6 +437,7 @@
     const summaryTitle = document.createElement("p");
     const summaryList = document.createElement("dl");
     const form = document.createElement("div");
+    const legalAcceptance = document.createElement("div");
     const actions = document.createElement("div");
     const submit = document.createElement("button");
     const globalError = document.createElement("p");
@@ -474,6 +477,10 @@
 
     form.className = "hourly-mobile-contact-step__form";
     form.setAttribute("data-hourly-mobile-contact-form", "1");
+	
+	legalAcceptance.className = "hourly-mobile-contact-step__legal";
+    legalAcceptance.setAttribute("data-hourly-mobile-legal-acceptance", "1");
+    legalAcceptance.hidden = true;
 
     form.appendChild(buildField(FIELD_NAME, "text", "name"));
     form.appendChild(buildField(FIELD_PHONE, "tel", "tel"));
@@ -499,6 +506,7 @@
     root.appendChild(backRow);
     root.appendChild(summary);
     root.appendChild(form);
+    root.appendChild(legalAcceptance);
     root.appendChild(globalError);
     root.appendChild(actions);
 
@@ -717,11 +725,103 @@
     return Boolean(name && isValidPhone(phone) && isValidEmail(email));
   }
 
+  function getLegalAcceptanceApi() {
+    return window.PixkuyForms &&
+      window.PixkuyForms.LegalAcceptance &&
+      typeof window.PixkuyForms.LegalAcceptance.create === "function"
+      ? window.PixkuyForms.LegalAcceptance
+      : null;
+  }
+
+  function getLegalAcceptanceHost() {
+    return contactStepNode
+      ? contactStepNode.querySelector(LEGAL_ACCEPTANCE_SELECTOR)
+      : null;
+  }
+
+  function getReservationForm() {
+    const formsApi = getReservationFormsApi();
+
+    return formsApi ? formsApi.getReservationForm() : null;
+  }
+
+  function isLegalAcceptanceAccepted() {
+    return Boolean(
+      legalAcceptanceInstance &&
+      typeof legalAcceptanceInstance.isAccepted === "function" &&
+      legalAcceptanceInstance.isAccepted()
+    );
+  }
+
+  function ensureLegalAcceptance() {
+    const api = getLegalAcceptanceApi();
+    const host = getLegalAcceptanceHost();
+    const form = getReservationForm();
+
+    if (!api || !host || !form) {
+      return null;
+    }
+
+    if (
+      legalAcceptanceInstance &&
+      typeof legalAcceptanceInstance.validate === "function"
+    ) {
+      return legalAcceptanceInstance;
+    }
+
+    legalAcceptanceInstance = api.create({
+      container: host,
+      form: form,
+      channel: "web_hourly_mobile_checkout",
+      checkboxId: "pixkuy-hourly-mobile-legal-acceptance"
+    });
+
+    if (
+      legalAcceptanceInstance.checkbox &&
+      legalAcceptanceInstance.checkbox.__pixkuyHourlyMobileLegalBound !== true
+    ) {
+      legalAcceptanceInstance.checkbox.__pixkuyHourlyMobileLegalBound = true;
+      legalAcceptanceInstance.checkbox.addEventListener("change", syncSubmitAvailability);
+    }
+
+    return legalAcceptanceInstance;
+  }
+
+  function syncLegalAcceptanceVisibility(snapshot) {
+    const host = getLegalAcceptanceHost();
+    const requiresLegalAcceptance = isTransactionalHourlySnapshot(snapshot);
+
+    if (!host) {
+      return false;
+    }
+
+    host.hidden = !requiresLegalAcceptance;
+
+    if (requiresLegalAcceptance) {
+      ensureLegalAcceptance();
+    }
+
+    return true;
+  }
+
+  function validateLegalAcceptance() {
+    const instance = ensureLegalAcceptance();
+
+    if (!instance || typeof instance.validate !== "function") {
+      return false;
+    }
+
+    return instance.validate();
+  }
+
   function syncSubmitAvailability() {
     const submit = contactStepNode
       ? contactStepNode.querySelector("[data-hourly-mobile-contact-submit]")
       : null;
-    const isReady = hasFilledContactData();
+    const requiresLegalAcceptance = isTransactionalHourlySnapshot(currentSnapshot);
+    const isReady =
+      hasFilledContactData() &&
+      (!requiresLegalAcceptance || isLegalAcceptanceAccepted());
 
     if (!submit) {
       return false;
@@ -973,6 +1073,11 @@
       return false;
     }
 
+    if (isTransactionalHourlySnapshot(snapshot) && !validateLegalAcceptance()) {
+      syncSubmitAvailability();
+      return false;
+    }
+
     trackHourlyMobileContactRequest(snapshot);
 
     if (isTransactionalHourlySnapshot(snapshot)) {
@@ -1074,6 +1179,7 @@
 
     syncCopy();
     syncSummary(snapshot);
+    syncLegalAcceptanceVisibility(snapshot);
     syncSubmitAvailability();
 
     panel.setAttribute(PRIMARY_STEP_HIDDEN_ATTR, "true");

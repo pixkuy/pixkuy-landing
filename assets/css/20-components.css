@@ -284,6 +284,110 @@
 }
 
 /* ---------------------------------------------
+   LEGAL ACCEPTANCE — checkout consent
+   --------------------------------------------- */
+
+.legal-acceptance{
+  display:grid;
+  grid-template-columns:18px minmax(0, 1fr);
+  gap:8px 10px;
+  align-items:start;
+
+  margin-top:4px;
+  padding:12px 14px;
+
+  border:1px solid rgba(236,220,189,.18);
+  border-radius:10px;
+  background:rgba(255,255,255,.025);
+}
+
+.form .legal-acceptance__checkbox{
+  appearance:none;
+  -webkit-appearance:none;
+
+  width:18px;
+  height:18px;
+  min-width:18px;
+  min-height:18px;
+
+  margin:2px 0 0;
+  padding:0;
+
+  border-radius:4px;
+  border:1px solid rgba(236,220,189,.42);
+  background:rgba(20,24,27,.95);
+  color:var(--fg);
+
+  cursor:pointer;
+}
+
+.form .legal-acceptance__checkbox:checked{
+  background:var(--accent);
+  border-color:var(--accent);
+  box-shadow:inset 0 0 0 3px #0f1113;
+}
+
+.form .legal-acceptance__checkbox:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+}
+
+.legal-acceptance__label{
+  margin:0;
+  color:rgba(255,249,238,.94);
+  font-size:14px;
+  line-height:1.45;
+}
+
+.legal-acceptance__links{
+  grid-column:2;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 8px;
+
+  font-size:13px;
+  line-height:1.35;
+}
+
+.legal-acceptance__links a{
+  color:rgba(255,249,238,.82);
+  text-decoration:underline;
+  text-decoration-color:rgba(255,249,238,.34);
+  text-underline-offset:3px;
+}
+
+.legal-acceptance__links a:hover{
+  color:var(--fg);
+  text-decoration-color:rgba(31,122,109,.9);
+}
+
+.legal-acceptance__links a:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:3px;
+}
+
+.legal-acceptance__error{
+  grid-column:2;
+  margin:0;
+}
+
+@media (max-width:720px){
+  .legal-acceptance{
+    grid-template-columns:18px minmax(0, 1fr);
+    padding:12px;
+    border-radius:9px;
+  }
+
+  .legal-acceptance__label{
+    font-size:13.5px;
+  }
+
+  .legal-acceptance__links{
+    font-size:13px;
+  }
+}
+
+/* ---------------------------------------------
    FORM — SUCCESS STATUS (post-submit)
    --------------------------------------------- */
 

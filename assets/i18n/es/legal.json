@@ -1,5 +1,6 @@
 {
   "legal": {
+    "privacyPolicyVersion": "privacy_v1_2026_05",
     "links": {
       "terms": "Términos",
       "cancellations": "Cancelaciones"
@@ -16,6 +17,15 @@
     "lastUpdated": "",
     "intro": "Los presentes Términos y condiciones regulan la solicitud, contratación, confirmación y prestación de los servicios privados de movilidad con conductor ofrecidos por Pixkuy Mobility S.A. de C.V. Al solicitar, confirmar, pagar o utilizar un servicio de Pixkuy, el cliente declara haber leído, entendido y aceptado estos Términos y condiciones, la Política de cancelación, cambios y reembolsos y el Aviso de privacidad de Pixkuy, en lo que resulte aplicable al servicio contratado.",
     "back": "Volver a la página de inicio",
+    "policyVersion": "terms_v1_2026_05",
+    "acceptance": {
+      "title": "Condiciones legales",
+      "checkbox": "He leído y acepto los Términos y condiciones, la Política de cancelación, cambios y reembolsos y el Aviso de privacidad de Pixkuy.",
+      "viewTerms": "Ver Términos",
+      "viewCancellations": "Ver Cancelaciones",
+      "viewPrivacy": "Ver Privacidad",
+      "error": "Debes aceptar las condiciones legales para continuar al pago."
+    },
     "sections": {
       "provider": {
         "title": "1. Identificación del proveedor",

@@ -21,6 +21,7 @@ var RECAPTCHA_ACTION = "hourly_checkout";
 var DEFAULT_HOURLY_PASSENGERS = 6;
 var BOOKING_CHECKOUT_HANDOFF_PATH = "/booking-checkout.html";
 var BOOKING_CHECKOUT_STORAGE_PREFIX = "pixkuy_booking_checkout:";
+var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -126,6 +127,21 @@ var BOOKING_CHECKOUT_STORAGE_PREFIX = "pixkuy_booking_checkout:";
         data.hourlyDailyMode === "hourly" ||
         data.hourlyDailyMode === "full_day"
       )
+    );
+  }
+  
+  function hasRequiredHourlyCheckoutData(data) {
+    return Boolean(
+      data &&
+      isHourlyTransactionalData(data) &&
+      normalizeText(data.name) &&
+      normalizeText(data.email) &&
+      normalizeText(data.phone) &&
+      normalizeText(data.hourlyDailyPickup) &&
+      normalizeText(data.hourlyDailyDate) &&
+      normalizeText(data.hourlyDailyStartTime) &&
+      normalizeText(data.hourlyDailyDurationHours) &&
+      normalizeText(data.hourlyDailyPrice)
     );
   }
 
@@ -376,6 +392,217 @@ var BOOKING_CHECKOUT_STORAGE_PREFIX = "pixkuy_booking_checkout:";
 
     return true;
   }
+  
+    function getLegalAcceptanceApi() {
+    return window.PixkuyForms &&
+      window.PixkuyForms.LegalAcceptance &&
+      typeof window.PixkuyForms.LegalAcceptance.create === "function"
+      ? window.PixkuyForms.LegalAcceptance
+      : null;
+  }
+
+  function getLegalAcceptanceHost(form) {
+    var existing = form
+      ? form.querySelector(LEGAL_ACCEPTANCE_HOST_SELECTOR)
+      : null;
+    var actions;
+    var host;
+
+    if (existing) {
+      return existing;
+    }
+
+    if (!form) {
+      return null;
+    }
+
+    actions = form.querySelector(".form-actions");
+
+    if (!actions || !actions.parentNode) {
+      return null;
+    }
+
+    host = document.createElement("div");
+    host.setAttribute("data-hourly-checkout-legal-acceptance", "1");
+    host.hidden = true;
+
+    actions.parentNode.insertBefore(host, actions);
+
+    return host;
+  }
+  
+    function setLegalAcceptanceSubmitDisabled(form, isDisabled) {
+    var buttons;
+
+    if (!form) {
+      return false;
+    }
+
+    buttons = Array.prototype.slice.call(
+      form.querySelectorAll(
+        'button[type="submit"]'
+      )
+    );
+
+    buttons.forEach(function syncLegalButton(button) {
+      button.disabled = Boolean(isDisabled);
+      button.setAttribute("aria-disabled", isDisabled ? "true" : "false");
+    });
+
+    return true;
+  }
+
+  function bindLegalAcceptanceSubmitState(form, instance) {
+    if (
+      !form ||
+      !instance ||
+      !instance.checkbox ||
+      instance.checkbox.__pixkuyLegalAcceptanceSubmitBound === true
+    ) {
+      return false;
+    }
+
+    instance.checkbox.__pixkuyLegalAcceptanceSubmitBound = true;
+
+    scheduleLegalAcceptanceVisibilitySync(form);
+
+    instance.checkbox.addEventListener("change", function onLegalAcceptanceChange() {
+      scheduleLegalAcceptanceVisibilitySync(form);
+    });
+
+    return true;
+  }
+
+  function getLegalAcceptanceInstance(form) {
+    var host = getLegalAcceptanceHost(form);
+    var api = getLegalAcceptanceApi();
+    var existing;
+
+    if (!host || !api) {
+      return null;
+    }
+
+    existing = host.__pixkuyLegalAcceptanceInstance || null;
+
+    if (existing && typeof existing.validate === "function") {
+      return existing;
+    }
+
+    host.__pixkuyLegalAcceptanceInstance = api.create({
+      container: host,
+      form: form,
+      channel: "web_hourly_checkout",
+      checkboxId: "pixkuy-hourly-legal-acceptance"
+    });
+
+    bindLegalAcceptanceSubmitState(form, host.__pixkuyLegalAcceptanceInstance);
+
+    return host.__pixkuyLegalAcceptanceInstance;
+  }
+
+  function hasSyncedLegalAcceptance(form) {
+    return Boolean(
+      getFieldValue(form, "legal_acceptance_accepted") === "true" &&
+      getFieldValue(form, "legal_acceptance_terms_version") &&
+      getFieldValue(form, "legal_acceptance_cancellation_policy_version") &&
+      getFieldValue(form, "legal_acceptance_privacy_version") &&
+      getFieldValue(form, "legal_acceptance_accepted_at") &&
+      getFieldValue(form, "legal_acceptance_channel")
+    );
+  }
+
+  function validateLegalAcceptance(form) {
+    var instance;
+
+    if (hasSyncedLegalAcceptance(form)) {
+      return true;
+    }
+
+    instance = getLegalAcceptanceInstance(form);
+
+    if (!instance || typeof instance.validate !== "function") {
+      return false;
+    }
+
+    return instance.validate();
+  }
+  
+    function getExistingLegalAcceptanceHost(form) {
+    return form ? form.querySelector(LEGAL_ACCEPTANCE_HOST_SELECTOR) : null;
+  }
+
+  function isLegalAcceptanceInstanceAccepted(instance) {
+    return Boolean(
+      instance &&
+      typeof instance.isAccepted === "function" &&
+      instance.isAccepted()
+    );
+  }
+
+  function syncLegalAcceptanceVisibility(form) {
+    var api = getReservationApi();
+    var fields;
+    var data;
+    var host;
+    var instance;
+    var isRequired;
+
+    if (!form || !api) {
+      return false;
+    }
+
+    fields = api.getReservationRequestFields(form);
+    data = fields ? api.getReservationRequestData(fields) : null;
+    isRequired = isHourlyTransactionalData(data);
+
+    if (!isRequired) {
+      host = getExistingLegalAcceptanceHost(form);
+
+      if (host) {
+        host.hidden = true;
+      }
+
+      setLegalAcceptanceSubmitDisabled(form, false);
+      return true;
+    }
+
+    instance = getLegalAcceptanceInstance(form);
+    host = getExistingLegalAcceptanceHost(form);
+
+    if (host) {
+      host.hidden = false;
+    }
+
+    setLegalAcceptanceSubmitDisabled(
+      form,
+      !hasRequiredHourlyCheckoutData(data) ||
+        (
+          !hasSyncedLegalAcceptance(form) &&
+          !isLegalAcceptanceInstanceAccepted(instance)
+        )
+    );
+
+    return true;
+  }
+
+  function scheduleLegalAcceptanceVisibilitySync(form) {
+    if (!form) {
+      return false;
+    }
+
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(function syncOnFrame() {
+        syncLegalAcceptanceVisibility(form);
+      });
+      return true;
+    }
+
+    window.setTimeout(function syncOnTimeout() {
+      syncLegalAcceptanceVisibility(form);
+    }, 0);
+
+    return true;
+  }
 
   function requestCheckout(input) {
     return window.fetch(buildCheckoutUrl(input.config), {
@@ -491,7 +718,13 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
       return;
     }
 
+    syncLegalAcceptanceVisibility(form);
+
     if (!api.refreshReservationRequestValidationUX(fields)) {      
+      return;
+    }
+
+    if (!validateLegalAcceptance(form)) {
       return;
     }
 
@@ -538,11 +771,32 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
   }
 
   function init() {
+    var form = getForm();
+
     if (document.documentElement.dataset.hourlyBookingApiCheckoutBound === "1") {
       return false;
     }
 
     document.addEventListener("submit", handleSubmit, true);
+
+    document.addEventListener("input", function onDocumentInput() {
+      scheduleLegalAcceptanceVisibilitySync(getForm());
+    }, true);
+
+    document.addEventListener("change", function onDocumentChange() {
+      scheduleLegalAcceptanceVisibilitySync(getForm());
+    }, true);
+
+    document.addEventListener("click", function onDocumentClick() {
+      scheduleLegalAcceptanceVisibilitySync(getForm());
+    }, true);
+
+    window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
+      scheduleLegalAcceptanceVisibilitySync(getForm());
+    });
+
+    scheduleLegalAcceptanceVisibilitySync(form);
+
     document.documentElement.dataset.hourlyBookingApiCheckoutBound = "1";
 
     return true;
