@@ -52,6 +52,24 @@
     return document.querySelector("[data-booking-status-mobile-panel]");
   }
 
+  function getDesktopRoot() {
+    return document.querySelector("[data-booking-status-desktop]");
+  }
+
+  function setDesktopHidden(hidden) {
+    var desktopRoot = getDesktopRoot();
+
+    if (!desktopRoot) {
+      return false;
+    }
+
+    desktopRoot.hidden = Boolean(hidden);
+    desktopRoot.setAttribute("aria-hidden", hidden ? "true" : "false");
+    desktopRoot.style.display = hidden ? "none" : "";
+
+    return true;
+  }
+
   function setText(root, selector, value) {
     var node = root ? root.querySelector(selector) : null;
 
@@ -154,6 +172,55 @@
     }
 
     return String(value) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
+  }
+
+  function getVehicleThumbnailSrc(vehicleDisplayName) {
+    var normalized = String(vehicleDisplayName || "").toLowerCase();
+
+    if (normalized.indexOf("byd m9") > -1 || normalized.indexOf("m9") > -1) {
+      return "assets/img/fleet/bydm9_xhoras001d.jpeg";
+    }
+
+    return "";
+  }
+
+  function syncVehicleThumbnail(root, result) {
+    var vehicleNode = root ? root.querySelector("[data-booking-status-vehicle]") : null;
+    var existing;
+    var src;
+    var image;
+
+    if (!vehicleNode) {
+      return false;
+    }
+
+    existing = vehicleNode.querySelector("[data-booking-status-vehicle-thumb]");
+
+    if (existing) {
+      existing.remove();
+    }
+
+    vehicleNode.classList.remove("booking-status-mobile__vehicle-value");
+
+    src = getVehicleThumbnailSrc(result && result.vehicleDisplayName);
+
+    if (!src) {
+      return false;
+    }
+
+    image = document.createElement("img");
+    image.className = "booking-status-mobile__vehicle-thumb";
+    image.setAttribute("data-booking-status-vehicle-thumb", "1");
+    image.setAttribute("src", src);
+    image.setAttribute("alt", "");
+    image.setAttribute("aria-hidden", "true");
+    image.setAttribute("loading", "lazy");
+    image.setAttribute("decoding", "async");
+
+    vehicleNode.classList.add("booking-status-mobile__vehicle-value");
+    vehicleNode.appendChild(image);
+
+    return true;
   }
 
   function getCommonCopyPath(view) {
@@ -282,6 +349,8 @@
 
     previousFocus = document.activeElement;
 
+    setDesktopHidden(true);
+
     root.hidden = false;
     root.setAttribute("aria-hidden", "false");
     document.body.classList.add(LOCK_CLASS);
@@ -306,6 +375,7 @@
 
     root.setAttribute("aria-hidden", "true");
     document.body.classList.remove(LOCK_CLASS);
+    setDesktopHidden(false);
 
     if (
       previousFocus &&
@@ -382,6 +452,7 @@
       "[data-booking-status-vehicle]",
       result.vehicleDisplayName || emptyValue(dictionary)
     );
+    syncVehicleThumbnail(root, result);
     setText(
       root,
       "[data-booking-status-date]",

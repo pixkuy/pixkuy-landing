@@ -54,8 +54,8 @@
     "confirmed": {
       "state": "Reserva confirmada",
       "title": "Tu reserva está confirmada",
-      "lead": "Tu vehículo queda reservado. Revisa el resumen y conserva el código de reserva para cualquier coordinación con Pixkuy.",
-      "notice": "La fecha y hora mostradas corresponden a Ciudad de México. No se convierten a la zona horaria del dispositivo."
+      "lead": "Tu vehículo queda reservado. Conserva el código de reserva para cualquier coordinación con Pixkuy.",
+      "notice": "Recibirás un email de confirmación con el resumen de la reserva. La fecha y hora corresponden a Ciudad de México."
     },
     "pending": {
       "state": "Pago en verificación",

@@ -227,6 +227,28 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
 
     return payload;
   }
+  
+    function addLegalAcceptanceFields(payload, form) {
+    [
+      "legal_acceptance_accepted",
+      "legal_acceptance_terms_version",
+      "legal_acceptance_cancellation_policy_version",
+      "legal_acceptance_privacy_version",
+      "legal_acceptance_accepted_at",
+      "legal_acceptance_channel",
+      "legal_acceptance_terms_url",
+      "legal_acceptance_cancellations_url",
+      "legal_acceptance_privacy_url"
+    ].forEach(function copyLegalField(name) {
+      var value = getFieldValue(form, name);
+
+      if (value) {
+        payload[name] = value;
+      }
+    });
+
+    return payload;
+  }
 
   function buildRequestSummary(data) {
     var parts = [];
@@ -290,6 +312,7 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     addOptionalString(payload, "hourly_daily_pickup_place_id", data.hourlyDailyPickupPlaceId);
     addOptionalNumber(payload, "hourly_daily_pickup_lat", data.hourlyDailyPickupLat);
     addOptionalNumber(payload, "hourly_daily_pickup_lng", data.hourlyDailyPickupLng);
+    addLegalAcceptanceFields(payload, form);
 
     if (normalizeText(recaptchaToken)) {
       payload.recaptchaToken = normalizeText(recaptchaToken);
@@ -374,6 +397,15 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     if (fields && fields.formError) {
       fields.formError.textContent = message;
       fields.formError.hidden = false;
+    }
+
+    var mobileError = document.querySelector(
+      '[data-hourly-mobile-contact-step][aria-hidden="false"] [data-hourly-mobile-contact-global-error]'
+    );
+
+    if (mobileError) {
+      mobileError.textContent = message;
+      mobileError.hidden = false;
     }
 
     return true;
@@ -566,6 +598,21 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
       return true;
     }
 
+    if (hasSyncedLegalAcceptance(form)) {
+      host = getExistingLegalAcceptanceHost(form);
+
+      if (host) {
+        host.hidden = true;
+      }
+
+      setLegalAcceptanceSubmitDisabled(
+        form,
+        !hasRequiredHourlyCheckoutData(data)
+      );
+
+      return true;
+    }
+
     instance = getLegalAcceptanceInstance(form);
     host = getExistingLegalAcceptanceHost(form);
 
@@ -576,10 +623,7 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     setLegalAcceptanceSubmitDisabled(
       form,
       !hasRequiredHourlyCheckoutData(data) ||
-        (
-          !hasSyncedLegalAcceptance(form) &&
-          !isLegalAcceptanceInstanceAccepted(instance)
-        )
+        !isLegalAcceptanceInstanceAccepted(instance)
     );
 
     return true;
@@ -720,7 +764,8 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
 
     syncLegalAcceptanceVisibility(form);
 
-    if (!api.refreshReservationRequestValidationUX(fields)) {      
+    if (!hasRequiredHourlyCheckoutData(data)) {
+      showCheckoutError(form);
       return;
     }
 

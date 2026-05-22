@@ -50,7 +50,8 @@ body.booking-status-mobile-lock{
     background:#0f1113;
   }
 
-  .booking-status--desktop{
+  .booking-status--desktop,
+  body.booking-status-mobile-lock .booking-status--desktop{
     display:none !important;
   }
 
@@ -81,16 +82,14 @@ body.booking-status-mobile-lock{
 
   .booking-status-mobile__panel{
     position:absolute;
-    left:0;
-    right:0;
-    bottom:0;
+    inset:0;
 
     box-sizing:border-box;
     width:100%;
-    max-height:calc(100svh - env(safe-area-inset-top));
+    height:100%;
 
     display:grid;
-    grid-template-rows:auto auto auto auto auto auto;
+    grid-template-rows:auto auto auto auto minmax(0, 1fr) auto auto;
     gap:0;
 
     padding:
@@ -98,51 +97,22 @@ body.booking-status-mobile-lock{
       18px
       calc(14px + env(safe-area-inset-bottom));
 
-    border:1px solid rgba(255,255,255,.12);
-    border-right:0;
-    border-bottom:0;
-    border-left:0;
-    border-radius:16px 16px 0 0;
+    border:0;
+    border-radius:0;
 
-    background:#111315;
+    background:
+      linear-gradient(180deg, rgba(17,19,21,.94) 0%, rgba(17,19,21,.88) 100%),
+      url("../img/hero-night-cdmx.webp");
+    background-position:center;
+    background-size:cover;
     color:var(--fg);
-    box-shadow:0 -12px 34px rgba(0,0,0,.34);
+    box-shadow:none;
     outline:none;
     overflow:hidden;
   }
-
+  
   .booking-status-mobile__close{
-    position:absolute;
-    top:11px;
-    right:12px;
-    z-index:2;
-
-    width:36px;
-    height:36px;
-
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:0;
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:999px;
-
-    background:rgba(255,255,255,.04);
-    color:rgba(244,242,238,.86);
-    box-shadow:none;
-
-    font:inherit;
-    font-size:22px;
-    line-height:1;
-    font-weight:500;
-
-    cursor:pointer;
-  }
-
-  .booking-status-mobile__close:focus-visible{
-    outline:2px solid rgba(31,122,109,.95);
-    outline-offset:3px;
+    display:none !important;
   }
 
   .booking-status-mobile__brand{
@@ -157,15 +127,11 @@ body.booking-status-mobile-lock{
   }
 
   .booking-status-mobile__state{
-    margin:0 44px 7px 0;
-    color:rgba(244,242,238,.62);
-    font-size:12px;
-    line-height:1.25;
-    font-weight:700;
+    display:none;
   }
 
   .booking-status-mobile__title{
-    margin:0 44px 9px 0;
+    margin:0 0 9px;
     color:var(--fg);
     font-size:29px;
     line-height:1.04;
@@ -184,6 +150,7 @@ body.booking-status-mobile-lock{
     grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:1px;
 
+    align-self:start;
     margin:12px 0 0;
     padding:0;
 
@@ -224,16 +191,40 @@ body.booking-status-mobile-lock{
 
     overflow-wrap:anywhere;
   }
+  
+  .booking-status-mobile__vehicle-value{
+    display:grid;
+    gap:6px;
+  }
+
+  .booking-status-mobile__vehicle-thumb{
+    display:block;
+
+    width:132px;
+    height:90px;
+
+    max-width:100%;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:9px;
+
+    object-fit:cover;
+    object-position:center 88%;
+
+    background:rgba(255,255,255,.04);
+    pointer-events:none;
+  }
 
   .booking-status-mobile__notice{
-    margin-top:11px;
+    align-self:end;
+    margin-top:12px;
     padding:9px 10px;
 
     border:1px solid rgba(255,255,255,.12);
     border-radius:10px;
 
-    background:rgba(255,255,255,.03);
-    color:rgba(244,242,238,.78);
+    background:rgba(255,255,255,.05);
+    color:rgba(244,242,238,.84);
 
     font-size:12px;
     line-height:1.32;
@@ -266,6 +257,7 @@ body.booking-status-mobile-lock{
     grid-template-columns:1fr 1fr;
     gap:8px;
 
+    align-self:end;
     margin-top:12px;
   }
 
