@@ -17,6 +17,8 @@
   const DEFAULT_VEHICLE_TYPE = "executive_van";
   const DEFAULT_DURATION_HOURS = 2;
   const DEFAULT_CURRENCY = "MXN";
+  const CHECKOUT_REVIEW_RETURN_KEY = "pixkuy_hourly_checkout_review_return";
+  const CHECKOUT_REVIEW_SNAPSHOT_KEY = "pixkuy_hourly_checkout_review_snapshot";
 
   const HOURLY_DURATION_OPTIONS = Object.freeze([2, 3, 4, 5, 6, 7, 8, 9, 10]);
   const LONG_TERM_OPTIONS = Object.freeze(["week", "fortnight", "monthly", "custom"]);
@@ -976,6 +978,106 @@
   return true;
 }
 
+  function readCheckoutReviewReturnSnapshot() {
+    let raw;
+    let parsed;
+
+    try {
+      if (window.sessionStorage.getItem(CHECKOUT_REVIEW_RETURN_KEY) !== "1") {
+        return null;
+      }
+
+      raw = window.sessionStorage.getItem(CHECKOUT_REVIEW_SNAPSHOT_KEY);
+    } catch (error) {
+      return null;
+    }
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (error) {
+      return null;
+    }
+
+    return parsed && typeof parsed === "object" ? parsed : null;
+  }
+
+  function activateHourlyDailyServiceForCheckoutReturn() {
+    const form = getReservationForm();
+    const serviceTypeField = form
+      ? form.querySelector('input[name="service_type"]')
+      : null;
+    const serviceStateApi = NAMESPACE.contactServiceState;
+
+    if (serviceTypeField) {
+      serviceTypeField.value = "hourly_daily";
+    }
+
+    if (
+      serviceStateApi &&
+      typeof serviceStateApi.setActiveServiceType === "function"
+    ) {
+      serviceStateApi.setActiveServiceType("hourly_daily", {
+        source: "hourly-checkout-review-return",
+        skipConfirm: true
+      });
+    }
+
+    return true;
+  }
+
+  function scrollCheckoutReviewReturnToForm() {
+    const form = getReservationForm();
+
+    if (!form || typeof form.scrollIntoView !== "function") {
+      return false;
+    }
+
+    form.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    return true;
+  }
+
+  function restoreCheckoutReviewHourlyState() {
+    const snapshot = readCheckoutReviewReturnSnapshot();
+
+    if (!snapshot) {
+      return false;
+    }
+
+    activateHourlyDailyServiceForCheckoutReturn();
+
+    if (!applyHandoff(snapshot)) {
+      return false;
+    }
+
+    window.setTimeout(function reapplyCheckoutReviewSnapshot() {
+      activateHourlyDailyServiceForCheckoutReturn();
+      applyHandoff(snapshot);
+      scrollCheckoutReviewReturnToForm();
+    }, 0);
+
+    window.setTimeout(function finalReapplyCheckoutReviewSnapshot() {
+      activateHourlyDailyServiceForCheckoutReturn();
+      applyHandoff(snapshot);
+      scrollCheckoutReviewReturnToForm();
+
+      try {
+        window.sessionStorage.removeItem(CHECKOUT_REVIEW_RETURN_KEY);
+      } catch (error) {
+        // no-op
+      }
+    }, 250);
+
+    return true;
+  }
+
   function applyHandoff(payload) {
     const form = getReservationForm();
     const nodes = getEditorNodes(form);
@@ -1453,6 +1555,10 @@
     syncView(nodes, {
       syncReservationState: false
     });
+
+    window.setTimeout(function restoreCheckoutReviewReturn() {
+      restoreCheckoutReviewHourlyState();
+    }, 0);
 
     return true;
   }

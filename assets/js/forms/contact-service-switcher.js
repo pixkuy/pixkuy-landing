@@ -323,6 +323,10 @@
     const commonTripTimeWrapper = commonTripTimeField
       ? commonTripTimeField.closest('.form-field')
       : null;
+    const messageField = form.querySelector('#contact-message');
+    const messageWrapper = messageField
+      ? messageField.closest('.form-field')
+      : null;
     const shouldHideSharedPlacesAndPassengers =
       activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private" ||
@@ -340,6 +344,9 @@
       activeServiceType === "hourly_daily" ||
       activeServiceType === "event_special" ||
       activeServiceType === "direct_transfer";
+    const shouldHideSharedMessage =
+      activeServiceType === "hourly_daily" &&
+      !isMobileServiceSelectViewport();
 
     if (originField) {
       originField.hidden = shouldHideSharedPlacesAndPassengers;
@@ -387,6 +394,20 @@
         "aria-hidden",
         shouldHideSharedTripDateTime ? "true" : "false"
       );
+    }
+
+    if (messageWrapper) {
+      messageWrapper.hidden = shouldHideSharedMessage;
+      messageWrapper.setAttribute(
+        "aria-hidden",
+        shouldHideSharedMessage ? "true" : "false"
+      );
+    }
+
+    if (messageField && shouldHideSharedMessage) {
+      messageField.value = "";
+      messageField.required = false;
+      messageField.setAttribute("aria-invalid", "false");
     }
 
     return true;

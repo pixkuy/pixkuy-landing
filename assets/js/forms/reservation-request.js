@@ -934,9 +934,129 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   function isFormLocked(form) {
     return isFormSubmitted(form) || isFormBusy(form);
   }
+  
+    function isDesktopViewport() {
+    return !(
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(max-width: 720px)').matches
+    );
+  }
+
+  function getSubmitLabel(path, fallback) {
+    var value = getI18nValue(path);
+
+    return value || fallback || '';
+  }
+
+  function getSubmitLabelForData(data) {
+    if (
+      data &&
+      data.serviceType === 'hourly_daily' &&
+      (
+        data.hourlyDailyMode === 'hourly' ||
+        data.hourlyDailyMode === 'full_day'
+      ) &&
+      isDesktopViewport()
+    ) {
+      return getSubmitLabel(
+        'services.cards.hourly.panel.reviewCta',
+        'Revisar reserva'
+      );
+    }
+
+    return getSubmitLabel('contact.submit', 'Enviar solicitud');
+  }
+
+  function syncSubmitLabel(fields, data) {
+    if (!fields || !fields.submit) {
+      return false;
+    }
+
+    fields.submit.textContent = getSubmitLabelForData(data);
+    return true;
+  }
 
   function setReadyState(form) {
     form.setAttribute('data-reservation-request-ready', '1');
+  }
+  
+    function readCheckoutReviewReturnSnapshot() {
+    var raw;
+    var parsed;
+
+    try {
+      if (window.sessionStorage.getItem('pixkuy_hourly_checkout_review_return') !== '1') {
+        return null;
+      }
+
+      raw = window.sessionStorage.getItem('pixkuy_hourly_checkout_review_snapshot');
+    } catch (error) {
+      return null;
+    }
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (error) {
+      return null;
+    }
+
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  }
+
+  function restoreFieldValue(field, value) {
+    if (!field || value === undefined || value === null) {
+      return false;
+    }
+
+    field.value = typeof value === 'string' ? value : String(value);
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    field.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  }
+
+  function restoreCheckoutReviewCommonFields(fields) {
+    var snapshot = readCheckoutReviewReturnSnapshot();
+    var legalFieldNames;
+
+    if (!snapshot || !hasCriticalFields(fields)) {
+      return false;
+    }
+
+    restoreFieldValue(fields.name, snapshot.name);
+    restoreFieldValue(fields.phone, snapshot.phone);
+    restoreFieldValue(fields.email, snapshot.email);
+
+    if (fields.serviceType) {
+      restoreFieldValue(fields.serviceType, 'hourly_daily');
+    }
+
+    legalFieldNames = [
+      'legal_acceptance_accepted',
+      'legal_acceptance_terms_version',
+      'legal_acceptance_cancellation_policy_version',
+      'legal_acceptance_privacy_version',
+      'legal_acceptance_accepted_at',
+      'legal_acceptance_channel',
+      'legal_acceptance_terms_url',
+      'legal_acceptance_cancellations_url',
+      'legal_acceptance_privacy_url'
+    ];
+
+    legalFieldNames.forEach(function restoreLegalField(fieldName) {
+      var field = fields.form.querySelector('input[name="' + fieldName + '"]');
+
+      if (field && snapshot[fieldName]) {
+        field.value = snapshot[fieldName];
+      }
+    });
+
+    syncReservationRequestState(fields);
+    return true;
   }
 
   function setSubmitEnabled(fields, enabled) {
@@ -1529,6 +1649,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     syncReservationDateTimeMinimum(fields);
     data = getReservationRequestData(fields);
     syncNativeRequiredState(fields, data);
+    syncSubmitLabel(fields, data);
 
     if (isFormLocked(fields.form)) {
       setSubmitEnabled(fields, false);
@@ -1816,7 +1937,12 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     syncReservationDateTimeMinimum(fields);
     bindLiveState(fields);
     bindSubmitValidation(fields);
+    restoreCheckoutReviewCommonFields(fields);
     syncReservationRequestState(fields);
+
+    window.addEventListener('pixkuy:i18n-applied', function () {
+      syncReservationRequestState(fields);
+    });
 
     return true;
   }

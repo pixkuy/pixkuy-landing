@@ -111,6 +111,37 @@
           "longTermPriceValue": "Según operación",
           "priceValuePending": "—",
           "cta": "Solicitar",
+          "reviewCta": "Revisar reserva",
+          "review": {
+            "title": "Revisa tu reserva",
+            "text": "Confirma que los datos son correctos antes de pasar al pago.",
+            "proceed": "Proceder al pago",
+            "edit": "Editar datos"
+          },
+          "reviewPage": {
+            "emptyTitle": "No encontramos los datos de la reserva",
+            "emptyText": "Vuelve al formulario para revisar tu servicio y continuar.",
+            "emptyCta": "Volver al formulario",
+            "serviceValue": "Vehículo privado con conductor",
+            "vehicleValue": "BYD M9",
+            "passengersValue": "Hasta 6 pasajeros",
+            "legalTitle": "Condiciones aceptadas",
+            "legalText": "Aceptaste los términos, la política de cancelaciones y la política de privacidad antes de continuar.",
+            "legalTextFallback": "Aceptaste los términos, la política de cancelaciones y la política de privacidad.",
+            "error": "No pudimos iniciar el pago. Revisa los datos y vuelve a intentarlo.",
+            "details": {
+              "service": "Servicio",
+              "mode": "Modalidad",
+              "pickup": "Recogida",
+              "date": "Fecha",
+              "time": "Hora",
+              "duration": "Duración",
+              "vehicle": "Vehículo",
+              "passengers": "Pasajeros",
+              "price": "Precio final",
+              "notes": "Notas"
+            }
+          },
 "ctaDisabled": "Completa la configuración",
 "availability": {
   "checking": "Comprobando disponibilidad...",

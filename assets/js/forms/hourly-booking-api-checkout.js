@@ -21,6 +21,8 @@ var RECAPTCHA_ACTION = "hourly_checkout";
 var DEFAULT_HOURLY_PASSENGERS = 6;
 var BOOKING_CHECKOUT_HANDOFF_PATH = "/booking-checkout.html";
 var BOOKING_CHECKOUT_STORAGE_PREFIX = "pixkuy_booking_checkout:";
+var HOURLY_CHECKOUT_REVIEW_PATH = "/hourly-checkout-review.html";
+var HOURLY_CHECKOUT_REVIEW_STORAGE_KEY = "pixkuy_hourly_checkout_review_snapshot";
 var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
 
   function normalizeText(value) {
@@ -127,6 +129,13 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
         data.hourlyDailyMode === "hourly" ||
         data.hourlyDailyMode === "full_day"
       )
+    );
+  }
+  
+  function isDesktopViewport() {
+    return !(
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(max-width: 720px)").matches
     );
   }
   
@@ -319,6 +328,46 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     }
 
     return payload;
+  }
+  
+    function buildCheckoutReviewSnapshot(form, data) {
+    var snapshot = getFormPayloadRaw(form);
+
+    snapshot.name = data.name;
+    snapshot.email = data.email;
+    snapshot.phone = data.phone;
+    snapshot.service_type = "hourly_daily";
+    snapshot.hourly_daily_mode = data.hourlyDailyMode;
+    snapshot.hourly_daily_pickup = data.hourlyDailyPickup;
+    snapshot.hourly_daily_date = data.hourlyDailyDate;
+    snapshot.hourly_daily_start_time = data.hourlyDailyStartTime;
+    snapshot.hourly_daily_duration_hours = data.hourlyDailyDurationHours;
+    snapshot.hourly_daily_price = data.hourlyDailyPrice;
+    snapshot.hourly_daily_currency = data.hourlyDailyCurrency || "MXN";
+    snapshot.hourly_daily_pickup_place_id = data.hourlyDailyPickupPlaceId || "";
+    snapshot.hourly_daily_pickup_lat = data.hourlyDailyPickupLat || "";
+    snapshot.hourly_daily_pickup_lng = data.hourlyDailyPickupLng || "";
+    snapshot.request_summary = getFieldValue(form, "request_summary") || buildRequestSummary(data);
+    snapshot.locale = getDocumentLocale();
+    snapshot.form_payload_raw = getFormPayloadRaw(form);
+
+    addLegalAcceptanceFields(snapshot, form);
+
+    return snapshot;
+  }
+
+  function redirectToCheckoutReview(form, data) {
+    try {
+      window.sessionStorage.setItem(
+        HOURLY_CHECKOUT_REVIEW_STORAGE_KEY,
+        JSON.stringify(buildCheckoutReviewSnapshot(form, data))
+      );
+    } catch (error) {
+      return false;
+    }
+
+    window.location.assign(HOURLY_CHECKOUT_REVIEW_PATH);
+    return true;
   }
 
   function getRecaptchaToken(config) {
@@ -602,7 +651,7 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
       host = getExistingLegalAcceptanceHost(form);
 
       if (host) {
-        host.hidden = true;
+        host.hidden = false;
       }
 
       setLegalAcceptanceSubmitDisabled(
@@ -774,6 +823,15 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
     }
 
     hideCheckoutError(form);
+
+    if (isDesktopViewport()) {
+      if (!redirectToCheckoutReview(form, data)) {
+        showCheckoutError(form);
+      }
+
+      return;
+    }
+
     setFormBusy(form, true);
 
     config = getConfig();
