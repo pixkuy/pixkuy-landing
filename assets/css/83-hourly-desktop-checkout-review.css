@@ -1,0 +1,158 @@
+/* assets/css/83-hourly-desktop-checkout-review.css
+   Hourly desktop checkout review.
+   Alcance:
+   - solo desktop
+   - resumen inline antes de iniciar checkout Stripe
+   - no toca móvil
+*/
+
+.hourly-desktop-checkout-review{
+  display:grid;
+  gap:16px;
+  margin:20px 0;
+  padding:18px;
+  border:1px solid rgba(236,220,189,.18);
+  border-radius:12px;
+  background:rgba(15,17,19,.42);
+  outline:none;
+}
+
+.hourly-desktop-checkout-review__header{
+  display:grid;
+  gap:6px;
+}
+
+.hourly-desktop-checkout-review__title{
+  margin:0;
+  color:rgba(255,249,238,.98);
+  font-size:20px;
+  line-height:1.2;
+  letter-spacing:-.01em;
+}
+
+.hourly-desktop-checkout-review__text{
+  margin:0;
+  color:rgba(255,245,228,.74);
+  font-size:14px;
+  line-height:1.45;
+}
+
+.hourly-desktop-checkout-review__list{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:1px;
+  margin:0;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:10px;
+  background:rgba(255,255,255,.10);
+}
+
+.hourly-desktop-checkout-review__row{
+  min-width:0;
+  display:grid;
+  gap:6px;
+  margin:0;
+  padding:14px 16px;
+  background:rgba(17,19,21,.96);
+}
+
+.hourly-desktop-checkout-review__label{
+  margin:0;
+  color:rgba(255,245,228,.58);
+  font-size:12px;
+  line-height:1.25;
+  font-weight:700;
+}
+
+.hourly-desktop-checkout-review__value{
+  margin:0;
+  min-width:0;
+  color:rgba(255,249,238,.96);
+  font-size:15px;
+  line-height:1.35;
+  font-weight:750;
+  overflow-wrap:anywhere;
+}
+
+.hourly-desktop-checkout-review__actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.hourly-desktop-checkout-review__primary,
+.hourly-desktop-checkout-review__secondary{
+  min-height:46px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 18px;
+  border-radius:10px;
+  font:inherit;
+  font-size:14px;
+  line-height:1;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.hourly-desktop-checkout-review__primary{
+  border:1px solid rgba(31,122,109,.72);
+  background:rgba(31,122,109,.88);
+  color:rgba(255,249,238,.98);
+}
+
+.hourly-desktop-checkout-review__secondary{
+  border:1px solid rgba(255,255,255,.14);
+  background:transparent;
+  color:rgba(255,249,238,.94);
+}
+
+.hourly-desktop-checkout-review__primary:hover{
+  background:rgba(31,122,109,.96);
+}
+
+.hourly-desktop-checkout-review__secondary:hover{
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.05);
+}
+
+.hourly-desktop-checkout-review__primary:focus-visible,
+.hourly-desktop-checkout-review__secondary:focus-visible{
+  outline:2px solid rgba(31,122,109,.95);
+  outline-offset:2px;
+}
+
+@media (min-width:721px){
+  form[name="contact"][data-hourly-desktop-review-active="true"] .form-grid,
+  form[name="contact"][data-hourly-desktop-review-active="true"] .form-actions,
+  form[name="contact"][data-hourly-desktop-review-active="true"] .contact-handoff,
+  form[name="contact"][data-hourly-desktop-review-active="true"] #contact-status,
+  form[name="contact"][data-hourly-desktop-review-active="true"] #contact-form-error{
+    display:none !important;
+  }
+
+  form[name="contact"][data-hourly-desktop-review-active="true"] [data-hourly-desktop-checkout-review-host]{
+    display:block;
+    max-width:860px;
+    margin:28px 0 0;
+  }
+
+  form[name="contact"][data-hourly-desktop-review-active="true"] [data-hourly-checkout-legal-acceptance]{
+    display:block;
+    max-width:860px;
+    margin:0 0 16px;
+  }
+
+  form[name="contact"][data-hourly-desktop-review-active="true"] .hourly-desktop-checkout-review{
+    margin:0;
+  }
+}
+
+@media (max-width:720px){
+  .hourly-desktop-checkout-review,
+  [data-hourly-desktop-checkout-review-host]{
+    display:none !important;
+  }
+}
