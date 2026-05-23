@@ -26,6 +26,9 @@
       "passengers": "Pasajeros",
       "payment": "Estado del pago",
       "amount": "Importe pagado",
+      "customerName": "Nombre",
+      "customerPhone": "Teléfono",
+      "customerEmail": "Email",
       "durationOneHour": "1 hora",
       "durationHours": "horas",
       "passengerOne": "1 pasajero",
@@ -61,7 +64,7 @@
       "state": "Pago en verificación",
       "title": "Estamos verificando tu pago",
       "lead": "Stripe puede tardar unos instantes en notificar el resultado. Si ya pagaste, espera un momento y actualiza esta página.",
-      "notice": "Esta pantalla solo muestra el estado recibido desde Booking API. La reserva se confirma únicamente cuando el webhook de Stripe queda procesado."
+      "notice": "La reserva solo quedará confirmada cuando el pago se complete correctamente."
     },
     "manualReview": {
       "state": "Revisión manual",
@@ -76,12 +79,6 @@
       "title": "La reserva temporal ha caducado",
       "lead": "La ventana temporal de pago ya no está activa. Para reservar, vuelve a iniciar el proceso o contacta con Pixkuy.",
       "notice": "No se ha confirmado ninguna reserva con este estado."
-    },
-	"cancelled": {
-      "state": "Reserva cancelada",
-      "title": "Esta reserva ha sido cancelada",
-      "lead": "Esta reserva ya no está activa. Si necesitas un nuevo servicio, inicia una nueva solicitud o contacta con Pixkuy.",
-      "notice": "No se puede reactivar esta reserva ni reutilizar su disponibilidad anterior."
     },
     "unknown": {
       "state": "Estado no disponible",
@@ -111,8 +108,8 @@
       "pending": {
         "state": "Pago no completado",
         "title": "El pago no se ha completado",
-        "lead": "Tu reserva temporal puede seguir activa durante unos minutos. Si quieres mantener esta solicitud, puedes volver a abrir el pago.",
-        "notice": "Solo se confirmará la reserva si Stripe confirma el pago y Booking API procesa el webhook correctamente."
+        "lead": "Tu reserva temporal puede seguir activa durante unos minutos. Si quieres mantener esta solicitud, puedes volver a intentar el pago.",
+        "notice": "La reserva solo quedará confirmada cuando el pago se complete correctamente."
       },
       "confirmed": {
         "state": "Reserva confirmada",
@@ -164,9 +161,13 @@
         "lead": "Ha ocurrido un problema al conectar con Booking API.",
         "notice": "No podemos habilitar el reintento de pago hasta consultar el estado real."
       },
+      "details": {
+        "amount": "Importe pendiente"
+      },
       "actions": {
         "retry": "Reintentar pago",
-        "newBooking": "Nueva reserva"
+        "newBooking": "Nueva reserva",
+        "home": "Volver al inicio"
       },
       "retry": {
         "loading": "Abriendo pago",

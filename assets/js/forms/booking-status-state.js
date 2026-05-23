@@ -302,6 +302,30 @@
 
     return "";
   }
+  
+    function getCustomerFullName(body) {
+    if (body && body.customer && typeof body.customer.fullName === "string") {
+      return body.customer.fullName;
+    }
+
+    return "";
+  }
+
+  function getCustomerEmail(body) {
+    if (body && body.customer && typeof body.customer.email === "string") {
+      return body.customer.email;
+    }
+
+    return "";
+  }
+
+  function getCustomerPhone(body) {
+    if (body && body.customer && typeof body.customer.phone === "string") {
+      return body.customer.phone;
+    }
+
+    return "";
+  }
 
   function getServiceStartLocalTime(body) {
     if (body && body.reservation && typeof body.reservation.serviceStartLocalTime === "string") {
@@ -370,6 +394,9 @@
       durationHours: getDurationHours(body),
       passengerCount: getPassengerCount(body),
       vehicleDisplayName: getVehicleDisplayName(body),
+      customerFullName: getCustomerFullName(body),
+      customerEmail: getCustomerEmail(body),
+      customerPhone: getCustomerPhone(body),
       raw: body
     };
   }
@@ -416,6 +443,9 @@
       durationHours: null,
       passengerCount: null,
       vehicleDisplayName: "",
+      customerFullName: "",
+      customerEmail: "",
+      customerPhone: "",
       raw: {}
     };
   }
@@ -436,6 +466,9 @@
       durationHours: null,
       passengerCount: null,
       vehicleDisplayName: "",
+      customerFullName: "",
+      customerEmail: "",
+      customerPhone: "",
       raw: {}
     };
   }

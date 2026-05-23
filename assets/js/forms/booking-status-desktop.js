@@ -132,6 +132,67 @@
 
     return String(value) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
   }
+  
+    function getVehicleThumbnailSrc(vehicleDisplayName) {
+    var normalized = String(vehicleDisplayName || "").toLowerCase();
+
+    if (normalized.indexOf("byd m9") > -1 || normalized.indexOf("m9") > -1) {
+      return "assets/img/fleet/bydm9_xhoras001d.jpeg";
+    }
+
+    return "";
+  }
+
+  function syncVehicleThumbnail(root, result) {
+    var vehicleNode = root ? root.querySelector("[data-booking-status-vehicle]") : null;
+    var existing;
+    var src;
+    var image;
+    var name;
+
+    if (!vehicleNode) {
+      return false;
+    }
+
+    existing = vehicleNode.querySelector("[data-booking-status-vehicle-thumb]");
+
+    if (existing) {
+      existing.remove();
+    }
+
+    vehicleNode.classList.remove("booking-status__vehicle-value");
+
+    if (!result || !result.vehicleDisplayName) {
+      return false;
+    }
+
+    name = document.createElement("span");
+    name.className = "booking-status__vehicle-name";
+    name.textContent = result.vehicleDisplayName;
+
+    vehicleNode.textContent = "";
+    vehicleNode.appendChild(name);
+
+    src = getVehicleThumbnailSrc(result.vehicleDisplayName);
+
+    if (!src) {
+      return false;
+    }
+
+    image = document.createElement("img");
+    image.className = "booking-status__vehicle-thumb";
+    image.setAttribute("data-booking-status-vehicle-thumb", "1");
+    image.setAttribute("src", src);
+    image.setAttribute("alt", "");
+    image.setAttribute("aria-hidden", "true");
+    image.setAttribute("loading", "lazy");
+    image.setAttribute("decoding", "async");
+
+    vehicleNode.classList.add("booking-status__vehicle-value");
+    vehicleNode.appendChild(image);
+
+    return true;
+  }
 
   function getCopyPath(view) {
     if (view === "missingToken") {
@@ -160,6 +221,10 @@
 
     if (view === "expired") {
       return "expired";
+    }
+
+    if (view === "cancelled") {
+      return "cancelled.cancelled";
     }
 
     return "unknown";
@@ -198,6 +263,27 @@
 
     return "error";
   }
+  
+  function hasCustomerDetails(result) {
+    return Boolean(
+      result &&
+      (
+        result.customerFullName ||
+        result.customerPhone ||
+        result.customerEmail
+      )
+    );
+  }
+
+  function syncCustomerDetailsVisibility(root, result) {
+    var isVisible = hasCustomerDetails(result);
+
+    setHidden(root, ".booking-status__detail--customer-name", !isVisible);
+    setHidden(root, ".booking-status__detail--customer-phone", !isVisible);
+    setHidden(root, ".booking-status__detail--customer-email", !isVisible);
+
+    return true;
+  }
 
   function renderDetails(root, dictionary, result) {
     setText(
@@ -220,6 +306,7 @@
       "[data-booking-status-vehicle]",
       result.vehicleDisplayName || emptyValue(dictionary)
     );
+    syncVehicleThumbnail(root, result);
     setText(
       root,
       "[data-booking-status-date]",
@@ -250,6 +337,22 @@
       "[data-booking-status-amount]",
       amountLabel(dictionary, result)
     );
+    setText(
+      root,
+      "[data-booking-status-customer-name]",
+      result.customerFullName || emptyValue(dictionary)
+    );
+    setText(
+      root,
+      "[data-booking-status-customer-phone]",
+      result.customerPhone || emptyValue(dictionary)
+    );
+    setText(
+      root,
+      "[data-booking-status-customer-email]",
+      result.customerEmail || emptyValue(dictionary)
+    );
+    syncCustomerDetailsVisibility(root, result);
     setHidden(root, "[data-booking-status-details]", false);
   }
 
@@ -277,6 +380,10 @@
     setText(root, '[data-booking-status-label="passengers"]', t(dictionary, "details.passengers"));
     setText(root, '[data-booking-status-label="payment"]', t(dictionary, "details.payment"));
     setText(root, '[data-booking-status-label="amount"]', t(dictionary, "details.amount"));
+	
+	setText(root, '[data-booking-status-label="customerName"]', t(dictionary, "details.customerName"));
+    setText(root, '[data-booking-status-label="customerPhone"]', t(dictionary, "details.customerPhone"));
+    setText(root, '[data-booking-status-label="customerEmail"]', t(dictionary, "details.customerEmail"));
 
     setText(root, "[data-booking-status-primary]", t(dictionary, "actions.primary"));
     setText(root, "[data-booking-status-whatsapp]", t(dictionary, "actions.whatsapp"));
