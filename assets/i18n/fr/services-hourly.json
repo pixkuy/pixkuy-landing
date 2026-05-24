@@ -71,7 +71,7 @@
               "notes": "Ajoutez des indications, arrêts, agenda ou tout détail pertinent"
             },
             "cta": {
-              "submit": "Demander confirmation"
+              "submit": "Continuer vers le paiement"
             },
             "notesEditor": {
               "title": "Notes du service",
@@ -111,7 +111,47 @@
           "longTermPriceValue": "Selon l’opération",
           "priceValuePending": "—",
           "cta": "Demander",
+          "reviewCta": "Vérifier la réservation",
+          "review": {
+            "title": "Vérifiez votre réservation",
+            "text": "Confirmez que les informations sont correctes avant de passer au paiement.",
+            "proceed": "Procéder au paiement",
+            "edit": "Modifier les informations"
+          },
+          "reviewPage": {
+            "emptyTitle": "Nous ne trouvons pas les données de la réservation",
+            "emptyText": "Retournez au formulaire pour vérifier votre service et continuer.",
+            "emptyCta": "Retour au formulaire",
+            "serviceValue": "Véhicule privé avec chauffeur",
+            "vehicleValue": "BYD M9",
+            "passengersValue": "Jusqu’à 6 passagers",
+            "legalTitle": "Conditions acceptées",
+            "legalText": "Vous avez accepté les Conditions générales, la Politique d’annulation et l’Avis de confidentialité avant de continuer.",
+            "legalTextFallback": "Vous avez accepté les Conditions générales, la Politique d’annulation et l’Avis de confidentialité.",
+            "error": "Nous n’avons pas pu lancer le paiement. Vérifiez les informations et réessayez.",
+            "details": {
+              "service": "Service",
+              "mode": "Mode",
+              "pickup": "Prise en charge",
+              "date": "Date",
+              "time": "Heure",
+              "duration": "Durée",
+              "vehicle": "Véhicule",
+              "passengers": "Passagers",
+              "price": "Prix final",
+              "notes": "Notes"
+            }
+          },
           "ctaDisabled": "Complétez la configuration",
+          "availability": {
+            "checking": "Vérification de la disponibilité...",
+            "available": "Disponibilité confirmée. Vous pouvez continuer.",
+            "unavailable": "Aucune disponibilité pour cette date et cette heure. Choisissez une autre option.",
+            "nextAvailableSlot": "Prochaine heure disponible : {time}",
+            "minimumLeadTime": "Nous avons besoin d’au moins 24 heures de préavis pour confirmer ce service.",
+            "priceMismatch": "Le tarif a changé. Mettez à jour la configuration avant de continuer.",
+            "error": "Nous n’avons pas pu confirmer la disponibilité. Vérifiez la date, l’heure et la prise en charge."
+          },
           "tabs": {
             "hourly": "À l’heure",
             "fullDay": "Journée complète",

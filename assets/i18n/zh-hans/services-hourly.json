@@ -71,7 +71,7 @@
               "notes": "添加说明、停靠点、日程或任何相关细节"
             },
             "cta": {
-              "submit": "请求确认"
+              "submit": "继续付款"
             },
             "notesEditor": {
               "title": "服务备注",
@@ -111,7 +111,47 @@
           "longTermPriceValue": "视运营而定",
           "priceValuePending": "—",
           "cta": "请求",
+          "reviewCta": "检查预订",
+          "review": {
+            "title": "检查您的预订",
+            "text": "继续付款前，请确认信息是否正确。",
+            "proceed": "前往付款",
+            "edit": "编辑信息"
+          },
+          "reviewPage": {
+            "emptyTitle": "未找到预订信息",
+            "emptyText": "请返回表单检查您的服务并继续。",
+            "emptyCta": "返回表单",
+            "serviceValue": "带司机的私人车辆",
+            "vehicleValue": "BYD M9",
+            "passengersValue": "最多 6 位乘客",
+            "legalTitle": "已接受的条件",
+            "legalText": "继续前，您已接受条款和条件、取消政策及隐私声明。",
+            "legalTextFallback": "您已接受条款和条件、取消政策及隐私声明。",
+            "error": "无法启动付款。请检查信息后重试。",
+            "details": {
+              "service": "服务",
+              "mode": "模式",
+              "pickup": "接载",
+              "date": "日期",
+              "time": "时间",
+              "duration": "时长",
+              "vehicle": "车辆",
+              "passengers": "乘客",
+              "price": "最终价格",
+              "notes": "备注"
+            }
+          },
           "ctaDisabled": "请完成配置",
+          "availability": {
+            "checking": "正在检查可用性...",
+            "available": "可用性已确认。您可以继续。",
+            "unavailable": "该日期和时间没有可用服务。请选择其他选项。",
+            "nextAvailableSlot": "下一个可用时间：{time}",
+            "minimumLeadTime": "确认此服务至少需要提前 24 小时。",
+            "priceMismatch": "价格已变更。继续前请更新配置。",
+            "error": "无法确认可用性。请检查日期、时间和接载点。"
+          },
           "tabs": {
             "hourly": "按小时",
             "fullDay": "全天",

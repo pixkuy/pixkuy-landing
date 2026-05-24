@@ -71,7 +71,7 @@
               "notes": "Adicione indicações, paragens, agenda ou qualquer detalhe relevante"
             },
             "cta": {
-              "submit": "Solicitar confirmação"
+              "submit": "Continuar para pagamento"
             },
             "notesEditor": {
               "title": "Notas do serviço",
@@ -111,7 +111,47 @@
           "longTermPriceValue": "Conforme a operação",
           "priceValuePending": "—",
           "cta": "Solicitar",
+          "reviewCta": "Rever reserva",
+          "review": {
+            "title": "Reveja a sua reserva",
+            "text": "Confirme que os dados estão corretos antes de avançar para o pagamento.",
+            "proceed": "Avançar para pagamento",
+            "edit": "Editar dados"
+          },
+          "reviewPage": {
+            "emptyTitle": "Não encontramos os dados da reserva",
+            "emptyText": "Volte ao formulário para rever o serviço e continuar.",
+            "emptyCta": "Voltar ao formulário",
+            "serviceValue": "Veículo privado com motorista",
+            "vehicleValue": "BYD M9",
+            "passengersValue": "Até 6 passageiros",
+            "legalTitle": "Condições aceites",
+            "legalText": "Aceitou os Termos e condições, a Política de cancelamento e o Aviso de privacidade antes de continuar.",
+            "legalTextFallback": "Aceitou os Termos e condições, a Política de cancelamento e o Aviso de privacidade.",
+            "error": "Não foi possível iniciar o pagamento. Verifique os dados e tente novamente.",
+            "details": {
+              "service": "Serviço",
+              "mode": "Modalidade",
+              "pickup": "Recolha",
+              "date": "Data",
+              "time": "Hora",
+              "duration": "Duração",
+              "vehicle": "Veículo",
+              "passengers": "Passageiros",
+              "price": "Preço final",
+              "notes": "Notas"
+            }
+          },
           "ctaDisabled": "Complete a configuração",
+          "availability": {
+            "checking": "A verificar disponibilidade...",
+            "available": "Disponibilidade confirmada. Pode continuar.",
+            "unavailable": "Não há disponibilidade para essa data e hora. Escolha outra opção.",
+            "nextAvailableSlot": "Próxima hora disponível: {time}",
+            "minimumLeadTime": "Precisamos de pelo menos 24 horas de antecedência para confirmar este serviço.",
+            "priceMismatch": "A tarifa foi alterada. Atualize a configuração antes de continuar.",
+            "error": "Não foi possível confirmar a disponibilidade. Verifique data, hora e recolha."
+          },
           "tabs": {
             "hourly": "À hora",
             "fullDay": "Dia completo",

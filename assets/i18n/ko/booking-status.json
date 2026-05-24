@@ -1,0 +1,230 @@
+{
+  "bookingStatus": {
+    "meta": {
+      "successTitle": "예약 접수 완료 — Pixkuy Mobility",
+      "cancelledTitle": "결제가 완료되지 않았습니다 — Pixkuy Mobility"
+    },
+    "checkout": {
+      "meta": {
+        "title": "결제 열기 — Pixkuy Mobility"
+      },
+      "state": "보안 결제",
+      "title": "Stripe를 여는 중입니다",
+      "lead": "결제를 완료할 수 있도록 안전한 Stripe 화면으로 이동합니다.",
+      "notice": "결제 화면을 자동으로 열 수 없습니다. 새 예약을 시작하거나 Pixkuy에 문의하세요.",
+      "errorTitle": "결제를 열 수 없습니다",
+      "errorLead": "결제 세션을 사용할 수 없거나 만료되었습니다."
+    },
+    "details": {
+      "publicCode": "예약 코드",
+      "service": "서비스",
+      "pickup": "픽업",
+      "vehicle": "차량",
+      "date": "서비스 날짜",
+      "time": "서비스 시간",
+      "duration": "기간",
+      "passengers": "승객",
+      "payment": "결제 상태",
+      "amount": "결제 금액",
+      "customerName": "이름",
+      "customerPhone": "전화",
+      "customerEmail": "이메일",
+      "durationOneHour": "1시간",
+      "durationHours": "시간",
+      "passengerOne": "승객 1명",
+      "passengerMany": "승객",
+      "empty": "—"
+    },
+    "serviceLabels": {
+      "hourly_daily": "전용 기사 포함 차량",
+      "notAvailable": "Pixkuy 서비스"
+    },
+    "paymentLabels": {
+      "confirmed": "확정됨",
+      "pending_payment": "결제 대기",
+      "paid": "결제 완료",
+      "hold_expired": "임시 예약 만료",
+      "payment_mismatch": "결제 검토 중",
+      "payment_after_expiry": "결제 가능 시간 이후 결제 수신",
+      "cancelled_manual": "수동 취소됨",
+      "pending_manual_review": "수동 검토 대기",
+      "pending": "대기 중",
+      "failed": "실패",
+      "expired": "만료됨",
+      "mismatch": "결제 검토 중",
+      "notAvailable": "사용 불가"
+    },
+    "confirmed": {
+      "state": "예약 확정",
+      "title": "예약이 확정되었습니다",
+      "lead": "차량이 예약되었습니다. Pixkuy와의 조율을 위해 예약 코드를 보관하세요.",
+      "notice": "예약 요약이 포함된 확인 이메일을 받게 됩니다. 날짜와 시간은 멕시코시티 기준입니다."
+    },
+    "pending": {
+      "state": "결제 확인 중",
+      "title": "결제를 확인하고 있습니다",
+      "lead": "Stripe가 결과를 알리는 데 잠시 걸릴 수 있습니다. 이미 결제했다면 잠시 후 이 페이지를 새로고침하세요.",
+      "notice": "결제가 정상적으로 완료되어야 예약이 확정됩니다."
+    },
+    "manualReview": {
+      "state": "수동 검토",
+      "title": "예약에 검토가 필요합니다",
+      "lead": "예약을 확정하기 전에 Pixkuy 팀이 확인해야 하는 상황이 감지되었습니다.",
+      "defaultNotice": "이 예약 상태에 대해 확인이 필요하면 Pixkuy에 문의하세요.",
+      "paymentMismatchNotice": "결제 금액이 예상 금액과 일치하지 않습니다. 예약이 자동으로 확정되지 않았습니다.",
+      "paymentAfterExpiryNotice": "임시 예약 시간이 더 이상 유효하지 않은 후 결제가 도착했습니다. 수동으로 검토하겠습니다."
+    },
+    "expired": {
+      "state": "임시 예약 만료",
+      "title": "임시 예약이 만료되었습니다",
+      "lead": "결제 가능 시간이 더 이상 활성 상태가 아닙니다. 예약하려면 절차를 다시 시작하거나 Pixkuy에 문의하세요.",
+      "notice": "이 상태에서는 어떤 예약도 확정되지 않았습니다."
+    },
+    "unknown": {
+      "state": "상태 확인 불가",
+      "title": "상태를 확인할 수 없습니다",
+      "lead": "수신된 응답으로는 명확한 확인을 표시할 수 없습니다. 사례 검토를 위해 Pixkuy에 문의하세요.",
+      "notice": "이 화면에서는 어떤 예약도 확정되지 않았습니다."
+    },
+    "missingToken": {
+      "state": "토큰 없음",
+      "title": "이 예약을 조회할 수 없습니다",
+      "lead": "URL에 예약 공개 토큰이 없습니다. 결제 후 받은 링크를 다시 여세요.",
+      "notice": "백엔드에 조회가 수행되지 않았습니다."
+    },
+    "notFound": {
+      "state": "예약을 찾을 수 없음",
+      "title": "이 예약을 찾을 수 없습니다",
+      "lead": "해당 링크는 사용 가능한 공개 예약과 일치하지 않거나 더 이상 유효하지 않습니다.",
+      "notice": "링크를 확인하거나 Pixkuy에 문의하세요."
+    },
+    "requestError": {
+      "state": "조회 오류",
+      "title": "상태를 조회할 수 없습니다",
+      "lead": "Booking API에 연결하는 중 문제가 발생했습니다. 잠시 후 다시 시도하세요.",
+      "notice": "이 화면에서는 어떤 예약도 확정되지 않았습니다."
+    },
+    "cancelled": {
+      "pending": {
+        "state": "결제 미완료",
+        "title": "결제가 완료되지 않았습니다",
+        "lead": "임시 예약은 몇 분 동안 계속 활성 상태일 수 있습니다. 이 요청을 유지하려면 결제를 다시 시도할 수 있습니다.",
+        "notice": "결제가 정상적으로 완료되어야 예약이 확정됩니다."
+      },
+      "confirmed": {
+        "state": "예약 확정",
+        "title": "예약이 이미 확정되었습니다",
+        "lead": "결제 화면에서 돌아왔더라도 예약은 이미 확정되어 있습니다.",
+        "notice": "결제가 이미 등록되었습니다. Pixkuy와의 조율을 위해 예약 코드를 보관하세요."
+      },
+      "manualReview": {
+        "state": "수동 검토",
+        "title": "이 예약은 검토가 필요합니다",
+        "lead": "운영 검토가 필요한 예약이므로 새 결제를 자동으로 열 수 없습니다.",
+        "defaultNotice": "사례 검토를 위해 Pixkuy에 문의하세요.",
+        "paymentMismatchNotice": "결제 금액이 예상 금액과 일치하지 않습니다. 예약이 자동으로 확정되지 않았습니다.",
+        "paymentAfterExpiryNotice": "임시 예약 시간이 더 이상 유효하지 않은 후 결제가 도착했습니다. 수동으로 검토하겠습니다."
+      },
+      "expired": {
+        "state": "임시 예약 만료",
+        "title": "임시 예약이 만료되었습니다",
+        "lead": "결제 시간이 더 이상 활성 상태가 아닙니다. 예약하려면 새 요청을 시작하세요.",
+        "notice": "이 화면에서는 만료된 예약을 재활성화하지 않습니다."
+      },
+      "cancelled": {
+        "state": "예약 취소됨",
+        "title": "이 예약은 취소되었습니다",
+        "lead": "이전 예약은 더 이상 활성 상태가 아닙니다. 서비스가 필요하면 새 요청을 시작하세요.",
+        "notice": "취소된 예약을 재활성화하거나 이전 시간을 보존하지 않습니다."
+      },
+      "unknown": {
+        "state": "상태 확인 불가",
+        "title": "상태를 확인할 수 없습니다",
+        "lead": "수신된 응답으로 결제를 다시 시도할 수 있는지 알 수 없습니다.",
+        "notice": "이 예약을 검토하려면 Pixkuy에 문의하세요."
+      },
+      "missingToken": {
+        "state": "토큰 없음",
+        "title": "이 예약을 조회할 수 없습니다",
+        "lead": "URL에 예약 공개 토큰이 없습니다.",
+        "notice": "유효한 토큰 없이는 결제를 다시 시도할 수 없습니다."
+      },
+      "notFound": {
+        "state": "예약을 찾을 수 없음",
+        "title": "이 예약을 찾을 수 없습니다",
+        "lead": "해당 링크는 사용 가능한 공개 예약과 일치하지 않거나 더 이상 유효하지 않습니다.",
+        "notice": "링크를 확인하거나 새 요청을 시작하세요."
+      },
+      "requestError": {
+        "state": "조회 오류",
+        "title": "상태를 조회할 수 없습니다",
+        "lead": "Booking API에 연결하는 중 문제가 발생했습니다.",
+        "notice": "실제 상태를 조회하기 전에는 결제 재시도를 활성화할 수 없습니다."
+      },
+      "details": {
+        "amount": "미결제 금액"
+      },
+      "actions": {
+        "retry": "결제 다시 시도",
+        "newBooking": "새 예약",
+        "home": "홈으로 돌아가기"
+      },
+      "retry": {
+        "loading": "결제 열기",
+        "loadingNotice": "이 임시 예약에 대한 새 결제 링크를 요청하고 있습니다.",
+        "error": "새 결제를 열 수 없습니다. 임시 예약 시간이 만료되었을 수 있습니다. 새 예약을 만들거나 Pixkuy에 문의하세요."
+      },
+      "mobile": {
+        "pending": {
+          "state": "결제 미완료",
+          "title": "결제가 완료되지 않았습니다",
+          "lead": "임시 예약이 아직 활성 상태라면 결제를 다시 열 수 있습니다.",
+          "notice": "Stripe와 Pixkuy가 결제를 확인해야 예약이 확정됩니다.",
+          "emailNotice": "이메일: {{email}}",
+          "contactNotice": "연락처: {{contact}}"
+        },
+        "confirmed": {
+          "state": "예약 확정",
+          "title": "예약이 이미 확정되었습니다",
+          "lead": "결제 화면에서 돌아왔더라도 예약은 이미 확정되어 있습니다.",
+          "emailNotice": "{{email}}로 확인 이메일을 받게 됩니다.",
+          "contactNotice": "연락처: {{contact}}",
+          "timezoneNotice": "날짜와 시간은 멕시코시티 기준입니다."
+        },
+        "manualReview": {
+          "emailNotice": "이메일: {{email}}",
+          "contactNotice": "연락처: {{contact}}"
+        },
+        "expired": {
+          "state": "예약 만료",
+          "title": "임시 예약이 만료되었습니다",
+          "lead": "결제 시간이 더 이상 활성 상태가 아닙니다. 새 요청을 시작하세요.",
+          "notice": "결제가 청구되거나 예약이 확정되지 않았습니다."
+        },
+        "cancelled": {
+          "state": "예약 취소됨",
+          "title": "예약 취소됨",
+          "lead": "이 예약은 더 이상 활성 상태가 아닙니다. 서비스가 필요하면 새 요청을 시작하세요.",
+          "notice": "이전 시간은 보존되지 않습니다."
+        }
+      }
+    },
+    "actions": {
+      "primary": "다른 서비스 예약",
+      "whatsapp": "WhatsApp으로 문의"
+    },
+    "mobile": {
+      "close": "닫기",
+      "whatsappMessage": "안녕하세요 Pixkuy, 제 예약 {{publicCode}} 관련 도움이 필요합니다.",
+      "confirmed": {
+        "emailNotice": "{{email}}로 확인 이메일을 받게 됩니다.",
+        "contactNotice": "연락처: {{contact}}",
+        "timezoneNotice": "날짜와 시간은 멕시코시티 기준입니다."
+      },
+      "manualReview": {
+        "emailNotice": "이메일: {{email}}",
+        "contactNotice": "연락처: {{contact}}"
+      }
+    }
+  }
+}

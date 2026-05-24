@@ -1,0 +1,230 @@
+{
+  "bookingStatus": {
+    "meta": {
+      "successTitle": "Réservation reçue — Pixkuy Mobility",
+      "cancelledTitle": "Paiement non finalisé — Pixkuy Mobility"
+    },
+    "checkout": {
+      "meta": {
+        "title": "Ouverture du paiement — Pixkuy Mobility"
+      },
+      "state": "Paiement sécurisé",
+      "title": "Nous ouvrons Stripe",
+      "lead": "Nous allons vous rediriger vers une page Stripe sécurisée pour finaliser le paiement.",
+      "notice": "Le paiement n’a pas pu s’ouvrir automatiquement. Lancez une nouvelle réservation ou contactez Pixkuy.",
+      "errorTitle": "Nous n’avons pas pu ouvrir le paiement",
+      "errorLead": "La session de paiement n’est pas disponible ou a expiré."
+    },
+    "details": {
+      "publicCode": "Code de réservation",
+      "service": "Service",
+      "pickup": "Prise en charge",
+      "vehicle": "Véhicule",
+      "date": "Date du service",
+      "time": "Heure du service",
+      "duration": "Durée",
+      "passengers": "Passagers",
+      "payment": "État du paiement",
+      "amount": "Montant payé",
+      "customerName": "Nom",
+      "customerPhone": "Téléphone",
+      "customerEmail": "E-mail",
+      "durationOneHour": "1 heure",
+      "durationHours": "heures",
+      "passengerOne": "1 passager",
+      "passengerMany": "passagers",
+      "empty": "—"
+    },
+    "serviceLabels": {
+      "hourly_daily": "Véhicule privé avec chauffeur",
+      "notAvailable": "Service Pixkuy"
+    },
+    "paymentLabels": {
+      "confirmed": "Confirmée",
+      "pending_payment": "Paiement en attente",
+      "paid": "Payé",
+      "hold_expired": "Réservation temporaire expirée",
+      "payment_mismatch": "Paiement en révision",
+      "payment_after_expiry": "Paiement reçu hors délai",
+      "cancelled_manual": "Annulée manuellement",
+      "pending_manual_review": "Révision manuelle",
+      "pending": "En attente",
+      "failed": "Échec",
+      "expired": "Expiré",
+      "mismatch": "Paiement en révision",
+      "notAvailable": "Non disponible"
+    },
+    "confirmed": {
+      "state": "Réservation confirmée",
+      "title": "Votre réservation est confirmée",
+      "lead": "Votre véhicule est réservé. Conservez le code de réservation pour toute coordination avec Pixkuy.",
+      "notice": "Vous recevrez un e-mail de confirmation avec le résumé de la réservation. La date et l’heure correspondent à Mexico."
+    },
+    "pending": {
+      "state": "Paiement en vérification",
+      "title": "Nous vérifions votre paiement",
+      "lead": "Stripe peut prendre quelques instants pour notifier le résultat. Si vous avez déjà payé, patientez un moment puis actualisez cette page.",
+      "notice": "La réservation ne sera confirmée que lorsque le paiement sera correctement finalisé."
+    },
+    "manualReview": {
+      "state": "Révision manuelle",
+      "title": "Votre réservation nécessite une révision",
+      "lead": "Nous avons détecté une situation que l’équipe Pixkuy doit examiner avant de confirmer la réservation.",
+      "defaultNotice": "Contactez Pixkuy si vous avez besoin de clarifier l’état de cette réservation.",
+      "paymentMismatchNotice": "Le montant payé ne correspond pas au montant attendu. La réservation n’a pas été confirmée automatiquement.",
+      "paymentAfterExpiryNotice": "Le paiement est arrivé alors que la fenêtre temporaire de réservation n’était plus valide. Nous examinerons le cas manuellement."
+    },
+    "expired": {
+      "state": "Réservation temporaire expirée",
+      "title": "La réservation temporaire a expiré",
+      "lead": "La fenêtre de paiement n’est plus active. Pour réserver, relancez le processus ou contactez Pixkuy.",
+      "notice": "Aucune réservation n’a été confirmée avec cet état."
+    },
+    "unknown": {
+      "state": "État non disponible",
+      "title": "Nous n’avons pas pu confirmer l’état",
+      "lead": "La réponse reçue ne permet pas d’afficher une confirmation claire. Contactez Pixkuy pour vérifier votre cas.",
+      "notice": "Aucune réservation n’a été confirmée depuis cet écran."
+    },
+    "missingToken": {
+      "state": "Token non disponible",
+      "title": "Nous ne pouvons pas consulter cette réservation",
+      "lead": "Le token public de la réservation est absent de l’URL. Ouvrez à nouveau le lien reçu après le paiement.",
+      "notice": "Aucune consultation du backend n’a été effectuée."
+    },
+    "notFound": {
+      "state": "Réservation introuvable",
+      "title": "Nous ne trouvons pas cette réservation",
+      "lead": "Le lien ne correspond pas à une réservation publique disponible ou n’est plus valide.",
+      "notice": "Vérifiez le lien ou contactez Pixkuy."
+    },
+    "requestError": {
+      "state": "Erreur de consultation",
+      "title": "Nous n’avons pas pu consulter l’état",
+      "lead": "Un problème est survenu lors de la connexion à Booking API. Réessayez dans quelques instants.",
+      "notice": "Aucune réservation n’a été confirmée depuis cet écran."
+    },
+    "cancelled": {
+      "pending": {
+        "state": "Paiement non finalisé",
+        "title": "Le paiement n’a pas été finalisé",
+        "lead": "Votre réservation temporaire peut rester active quelques minutes. Si vous souhaitez conserver cette demande, vous pouvez réessayer le paiement.",
+        "notice": "La réservation ne sera confirmée que lorsque le paiement sera correctement finalisé."
+      },
+      "confirmed": {
+        "state": "Réservation confirmée",
+        "title": "Votre réservation est déjà confirmée",
+        "lead": "Même si vous êtes revenu depuis l’écran de paiement, votre réservation est déjà confirmée.",
+        "notice": "Votre paiement est déjà enregistré. Conservez le code de réservation pour toute coordination avec Pixkuy."
+      },
+      "manualReview": {
+        "state": "Révision manuelle",
+        "title": "Cette réservation nécessite une révision",
+        "lead": "Nous ne pouvons pas ouvrir automatiquement un nouveau paiement, car la réservation nécessite une révision opérationnelle.",
+        "defaultNotice": "Contactez Pixkuy pour vérifier le cas.",
+        "paymentMismatchNotice": "Le montant payé ne correspond pas au montant attendu. La réservation n’a pas été confirmée automatiquement.",
+        "paymentAfterExpiryNotice": "Le paiement est arrivé alors que la fenêtre temporaire de réservation n’était plus valide. Nous examinerons le cas manuellement."
+      },
+      "expired": {
+        "state": "Réservation temporaire expirée",
+        "title": "La réservation temporaire a expiré",
+        "lead": "La fenêtre de paiement n’est plus active. Pour réserver, lancez une nouvelle demande.",
+        "notice": "Nous ne réactivons pas les réservations expirées depuis cet écran."
+      },
+      "cancelled": {
+        "state": "Réservation annulée",
+        "title": "Cette réservation a été annulée",
+        "lead": "La réservation précédente n’est plus active. Si vous avez besoin du service, lancez une nouvelle demande.",
+        "notice": "Nous ne réactivons pas les réservations annulées et ne conservons pas l’horaire précédent."
+      },
+      "unknown": {
+        "state": "État non disponible",
+        "title": "Nous n’avons pas pu confirmer l’état",
+        "lead": "La réponse reçue ne permet pas de savoir si vous pouvez réessayer le paiement.",
+        "notice": "Contactez Pixkuy si vous devez vérifier cette réservation."
+      },
+      "missingToken": {
+        "state": "Token non disponible",
+        "title": "Nous ne pouvons pas consulter cette réservation",
+        "lead": "Le token public de la réservation est absent de l’URL.",
+        "notice": "Il n’est pas possible de réessayer le paiement sans token valide."
+      },
+      "notFound": {
+        "state": "Réservation introuvable",
+        "title": "Nous ne trouvons pas cette réservation",
+        "lead": "Le lien ne correspond pas à une réservation publique disponible ou n’est plus valide.",
+        "notice": "Vérifiez le lien ou lancez une nouvelle demande."
+      },
+      "requestError": {
+        "state": "Erreur de consultation",
+        "title": "Nous n’avons pas pu consulter l’état",
+        "lead": "Un problème est survenu lors de la connexion à Booking API.",
+        "notice": "Nous ne pouvons pas activer le réessai de paiement tant que l’état réel n’a pas été consulté."
+      },
+      "details": {
+        "amount": "Montant en attente"
+      },
+      "actions": {
+        "retry": "Réessayer le paiement",
+        "newBooking": "Nouvelle réservation",
+        "home": "Retour à l’accueil"
+      },
+      "retry": {
+        "loading": "Ouverture du paiement",
+        "loadingNotice": "Nous demandons un nouveau lien de paiement pour cette réservation temporaire.",
+        "error": "Nous n’avons pas pu ouvrir un nouveau paiement. La fenêtre temporaire peut avoir expiré. Créez une nouvelle réservation ou contactez Pixkuy."
+      },
+      "mobile": {
+        "pending": {
+          "state": "Paiement non finalisé",
+          "title": "Le paiement n’a pas été finalisé",
+          "lead": "Si la réservation temporaire est encore active, vous pouvez rouvrir le paiement.",
+          "notice": "La réservation n’est confirmée que lorsque Stripe et Pixkuy confirment le paiement.",
+          "emailNotice": "E-mail : {{email}}",
+          "contactNotice": "Contact : {{contact}}"
+        },
+        "confirmed": {
+          "state": "Réservation confirmée",
+          "title": "Votre réservation est déjà confirmée",
+          "lead": "Même si vous êtes revenu depuis l’écran de paiement, votre réservation est déjà confirmée.",
+          "emailNotice": "Vous recevrez un e-mail de confirmation à {{email}}.",
+          "contactNotice": "Contact : {{contact}}",
+          "timezoneNotice": "La date et l’heure correspondent à Mexico."
+        },
+        "manualReview": {
+          "emailNotice": "E-mail : {{email}}",
+          "contactNotice": "Contact : {{contact}}"
+        },
+        "expired": {
+          "state": "Réservation expirée",
+          "title": "La réservation temporaire a expiré",
+          "lead": "La fenêtre de paiement n’est plus active. Lancez une nouvelle demande.",
+          "notice": "Aucun débit n’a été effectué et aucune réservation n’a été confirmée."
+        },
+        "cancelled": {
+          "state": "Réservation annulée",
+          "title": "Réservation annulée",
+          "lead": "Cette réservation n’est plus active. Lancez une nouvelle demande si vous avez besoin du service.",
+          "notice": "L’horaire précédent n’est pas conservé."
+        }
+      }
+    },
+    "actions": {
+      "primary": "Réserver un autre service",
+      "whatsapp": "Écrire sur WhatsApp"
+    },
+    "mobile": {
+      "close": "Fermer",
+      "whatsappMessage": "Bonjour Pixkuy, j’ai besoin d’aide avec ma réservation {{publicCode}}.",
+      "confirmed": {
+        "emailNotice": "Vous recevrez un e-mail de confirmation à {{email}}.",
+        "contactNotice": "Contact : {{contact}}",
+        "timezoneNotice": "La date et l’heure correspondent à Mexico."
+      },
+      "manualReview": {
+        "emailNotice": "E-mail : {{email}}",
+        "contactNotice": "Contact : {{contact}}"
+      }
+    }
+  }
+}

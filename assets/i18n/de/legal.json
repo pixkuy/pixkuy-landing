@@ -1,0 +1,368 @@
+{
+    "legal": {
+        "privacyPolicyVersion": "privacy_v1_2026_05",
+        "links": {
+            "terms": "Bedingungen",
+            "cancellations": "Stornierungen"
+        }
+    },
+    "legalOverlay": {
+        "tabs": {
+            "terms": "Bedingungen",
+            "cancellations": "Stornierungen"
+        }
+    },
+    "terms": {
+        "title": "Allgemeine Gesch\u00e4ftsbedingungen",
+        "lastUpdated": "",
+        "intro": "Diese Allgemeinen Gesch\u00e4ftsbedingungen regeln die Anfrage, Buchung, Best\u00e4tigung und Erbringung der privaten Mobilit\u00e4tsdienste mit Fahrer von Pixkuy Mobility S.A. de C.V. Durch das Anfragen, Best\u00e4tigen, Bezahlen oder Nutzen eines Pixkuy-Services erkl\u00e4rt der Kunde, diese Allgemeinen Gesch\u00e4ftsbedingungen, die Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen sowie den Datenschutzhinweis von Pixkuy gelesen, verstanden und akzeptiert zu haben, soweit sie auf den gebuchten Service anwendbar sind.",
+        "back": "Zur\u00fcck zur Startseite",
+        "policyVersion": "terms_v1_2026_05",
+        "acceptance": {
+            "title": "Rechtliche Bedingungen",
+            "checkbox": "Ich habe die Allgemeinen Gesch\u00e4ftsbedingungen, die Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen sowie den Datenschutzhinweis von Pixkuy gelesen und akzeptiere sie.",
+            "viewTerms": "Bedingungen ansehen",
+            "viewCancellations": "Stornierungen ansehen",
+            "viewPrivacy": "Datenschutz ansehen",
+            "error": "Du musst die rechtlichen Bedingungen akzeptieren, um zur Zahlung fortzufahren."
+        },
+        "sections": {
+            "provider": {
+                "title": "1. Identifikation des Anbieters",
+                "body1": "Der Service wird von Pixkuy Mobility S.A. de C.V. mit Betrieb in Mexiko-Stadt, Mexiko, erbracht.",
+                "body2": "Die offiziellen Kontaktkan\u00e4le sind diejenigen, die auf der Website, in der Reservierungsbest\u00e4tigung oder in den offiziellen Mitteilungen von Pixkuy angegeben werden.",
+                "body3": "Pixkuy kann die ver\u00f6ffentlichten oder dem Kunden mitgeteilten offiziellen Kontaktkan\u00e4le aktualisieren. F\u00fcr operative Zwecke und zur Beweissicherung m\u00fcssen relevante Mitteilungen zu Reservierungen, \u00c4nderungen, Stornierungen, Best\u00e4tigungen, Zahlungen oder Vorf\u00e4llen \u00fcber die von Pixkuy angegebenen offiziellen Kan\u00e4le erfolgen."
+            },
+            "definitions": {
+                "title": "2. Definitionen",
+                "body1": "Kunde ist die Person, die einen Service mit Pixkuy anfragt, bucht, bezahlt oder best\u00e4tigt, sei es f\u00fcr sich selbst oder f\u00fcr einen Dritten.",
+                "body2": "Passagier ist die Person, die den Service nutzt, auch wenn sie die Reservierung oder Zahlung nicht direkt vorgenommen hat.",
+                "body3": "Reservierung ist der von Pixkuy angefragte und best\u00e4tigte Service mit Datum, Uhrzeit, Abholpunkt, Modalit\u00e4t, Dauer, Preis und weiteren anwendbaren Bedingungen.",
+                "body4": "Anfrage ist die urspr\u00fcngliche Bitte des Kunden vor der ausdr\u00fccklichen Best\u00e4tigung durch Pixkuy.",
+                "body5": "Best\u00e4tigter Service ist die von Pixkuy ausdr\u00fccklich akzeptierte Reservierung, die, sofern anwendbar, gem\u00e4\u00df der jeweiligen Zahlungsmethode bezahlt, autorisiert oder garantiert wurde.",
+                "body6": "Nichtantreten oder No-show liegt vor, wenn der Kunde oder Passagier nicht erscheint, nicht verf\u00fcgbar ist, nicht erreicht werden kann oder die Leistungserbringung innerhalb der anwendbaren Wartezeit nicht erm\u00f6glicht."
+            },
+            "scope": {
+                "title": "3. Anwendungsbereich",
+                "body1": "Diese Allgemeinen Gesch\u00e4ftsbedingungen gelten f\u00fcr direkt bei Pixkuy gebuchte Services, einschlie\u00dflich stundenweiser Services, Ganztagesbuchungen, privater Transfers, Abholungen an Flughafen, Hotel, Wohnung, B\u00fcro, Restaurant, Event oder anderen vereinbarten Orten, privater Touren, Event-Services, Firmenservices oder operativer Verf\u00fcgbarkeit sowie jedes anderen von Pixkuy best\u00e4tigten Services.",
+                "body2": "Wenn eine Reservierung \u00fcber eine Plattform, Agentur, einen Vermittler oder einen Dritten erfolgt, gelten die wirtschaftlichen Bedingungen, Zahlungs-, Straf-, Stornierungs-, \u00c4nderungs-, Erstattungs- und Streitfallregeln dieses Kanals, soweit sie anwendbar sind.",
+                "body3": "Regelt dieser Kanal einen bestimmten Fall nicht, gelten diese Allgemeinen Gesch\u00e4ftsbedingungen sowie die Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen von Pixkuy entsprechend.",
+                "body4": "Unabh\u00e4ngig davon gelten die operativen Bedingungen von Pixkuy zu Sicherheit, Verhalten, Wartezeiten, Passagieren, Gep\u00e4ck, Reinigung, Sch\u00e4den, vergessenen Gegenst\u00e4nden, Abholdaten, operativer Durchf\u00fchrbarkeit und Zusatzkosten immer dann, wenn Pixkuy den Service tats\u00e4chlich erbringt."
+            },
+            "serviceNature": {
+                "title": "4. Art des Services",
+                "body1": "Pixkuy erbringt private Mobilit\u00e4tsdienste mit Fahrer auf vorherige Reservierung, vorbehaltlich Verf\u00fcgbarkeit, operativer Pr\u00fcfung, Sicherheitsbedingungen und Einhaltung der anwendbaren Vorschriften.",
+                "body2": "Die Services von Pixkuy stellen keinen \u00f6ffentlichen Sammelverkehr und keinen offenen Stra\u00dfenservice dar. Der Service wird privat f\u00fcr den Kunden oder die benannten Passagiere gem\u00e4\u00df den best\u00e4tigten Daten und Bedingungen jeder Reservierung erbracht.",
+                "body3": "Pixkuy kann eine Anfrage ablehnen oder nicht best\u00e4tigen, wenn der angefragte Service nach angemessenem Ermessen nicht durchf\u00fchrbar, sicher, legal, operativ oder mit der tats\u00e4chlichen Verf\u00fcgbarkeit von Fahrzeug, Fahrer, Zeitplan, Abdeckung, Dauer, Kapazit\u00e4t, Route, Verkehrsbedingungen, Event, Zone oder anderen relevanten Umst\u00e4nden vereinbar ist."
+            },
+            "booking": {
+                "title": "5. Anfragen und Reservierungsbest\u00e4tigung",
+                "body1": "Eine vom Kunden gesendete Anfrage stellt f\u00fcr sich allein keine best\u00e4tigte Reservierung dar.",
+                "body2": "Die Reservierung gilt erst dann als best\u00e4tigt, wenn Pixkuy eine ausdr\u00fcckliche Best\u00e4tigung \u00fcber einen offiziellen Kanal ausstellt und, sofern erforderlich, Zahlung, Autorisierung, Garantie oder Validierung der Reservierung erfolgreich abgeschlossen wurde.",
+                "body3": "Pixkuy kann vor der Best\u00e4tigung zus\u00e4tzliche Informationen anfordern, darunter vollst\u00e4ndiger Name, Telefonnummer, E-Mail, Datum, Uhrzeit, Abholpunkt, Ziel oder Route, gew\u00fcnschte Dauer, Anzahl der Passagiere, Gep\u00e4ck, Flugnummer, operative Hinweise, besondere Bed\u00fcrfnisse oder Rechnungsdaten.",
+                "body4": "Stellt der Kunde die zur Bewertung oder Erbringung des Services notwendigen Informationen nicht bereit, kann Pixkuy von einer Best\u00e4tigung der Reservierung absehen."
+            },
+            "paymentHold": {
+                "title": "6. Reservierungen mit ausstehender Zahlung oder Autorisierung",
+                "body1": "Wenn Pixkuy einen Zahlungslink, Checkout, eine Autorisierungsanforderung, eine zahlungspflichtige ausstehende Reservierung oder einen \u00e4hnlichen Mechanismus ausstellt, kann die Verf\u00fcgbarkeit des Services zeitlich begrenzt sein.",
+                "body2": "Wird die Zahlung, Autorisierung oder erforderliche Best\u00e4tigung nicht innerhalb der von Pixkuy angegebenen Frist abgeschlossen, kann die Anfrage automatisch verfallen und Pixkuy ist nicht verpflichtet, Verf\u00fcgbarkeit, Fahrzeug, Fahrer, Preis, Zeitfenster oder urspr\u00fcnglich angebotene Bedingungen beizubehalten.",
+                "body3": "Eine Reservierung mit ausstehender Zahlung entspricht keiner best\u00e4tigten Reservierung, sofern Pixkuy nicht ausdr\u00fccklich schriftlich etwas anderes angibt."
+            },
+            "price": {
+                "title": "7. Preis, W\u00e4hrung und anwendbare Geb\u00fchren",
+                "body1": "Preise werden in mexikanischen Pesos (MXN) angezeigt oder mitgeteilt, sofern Pixkuy nicht ausdr\u00fccklich eine andere W\u00e4hrung angibt.",
+                "body2": "Vor Best\u00e4tigung oder Zahlung informiert Pixkuy den Betrag f\u00fcr den angefragten Service anhand der vom Kunden bereitgestellten Daten.",
+                "body3": "Der Preis kann von Serviceart, Datum, Uhrzeit, Dauer, Abholpunkt, Ziel oder Zone, Entfernung, Modalit\u00e4t, besonderen Events, operativer Verf\u00fcgbarkeit, Nachfragebedingungen, Zuschl\u00e4gen, Zusatzleistungen, Routen\u00e4nderungen, Stopps oder Serviceverl\u00e4ngerung abh\u00e4ngen.",
+                "body4": "Der zu zahlende Gesamtbetrag ist der vor Best\u00e4tigung oder Zahlung mitgeteilte Betrag, vorbehaltlich zus\u00e4tzlicher Geb\u00fchren, die durch sp\u00e4tere, dem Kunden zurechenbare Umst\u00e4nde, Zusatzw\u00fcnsche, akzeptierte \u00c4nderungen, zus\u00e4tzliche Wartezeiten, Verl\u00e4ngerungen, Sch\u00e4den, au\u00dfergew\u00f6hnliche Reinigung, Maut, Parkgeb\u00fchren, Genehmigungen, eingeschr\u00e4nkte Zufahrten oder andere bei Reservierung nicht vorgesehene Kosten entstehen.",
+                "body5": "Bei offensichtlichem Preisfehler, technischer Abweichung, Manipulation, Systeminkonsistenz oder Unterschied zwischen berechnetem und erhaltenem Preis kann Pixkuy die automatische Best\u00e4tigung aussetzen und die Reservierung manuell pr\u00fcfen."
+            },
+            "payment": {
+                "title": "8. Zahlungsweise",
+                "body1": "Pixkuy kann Zahlungen \u00fcber die jeweils aktivierten Methoden akzeptieren, einschlie\u00dflich Zahlungs-Gateway, Bankkarte, \u00dcberweisung, manueller Zahlung oder anderer autorisierter Mittel.",
+                "body2": "Bei Zahlung \u00fcber einen externen Zahlungsanbieter speichert Pixkuy nicht die vollst\u00e4ndigen Kartendaten des Kunden. Die Verarbeitung unterliegt den technischen und sicherheitsbezogenen Bedingungen des jeweiligen Zahlungsanbieters.",
+                "body3": "Der Kunde ist verantwortlich daf\u00fcr, g\u00fcltige, ausreichende und autorisierte Zahlungsinformationen bereitzustellen. Fehlende Zahlung, abgelehnte Transaktion, R\u00fcckbuchung, unvollst\u00e4ndige oder nicht abgeglichene Zahlung oder fehlende Zahlungspr\u00fcfung kann die Best\u00e4tigung verhindern oder eine manuelle Pr\u00fcfung ausl\u00f6sen."
+            },
+            "customerObligations": {
+                "title": "9. Pflichten des Kunden",
+                "body1": "Der Kunde muss vollst\u00e4ndige, wahrheitsgem\u00e4\u00dfe und aktuelle Informationen bereitstellen; Abholpunkt, Datum, Uhrzeit und Kontaktdaten korrekt angeben; \u00fcber die angegebenen Kan\u00e4le erreichbar bleiben; p\u00fcnktlich am vereinbarten Ort erscheinen; relevante \u00c4nderungen fr\u00fchzeitig mitteilen; die Fahrzeugkapazit\u00e4t respektieren; Passagier- und Gep\u00e4ckanzahl korrekt angeben; angemessene Anweisungen des Fahrers befolgen und das Fahrzeug pfleglich behandeln.",
+                "body2": "Bucht der Kunde f\u00fcr einen Dritten, ist er verantwortlich daf\u00fcr, den Passagier \u00fcber die anwendbaren Bedingungen zu informieren und sicherzustellen, dass dieser sie einh\u00e4lt."
+            },
+            "communications": {
+                "title": "10. Kontaktdaten und Kommunikation mit dem Kunden",
+                "body1": "Pixkuy kann den Kunden \u00fcber die in der Reservierung angegebenen Daten kontaktieren, einschlie\u00dflich WhatsApp, Telefon und E-Mail.",
+                "body2": "Der Kunde muss eine funktionierende Telefonnummer, vorzugsweise mit WhatsApp, und eine g\u00fcltige E-Mail-Adresse angeben. Fehlende Antwort des Kunden kann die Koordination oder Leistungserbringung beeintr\u00e4chtigen.",
+                "body3": "Wenn Pixkuy wesentliche Informationen best\u00e4tigen muss und der Kunde nicht \u00fcber die angegebenen Kan\u00e4le antwortet, kann Pixkuy die Kontaktversuche dokumentieren. Verhindert die fehlende Antwort die Leistungserbringung zu Datum, Uhrzeit oder Bedingungen der Reservierung, kann der Vorfall dem Kunden zugerechnet werden.",
+                "body4": "F\u00fcr Stornierungen, \u00c4nderungen, Reklamationen oder relevante Mitteilungen m\u00fcssen telefonische Anfragen schriftlich per WhatsApp oder E-Mail best\u00e4tigt werden. Ma\u00dfgeblich ist der Zeitpunkt, zu dem Pixkuy die Anfrage \u00fcber einen offiziellen Kanal schriftlich erh\u00e4lt oder best\u00e4tigt."
+            },
+            "officialChannels": {
+                "title": "11. Offizielle Kan\u00e4le f\u00fcr \u00c4nderungen und Stornierungen",
+                "body1": "Der Kunde muss \u00c4nderungen oder Stornierungen \u00fcber die offiziellen Kan\u00e4le beantragen, die Pixkuy auf der Website, in der Reservierungsbest\u00e4tigung oder in offiziellen Mitteilungen angibt.",
+                "body2": "Regul\u00e4re Kan\u00e4le sind das offizielle WhatsApp von Pixkuy, die offizielle Reservierungs-E-Mail von Pixkuy und die offizielle Pixkuy-Telefonnummer.",
+                "body3": "Pixkuy kann Anfragen, die \u00fcber nicht offizielle Kan\u00e4le, nicht f\u00fcr Reservierungen freigegebene soziale Netzwerke, pers\u00f6nliche Nummern, informelle Nachrichten, \u00f6ffentliche Kommentare oder andere Medien gesendet werden, nicht anerkennen."
+            },
+            "changes": {
+                "title": "12. \u00c4nderungen der Reservierung",
+                "body1": "Jede \u00c4nderung von Datum, Uhrzeit, Abholpunkt, Ziel, Dauer, Route, Passagierzahl, Gep\u00e4ck, Serviceart, Stopps, Verl\u00e4ngerung, Fahrzeug, operativen Bedingungen oder anderen relevanten Daten unterliegt Verf\u00fcgbarkeit und ausdr\u00fccklicher Best\u00e4tigung durch Pixkuy.",
+                "body2": "Eine vom Kunden beantragte \u00c4nderung gilt erst als akzeptiert, wenn Pixkuy sie ausdr\u00fccklich schriftlich best\u00e4tigt.",
+                "body3": "Wenn eine \u00c4nderung einen h\u00f6heren Preis, Zuschlag, operative Geb\u00fchr oder ge\u00e4nderte Bedingungen mit sich bringt, muss der Kunde die Differenz akzeptieren und zahlen, bevor die \u00c4nderung best\u00e4tigt ist.",
+                "body4": "\u00c4nderungsanfragen innerhalb von 24 Stunden vor Servicebeginn machen die Reservierung nicht erstattungsf\u00e4hig. Kann Pixkuy die \u00c4nderung nicht akzeptieren, bleibt die urspr\u00fcngliche Reservierung zu den best\u00e4tigten Bedingungen bestehen."
+            },
+            "cancellationsReference": {
+                "title": "13. Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen",
+                "body1": "Stornierungen, \u00c4nderungen, Nichtantreten, Wartezeiten, Erstattungen und damit verbundene F\u00e4lle richten sich nach der Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen von Pixkuy, die auf der Website verf\u00fcgbar und gegebenenfalls im Checkout, Footer, in Best\u00e4tigungen oder \u00f6ffentlichen Statusseiten verlinkt ist.",
+                "body2": "Grunds\u00e4tzlich ist eine Stornierung ohne Strafgeb\u00fchr m\u00f6glich, wenn Pixkuy die Anfrage mindestens 24 Stunden vor Servicebeginn erh\u00e4lt; Stornierungen mit weniger als 24 Stunden Vorlauf und No-shows sind nicht erstattungsf\u00e4hig.",
+                "body3": "Bei Abweichungen zwischen diesem Abschnitt und der spezifischen Stornierungsrichtlinie hat die spezifische Richtlinie f\u00fcr Stornierung, \u00c4nderung, No-show, Wartezeit und Erstattung Vorrang, sofern zwingendes Recht nichts anderes vorsieht."
+            },
+            "waitingTimes": {
+                "title": "14. Wartezeiten",
+                "body1": "Die anwendbaren Wartezeiten sind in der Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen sowie in der Servicebest\u00e4tigung festgelegt.",
+                "body2": "Grunds\u00e4tzlich gilt: F\u00fcr urbane Abholungen, Hotels, Wohnungen, B\u00fcros, Restaurants, Events, Touren und stundenweise Services sind 15 Minuten ab geplanter Uhrzeit enthalten; f\u00fcr Flughafenabholungen mit korrekter und verifizierbarer Flugnummer 60 Minuten ab tats\u00e4chlicher Landezeit; f\u00fcr Flughafenabholungen ohne verifizierbaren Flug oder mit fester, vom Flug unabh\u00e4ngiger Uhrzeit 30 Minuten ab geplanter Abholzeit.",
+                "body3": "Nach Ablauf der anwendbaren Wartezeit ohne Erscheinen, Verf\u00fcgbarkeit oder Erreichbarkeit des Kunden oder Passagiers kann Pixkuy die Reservierung gem\u00e4\u00df Richtlinie als No-show behandeln."
+            },
+            "hourlyServices": {
+                "title": "15. Stunden- und Ganztagesservices",
+                "body1": "Bei stundenweisen Services beginnt die gebuchte Zeit zur geplanten Startzeit, auch wenn der Kunde oder Passagier versp\u00e4tet erscheint.",
+                "body2": "Wenn der Kunde versp\u00e4tet erscheint und Pixkuy den Service erbringen kann, endet der Service zur urspr\u00fcnglich vorgesehenen Uhrzeit, sofern Pixkuy keine Verl\u00e4ngerung akzeptiert.",
+                "body3": "Verl\u00e4ngerungen unterliegen operativer Verf\u00fcgbarkeit, Fahrer- und Fahrzeugplanung, anwendbaren Vorschriften, Sicherheit und Zahlung der entsprechenden Zusatzkosten.",
+                "body4": "Bei Ganztagesservices richten sich Dauer, enthaltene Kilometer, Abdeckung, Zeiten, Stopps, Pausen, Verl\u00e4ngerungen und Zuschl\u00e4ge nach den dem Kunden mitgeteilten und von Pixkuy best\u00e4tigten Bedingungen."
+            },
+            "vehicle": {
+                "title": "16. Fahrzeug, Kapazit\u00e4t und Ersatz",
+                "body1": "Pixkuy erbringt den Service mit dem in der Best\u00e4tigung angegebenen Fahrzeug oder der angegebenen Kategorie, es sei denn, operative, technische, Wartungs-, Sicherheits-, h\u00f6here-Gewalt- oder Verf\u00fcgbarkeitsgr\u00fcnde erfordern einen Ersatz.",
+                "body2": "Soweit m\u00f6glich, kann Pixkuy ohne zus\u00e4tzliche Kosten ein gleichwertiges oder h\u00f6herwertiges Fahrzeug einsetzen.",
+                "body3": "Kann Pixkuy einen best\u00e4tigten Service aus einem Pixkuy zurechenbaren Grund nicht erbringen und gibt es keine vom Kunden akzeptierte angemessene Alternative, kann der Kunde zwischen kostenloser Umbuchung vorbehaltlich Verf\u00fcgbarkeit oder vollst\u00e4ndiger Erstattung des f\u00fcr den nicht erbrachten Service gezahlten Betrags w\u00e4hlen.",
+                "body4": "Der Kunde kann kein bestimmtes Fahrzeug verlangen, sofern Pixkuy dieses nicht ausdr\u00fccklich als wesentliche Bedingung der Reservierung best\u00e4tigt hat."
+            },
+            "passengersLuggage": {
+                "title": "17. Passagiere, Gep\u00e4ck und besondere Gegenst\u00e4nde",
+                "body1": "Der Kunde muss bei der Reservierung die Anzahl der Passagiere und das Gep\u00e4ck korrekt angeben.",
+                "body2": "Pixkuy kann den Service ablehnen oder nicht beginnen, wenn Passagierzahl oder Volumen, Gewicht, Art oder Abmessungen des Gep\u00e4cks die Fahrzeugkapazit\u00e4t, die reservierten Bedingungen, anwendbare Vorschriften oder angemessene Sicherheitsstandards \u00fcberschreiten.",
+                "body3": "Gegenst\u00e4nde, die das Fahrzeug besch\u00e4digen, verschmutzen, blockieren, die Sicherheit beeintr\u00e4chtigen oder Komfort von Fahrer oder Passagieren beeintr\u00e4chtigen k\u00f6nnen, sind nicht erlaubt.",
+                "body4": "Haustiere, Lebensmittel, Getr\u00e4nke, empfindliche Materialien, sperrige Gegenst\u00e4nde, Instrumente, Sportausr\u00fcstung, Kisten, Waren, zerbrechliche Gegenst\u00e4nde oder besondere Artikel m\u00fcssen vorab gemeldet werden und unterliegen der Genehmigung durch Pixkuy."
+            },
+            "minors": {
+                "title": "18. Minderj\u00e4hrige und besondere Bed\u00fcrfnisse",
+                "body1": "Wenn Minderj\u00e4hrige mitreisen, ist der Kunde verantwortlich, dies vor der Reservierung mitzuteilen und die anwendbaren Sicherheitsregeln einzuhalten.",
+                "body2": "Wenn Kindersitz, besonderer Sitz, Barrierefreiheit, zus\u00e4tzlicher Platz, besondere Unterst\u00fctzung oder ein anderer operativer Bedarf erforderlich ist, muss der Kunde dies vor Best\u00e4tigung mitteilen. Pixkuy kann die Anfrage je nach Verf\u00fcgbarkeit, Durchf\u00fchrbarkeit und anwendbaren Vorschriften annehmen oder ablehnen.",
+                "body3": "Fehlender vorheriger Hinweis auf besondere Bed\u00fcrfnisse kann die Leistungserbringung verhindern oder \u00c4nderungen, Zuschl\u00e4ge oder Stornierung gem\u00e4\u00df der anwendbaren Richtlinie ausl\u00f6sen."
+            },
+            "conduct": {
+                "title": "19. Verhalten, Sicherheit und Leistungsbedingungen",
+                "body1": "Pixkuy kann den Service ablehnen, aussetzen oder beenden, ohne dass daraus automatisch ein Erstattungsanspruch entsteht, wenn Verhalten oder Umst\u00e4nde des Kunden oder seiner Begleiter eine sichere, legale, respektvolle oder operativ durchf\u00fchrbare Leistungserbringung verhindern.",
+                "body2": "Dazu geh\u00f6ren unter anderem Konsum, Besitz oder Transport illegaler Substanzen; Rausch- oder Beeintr\u00e4chtigungszustand; aggressives, einsch\u00fcchterndes, beleidigendes, missbr\u00e4uchliches oder respektloses Verhalten; Drohungen, Beleidigungen, Bel\u00e4stigung oder unangemessene Behandlung; Verweigerung des Sicherheitsgurts; Verweigerung angemessener Anweisungen; Bitte um gef\u00e4hrliche Man\u00f6ver, verbotene Routen, Geschwindigkeits\u00fcberschreitungen, Verst\u00f6\u00dfe oder illegale Handlungen; \u00dcberzahl an Passagieren oder Gep\u00e4ck; gef\u00e4hrliche oder nicht autorisierte Gegenst\u00e4nde; au\u00dfergew\u00f6hnliche Verschmutzung; Sch\u00e4den; anhaltende Ger\u00fcche; oder jedes Verhalten, das Verkehrssicherheit, Fahrzeugintegrit\u00e4t, W\u00fcrde des Fahrers oder Legalit\u00e4t des Services beeintr\u00e4chtigt.",
+                "body3": "Der Fahrer kann angemessene Entscheidungen treffen, um Sicherheit des Services, Fahrzeugs, der Passagiere, Dritter und seiner selbst zu sch\u00fctzen."
+            },
+            "alcoholFood": {
+                "title": "20. Alkohol, Lebensmittel, Tabak und Substanzen",
+                "body1": "Ohne ausdr\u00fcckliche Genehmigung von Pixkuy d\u00fcrfen im Fahrzeug keine Lebensmittel oder Getr\u00e4nke konsumiert werden, wenn sie Versch\u00fcttungen, Flecken, Ger\u00fcche, R\u00fcckst\u00e4nde oder Beeintr\u00e4chtigungen des Fahrzeugs verursachen k\u00f6nnen.",
+                "body2": "Rauchen im Fahrzeug ist nicht gestattet.",
+                "body3": "Alkoholkonsum im Fahrzeug ist nur mit ausdr\u00fccklicher Genehmigung von Pixkuy m\u00f6glich und nur, wenn Sicherheit, Sauberkeit, Legalit\u00e4t oder ordnungsgem\u00e4\u00dfe Serviceerbringung nicht beeintr\u00e4chtigt werden.",
+                "body4": "Konsum, Besitz, Transport oder Bereitstellung illegaler Substanzen im Fahrzeug oder w\u00e4hrend des Services ist strikt verboten.",
+                "body5": "Pixkuy kann Reinigungs-, Reparatur-, Desodorierungs-, Ausfall- oder sonstige Schadenskosten aus Verst\u00f6\u00dfen gegen diesen Abschnitt berechnen."
+            },
+            "damageCleaning": {
+                "title": "21. Sch\u00e4den, au\u00dfergew\u00f6hnliche Reinigung und Zusatzgeb\u00fchren",
+                "body1": "Der Kunde haftet f\u00fcr Sch\u00e4den, Defekte, Flecken, Br\u00fcche, au\u00dfergew\u00f6hnliche Verschmutzung, anhaltende Ger\u00fcche, R\u00fcckst\u00e4nde, Erbrochenes, Versch\u00fcttungen, Brandspuren, Kratzer, Besch\u00e4digung des Innenraums, Verlust von Zubeh\u00f6r oder jede Beeintr\u00e4chtigung des Fahrzeugs, die durch den Kunden, Passagiere, Begleiter, Haustiere, Gep\u00e4ck oder transportierte Gegenst\u00e4nde verursacht wird.",
+                "body2": "Pixkuy kann vom Kunden angemessene Kosten f\u00fcr au\u00dfergew\u00f6hnliche Reinigung, Reparatur, Ersatz, Desodorierung, Fahrzeugausfall, Verf\u00fcgbarkeitsverlust, Sachsch\u00e4den, operative Verwaltung, Drittgeb\u00fchren, Maut, Parken, Genehmigungen, zus\u00e4tzliche Wartezeiten, Serviceverl\u00e4ngerungen, Routen\u00e4nderungen, nicht geplante Stopps, zus\u00e4tzliche Kilometer, Fahrt au\u00dferhalb der operativen Zone oder andere durch Anweisungen, Handlungen oder Unterlassungen des Kunden oder der Passagiere verursachte Kosten verlangen oder berechnen.",
+                "body3": "Soweit m\u00f6glich, dokumentiert Pixkuy den Vorfall durch Fotos, Kommunikation, Berichte, Belege, Rechnungen oder andere angemessene Nachweise."
+            },
+            "routeChanges": {
+                "title": "22. Routen, Stopps und \u00c4nderungen w\u00e4hrend des Services",
+                "body1": "Der Service wird gem\u00e4\u00df der best\u00e4tigten Reservierung erbracht.",
+                "body2": "Nicht vorgesehene Stopps, Routen\u00e4nderungen, Erweiterungen der Route, Ziel\u00e4nderungen, Zeitverl\u00e4ngerungen oder zus\u00e4tzliche W\u00fcnsche unterliegen Verf\u00fcgbarkeit von Fahrer und Fahrzeug, operativer Durchf\u00fchrbarkeit, Sicherheit, Verkehrsbedingungen, anwendbaren Vorschriften, Genehmigung durch Pixkuy und Zahlung zus\u00e4tzlicher Geb\u00fchren.",
+                "body3": "Pixkuy ist nicht verpflichtet, \u00c4nderungen w\u00e4hrend des Services zu akzeptieren, wenn diese Sicherheit, Legalit\u00e4t, operative Planung, nachfolgende Reservierungen, Fahrzeugreichweite, Fahrerarbeitszeit oder andere angemessene Leistungsbedingungen beeintr\u00e4chtigen."
+            },
+            "externalDelays": {
+                "title": "23. Verz\u00f6gerungen, Verkehr und externe Umst\u00e4nde",
+                "body1": "Pixkuy bem\u00fcht sich, den Service p\u00fcnktlich und mit angemessener Sorgfalt zu erbringen. Der Kunde erkennt jedoch an, dass externe Umst\u00e4nde au\u00dferhalb der angemessenen Kontrolle von Pixkuy auftreten k\u00f6nnen, darunter Verkehr, Unf\u00e4lle, Baustellen, Blockaden, Stra\u00dfensperrungen, Demonstrationen, beh\u00f6rdliche Einschr\u00e4nkungen, Wetter, Notf\u00e4lle, Sicherheitslagen, Infrastrukturfehler, Handlungen Dritter, Gro\u00dfveranstaltungen, Flug- oder andere Verkehrsmittelversp\u00e4tungen und h\u00f6here Gewalt.",
+                "body2": "Pixkuy haftet nicht f\u00fcr Verz\u00f6gerungen, \u00c4nderungen oder Unm\u00f6glichkeit der Leistungserbringung aufgrund externer Umst\u00e4nde au\u00dferhalb seiner angemessenen Kontrolle, au\u00dfer soweit zwingendes Recht eine Haftung vorsieht.",
+                "body3": "Soweit m\u00f6glich, versucht Pixkuy, mit dem Kunden eine angemessene Alternative zu koordinieren."
+            },
+            "airport": {
+                "title": "24. Fl\u00fcge und Flughafenabholungen",
+                "body1": "Umfasst der Service eine Flughafenabholung, muss der Kunde eine korrekte und verifizierbare Flugnummer angeben, wenn Pixkuy diese operativ ber\u00fccksichtigen soll.",
+                "body2": "Gibt der Kunde eine g\u00fcltige und verifizierbare Flugnummer an, kann Pixkuy die Wartereferenz angemessen anhand der tats\u00e4chlichen Landezeit gem\u00e4\u00df anwendbarer Richtlinie anpassen.",
+                "body3": "Gibt der Kunde keine Flugnummer an, ist die Nummer falsch, kann der Flug nicht verifiziert werden oder wird die Abholung zu einer festen, vom Flug unabh\u00e4ngigen Uhrzeit geplant, nutzt Pixkuy die geplante Abholzeit als Referenz.",
+                "body4": "Pixkuy haftet nicht f\u00fcr die Unm\u00f6glichkeit, den Kunden zu finden, wenn dieser falsche Daten angibt, sein Telefon nicht aktiviert, \u00fcber die bereitgestellten Kan\u00e4le nicht antwortet, sich ohne Mitteilung zu einem anderen Punkt begibt oder nicht am vereinbarten Treffpunkt erscheint."
+            },
+            "eventsTours": {
+                "title": "25. Services f\u00fcr Events, Touren und besondere Agenden",
+                "body1": "Services im Zusammenhang mit Events, Konzerten, Kongressen, Touren, privaten Besuchen, Firmenterminen oder anderen Sonderf\u00e4llen unterliegen Verf\u00fcgbarkeit, Verkehrsbedingungen, Zug\u00e4ngen, Sicherheit, Einschr\u00e4nkungen des Veranstaltungsortes, Zeiten, Genehmigungen, Parkm\u00f6glichkeiten und anwendbaren Vorschriften.",
+                "body2": "Pixkuy kann Empfehlungen zu Uhrzeit, Abholpunkt oder Route anpassen, um die Durchf\u00fchrbarkeit zu verbessern, garantiert jedoch keinen Zugang zu Veranstaltungsorten, Eventtickets, Sondergenehmigungen, Parkverf\u00fcgbarkeit, Verkehrsfreiheit oder genaue Ankunftszeiten, wenn diese von Dritten oder externen Umst\u00e4nden abh\u00e4ngen."
+            },
+            "forgottenItems": {
+                "title": "26. Vergessene Gegenst\u00e4nde",
+                "body1": "Kunde und Passagiere sind f\u00fcr ihre pers\u00f6nlichen Gegenst\u00e4nde verantwortlich.",
+                "body2": "Pixkuy haftet nicht f\u00fcr im Fahrzeug vergessene, verlorene, zur\u00fcckgelassene oder besch\u00e4digte Gegenst\u00e4nde, au\u00dfer soweit das anwendbare Recht etwas anderes vorsieht.",
+                "body3": "Findet Pixkuy einen vergessenen Gegenstand, versucht Pixkuy, die R\u00fcckgabe mit dem Kunden zu koordinieren. Versand-, Transport-, Kurier-, Sonderlieferungs- oder Fahrtkosten k\u00f6nnen dem Kunden berechnet werden.",
+                "body4": "Pixkuy kann angemessene Informationen verlangen, um das Eigentum am Gegenstand vor \u00dcbergabe zu pr\u00fcfen."
+            },
+            "pixkuyFault": {
+                "title": "27. Stornierung oder Unm\u00f6glichkeit der Leistung aus Pixkuy zurechenbarem Grund",
+                "body1": "Kann Pixkuy einen best\u00e4tigten Service aus einem Pixkuy zurechenbaren Grund nicht erbringen, kann der Kunde zwischen kostenloser Umbuchung vorbehaltlich Verf\u00fcgbarkeit oder vollst\u00e4ndiger Erstattung des f\u00fcr den nicht erbrachten Service gezahlten Betrags w\u00e4hlen.",
+                "body2": "Pixkuy haftet nicht f\u00fcr mittelbare Sch\u00e4den, entgangenen Gewinn, Verlust von Chancen, verpasste Fl\u00fcge, verpasste Events, verlorene Reservierungen, Gesch\u00e4ftsausf\u00e4lle oder Folgesch\u00e4den, sofern zwingendes Recht nichts anderes bestimmt."
+            },
+            "forceMajeure": {
+                "title": "28. H\u00f6here Gewalt",
+                "body1": "Als h\u00f6here Gewalt oder Zufall gelten Umst\u00e4nde au\u00dferhalb der angemessenen Kontrolle von Pixkuy, die die Leistung verhindern, verz\u00f6gern oder beeintr\u00e4chtigen, darunter Naturereignisse, extremes Wetter, Stra\u00dfensperren, Blockaden, beh\u00f6rdliche Einschr\u00e4nkungen, Gesundheitsnotf\u00e4lle, Unruhen, schwere Sicherheitslagen, Unf\u00e4lle, allgemeine Infrastrukturfehler, Stromausf\u00e4lle, Telekommunikationsausf\u00e4lle, Handlungen oder Unterlassungen Dritter, Flughafeneinschr\u00e4nkungen oder au\u00dfergew\u00f6hnliche Ereignisse.",
+                "body2": "In solchen F\u00e4llen versucht Pixkuy, eine angemessene Alternative oder Umbuchung vorbehaltlich Verf\u00fcgbarkeit anzubieten. Kann der Service nicht erbracht werden und gibt es keine vom Kunden akzeptierte Alternative, bewertet Pixkuy die Erstattung entsprechend dem nicht erbrachten Service und dem anwendbaren Recht."
+            },
+            "platforms": {
+                "title": "29. Plattformen, Agenturen und Vermittler",
+                "body1": "Wenn der Kunde den Service \u00fcber eine Plattform, Agentur, einen Marketplace, Vermittler oder Dritten bucht, akzeptiert der Kunde, dass Preis, Abrechnung, Strafgeb\u00fchren, Stornierung, \u00c4nderung, Erstattung und wirtschaftliche Streitigkeiten den Bedingungen dieses Kanals unterliegen k\u00f6nnen.",
+                "body2": "Pixkuy kann verpflichtet sein, Anweisungen oder operative Regeln der Plattform zu befolgen und kontrolliert nicht alle wirtschaftlichen Bedingungen des externen Kanals.",
+                "body3": "Der Kunde muss bestimmte Reklamationen, Erstattungen oder Streitigkeiten direkt mit der Plattform abwickeln, wenn deren Bedingungen dies vorsehen.",
+                "body4": "Fehlt eine spezifische Regelung des externen Kanals, gelten diese Bedingungen und die Pixkuy-Richtlinie entsprechend."
+            },
+            "refunds": {
+                "title": "30. Erstattungen",
+                "body1": "Von Pixkuy genehmigte Erstattungen werden, soweit m\u00f6glich, \u00fcber dieselbe Zahlungsmethode abgewickelt, die der Kunde verwendet hat.",
+                "body2": "Nach Einleitung der Erstattung h\u00e4ngen die Gutschriftzeiten von Bank, Kartenherausgeber, Zahlungsanbieter oder entsprechender Plattform ab.",
+                "body3": "Pixkuy kann Betr\u00e4ge abziehen oder einbehalten, wenn g\u00fcltig entstandene Geb\u00fchren, Sch\u00e4den, au\u00dfergew\u00f6hnliche Reinigung, Zusatzkosten, anwendbare Strafgeb\u00fchren oder nicht erstattungsf\u00e4hige F\u00e4lle gem\u00e4\u00df akzeptierter Richtlinie vorliegen, sofern zwingendes Recht nichts anderes bestimmt."
+            },
+            "chargebacks": {
+                "title": "31. R\u00fcckbuchungen und Zahlungsstreitigkeiten",
+                "body1": "Wenn der Kunde eine R\u00fcckbuchung, Bankstreitigkeit, Zahlungsreklamation oder ein \u00e4hnliches Verfahren einleitet, kann Pixkuy der zust\u00e4ndigen Stelle verf\u00fcgbare Nachweise zur Reservierung, Akzeptanz der Bedingungen, Best\u00e4tigung, Kommunikation, Leistung oder versuchten Leistung, No-show, anwendbaren Richtlinie, Zusatzkosten oder sonstigen relevanten Informationen vorlegen.",
+                "body2": "Die Einleitung einer R\u00fcckbuchung bedeutet nicht automatisch, dass der Betrag unberechtigt oder erstattungsf\u00e4hig ist."
+            },
+            "billing": {
+                "title": "32. Rechnungen und Belege",
+                "body1": "Wenn der Kunde eine Rechnung oder einen steuerlichen Beleg ben\u00f6tigt, muss er vollst\u00e4ndige und korrekte Steuerdaten innerhalb der von Pixkuy angegebenen Fristen bereitstellen.",
+                "body2": "Die Ausstellung von Rechnungen, Belegen oder steuerlichen Dokumenten unterliegt den anwendbaren mexikanischen Steuervorschriften und der Verf\u00fcgbarkeit korrekter Kundendaten.",
+                "body3": "Pixkuy haftet nicht f\u00fcr Fehler aufgrund unvollst\u00e4ndiger, falscher oder versp\u00e4tet bereitgestellter Steuerdaten."
+            },
+            "privacy": {
+                "title": "33. Datenschutz und personenbezogene Daten",
+                "body1": "Die Verarbeitung personenbezogener Daten richtet sich nach dem Datenschutzhinweis von Pixkuy.",
+                "body2": "Pixkuy kann die f\u00fcr Anfragen, Reservierungen, Zahlungen, Kommunikation, operative Koordination, Rechnungsstellung, Sicherheit, Kundenservice, rechtliche Erf\u00fcllung, Betrugspr\u00e4vention, Vorfallbearbeitung und Aufbewahrung vertraglicher Nachweise notwendigen Daten verarbeiten.",
+                "body3": "Durch Nutzung des Services erkennt der Kunde an, dass Pixkuy Informationen zur Reservierung, Akzeptanz von Bedingungen, Zahlung, Kommunikation, Vorf\u00e4llen, Servicestatus und akzeptierter Richtlinienversion gem\u00e4\u00df Datenschutzhinweis und anwendbarem Recht speichern kann."
+            },
+            "siteUse": {
+                "title": "34. Nutzung der Website und digitaler Kan\u00e4le",
+                "body1": "Der Kunde muss Website, Formulare, Zahlungslinks, Statusseiten und digitale Kan\u00e4le von Pixkuy rechtm\u00e4\u00dfig, korrekt und nicht betr\u00fcgerisch nutzen.",
+                "body2": "Es ist untersagt, Preise, Formulare, Payloads, Verf\u00fcgbarkeit oder Checkout-Prozesse zu manipulieren; falsche Daten zu verwenden; Identit\u00e4t vorzut\u00e4uschen; unautorisierten Systemzugang zu versuchen; den Betrieb der Website zu st\u00f6ren; b\u00f6sartige Tests durchzuf\u00fchren; Code, missbr\u00e4uchliche Automatisierungen, Bots oder nicht autorisierte Lasten einzubringen; oder technische Fehler zum eigenen Vorteil auszunutzen.",
+                "body3": "Pixkuy kann Reservierungen stornieren, manuell pr\u00fcfen oder ablehnen, wenn Missbrauch, Manipulation, technische Inkonsistenzen, Betrug, \u00dcberlastung oder operatives Risiko erkannt werden."
+            },
+            "intellectualProperty": {
+                "title": "35. Geistiges Eigentum",
+                "body1": "Website, Marke, Logos, Texte, Design, Bilder, Materialien, Struktur, Inhalte und visuelle Elemente von Pixkuy geh\u00f6ren Pixkuy oder werden mit Genehmigung genutzt.",
+                "body2": "Der Kunde erwirbt durch Nutzung der Website oder Buchung der Services keine Rechte an geistigem Eigentum.",
+                "body3": "Vervielf\u00e4ltigung, Verbreitung, \u00c4nderung, Extraktion, Scraping, nicht autorisierte kommerzielle Nutzung oder sonstige missbr\u00e4uchliche Nutzung der Pixkuy-Inhalte ist untersagt."
+            },
+            "digitalAvailability": {
+                "title": "36. Verf\u00fcgbarkeit der Website und Systeme",
+                "body1": "Pixkuy bem\u00fcht sich, digitale Kan\u00e4le betriebsbereit zu halten, garantiert jedoch keine ununterbrochene Verf\u00fcgbarkeit der Website, Formulare, Checkouts, Statusseiten, Integrationen, Karten, Zahlungs-Gateways, Dienste Dritter oder externen Systeme.",
+                "body2": "Pixkuy haftet nicht f\u00fcr Ausf\u00e4lle, die Technologieanbietern, Netzwerken, Zahlungs-Gateways, Kartendiensten, Kommunikationsdiensten, Banken, externen Plattformen, Browsern, Ger\u00e4ten des Kunden oder Ursachen au\u00dferhalb der angemessenen Kontrolle von Pixkuy zuzurechnen sind."
+            },
+            "acceptanceEvidence": {
+                "title": "37. Nachweis der Akzeptanz und anwendbare Version",
+                "body1": "Pixkuy kann Nachweise \u00fcber Datum und Uhrzeit der Akzeptanz, akzeptierte Version der Allgemeinen Gesch\u00e4ftsbedingungen, akzeptierte Version der Stornierungs-, \u00c4nderungs- und Erstattungsrichtlinie, anwendbaren Datenschutzhinweis, Akzeptanzkanal, Seite der Akzeptanz, Reservierungsdaten, Zahlungsstatus, zugeh\u00f6rige Kommunikation, Anfrage, Best\u00e4tigung, \u00c4nderungen oder Vorf\u00e4lle speichern.",
+                "body2": "Anwendbar ist die zum Zeitpunkt der Best\u00e4tigung, Zahlung oder Akzeptanz der Reservierung g\u00fcltige Version, sofern eine sp\u00e4tere \u00c4nderung nicht ausdr\u00fccklich vom Kunden akzeptiert wird oder gesetzlich verpflichtend ist."
+            },
+            "updates": {
+                "title": "38. \u00c4nderungen dieser Allgemeinen Gesch\u00e4ftsbedingungen",
+                "body1": "Pixkuy kann diese Allgemeinen Gesch\u00e4ftsbedingungen aktualisieren, um operative, rechtliche, kommerzielle, technische oder servicebezogene \u00c4nderungen abzubilden.",
+                "body2": "\u00c4nderungen wirken nicht r\u00fcckwirkend auf bereits best\u00e4tigte Reservierungen, sofern dies nicht gesetzlich zul\u00e4ssig ist, dem Kunden zugutekommt oder vom Kunden ausdr\u00fccklich akzeptiert wird.",
+                "body3": "Wenn eine \u00c4nderung f\u00fcr eine zuk\u00fcnftige Reservierung relevant ist, bem\u00fcht sich Pixkuy, die anwendbare Version vor der Buchung verf\u00fcgbar zu machen."
+            },
+            "complaints": {
+                "title": "39. Kundenservice, Kl\u00e4rungen und Reklamationen",
+                "body1": "Der Kunde kann Pixkuy \u00fcber die offiziellen Kan\u00e4le kontaktieren, um Kl\u00e4rungen anzufordern, Vorf\u00e4lle zu melden, \u00c4nderungen zu beantragen, Stornierungen zu verwalten oder Reklamationen einzureichen.",
+                "body2": "Zur Bearbeitung einer Reklamation kann Pixkuy Reservierungscode, Kundenname, Servicedatum, Beschreibung des Vorfalls, verf\u00fcgbare Nachweise, Kontaktdaten und gegebenenfalls Zahlungsbeleg anfordern.",
+                "body3": "Pixkuy bem\u00fcht sich, Mitteilungen in gutem Glauben und angemessen zu bearbeiten, unbeschadet der Rechte des Verbrauchers nach anwendbarem Recht."
+            },
+            "compliance": {
+                "title": "40. Gesetzliche Einhaltung und Verbraucherschutz",
+                "body1": "Nichts in diesen Allgemeinen Gesch\u00e4ftsbedingungen soll unverzichtbare Verbraucherrechte nach anwendbarem Recht beschr\u00e4nken, ausschlie\u00dfen oder vermindern.",
+                "body2": "Sollte eine Klausel als ung\u00fcltig, missbr\u00e4uchlich, nicht anwendbar oder rechtswidrig gelten, wird sie soweit erforderlich ausgelegt oder begrenzt, ohne die G\u00fcltigkeit der \u00fcbrigen Bedingungen zu beeintr\u00e4chtigen.",
+                "body3": "Pixkuy bem\u00fcht sich, wesentliche Informationen zu Service, Preis, Bedingungen, Geb\u00fchren, Stornierungen, \u00c4nderungen, Erstattungen und Kontaktkan\u00e4len vor der Buchung klar und zug\u00e4nglich bereitzustellen."
+            },
+            "nonDiscrimination": {
+                "title": "41. Nichtdiskriminierung",
+                "body1": "Pixkuy verweigert den Service nicht aus diskriminierenden Gr\u00fcnden. Ablehnung, Aussetzung oder Beendigung eines Services darf nur auf objektiven Gr\u00fcnden wie Sicherheit, Legalit\u00e4t, Kapazit\u00e4t, Verf\u00fcgbarkeit, unvollst\u00e4ndigen Daten, Nichtzahlung, Versto\u00df gegen Bedingungen, operativem Risiko oder angemessener Undurchf\u00fchrbarkeit beruhen."
+            },
+            "governingLaw": {
+                "title": "42. Anwendbares Recht",
+                "body1": "Diese Allgemeinen Gesch\u00e4ftsbedingungen unterliegen den anwendbaren Gesetzen Mexikos.",
+                "body2": "Im Streitfall k\u00f6nnen die Parteien die nach anwendbarem Recht entsprechenden Mechanismen f\u00fcr Betreuung, Schlichtung oder Reklamation nutzen, einschlie\u00dflich Verbraucherschutzmechanismen, soweit anwendbar.",
+                "body3": "Unbeschadet unverzichtbarer Verbraucherrechte unterliegt jede Streitigkeit, die nicht in die Zust\u00e4ndigkeit einer Verbraucherbeh\u00f6rde f\u00e4llt oder nicht durch alternative Verfahren gel\u00f6st werden kann, den zust\u00e4ndigen Beh\u00f6rden gem\u00e4\u00df anwendbarem mexikanischem Recht."
+            },
+            "acceptance": {
+                "title": "43. Akzeptanz",
+                "body1": "Durch das Anfragen, Best\u00e4tigen, Bezahlen oder Nutzen eines Pixkuy-Services erkennt der Kunde an und akzeptiert, dass er die wesentlichen Bedingungen des Services gepr\u00fcft, wahrheitsgem\u00e4\u00dfe Informationen bereitgestellt hat, versteht, dass die Reservierung Best\u00e4tigung, operative Verf\u00fcgbarkeit und gegebenenfalls Zahlung unterliegt, diese Allgemeinen Gesch\u00e4ftsbedingungen, die Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen sowie den Datenschutzhinweis von Pixkuy akzeptiert, Verantwortung f\u00fcr die Passagiere \u00fcbernimmt, f\u00fcr die er bucht, und akzeptiert, dass Pixkuy Nachweise \u00fcber Akzeptanz, Reservierung, Zahlung, Kommunikation und anwendbare Richtlinienversionen speichern kann."
+            }
+        }
+    },
+    "cancellations": {
+        "title": "Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen",
+        "intro": "Diese Richtlinie gilt f\u00fcr best\u00e4tigte Reservierungen privater Services, die mit Pixkuy gebucht wurden, einschlie\u00dflich stundenweiser Services, privater Transfers, Abholungen an Hotel, Wohnung, B\u00fcro, Flughafen, Events, Touren oder anderer durch Zahlung oder ausdr\u00fcckliche Akzeptanz von Pixkuy best\u00e4tigter Services.",
+        "timeZoneTitle": "Berechnung von Fristen",
+        "timeZoneBody": "Fristen f\u00fcr Stornierung, \u00c4nderung, Wartezeit und No-show werden nach der Ortszeit des Startorts des Services berechnet. F\u00fcr Services mit Start in Mexiko-Stadt ist die Ortszeit von Mexiko-Stadt ma\u00dfgeblich.",
+        "cancellationTitle": "Stornierungen",
+        "cancellationBody1": "Der Kunde kann die Reservierung ohne Strafgeb\u00fchr stornieren, wenn Pixkuy die Stornierungsanfrage mindestens 24 Stunden vor der geplanten Startzeit des Services erh\u00e4lt.",
+        "cancellationBody2": "In diesem Fall verarbeitet Pixkuy die vollst\u00e4ndige Erstattung des gezahlten Betrags \u00fcber dieselbe Zahlungsmethode, die f\u00fcr die Reservierung verwendet wurde.",
+        "cancellationBody3": "Stornierungsanfragen, die weniger als 24 Stunden vor der geplanten Startzeit eingehen, sind nicht erstattungsf\u00e4hig.",
+        "channelsTitle": "Offizielle Kan\u00e4le",
+        "channelsBody1": "Der Kunde muss jede Stornierung oder \u00c4nderung \u00fcber die offiziellen Kan\u00e4le beantragen, die Pixkuy in der Reservierungsbest\u00e4tigung angibt.",
+        "channelsList": {
+            "whatsapp": "Offizielles WhatsApp von Pixkuy.",
+            "email": "Offizielle Reservierungs-E-Mail von Pixkuy.",
+            "phone": "Offizielle Telefonnummer von Pixkuy."
+        },
+        "channelsBody2": "Telefonische Anfragen m\u00fcssen schriftlich per WhatsApp oder E-Mail best\u00e4tigt werden. Ma\u00dfgeblich ist der Zeitpunkt, zu dem Pixkuy die Anfrage \u00fcber einen offiziellen Kanal schriftlich erh\u00e4lt oder best\u00e4tigt.",
+        "changesTitle": "\u00c4nderungen der Reservierung",
+        "changesBody1": "Jede Anfrage zur \u00c4nderung von Datum, Uhrzeit, Abholpunkt, Ziel, Dauer, Route, Anzahl der Passagiere, Gep\u00e4ck, Serviceart oder anderer Reservierungsbedingungen unterliegt operativer Verf\u00fcgbarkeit und muss ausdr\u00fccklich von Pixkuy best\u00e4tigt werden.",
+        "changesBody2": "Wenn eine \u00c4nderung zu einem h\u00f6heren Preis f\u00fchrt, muss der Kunde die entsprechende Differenz zahlen, bevor die \u00c4nderung best\u00e4tigt wird.",
+        "changesBody3": "Eine \u00c4nderungsanfrage innerhalb der letzten 24 Stunden macht die Reservierung nicht erstattungsf\u00e4hig. Wenn Pixkuy die \u00c4nderung nicht akzeptieren kann, bleibt die urspr\u00fcngliche Reservierung zu den best\u00e4tigten Bedingungen bestehen.",
+        "waitingTitle": "Wartezeiten",
+        "waitingBody1": "F\u00fcr Abholungen an Hotels, Wohnungen, B\u00fcros, Restaurants, Events, Touren, urbanen Punkten und stundenweisen Services sind 15 Minuten Wartezeit ab der geplanten Abhol- oder Startzeit enthalten.",
+        "waitingBody2": "F\u00fcr Flughafenabholungen mit angegebener und verifizierbarer Flugnummer sind 60 Minuten Wartezeit ab tats\u00e4chlicher Landezeit enthalten.",
+        "waitingBody3": "Wenn der Kunde keine Flugnummer angibt, der Flug nicht verifiziert werden kann oder die Abholung zu einer festen, vom Flug unabh\u00e4ngigen Uhrzeit geplant ist, sind 30 Minuten Wartezeit ab geplanter Abholzeit enthalten.",
+        "hourlyTitle": "Stundenweise Services",
+        "hourlyBody": "Bei stundenweisen Services beginnt die gebuchte Zeit zur geplanten Startzeit, auch wenn der Kunde versp\u00e4tet ist. Wenn der Kunde versp\u00e4tet erscheint und Pixkuy den Service erbringen kann, endet der Service zur urspr\u00fcnglich vorgesehenen Zeit. Jede Verl\u00e4ngerung unterliegt operativer Verf\u00fcgbarkeit und Zustimmung von Pixkuy und kann zus\u00e4tzliche Geb\u00fchren verursachen.",
+        "noShowTitle": "No-show des Kunden",
+        "noShowBody1": "Ein No-show liegt vor, wenn der Kunde nach Ablauf der anwendbaren Wartezeit nicht am vereinbarten Abholpunkt ist, nicht verf\u00fcgbar ist oder nicht \u00fcber die in der Reservierung angegebenen Daten erreicht werden kann.",
+        "noShowBody2": "Als No-show behandelte Reservierungen sind nicht erstattungsf\u00e4hig.",
+        "conductTitle": "Sicherheit, Verhalten und Leistungsbedingungen",
+        "conductBody1": "Pixkuy kann den Service ablehnen, aussetzen oder beenden, ohne dass daraus ein Erstattungsanspruch entsteht, wenn Kunde oder Begleiter Verhalten oder Umst\u00e4nde verursachen, die eine sichere, legale oder operativ durchf\u00fchrbare Leistungserbringung verhindern.",
+        "conductList": {
+            "illegalSubstances": "Konsum, Besitz oder Transport illegaler Substanzen.",
+            "intoxication": "Rausch- oder Beeintr\u00e4chtigungszustand, der die Sicherheit gef\u00e4hrdet.",
+            "aggressiveBehavior": "Aggressives, einsch\u00fcchterndes, beleidigendes, missbr\u00e4uchliches oder respektloses Verhalten.",
+            "safetyInstructions": "Weigerung, angemessene Anweisungen des Fahrers zu Sicherheit oder anwendbaren Vorschriften zu befolgen.",
+            "capacity": "Mehr Passagiere oder Gep\u00e4ck als reserviert oder erlaubt.",
+            "damageRisk": "Gegenst\u00e4nde, Haustiere, Lebensmittel, Getr\u00e4nke oder Materialien, die das Fahrzeug besch\u00e4digen, verschmutzen oder gef\u00e4hrden k\u00f6nnen.",
+            "cleaning": "Sch\u00e4den, au\u00dfergew\u00f6hnliche Verschmutzung, Versch\u00fcttungen, Erbrochenes, anhaltende Ger\u00fcche oder R\u00fcckst\u00e4nde.",
+            "illegalRequests": "Anfrage illegaler, unsicherer, nicht autorisierter oder von den gebuchten Bedingungen abweichender Handlungen."
+        },
+        "chargesTitle": "Zusatzgeb\u00fchren",
+        "chargesBody": "Pixkuy kann gerechtfertigte Zusatzgeb\u00fchren f\u00fcr au\u00dfergew\u00f6hnliche Reinigung, Fahrzeugsch\u00e4den, Maut, Parken, Sondergenehmigungen, zus\u00e4tzliche Wartezeiten, Routen\u00e4nderungen, nicht geplante Stopps, Serviceverl\u00e4ngerung oder andere durch den Kunden oder seine Begleiter verursachte Kosten berechnen.",
+        "forgottenItemsTitle": "Vergessene Gegenst\u00e4nde",
+        "forgottenItemsBody": "Pixkuy haftet nicht f\u00fcr pers\u00f6nliche Gegenst\u00e4nde, die im Fahrzeug vergessen, verloren oder zur\u00fcckgelassen wurden, au\u00dfer soweit das anwendbare Recht etwas anderes vorsieht. Wenn Pixkuy einen Gegenstand findet, versucht Pixkuy, die R\u00fcckgabe mit dem Kunden zu koordinieren. Versand-, Transport- oder Lieferkosten k\u00f6nnen vom Kunden getragen werden.",
+        "pixkuyCancellationTitle": "Stornierung aus Pixkuy zurechenbarem Grund",
+        "pixkuyCancellationBody": "Kann Pixkuy einen best\u00e4tigten Service aus einem Pixkuy zurechenbaren Grund nicht erbringen, kann der Kunde zwischen kostenloser Umbuchung vorbehaltlich Verf\u00fcgbarkeit oder vollst\u00e4ndiger Erstattung des gezahlten Betrags w\u00e4hlen.",
+        "forceMajeureTitle": "H\u00f6here Gewalt",
+        "forceMajeureBody": "Kann der Service aus Gr\u00fcnden au\u00dferhalb der angemessenen Kontrolle von Pixkuy nicht erbracht werden, einschlie\u00dflich beh\u00f6rdlicher Einschr\u00e4nkungen, Stra\u00dfensperren, extremer Wetterbedingungen, Notf\u00e4llen, Unf\u00e4llen, schwerer Sicherheitslagen oder \u00e4hnlicher Umst\u00e4nde, versucht Pixkuy, eine angemessene Umbuchung vorbehaltlich Verf\u00fcgbarkeit anzubieten. Kann der Service nicht erbracht werden und gibt es keine vom Kunden akzeptierte Alternative, bewertet Pixkuy die Erstattung entsprechend dem nicht erbrachten Service und dem anwendbaren Recht.",
+        "thirdPartiesTitle": "Reservierungen \u00fcber Plattformen oder Dritte",
+        "thirdPartiesBody1": "Wenn die Reservierung \u00fcber eine Plattform, Agentur, einen Vermittler oder Dritten erfolgt, gelten die Stornierungs-, \u00c4nderungs-, Zahlungs-, Straf-, Erstattungs-, Streitfall- und wirtschaftlichen Verwaltungsbedingungen dieses Kanals, soweit anwendbar.",
+        "thirdPartiesBody2": "Wenn dieser Kanal keine spezifische Bedingung f\u00fcr einen konkreten Fall festlegt, gilt die Pixkuy-Richtlinie entsprechend.",
+        "thirdPartiesBody3": "Unabh\u00e4ngig davon muss der Kunde die operativen Bedingungen einhalten, die zur Leistungserbringung durch Pixkuy erforderlich sind, einschlie\u00dflich Wartezeiten, No-show, Kontaktkan\u00e4le, Verhalten, Sicherheit, Passagiere, Gep\u00e4ck, Reinigung, Sch\u00e4den, vergessene Gegenst\u00e4nde, Abholdaten und zus\u00e4tzliche servicebedingte Kosten.",
+        "refundsTitle": "Erstattungen",
+        "refundsBody": "Genehmigte Erstattungen werden \u00fcber dieselbe Zahlungsmethode verarbeitet, die f\u00fcr die Reservierung verwendet wurde. Nach Einleitung der Erstattung h\u00e4ngen die Gutschriftzeiten vom Kartenherausgeber, der Bank oder dem jeweiligen Zahlungsanbieter ab.",
+        "acceptanceTitle": "Akzeptanz der Richtlinie",
+        "acceptanceBody": "Die Best\u00e4tigung einer Reservierung mit Pixkuy beinhaltet die Akzeptanz dieser Richtlinie, soweit sie auf den Buchungskanal anwendbar ist. Pixkuy kann Nachweise \u00fcber Akzeptanz, Best\u00e4tigung, Zahlung, Kommunikation, anwendbare Bedingungen und die zum Zeitpunkt der Reservierung g\u00fcltige Richtlinienversion speichern.",
+        "back": "Zur\u00fcck zur Startseite",
+        "policyVersion": "cancellation_policy_v1_2026_05",
+        "acceptance": {
+            "title": "Stornierungsbedingungen",
+            "checkbox": "Ich habe die Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen gelesen und akzeptiere sie.",
+            "viewPolicy": "Vollst\u00e4ndige Richtlinie ansehen",
+            "error": "Du musst die Richtlinie zu Stornierungen, \u00c4nderungen und Erstattungen akzeptieren, um zur Zahlung fortzufahren."
+        },
+        "short": {
+            "checkout": "Kostenlose Stornierung mit vollst\u00e4ndiger Erstattung bis 24 Stunden vor Servicebeginn. Stornierungen mit weniger als 24 Stunden Vorlauf und No-shows sind nicht erstattungsf\u00e4hig.",
+            "email": "Du kannst bis 24 Stunden vor Servicebeginn ohne Strafgeb\u00fchr stornieren. Stornierungen mit weniger als 24 Stunden Vorlauf und No-shows sind nicht erstattungsf\u00e4hig.",
+            "status": "Kostenlose Stornierung bis 24 Stunden vorher. Innerhalb der letzten 24 Stunden und bei No-show: nicht erstattungsf\u00e4hig."
+        }
+    }
+}

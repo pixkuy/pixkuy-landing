@@ -71,7 +71,7 @@
               "notes": "안내 사항, 정차 지점, 일정 또는 관련 세부 정보를 추가하세요"
             },
             "cta": {
-              "submit": "확인 요청"
+              "submit": "결제로 계속"
             },
             "notesEditor": {
               "title": "서비스 메모",
@@ -111,7 +111,47 @@
           "longTermPriceValue": "운영에 따라",
           "priceValuePending": "—",
           "cta": "요청하기",
+          "reviewCta": "예약 검토",
+          "review": {
+            "title": "예약을 검토하세요",
+            "text": "결제로 계속하기 전에 입력한 정보가 정확한지 확인하세요.",
+            "proceed": "결제로 진행",
+            "edit": "정보 수정"
+          },
+          "reviewPage": {
+            "emptyTitle": "예약 정보를 찾을 수 없습니다",
+            "emptyText": "서비스를 검토하고 계속하려면 양식으로 돌아가세요.",
+            "emptyCta": "양식으로 돌아가기",
+            "serviceValue": "전용 기사 포함 차량",
+            "vehicleValue": "BYD M9",
+            "passengersValue": "최대 6명",
+            "legalTitle": "동의한 조건",
+            "legalText": "계속하기 전에 이용 약관, 취소 정책 및 개인정보 처리방침에 동의했습니다.",
+            "legalTextFallback": "이용 약관, 취소 정책 및 개인정보 처리방침에 동의했습니다.",
+            "error": "결제를 시작할 수 없습니다. 정보를 확인하고 다시 시도하세요.",
+            "details": {
+              "service": "서비스",
+              "mode": "모드",
+              "pickup": "픽업",
+              "date": "날짜",
+              "time": "시간",
+              "duration": "기간",
+              "vehicle": "차량",
+              "passengers": "승객",
+              "price": "최종 요금",
+              "notes": "메모"
+            }
+          },
           "ctaDisabled": "설정을 완료하세요",
+          "availability": {
+            "checking": "이용 가능 여부를 확인 중입니다...",
+            "available": "이용 가능 여부가 확인되었습니다. 계속할 수 있습니다.",
+            "unavailable": "해당 날짜와 시간에는 이용 가능하지 않습니다. 다른 옵션을 선택하세요.",
+            "nextAvailableSlot": "다음 이용 가능 시간: {time}",
+            "minimumLeadTime": "이 서비스를 확정하려면 최소 24시간 전 예약이 필요합니다.",
+            "priceMismatch": "요금이 변경되었습니다. 계속하기 전에 설정을 업데이트하세요.",
+            "error": "이용 가능 여부를 확인할 수 없습니다. 날짜, 시간 및 픽업을 확인하세요."
+          },
           "tabs": {
             "hourly": "시간 단위",
             "fullDay": "하루 전체",

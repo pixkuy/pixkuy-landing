@@ -1,0 +1,230 @@
+{
+  "bookingStatus": {
+    "meta": {
+      "successTitle": "预订已收到 — Pixkuy Mobility",
+      "cancelledTitle": "付款未完成 — Pixkuy Mobility"
+    },
+    "checkout": {
+      "meta": {
+        "title": "正在打开付款 — Pixkuy Mobility"
+      },
+      "state": "安全付款",
+      "title": "正在打开 Stripe",
+      "lead": "我们会将您带到 Stripe 的安全页面完成付款。",
+      "notice": "无法自动打开付款。请重新发起预订或联系 Pixkuy。",
+      "errorTitle": "无法打开付款",
+      "errorLead": "付款会话不可用或已过期。"
+    },
+    "details": {
+      "publicCode": "预订代码",
+      "service": "服务",
+      "pickup": "接载",
+      "vehicle": "车辆",
+      "date": "服务日期",
+      "time": "服务时间",
+      "duration": "时长",
+      "passengers": "乘客",
+      "payment": "付款状态",
+      "amount": "已付金额",
+      "customerName": "姓名",
+      "customerPhone": "电话",
+      "customerEmail": "邮箱",
+      "durationOneHour": "1 小时",
+      "durationHours": "小时",
+      "passengerOne": "1 位乘客",
+      "passengerMany": "位乘客",
+      "empty": "—"
+    },
+    "serviceLabels": {
+      "hourly_daily": "私人车辆与司机",
+      "notAvailable": "Pixkuy 服务"
+    },
+    "paymentLabels": {
+      "confirmed": "已确认",
+      "pending_payment": "待付款",
+      "paid": "已付款",
+      "hold_expired": "临时预订已过期",
+      "payment_mismatch": "付款审核中",
+      "payment_after_expiry": "付款超出有效窗口",
+      "cancelled_manual": "已手动取消",
+      "pending_manual_review": "人工审核中",
+      "pending": "待处理",
+      "failed": "失败",
+      "expired": "已过期",
+      "mismatch": "付款审核中",
+      "notAvailable": "不可用"
+    },
+    "confirmed": {
+      "state": "预订已确认",
+      "title": "您的预订已确认",
+      "lead": "车辆已为您保留。请保存预订代码，以便与 Pixkuy 协调。",
+      "notice": "您将收到一封包含预订摘要的确认邮件。日期和时间均为墨西哥城时间。"
+    },
+    "pending": {
+      "state": "付款验证中",
+      "title": "我们正在验证您的付款",
+      "lead": "Stripe 可能需要一些时间通知结果。如果您已经付款，请稍等片刻后刷新页面。",
+      "notice": "只有在付款成功完成后，预订才会被确认。"
+    },
+    "manualReview": {
+      "state": "人工审核",
+      "title": "您的预订需要审核",
+      "lead": "我们检测到需要 Pixkuy 团队在确认预订前进行审核的情况。",
+      "defaultNotice": "如需了解此预订状态，请联系 Pixkuy。",
+      "paymentMismatchNotice": "已付金额与预期金额不一致。预订未被自动确认。",
+      "paymentAfterExpiryNotice": "付款在预订临时窗口失效后到达。我们将人工审核此情况。"
+    },
+    "expired": {
+      "state": "临时预订已过期",
+      "title": "临时预订已过期",
+      "lead": "付款有效窗口已不再有效。如需预订，请重新开始流程或联系 Pixkuy。",
+      "notice": "此状态下未确认任何预订。"
+    },
+    "unknown": {
+      "state": "状态不可用",
+      "title": "无法确认状态",
+      "lead": "收到的响应无法清楚显示确认状态。请联系 Pixkuy 审核您的情况。",
+      "notice": "此页面未确认任何预订。"
+    },
+    "missingToken": {
+      "state": "缺少令牌",
+      "title": "无法查询此预订",
+      "lead": "URL 中缺少预订公开令牌。请重新打开付款后收到的链接。",
+      "notice": "未向后端发起任何查询。"
+    },
+    "notFound": {
+      "state": "未找到预订",
+      "title": "我们找不到此预订",
+      "lead": "该链接不对应可用的公开预订，或已不再有效。",
+      "notice": "请检查链接或联系 Pixkuy。"
+    },
+    "requestError": {
+      "state": "查询错误",
+      "title": "无法查询状态",
+      "lead": "连接 Booking API 时出现问题。请稍后重试。",
+      "notice": "此页面未确认任何预订。"
+    },
+    "cancelled": {
+      "pending": {
+        "state": "付款未完成",
+        "title": "付款未完成",
+        "lead": "您的临时预订可能仍会在几分钟内有效。如需保留该请求，可重新尝试付款。",
+        "notice": "只有在付款成功完成后，预订才会被确认。"
+      },
+      "confirmed": {
+        "state": "预订已确认",
+        "title": "您的预订已经确认",
+        "lead": "即使您从付款页面返回，您的预订也已经确认。",
+        "notice": "您的付款已登记。请保存预订代码，以便后续协调。"
+      },
+      "manualReview": {
+        "state": "人工审核",
+        "title": "此预订需要审核",
+        "lead": "由于该预订需要运营审核，我们无法自动打开新的付款。",
+        "defaultNotice": "请联系 Pixkuy 审核此情况。",
+        "paymentMismatchNotice": "已付金额与预期金额不一致。预订未被自动确认。",
+        "paymentAfterExpiryNotice": "付款在预订临时窗口失效后到达。我们将人工审核此情况。"
+      },
+      "expired": {
+        "state": "临时预订已过期",
+        "title": "临时预订已过期",
+        "lead": "付款窗口已不再有效。如需预订，请重新发起请求。",
+        "notice": "我们不会从此页面重新激活过期预订。"
+      },
+      "cancelled": {
+        "state": "预订已取消",
+        "title": "此预订已取消",
+        "lead": "之前的预订已不再有效。如需服务，请重新发起请求。",
+        "notice": "我们不会重新激活已取消的预订，也不会保留之前的时间。"
+      },
+      "unknown": {
+        "state": "状态不可用",
+        "title": "无法确认状态",
+        "lead": "收到的响应无法判断是否可以重新尝试付款。",
+        "notice": "如需审核此预订，请联系 Pixkuy。"
+      },
+      "missingToken": {
+        "state": "缺少令牌",
+        "title": "无法查询此预订",
+        "lead": "URL 中缺少预订公开令牌。",
+        "notice": "没有有效令牌，无法重新尝试付款。"
+      },
+      "notFound": {
+        "state": "未找到预订",
+        "title": "我们找不到此预订",
+        "lead": "该链接不对应可用的公开预订，或已不再有效。",
+        "notice": "请检查链接或重新发起请求。"
+      },
+      "requestError": {
+        "state": "查询错误",
+        "title": "无法查询状态",
+        "lead": "连接 Booking API 时出现问题。",
+        "notice": "在查询真实状态前，无法启用重新付款。"
+      },
+      "details": {
+        "amount": "待付金额"
+      },
+      "actions": {
+        "retry": "重新付款",
+        "newBooking": "新预订",
+        "home": "返回首页"
+      },
+      "retry": {
+        "loading": "正在打开付款",
+        "loadingNotice": "我们正在为此临时预订请求新的付款链接。",
+        "error": "无法打开新的付款。临时窗口可能已过期。请创建新预订或联系 Pixkuy。"
+      },
+      "mobile": {
+        "pending": {
+          "state": "付款未完成",
+          "title": "付款未完成",
+          "lead": "如果临时预订仍然有效，您可以重新打开付款。",
+          "notice": "只有当 Stripe 和 Pixkuy 均确认付款后，预订才会确认。",
+          "emailNotice": "邮箱：{{email}}",
+          "contactNotice": "联系方式：{{contact}}"
+        },
+        "confirmed": {
+          "state": "预订已确认",
+          "title": "您的预订已经确认",
+          "lead": "即使您从付款页面返回，您的预订也已经确认。",
+          "emailNotice": "您将在 {{email}} 收到确认邮件。",
+          "contactNotice": "联系方式：{{contact}}",
+          "timezoneNotice": "日期和时间均为墨西哥城时间。"
+        },
+        "manualReview": {
+          "emailNotice": "邮箱：{{email}}",
+          "contactNotice": "联系方式：{{contact}}"
+        },
+        "expired": {
+          "state": "预订已过期",
+          "title": "临时预订已过期",
+          "lead": "付款窗口已不再有效。请重新发起请求。",
+          "notice": "未产生扣款，也未确认任何预订。"
+        },
+        "cancelled": {
+          "state": "预订已取消",
+          "title": "预订已取消",
+          "lead": "此预订已不再有效。如需服务，请重新发起请求。",
+          "notice": "不会保留之前的时间。"
+        }
+      }
+    },
+    "actions": {
+      "primary": "预订其他服务",
+      "whatsapp": "通过 WhatsApp 联系"
+    },
+    "mobile": {
+      "close": "关闭",
+      "whatsappMessage": "你好 Pixkuy，我需要协助处理我的预订 {{publicCode}}。",
+      "confirmed": {
+        "emailNotice": "您将在 {{email}} 收到确认邮件。",
+        "contactNotice": "联系方式：{{contact}}",
+        "timezoneNotice": "日期和时间均为墨西哥城时间。"
+      },
+      "manualReview": {
+        "emailNotice": "邮箱：{{email}}",
+        "contactNotice": "联系方式：{{contact}}"
+      }
+    }
+  }
+}

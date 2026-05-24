@@ -71,7 +71,7 @@
               "notes": "Aggiungi indicazioni, fermate, agenda o qualsiasi dettaglio rilevante"
             },
             "cta": {
-              "submit": "Richiedi conferma"
+              "submit": "Continua al pagamento"
             },
             "notesEditor": {
               "title": "Note del servizio",
@@ -111,7 +111,47 @@
           "longTermPriceValue": "Secondo operatività",
           "priceValuePending": "—",
           "cta": "Richiedi",
+          "reviewCta": "Rivedi prenotazione",
+          "review": {
+            "title": "Rivedi la tua prenotazione",
+            "text": "Conferma che i dati siano corretti prima di passare al pagamento.",
+            "proceed": "Procedi al pagamento",
+            "edit": "Modifica dati"
+          },
+          "reviewPage": {
+            "emptyTitle": "Non troviamo i dati della prenotazione",
+            "emptyText": "Torna al modulo per rivedere il servizio e continuare.",
+            "emptyCta": "Torna al modulo",
+            "serviceValue": "Veicolo privato con autista",
+            "vehicleValue": "BYD M9",
+            "passengersValue": "Fino a 6 passeggeri",
+            "legalTitle": "Condizioni accettate",
+            "legalText": "Hai accettato i Termini e condizioni, la Politica di cancellazione e l'Informativa sulla privacy prima di continuare.",
+            "legalTextFallback": "Hai accettato i Termini e condizioni, la Politica di cancellazione e l'Informativa sulla privacy.",
+            "error": "Non siamo riusciti ad avviare il pagamento. Controlla i dati e riprova.",
+            "details": {
+              "service": "Servizio",
+              "mode": "Modalità",
+              "pickup": "Raccolta",
+              "date": "Data",
+              "time": "Ora",
+              "duration": "Durata",
+              "vehicle": "Veicolo",
+              "passengers": "Passeggeri",
+              "price": "Prezzo finale",
+              "notes": "Note"
+            }
+          },
           "ctaDisabled": "Completa la configurazione",
+          "availability": {
+            "checking": "Verifica disponibilità...",
+            "available": "Disponibilità confermata. Puoi continuare.",
+            "unavailable": "Non c'è disponibilità per quella data e quell'ora. Scegli un'altra opzione.",
+            "nextAvailableSlot": "Prossima ora disponibile: {time}",
+            "minimumLeadTime": "Abbiamo bisogno di almeno 24 ore di anticipo per confermare questo servizio.",
+            "priceMismatch": "La tariffa è cambiata. Aggiorna la configurazione prima di continuare.",
+            "error": "Non siamo riusciti a confermare la disponibilità. Controlla data, ora e raccolta."
+          },
           "tabs": {
             "hourly": "A ore",
             "fullDay": "Giornata completa",

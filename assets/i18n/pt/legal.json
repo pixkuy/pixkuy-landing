@@ -1,0 +1,368 @@
+{
+  "legal": {
+    "privacyPolicyVersion": "privacy_v1_2026_05",
+    "links": {
+      "terms": "Termos",
+      "cancellations": "Cancelamentos"
+    }
+  },
+  "legalOverlay": {
+    "tabs": {
+      "terms": "Termos",
+      "cancellations": "Cancelamentos"
+    }
+  },
+  "terms": {
+    "title": "Termos e condições",
+    "lastUpdated": "",
+    "intro": "Os presentes Termos e condições regulam o pedido, contratação, confirmação e prestação dos serviços privados de mobilidade com motorista oferecidos pela Pixkuy Mobility S.A. de C.V. Ao solicitar, confirmar, pagar ou utilizar um serviço da Pixkuy, o cliente declara ter lido, entendido e aceite estes Termos e condições, a Política de cancelamento, alterações e reembolsos e o Aviso de privacidade da Pixkuy, na medida aplicável ao serviço contratado.",
+    "back": "Voltar à página inicial",
+    "policyVersion": "terms_v1_2026_05",
+    "acceptance": {
+      "title": "Condições legais",
+      "checkbox": "Li e aceito os Termos e condições, a Política de cancelamento, alterações e reembolsos e o Aviso de privacidade da Pixkuy.",
+      "viewTerms": "Ver Termos",
+      "viewCancellations": "Ver Cancelamentos",
+      "viewPrivacy": "Ver Privacidade",
+      "error": "Deve aceitar as condições legais para continuar para o pagamento."
+    },
+    "sections": {
+      "provider": {
+        "title": "1. Identificação do fornecedor",
+        "body1": "O serviço é prestado pela Pixkuy Mobility S.A. de C.V., com operação na Cidade do México, México.",
+        "body2": "Os canais oficiais de contacto serão os indicados no site, na confirmação da reserva ou nas comunicações oficiais enviadas pela Pixkuy.",
+        "body3": "A Pixkuy poderá atualizar os canais oficiais de contacto publicados ou comunicados ao cliente. Para efeitos operacionais e de evidência, as comunicações relevantes sobre reservas, alterações, cancelamentos, confirmações, pagamentos ou incidentes deverão ser feitas pelos canais oficiais indicados pela Pixkuy."
+      },
+      "definitions": {
+        "title": "2. Definições",
+        "body1": "Cliente é a pessoa que solicita, contrata, paga ou confirma um serviço com a Pixkuy, para si própria ou para um terceiro.",
+        "body2": "Passageiro é a pessoa que utiliza o serviço, mesmo que não tenha feito diretamente a reserva ou o pagamento.",
+        "body3": "Reserva é o serviço solicitado e confirmado pela Pixkuy, com data, hora, ponto de recolha, modalidade, duração, preço e demais condições aplicáveis.",
+        "body4": "Pedido é a solicitação inicial feita pelo cliente antes da confirmação expressa da Pixkuy.",
+        "body5": "Serviço confirmado é a reserva aceite expressamente pela Pixkuy e, quando aplicável, paga, autorizada ou garantida conforme o método de pagamento aplicável.",
+        "body6": "No-show é a situação em que o cliente ou passageiro não comparece, não está disponível para iniciar o serviço, não pode ser localizado ou não permite a prestação do serviço dentro do tempo de espera aplicável."
+      },
+      "scope": {
+        "title": "3. Âmbito de aplicação",
+        "body1": "Estes Termos e condições aplicam-se aos serviços contratados diretamente com a Pixkuy, incluindo serviços por horas, dia completo, transfers privados, recolhas em aeroporto, hotel, domicílio, escritório, restaurante, evento ou outros pontos acordados, tours privados, serviços para eventos, serviços corporativos ou de disponibilidade operacional e qualquer outro serviço confirmado pela Pixkuy.",
+        "body2": "Quando uma reserva for feita através de uma plataforma, agência, intermediário ou terceiro, as condições económicas, de pagamento, penalização, cancelamento, alteração, reembolso e disputa serão as estabelecidas por esse canal quando aplicáveis.",
+        "body3": "Caso esse canal não regule uma situação concreta, aplicam-se estes Termos e condições e a Política de cancelamento, alterações e reembolsos da Pixkuy no que corresponda.",
+        "body4": "Sem prejuízo do anterior, as condições operacionais da Pixkuy relativas a segurança, conduta, tempos de espera, passageiros, bagagem, limpeza, danos, objetos esquecidos, dados de recolha, viabilidade operacional e custos adicionais serão sempre aplicáveis quando a Pixkuy prestar materialmente o serviço."
+      },
+      "serviceNature": {
+        "title": "4. Natureza do serviço",
+        "body1": "A Pixkuy presta serviços privados de mobilidade com motorista mediante reserva prévia, sujeitos a disponibilidade, validação operacional, condições de segurança e cumprimento da normativa aplicável.",
+        "body2": "Os serviços da Pixkuy não constituem transporte público coletivo nem serviço aberto na via pública. O serviço é prestado de forma privada, para o cliente ou passageiros designados, de acordo com os dados e condições confirmados para cada reserva.",
+        "body3": "A Pixkuy poderá recusar ou não confirmar um pedido quando, a seu critério razoável, o serviço solicitado não seja viável, seguro, legal, operacional ou compatível com a disponibilidade real de veículo, motorista, horário, cobertura, duração, capacidade, rota, condições de trânsito, evento, zona ou qualquer outra circunstância relevante."
+      },
+      "booking": {
+        "title": "5. Pedidos e confirmação de reserva",
+        "body1": "Um pedido enviado pelo cliente não constitui por si só uma reserva confirmada.",
+        "body2": "A reserva ficará confirmada apenas quando a Pixkuy emitir confirmação expressa por um canal oficial e, quando aplicável, o pagamento, autorização, garantia ou validação da reserva tiver sido concluído satisfatoriamente.",
+        "body3": "A Pixkuy poderá solicitar informação adicional antes de confirmar uma reserva, incluindo nome completo do cliente, telefone, email, data, hora, ponto de recolha, destino ou itinerário, duração solicitada, número de passageiros, bagagem, número de voo, notas operacionais, necessidades especiais ou dados de faturação.",
+        "body4": "Se o cliente não fornecer a informação necessária para avaliar ou prestar o serviço, a Pixkuy poderá abster-se de confirmar a reserva."
+      },
+      "paymentHold": {
+        "title": "6. Reservas pendentes de pagamento ou autorização",
+        "body1": "Quando a Pixkuy emitir link de pagamento, checkout, pedido de autorização, reserva pendente de pagamento ou mecanismo semelhante, a disponibilidade do serviço poderá ficar sujeita a um tempo limitado de vigência.",
+        "body2": "Se o pagamento, autorização ou confirmação necessária não for concluído dentro do prazo indicado pela Pixkuy, o pedido poderá expirar automaticamente e a Pixkuy não será obrigada a conservar disponibilidade, veículo, motorista, preço, horário ou condições inicialmente oferecidas.",
+        "body3": "Uma reserva pendente de pagamento não equivale a uma reserva confirmada, salvo indicação expressa em contrário por escrito pela Pixkuy."
+      },
+      "price": {
+        "title": "7. Preço, moeda e custos aplicáveis",
+        "body1": "Os preços serão apresentados ou comunicados em pesos mexicanos (MXN), salvo indicação expressa de outra moeda pela Pixkuy.",
+        "body2": "Antes da confirmação ou pagamento, a Pixkuy informará o montante correspondente ao serviço solicitado de acordo com os dados fornecidos pelo cliente.",
+        "body3": "O preço poderá depender do tipo de serviço, data, hora, duração, ponto de recolha, destino ou zona, distância, modalidade, eventos especiais, disponibilidade operacional, condições de procura, suplementos aplicáveis, serviços adicionais solicitados, alterações de rota, paragens ou extensão do serviço.",
+        "body4": "O valor total a pagar será o informado antes da confirmação ou pagamento, salvo custos adicionais gerados por factos posteriores atribuíveis ao cliente, pedidos adicionais, alterações aceites, esperas adicionais, extensões, danos, limpeza extraordinária, portagens, estacionamentos, autorizações, acessos restritos ou outros custos não previstos no momento da reserva.",
+        "body5": "Em caso de erro manifesto de preço, desajuste técnico, manipulação, inconsistência de sistema ou diferença entre o preço calculado e o preço recebido, a Pixkuy poderá suspender a confirmação automática do serviço e submeter a reserva a revisão manual."
+      },
+      "payment": {
+        "title": "8. Forma de pagamento",
+        "body1": "A Pixkuy poderá aceitar pagamentos através dos métodos habilitados em cada momento, incluindo gateway de pagamento, cartão bancário, transferência, pagamento manual ou outros meios autorizados.",
+        "body2": "Quando o pagamento for feito através de um fornecedor externo de pagamentos, a Pixkuy não armazenará os dados completos do cartão bancário do cliente. O processamento estará sujeito às condições técnicas e de segurança do fornecedor correspondente.",
+        "body3": "O cliente é responsável por fornecer informação de pagamento válida, suficiente e autorizada. Falta de pagamento, rejeição da operação, chargeback, pagamento incompleto, pagamento não conciliado ou impossibilidade de verificar o pagamento poderá impedir a confirmação da reserva ou originar revisão manual."
+      },
+      "customerObligations": {
+        "title": "9. Obrigações do cliente",
+        "body1": "O cliente deverá fornecer informação completa, verdadeira e atualizada; indicar corretamente ponto de recolha, data, hora e dados de contacto; manter-se disponível nos canais fornecidos; apresentar-se pontualmente no local acordado; informar alterações relevantes com a maior antecedência possível; respeitar a capacidade do veículo; declarar corretamente número de passageiros e bagagem; respeitar instruções razoáveis do motorista e cuidar do veículo.",
+        "body2": "Quando o cliente reserve para um terceiro, será responsável por informar o passageiro das condições aplicáveis e garantir que esse passageiro cumpre estes Termos e condições."
+      },
+      "communications": {
+        "title": "10. Dados de contacto e comunicação com o cliente",
+        "body1": "A Pixkuy poderá contactar o cliente através dos dados fornecidos na reserva, incluindo WhatsApp, telefone e email.",
+        "body2": "O cliente deverá fornecer um telefone operacional, preferencialmente com WhatsApp ativo, e um email válido. A falta de resposta do cliente poderá afetar a possibilidade de coordenar ou prestar o serviço.",
+        "body3": "Quando a Pixkuy necessitar de confirmar informação essencial para prestar o serviço e o cliente não responder pelos canais fornecidos, a Pixkuy poderá documentar as tentativas de contacto. Se a falta de resposta impedir a prestação do serviço na data, hora ou condições confirmadas, a incidência poderá ser considerada atribuível ao cliente.",
+        "body4": "Para cancelamentos, alterações, reclamações ou comunicações relevantes, os pedidos feitos por telefone deverão ficar confirmados por escrito através de WhatsApp ou email. A hora relevante será a hora em que a Pixkuy receber ou confirmar por escrito o pedido num canal oficial."
+      },
+      "officialChannels": {
+        "title": "11. Canais oficiais para alterações e cancelamentos",
+        "body1": "O cliente deverá solicitar alterações ou cancelamentos através dos canais oficiais indicados pela Pixkuy no site, na confirmação da reserva ou em comunicações oficiais.",
+        "body2": "Os canais ordinários serão o WhatsApp oficial da Pixkuy, o email oficial de reservas da Pixkuy e o telefone oficial da Pixkuy.",
+        "body3": "A Pixkuy poderá não reconhecer pedidos enviados para canais não oficiais, redes sociais não habilitadas para gestão de reservas, números pessoais, mensagens informais, comentários públicos ou meios diferentes dos indicados para a reserva."
+      },
+      "changes": {
+        "title": "12. Alterações na reserva",
+        "body1": "Qualquer alteração de data, hora, ponto de recolha, destino, duração, itinerário, número de passageiros, bagagem, modalidade de serviço, paragens, extensão, veículo, condições operacionais ou qualquer outro dado relevante estará sujeita à disponibilidade e confirmação expressa da Pixkuy.",
+        "body2": "Uma alteração solicitada pelo cliente não será considerada aceite até que a Pixkuy a confirme expressamente por escrito.",
+        "body3": "Quando uma alteração implicar aumento de preço, suplemento, custo operacional ou modificação de condições, o cliente deverá aceitar e pagar a diferença correspondente antes de a alteração ficar confirmada.",
+        "body4": "Os pedidos de alteração nas 24 horas anteriores ao início do serviço não tornam a reserva reembolsável. Se a Pixkuy não puder aceitar a alteração, a reserva original permanecerá vigente nas condições confirmadas."
+      },
+      "cancellationsReference": {
+        "title": "13. Política de cancelamento, alterações e reembolsos",
+        "body1": "Cancelamentos, alterações, no-show, tempos de espera, reembolsos e situações relacionadas regem-se pela Política de cancelamento, alterações e reembolsos da Pixkuy, disponível no site e ligada a partir do checkout, rodapé, confirmações ou páginas públicas de estado quando aplicável.",
+        "body2": "Como regra geral, o cancelamento será sem penalização quando a Pixkuy receber o pedido com 24 horas ou mais de antecedência relativamente ao início do serviço; cancelamentos recebidos com menos de 24 horas de antecedência e reservas no-show não serão reembolsáveis.",
+        "body3": "Em caso de divergência entre este apartado e a Política de cancelamento, alterações e reembolsos, prevalecerá a política específica para cancelamento, alteração, no-show, espera e reembolso, salvo se a legislação aplicável estabelecer outra coisa."
+      },
+      "waitingTimes": {
+        "title": "14. Tempos de espera",
+        "body1": "Os tempos de espera aplicáveis serão os estabelecidos na Política de cancelamento, alterações e reembolsos e na confirmação do serviço.",
+        "body2": "Como regra geral: para recolhas urbanas, hotéis, domicílios, escritórios, restaurantes, eventos, tours e serviços por horas, o tempo de espera incluído será de 15 minutos desde a hora programada; para recolhas no aeroporto com número de voo informado e verificável, será de 60 minutos desde a hora real de aterragem; e para recolhas no aeroporto sem voo verificável ou com hora fixa independente do voo, será de 30 minutos desde a hora programada.",
+        "body3": "Decorrido o tempo de espera aplicável sem que o cliente ou passageiro compareça, esteja disponível ou possa ser contactado, a Pixkuy poderá considerar a reserva como no-show, conforme a política aplicável."
+      },
+      "hourlyServices": {
+        "title": "15. Serviços por horas e dia completo",
+        "body1": "Nos serviços por horas, o tempo contratado começa a contar desde a hora programada de início do serviço, mesmo que o cliente ou passageiro chegue tarde.",
+        "body2": "Se o cliente chegar tarde e a Pixkuy puder prestar o serviço, o serviço terminará na hora originalmente prevista, salvo se a Pixkuy aceitar uma extensão.",
+        "body3": "As extensões estarão sujeitas à disponibilidade operacional, continuidade do motorista, agenda do veículo, normativa aplicável, segurança e pagamento dos custos adicionais correspondentes.",
+        "body4": "Nos serviços de dia completo, a duração, quilómetros incluídos, cobertura, horários, paragens, descansos, extensões e suplementos reger-se-ão pelas condições informadas ao cliente e confirmadas pela Pixkuy."
+      },
+      "vehicle": {
+        "title": "16. Veículo, capacidade e substituições",
+        "body1": "A Pixkuy prestará o serviço com o veículo ou categoria indicado na confirmação, salvo se existir causa operacional, técnica, de manutenção, segurança, força maior ou disponibilidade que torne necessária a substituição do veículo.",
+        "body2": "Quando possível, a Pixkuy poderá utilizar um veículo equivalente ou superior sem custo adicional para o cliente.",
+        "body3": "Se a Pixkuy não puder prestar o serviço confirmado por causa atribuível à Pixkuy e não existir alternativa razoável aceite pelo cliente, o cliente poderá optar por remarcação sem custo adicional, sujeita à disponibilidade, ou reembolso integral do valor pago pelo serviço não prestado.",
+        "body4": "O cliente não poderá exigir um veículo específico salvo se a Pixkuy o tiver confirmado expressamente como condição essencial da reserva."
+      },
+      "passengersLuggage": {
+        "title": "17. Passageiros, bagagem e objetos especiais",
+        "body1": "O cliente deverá informar corretamente o número de passageiros e bagagem no momento da reserva.",
+        "body2": "A Pixkuy poderá recusar ou não iniciar o serviço se o número de passageiros ou o volume, peso, natureza ou dimensões da bagagem excederem a capacidade do veículo, as condições reservadas, a normativa aplicável ou padrões razoáveis de segurança.",
+        "body3": "Não serão permitidos objetos que possam danificar, sujar, bloquear, comprometer a segurança do veículo ou afetar o conforto do motorista ou passageiros.",
+        "body4": "O transporte de animais, alimentos, bebidas, materiais delicados, objetos volumosos, instrumentos, equipamento desportivo, caixas, mercadorias, objetos frágeis ou artigos especiais deverá ser informado previamente e estará sujeito à autorização da Pixkuy."
+      },
+      "minors": {
+        "title": "18. Menores de idade e necessidades especiais",
+        "body1": "Quando viajem menores de idade, o cliente será responsável por informar antes da reserva e cumprir as normas de segurança aplicáveis.",
+        "body2": "Se for necessária cadeira infantil, assento especial, acessibilidade, espaço adicional, assistência particular ou qualquer necessidade operacional específica, o cliente deverá comunicá-lo antes da confirmação. A Pixkuy poderá aceitar ou recusar o pedido conforme disponibilidade, viabilidade e normativa aplicável.",
+        "body3": "A falta de aviso prévio sobre necessidades especiais poderá impedir a prestação do serviço ou gerar alterações, suplementos ou cancelamento conforme a política aplicável."
+      },
+      "conduct": {
+        "title": "19. Conduta, segurança e condições de prestação",
+        "body1": "A Pixkuy poderá recusar, suspender ou terminar o serviço, sem que isso gere direito automático a reembolso, quando o cliente ou acompanhantes incorram em condutas ou circunstâncias que impeçam a prestação do serviço de forma segura, legal, respeitosa ou operacionalmente viável.",
+        "body2": "Entre outros casos, a Pixkuy poderá recusar, suspender ou terminar o serviço quando exista consumo, posse ou transporte de substâncias ilegais; estado de intoxicação ou alteração que comprometa a segurança; conduta agressiva, intimidatória, ofensiva, abusiva ou desrespeitosa; ameaças, insultos, assédio ou tratamento indevido; recusa em usar cinto de segurança; recusa em seguir instruções razoáveis; pedido de manobras perigosas, rotas proibidas, excesso de velocidade, infrações ou atos ilegais; excesso de passageiros ou bagagem; transporte de objetos perigosos ou não autorizados; sujidade extraordinária; danos; odores persistentes; ou qualquer conduta que comprometa a segurança rodoviária, a integridade do veículo, a dignidade do motorista ou a legalidade do serviço.",
+        "body3": "O motorista poderá tomar decisões razoáveis para proteger a segurança do serviço, do veículo, dos passageiros, de terceiros e de si próprio."
+      },
+      "alcoholFood": {
+        "title": "20. Álcool, alimentos, tabaco e substâncias",
+        "body1": "Salvo autorização expressa da Pixkuy, não é permitido consumir alimentos ou bebidas dentro do veículo quando possam gerar derrames, manchas, odores, resíduos ou afetar o estado do veículo.",
+        "body2": "Não é permitido fumar dentro do veículo.",
+        "body3": "O consumo de álcool dentro do veículo só será possível quando a Pixkuy o autorizar expressamente e desde que não comprometa a segurança, limpeza, legalidade ou adequada prestação do serviço.",
+        "body4": "É estritamente proibido consumir, portar, transportar ou facilitar substâncias ilegais dentro do veículo ou durante o serviço.",
+        "body5": "A Pixkuy poderá aplicar custos de limpeza, reparação, desodorização, imobilização do veículo, perda de disponibilidade ou outros danos derivados do incumprimento deste apartado."
+      },
+      "damageCleaning": {
+        "title": "21. Danos, limpeza extraordinária e custos adicionais",
+        "body1": "O cliente será responsável por danos, avarias, manchas, ruturas, sujidade extraordinária, odores persistentes, resíduos, vómito, derrames, queimaduras, riscos, deterioração de interiores, perda de acessórios ou qualquer afetação ao veículo ocasionada pelo cliente, passageiros, acompanhantes, animais, bagagem ou objetos transportados.",
+        "body2": "A Pixkuy poderá reclamar ou cobrar ao cliente os custos razoáveis derivados de limpeza extraordinária, reparação, reposição, desodorização, imobilização do veículo, perda de disponibilidade, danos materiais, gestão operacional, custos de terceiros, portagens, estacionamentos, autorizações, esperas adicionais, extensões do serviço, alterações de rota, paragens não previstas, quilómetros adicionais, saída da zona operacional ou qualquer outro custo gerado por instruções, atos ou omissões do cliente ou passageiros.",
+        "body3": "Quando possível, a Pixkuy documentará a incidência através de fotografias, comunicações, relatórios, recibos, faturas ou outra evidência razoável."
+      },
+      "routeChanges": {
+        "title": "22. Rotas, paragens e alterações durante o serviço",
+        "body1": "O serviço será prestado conforme a reserva confirmada.",
+        "body2": "Paragens não previstas, alterações de rota, ampliações de itinerário, alterações de destino, extensões horárias ou pedidos adicionais estarão sujeitos à disponibilidade do motorista e veículo, viabilidade operacional, segurança, condições de trânsito, normativa aplicável, aprovação da Pixkuy e pagamento de custos adicionais.",
+        "body3": "A Pixkuy não será obrigada a aceitar alterações durante o serviço se estas afetarem a segurança, legalidade, agenda operacional, reservas posteriores, autonomia do veículo, jornada do motorista ou qualquer outra condição razoável de prestação."
+      },
+      "externalDelays": {
+        "title": "23. Atrasos, trânsito e circunstâncias externas",
+        "body1": "A Pixkuy procurará prestar o serviço com pontualidade e diligência razoável. Contudo, o cliente reconhece que podem existir circunstâncias externas fora do controlo razoável da Pixkuy, incluindo trânsito, acidentes, obras, bloqueios, encerramentos de vias, manifestações, restrições de autoridade, clima, emergências, insegurança, falhas de infraestrutura, atos de terceiros, eventos massivos, atrasos de voos ou outros meios de transporte e força maior.",
+        "body2": "A Pixkuy não será responsável por atrasos, alterações ou impossibilidade de prestar o serviço causados por circunstâncias externas fora do seu controlo razoável, salvo nos casos em que a legislação aplicável estabeleça responsabilidade.",
+        "body3": "Quando possível, a Pixkuy tentará coordenar uma alternativa razoável com o cliente."
+      },
+      "airport": {
+        "title": "24. Voos e recolhas no aeroporto",
+        "body1": "Quando o serviço incluir recolha no aeroporto, o cliente deverá fornecer número de voo correto e verificável se desejar que a Pixkuy possa utilizá-lo como referência operacional.",
+        "body2": "Se o cliente fornecer número de voo válido e verificável, a Pixkuy poderá ajustar razoavelmente a referência de espera de acordo com a hora real de aterragem, conforme a política aplicável.",
+        "body3": "Se o cliente não fornecer número de voo, fornecer número incorreto, se o voo não puder ser verificado ou se a recolha for programada a uma hora fixa independente do voo, a Pixkuy tomará como referência a hora programada de recolha.",
+        "body4": "A Pixkuy não será responsável pela impossibilidade de localizar o cliente quando este não fornecer dados corretos, não ativar o telefone, não responder pelos canais fornecidos, deslocar-se para ponto diferente sem avisar ou não comparecer no ponto de encontro acordado."
+      },
+      "eventsTours": {
+        "title": "25. Serviços para eventos, tours e agendas especiais",
+        "body1": "Serviços vinculados a eventos, concertos, congressos, tours, visitas privadas, jornadas corporativas ou outros casos especiais estarão sujeitos a disponibilidade, condições de trânsito, acessos, segurança, restrições do recinto, horários, autorizações, estacionamentos e normativa aplicável.",
+        "body2": "A Pixkuy poderá adaptar recomendações de horário, ponto de recolha ou rota para melhorar a viabilidade do serviço, mas não garante acesso a recintos, bilhetes para eventos, autorizações especiais, disponibilidade de estacionamento, ausência de trânsito ou tempos exatos de chegada quando dependam de terceiros ou circunstâncias externas."
+      },
+      "forgottenItems": {
+        "title": "26. Objetos esquecidos",
+        "body1": "O cliente e passageiros são responsáveis pelos seus objetos pessoais.",
+        "body2": "A Pixkuy não será responsável por objetos esquecidos, perdidos, abandonados ou danificados no veículo, salvo nos casos em que a lei aplicável estabeleça o contrário.",
+        "body3": "Se a Pixkuy localizar um objeto esquecido, tentará coordenar a devolução com o cliente. Os custos de envio, transporte, mensageiro, entrega especial ou deslocação poderão ficar a cargo do cliente.",
+        "body4": "A Pixkuy poderá requerer informação razoável para verificar a propriedade do objeto antes de o entregar."
+      },
+      "pixkuyFault": {
+        "title": "27. Cancelamento ou impossibilidade de prestação por causa atribuível à Pixkuy",
+        "body1": "Se a Pixkuy não puder prestar um serviço confirmado por causa atribuível à Pixkuy, o cliente poderá escolher entre remarcação sem custo adicional, sujeita à disponibilidade, ou reembolso integral do valor pago correspondente ao serviço não prestado.",
+        "body2": "A Pixkuy não será responsável por danos indiretos, lucros cessantes, perda de oportunidade, perda de voos, perda de eventos, perda de reservas, perda de negócio ou outros danos consequenciais, salvo se a legislação aplicável estabelecer outra coisa."
+      },
+      "forceMajeure": {
+        "title": "28. Força maior",
+        "body1": "Consideram-se causas de força maior ou caso fortuito as circunstâncias fora do controlo razoável da Pixkuy que impeçam, atrasem ou afetem a prestação do serviço, incluindo fenómenos naturais, clima extremo, encerramento de vias, bloqueios, restrições de autoridade, emergências sanitárias, distúrbios, insegurança grave, acidentes, falhas generalizadas de infraestrutura, cortes de energia, falhas de telecomunicações, atos ou omissões de terceiros, restrições aeroportuárias ou eventos extraordinários.",
+        "body2": "Nestes casos, a Pixkuy tentará oferecer uma alternativa razoável ou remarcação sujeita à disponibilidade. Se o serviço não puder ser prestado e não existir alternativa aceite pelo cliente, a Pixkuy avaliará o reembolso conforme o serviço não prestado e a legislação aplicável."
+      },
+      "platforms": {
+        "title": "29. Plataformas, agências e intermediários",
+        "body1": "Quando o cliente contratar o serviço através de plataforma, agência, marketplace, intermediário ou terceiro, aceita que o preço, cobrança, penalização, cancelamento, alteração, reembolso e disputa económica poderão reger-se pelas condições desse canal.",
+        "body2": "A Pixkuy poderá estar obrigada a seguir instruções ou regras operacionais da plataforma e não controla todos os termos económicos do canal externo.",
+        "body3": "O cliente deverá gerir determinadas reclamações, reembolsos ou disputas diretamente com a plataforma quando assim o estabeleçam as suas condições.",
+        "body4": "Na ausência de regulação específica do canal externo, aplicam-se estes Termos e condições e a política da Pixkuy no que corresponda."
+      },
+      "refunds": {
+        "title": "30. Reembolsos",
+        "body1": "Os reembolsos aprovados pela Pixkuy serão processados, quando possível, através do mesmo método de pagamento utilizado pelo cliente.",
+        "body2": "Uma vez iniciado o reembolso, os tempos de crédito dependerão da entidade bancária, emissor do cartão, fornecedor de pagamentos ou plataforma correspondente.",
+        "body3": "A Pixkuy poderá descontar ou reter valores quando existam custos validamente gerados, danos, limpeza extraordinária, custos adicionais, penalizações aplicáveis ou casos não reembolsáveis conforme a política aceite, salvo se a legislação aplicável dispuser outra coisa."
+      },
+      "chargebacks": {
+        "title": "31. Chargebacks e disputas de pagamento",
+        "body1": "Se o cliente iniciar chargeback, disputa bancária, reclamação de pagamento ou procedimento semelhante, a Pixkuy poderá fornecer à entidade correspondente a evidência disponível da reserva, aceitação de termos, confirmação, comunicações, prestação ou tentativa de prestação do serviço, no-show, política aplicável, custos adicionais ou qualquer outra informação relevante.",
+        "body2": "O início de um chargeback não implica por si só que o valor seja indevido ou reembolsável."
+      },
+      "billing": {
+        "title": "32. Faturação e comprovativos",
+        "body1": "Quando o cliente solicitar fatura ou comprovativo fiscal, deverá fornecer os dados fiscais completos, corretos e dentro dos prazos indicados pela Pixkuy.",
+        "body2": "A emissão de faturas, comprovativos ou documentos fiscais estará sujeita à normativa fiscal mexicana aplicável e à disponibilidade de informação correta por parte do cliente.",
+        "body3": "A Pixkuy não será responsável por erros derivados de dados fiscais incompletos, incorretos ou entregues fora de prazo."
+      },
+      "privacy": {
+        "title": "33. Privacidade e dados pessoais",
+        "body1": "O tratamento de dados pessoais reger-se-á pelo Aviso de privacidade da Pixkuy.",
+        "body2": "A Pixkuy poderá tratar os dados necessários para gerir pedidos, reservas, pagamentos, comunicações, coordenação operacional, faturação, segurança, atendimento ao cliente, cumprimento legal, prevenção de fraude, resolução de incidências e conservação de evidência contratual.",
+        "body3": "Ao utilizar o serviço, o cliente reconhece que a Pixkuy poderá conservar informação relacionada com a reserva, aceitação de termos, pagamento, comunicações, incidências, estado do serviço e versão das políticas aceites, conforme o Aviso de privacidade e a legislação aplicável."
+      },
+      "siteUse": {
+        "title": "34. Uso do site e canais digitais",
+        "body1": "O cliente deverá utilizar o site, formulários, links de pagamento, páginas de estado e canais digitais da Pixkuy de forma lícita, correta e não fraudulenta.",
+        "body2": "É proibido manipular preços, formulários, payloads, disponibilidade ou processos de checkout; usar dados falsos; usurpar identidade; tentar aceder a sistemas não autorizados; interferir com o funcionamento do site; realizar testes maliciosos; introduzir código, automatizações abusivas, bots ou cargas não autorizadas; ou explorar erros técnicos em benefício próprio.",
+        "body3": "A Pixkuy poderá cancelar, rever manualmente ou recusar reservas quando detetar uso indevido, manipulação, inconsistências técnicas, fraude, abuso ou risco operacional."
+      },
+      "intellectualProperty": {
+        "title": "35. Propriedade intelectual",
+        "body1": "O site, marca, logótipos, textos, design, imagens, materiais, estrutura, conteúdos e elementos visuais da Pixkuy são propriedade da Pixkuy ou são utilizados com autorização.",
+        "body2": "O cliente não adquire qualquer direito de propriedade intelectual por utilizar o site ou contratar os serviços.",
+        "body3": "É proibida a reprodução, distribuição, modificação, extração, scraping, uso comercial não autorizado ou qualquer aproveitamento indevido dos conteúdos da Pixkuy."
+      },
+      "digitalAvailability": {
+        "title": "36. Disponibilidade do site e sistemas",
+        "body1": "A Pixkuy procurará manter os seus canais digitais operacionais, mas não garante disponibilidade ininterrupta do site, formulários, checkout, páginas de estado, integrações, mapas, gateways de pagamento, serviços de terceiros ou sistemas externos.",
+        "body2": "A Pixkuy não será responsável por falhas atribuíveis a fornecedores tecnológicos, redes, gateways de pagamento, serviços de mapas, serviços de comunicação, bancos, plataformas externas, navegadores, dispositivos do cliente ou causas fora do seu controlo razoável."
+      },
+      "acceptanceEvidence": {
+        "title": "37. Evidência de aceitação e versão aplicável",
+        "body1": "A Pixkuy poderá conservar evidência de data e hora de aceitação, versão dos Termos e condições aceite, versão da Política de cancelamento, alterações e reembolsos aceite, Aviso de privacidade aplicável, canal de aceitação, endereço ou página a partir da qual as condições foram aceites, dados da reserva, estado de pagamento, comunicações relacionadas, pedido, confirmação, alterações ou incidências.",
+        "body2": "A versão aplicável será a vigente no momento em que o cliente confirme, pague ou aceite a reserva, salvo se uma modificação posterior for aceite expressamente pelo cliente ou for obrigatória por lei."
+      },
+      "updates": {
+        "title": "38. Alterações a estes Termos e condições",
+        "body1": "A Pixkuy poderá atualizar estes Termos e condições para refletir alterações operacionais, legais, comerciais, técnicas ou de serviço.",
+        "body2": "As alterações não afetarão retroativamente reservas já confirmadas, salvo se a lei o permitir, se beneficiarem o cliente ou se o cliente aceitar expressamente as novas condições.",
+        "body3": "Quando uma alteração for relevante para uma reserva futura, a Pixkuy procurará que a versão aplicável esteja disponível antes da contratação."
+      },
+      "complaints": {
+        "title": "39. Atendimento ao cliente, esclarecimentos e reclamações",
+        "body1": "O cliente poderá contactar a Pixkuy pelos canais oficiais para solicitar esclarecimentos, apresentar incidências, solicitar alterações, gerir cancelamentos ou formular reclamações.",
+        "body2": "Para atender uma reclamação, a Pixkuy poderá solicitar código de reserva, nome do cliente, data do serviço, descrição da incidência, evidência disponível, dados de contacto e comprovativo de pagamento, se aplicável.",
+        "body3": "A Pixkuy procurará atender as comunicações de boa-fé e de forma razoável, sem prejuízo dos direitos que correspondam ao consumidor conforme a legislação aplicável."
+      },
+      "compliance": {
+        "title": "40. Cumprimento legal e proteção do consumidor",
+        "body1": "Nada nestes Termos e condições tem por objetivo limitar, excluir ou reduzir direitos irrenunciáveis que correspondam ao consumidor conforme a legislação aplicável.",
+        "body2": "Se alguma cláusula for considerada inválida, abusiva, inaplicável ou contrária à lei, essa cláusula será interpretada ou limitada na medida necessária para cumprir a normativa aplicável, sem afetar a validade do restante dos Termos e condições.",
+        "body3": "A Pixkuy procurará que a informação essencial do serviço, preço, condições, custos, cancelamentos, alterações, reembolsos e canais de contacto seja clara e acessível antes da contratação."
+      },
+      "nonDiscrimination": {
+        "title": "41. Não discriminação",
+        "body1": "A Pixkuy não negará o serviço por motivos discriminatórios. A recusa, suspensão ou terminação de um serviço deverá obedecer apenas a causas objetivas de segurança, legalidade, capacidade, disponibilidade, dados incompletos, falta de pagamento, incumprimento de condições, risco operacional ou inviabilidade razoável do serviço."
+      },
+      "governingLaw": {
+        "title": "42. Lei aplicável",
+        "body1": "Estes Termos e condições reger-se-ão pelas leis aplicáveis do México.",
+        "body2": "Em caso de controvérsia, as partes poderão recorrer aos mecanismos de atendimento, conciliação ou reclamação que correspondam conforme a legislação aplicável, incluindo mecanismos de proteção ao consumidor quando aplicável.",
+        "body3": "Sem prejuízo dos direitos irrenunciáveis do consumidor, qualquer controvérsia que não seja da competência de uma autoridade de consumo ou que não possa ser resolvida por meios alternativos será submetida às autoridades competentes conforme a legislação mexicana aplicável."
+      },
+      "acceptance": {
+        "title": "43. Aceitação",
+        "body1": "Ao solicitar, confirmar, pagar ou utilizar um serviço da Pixkuy, o cliente reconhece e aceita que reviu as condições essenciais do serviço, forneceu informação verdadeira, entende que a reserva está sujeita a confirmação, disponibilidade operacional e pagamento quando aplicável, aceita estes Termos e condições, aceita a Política de cancelamento, alterações e reembolsos, conhece o Aviso de privacidade da Pixkuy, assume a responsabilidade pelos passageiros para quem reserva e aceita que a Pixkuy conserve evidência da aceitação, reserva, pagamento, comunicações e versão de políticas aplicáveis."
+      }
+    }
+  },
+  "cancellations": {
+    "title": "Política de cancelamento, alterações e reembolsos",
+    "intro": "Esta política aplica-se às reservas confirmadas de serviços privados contratados com a Pixkuy, incluindo serviços por horas, transfers privados, recolhas em hotel, domicílio, escritório, aeroporto, eventos, tours ou outros serviços confirmados mediante pagamento ou aceitação expressa da Pixkuy.",
+    "timeZoneTitle": "Cálculo de prazos",
+    "timeZoneBody": "Os prazos de cancelamento, alteração, espera e no-show serão calculados de acordo com a hora local do local de início do serviço. Para serviços com início na Cidade do México, a referência será a hora local da Cidade do México.",
+    "cancellationTitle": "Cancelamentos",
+    "cancellationBody1": "O cliente poderá cancelar a reserva sem penalização quando o pedido de cancelamento for recebido pela Pixkuy com 24 horas ou mais de antecedência relativamente à hora programada de início do serviço.",
+    "cancellationBody2": "Nesse caso, a Pixkuy processará o reembolso integral do valor pago através do mesmo método de pagamento utilizado para a reserva.",
+    "cancellationBody3": "Os pedidos de cancelamento recebidos com menos de 24 horas de antecedência relativamente à hora programada de início do serviço não serão reembolsáveis.",
+    "channelsTitle": "Canais oficiais",
+    "channelsBody1": "O cliente deverá solicitar qualquer cancelamento ou alteração através dos canais oficiais indicados pela Pixkuy na confirmação da reserva.",
+    "channelsList": {
+      "whatsapp": "WhatsApp oficial da Pixkuy.",
+      "email": "Email oficial de reservas da Pixkuy.",
+      "phone": "Telefone oficial da Pixkuy."
+    },
+    "channelsBody2": "Os pedidos feitos por telefone deverão ficar confirmados por escrito através de WhatsApp ou email. A hora relevante será a hora em que a Pixkuy receber ou confirmar por escrito o pedido num canal oficial.",
+    "changesTitle": "Alterações na reserva",
+    "changesBody1": "Qualquer pedido de alteração de data, hora, ponto de recolha, destino, duração, itinerário, número de passageiros, bagagem, tipo de serviço ou qualquer outra condição da reserva estará sujeito à disponibilidade operacional e deverá ser confirmado expressamente pela Pixkuy.",
+    "changesBody2": "Quando uma alteração implicar aumento de preço, o cliente deverá pagar a diferença correspondente antes de a alteração ficar confirmada.",
+    "changesBody3": "O pedido de alteração nas 24 horas anteriores não torna a reserva reembolsável. Se a Pixkuy não puder aceitar a alteração, a reserva original manter-se-á vigente nas condições confirmadas.",
+    "waitingTitle": "Tempos de espera",
+    "waitingBody1": "Para recolhas em hotéis, domicílios, escritórios, restaurantes, eventos, tours, pontos urbanos e serviços por horas, o tempo de espera incluído será de 15 minutos desde a hora programada de recolha ou início do serviço.",
+    "waitingBody2": "Para recolhas no aeroporto com número de voo informado e verificável, o tempo de espera incluído será de 60 minutos desde a hora real de aterragem.",
+    "waitingBody3": "Se o cliente não fornecer número de voo, se o voo não puder ser verificado ou se a recolha for programada a uma hora fixa independente do voo, o tempo de espera incluído será de 30 minutos desde a hora programada de recolha.",
+    "hourlyTitle": "Serviços por horas",
+    "hourlyBody": "Nos serviços por horas, o tempo contratado começa a contar desde a hora programada de início do serviço, mesmo que o cliente se atrase. Se o cliente chegar tarde e a Pixkuy puder prestar o serviço, o serviço terminará na hora originalmente prevista. Qualquer extensão estará sujeita à disponibilidade operacional e aprovação da Pixkuy, podendo gerar custos adicionais.",
+    "noShowTitle": "No-show do cliente",
+    "noShowBody1": "Considera-se no-show quando, decorrido o tempo de espera aplicável, o cliente não se encontra no ponto de recolha acordado, não está disponível para iniciar o serviço ou não pode ser contactado através dos dados fornecidos na reserva.",
+    "noShowBody2": "As reservas consideradas no-show não serão reembolsáveis.",
+    "conductTitle": "Segurança, conduta e condições de prestação",
+    "conductBody1": "A Pixkuy poderá recusar, suspender ou terminar o serviço, sem que isso gere direito a reembolso, quando o cliente ou acompanhantes adotem condutas ou circunstâncias que impeçam a prestação do serviço de forma segura, legal ou operacionalmente viável.",
+    "conductList": {
+      "illegalSubstances": "Consumo, posse ou transporte de substâncias ilegais.",
+      "intoxication": "Estado de intoxicação ou alteração que comprometa a segurança.",
+      "aggressiveBehavior": "Conduta agressiva, intimidatória, ofensiva, abusiva ou desrespeitosa.",
+      "safetyInstructions": "Recusa em seguir instruções razoáveis do motorista relacionadas com segurança ou normativa aplicável.",
+      "capacity": "Excesso de passageiros ou bagagem relativamente ao reservado ou permitido.",
+      "damageRisk": "Objetos, animais, alimentos, bebidas ou materiais que possam danificar, sujar ou pôr em risco o veículo.",
+      "cleaning": "Danos, sujidade extraordinária, derrames, vómito, odores persistentes ou resíduos.",
+      "illegalRequests": "Pedido de atos ilegais, inseguros, não autorizados ou diferentes das condições contratadas."
+    },
+    "chargesTitle": "Custos adicionais",
+    "chargesBody": "A Pixkuy poderá aplicar custos adicionais justificados por limpeza extraordinária, danos no veículo, portagens, estacionamentos, autorizações especiais, esperas adicionais, alterações de rota, paragens não previstas, extensão do serviço ou outros custos ocasionados pelo cliente ou acompanhantes.",
+    "forgottenItemsTitle": "Objetos esquecidos",
+    "forgottenItemsBody": "A Pixkuy não será responsável por objetos pessoais esquecidos, perdidos ou abandonados no veículo, salvo nos casos em que a lei aplicável determine o contrário. Se localizar um objeto esquecido, a Pixkuy tentará coordenar a devolução com o cliente. Os custos de envio, deslocação ou entrega poderão ficar a cargo do cliente.",
+    "pixkuyCancellationTitle": "Cancelamento por causa atribuível à Pixkuy",
+    "pixkuyCancellationBody": "Se a Pixkuy não puder prestar um serviço confirmado por causa atribuível à Pixkuy, o cliente poderá escolher entre reagendar o serviço sem custo adicional, sujeito à disponibilidade, ou receber o reembolso total do valor pago.",
+    "forceMajeureTitle": "Força maior",
+    "forceMajeureBody": "Se o serviço não puder ser prestado por causas fora do controlo razoável da Pixkuy, incluindo restrições de autoridade, encerramento de vias, condições climáticas extremas, emergências, acidentes, situações de insegurança grave ou circunstâncias semelhantes, a Pixkuy tentará oferecer uma remarcação razoável, sujeita à disponibilidade. Se o serviço não puder ser prestado e não existir alternativa aceite pelo cliente, a Pixkuy avaliará o reembolso conforme o serviço não prestado e a legislação aplicável.",
+    "thirdPartiesTitle": "Reservas através de plataformas ou terceiros",
+    "thirdPartiesBody1": "Quando a reserva for feita através de plataforma, agência, intermediário ou terceiro, as condições de cancelamento, alteração, cobrança, penalização, reembolso, disputa e gestão económica serão as estabelecidas por esse canal, quando aplicáveis.",
+    "thirdPartiesBody2": "Caso esse canal não estabeleça condição específica para um determinado caso, aplicar-se-á a política da Pixkuy no que corresponda.",
+    "thirdPartiesBody3": "Sem prejuízo do anterior, o cliente deverá cumprir as condições operacionais necessárias para a prestação do serviço pela Pixkuy, incluindo tempos de espera, no-show, canais de contacto, conduta, segurança, passageiros, bagagem, limpeza, danos, objetos esquecidos, dados de recolha e custos adicionais decorrentes do serviço.",
+    "refundsTitle": "Reembolsos",
+    "refundsBody": "Os reembolsos aprovados serão processados através do mesmo método de pagamento utilizado para a reserva. Uma vez iniciado o reembolso, os tempos de crédito dependerão da entidade emissora, banco ou fornecedor de pagamentos correspondente.",
+    "acceptanceTitle": "Aceitação da política",
+    "acceptanceBody": "A confirmação de uma reserva com a Pixkuy implica a aceitação desta política, na medida em que seja aplicável ao canal pelo qual o serviço tenha sido contratado. A Pixkuy poderá conservar evidência da aceitação, confirmação, pagamento, comunicações, condições aplicáveis e versão da política vigente no momento da reserva.",
+    "back": "Voltar à página inicial",
+    "policyVersion": "cancellation_policy_v1_2026_05",
+    "acceptance": {
+      "title": "Condições de cancelamento",
+      "checkbox": "Li e aceito a política de cancelamento, alterações e reembolsos.",
+      "viewPolicy": "Ver política completa",
+      "error": "Deve aceitar a política de cancelamento, alterações e reembolsos para continuar para o pagamento."
+    },
+    "short": {
+      "checkout": "Cancelamento gratuito com reembolso total até 24 horas antes do início do serviço. Cancelamentos recebidos com menos de 24 horas de antecedência e reservas no-show não são reembolsáveis.",
+      "email": "Pode cancelar sem penalização até 24 horas antes do início do serviço. Cancelamentos recebidos com menos de 24 horas de antecedência e reservas no-show não são reembolsáveis.",
+      "status": "Cancelamento gratuito até 24 horas antes. Dentro das 24 horas anteriores e no-show: não reembolsável."
+    }
+  }
+}

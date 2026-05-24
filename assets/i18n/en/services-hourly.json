@@ -71,7 +71,7 @@
               "notes": "Add instructions, stops, agenda or any relevant detail"
             },
             "cta": {
-              "submit": "Request confirmation"
+              "submit": "Continue to payment"
             },
             "notesEditor": {
               "title": "Service notes",
@@ -111,7 +111,47 @@
           "longTermPriceValue": "According to operation",
           "priceValuePending": "—",
           "cta": "Request",
+          "reviewCta": "Review booking",
+          "review": {
+            "title": "Review your booking",
+            "text": "Confirm that the details are correct before continuing to payment.",
+            "proceed": "Proceed to payment",
+            "edit": "Edit details"
+          },
+          "reviewPage": {
+            "emptyTitle": "We could not find the booking details",
+            "emptyText": "Go back to the form to review your service and continue.",
+            "emptyCta": "Back to form",
+            "serviceValue": "Private vehicle with driver",
+            "vehicleValue": "BYD M9",
+            "passengersValue": "Up to 6 passengers",
+            "legalTitle": "Accepted conditions",
+            "legalText": "You accepted the Terms and Conditions, the Cancellation Policy and the Privacy Notice before continuing.",
+            "legalTextFallback": "You accepted the Terms and Conditions, the Cancellation Policy and the Privacy Notice.",
+            "error": "We could not start payment. Check the details and try again.",
+            "details": {
+              "service": "Service",
+              "mode": "Mode",
+              "pickup": "Pickup",
+              "date": "Date",
+              "time": "Time",
+              "duration": "Duration",
+              "vehicle": "Vehicle",
+              "passengers": "Passengers",
+              "price": "Final price",
+              "notes": "Notes"
+            }
+          },
           "ctaDisabled": "Complete the configuration",
+          "availability": {
+            "checking": "Checking availability...",
+            "available": "Availability confirmed. You can continue.",
+            "unavailable": "There is no availability for that date and time. Choose another option.",
+            "nextAvailableSlot": "Next available time: {time}",
+            "minimumLeadTime": "We need at least 24 hours' notice to confirm this service.",
+            "priceMismatch": "The fare has changed. Update the configuration before continuing.",
+            "error": "We could not confirm availability. Check date, time and pickup."
+          },
           "tabs": {
             "hourly": "By the hour",
             "fullDay": "Full day",

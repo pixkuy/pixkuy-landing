@@ -1,0 +1,367 @@
+{
+  "legal": {
+    "privacyPolicyVersion": "privacy_v1_2026_05",
+    "links": {
+      "terms": "Termini",
+      "cancellazioni": "Cancellazioni"
+    }
+  },
+  "legalOverlay": {
+    "tabs": {
+      "terms": "Termini",
+      "cancellations": "Cancellazioni"
+    }
+  },
+  "terms": {
+    "title": "Termini e condizioni",
+    "lastUpdated": "",
+    "intro": "I presenti Termini e condizioni regolano la richiesta, la contrattazione, la conferma e la prestazione dei servizi privati di mobilità con autista offerti da Pixkuy Mobility S.A. de C.V. Richiedendo, confermando, pagando o utilizzando un servizio Pixkuy, il cliente dichiara di aver letto, compreso e accettato questi Termini e condizioni, la Politica di cancellazione, modifiche e rimborsi e l'Informativa sulla privacy di Pixkuy, per quanto applicabili al servizio contrattato.",
+    "back": "Torna alla pagina iniziale",
+    "policyVersion": "terms_v1_2026_05",
+    "acceptance": {
+      "title": "Condizioni legali",
+      "checkbox": "Ho letto e accetto i Termini e condizioni, la Politica di cancellazione, modifiche e rimborsi e l'Informativa sulla privacy di Pixkuy.",
+      "viewTerms": "Vedi Termini",
+      "viewCancellations": "Vedi Cancellazioni",
+      "viewPrivacy": "Vedi Privacy",
+      "error": "Devi accettare le condizioni legali per continuare al pagamento."
+    },
+    "sections": {
+      "provider": {
+        "title": "1. Identificazione del fornitore",
+        "body1": "Il servizio è prestato da Pixkuy Mobility S.A. de C.V., con operazione a Città del Messico, Messico.",
+        "body2": "I canali ufficiali di contatto saranno quelli indicati sul sito web, nella conferma di prenotazione o nelle comunicazioni ufficiali inviate da Pixkuy.",
+        "body3": "Pixkuy potrà aggiornare i canali ufficiali pubblicati o comunicati al cliente. Ai fini operativi e probatori, le comunicazioni rilevanti su prenotazioni, modifiche, cancellazioni, conferme, pagamenti o incidenti dovranno avvenire tramite i canali ufficiali indicati da Pixkuy."
+      },
+      "definitions": {
+        "title": "2. Definizioni",
+        "body1": "Cliente è la persona che richiede, contratta, paga o conferma un servizio con Pixkuy, per sé o per un terzo.",
+        "body2": "Passeggero è la persona che utilizza il servizio, anche se non ha effettuato direttamente la prenotazione o il pagamento.",
+        "body3": "Prenotazione è il servizio richiesto e confermato da Pixkuy, con data, ora, punto di raccolta, modalità, durata, prezzo e altre condizioni applicabili.",
+        "body4": "Richiesta è la domanda iniziale effettuata dal cliente prima della conferma espressa di Pixkuy.",
+        "body5": "Servizio confermato è la prenotazione accettata espressamente da Pixkuy e, ove applicabile, pagata, autorizzata o garantita secondo il metodo di pagamento applicabile.",
+        "body6": "No-show o mancata presentazione è il caso in cui il cliente o passeggero non si presenta, non è disponibile per iniziare il servizio, non può essere contattato o non consente la prestazione del servizio entro il tempo di attesa applicabile."
+      },
+      "scope": {
+        "title": "3. Ambito di applicazione",
+        "body1": "Questi Termini e condizioni si applicano ai servizi contrattati direttamente con Pixkuy, inclusi servizi a ore, giornata completa, trasferimenti privati, raccolte in aeroporto, hotel, domicilio, ufficio, ristorante, evento o altri punti concordati, tour privati, servizi per eventi, servizi aziendali o di disponibilità operativa e qualsiasi altro servizio confermato da Pixkuy.",
+        "body2": "Quando una prenotazione è effettuata tramite piattaforma, agenzia, intermediario o terzo, le condizioni economiche, di pagamento, penalità, cancellazione, modifica, rimborso e disputa saranno quelle stabilite da tale canale quando applicabili.",
+        "body3": "Se tale canale non regola un caso specifico, si applicheranno questi Termini e condizioni e la Politica di cancellazione, modifiche e rimborsi di Pixkuy per quanto pertinente.",
+        "body4": "Fermo restando quanto sopra, le condizioni operative di Pixkuy relative a sicurezza, condotta, tempi di attesa, passeggeri, bagagli, pulizia, danni, oggetti dimenticati, dati di raccolta, viabilità operativa e costi aggiuntivi saranno sempre applicabili quando Pixkuy presti materialmente il servizio."
+      },
+      "serviceNature": {
+        "title": "4. Natura del servizio",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "booking": {
+        "title": "5. Richieste e conferma della prenotazione",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "paymentHold": {
+        "title": "6. Prenotazioni in attesa di pagamento o autorizzazione",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "price": {
+        "title": "7. Prezzo, valuta e costi applicabili",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "payment": {
+        "title": "8. Forma di pagamento",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "customerObligations": {
+        "title": "9. Obblighi del cliente",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "communications": {
+        "title": "10. Dati di contatto e comunicazione con il cliente",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "officialChannels": {
+        "title": "11. Canali ufficiali per modifiche e cancellazioni",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "changes": {
+        "title": "12. Modifiche alla prenotazione",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "cancellationsReference": {
+        "title": "13. Politica di cancellazione, modifiche e rimborsi",
+        "body1": "Le cancellazioni, le modifiche, la mancata presentazione, i tempi di attesa, i rimborsi e i casi correlati sono regolati dalla Politica di cancellazione, modifiche e rimborsi di Pixkuy, disponibile sul sito web e collegata dal checkout, dal footer, dalle conferme o dalle pagine pubbliche di stato quando applicabile.",
+        "body2": "Come regola generale, la cancellazione sarà senza penale quando Pixkuy riceve la richiesta con almeno 24 ore di anticipo rispetto all'inizio del servizio; le cancellazioni ricevute con meno di 24 ore di anticipo e le prenotazioni no-show non saranno rimborsabili.",
+        "body3": "In caso di discrepanza tra questa sezione e la Politica di cancellazione, modifiche e rimborsi, prevarrà la politica specifica per i casi di cancellazione, modifica, no-show, attesa e rimborso, salvo diversa disposizione di legge."
+      },
+      "waitingTimes": {
+        "title": "14. Tempi di attesa",
+        "body1": "I tempi di attesa applicabili saranno quelli stabiliti nella Politica di cancellazione, modifiche e rimborsi e nella conferma del servizio.",
+        "body2": "Come regola generale: per raccolte urbane, hotel, domicili, uffici, ristoranti, eventi, tour e servizi a ore, il tempo di attesa incluso sarà di 15 minuti dall'orario programmato; per raccolte in aeroporto con numero di volo comunicato e verificabile, sarà di 60 minuti dall'orario reale di atterraggio; per raccolte in aeroporto senza volo verificabile o con orario fisso indipendente dal volo, sarà di 30 minuti dall'orario programmato.",
+        "body3": "Trascorso il tempo di attesa applicabile senza che il cliente o passeggero si presenti, sia disponibile o possa essere contattato, Pixkuy potrà considerare la prenotazione come no-show, secondo la politica applicabile."
+      },
+      "hourlyServices": {
+        "title": "15. Servizi a ore e giornata completa",
+        "body1": "Nei servizi a ore, il tempo contrattato inizierà a decorrere dall'orario programmato di inizio del servizio, anche se il cliente o passeggero arriva in ritardo.",
+        "body2": "Se il cliente arriva in ritardo e Pixkuy può prestare il servizio, il servizio terminerà all'orario originariamente previsto, salvo che Pixkuy accetti un'estensione.",
+        "body3": "Le estensioni saranno soggette a disponibilità operativa, continuità del conducente, agenda del veicolo, normativa applicabile, sicurezza e pagamento dei costi aggiuntivi corrispondenti.",
+        "body4": "Nei servizi di giornata completa, durata, chilometri inclusi, copertura, orari, fermate, pause, estensioni e supplementi saranno regolati dalle condizioni comunicate al cliente e confermate da Pixkuy."
+      },
+      "vehicle": {
+        "title": "16. Veicolo, capacità e sostituzioni",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "passengersLuggage": {
+        "title": "17. Passeggeri, bagagli e oggetti speciali",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "minors": {
+        "title": "18. Minori e necessità speciali",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "conduct": {
+        "title": "19. Condotta, sicurezza e condizioni di prestazione",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "alcoholFood": {
+        "title": "20. Alcol, alimenti, tabacco e sostanze",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "damageCleaning": {
+        "title": "21. Danni, pulizia straordinaria e costi aggiuntivi",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "routeChanges": {
+        "title": "22. Percorsi, fermate e modifiche durante il servizio",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "externalDelays": {
+        "title": "23. Ritardi, traffico e circostanze esterne",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "airport": {
+        "title": "24. Voli e raccolte in aeroporto",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "eventsTours": {
+        "title": "25. Servizi per eventi, tour e agende speciali",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "forgottenItems": {
+        "title": "26. Oggetti dimenticati",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "pixkuyFault": {
+        "title": "27. Cancellazione o impossibilità di prestazione per causa attribuibile a Pixkuy",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "forceMajeure": {
+        "title": "28. Forza maggiore",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "platforms": {
+        "title": "29. Piattaforme, agenzie e intermediari",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "refunds": {
+        "title": "30. Rimborsi",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "chargebacks": {
+        "title": "31. Chargeback e dispute di pagamento",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "billing": {
+        "title": "32. Fatturazione e ricevute",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "privacy": {
+        "title": "33. Privacy e dati personali",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "siteUse": {
+        "title": "34. Uso del sito web e dei canali digitali",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "intellectualProperty": {
+        "title": "35. Proprietà intellettuale",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "digitalAvailability": {
+        "title": "36. Disponibilità del sito web e dei sistemi",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "acceptanceEvidence": {
+        "title": "37. Prova di accettazione e versione applicabile",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "updates": {
+        "title": "38. Modifiche dei presenti Termini e condizioni",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "complaints": {
+        "title": "39. Assistenza clienti, chiarimenti e reclami",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "compliance": {
+        "title": "40. Conformità legale e tutela del consumatore",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "nonDiscrimination": {
+        "title": "41. Non discriminazione",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "governingLaw": {
+        "title": "42. Legge applicabile",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      },
+      "acceptance": {
+        "title": "43. Accettazione",
+        "body1": "Questa sezione stabilisce le condizioni applicabili al servizio confermato, alla sua prestazione e alle responsabilità del cliente e di Pixkuy.",
+        "body2": "Il cliente dovrà rispettare le informazioni confermate, i canali ufficiali, le istruzioni ragionevoli, le condizioni di sicurezza e le politiche applicabili.",
+        "body3": "Pixkuy potrà valutare, documentare, rifiutare, sospendere o sottoporre a revisione manuale qualsiasi situazione che presenti rischio operativo, legale, di sicurezza, di pagamento o di coerenza con la prenotazione confermata."
+      }
+    }
+  },
+  "cancellations": {
+    "title": "Politica di cancellazione, modifiche e rimborsi",
+    "intro": "Questa politica si applica alle prenotazioni confermate di servizi privati contrattati con Pixkuy, inclusi servizi a ore, trasferimenti privati, prelievi presso hotel, domicilio, ufficio, aeroporto, eventi, tour o altri servizi confermati tramite pagamento o accettazione espressa di Pixkuy.",
+    "timeZoneTitle": "Calcolo dei termini",
+    "timeZoneBody": "I termini di cancellazione, modifica, attesa e no-show saranno calcolati secondo l'ora locale del luogo di inizio del servizio. Per servizi con inizio a Città del Messico, il riferimento sarà l'ora locale di Città del Messico.",
+    "cancellationTitle": "Cancellazioni",
+    "cancellationBody1": "Il cliente potrà cancellare la prenotazione senza penale quando la richiesta di cancellazione sarà ricevuta da Pixkuy con almeno 24 ore di anticipo rispetto all'orario programmato di inizio del servizio.",
+    "cancellationBody2": "In tale caso, Pixkuy elaborerà il rimborso integrale dell'importo pagato tramite lo stesso metodo di pagamento utilizzato per la prenotazione.",
+    "cancellationBody3": "Le richieste di cancellazione ricevute con meno di 24 ore di anticipo rispetto all'orario programmato di inizio del servizio non saranno rimborsabili.",
+    "channelsTitle": "Canali ufficiali",
+    "channelsBody1": "Il cliente dovrà richiedere qualsiasi cancellazione o modifica tramite i canali ufficiali indicati da Pixkuy nella conferma di prenotazione.",
+    "channelsList": {
+      "whatsapp": "WhatsApp ufficiale di Pixkuy.",
+      "email": "Email ufficiale prenotazioni di Pixkuy.",
+      "phone": "Telefono ufficiale di Pixkuy."
+    },
+    "channelsBody2": "Le richieste effettuate per telefono dovranno essere confermate per iscritto tramite WhatsApp o email. L'orario rilevante sarà quello in cui Pixkuy riceve o conferma per iscritto la richiesta su un canale ufficiale.",
+    "changesTitle": "Modifiche alla prenotazione",
+    "changesBody1": "Qualsiasi richiesta di modifica di data, ora, punto di raccolta, destinazione, durata, itinerario, numero di passeggeri, bagagli, tipo di servizio o altra condizione della prenotazione sarà soggetta a disponibilità operativa e dovrà essere confermata espressamente da Pixkuy.",
+    "changesBody2": "Quando una modifica comporti un aumento di prezzo, il cliente dovrà pagare la differenza corrispondente prima che la modifica sia confermata.",
+    "changesBody3": "La richiesta di modifica nelle 24 ore precedenti non rende la prenotazione rimborsabile. Se Pixkuy non può accettare la modifica, la prenotazione originaria resterà valida alle condizioni confermate.",
+    "waitingTitle": "Tempi di attesa",
+    "waitingBody1": "Per prelievi presso hotel, domicili, uffici, ristoranti, eventi, tour, punti urbani e servizi a ore, il tempo di attesa incluso sarà di 15 minuti dall'orario programmato di raccolta o inizio del servizio.",
+    "waitingBody2": "Per prelievi in aeroporto con numero di volo comunicato e verificabile, il tempo di attesa incluso sarà di 60 minuti dall'orario reale di atterraggio.",
+    "waitingBody3": "Se il cliente non comunica un numero di volo, il volo non può essere verificato o il prelievo è programmato a un orario fisso indipendente dal volo, il tempo di attesa incluso sarà di 30 minuti dall'orario programmato di raccolta.",
+    "hourlyTitle": "Servizi a ore",
+    "hourlyBody": "Nei servizi a ore, il tempo contrattato inizierà a decorrere dall'orario programmato di inizio del servizio, anche se il cliente è in ritardo. Se il cliente arriva in ritardo e Pixkuy può prestare il servizio, il servizio terminerà all'orario originariamente previsto. Qualsiasi estensione sarà soggetta a disponibilità operativa e approvazione di Pixkuy, e potrà generare costi aggiuntivi.",
+    "noShowTitle": "Mancata presentazione del cliente",
+    "noShowBody1": "Si considera mancata presentazione quando, trascorso il tempo di attesa applicabile, il cliente non si trova nel punto di raccolta concordato, non è disponibile per iniziare il servizio o non può essere contattato tramite i dati forniti nella prenotazione.",
+    "noShowBody2": "Le prenotazioni considerate no-show non saranno rimborsabili.",
+    "conductTitle": "Sicurezza, condotta e condizioni di prestazione",
+    "conductBody1": "Pixkuy potrà rifiutare, sospendere o terminare il servizio, senza che ciò generi diritto a rimborso, quando il cliente o i suoi accompagnatori incorrano in condotte o circostanze che impediscano di prestare il servizio in modo sicuro, legale o operativamente praticabile.",
+    "conductList": {
+      "illegalSubstances": "Consumo, possesso o trasporto di sostanze illegali.",
+      "intoxication": "Stato di intossicazione o alterazione che comprometta la sicurezza.",
+      "aggressiveBehavior": "Condotta aggressiva, intimidatoria, offensiva, abusiva o irrispettosa.",
+      "safetyInstructions": "Rifiuto di seguire istruzioni ragionevoli del conducente relative alla sicurezza o alla normativa applicabile.",
+      "capacity": "Eccesso di passeggeri o bagagli rispetto a quanto prenotato o consentito.",
+      "damageRisk": "Oggetti, animali, alimenti, bevande o materiali che possano danneggiare, sporcare o mettere a rischio il veicolo.",
+      "cleaning": "Danni, sporco straordinario, versamenti, vomito, odori persistenti o residui.",
+      "illegalRequests": "Richiesta di atti illegali, insicuri, non autorizzati o diversi dalle condizioni contrattate."
+    },
+    "chargesTitle": "Costi aggiuntivi",
+    "chargesBody": "Pixkuy potrà applicare costi aggiuntivi giustificati per pulizia straordinaria, danni al veicolo, pedaggi, parcheggi, permessi speciali, attese aggiuntive, cambi di percorso, fermate non previste, estensione del servizio o altri costi causati dal cliente o dai suoi accompagnatori.",
+    "forgottenItemsTitle": "Oggetti dimenticati",
+    "forgottenItemsBody": "Pixkuy non sarà responsabile per oggetti personali dimenticati, persi o abbandonati nel veicolo, salvo nei casi previsti dalla legge applicabile. Se Pixkuy localizza un oggetto dimenticato, cercherà di coordinarne la restituzione con il cliente. I costi di spedizione, trasferimento o consegna potranno essere a carico del cliente.",
+    "pixkuyCancellationTitle": "Cancellazione per causa attribuibile a Pixkuy",
+    "pixkuyCancellationBody": "Se Pixkuy non può prestare un servizio confermato per una causa attribuibile a Pixkuy, il cliente potrà scegliere tra riprogrammare il servizio senza costo aggiuntivo, soggetto a disponibilità, o ricevere il rimborso completo dell'importo pagato.",
+    "forceMajeureTitle": "Forza maggiore",
+    "forceMajeureBody": "Se il servizio non può essere prestato per cause fuori dal ragionevole controllo di Pixkuy, incluse restrizioni dell'autorità, chiusure stradali, condizioni climatiche estreme, emergenze, incidenti, situazioni di grave insicurezza o circostanze simili, Pixkuy tenterà di offrire una riprogrammazione ragionevole, soggetta a disponibilità. Se il servizio non può essere prestato e non esiste un'alternativa accettata dal cliente, Pixkuy valuterà il rimborso in base al servizio non prestato e alla legge applicabile.",
+    "thirdPartiesTitle": "Prenotazioni tramite piattaforme o terzi",
+    "thirdPartiesBody1": "Quando la prenotazione è effettuata tramite piattaforma, agenzia, intermediario o terzo, le condizioni di cancellazione, modifica, addebito, penale, rimborso, disputa e gestione economica saranno quelle stabilite da tale canale, quando applicabili.",
+    "thirdPartiesBody2": "Se tale canale non stabilisce una condizione specifica per un caso concreto, si applicherà la politica di Pixkuy per quanto pertinente.",
+    "thirdPartiesBody3": "Fermo restando quanto sopra, il cliente dovrà rispettare le condizioni operative necessarie per la prestazione del servizio da parte di Pixkuy, inclusi tempi di attesa, mancata presentazione, canali di contatto, condotta, sicurezza, passeggeri, bagagli, pulizia, danni, oggetti dimenticati, dati di raccolta e costi aggiuntivi derivanti dal servizio.",
+    "refundsTitle": "Rimborsi",
+    "refundsBody": "I rimborsi approvati saranno elaborati tramite lo stesso metodo di pagamento utilizzato per la prenotazione. Una volta avviato il rimborso, i tempi di accredito dipenderanno dall'ente emittente, banca o fornitore di pagamento corrispondente.",
+    "acceptanceTitle": "Accettazione della politica",
+    "acceptanceBody": "La conferma di una prenotazione con Pixkuy implica l'accettazione della presente politica, nella misura in cui risulti applicabile al canale tramite cui è stato contrattato il servizio. Pixkuy potrà conservare prova dell'accettazione, conferma, pagamento, comunicazioni, condizioni applicabili e versione della politica vigente al momento della prenotazione.",
+    "back": "Torna alla pagina iniziale",
+    "policyVersion": "cancellation_policy_v1_2026_05",
+    "acceptance": {
+      "title": "Condizioni di cancellazione",
+      "checkbox": "Ho letto e accetto la politica di cancellazione, modifiche e rimborsi.",
+      "viewPolicy": "Vedi politica completa",
+      "error": "Devi accettare la politica di cancellazione, modifiche e rimborsi per continuare al pagamento."
+    },
+    "short": {
+      "checkout": "Cancellazione gratuita con rimborso completo fino a 24 ore prima dell'inizio del servizio. Le cancellazioni ricevute con meno di 24 ore di anticipo e le prenotazioni no-show non sono rimborsabili.",
+      "email": "Puoi cancellare senza penale fino a 24 ore prima dell'inizio del servizio. Le cancellazioni ricevute con meno di 24 ore di anticipo e le prenotazioni no-show non sono rimborsabili.",
+      "status": "Cancellazione gratuita fino a 24 ore prima. Nelle 24 ore precedenti e no-show: non rimborsabile."
+    }
+  }
+}
