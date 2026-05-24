@@ -217,7 +217,8 @@ body.booking-status-mobile-lock{
 
   .booking-status-mobile__notice{
     align-self:end;
-    margin-top:12px;
+    margin-top:4px;
+    margin-bottom:6px;
     padding:9px 10px;
 
     border:1px solid rgba(255,255,255,.12);
@@ -227,7 +228,8 @@ body.booking-status-mobile-lock{
     color:rgba(244,242,238,.84);
 
     font-size:12px;
-    line-height:1.32;
+    line-height:1.28;
+    white-space:pre-line;
   }
 
   .booking-status-mobile__notice[hidden]{
@@ -258,7 +260,7 @@ body.booking-status-mobile-lock{
     gap:8px;
 
     align-self:end;
-    margin-top:12px;
+    margin-top:18px;
   }
 
   .booking-status-mobile__primary,

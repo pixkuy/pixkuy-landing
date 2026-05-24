@@ -74,6 +74,16 @@
       t(dictionary, "paymentLabels.notAvailable") ||
       emptyValue(dictionary);
   }
+
+  function statusPaymentLabel(dictionary, result) {
+    if (result && result.view === "manualReview") {
+      return t(dictionary, "paymentLabels.pending_manual_review") ||
+        t(dictionary, "paymentLabels.notAvailable") ||
+        emptyValue(dictionary);
+    }
+
+    return paymentLabel(dictionary, result ? result.paymentStatus : "");
+  }
   
     function serviceLabel(dictionary, serviceType) {
     return t(dictionary, "serviceLabels." + serviceType) ||
@@ -330,7 +340,7 @@
     setText(
       root,
       "[data-booking-status-payment]",
-      paymentLabel(dictionary, result.paymentStatus)
+      statusPaymentLabel(dictionary, result)
     );
     setText(
       root,

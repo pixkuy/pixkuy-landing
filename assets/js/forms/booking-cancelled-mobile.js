@@ -81,6 +81,17 @@
     node.hidden = Boolean(hidden);
     return true;
   }
+  
+  function setAttribute(root, selector, name, value) {
+    var node = root ? root.querySelector(selector) : null;
+
+    if (!node) {
+      return false;
+    }
+
+    node.setAttribute(name, value);
+    return true;
+  }
 
   function showNotice(root, message, tone) {
     var notice = root ? root.querySelector("[data-booking-status-notice]") : null;
@@ -104,6 +115,140 @@
     return t(dictionary, "paymentLabels." + paymentStatus) ||
       t(dictionary, "paymentLabels.notAvailable") ||
       emptyValue(dictionary);
+  }
+
+  function cancelledPaymentLabel(dictionary, result) {
+    if (result && result.view === "manualReview") {
+      return t(dictionary, "paymentLabels.pending_manual_review") ||
+        t(dictionary, "paymentLabels.notAvailable") ||
+        emptyValue(dictionary);
+    }
+
+    return paymentLabel(dictionary, result ? result.paymentStatus : "");
+  }
+
+  function serviceLabel(dictionary, serviceType) {
+    return t(dictionary, "serviceLabels." + serviceType) ||
+      t(dictionary, "serviceLabels.notAvailable") ||
+      emptyValue(dictionary);
+  }
+
+  function formatMoney(dictionary, amountMinor, currency) {
+    var formatter;
+
+    if (typeof amountMinor !== "number" || !currency) {
+      return emptyValue(dictionary);
+    }
+
+    try {
+      formatter = new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: currency,
+        maximumFractionDigits: 0
+      });
+
+      return formatter.format(amountMinor / 100) + " " + currency;
+    } catch (error) {
+      return String(amountMinor / 100) + " " + currency;
+    }
+  }
+
+  function amountLabel(dictionary, result) {
+    if (typeof result.paymentAmountPaid === "number") {
+      return formatMoney(dictionary, result.paymentAmountPaid, result.paymentCurrency);
+    }
+
+    return formatMoney(dictionary, result.paymentAmountExpected, result.paymentCurrency);
+  }
+
+  function durationLabel(dictionary, value) {
+    if (typeof value !== "number") {
+      return emptyValue(dictionary);
+    }
+
+    if (value === 1) {
+      return t(dictionary, "details.durationOneHour") || "1 hora";
+    }
+
+    return String(value) + " " + (t(dictionary, "details.durationHours") || "horas");
+  }
+
+  function passengerLabel(dictionary, value) {
+    if (typeof value !== "number") {
+      return emptyValue(dictionary);
+    }
+
+    if (value === 1) {
+      return t(dictionary, "details.passengerOne") || "1 pasajero";
+    }
+
+    return String(value) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
+  }
+
+  function getVehicleThumbnailSrc(vehicleDisplayName) {
+    var normalized = String(vehicleDisplayName || "").toLowerCase();
+
+    if (normalized.indexOf("byd m9") > -1 || normalized.indexOf("m9") > -1) {
+      return "assets/img/fleet/bydm9_xhoras001d.jpeg";
+    }
+
+    return "";
+  }
+
+  function syncVehicleThumbnail(root, result) {
+    var vehicleNode = root ? root.querySelector("[data-booking-status-vehicle]") : null;
+    var existing;
+    var src;
+    var image;
+
+    if (!vehicleNode) {
+      return false;
+    }
+
+    existing = vehicleNode.querySelector("[data-booking-status-vehicle-thumb]");
+
+    if (existing) {
+      existing.remove();
+    }
+
+    vehicleNode.classList.remove("booking-status-mobile__vehicle-value");
+
+    src = getVehicleThumbnailSrc(result && result.vehicleDisplayName);
+
+    if (!src) {
+      return false;
+    }
+
+    image = document.createElement("img");
+    image.className = "booking-status-mobile__vehicle-thumb";
+    image.setAttribute("data-booking-status-vehicle-thumb", "1");
+    image.setAttribute("src", src);
+    image.setAttribute("alt", "");
+    image.setAttribute("aria-hidden", "true");
+    image.setAttribute("loading", "lazy");
+    image.setAttribute("decoding", "async");
+
+    vehicleNode.classList.add("booking-status-mobile__vehicle-value");
+    vehicleNode.appendChild(image);
+
+    return true;
+  }
+
+  function hasRenderableReservationDetails(result) {
+    return Boolean(
+      result &&
+      (
+        result.publicCode ||
+        result.pickupAddress ||
+        result.vehicleDisplayName ||
+        result.serviceStartLocalDate ||
+        result.serviceStartLocalTime ||
+        typeof result.durationHours === "number" ||
+        typeof result.passengerCount === "number" ||
+        typeof result.paymentAmountPaid === "number" ||
+        typeof result.paymentAmountExpected === "number"
+      )
+    );
   }
 
   function getCommonCopyPath(view) {
@@ -154,35 +299,157 @@
     ) || t(dictionary, getCommonCopyPath(view) + "." + key);
   }
 
-  function getNotice(dictionary, result) {
-    if (
-      result.view === "manualReview" &&
-      result.reservationStatus === "payment_mismatch"
-    ) {
-      return tFallback(
+  function replaceToken(template, token, value) {
+    return String(template || "").replace(token, value || "");
+  }
+
+  function compactParts(parts) {
+    return parts.filter(function keepValue(value) {
+      return Boolean(value);
+    });
+  }
+  
+  function buildPendingCancelledMobileNotice(dictionary, result) {
+    var baseNotice = getCopy(dictionary, result.view, "notice");
+    var emailNotice = t(dictionary, "cancelled.mobile.pending.emailNotice");
+    var contactNotice = t(dictionary, "cancelled.mobile.pending.contactNotice");
+    var contactValue = compactParts([
+      result.customerFullName,
+      result.customerPhone
+    ]).join(" · ");
+    var lines = [];
+
+    if (baseNotice) {
+      lines.push(baseNotice);
+    }
+
+    if (result.customerEmail && emailNotice) {
+      lines.push(replaceToken(emailNotice, "{{email}}", result.customerEmail));
+    }
+
+    if (contactValue && contactNotice) {
+      lines.push(replaceToken(contactNotice, "{{contact}}", contactValue));
+    }
+
+    if (lines.length > 0) {
+      return lines.join("\n");
+    }
+
+    return getCopy(dictionary, result.view, "notice");
+  }
+
+
+  function buildConfirmedCancelledMobileNotice(dictionary, result) {
+    var emailNotice = t(dictionary, "cancelled.mobile.confirmed.emailNotice");
+    var contactNotice = t(dictionary, "cancelled.mobile.confirmed.contactNotice");
+    var timezoneNotice = t(dictionary, "cancelled.mobile.confirmed.timezoneNotice");
+    var contactValue = compactParts([
+      result.customerFullName,
+      result.customerPhone
+    ]).join(" · ");
+    var lines = [];
+
+    if (result.customerEmail && emailNotice) {
+      lines.push(replaceToken(emailNotice, "{{email}}", result.customerEmail));
+    }
+
+    if (contactValue && contactNotice) {
+      lines.push(replaceToken(contactNotice, "{{contact}}", contactValue));
+    }
+
+    if (timezoneNotice) {
+      if (lines.length > 0) {
+        lines.push("");
+      }
+
+      lines.push(timezoneNotice);
+    }
+
+    if (lines.length > 0) {
+      return lines.join("\n");
+    }
+
+    return getCopy(dictionary, result.view, "notice");
+  }
+  
+  function buildManualReviewCancelledMobileNotice(dictionary, result) {
+    var baseNotice;
+    var emailNotice = t(dictionary, "cancelled.mobile.manualReview.emailNotice");
+    var contactNotice = t(dictionary, "cancelled.mobile.manualReview.contactNotice");
+    var contactValue = compactParts([
+      result.customerFullName,
+      result.customerPhone
+    ]).join(" · ");
+    var lines = [];
+
+    if (result.reservationStatus === "payment_mismatch") {
+      baseNotice = tFallback(
         dictionary,
         "cancelled.mobile.manualReview.paymentMismatchNotice",
         "cancelled.manualReview.paymentMismatchNotice"
       ) || t(dictionary, "manualReview.paymentMismatchNotice");
-    }
-
-    if (
-      result.view === "manualReview" &&
-      result.reservationStatus === "payment_after_expiry"
-    ) {
-      return tFallback(
+    } else if (result.reservationStatus === "payment_after_expiry") {
+      baseNotice = tFallback(
         dictionary,
         "cancelled.mobile.manualReview.paymentAfterExpiryNotice",
         "cancelled.manualReview.paymentAfterExpiryNotice"
       ) || t(dictionary, "manualReview.paymentAfterExpiryNotice");
-    }
-
-    if (result.view === "manualReview") {
-      return tFallback(
+    } else {
+      baseNotice = tFallback(
         dictionary,
         "cancelled.mobile.manualReview.defaultNotice",
         "cancelled.manualReview.defaultNotice"
       ) || t(dictionary, "manualReview.defaultNotice");
+    }
+
+    if (baseNotice) {
+      lines.push(baseNotice);
+    }
+
+    if (result.customerEmail && emailNotice) {
+      lines.push(replaceToken(emailNotice, "{{email}}", result.customerEmail));
+    }
+
+    if (contactValue && contactNotice) {
+      lines.push(replaceToken(contactNotice, "{{contact}}", contactValue));
+    }
+
+    if (lines.length > 0) {
+      return lines.join("\n");
+    }
+
+    return getCopy(dictionary, result.view, "notice");
+  }
+
+
+  function buildMobileWhatsappMessage(dictionary, result) {
+    var template = t(dictionary, "mobile.whatsappMessage") ||
+      "Hola Pixkuy, necesito ayuda con mi reserva {{publicCode}}.";
+    var message = replaceToken(
+      template,
+      "{{publicCode}}",
+      result.publicCode || ""
+    );
+
+    return message.trim();
+  }
+
+  function buildMobileWhatsappHref(dictionary, result) {
+    return "whatsapp://send?phone=5215528837400&text=" +
+      encodeURIComponent(buildMobileWhatsappMessage(dictionary, result));
+  }
+
+  function getNotice(dictionary, result) {
+    if (result.view === "confirmed") {
+      return buildConfirmedCancelledMobileNotice(dictionary, result);
+    }
+
+    if (result.view === "pending") {
+      return buildPendingCancelledMobileNotice(dictionary, result);
+    }
+
+    if (result.view === "manualReview") {
+      return buildManualReviewCancelledMobileNotice(dictionary, result);
     }
 
     return getCopy(dictionary, result.view, "notice");
@@ -333,9 +600,20 @@
     );
     setText(
       root,
-      "[data-booking-status-payment]",
-      paymentLabel(dictionary, result.paymentStatus)
+      "[data-booking-status-service]",
+      serviceLabel(dictionary, result.serviceType)
     );
+    setText(
+      root,
+      "[data-booking-status-pickup]",
+      result.pickupAddress || emptyValue(dictionary)
+    );
+    setText(
+      root,
+      "[data-booking-status-vehicle]",
+      result.vehicleDisplayName || emptyValue(dictionary)
+    );
+    syncVehicleThumbnail(root, result);
     setText(
       root,
       "[data-booking-status-date]",
@@ -345,6 +623,26 @@
       root,
       "[data-booking-status-time]",
       result.serviceStartLocalTime || emptyValue(dictionary)
+    );
+    setText(
+      root,
+      "[data-booking-status-duration]",
+      durationLabel(dictionary, result.durationHours)
+    );
+    setText(
+      root,
+      "[data-booking-status-passengers]",
+      passengerLabel(dictionary, result.passengerCount)
+    );
+    setText(
+      root,
+      "[data-booking-status-payment]",
+      cancelledPaymentLabel(dictionary, result)
+    );
+    setText(
+      root,
+      "[data-booking-status-amount]",
+      amountLabel(dictionary, result)
     );
     setHidden(root, "[data-booking-status-details]", false);
   }
@@ -369,6 +667,13 @@ function syncActions(root, dictionary, result) {
   setNodeText(retry, t(dictionary, "cancelled.actions.retry"));
   setNodeText(newBooking, t(dictionary, "cancelled.actions.newBooking"));
   setText(root, "[data-booking-status-whatsapp]", t(dictionary, "actions.whatsapp"));
+  setAttribute(
+    root,
+    "[data-booking-status-whatsapp]",
+    "href",
+    buildMobileWhatsappHref(dictionary, result)
+  );
+  setAttribute(root, "[data-booking-status-whatsapp]", "target", "_self");
 
   setActionVisible(retry, canRetry);
   setActionVisible(newBooking, !canRetry);
@@ -453,8 +758,18 @@ function syncActions(root, dictionary, result) {
     );
     setText(
       root,
-      '[data-booking-status-label="payment"]',
-      tFallback(dictionary, "mobile.details.payment", "details.payment")
+      '[data-booking-status-label="service"]',
+      tFallback(dictionary, "mobile.details.service", "details.service")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="pickup"]',
+      tFallback(dictionary, "mobile.details.pickup", "details.pickup")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="vehicle"]',
+      tFallback(dictionary, "mobile.details.vehicle", "details.vehicle")
     );
     setText(
       root,
@@ -466,11 +781,34 @@ function syncActions(root, dictionary, result) {
       '[data-booking-status-label="time"]',
       tFallback(dictionary, "mobile.details.time", "details.time")
     );
+    setText(
+      root,
+      '[data-booking-status-label="duration"]',
+      tFallback(dictionary, "mobile.details.duration", "details.duration")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="passengers"]',
+      tFallback(dictionary, "mobile.details.passengers", "details.passengers")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="payment"]',
+      tFallback(dictionary, "mobile.details.payment", "details.payment")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="amount"]',
+      result.view === "confirmed"
+        ? tFallback(dictionary, "mobile.details.amount", "details.amount")
+        : tFallback(dictionary, "cancelled.details.amount", "details.amount")
+    );
 
     if (
       result.view === "missingToken" ||
       result.view === "notFound" ||
-      result.view === "requestError"
+      result.view === "requestError" ||
+      !hasRenderableReservationDetails(result)
     ) {
       setHidden(root, "[data-booking-status-details]", true);
     } else {

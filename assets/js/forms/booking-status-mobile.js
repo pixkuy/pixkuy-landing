@@ -91,6 +91,17 @@
     node.hidden = Boolean(hidden);
     return true;
   }
+  
+  function setAttribute(root, selector, name, value) {
+    var node = root ? root.querySelector(selector) : null;
+
+    if (!node) {
+      return false;
+    }
+
+    node.setAttribute(name, value);
+    return true;
+  }
 
   function showNotice(root, message, tone) {
     var notice = root ? root.querySelector("[data-booking-status-notice]") : null;
@@ -114,6 +125,16 @@
     return t(dictionary, "paymentLabels." + paymentStatus) ||
       t(dictionary, "paymentLabels.notAvailable") ||
       emptyValue(dictionary);
+  }
+
+  function statusPaymentLabel(dictionary, result) {
+    if (result && result.view === "manualReview") {
+      return t(dictionary, "paymentLabels.pending_manual_review") ||
+        t(dictionary, "paymentLabels.notAvailable") ||
+        emptyValue(dictionary);
+    }
+
+    return paymentLabel(dictionary, result ? result.paymentStatus : "");
   }
   
     function serviceLabel(dictionary, serviceType) {
@@ -267,35 +288,123 @@
     );
   }
 
-  function getNotice(dictionary, result) {
-    if (
-      result.view === "manualReview" &&
-      result.reservationStatus === "payment_mismatch"
-    ) {
-      return tFallback(
+  function replaceToken(template, token, value) {
+    return String(template || "").replace(token, value || "");
+  }
+
+  function compactParts(parts) {
+    return parts.filter(function keepValue(value) {
+      return Boolean(value);
+    });
+  }
+  
+  function buildMobileWhatsappMessage(dictionary, result) {
+    var template = t(dictionary, "mobile.whatsappMessage") ||
+      "Hola Pixkuy, necesito ayuda con mi reserva {{publicCode}}.";
+    var message = replaceToken(
+      template,
+      "{{publicCode}}",
+      result.publicCode || ""
+    );
+
+    return message.trim();
+  }
+
+  function buildMobileWhatsappHref(dictionary, result) {
+    return "whatsapp://send?phone=5215528837400&text=" +
+      encodeURIComponent(buildMobileWhatsappMessage(dictionary, result));
+  }
+  
+    function buildManualReviewMobileNotice(dictionary, result) {
+    var baseNotice;
+    var emailNotice = t(dictionary, "mobile.manualReview.emailNotice");
+    var contactNotice = t(dictionary, "mobile.manualReview.contactNotice");
+    var contactValue = compactParts([
+      result.customerFullName,
+      result.customerPhone
+    ]).join(" · ");
+    var lines = [];
+
+    if (result.reservationStatus === "payment_mismatch") {
+      baseNotice = tFallback(
         dictionary,
         "mobile.manualReview.paymentMismatchNotice",
         "manualReview.paymentMismatchNotice"
       );
-    }
-
-    if (
-      result.view === "manualReview" &&
-      result.reservationStatus === "payment_after_expiry"
-    ) {
-      return tFallback(
+    } else if (result.reservationStatus === "payment_after_expiry") {
+      baseNotice = tFallback(
         dictionary,
         "mobile.manualReview.paymentAfterExpiryNotice",
         "manualReview.paymentAfterExpiryNotice"
       );
-    }
-
-    if (result.view === "manualReview") {
-      return tFallback(
+    } else {
+      baseNotice = tFallback(
         dictionary,
         "mobile.manualReview.defaultNotice",
         "manualReview.defaultNotice"
       );
+    }
+
+    if (baseNotice) {
+      lines.push(baseNotice);
+    }
+
+    if (result.customerEmail && emailNotice) {
+      lines.push(replaceToken(emailNotice, "{{email}}", result.customerEmail));
+    }
+
+    if (contactValue && contactNotice) {
+      lines.push(replaceToken(contactNotice, "{{contact}}", contactValue));
+    }
+
+    if (lines.length > 0) {
+      return lines.join("\n");
+    }
+
+    return getCopy(dictionary, result.view, "notice");
+  }
+
+
+  function buildConfirmedMobileNotice(dictionary, result) {
+    var emailNotice = t(dictionary, "mobile.confirmed.emailNotice");
+    var contactNotice = t(dictionary, "mobile.confirmed.contactNotice");
+    var timezoneNotice = t(dictionary, "mobile.confirmed.timezoneNotice");
+    var contactValue = compactParts([
+      result.customerFullName,
+      result.customerPhone
+    ]).join(" · ");
+    var lines = [];
+
+    if (result.customerEmail && emailNotice) {
+      lines.push(replaceToken(emailNotice, "{{email}}", result.customerEmail));
+    }
+
+    if (contactValue && contactNotice) {
+      lines.push(replaceToken(contactNotice, "{{contact}}", contactValue));
+    }
+
+    if (timezoneNotice) {
+      if (lines.length > 0) {
+        lines.push("");
+      }
+
+      lines.push(timezoneNotice);
+    }
+
+    if (lines.length > 0) {
+      return lines.join("\n");
+    }
+
+    return getCopy(dictionary, result.view, "notice");
+  }
+
+  function getNotice(dictionary, result) {
+    if (result.view === "confirmed") {
+      return buildConfirmedMobileNotice(dictionary, result);
+    }
+
+    if (result.view === "manualReview") {
+      return buildManualReviewMobileNotice(dictionary, result);
     }
 
     return getCopy(dictionary, result.view, "notice");
@@ -476,7 +585,7 @@
     setText(
       root,
       "[data-booking-status-payment]",
-      paymentLabel(dictionary, result.paymentStatus)
+      statusPaymentLabel(dictionary, result)
     );
     setText(
       root,
@@ -554,6 +663,13 @@
 
     setText(root, "[data-booking-status-primary]", t(dictionary, "actions.primary"));
     setText(root, "[data-booking-status-whatsapp]", t(dictionary, "actions.whatsapp"));
+    setAttribute(
+      root,
+      "[data-booking-status-whatsapp]",
+      "href",
+      buildMobileWhatsappHref(dictionary, result)
+    );
+    setAttribute(root, "[data-booking-status-whatsapp]", "target", "_self");
 
     if (
       result.view === "missingToken" ||

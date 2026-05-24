@@ -114,8 +114,8 @@
       "confirmed": {
         "state": "Reserva confirmada",
         "title": "Tu reserva ya está confirmada",
-        "lead": "Aunque hayas vuelto desde una pantalla de pago cancelado, Booking API indica que la reserva está confirmada.",
-        "notice": "No es necesario reintentar el pago. Conserva el código de reserva para cualquier coordinación con Pixkuy."
+        "lead": "Aunque hayas vuelto desde la pantalla de pago, tu reserva ya está confirmada.",
+        "notice": "Tu pago ya está registrado. Conserva el código de reserva para cualquier coordinación con Pixkuy."
       },
       "manualReview": {
         "state": "Revisión manual",
@@ -179,13 +179,27 @@
           "state": "Pago no completado",
           "title": "El pago no se completó",
           "lead": "Si la reserva temporal sigue activa, puedes volver a abrir el pago.",
-          "notice": "La reserva solo se confirma cuando Stripe y Booking API confirman el pago."
+          "notice": "La reserva solo se confirma cuando Stripe y Pixkuy confirman el pago.",
+          "emailNotice": "Email: {{email}}",
+          "contactNotice": "Contacto: {{contact}}"
+        },
+        "confirmed": {
+          "state": "Reserva confirmada",
+          "title": "Tu reserva ya está confirmada",
+          "lead": "Aunque hayas vuelto desde la pantalla de pago, tu reserva ya está confirmada.",
+          "emailNotice": "Recibirás un email de confirmación en {{email}}.",
+          "contactNotice": "Contacto: {{contact}}",
+          "timezoneNotice": "La fecha y hora corresponden a Ciudad de México."
+        },
+        "manualReview": {
+          "emailNotice": "Email: {{email}}",
+          "contactNotice": "Contacto: {{contact}}"
         },
         "expired": {
           "state": "Reserva caducada",
           "title": "La reserva temporal caducó",
           "lead": "La ventana de pago ya no está activa. Inicia una nueva solicitud.",
-          "notice": "No se ha confirmado ninguna reserva."
+          "notice": "No se ha realizado ningún cargo ni confirmado ninguna reserva."
         },
         "cancelled": {
           "state": "Reserva cancelada",
@@ -200,7 +214,17 @@
       "whatsapp": "Hablar por WhatsApp"
     },
     "mobile": {
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "whatsappMessage": "Hola Pixkuy, necesito ayuda con mi reserva {{publicCode}}.",
+      "confirmed": {
+        "emailNotice": "Recibirás un email de confirmación en {{email}}.",
+        "contactNotice": "Contacto: {{contact}}",
+        "timezoneNotice": "La fecha y hora corresponden a Ciudad de México."
+      },
+      "manualReview": {
+        "emailNotice": "Email: {{email}}",
+        "contactNotice": "Contacto: {{contact}}"
+      }
     }
   }
 }
