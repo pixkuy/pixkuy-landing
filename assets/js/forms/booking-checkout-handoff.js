@@ -42,25 +42,35 @@
 
   function getActiveLang() {
     var params;
+    var langParam;
+    var storedLang;
     var fromUrl;
     var fromStorage;
 
     try {
       params = new URLSearchParams(window.location.search);
-      fromUrl = normalizeLangCode(params.get("lang"));
+      langParam = normalizeText(params.get("lang"));
 
-      if (fromUrl) {
-        return fromUrl;
+      if (langParam) {
+        fromUrl = normalizeLangCode(langParam);
+
+        if (fromUrl) {
+          return fromUrl;
+        }
       }
     } catch (error) {
       // no-op
     }
 
     try {
-      fromStorage = normalizeLangCode(window.localStorage.getItem("lang"));
+      storedLang = normalizeText(window.localStorage.getItem("lang"));
 
-      if (fromStorage) {
-        return fromStorage;
+      if (storedLang) {
+        fromStorage = normalizeLangCode(storedLang);
+
+        if (fromStorage) {
+          return fromStorage;
+        }
       }
     } catch (error) {
       // no-op

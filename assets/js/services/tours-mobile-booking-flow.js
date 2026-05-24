@@ -93,12 +93,23 @@
   }
 
   function runWithViewTransition(update) {
+    let transition;
+
     if (
       document &&
       typeof document.startViewTransition === "function" &&
       typeof update === "function"
     ) {
-      document.startViewTransition(update);
+      transition = document.startViewTransition(update);
+
+      if (transition && transition.ready && typeof transition.ready.catch === "function") {
+        transition.ready.catch(function ignoreSkippedViewTransition() {});
+      }
+
+      if (transition && transition.finished && typeof transition.finished.catch === "function") {
+        transition.finished.catch(function ignoreSkippedViewTransition() {});
+      }
+
       return true;
     }
 

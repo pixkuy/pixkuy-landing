@@ -624,9 +624,9 @@
     cursor:pointer;
   }
 
-  .tours-mobile-config__date .services-hourly-panel__control:not(:placeholder-shown) + .services-hourly-panel__date-overlay,
-  .tours-mobile-config__time .services-hourly-panel__control:not(:placeholder-shown) + .services-hourly-panel__date-overlay{
-    display:none;
+  .tours-mobile-config__date .services-hourly-panel__date-overlay[hidden],
+  .tours-mobile-config__time .services-hourly-panel__date-overlay[hidden]{
+    display:none !important;
   }
   
     .tours-mobile-config__passengers{

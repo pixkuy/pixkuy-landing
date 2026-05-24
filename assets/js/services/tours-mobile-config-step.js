@@ -244,17 +244,70 @@
     return state.hasGuide === "yes" ? "yes" : "no";
   }
 
+  function getTemporalPricingApi() {
+    const api = window.PixkuyToursTemporalPricing;
+
+    return api && typeof api === "object" ? api : null;
+  }
+
+  function applyTemporalDatePricing(basePrice, serviceDateLiteral) {
+    const api = getTemporalPricingApi();
+
+    if (!api || typeof api.applyTemporalPricing !== "function") {
+      return basePrice;
+    }
+
+    return api.applyTemporalPricing(basePrice, serviceDateLiteral);
+  }
+
   function getPrice() {
     const tour = getTour(activeTourId);
     const passengerFareKey = state.passengerFareKey || "van_1_2";
     const guideKey = getGuideKey();
     const bucket = tour && tour.fares ? tour.fares[passengerFareKey] : null;
+    const basePrice = bucket ? Number(bucket[guideKey] || bucket.no || 0) : 0;
 
-    if (!bucket) {
+    if (!basePrice) {
       return 0;
     }
 
-    return Number(bucket[guideKey] || bucket.no || 0);
+    if (!isDateAtOrAfterMinimum(state.date)) {
+      return 0;
+    }
+
+    return applyTemporalDatePricing(basePrice, state.date);
+  }
+
+  function getReservationMinimumDateLiteral() {
+    const formsApi = window.PixkuyForms || {};
+    const getMinimumDateTime =
+      typeof formsApi.getReservationMinimumDateTime === "function"
+        ? formsApi.getReservationMinimumDateTime
+        : null;
+    const formatDate =
+      typeof formsApi.formatReservationDateForInput === "function"
+        ? formsApi.formatReservationDateForInput
+        : null;
+    const minimumDateTime = getMinimumDateTime
+      ? getMinimumDateTime()
+      : null;
+
+    if (!minimumDateTime || !formatDate) {
+      return "";
+    }
+
+    return String(formatDate(minimumDateTime) || "").trim();
+  }
+
+  function isDateAtOrAfterMinimum(dateLiteral) {
+    const safeDate = normalizeText(dateLiteral);
+    const minimumDateLiteral = getReservationMinimumDateLiteral();
+
+    if (!safeDate || !minimumDateLiteral) {
+      return false;
+    }
+
+    return safeDate >= minimumDateLiteral;
   }
 
   function canContinue() {
@@ -265,6 +318,10 @@
     }
 
     if (!state.passengerFareKey || !state.pickup || !state.date || !state.time) {
+      return false;
+    }
+
+    if (!isDateAtOrAfterMinimum(state.date)) {
       return false;
     }
 
@@ -497,9 +554,25 @@
   }
 
   function syncStateFromFields() {
+    const step = getStep();
+    const dateField = step ? step.querySelector('[data-tours-mobile-config-field="date"]') : null;
+    const dateOverlay = step ? step.querySelector("[data-tours-mobile-date-overlay]") : null;
+
     state.pickup = getFieldValue("pickup");
     state.date = getFieldValue("date");
     state.time = getFieldValue("time");
+
+    if (state.date && !isDateAtOrAfterMinimum(state.date)) {
+      state.date = "";
+
+      if (dateField) {
+        dateField.value = "";
+      }
+    }
+
+    if (dateOverlay) {
+      dateOverlay.hidden = Boolean(state.date);
+    }
 
     syncPickupClearState();
 
@@ -626,6 +699,7 @@
     const passengersLabel = getI18nValue("services.cards.tours.panel.passengersLabel", "");
     const priceLabel = getI18nValue("services.cards.tours.panel.priceLabel", "");
     const ctaText = getI18nValue("airportMobileFlow.cta.continue", "Continuar");
+    const minimumDateLiteral = getReservationMinimumDateLiteral();
 
     if (!tour) {
       return "";
@@ -666,8 +740,8 @@
       '<div class="services-hourly-panel__field services-hourly-panel__field--date-airport-mobile tours-mobile-config__date">',
       '<label class="services-hourly-panel__label" for="tours-mobile-date">' + escapeHtml(dateLabel) + '</label>',
       '<div class="services-hourly-panel__date-wrap">',
-      '<input id="tours-mobile-date" type="date" class="services-hourly-panel__control" data-tours-mobile-config-field="date" value="' + escapeHtml(state.date) + '" />',
-      '<span class="services-hourly-panel__date-overlay" aria-hidden="true" data-tours-mobile-date-overlay>dd/mm/aaaa</span>',
+      '<input id="tours-mobile-date" type="date" class="services-hourly-panel__control" data-tours-mobile-config-field="date" value="' + escapeHtml(state.date) + '"' + (minimumDateLiteral ? ' min="' + escapeHtml(minimumDateLiteral) + '"' : '') + ' />',
+      '<span class="services-hourly-panel__date-overlay" aria-hidden="true" data-tours-mobile-date-overlay' + (state.date ? ' hidden' : '') + '>dd/mm/aaaa</span>',
       '<span class="services-hourly-panel__date-icon" aria-hidden="true">',
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">',
       '<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>',
@@ -797,15 +871,33 @@
     return true;
   }
   
-  function blurActiveElementInside(node) {
+  function moveFocusOutsideStepBeforeHide(step) {
     const activeElement = document.activeElement;
+    const route = getRoute();
+    const fallbackTarget = route
+      ? route.querySelector("[data-tours-mobile-flow-back]") ||
+        route.querySelector("[data-tours-mobile-tour]")
+      : null;
+
+    if (!step || !activeElement || !step.contains(activeElement)) {
+      return false;
+    }
 
     if (
-      node &&
-      activeElement &&
-      typeof activeElement.blur === "function" &&
-      node.contains(activeElement)
+      fallbackTarget &&
+      typeof fallbackTarget.focus === "function" &&
+      !step.contains(fallbackTarget)
     ) {
+      try {
+        fallbackTarget.focus({ preventScroll: true });
+      } catch (error) {
+        fallbackTarget.focus();
+      }
+
+      return true;
+    }
+
+    if (typeof activeElement.blur === "function") {
       activeElement.blur();
       return true;
     }
@@ -821,7 +913,7 @@
     }
 
     if (!isVisible) {
-      blurActiveElementInside(step);
+      moveFocusOutsideStepBeforeHide(step);
     }
 
     step.hidden = !isVisible;
