@@ -12,7 +12,6 @@
   "use strict";
 
   var DATA_URL = "assets/js/data/in-motion-gallery.json";
-  var MAX_DESKTOP_ITEMS = 4;
   var MAX_MOBILE_ITEMS = 6;
   var section = document.querySelector("[data-in-motion-section]");
   var mount = document.querySelector("[data-in-motion-gallery]");

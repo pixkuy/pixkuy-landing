@@ -20,7 +20,6 @@
 
   let mobileHintTimeout = null;
   let mobileHintObserver = null;
-  let mobileHintWasVisible = false;
   let openService = null;
 
   function getI18nValue(path) {

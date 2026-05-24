@@ -58,35 +58,6 @@
     return form.querySelector('input[name="service_type"]');
   }
 
-  function getI18nValue(path) {
-    const dict = window.__pixkuyI18nDict;
-    if (!dict || !path) {
-      return "";
-    }
-
-    const parts = String(path).split(".");
-    let cursor = dict;
-
-    for (let index = 0; index < parts.length; index += 1) {
-      const key = parts[index];
-
-      if (!cursor || typeof cursor !== "object" || !(key in cursor)) {
-        return "";
-      }
-
-      cursor = cursor[key];
-    }
-
-    return typeof cursor === "string" ? cursor.trim() : "";
-  }
-
-  function getConfirmChangeMessage() {
-    return (
-      getI18nValue("contact.services.confirmChangeSpecificData") ||
-      "Si cambias de servicio, se perderán los datos específicos del servicio actual."
-    );
-  }
-
   function readInitialServiceTypeFromDom(form) {
     const hiddenField = getServiceTypeHiddenField(form);
     const hiddenValue = normalizeText(hiddenField && hiddenField.value);
@@ -201,29 +172,6 @@
     }
 
     return true;
-  }
-
-  function shouldConfirmServiceChange(currentServiceType, nextServiceType, options) {
-    const safeOptions =
-      options && typeof options === "object" ? options : {};
-
-    if (safeOptions.skipConfirm === true) {
-      return false;
-    }
-
-    if (!isSupportedServiceType(currentServiceType)) {
-      return false;
-    }
-
-    if (!isSupportedServiceType(nextServiceType)) {
-      return false;
-    }
-
-    if (currentServiceType === nextServiceType) {
-      return false;
-    }
-
-    return hasSpecificDraftData(currentServiceType);
   }
 
   function confirmServiceChange() {

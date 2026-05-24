@@ -21,10 +21,6 @@
   let currentEvents = [];
   let hasBoundVisibilityListeners = false;
 
-  function isObject(value) {
-    return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-  }
-
   function escapeHtml(value) {
     return String(value == null ? "" : value)
       .replace(/&/g, "&amp;")

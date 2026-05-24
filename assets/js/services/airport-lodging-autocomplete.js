@@ -926,14 +926,6 @@ function clearAllRootUis() {
     }
   }
   
-    function hasQuery(dom) {
-    if (!dom || !dom.input) {
-      return false;
-    }
-
-    return normalizeText(dom.input.value).trim().length > 0;
-  }
-
   function getResolvedVisibleLabel(nodes) {
     if (!nodes || !nodes.label) {
       return "";

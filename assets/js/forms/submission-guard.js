@@ -177,17 +177,7 @@
     return field ? normalizeText(field.value) : "";
   }
 
-  function setFieldValue(form, name, value) {
-    const fields = getFields(form, name);
-
-    fields.forEach(function setValue(field) {
-      field.value = value || "";
-    });
-
-    return fields.length > 0;
-  }
-  
-    function normalizeEmailValue(value) {
+  function normalizeEmailValue(value) {
     return normalizeText(value).toLowerCase();
   }
 

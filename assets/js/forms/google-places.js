@@ -19,11 +19,6 @@
     'types'
   ];
   
-    function getCoverageApi() {
-    var namespace = window.PixkuyForms || {};
-    return namespace.coverage || null;
-  }
-
    function getCoverageDecisionSafe(place, options) {
     var resolvedCoverageApi = resolveCoverageApi(options);
 
@@ -565,26 +560,8 @@ if (placesLibraryPromise) {
       widget.setAttribute('data-place-fallback', isFallback ? '1' : '0');
     }
   }
-
-  function syncWidgetValueToLegacyInput(widget, input) {
-    var widgetValue = '';
-
-    if (!input) {
-      return;
-    }
-
-    if (widget && 'value' in widget) {
-      try {
-        widgetValue = widget.value || '';
-      } catch (error) {
-        widgetValue = '';
-      }
-    }
-
-    input.value = widgetValue;
-  }
-  
-    function shouldUseMobileAutocompleteStrategy() {
+ 
+  function shouldUseMobileAutocompleteStrategy() {
     var hasCoarsePointer;
     var hasTouchPoints;
     var isNarrowViewport;
@@ -639,15 +616,7 @@ if (placesLibraryPromise) {
 
     return window.PixkuyForms.createMobilePlacesAutocompleteController;
   }
-  
-  function getProgrammaticAutocompleteControllerFactory() {
-    if (!window.PixkuyForms || typeof window.PixkuyForms.createProgrammaticPlacesController !== 'function') {
-      return null;
-    }
 
-    return window.PixkuyForms.createProgrammaticPlacesController;
-  }
-  
   function syncReservationRequestUiFromInput(input) {
     var formsNamespace;
     var form;
@@ -726,84 +695,7 @@ if (placesLibraryPromise) {
     return DEFAULT_LOCATION_RESTRICTION;
   }
   
-    function buildSuggestionCoverageProbe(suggestion) {
-    var placePrediction;
-    var structuredFormat;
-    var mainText;
-    var secondaryText;
-    var combinedText;
-    var lowerCombinedText;
-    var iataMatch;
-
-    placePrediction = isObject(suggestion && suggestion.placePrediction)
-      ? suggestion.placePrediction
-      : (isObject(suggestion) ? suggestion : {});
-
-    structuredFormat = isObject(placePrediction.structuredFormat)
-      ? placePrediction.structuredFormat
-      : (isObject(placePrediction.structuredFormatting) ? placePrediction.structuredFormatting : {});
-
-    mainText = getString(
-      structuredFormat.mainText && structuredFormat.mainText.text
-        ? structuredFormat.mainText.text
-        : (structuredFormat.mainText || '')
-    );
-
-    secondaryText = getString(
-      structuredFormat.secondaryText && structuredFormat.secondaryText.text
-        ? structuredFormat.secondaryText.text
-        : (structuredFormat.secondaryText || '')
-    );
-
-    combinedText = (mainText + ' ' + secondaryText).trim();
-    lowerCombinedText = combinedText.toLowerCase();
-    iataMatch = lowerCombinedText.match(/\b(mex|nlu|aifa|tol|tlc|pbc|qro)\b/i);
-
-    return {
-      label: combinedText,
-      displayName: mainText,
-      formattedAddress: secondaryText,
-      primaryText: mainText,
-      secondaryText: secondaryText,
-      text: combinedText,
-      placeId: getString(placePrediction.placeId || suggestion && suggestion.placeId || suggestion && suggestion.id),
-      countryCode: (
-        lowerCombinedText.indexOf('mex') !== -1 ||
-        lowerCombinedText.indexOf('méxico') !== -1 ||
-        lowerCombinedText.indexOf('mexico') !== -1
-      ) ? 'mx' : '',
-      administrativeAreaLevel1: secondaryText,
-      locality: secondaryText,
-      iataCode: iataMatch ? iataMatch[1].toUpperCase() : '',
-      types: []
-    };
-  }
-
-  function isSuggestionWithinCoverage(suggestion, options) {
-    var probePlace;
-    var decision;
-
-    try {
-      probePlace = buildSuggestionCoverageProbe(suggestion);
-      decision = getCoverageDecisionSafe(probePlace, options);
-      return Boolean(decision && decision.isWithinCoverage);
-    } catch (error) {
-      return true;
-    }
-  }
-
-
-    function buildMobileAutocompleteDebugMessage(error) {
-    var message = getString(error && error.message);
-
-    if (!message) {
-      message = 'Unknown mobile autocomplete error.';
-    }
-
-    return '[DEBUG Places móvil] ' + message;
-  }
-
-    function createAutocompleteController(options) {
+  function createAutocompleteController(options) {
     var controller;
     var strategyController;
     var root;
@@ -1052,63 +944,6 @@ if (placesLibraryPromise) {
         onPlaceSelected: function (normalizedPlace, meta) {
           handleResolvedPlace(normalizedPlace, meta || {
             reason: 'google-mobile-select'
-          });
-        },
-        onClearSelection: function () {
-          clearSelectedPlace({
-            preserveInputValue: true,
-            reason: 'clear-selection'
-          });
-        },
-        onManualInput: handleManualInput,
-        onError: function (error) {
-          controller.onError(error);
-        },
-        onUiStateChange: function (state) {
-          syncFacadeUiState(state);
-        }
-      });
-    }
-
-    function createDesktopStrategy() {
-      if (!isFunction(desktopFactory)) {
-        throw new Error('Desktop Places controller factory is unavailable.');
-      }
-
-      return desktopFactory({
-        root: root,
-        input: controller.input,
-        mountNode: controller.mountNode,
-        fieldName: controller.fieldName || getString(controller.input && controller.input.name),
-        inputId: controller.input && controller.input.id ? controller.input.id : '',
-        language: normalizeLanguage(controller.options.language),
-        placeholder: controller.input && controller.input.getAttribute ? (controller.input.getAttribute('placeholder') || '') : '',
-        loadPlacesLibrary: function () {
-          return loadPlacesLibrary(controller.options);
-        },
-        resolvePlaceFromSelection: function (requestContext) {
-          var selection = requestContext && requestContext.selection;
-          var place;
-
-          if (!selection || !isFunction(selection.toPlace)) {
-            throw new Error('Google desktop selection cannot be resolved.');
-          }
-
-          place = selection.toPlace();
-
-          if (!place || !isFunction(place.fetchFields)) {
-            throw new Error('Google place details API is unavailable.');
-          }
-
-          return Promise.resolve(place.fetchFields({
-            fields: controller.options.placeFields || DEFAULT_PLACE_FIELDS
-          })).then(function () {
-            return normalizePlace(place, selection);
-          });
-        },
-        onPlaceSelected: function (normalizedPlace, meta) {
-          handleResolvedPlace(normalizedPlace, meta || {
-            reason: 'google-desktop-select'
           });
         },
         onClearSelection: function () {

@@ -5,8 +5,6 @@
     return;
   }
 
-  function noop() {}
-
   function ensurePixkuyFormsNamespace() {
     window.PixkuyForms = window.PixkuyForms || {};
     return window.PixkuyForms;

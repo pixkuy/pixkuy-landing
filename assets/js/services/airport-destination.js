@@ -394,26 +394,6 @@ function getAutocompleteApi() {
 
 let lastRenderedActiveRootId = "";
 
-function getFocusableLodgingInput(nodes) {
-  if (!nodes || !nodes.search) {
-    return null;
-  }
-
-  return (
-    nodes.search.querySelector("input:not([type='hidden']):not([disabled])") ||
-    nodes.search.querySelector("textarea:not([disabled])") ||
-    nodes.search.querySelector(
-      '[contenteditable="true"], [contenteditable=""]'
-    ) ||
-    nodes.mount.querySelector("input:not([type='hidden']):not([disabled])") ||
-    nodes.mount.querySelector("textarea:not([disabled])") ||
-    nodes.mount.querySelector(
-      '[contenteditable="true"], [contenteditable=""]'
-    ) ||
-    null
-  );
-}
-
 function blurActiveElementInside(node) {
   const activeElement = document.activeElement;
 
@@ -440,32 +420,6 @@ function blurAirportDestinationNodes(nodes) {
     blurActiveElementInside(nodes.search) ||
     blurActiveElementInside(nodes.root)
   );
-}
-
-function focusActiveLodgingInputIfNeeded(activeNodes, options) {
-  const settings = options && typeof options === "object" ? options : {};
-  const shouldFocus = settings.shouldFocus === true;
-
-  if (!shouldFocus || !activeNodes) {
-    return;
-  }
-
-  const input = getFocusableLodgingInput(activeNodes);
-  if (!input || typeof input.focus !== "function") {
-    return;
-  }
-
-  window.requestAnimationFrame(function () {
-    input.focus();
-
-    if (
-      typeof input.setSelectionRange === "function" &&
-      typeof input.value === "string"
-    ) {
-      const caret = input.value.length;
-      input.setSelectionRange(caret, caret);
-    }
-  });
 }
 
 function sideToRootId(side) {

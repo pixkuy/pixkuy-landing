@@ -177,10 +177,6 @@
     };
   }
 
-  function getCatalog() {
-    return requireCatalogApi().getCatalog();
-  }
-
   function getZoneResolver() {
     const resolver = window.PixkuyZoneResolver;
     if (!resolver || typeof resolver !== "object") return null;
@@ -205,10 +201,6 @@
 
   function getSelectedFareKey(state) {
     return requireStateApi().getSelectedFareKey(state, getStateDeps());
-  }
-
-  function getFarePendingSelectionValue() {
-    return requireUtils().getFarePendingSelectionValue();
   }
 
   function getPassengersPlaceholderValue() {
@@ -314,10 +306,6 @@
     } catch (error) {
       return null;
     }
-  }
-
-  function getI18nValue(path, fallback) {
-    return requireUtils().getI18nValue(path, fallback);
   }
 
   function getPlaceholderKey(role, type) {
@@ -510,10 +498,6 @@ function shouldUsePassengerChipUi(nodes) {
 
   function setFieldType(field, type) {
     field.dataset.airportTariffType = type;
-  }
-
-  function getRoleFromControl(control) {
-    return control && control.dataset ? control.dataset.airportTariffControl || "" : "";
   }
 
   function getActiveItemsByType(type) {
@@ -909,52 +893,7 @@ function shouldUsePassengerChipUi(nodes) {
     api.renderDestinationUi();
   }
 
-  function getReservationFormApi() {
-    return requireHandoffApi().getReservationFormApi();
-  }
 
-  function getGooglePlacesFacade() {
-    return requireHandoffApi().getGooglePlacesFacade();
-  }
-
-  function getPanelHandoffSummaryApi() {
-    return requireHandoffApi().getPanelHandoffSummaryApi();
-  }
-
-  function getContactFields() {
-    return requireHandoffApi().getContactFields();
-  }
-
-  function setInputValueAndDispatch(input, value) {
-    return requireHandoffApi().setInputValueAndDispatch(
-      input,
-      value,
-      getHandoffDeps()
-    );
-  }
-
-  function clearPlaceHiddenFieldsForHandoff(fields) {
-    return requireHandoffApi().clearPlaceHiddenFieldsForHandoff(fields);
-  }
-
-  function syncContactFormAfterPanelPrefill(fields) {
-    return requireHandoffApi().syncContactFormAfterPanelPrefill(fields);
-  }
-
-  function buildPanelToContactPrefill(state) {
-    return requireHandoffApi().buildPanelToContactPrefill(
-      state,
-      getHandoffDeps()
-    );
-  }
-
-  function buildPanelSummaryPayload(state, prefill) {
-    return requireHandoffApi().buildPanelSummaryPayload(
-      state,
-      prefill,
-      getHandoffDeps()
-    );
-  }
 
   function buildCurrentContactSummaryPayload(state) {
     return requireHandoffApi().buildCurrentContactSummaryPayload(
@@ -963,37 +902,10 @@ function shouldUsePassengerChipUi(nodes) {
     );
   }
 
-  function scrollToContactForm(fields) {
-    return requireHandoffApi().scrollToContactForm(fields);
-  }
-
   function handoffPanelSelectionToContact(state) {
     return requireHandoffApi().handoffPanelSelectionToContact(
       state,
       getHandoffDeps()
-    );
-  }
-
-  function applySwappedStateSnapshot(state, snapshot) {
-    return requireSwapApi().applySwappedStateSnapshot(
-      state,
-      snapshot,
-      getSwapDeps()
-    );
-  }
-
-  function buildLegacySwappedStateFromEndpoints(state, endpointsStateApi) {
-    return requireSwapApi().buildLegacySwappedStateFromEndpoints(
-      state,
-      endpointsStateApi,
-      getSwapDeps()
-    );
-  }
-
-  function buildFallbackAirportEmptySwapSnapshot(state) {
-    return requireSwapApi().buildFallbackAirportEmptySwapSnapshot(
-      state,
-      getSwapDeps()
     );
   }
 
@@ -1180,18 +1092,6 @@ function shouldUsePassengerChipUi(nodes) {
     if (nodes.originDropdown.parentNode !== hostField) {
       hostField.appendChild(nodes.originDropdown);
     }
-  }
-
-  function createDropdownPanel(role) {
-    return requireDropdownsApi().createDropdownPanel(role);
-  }
-
-  function createStatusNode(kind, text) {
-    return requireDropdownsApi().createStatusNode(kind, text);
-  }
-
-  function createOptionNode(role, option, index, isActive) {
-    return requireDropdownsApi().createOptionNode(role, option, index, isActive);
   }
 
   function getDropdownBinding(state, role) {

@@ -24,20 +24,9 @@
     return window.PixkuyForms;
   }
 
-  function escapeHtml(value) {
-    return String(value || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
   function normalizeString(value) {
     return String(value || '').trim();
   }
-
-  function exposeDebugApi() {}
 
   function buildVisibleErrorMessage(error, fallbackMessage) {
     var message;

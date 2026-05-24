@@ -22,7 +22,6 @@
   var BODY_SCREEN_ATTR = "data-airport-mobile-screen";
   var BODY_GALLERY_ATTR = "data-airport-mobile-vehicle-gallery-active";
 
-  var PANEL_SELECTOR = "#services-expand-airport";
   var FARE_FIELD_SELECTOR =
     ".airport-mobile-route #services-expand-airport .services-expand__field--fare";
   var ACTIONS_SELECTOR =

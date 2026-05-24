@@ -23,8 +23,6 @@
     ".hourly-mobile-route .services-hourly-panel__price--inline";
   const PRICE_SELECTOR =
     ".hourly-mobile-route .services-hourly-panel__price-value";
-  const CTA_SELECTOR =
-    ".hourly-mobile-route [data-services-hourly-cta]";
   const CONFIG_SELECTOR =
     ".hourly-mobile-route [data-services-hourly-config]";
   const DATE_SELECTOR =
@@ -62,10 +60,6 @@
 
   function getPriceNode() {
     return document.querySelector(PRICE_SELECTOR);
-  }
-
-  function getCtaNode() {
-    return document.querySelector(CTA_SELECTOR);
   }
 
   function getActiveMode() {

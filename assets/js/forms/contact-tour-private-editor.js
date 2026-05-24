@@ -989,15 +989,6 @@
     return parts.join(" | ");
   }
 
-  function getPickupPlaceSelection() {
-    return {
-      label: normalizeText(state.pickup),
-      placeId: normalizeText(state.pickupPlaceId),
-      lat: normalizeText(state.pickupLat),
-      lng: normalizeText(state.pickupLng)
-    };
-  }
-
   function clearPickupPlaceSelection() {
     state.pickupPlaceId = "";
     state.pickupLat = "";
@@ -1262,21 +1253,7 @@
       );
     }
   }
-  function resetState() {
-    state.selectedTourId = "";
-    state.passengerFareKey = "";
-    state.pickup = "";
-    state.pickupPlaceId = "";
-    state.pickupLat = "";
-    state.pickupLng = "";
-    state.tripDate = "";
-    state.tripTime = "";
-    state.hasGuide = "no";
-    state.guideLanguage = "";
-    state.price = "";
-    state.currency = "MXN";
-  }
-  
+ 
     function shouldApplyDefaultTourOnColdStart() {
     return Boolean(
       !state.selectedTourId &&
@@ -1317,25 +1294,6 @@
       state.guideLanguage ||
       state.price
     );
-  }
-
-  function resetEditor(options) {
-    const form = getReservationForm();
-    const nodes = getEditorNodes(form);
-    const safeOptions =
-      options && typeof options === "object" ? options : {};
-    const shouldRender =
-      safeOptions.render !== false;
-    const shouldSyncReservationState =
-      safeOptions.syncReservationState !== false;
-
-    resetState();
-
-    if (hasCriticalNodes(nodes) && shouldRender) {
-      syncView(nodes, {
-        syncReservationState: shouldSyncReservationState
-      });
-    }
   }
 
   function getTripSnapshot() {

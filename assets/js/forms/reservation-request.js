@@ -1582,18 +1582,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     }
   }
 
-  function hasCompleteTripDateTimeData(fields) {
-    var data;
-
-    if (!hasCriticalFields(fields)) {
-      return false;
-    }
-
-    data = getReservationRequestData(fields);
-
-    return Boolean(data && data.tripDate && data.tripTime);
-  }
-  
   function applyPartialValidationState(fields, validity, fieldNames) {
     var i;
     var currentFieldName;

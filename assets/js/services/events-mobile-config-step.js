@@ -1217,20 +1217,6 @@
     }).join("");
   }
 
-  function getAddressLabel(role) {
-    if (role === "destination") {
-      return getI18nValue(
-        "services.cards.events.panel.addressReturnDestinationLabel",
-        getI18nValue("services.cards.events.panel.addressDestinationLabel", "")
-      );
-    }
-
-    return getI18nValue(
-      "services.cards.events.panel.addressOriginPickupLabel",
-      ""
-    );
-  }
-
   function getAddressPlaceholder(role) {
     if (role === "destination") {
       return getI18nValue(
@@ -1349,7 +1335,6 @@
     const group = getGroup();
     const selectedEvent = getSelectedEvent();
     const title = getEventTitle(group);
-    const selectedDate = getEventDateLabel(selectedEvent);
     const venueName = getVenueName();
     const venueAddress = getVenueAddress();
     const poster = group ? group.posterMobileSrc || group.posterSrc || "" : "";

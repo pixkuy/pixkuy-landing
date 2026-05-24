@@ -6,7 +6,6 @@
   }
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
-  const DEBUG_PREFIX = "[Pixkuy][contact-airport-hotel-lodging-adapter]";
   const MIN_QUERY_LENGTH = 3;
   const DEBOUNCE_MS = 220;
   const MAX_RESULTS = 6;

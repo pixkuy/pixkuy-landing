@@ -21,7 +21,6 @@
   const BODY_SCREEN_ATTR = "data-hourly-mobile-screen";
   const NOTES_EDITOR_ACTIVE_ATTR = "data-hourly-mobile-notes-editor-active";
 
-  const ROUTE_SELECTOR = ".hourly-mobile-route";
   const COMPACT_NOTES_SELECTOR =
     ".hourly-mobile-route .services-hourly-panel__field--notes textarea";
 
@@ -78,10 +77,6 @@
       isMobileViewport() &&
       document.body.getAttribute(BODY_SCREEN_ATTR) === "true"
     );
-  }
-
-  function getCompactNotesInput() {
-    return document.querySelector(COMPACT_NOTES_SELECTOR);
   }
 
   function getEditorInput() {

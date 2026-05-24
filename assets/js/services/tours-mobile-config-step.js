@@ -22,7 +22,6 @@
   const CONFIG_BACK_SELECTOR = "[data-tours-mobile-config-back]";
   const CONFIG_FIELD_SELECTOR = "[data-tours-mobile-config-field]";
   const CONFIG_PASSENGERS_SELECTOR = "[data-tours-mobile-config-passengers]";
-  const CONFIG_GUIDE_SELECTOR = "[data-tours-mobile-config-guide]";
   const CONFIG_LANGUAGE_SELECTOR = "[data-tours-mobile-config-language]";
   const CONFIG_PRICE_SELECTOR = "[data-tours-mobile-config-price]";
   const CONFIG_CTA_SELECTOR = "[data-tours-mobile-config-cta]";
@@ -562,30 +561,6 @@
         '</option>'
       ].join("");
     }).join("");
-  }
-
-  function buildGuideLanguageOptionsMarkup() {
-    const placeholder = getI18nValue(
-      "services.cards.tours.panel.guideLanguagePlaceholder",
-      getI18nValue("services.cards.tours.contact.guideLanguagePlaceholder", "")
-    );
-
-    return [
-      '<option value="">' + escapeHtml(placeholder) + '</option>'
-    ].concat(GUIDE_LANGUAGES.map(function mapLanguage(language) {
-      const label = getI18nValue(
-        "services.cards.tours.panel.guideLanguages." + language,
-        language
-      );
-
-      return [
-        '<option value="' + escapeHtml(language) + '"',
-        language === state.guideLanguage ? ' selected' : '',
-        '>',
-        escapeHtml(label),
-        '</option>'
-      ].join("");
-    })).join("");
   }
 
   function buildGuideLanguageChipsMarkup() {

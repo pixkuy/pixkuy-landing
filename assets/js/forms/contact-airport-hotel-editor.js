@@ -225,43 +225,6 @@
     return true;
   }
 
-  function resetAirportHotelSpecificDraft(editorState, nodes) {
-    const destinationBridge = getDestinationBridge();
-    const panelSummaryApi = getPanelSummaryApi();
-
-    editorState.direction = DEFAULT_DIRECTION;
-    editorState.selectedAirport = null;
-
-    closeAirportListbox(editorState, nodes);
-
-    if (nodes.hotelInput) {
-      nodes.hotelInput.value = "";
-    }
-
-    syncHotelClear(nodes);
-
-    if (
-      destinationBridge &&
-      typeof destinationBridge.clearResolvedDestination === "function"
-    ) {
-      destinationBridge.clearResolvedDestination();
-    }
-
-    clearCommonTripFields(nodes);
-
-    if (
-      panelSummaryApi &&
-      typeof panelSummaryApi.clearPanelHandoffSummary === "function"
-    ) {
-      panelSummaryApi.clearPanelHandoffSummary();
-    }
-
-    syncAirportTrigger(editorState, nodes);
-    syncSideAwareLayout(editorState, nodes);
-
-    return true;
-  }
-
   function getI18nValue(path, fallback) {
     const dict = window.__pixkuyI18nDict;
     if (!dict || !path) {
@@ -486,23 +449,6 @@
     return editorDate || visibleDate || "";
   }
   
-    function getAirportHotelServiceTime(editorState, nodes) {
-    const editorTime =
-      editorState && typeof editorState.serviceTime === "string"
-        ? normalizeText(editorState.serviceTime)
-        : "";
-    const visibleTime =
-      nodes && nodes.root
-        ? normalizeText(
-            (
-              nodes.root.querySelector("[data-contact-airport-hotel-time]") || {}
-            ).value
-          )
-        : "";
-
-    return editorTime || visibleTime || "";
-  }
-
   function isAirportHotelDateRequiredForPricing() {
     const temporalPricing =
       window && window.PixkuyAirportTariffTemporalPricing
@@ -654,12 +600,6 @@
     }
 
     return normalizeText(utilsApi.formatPrice(finalPrice, resolvedFare.currency));
-  }
-
-  function getAirportHotelFareLabel() {
-    const form = getReservationForm();
-    const fareField = form ? form.querySelector('input[name="fare"]') : null;
-    return normalizeText(fareField && fareField.value);
   }
 
   function buildAirportHotelTripSummary(snapshot, editorState, nodes) {

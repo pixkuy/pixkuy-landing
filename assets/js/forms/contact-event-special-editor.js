@@ -1382,8 +1382,6 @@
 
   function buildQuoteCardMarkup() {
     const priceLabel = getI18nValue("contact.services.eventSpecial.priceLabel", "Precio");
-    const estimatedEventLabel = getI18nValue("contact.services.eventSpecial.estimatedEventArrivalLabel", "Llegada al evento estimada");
-    const estimatedDestinationLabel = getI18nValue("contact.services.eventSpecial.estimatedDestinationArrivalLabel", "Llegada a destino estimada");
     const pendingLabel = getI18nValue("services.cards.events.panel.quotePending", "Completa los datos para calcular el precio.");
     const loadingLabel = getI18nValue("services.cards.events.panel.quoteLoading", "Calculando precio...");
     const unavailableLabel = getI18nValue(

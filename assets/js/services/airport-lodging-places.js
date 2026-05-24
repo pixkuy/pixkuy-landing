@@ -18,7 +18,6 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
   let debounceTimer = null;
   let activeRequestId = 0;
   let currentSessionToken = "";
-  let currentAutocomplete = null;
   let currentInput = null;
   const boundInputs = new Set();
 
@@ -819,7 +818,6 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
       });
     }
 
-    currentAutocomplete = ui;
     bindInputListener("0");
     bindInputListener("1");
     observeInputMount();

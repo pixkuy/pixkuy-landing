@@ -16,7 +16,6 @@
   let configMountPlaceholder = null;
 
   let isSheetOpen = false;
-  let activeTourId = '';
   let activeTourTitle = '';
   let activeTourDuration = '';
   let pointerSession = null;
@@ -536,7 +535,6 @@
     const snapshot = readTourSnapshot(card);
     if (!snapshot.id) return;
 
-    activeTourId = snapshot.id;
     activeTourTitle = snapshot.title;
     activeTourDuration = snapshot.duration;
 

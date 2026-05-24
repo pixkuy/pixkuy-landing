@@ -641,17 +641,6 @@
     return state ? normalizeText(state.selectedFareKey) : "";
   }
 
-  function getPassengerLabelForFareKey(panel, fareKey) {
-    const safeFareKey = normalizeText(fareKey);
-    const options = getPassengerSourceOptions(panel);
-
-    const match = options.find(function findOption(option) {
-      return option.fareKey === safeFareKey;
-    });
-
-    return match ? match.label : "";
-  }
-
   function getDefaultPassengerFareKey(options) {
     const safeOptions = Array.isArray(options) ? options : [];
     const preferred = safeOptions.find(function findPreferredPassenger(option) {

@@ -913,22 +913,6 @@
   return true;
 }
 
-  function resetState() {
-    state.mode = DEFAULT_MODE;
-    state.vehicleType = DEFAULT_VEHICLE_TYPE;
-    state.pickup = "";
-    state.pickupPlaceId = "";
-    state.pickupLat = "";
-    state.pickupLng = "";
-    state.tripDate = "";
-    state.startTime = "";
-    state.durationHours = DEFAULT_DURATION_HOURS;
-    state.longTermOption = "";
-    state.notes = "";
-    state.price = "";
-    state.currency = DEFAULT_CURRENCY;
-  }
-
   function hasSpecificDraftData() {
     return Boolean(
       state.pickup ||
