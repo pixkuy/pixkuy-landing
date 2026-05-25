@@ -370,28 +370,42 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     return true;
   }
 
-  function getRecaptchaToken(config) {
-    var grecaptcha = window.grecaptcha;
-
-    if (!config.recaptchaSiteKey) {
-      return Promise.resolve("");
-    }
+  function waitForPublicConfigReady() {
+    var loader = window.PixkuyBookingPublicConfig;
 
     if (
-      !grecaptcha ||
-      !grecaptcha.enterprise ||
-      typeof grecaptcha.enterprise.execute !== "function"
+      !loader ||
+      !loader.ready ||
+      typeof loader.ready.then !== "function"
     ) {
-      return Promise.resolve("");
+      return Promise.resolve();
     }
 
-    return grecaptcha.enterprise.execute(config.recaptchaSiteKey, {
-      action: RECAPTCHA_ACTION
-    }).then(function (token) {
-      return normalizeText(token);
-    }).catch(function () {
-      return "";
+    return loader.ready.catch(function ignorePublicConfigError() {
+      return undefined;
     });
+  }
+
+  function getRecaptchaToken() {
+    return waitForPublicConfigReady()
+      .then(function executeRecaptchaAfterConfig() {
+        var recaptcha = window.PixkuyRecaptchaEnterprise;
+
+        if (
+          !recaptcha ||
+          typeof recaptcha.execute !== "function"
+        ) {
+          return "";
+        }
+
+        return recaptcha.execute(RECAPTCHA_ACTION);
+      })
+      .then(function normalizeRecaptchaToken(token) {
+        return normalizeText(token);
+      })
+      .catch(function ignoreRecaptchaError() {
+        return "";
+      });
   }
 
   function setFormBusy(form, isBusy) {
@@ -837,7 +851,7 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
     config = getConfig();
     idempotencyKey = createIdempotencyKey();
 
-    getRecaptchaToken(config)
+    getRecaptchaToken()
       .then(function (recaptchaToken) {
         var payload = buildCheckoutPayload(form, data, recaptchaToken);
 

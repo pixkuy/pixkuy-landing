@@ -3907,6 +3907,7 @@
 
     var hostname = window.location.hostname;
     var apiBaseUrl = "";
+    var recaptchaSiteKey = "";
 
     if (hostname === "192.168.0.14") {
       apiBaseUrl = "http://192.168.0.14:3002";
@@ -3917,13 +3918,22 @@
       apiBaseUrl = "http://localhost:3002";
     }
 
+    if (
+      hostname === "pixkuy.com" ||
+      hostname === "www.pixkuy.com"
+    ) {
+      recaptchaSiteKey = "";
+    }
+
     window.PIXKUY_BOOKING_API_CONFIG = {
       apiBaseUrl: apiBaseUrl,
       publicSiteKey: "local_pixkuy_site_key",
-      recaptchaSiteKey: ""
+      recaptchaSiteKey: recaptchaSiteKey
     };
   })(window);
 </script>
+<script src="assets/js/forms/booking-public-config.js"></script>
+<script src="assets/js/forms/recaptcha-enterprise.js"></script>
 <script src="assets/js/forms/legal-acceptance.js"></script>
 <script src="assets/js/forms/hourly-booking-api-checkout.js"></script>
 <script src="assets/js/forms/contact-service-state.js"></script>

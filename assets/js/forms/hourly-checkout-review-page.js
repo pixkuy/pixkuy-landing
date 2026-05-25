@@ -52,7 +52,8 @@
 
     return {
       apiBaseUrl: apiBaseUrl,
-      publicSiteKey: normalizeText(config.publicSiteKey) || "local_pixkuy_site_key"
+      publicSiteKey: normalizeText(config.publicSiteKey) || "local_pixkuy_site_key",
+      recaptchaSiteKey: normalizeText(config.recaptchaSiteKey)
     };
   }
 
@@ -473,6 +474,41 @@
     return true;
   }
 
+  function waitForPublicConfigReady() {
+    var loader = window.PixkuyBookingPublicConfig;
+
+    if (
+      !loader ||
+      !loader.ready ||
+      typeof loader.ready.then !== "function"
+    ) {
+      return Promise.resolve();
+    }
+
+    return loader.ready.catch(function ignorePublicConfigError() {
+      return undefined;
+    });
+  }
+
+  function getRecaptchaToken() {
+    return waitForPublicConfigReady()
+      .then(function executeRecaptchaAfterConfig() {
+        var recaptcha = window.PixkuyRecaptchaEnterprise;
+
+        if (!recaptcha || typeof recaptcha.execute !== "function") {
+          return "";
+        }
+
+        return recaptcha.execute("hourly_checkout");
+      })
+      .then(function normalizeRecaptchaToken(token) {
+        return normalizeText(token);
+      })
+      .catch(function ignoreRecaptchaError() {
+        return "";
+      });
+  }
+
   function requestCheckout(snapshot) {
     var config = getConfig();
     var payload = buildPayload(snapshot);
@@ -488,28 +524,36 @@
       ? apiBaseUrl.replace(/\/+$/, "") + CHECKOUT_ENDPOINT
       : CHECKOUT_ENDPOINT;
 
-    return window.fetch(
-      checkoutUrl,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Pixkuy-Site-Key": config.publicSiteKey,
-          "Idempotency-Key": "pixkuy-review-" + Date.now() + "-" + Math.random().toString(36).slice(2)
-        },
-        body: JSON.stringify(payload)
-      }
-    ).then(function parseResponse(response) {
-      return response.json().catch(function () {
-        return {};
-      }).then(function withBody(body) {
-        return {
-          ok: response.ok,
-          statusCode: response.status,
-          body: body
-        };
+    return getRecaptchaToken()
+      .then(function addRecaptchaToken(recaptchaToken) {
+        if (normalizeText(recaptchaToken)) {
+          payload.recaptchaToken = normalizeText(recaptchaToken);
+        }
+
+        return window.fetch(
+          checkoutUrl,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Pixkuy-Site-Key": config.publicSiteKey,
+              "Idempotency-Key": "pixkuy-review-" + Date.now() + "-" + Math.random().toString(36).slice(2)
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+      })
+      .then(function parseResponse(response) {
+        return response.json().catch(function () {
+          return {};
+        }).then(function withBody(body) {
+          return {
+            ok: response.ok,
+            statusCode: response.status,
+            body: body
+          };
+        });
       });
-    });
   }
 
   function bindActions(snapshot, dictionary) {
