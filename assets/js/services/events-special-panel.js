@@ -448,6 +448,14 @@
       return;
     }
 
+    if (cards.length === 1) {
+      if (configMount.parentElement !== panelRoot) {
+        panelRoot.appendChild(configMount);
+      }
+
+      return;
+    }
+
     const rowStartIndex = Math.floor(selectedGroupIndex / 3) * 3;
     const rowEndIndex = Math.min(rowStartIndex + 2, cards.length - 1);
     const anchorCard = cards[rowEndIndex];
