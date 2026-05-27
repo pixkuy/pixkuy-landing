@@ -61,6 +61,67 @@
   function normalizeText(value) {
     return typeof value === 'string' ? value.trim() : '';
   }
+
+  function getSafariTimeSelectApi() {
+    const api = window.PixkuySafariTimeSelect;
+
+    return api && typeof api.mount === 'function' ? api : null;
+  }
+
+  function getSafariDesktopTimeSelect() {
+    return configMount
+      ? configMount.querySelector('[data-services-hourly-time-select]')
+      : null;
+  }
+
+  function syncSafariDesktopTimeSelect() {
+    const select = getSafariDesktopTimeSelect();
+
+    if (!select) {
+      return false;
+    }
+
+    if (select.value !== state.startTime) {
+      select.value = state.startTime || '';
+    }
+
+    return true;
+  }
+
+  function ensureSafariDesktopTimeFallback() {
+    const api = getSafariTimeSelectApi();
+    const timeInput = configMount
+      ? configMount.querySelector('[data-services-hourly-time]')
+      : null;
+    const wrap = timeInput ? timeInput.closest('.services-hourly-panel__date-wrap') : null;
+    const timeOverlay = wrap
+      ? wrap.querySelector('.services-hourly-panel__time-overlay')
+      : null;
+    const result = api && timeInput
+      ? api.mount({
+          input: timeInput,
+          container: timeInput.parentNode,
+          overlay: timeOverlay,
+          selectSelector: '[data-services-hourly-time-select]',
+          className: 'services-hourly-panel__control',
+          label: getLabels().timeLabel || 'Hora de recogida',
+          placeholder: '--:--',
+          dataAttributeName: 'data-services-hourly-time-select',
+          dataAttributeValue: '1',
+          getValue: function getValue() {
+            return state.startTime || '';
+          },
+          onValueChange: function onValueChange(value) {
+            clearAvailabilityBlock();
+            state.startTime = normalizeText(value);
+            syncDerivedState();
+            syncLiveFieldValues();
+          }
+        })
+      : null;
+
+    return Boolean(result && result.mounted);
+  }
   
     let deepLinkedHourlyScrollDone = false;
 
@@ -1210,6 +1271,7 @@ onClearSelection: function () {
     configMount.hidden = false;
     configMount.setAttribute('data-services-hourly-mode-active', state.mode);
     configMount.innerHTML = buildConfigMarkup();
+    ensureSafariDesktopTimeFallback();
     mountPickupController();
     trackHourlyQuoteReady();
   }
@@ -1316,12 +1378,19 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
       timeInput.value = state.startTime;
     }
 
+    syncSafariDesktopTimeSelect();
+
     if (dateOverlay) {
       dateOverlay.hidden = Boolean(state.tripDate);
     }
 
     if (timeOverlay) {
-      timeOverlay.hidden = Boolean(state.startTime);
+      if (getSafariDesktopTimeSelect()) {
+        timeOverlay.hidden = true;
+        timeOverlay.style.display = 'none';
+      } else {
+        timeOverlay.hidden = Boolean(state.startTime);
+      }
     }
 
     if (notesInput && notesInput.value !== state.notes) {

@@ -54,6 +54,65 @@
     return typeof value === "string" ? value.trim() : "";
   }
 
+  function getSafariTimeSelectApi() {
+    const api = window.PixkuySafariTimeSelect;
+
+    return api && typeof api.mount === "function" ? api : null;
+  }
+
+  function getSafariDesktopTimeSelect() {
+    return configMount
+      ? configMount.querySelector("[data-direct-transfer-panel-time-select]")
+      : null;
+  }
+
+  function syncSafariDesktopTimeSelect() {
+    const select = getSafariDesktopTimeSelect();
+
+    if (!select) {
+      return false;
+    }
+
+    if (select.value !== state.time) {
+      select.value = state.time || "";
+    }
+
+    return true;
+  }
+
+  function ensureSafariDesktopTimeFallback() {
+    const api = getSafariTimeSelectApi();
+    const timeInput = configMount
+      ? configMount.querySelector('[data-direct-transfer-panel-field="time"]')
+      : null;
+    const wrap = timeInput ? timeInput.closest(".services-expand__time-wrap") : null;
+    const timeOverlay = wrap
+      ? wrap.querySelector(".services-expand__time-overlay")
+      : null;
+    const result = api && timeInput
+      ? api.mount({
+          input: timeInput,
+          container: timeInput.parentNode,
+          overlay: timeOverlay,
+          selectSelector: "[data-direct-transfer-panel-time-select]",
+          className: "services-expand__control",
+          label: getI18nValue("directTransferMobileFlow.fields.time", "Hora"),
+          placeholder: getI18nValue("directTransferMobileFlow.fields.timePlaceholder", "--:--"),
+          dataAttributeName: "data-direct-transfer-panel-time-select",
+          dataAttributeValue: "1",
+          getValue: function getValue() {
+            return state.time || "";
+          },
+          onValueChange: function onValueChange(value) {
+            state.time = normalizeText(value);
+            requestQuoteIfReady();
+          }
+        })
+      : null;
+
+    return Boolean(result && result.mounted);
+  }
+
   function normalizeLocationComparisonValue(value) {
     return String(value || "")
       .normalize("NFD")
@@ -1218,6 +1277,8 @@
     const restrictionType = getDirectTransferRestrictionType();
     const isReady = state.quoteStatus === "ready" && state.quote && state.quote.price;
 
+    syncSafariDesktopTimeSelect();
+
     if (fare) {
       fare.setAttribute("data-direct-transfer-panel-fare-state", state.quoteStatus);
     }
@@ -1295,6 +1356,7 @@
   function render() {
     configMount.hidden = false;
     configMount.innerHTML = buildMarkup();
+    ensureSafariDesktopTimeFallback();
     mountAddressControllers();
     syncView();
     return true;

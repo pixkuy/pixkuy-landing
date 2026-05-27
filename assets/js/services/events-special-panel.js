@@ -54,6 +54,85 @@
     }, dict) || "";
   }
 
+  function getSafariTimeSelectApi() {
+    const api = window.PixkuySafariTimeSelect;
+
+    return api && typeof api.mount === "function" ? api : null;
+  }
+
+  function getSafariDesktopTimeSelect(field) {
+    return configMount
+      ? configMount.querySelector('[data-services-events-time-select="' + field + '"]')
+      : null;
+  }
+
+  function getSafariDesktopTimeStateValue(field) {
+    if (field === "return") {
+      return state.returnPickupTime || "";
+    }
+
+    return state.originPickupTime || "";
+  }
+
+  function syncSafariDesktopTimeSelect(field) {
+    const select = getSafariDesktopTimeSelect(field);
+    const value = getSafariDesktopTimeStateValue(field);
+
+    if (!select) {
+      return false;
+    }
+
+    if (select.value !== value) {
+      select.value = value;
+    }
+
+    return true;
+  }
+
+  function ensureSafariDesktopTimeFallbackForInput(input) {
+    const api = getSafariTimeSelectApi();
+    const field = getTimeFieldName(input);
+    const wrap = input ? input.closest(".services-events-panel__date-wrap") : null;
+    const overlay = wrap ? wrap.querySelector(".services-events-panel__time-overlay") : null;
+    const labelNode = input && input.id
+      ? configMount.querySelector('label[for="' + input.id + '"]')
+      : null;
+    const result = api && field && input
+      ? api.mount({
+          input: input,
+          container: input.parentNode,
+          overlay: overlay,
+          selectSelector: '[data-services-events-time-select="' + field + '"]',
+          className: "services-events-panel__control",
+          label: labelNode ? labelNode.textContent : "",
+          placeholder: getPickupTimePlaceholder(),
+          dataAttributeName: "data-services-events-time-select",
+          dataAttributeValue: field,
+          getValue: function getValue() {
+            return getSafariDesktopTimeStateValue(field);
+          },
+          onValueChange: function onValueChange(value, nativeInput) {
+            applyTimeValue(field, value, nativeInput);
+          }
+        })
+      : null;
+
+    return Boolean(result && result.mounted);
+  }
+
+  function ensureSafariDesktopTimeFallbacks() {
+    const inputs = configMount
+      ? Array.from(configMount.querySelectorAll("[data-services-events-time]"))
+      : [];
+
+    if (!inputs.length) {
+      return false;
+    }
+
+    inputs.forEach(ensureSafariDesktopTimeFallbackForInput);
+    return true;
+  }
+
   function escapeHtml(value) {
     return String(value == null ? "" : value)
       .replace(/&/g, "&amp;")
@@ -1332,6 +1411,8 @@
 
     quoteMount.innerHTML = buildQuoteStatusMarkup();
     renderEstimatedArrivals();
+    syncSafariDesktopTimeSelect("origin");
+    syncSafariDesktopTimeSelect("return");
     syncContinueCtaState();
   }
   
@@ -1632,6 +1713,7 @@
     configMount.setAttribute("data-services-events-config-row", "");
     configMount.innerHTML = buildConfigMarkup();
     placeConfigMountForCurrentLayout();
+    ensureSafariDesktopTimeFallbacks();
     mountAddressControllers();
     renderQuoteStatus();
     requestQuoteIfReady();

@@ -191,6 +191,65 @@
     return requireUtils().normalizeText(value);
   }
 
+  function getSafariTimeSelectApi() {
+    const api = window.PixkuySafariTimeSelect;
+
+    return api && typeof api.mount === "function" ? api : null;
+  }
+
+  function getSafariDesktopTimeSelect(nodes) {
+    return nodes && nodes.timeField
+      ? nodes.timeField.querySelector("[data-airport-tariff-time-select]")
+      : null;
+  }
+
+  function syncSafariDesktopTimeSelect(nodes, state) {
+    const select = getSafariDesktopTimeSelect(nodes);
+    const serviceTime =
+      state && typeof state.serviceTime === "string"
+        ? normalizeText(state.serviceTime)
+        : "";
+
+    if (!select) {
+      return false;
+    }
+
+    if (select.value !== serviceTime) {
+      select.value = serviceTime;
+    }
+
+    return true;
+  }
+
+  function ensureSafariDesktopTimeFallback(nodes) {
+    const api = getSafariTimeSelectApi();
+    const result = api && nodes && nodes.timeInput
+      ? api.mount({
+          input: nodes.timeInput,
+          container: nodes.timeInput.parentNode,
+          overlay: nodes.timeOverlay || null,
+          selectSelector: "[data-airport-tariff-time-select]",
+          className: "services-expand__control",
+          label: "Hora",
+          placeholder: "--:--",
+          dataAttributeName: "data-airport-tariff-time-select",
+          dataAttributeValue: "1",
+          getValue: function getValue() {
+            return nodes && nodes.timeInput
+              ? normalizeText(nodes.timeInput.value)
+              : "";
+          },
+          onValueChange: function onValueChange(value, nativeInput) {
+            nativeInput.value = normalizeText(value);
+            nativeInput.dispatchEvent(new Event("input", { bubbles: true }));
+            nativeInput.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        })
+      : null;
+
+    return Boolean(result && result.mounted);
+  }
+
   function hasZoneResolver() {
     return !!getZoneResolver();
   }
@@ -651,8 +710,15 @@ function shouldUsePassengerChipUi(nodes) {
       nodes.timeInput.value = currentServiceTime || "";
     }
 
+    syncSafariDesktopTimeSelect(nodes, state);
+
     if (nodes.timeOverlay) {
-      nodes.timeOverlay.hidden = Boolean(nodes.timeInput.value);
+      if (getSafariDesktopTimeSelect(nodes)) {
+        nodes.timeOverlay.hidden = true;
+        nodes.timeOverlay.style.display = "none";
+      } else {
+        nodes.timeOverlay.hidden = Boolean(nodes.timeInput.value);
+      }
     }
 
     return true;
@@ -1676,6 +1742,7 @@ function shouldUsePassengerChipUi(nodes) {
 
     const state = createState();
 
+    ensureSafariDesktopTimeFallback(nodes);
     buildDropdownDom(nodes);
     seedInitialState(state);
 
