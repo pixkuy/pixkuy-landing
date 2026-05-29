@@ -16,15 +16,12 @@
   }
 
   const MOBILE_QUERY = "(max-width: 720px)";
+  const DATA_URL = "assets/js/data/fleet-gallery.json";
+  const VEHICLE_ID = "byd_m9";
   const BODY_SCREEN_ATTR = "data-hourly-mobile-screen";
   const BODY_GALLERY_ATTR = "data-hourly-mobile-vehicle-gallery-active";
-
-  const FOOTER_IMAGE_SELECTOR =
-    '.hourly-mobile-route [data-hourly-mobile-vehicle-in-footer="true"] .services-hourly-panel__vehicle-image';
-
   const FOOTER_MEDIA_SELECTOR =
     '.hourly-mobile-route [data-hourly-mobile-vehicle-in-footer="true"] .services-hourly-panel__vehicle-media';
-
   const GALLERY_SELECTOR = "[data-hourly-mobile-vehicle-gallery]";
   const IMAGE_SELECTOR = "[data-hourly-mobile-vehicle-gallery-image]";
   const CAPTION_SELECTOR = "[data-hourly-mobile-vehicle-gallery-caption]";
@@ -33,10 +30,10 @@
   const PREV_SELECTOR = "[data-hourly-mobile-vehicle-gallery-prev]";
   const NEXT_SELECTOR = "[data-hourly-mobile-vehicle-gallery-next]";
   const BACKDROP_SELECTOR = "[data-hourly-mobile-vehicle-gallery-backdrop]";
-
   const mobileQuery = window.matchMedia ? window.matchMedia(MOBILE_QUERY) : null;
 
   let galleryNode = null;
+  let cachedPayload = null;
   let currentIndex = 0;
   let previousFocus = null;
 
@@ -49,6 +46,94 @@
       isMobileViewport() &&
       document.body.getAttribute(BODY_SCREEN_ATTR) === "true"
     );
+  }
+  
+    function normalizeText(value) {
+    return typeof value === "string" ? value.trim() : "";
+  }
+
+  function normalizeImages(images) {
+    if (!Array.isArray(images)) {
+      return [];
+    }
+
+    return images
+      .filter(function filterImage(item) {
+        return Boolean(
+          item &&
+            item.active === true &&
+            normalizeText(item.id) &&
+            normalizeText(item.src)
+        );
+      })
+      .map(function mapImage(item) {
+        return {
+          id: normalizeText(item.id),
+          src: normalizeText(item.src)
+        };
+      });
+  }
+
+  function getVehicleFromPayload(payload) {
+    const vehicles = payload && payload.vehicles ? payload.vehicles : {};
+    const vehicle = vehicles[VEHICLE_ID] || null;
+    const images = normalizeImages(vehicle ? vehicle.images : []);
+
+    if (!vehicle || vehicle.active !== true || !images.length) {
+      return null;
+    }
+
+    return {
+      id: VEHICLE_ID,
+      images: images
+    };
+  }
+
+  function getVehicle() {
+    return getVehicleFromPayload(cachedPayload);
+  }
+
+  async function loadFleetGallery() {
+    let response;
+    let payload;
+
+    if (cachedPayload) {
+      return cachedPayload;
+    }
+
+    response = await fetch(DATA_URL, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status);
+    }
+
+    payload = await response.json();
+    cachedPayload = payload && typeof payload === "object" ? payload : {};
+
+    return cachedPayload;
+  }
+
+  function getSlideCopyKeys(slide, index) {
+    const id = slide && slide.id ? slide.id : "";
+
+    if (index === 0 || id === "byd_m9_main") {
+      return {
+        altKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.main.alt",
+        captionKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.main.caption"
+      };
+    }
+
+    if (id.includes("passengers") || id.includes("captain")) {
+      return {
+        altKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.passengers.alt",
+        captionKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.passengers.caption"
+      };
+    }
+
+    return {
+      altKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.interior.alt",
+      captionKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.interior.caption"
+    };
   }
   
   function getI18nText(key) {
@@ -73,28 +158,22 @@
   }
 
   function getSlides() {
-    const footerImage = document.querySelector(FOOTER_IMAGE_SELECTOR);
-    const src = footerImage ? footerImage.getAttribute("src") : "";
+    const vehicle = getVehicle();
 
-    return [
-      {
-        src: src || "assets/img/fleet/bydm9_xhoras001d.jpeg",
-        altKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.main.alt",
-        captionKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.main.caption"
-      },
-      {
-        src: "assets/img/fleet/Pixkuy_2603_bydm9002.PNG",
-        altKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.interior.alt",
-        captionKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.interior.caption"
-      },
-      {
-        src: "assets/img/fleet/Pixkuy_2603_bydm9003.PNG",
-        altKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.passengers.alt",
-        captionKey: "services.cards.hourly.mobileFlow.vehicleGallery.slides.passengers.caption"
-      }
-    ];
+    if (!vehicle || !Array.isArray(vehicle.images)) {
+      return [];
+    }
+
+    return vehicle.images.map(function mapVehicleImage(image, index) {
+      const copyKeys = getSlideCopyKeys(image, index);
+
+      return {
+        src: image.src,
+        altKey: copyKeys.altKey,
+        captionKey: copyKeys.captionKey
+      };
+    });
   }
-
   function buildGalleryNode() {
     const root = document.createElement("section");
     const backdrop = document.createElement("button");
@@ -452,23 +531,28 @@
     return true;
   }
 
-  function init() {
-    ensureGalleryNode();
-    bindFooterTrigger();
-    syncActiveState();
+  async function init() {
+    try {
+      await loadFleetGallery();
+      ensureGalleryNode();
+      bindFooterTrigger();
+      syncActiveState();
 
-    window.addEventListener("resize", syncActiveState);
-    window.addEventListener("pageshow", syncActiveState);
-    window.addEventListener("pixkuy:hourly-daily-panel-ui-sync", syncActiveState);
-    window.addEventListener("pixkuy:i18n-applied", syncActiveState);
+      window.addEventListener("resize", syncActiveState);
+      window.addEventListener("pageshow", syncActiveState);
+      window.addEventListener("pixkuy:hourly-daily-panel-ui-sync", syncActiveState);
+      window.addEventListener("pixkuy:i18n-applied", syncActiveState);
 
-    if (mobileQuery && typeof mobileQuery.addEventListener === "function") {
-      mobileQuery.addEventListener("change", syncActiveState);
-    } else if (mobileQuery && typeof mobileQuery.addListener === "function") {
-      mobileQuery.addListener(syncActiveState);
+      if (mobileQuery && typeof mobileQuery.addEventListener === "function") {
+        mobileQuery.addEventListener("change", syncActiveState);
+      } else if (mobileQuery && typeof mobileQuery.addListener === "function") {
+        mobileQuery.addListener(syncActiveState);
+      }
+
+      return true;
+    } catch (error) {
+      return false;
     }
-
-    return true;
   }
 
   if (document.readyState === "loading") {

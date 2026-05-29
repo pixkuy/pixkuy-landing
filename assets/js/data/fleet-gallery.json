@@ -23,6 +23,31 @@
           "id": "byd_m9_passengers",
           "active": true,
           "src": "assets/img/fleet/Pixkuy_2603_bydm9003.PNG"
+        },
+        {
+          "id": "byd_m9_captain_seats_side",
+          "active": true,
+          "src": "assets/img/fleet/byd-m9-captain-seats-side.webp"
+        },
+        {
+          "id": "byd_m9_captain_seats_angle",
+          "active": true,
+          "src": "assets/img/fleet/byd-m9-captain-seats-angle.webp"
+        },
+        {
+          "id": "byd_m9_cabin_overview",
+          "active": true,
+          "src": "assets/img/fleet/byd-m9-cabin-overview.webp"
+        },
+        {
+          "id": "byd_m9_dashboard_front",
+          "active": true,
+          "src": "assets/img/fleet/byd-m9-dashboard-front.webp"
+        },
+        {
+          "id": "byd_m9_cockpit_angle",
+          "active": true,
+          "src": "assets/img/fleet/byd-m9-cockpit-angle.webp"
         }
       ]
     }

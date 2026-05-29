@@ -47,6 +47,30 @@
       "lineKey": "inMotion.items.sanMiguelAllende.line",
       "monthKey": "inMotion.months.2026_04",
       "imageAltKey": "inMotion.items.sanMiguelAllende.alt"
+    },
+    {
+      "id": "202605-01-valquirico",
+      "active": true,
+      "serviceType": "tour_private",
+      "imageSrc": "assets/img/in-motion/202605-01-valquirico.webp",
+      "href": "?service=tour_private&tour=valquirico#services",
+      "titleKey": "inMotion.items.valquirico.title",
+      "contextKey": "inMotion.items.valquirico.context",
+      "lineKey": "inMotion.items.valquirico.line",
+      "monthKey": "inMotion.months.2026_05",
+      "imageAltKey": "inMotion.items.valquirico.alt"
+    },
+    {
+      "id": "202605-02-SantaFe",
+      "active": true,
+      "serviceType": "hourly_daily",
+      "imageSrc": "assets/img/in-motion/202605-02-SantaFe.webp",
+      "href": "?service=hourly_daily#services",
+      "titleKey": "inMotion.items.santaFe.title",
+      "contextKey": "inMotion.items.santaFe.context",
+      "lineKey": "inMotion.items.santaFe.line",
+      "monthKey": "inMotion.months.2026_05",
+      "imageAltKey": "inMotion.items.santaFe.alt"
     }
   ]
 }

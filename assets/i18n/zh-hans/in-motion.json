@@ -6,7 +6,8 @@
     "instagram": "在 Instagram 查看更多",
     "months": {
       "2026_03": "2026年3月",
-      "2026_04": "2026年4月"
+      "2026_04": "2026年4月",
+      "2026_05": "2026年5月"
     },
     "items": {
       "conductorPrivadoJornadaCdmx": {
@@ -32,6 +33,18 @@
         "context": "圣米格尔-德阿连德",
         "line": "静默流动的优雅。",
         "alt": "Pixkuy 车辆执行前往圣米格尔-德阿连德的私人服务"
+      },
+      "valquirico": {
+        "title": "私人游览",
+        "context": "从墨西哥城前往 Val’Quirico",
+        "line": "石板街道与欧式建筑灵感之间。",
+        "alt": "Pixkuy 车辆执行从墨西哥城前往 Val’Quirico 的私人游览服务"
+      },
+      "santaFe": {
+        "title": "私人司机",
+        "context": "圣塔菲商务行程",
+        "line": "面向金融区商务日程的私人接送服务。",
+        "alt": "Pixkuy 车辆在墨西哥城圣塔菲执行商务服务"
       }
     }
   }

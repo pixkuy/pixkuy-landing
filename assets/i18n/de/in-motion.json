@@ -6,7 +6,8 @@
     "instagram": "Mehr auf Instagram",
     "months": {
       "2026_03": "März 2026",
-      "2026_04": "April 2026"
+      "2026_04": "April 2026",
+      "2026_05": "Mai 2026"
     },
     "items": {
       "conductorPrivadoJornadaCdmx": {
@@ -32,6 +33,18 @@
         "context": "San Miguel de Allende",
         "line": "Eleganz, die leise fließt.",
         "alt": "Pixkuy-Fahrzeug während eines privaten Services nach San Miguel de Allende"
+      },
+      "valquirico": {
+        "title": "Private Touren",
+        "context": "Val’Quirico ab Mexiko-Stadt",
+        "line": "Zwischen Kopfsteinpflaster und europäisch inspirierter Architektur.",
+        "alt": "Pixkuy-Fahrzeug während einer privaten Tour nach Val’Quirico ab Mexiko-Stadt"
+      },
+      "santaFe": {
+        "title": "Privater Chauffeur",
+        "context": "Executive-Service in Santa Fe",
+        "line": "Private Transfers für geschäftliche Termine im Finanzviertel.",
+        "alt": "Pixkuy-Fahrzeug während eines Executive-Services in Santa Fe, Mexiko-Stadt"
       }
     }
   }
