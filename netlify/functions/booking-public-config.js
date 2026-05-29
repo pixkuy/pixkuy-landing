@@ -25,6 +25,12 @@ exports.handler = async function handler(event) {
 
   return buildResponse(200, {
     ok: true,
+    bookingApi: {
+      apiBaseUrl: normalizeText(process.env.BOOKING_API_BASE_URL)
+    },
+    publicSite: {
+      siteKey: normalizeText(process.env.PIXKUY_PUBLIC_SITE_KEY)
+    },
     recaptchaEnterprise: {
       siteKey: normalizeText(process.env.RECAPTCHA_ENTERPRISE_SITE_KEY)
     }

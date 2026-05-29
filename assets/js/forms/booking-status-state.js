@@ -194,6 +194,22 @@
       });
     });
   }
+  
+    function waitForPublicConfigReady() {
+    var loader = window.PixkuyBookingPublicConfig;
+
+    if (
+      !loader ||
+      !loader.ready ||
+      typeof loader.ready.then !== "function"
+    ) {
+      return Promise.resolve();
+    }
+
+    return loader.ready.catch(function ignorePublicConfigError() {
+      return undefined;
+    });
+  }
 
   function getReservationStatus(body) {
     if (body && body.reservation && typeof body.reservation.status === "string") {
@@ -488,7 +504,6 @@
   function init() {
     var preferredLang = getActiveLang();
     var token = getToken();
-    var config = getConfig();
 
     loadDictionary(preferredLang)
       .then(function (loaded) {
@@ -513,7 +528,10 @@
           return;
         }
 
-        requestStatus(config, token)
+        waitForPublicConfigReady()
+          .then(function requestStatusAfterPublicConfig() {
+            return requestStatus(getConfig(), token);
+          })
           .then(function (result) {
             notifyReady(Object.assign({}, baseState, {
               result: normalizeResult(result)

@@ -24,19 +24,56 @@
   }
 
   function mergePublicConfig(payload) {
-    var siteKey = normalizeText(
+    var apiBaseUrl = normalizeText(
+      payload &&
+      payload.bookingApi &&
+      payload.bookingApi.apiBaseUrl
+    );
+    var publicSiteKey = normalizeText(
+      payload &&
+      payload.publicSite &&
+      payload.publicSite.siteKey
+    );
+    var recaptchaSiteKey = normalizeText(
       payload &&
       payload.recaptchaEnterprise &&
       payload.recaptchaEnterprise.siteKey
     );
+    var apiConfigPatch = {};
+    var statusConfigPatch = {};
+    var statusConfig = window.PIXKUY_BOOKING_STATUS_CONFIG;
 
-    if (!siteKey) {
+    if (apiBaseUrl) {
+      apiConfigPatch.apiBaseUrl = apiBaseUrl;
+      statusConfigPatch.apiBaseUrl = apiBaseUrl;
+    }
+
+    if (publicSiteKey) {
+      apiConfigPatch.publicSiteKey = publicSiteKey;
+      statusConfigPatch.publicSiteKey = publicSiteKey;
+    }
+
+    if (recaptchaSiteKey) {
+      apiConfigPatch.recaptchaSiteKey = recaptchaSiteKey;
+    }
+
+    if (
+      !apiConfigPatch.apiBaseUrl &&
+      !apiConfigPatch.publicSiteKey &&
+      !apiConfigPatch.recaptchaSiteKey
+    ) {
       return;
     }
 
-    window.PIXKUY_BOOKING_API_CONFIG = Object.assign({}, getConfig(), {
-      recaptchaSiteKey: siteKey
-    });
+    window.PIXKUY_BOOKING_API_CONFIG = Object.assign({}, getConfig(), apiConfigPatch);
+
+    if (statusConfigPatch.apiBaseUrl || statusConfigPatch.publicSiteKey) {
+      window.PIXKUY_BOOKING_STATUS_CONFIG = Object.assign(
+        {},
+        statusConfig && typeof statusConfig === "object" ? statusConfig : {},
+        statusConfigPatch
+      );
+    }
   }
 
   function load() {
