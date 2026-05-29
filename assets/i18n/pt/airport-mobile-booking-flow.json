@@ -1,15 +1,15 @@
 {
   "airportMobileFlow": {
     "back": "Voltar",
-    "title": "Aeroporto e hotel",
+    "title": "Transfer aeroporto",
     "helper": "Transfers planeados para chegadas e partidas, com uma experiência clara e cuidada.",
     "note": "Pedido de serviço sujeito a validação operacional e confirmação manual.",
     "cta": {
       "continue": "Continuar"
     },
     "direction": {
-      "airportToHotel": "Aeroporto → Hotel",
-      "hotelToAirport": "Hotel → Aeroporto"
+      "airportToHotel": "Aeroporto → Endereço",
+      "hotelToAirport": "Endereço → Aeroporto"
     },
     "fields": {
       "passengers": "Passageiros",
@@ -20,7 +20,7 @@
       "separator": ", ",
       "finalSeparator": " e ",
       "fields": {
-        "hotel": "hotel",
+        "hotel": "endereço",
         "date": "data",
         "time": "hora"
       }

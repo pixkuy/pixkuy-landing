@@ -17,13 +17,6 @@
     north: 19.65
   };
 
-  // Subconjunto corto y seguro para el request a Places.
-  // El filtrado fino real sigue haciéndose después con PixkuyAirportLodgingTypes.
-  const SEARCH_PRIMARY_TYPES = [
-    "hotel",
-    "lodging"
-  ];
-
   let debounceTimer = null;
   let activeRequestId = 0;
   let currentSessionToken = null;
@@ -54,8 +47,8 @@
     const policy = window.PixkuyAirportLodgingTypes;
     return policy && typeof policy === "object" ? policy : null;
   }
-  
-    function getCoverageApi() {
+
+  function getCoverageApi() {
     const coverage = NAMESPACE.coverage;
     return coverage && typeof coverage === "object" ? coverage : null;
   }
@@ -325,7 +318,6 @@
     debugLog("fetchSuggestions:request", {
       query: query,
       includedRegionCodes: INCLUDED_REGION_CODES.slice(),
-      includedPrimaryTypes: SEARCH_PRIMARY_TYPES.slice(),
       locationRestriction: LOCATION_RESTRICTION
     });
 
@@ -334,7 +326,6 @@
         input: query,
         sessionToken: sessionToken,
         includedRegionCodes: INCLUDED_REGION_CODES,
-        includedPrimaryTypes: SEARCH_PRIMARY_TYPES,
         locationRestriction: LOCATION_RESTRICTION
       });
 
@@ -418,8 +409,8 @@
 
     return items;
   }
-  
-    function createSelectionSettlement(nodes, dom, item) {
+
+  function createSelectionSettlement(nodes, dom, item) {
     let settled = false;
     let fallbackTimer = null;
 
@@ -500,8 +491,8 @@
       button.appendChild(title);
       row.appendChild(button);
       dom.panel.appendChild(row);
-	  
-	        button.addEventListener("click", function () {
+
+      button.addEventListener("click", function () {
         const settlement = createSelectionSettlement(nodes, dom, item);
 
         window.clearTimeout(debounceTimer);
@@ -524,8 +515,6 @@
 
         isCommittingSelection = false;
       });
-
-
     });
 
     setStatus(dom, "");
@@ -568,8 +557,8 @@
     nodes.hotelClear.hidden = normalizeText(nodes.hotelInput.value) === "";
     return true;
   }
-  
-    function resetAdapterState(nodes, dom) {
+
+  function resetAdapterState(nodes, dom) {
     window.clearTimeout(debounceTimer);
     activeRequestId += 1;
     resetSessionToken();
@@ -662,7 +651,7 @@
         const previousServiceType = normalizeText(detail.previousServiceType);
         const source = normalizeText(detail.source);
 
-        debugLog("event:pixkuy-contact-service-change", {
+        debugLog("event:pixkuy:contact-service-change", {
           previousServiceType: previousServiceType,
           nextServiceType: nextServiceType,
           source: source

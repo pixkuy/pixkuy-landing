@@ -1,16 +1,6 @@
 (function () {
   "use strict";
 
-  const ACCEPTED_PRIMARY_TYPES = [
-    "hotel",
-    "lodging",
-    "resort_hotel",
-    "extended_stay_hotel",
-    "bed_and_breakfast",
-    "guest_house",
-    "inn"
-  ];
-
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
   }
@@ -20,7 +10,7 @@
   }
 
   function getAcceptedPrimaryTypes() {
-    return ACCEPTED_PRIMARY_TYPES.slice();
+    return [];
   }
 
   function isAcceptedLodgingPrimaryType(primaryType) {
@@ -29,7 +19,7 @@
       return false;
     }
 
-    return ACCEPTED_PRIMARY_TYPES.indexOf(normalized) >= 0;
+    return true;
   }
 
   function getRejectedReason(primaryType) {

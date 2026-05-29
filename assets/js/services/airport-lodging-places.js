@@ -5,13 +5,6 @@
 const DEBOUNCE_MS = 220;
 const MAX_RESULTS = 6;
 const INCLUDED_REGION_CODES = ["mx"];
-const SEARCH_PRIMARY_TYPES = [
-  "hotel",
-  "lodging",
-  "resort_hotel",
-  "extended_stay_hotel",
-  "bed_and_breakfast"
-];
 const GOOGLE_PLACES_READY_TIMEOUT_MS = 4000;
 const GOOGLE_PLACES_READY_RETRY_MS = 120;
 
@@ -397,7 +390,6 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
   input: query,
   sessionToken: sessionToken,
   includedRegionCodes: INCLUDED_REGION_CODES,
-  includedPrimaryTypes: SEARCH_PRIMARY_TYPES,
   locationRestriction: {
     west: -99.35,
     south: 19.15,

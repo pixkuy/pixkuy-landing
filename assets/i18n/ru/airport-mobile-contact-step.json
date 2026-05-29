@@ -12,15 +12,15 @@
       "name": "Ваше имя",
       "phone": "Напр. +525512345678",
       "email": "you@email.com",
-      "notes": "Рейс, отель, инструкции или важные детали"
+      "notes": "Номер рейса, инструкции или важные детали"
     },
     "summary": {
       "title": "Сводка трансфера:",
       "direction": "Поездка",
-      "directionAirportToHotel": "Аэропорт → Отель",
-      "directionHotelToAirport": "Отель → Аэропорт",
+      "directionAirportToHotel": "Аэропорт → Адрес",
+      "directionHotelToAirport": "Адрес → Аэропорт",
       "airport": "Аэропорт",
-      "hotel": "Отель",
+      "hotel": "Адрес",
       "zone": "Зона",
       "date": "Дата",
       "time": "Время",
@@ -36,7 +36,7 @@
       "close": "Назад",
       "save": "Сохранить примечания",
       "clear": "×",
-      "placeholder": "Рейс, отель, инструкции или важные детали"
+      "placeholder": "Номер рейса, инструкции или важные детали"
     },
     "validation": {
       "name": "Укажите ваше полное имя.",

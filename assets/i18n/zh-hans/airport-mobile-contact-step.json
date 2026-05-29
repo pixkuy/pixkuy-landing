@@ -12,15 +12,15 @@
       "name": "您的姓名",
       "phone": "例如 +525512345678",
       "email": "you@email.com",
-      "notes": "航班、酒店、说明或重要细节"
+      "notes": "航班号、说明或重要细节"
     },
     "summary": {
       "title": "接送摘要：",
       "direction": "行程",
-      "directionAirportToHotel": "机场 → 酒店",
-      "directionHotelToAirport": "酒店 → 机场",
+      "directionAirportToHotel": "机场 → 地址",
+      "directionHotelToAirport": "地址 → 机场",
       "airport": "机场",
-      "hotel": "酒店",
+      "hotel": "地址",
       "zone": "区域",
       "date": "日期",
       "time": "时间",
@@ -36,7 +36,7 @@
       "close": "返回",
       "save": "保存备注",
       "clear": "×",
-      "placeholder": "航班、酒店、说明或重要细节"
+      "placeholder": "航班号、说明或重要细节"
     },
     "validation": {
       "name": "请输入您的姓名。",

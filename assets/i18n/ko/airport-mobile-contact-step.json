@@ -12,15 +12,15 @@
       "name": "이름",
       "phone": "예: +525512345678",
       "email": "you@email.com",
-      "notes": "항공편, 호텔, 안내 사항 또는 중요한 세부 정보"
+      "notes": "항공편 번호, 안내 사항 또는 중요한 세부 정보"
     },
     "summary": {
       "title": "이동 요약:",
       "direction": "이동",
-      "directionAirportToHotel": "공항 → 호텔",
-      "directionHotelToAirport": "호텔 → 공항",
+      "directionAirportToHotel": "공항 → 주소",
+      "directionHotelToAirport": "주소 → 공항",
       "airport": "공항",
-      "hotel": "호텔",
+      "hotel": "주소",
       "zone": "구역",
       "date": "날짜",
       "time": "시간",
@@ -36,7 +36,7 @@
       "close": "뒤로",
       "save": "메모 저장",
       "clear": "×",
-      "placeholder": "항공편, 호텔, 안내 사항 또는 중요한 세부 정보"
+      "placeholder": "항공편 번호, 안내 사항 또는 중요한 세부 정보"
     },
     "validation": {
       "name": "성명을 입력해 주세요.",

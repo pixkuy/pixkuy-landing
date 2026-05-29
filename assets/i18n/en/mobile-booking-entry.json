@@ -3,8 +3,8 @@
     "title": "Private driver in Mexico City",
     "text": "Premium mobility with a private chauffeur, hybrid and electric fleet. Attention to every detail.",
     "airport": {
-      "title": "Airport / Hotel",
-      "text": "Private transfer to or from airports and hotels."
+      "title": "Airport transfer",
+      "text": "Private transfer to or from the airport with an address inside an enabled zone."
     },
     "hourly": {
       "title": "Chauffeured vehicle",

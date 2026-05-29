@@ -12,15 +12,15 @@
       "name": "Tu nombre",
       "phone": "Ej. +525512345678",
       "email": "tu@email.com",
-      "notes": "Vuelo, hotel, instrucciones o detalles importantes"
+      "notes": "Número de vuelo, instrucciones o detalles importantes"
     },
     "summary": {
       "title": "Resumen del traslado:",
       "direction": "Trayecto",
-      "directionAirportToHotel": "Aeropuerto → Hotel",
-      "directionHotelToAirport": "Hotel → Aeropuerto",
+      "directionAirportToHotel": "Aeropuerto → Dirección",
+      "directionHotelToAirport": "Dirección → Aeropuerto",
       "airport": "Aeropuerto",
-      "hotel": "Hotel",
+      "hotel": "Dirección",
       "zone": "Zona",
       "date": "Fecha",
       "time": "Hora",
@@ -36,7 +36,7 @@
       "close": "Volver",
       "save": "Guardar notas",
       "clear": "×",
-      "placeholder": "Vuelo, hotel, instrucciones o detalles importantes"
+      "placeholder": "Número de vuelo, instrucciones o detalles importantes"
     },
     "validation": {
       "name": "Indica tu nombre completo.",
