@@ -629,7 +629,13 @@ function clearAllRootUis() {
       return;
     }
 
-    if (result && result.reason === "unsupported-primary-type") {
+    if (
+      result &&
+      (
+        result.reason === "unsupported-primary-type" ||
+        result.reason === "extended-ring-unavailable"
+      )
+    ) {
       renderStatus(dom, "invalid");
       return;
     }

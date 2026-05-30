@@ -53,6 +53,45 @@
     return coverage && typeof coverage === "object" ? coverage : null;
   }
 
+  function getExtendedAirportPolicy() {
+    const policy = window.PixkuyAirportExtendedRingsPolicy;
+
+    return policy && typeof policy === "object" ? policy : null;
+  }
+
+  function getAirportLocationRestriction() {
+    const policy = getExtendedAirportPolicy();
+
+    if (
+      policy &&
+      typeof policy.getAirportSearchLocationRestriction === "function"
+    ) {
+      return policy.getAirportSearchLocationRestriction();
+    }
+
+    return LOCATION_RESTRICTION;
+  }
+
+  function isPointInsideBounds(lat, lng, bounds) {
+    if (
+      typeof lat !== "number" ||
+      !Number.isFinite(lat) ||
+      typeof lng !== "number" ||
+      !Number.isFinite(lng) ||
+      !bounds ||
+      typeof bounds !== "object"
+    ) {
+      return false;
+    }
+
+    return (
+      lat >= bounds.south &&
+      lat <= bounds.north &&
+      lng >= bounds.west &&
+      lng <= bounds.east
+    );
+  }
+
   function getCoverageDecisionForPoint(lat, lng) {
     const coverage = getCoverageApi();
 
@@ -67,6 +106,19 @@
   }
 
   function isPointWithinOperationalCoverage(lat, lng) {
+    const policy = getExtendedAirportPolicy();
+
+    if (
+      policy &&
+      typeof policy.getAirportSearchLocationRestriction === "function"
+    ) {
+      return isPointInsideBounds(
+        lat,
+        lng,
+        policy.getAirportSearchLocationRestriction()
+      );
+    }
+
     const decision = getCoverageDecisionForPoint(lat, lng);
 
     if (!decision || typeof decision !== "object") {
@@ -318,7 +370,7 @@
     debugLog("fetchSuggestions:request", {
       query: query,
       includedRegionCodes: INCLUDED_REGION_CODES.slice(),
-      locationRestriction: LOCATION_RESTRICTION
+      locationRestriction: getAirportLocationRestriction()
     });
 
     const response =
@@ -326,7 +378,7 @@
         input: query,
         sessionToken: sessionToken,
         includedRegionCodes: INCLUDED_REGION_CODES,
-        locationRestriction: LOCATION_RESTRICTION
+        locationRestriction: getAirportLocationRestriction()
       });
 
     const suggestions =

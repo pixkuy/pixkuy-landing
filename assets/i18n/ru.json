@@ -78,7 +78,21 @@
         "coyoacan_del_valle_napoles": "Койоакан / Дель Валье / Наполес",
         "sur": "Юг / Перисур / Педрегаль / Сан-Анхель",
         "norte": "Север / Базилика / Линдависта",
-        "aeropuerto_oriente": "Аэропорт / Восток / Foro Sol"
+        "aeropuerto_oriente": "Аэропорт / Восток / Foro Sol",
+        "airport_extended_ring_25km": "Ближняя агломерация",
+        "airport_extended_ring_50km": "Регион 25–50 км",
+        "airport_extended_ring_75km": "Регион 50–75 км",
+        "airport_extended_ring_90km": "Регион 75–90 км",
+        "airport_extended_ring_115km": "Регион 90–115 км",
+        "airport_extended_ring_140km": "Регион 115–140 км",
+        "airport_extended_corridor_taxco_guerrero": "Коридор Taxco / север Герреро",
+        "airport_extended_corridor_morelia_michoacan": "Коридор Morelia / Michoacán · ночёвка включена",
+        "airport_extended_corridor_sierra_norte_puebla": "Коридор Sierra Norte / Puebla",
+        "airport_extended_ring_200km": "Регион 140–200 км",
+        "airport_extended_ring_300km": "Регион 200–300 км · ночёвка включена",
+        "airport_extended_ring_400km": "Регион 300–400 км · ночёвка включена",
+        "airport_extended_ring_550km": "Регион 400–550 км · ночёвка включена",
+        "airport_extended_ring_700km": "Регион 550–700 км · операционное подтверждение"
       }
     }
   }

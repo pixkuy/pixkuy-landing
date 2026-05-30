@@ -909,6 +909,57 @@ function bindClearAction() {
       return null;
     }
   }
+  
+    function getExtendedAirportPolicy() {
+    const policy = window.PixkuyAirportExtendedRingsPolicy;
+
+    return policy && typeof policy === "object" ? policy : null;
+  }
+
+  function getAirportIdFromTariffState(state) {
+    if (!state || typeof state !== "object") {
+      return "";
+    }
+
+    if (
+      state.originType === "airport" &&
+      typeof state.originValue === "string" &&
+      state.originValue.trim()
+    ) {
+      return state.originValue.trim().toLowerCase();
+    }
+
+    if (
+      state.destinationType === "airport" &&
+      typeof state.destinationValue === "string" &&
+      state.destinationValue.trim()
+    ) {
+      return state.destinationValue.trim().toLowerCase();
+    }
+
+    return "";
+  }
+
+  function getExtendedRingSaleMode(state, zoneId) {
+    const policy = getExtendedAirportPolicy();
+
+    if (
+      !policy ||
+      typeof policy.getSaleModeForFare !== "function" ||
+      typeof policy.isExtendedRingZoneId !== "function"
+    ) {
+      return "automatic";
+    }
+
+    if (!policy.isExtendedRingZoneId(zoneId)) {
+      return "automatic";
+    }
+
+    return policy.getSaleModeForFare({
+      airportId: getAirportIdFromTariffState(state),
+      zoneId: zoneId
+    });
+  }
 
   async function applyResolvedDestination(input) {
   const tariffBridge = getTariffBridge();
@@ -1009,6 +1060,28 @@ function bindClearAction() {
       ok: false,
       reason: "zone-not-found",
       resolvedZone: null
+    };
+  }
+
+  const tariffState = tariffBridge.getState();
+  const extendedRingSaleMode = getExtendedRingSaleMode(
+    tariffState,
+    resolvedZone.zoneId
+  );
+
+  if (extendedRingSaleMode === "unavailable") {
+    debugTrace("applyResolvedDestination:fail", {
+      reason: "extended-ring-unavailable",
+      resolvedZone: resolvedZone,
+      saleMode: extendedRingSaleMode,
+      airportId: getAirportIdFromTariffState(tariffState)
+    });
+
+    return {
+      ok: false,
+      reason: "extended-ring-unavailable",
+      resolvedZone: resolvedZone,
+      saleMode: extendedRingSaleMode
     };
   }
 

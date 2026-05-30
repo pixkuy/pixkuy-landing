@@ -78,7 +78,21 @@
         "coyoacan_del_valle_napoles": "Coyoacán / Del Valle / Nápoles",
         "sur": "南部 / Perisur / Pedregal / San Ángel",
         "norte": "北部 / Basílica / Lindavista",
-        "aeropuerto_oriente": "机场 / 东部 / Foro Sol"
+        "aeropuerto_oriente": "机场 / 东部 / Foro Sol",
+        "airport_extended_ring_25km": "近郊都会区",
+        "airport_extended_ring_50km": "区域 25–50 km",
+        "airport_extended_ring_75km": "区域 50–75 km",
+        "airport_extended_ring_90km": "区域 75–90 km",
+        "airport_extended_ring_115km": "区域 90–115 km",
+        "airport_extended_ring_140km": "区域 115–140 km",
+        "airport_extended_corridor_taxco_guerrero": "Taxco / Guerrero 北部走廊",
+        "airport_extended_corridor_morelia_michoacan": "Morelia / Michoacán 走廊 · 含过夜",
+        "airport_extended_corridor_sierra_norte_puebla": "Sierra Norte / Puebla 走廊",
+        "airport_extended_ring_200km": "区域 140–200 km",
+        "airport_extended_ring_300km": "区域 200–300 km · 含过夜",
+        "airport_extended_ring_400km": "区域 300–400 km · 含过夜",
+        "airport_extended_ring_550km": "区域 400–550 km · 含过夜",
+        "airport_extended_ring_700km": "区域 550–700 km · 需运营确认"
       }
     }
   }

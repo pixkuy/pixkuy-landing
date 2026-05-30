@@ -78,7 +78,21 @@
         "coyoacan_del_valle_napoles": "Coyoacán / Del Valle / Nápoles",
         "sur": "Sud / Perisur / Pedregal / San Ángel",
         "norte": "Nord / Basílica / Lindavista",
-        "aeropuerto_oriente": "Aeroporto / Est / Foro Sol"
+        "aeropuerto_oriente": "Aeroporto / Est / Foro Sol",
+        "airport_extended_ring_25km": "Area metropolitana vicina",
+        "airport_extended_ring_50km": "Regionale 25–50 km",
+        "airport_extended_ring_75km": "Regionale 50–75 km",
+        "airport_extended_ring_90km": "Regionale 75–90 km",
+        "airport_extended_ring_115km": "Regionale 90–115 km",
+        "airport_extended_ring_140km": "Regionale 115–140 km",
+        "airport_extended_corridor_taxco_guerrero": "Corridoio Taxco / Guerrero settentrionale",
+        "airport_extended_corridor_morelia_michoacan": "Corridoio Morelia / Michoacán · pernottamento incluso",
+        "airport_extended_corridor_sierra_norte_puebla": "Corridoio Sierra Norte / Puebla",
+        "airport_extended_ring_200km": "Regionale 140–200 km",
+        "airport_extended_ring_300km": "Regionale 200–300 km · pernottamento incluso",
+        "airport_extended_ring_400km": "Regionale 300–400 km · pernottamento incluso",
+        "airport_extended_ring_550km": "Regionale 400–550 km · pernottamento incluso",
+        "airport_extended_ring_700km": "Regionale 550–700 km · conferma operativa"
       }
     }
   }

@@ -67,6 +67,50 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
     return coverage;
   }
 
+  function getExtendedAirportPolicy() {
+    const policy = window.PixkuyAirportExtendedRingsPolicy;
+
+    return policy && typeof policy === "object" ? policy : null;
+  }
+
+  function getAirportLocationRestriction() {
+    const policy = getExtendedAirportPolicy();
+
+    if (
+      policy &&
+      typeof policy.getAirportSearchLocationRestriction === "function"
+    ) {
+      return policy.getAirportSearchLocationRestriction();
+    }
+
+    return {
+      west: -99.35,
+      south: 19.15,
+      east: -98.90,
+      north: 19.65
+    };
+  }
+
+  function isPointInsideBounds(lat, lng, bounds) {
+    if (
+      typeof lat !== "number" ||
+      !Number.isFinite(lat) ||
+      typeof lng !== "number" ||
+      !Number.isFinite(lng) ||
+      !bounds ||
+      typeof bounds !== "object"
+    ) {
+      return false;
+    }
+
+    return (
+      lat >= bounds.south &&
+      lat <= bounds.north &&
+      lng >= bounds.west &&
+      lng <= bounds.east
+    );
+  }
+
   function getCoverageDecisionForPoint(lat, lng) {
     const coverage = getCoverageApi();
     if (!coverage || typeof coverage.getCoverageDecision !== "function") {
@@ -80,6 +124,19 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
   }
 
   function isPointWithinOperationalCoverage(lat, lng) {
+    const policy = getExtendedAirportPolicy();
+
+    if (
+      policy &&
+      typeof policy.getAirportSearchLocationRestriction === "function"
+    ) {
+      return isPointInsideBounds(
+        lat,
+        lng,
+        policy.getAirportSearchLocationRestriction()
+      );
+    }
+
     const decision = getCoverageDecisionForPoint(lat, lng);
 
     if (!decision || typeof decision !== "object") {
@@ -387,16 +444,11 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
     const sessionToken = await ensureSessionToken();
 
     const request = {
-  input: query,
-  sessionToken: sessionToken,
-  includedRegionCodes: INCLUDED_REGION_CODES,
-  locationRestriction: {
-    west: -99.35,
-    south: 19.15,
-    east: -98.90,
-    north: 19.65
-  }
-};
+      input: query,
+      sessionToken: sessionToken,
+      includedRegionCodes: INCLUDED_REGION_CODES,
+      locationRestriction: getAirportLocationRestriction()
+    };
 
     debugTrace("fetchSuggestions:request", {
       query: query,
