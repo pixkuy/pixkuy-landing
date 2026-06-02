@@ -19,6 +19,7 @@
       "publicCode": "Código de reserva",
       "service": "Servicio",
       "pickup": "Recogida",
+      "destination": "Destino",
       "vehicle": "Vehículo",
       "date": "Fecha del servicio",
       "time": "Hora del servicio",
@@ -37,6 +38,7 @@
     },
 	"serviceLabels": {
       "hourly_daily": "Vehículo privado con conductor",
+      "airport_transfer": "Transfer Aeropuerto",
       "notAvailable": "Servicio Pixkuy"
     },
     "paymentLabels": {

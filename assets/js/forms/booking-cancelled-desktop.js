@@ -136,16 +136,20 @@
     return String(value) + " " + (t(dictionary, "details.durationHours") || "horas");
   }
 
-  function passengerLabel(dictionary, value) {
-    if (typeof value !== "number") {
+  function passengerLabel(dictionary, result) {
+    if (result && result.passengerLabel) {
+      return result.passengerLabel;
+    }
+
+    if (!result || typeof result.passengerCount !== "number") {
       return emptyValue(dictionary);
     }
 
-    if (value === 1) {
+    if (result.passengerCount === 1) {
       return t(dictionary, "details.passengerOne") || "1 pasajero";
     }
 
-    return String(value) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
+    return String(result.passengerCount) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
   }
   
     function getVehicleThumbnailSrc(vehicleDisplayName) {
@@ -372,6 +376,16 @@
     );
     setText(
       root,
+      "[data-booking-status-destination]",
+      result.destinationAddress || emptyValue(dictionary)
+    );
+    setHidden(
+      root,
+      ".booking-status__detail--destination",
+      !result.destinationAddress
+    );
+    setText(
+      root,
       "[data-booking-status-vehicle]",
       result.vehicleDisplayName || emptyValue(dictionary)
     );
@@ -394,7 +408,7 @@
     setText(
       root,
       "[data-booking-status-passengers]",
-      passengerLabel(dictionary, result.passengerCount)
+      passengerLabel(dictionary, result)
     );
     setText(
       root,
@@ -527,6 +541,7 @@ function syncActions(root, dictionary, result) {
     setText(root, '[data-booking-status-label="publicCode"]', t(dictionary, "details.publicCode"));
     setText(root, '[data-booking-status-label="service"]', t(dictionary, "details.service"));
     setText(root, '[data-booking-status-label="pickup"]', t(dictionary, "details.pickup"));
+    setText(root, '[data-booking-status-label="destination"]', t(dictionary, "details.destination"));
     setText(root, '[data-booking-status-label="vehicle"]', t(dictionary, "details.vehicle"));
     setText(root, '[data-booking-status-label="date"]', t(dictionary, "details.date"));
     setText(root, '[data-booking-status-label="time"]', t(dictionary, "details.time"));

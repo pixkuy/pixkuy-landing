@@ -93,7 +93,7 @@ body.booking-status-mobile-lock{
     gap:0;
 
     padding:
-      18px
+      12px
       18px
       calc(14px + env(safe-area-inset-bottom));
 
@@ -131,18 +131,18 @@ body.booking-status-mobile-lock{
   }
 
   .booking-status-mobile__title{
-    margin:0 0 9px;
+    margin:0 0 6px;
     color:var(--fg);
-    font-size:29px;
-    line-height:1.04;
+    font-size:27px;
+    line-height:1.02;
     letter-spacing:-.035em;
   }
 
   .booking-status-mobile__lead{
     margin:0;
     color:rgba(244,242,238,.82);
-    font-size:14px;
-    line-height:1.34;
+    font-size:13px;
+    line-height:1.28;
   }
 
   .booking-status-mobile__details{
@@ -151,7 +151,7 @@ body.booking-status-mobile-lock{
     gap:1px;
 
     align-self:start;
-    margin:12px 0 0;
+    margin:8px 0 0;
     padding:0;
 
     overflow:hidden;
@@ -192,6 +192,14 @@ body.booking-status-mobile-lock{
     overflow-wrap:anywhere;
   }
   
+  .booking-status-mobile__detail:has([data-booking-status-label="vehicle"]){
+    grid-row:span 3;
+  }
+
+  .booking-status-mobile__detail:has([data-booking-status-label="amount"]){
+    grid-column:1 / -1;
+  }
+
   .booking-status-mobile__vehicle-value{
     display:grid;
     gap:6px;
@@ -217,8 +225,8 @@ body.booking-status-mobile-lock{
 
   .booking-status-mobile__notice{
     align-self:end;
-    margin-top:4px;
-    margin-bottom:6px;
+    margin-top:6px;
+    margin-bottom:24px;
     padding:9px 10px;
 
     border:1px solid rgba(255,255,255,.12);
@@ -260,7 +268,7 @@ body.booking-status-mobile-lock{
     gap:8px;
 
     align-self:end;
-    margin-top:18px;
+    margin-top:10px;
   }
 
   .booking-status-mobile__primary,

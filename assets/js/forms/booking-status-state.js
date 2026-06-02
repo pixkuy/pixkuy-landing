@@ -306,6 +306,14 @@
 
     return "";
   }
+  
+  function getDestinationAddress(body) {
+    if (body && body.reservation && typeof body.reservation.destinationAddress === "string") {
+      return body.reservation.destinationAddress;
+    }
+
+    return "";
+  }
 
   function getDurationHours(body) {
     if (body && body.reservation && typeof body.reservation.durationHours === "number") {
@@ -321,6 +329,14 @@
     }
 
     return null;
+  }
+  
+  function getPassengerLabel(body) {
+    if (body && body.reservation && typeof body.reservation.passengerLabel === "string") {
+      return body.reservation.passengerLabel;
+    }
+
+    return "";
   }
 
   function getVehicleDisplayName(body) {
@@ -419,8 +435,10 @@
       serviceStartLocalDate: getServiceStartLocalDate(body),
       serviceStartLocalTime: getServiceStartLocalTime(body),
       pickupAddress: getPickupAddress(body),
+      destinationAddress: getDestinationAddress(body),
       durationHours: getDurationHours(body),
       passengerCount: getPassengerCount(body),
+      passengerLabel: getPassengerLabel(body),
       vehicleDisplayName: getVehicleDisplayName(body),
       customerFullName: getCustomerFullName(body),
       customerEmail: getCustomerEmail(body),
@@ -468,8 +486,10 @@
       serviceStartLocalDate: "",
       serviceStartLocalTime: "",
       pickupAddress: "",
+      destinationAddress: "",
       durationHours: null,
       passengerCount: null,
+      passengerLabel: "",
       vehicleDisplayName: "",
       customerFullName: "",
       customerEmail: "",
@@ -491,8 +511,10 @@
       serviceStartLocalDate: "",
       serviceStartLocalTime: "",
       pickupAddress: "",
+      destinationAddress: "",
       durationHours: null,
       passengerCount: null,
+      passengerLabel: "",
       vehicleDisplayName: "",
       customerFullName: "",
       customerEmail: "",

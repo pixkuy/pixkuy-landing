@@ -510,12 +510,16 @@
   }
 
   .booking-status-page[data-booking-status-page="success"] .booking-status__detail--pickup,
-  .booking-status-page[data-booking-status-page="cancelled"] .booking-status__detail--pickup{
+  .booking-status-page[data-booking-status-page="success"] .booking-status__detail--destination,
+  .booking-status-page[data-booking-status-page="cancelled"] .booking-status__detail--pickup,
+  .booking-status-page[data-booking-status-page="cancelled"] .booking-status__detail--destination{
     grid-column:1 / -1;
   }
 
   .booking-status-page[data-booking-status-page="success"] .booking-status__detail--pickup dd,
-  .booking-status-page[data-booking-status-page="cancelled"] .booking-status__detail--pickup dd{
+  .booking-status-page[data-booking-status-page="success"] .booking-status__detail--destination dd,
+  .booking-status-page[data-booking-status-page="cancelled"] .booking-status__detail--pickup dd,
+  .booking-status-page[data-booking-status-page="cancelled"] .booking-status__detail--destination dd{
     display:-webkit-box;
     -webkit-line-clamp:2;
     -webkit-box-orient:vertical;
