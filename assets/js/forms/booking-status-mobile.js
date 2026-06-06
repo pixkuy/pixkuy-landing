@@ -198,6 +198,26 @@
 
     return String(result.passengerCount) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
   }
+  
+    function shouldShowLuggage(result) {
+    return Boolean(
+      result &&
+      result.serviceType === "airport_transfer" &&
+      typeof result.luggageCount === "number"
+    );
+  }
+
+  function luggageLabel(dictionary, result) {
+    if (!shouldShowLuggage(result)) {
+      return emptyValue(dictionary);
+    }
+
+    if (result.luggageCount === 1) {
+      return t(dictionary, "details.luggageOne") || "1 maleta";
+    }
+
+    return String(result.luggageCount) + " " + (t(dictionary, "details.luggageMany") || "maletas");
+  }
 
   function getVehicleThumbnailSrc(vehicleDisplayName) {
     var normalized = String(vehicleDisplayName || "").toLowerCase();
@@ -594,6 +614,16 @@
     );
     setText(
       root,
+      "[data-booking-status-luggage]",
+      luggageLabel(dictionary, result)
+    );
+    setHidden(
+      root,
+      "[data-booking-status-luggage-row]",
+      !shouldShowLuggage(result)
+    );
+    setText(
+      root,
       "[data-booking-status-payment]",
       statusPaymentLabel(dictionary, result)
     );
@@ -664,6 +694,11 @@
       root,
       '[data-booking-status-label="passengers"]',
       tFallback(dictionary, "mobile.details.passengers", "details.passengers")
+    );
+    setText(
+      root,
+      '[data-booking-status-label="luggage"]',
+      tFallback(dictionary, "mobile.details.luggage", "details.luggage") || "Maletas"
     );
     setText(
       root,

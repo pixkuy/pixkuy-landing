@@ -12,6 +12,7 @@
   var DEFAULT_REGION = 'mx';
   var DEFAULT_SCRIPT_VERSION = 'weekly';
   var DEFAULT_PLACE_FIELDS = [
+    'id',
     'displayName',
     'formattedAddress',
     'location',

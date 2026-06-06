@@ -190,6 +190,8 @@
         side: neutralSide,
         type: "lodging",
         label: neutralLabel,
+        placeId: normalizeText(state.lodgingEndpointPlaceId),
+        primaryType: normalizeText(state.lodgingEndpointPrimaryType),
         lat: state.lodgingEndpointLat,
         lng: state.lodgingEndpointLng,
         zoneId: neutralZoneId,
@@ -234,8 +236,10 @@
       side: "destination",
       type: "lodging",
       label: placeLabel,
-      lat: state.destinationLat,
-      lng: state.destinationLng,
+      placeId: normalizeText(state.lodgingEndpointPlaceId),
+      primaryType: normalizeText(state.lodgingEndpointPrimaryType),
+      lat: isFiniteNumber(state.destinationLat) ? state.destinationLat : null,
+      lng: isFiniteNumber(state.destinationLng) ? state.destinationLng : null,
       zoneId: zoneId,
       zoneLabelKey: zoneLabelKey
     };

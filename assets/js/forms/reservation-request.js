@@ -573,8 +573,7 @@
       data.airportHotelTime &&
       data.zone &&
       data.fare &&
-      hasAirportHotelFareKeySelected(data) &&
-      data.luggage !== ''
+      hasAirportHotelFareKeySelected(data)
     );
   }
 
@@ -745,8 +744,7 @@ function hasAttemptableDirectTransferReservationData(data) {
       data.airportHotelTime &&
       data.zone &&
       data.fare &&
-      hasAirportHotelFareKeySelected(data) &&
-      isZeroOrPositiveInteger(data.luggage)
+      hasAirportHotelFareKeySelected(data)
     );
   }
 
@@ -965,6 +963,17 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       );
     }
 
+    if (
+      data &&
+      data.serviceType === 'airport_hotel' &&
+      isDesktopViewport()
+    ) {
+      return getSubmitLabel(
+        'services.cards.hourly.panel.reviewCta',
+        'Revisar reserva'
+      );
+    }
+
     return getSubmitLabel('contact.submit', 'Enviar solicitud');
   }
 
@@ -1082,6 +1091,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   
   function syncNativeRequiredState(fields, data) {
   var usesSpecificServiceModel;
+  var isAirportHotel;
   var isTourPrivate;
   var isHourlyDaily;
   var isEventSpecial;
@@ -1108,6 +1118,11 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       data.serviceType === 'event_special' ||
       data.serviceType === 'direct_transfer'
     )
+  );
+  
+  isAirportHotel = Boolean(
+    data &&
+    data.serviceType === 'airport_hotel'
   );
 
   isTourPrivate = Boolean(
@@ -1137,7 +1152,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     fields.origin.required = false;
     fields.destination.required = false;
     fields.passengers.required = false;
-    fields.luggage.required = !(isTourPrivate || isHourlyDaily || isEventSpecial || isDirectTransfer);
+    fields.luggage.required = !(isAirportHotel || isTourPrivate || isHourlyDaily || isEventSpecial || isDirectTransfer);
     return true;
   }
 
@@ -1380,6 +1395,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
                 : isPositiveIntegerUpTo(data.passengers, 6)
             ),
         luggage: (
+          data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
           data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
@@ -1492,6 +1508,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
           : true;
       case 'luggage':
         if (
+          data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
           data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||

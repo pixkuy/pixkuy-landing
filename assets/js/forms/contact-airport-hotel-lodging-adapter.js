@@ -333,6 +333,24 @@
 
     return "";
   }
+  
+  function normalizePredictionPlaceId(prediction) {
+    const rawPlaceId = normalizeText(
+      prediction && (
+        prediction.placeId ||
+        prediction.id ||
+        prediction.place
+      )
+    );
+
+    if (!rawPlaceId) {
+      return "";
+    }
+
+    return rawPlaceId.indexOf("places/") === 0
+      ? rawPlaceId.slice("places/".length)
+      : rawPlaceId;
+  }
 
   function buildVisibleLabel(placeLike) {
     const displayName =
@@ -410,6 +428,7 @@
       });
 
       const normalized = api.normalizePlace(place, prediction);
+      const predictionPlaceId = normalizePredictionPlaceId(prediction);
       const primaryType = getPrimaryType(normalized);
 
       if (
@@ -444,6 +463,7 @@
 
       items.push({
         label: label,
+        placeId: normalizeText(normalized.placeId) || predictionPlaceId,
         primaryType: primaryType,
         lat: lat,
         lng: lng
@@ -557,6 +577,7 @@
             bubbles: true,
             detail: {
               label: item.label,
+              placeId: item.placeId,
               primaryType: item.primaryType,
               lat: item.lat,
               lng: item.lng,

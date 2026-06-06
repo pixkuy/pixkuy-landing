@@ -617,6 +617,7 @@ function clearAllRootUis() {
 
     const result = await bridge.resolveAndApplyDestination({
       placeLabel: item.label,
+      placeId: normalizeText(item.placeId),
       primaryType: item.primaryType,
       lat: item.lat,
       lng: item.lng

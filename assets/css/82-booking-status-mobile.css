@@ -131,18 +131,18 @@ body.booking-status-mobile-lock{
   }
 
   .booking-status-mobile__title{
-    margin:0 0 6px;
+    margin:0 0 4px;
     color:var(--fg);
-    font-size:27px;
-    line-height:1.02;
+    font-size:24px;
+    line-height:1;
     letter-spacing:-.035em;
   }
 
   .booking-status-mobile__lead{
     margin:0;
     color:rgba(244,242,238,.82);
-    font-size:13px;
-    line-height:1.28;
+    font-size:12px;
+    line-height:1.2;
   }
 
   .booking-status-mobile__details{
@@ -151,12 +151,12 @@ body.booking-status-mobile-lock{
     gap:1px;
 
     align-self:start;
-    margin:8px 0 0;
+    margin:6px 0 0;
     padding:0;
 
     overflow:hidden;
     border:1px solid rgba(255,255,255,.10);
-    border-radius:10px;
+    border-radius:9px;
 
     background:rgba(255,255,255,.10);
   }
@@ -168,15 +168,15 @@ body.booking-status-mobile-lock{
   .booking-status-mobile__detail{
     min-width:0;
     margin:0;
-    padding:9px 10px;
+    padding:7px 8px;
     background:#111315;
   }
 
   .booking-status-mobile__detail dt{
-    margin:0 0 4px;
+    margin:0 0 3px;
     color:rgba(244,242,238,.56);
-    font-size:10.5px;
-    line-height:1.2;
+    font-size:10px;
+    line-height:1.12;
     font-weight:700;
   }
 
@@ -185,8 +185,8 @@ body.booking-status-mobile-lock{
     min-width:0;
 
     color:var(--fg);
-    font-size:13.5px;
-    line-height:1.2;
+    font-size:12.5px;
+    line-height:1.14;
     font-weight:750;
 
     overflow-wrap:anywhere;
@@ -202,14 +202,14 @@ body.booking-status-mobile-lock{
 
   .booking-status-mobile__vehicle-value{
     display:grid;
-    gap:6px;
+    gap:4px;
   }
 
   .booking-status-mobile__vehicle-thumb{
     display:block;
 
-    width:132px;
-    height:90px;
+    width:112px;
+    height:72px;
 
     max-width:100%;
 
@@ -225,9 +225,9 @@ body.booking-status-mobile-lock{
 
   .booking-status-mobile__notice{
     align-self:end;
-    margin-top:6px;
-    margin-bottom:24px;
-    padding:9px 10px;
+    margin-top:5px;
+    margin-bottom:8px;
+    padding:7px 9px;
 
     border:1px solid rgba(255,255,255,.12);
     border-radius:10px;
@@ -235,8 +235,8 @@ body.booking-status-mobile-lock{
     background:rgba(255,255,255,.05);
     color:rgba(244,242,238,.84);
 
-    font-size:12px;
-    line-height:1.28;
+    font-size:11.25px;
+    line-height:1.18;
     white-space:pre-line;
   }
 
@@ -268,7 +268,8 @@ body.booking-status-mobile-lock{
     gap:8px;
 
     align-self:end;
-    margin-top:10px;
+    margin-top:0;
+    padding-bottom:max(0px, env(safe-area-inset-bottom));
   }
 
   .booking-status-mobile__primary,
@@ -276,8 +277,8 @@ body.booking-status-mobile-lock{
     box-sizing:border-box;
     width:100%;
     min-width:0;
-    min-height:44px;
-    height:44px;
+    min-height:40px;
+    height:40px;
 
     display:inline-flex;
     align-items:center;
@@ -288,7 +289,7 @@ body.booking-status-mobile-lock{
     border-radius:9px;
 
     font:inherit;
-    font-size:13px;
+    font-size:12.5px;
     line-height:1;
     font-weight:800;
     text-align:center;

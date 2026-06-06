@@ -402,6 +402,7 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
     const displayName = getDisplayName(placeLike);
     const formattedAddress = getFormattedAddress(placeLike);
     const label = buildVisibleLabel(displayName, formattedAddress);
+    const placeId = normalizeText(placeLike.placeId);
 
     if (!label) {
       return null;
@@ -418,6 +419,7 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
 
     return {
       label: label,
+      placeId: placeId,
       primaryType: primaryType,
       lat: coordinates.lat,
       lng: coordinates.lng

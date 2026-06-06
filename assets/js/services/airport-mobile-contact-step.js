@@ -20,18 +20,18 @@
   const MOBILE_QUERY = "(max-width: 720px)";
   const CONTACT_STEP_SELECTOR = "[data-airport-mobile-contact-step]";
   const CONTACT_STEP_ACTIVE_ATTR = "data-airport-mobile-contact-step-active";
-  const NOTES_EDITOR_ACTIVE_ATTR = "data-airport-mobile-notes-editor-active";
   const PRIMARY_STEP_HIDDEN_ATTR = "data-airport-mobile-primary-step-hidden";
+  const LEGAL_ACCEPTANCE_SELECTOR = "[data-airport-mobile-legal-acceptance]";
 
   const FIELD_NAME = "name";
   const FIELD_PHONE = "phone";
   const FIELD_EMAIL = "email";
-  const FIELD_NOTES = "notes";
 
   const mobileQuery = window.matchMedia ? window.matchMedia(MOBILE_QUERY) : null;
 
   let contactStepNode = null;
   let currentPanel = null;
+  let legalAcceptanceInstance = null;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -211,30 +211,6 @@
       : null;
   }
 
-  function syncNotesEditorClear(notesEditor) {
-    const editor = notesEditor || (
-      contactStepNode
-        ? contactStepNode.querySelector("[data-airport-mobile-notes-editor]")
-        : null
-    );
-    const input = editor
-      ? editor.querySelector("[data-airport-mobile-notes-editor-input]")
-      : null;
-    const clear = editor
-      ? editor.querySelector("[data-airport-mobile-notes-editor-clear]")
-      : null;
-    const hasValue = Boolean(normalizeText(input && input.value));
-
-    if (!clear) {
-      return false;
-    }
-
-    clear.hidden = !hasValue;
-    clear.setAttribute("aria-hidden", hasValue ? "false" : "true");
-
-    return true;
-  }
-
   function blurActiveElementInside(node) {
     const activeElement = document.activeElement;
 
@@ -364,6 +340,8 @@
       passengerFareKey: passengerFareKey,
       passengerBucketLabel: passengerBucketLabel,
       luggage: luggage,
+      lodgingPlaceId: normalizeText(state && state.lodgingEndpointPlaceId),
+      lodgingPrimaryType: normalizeText(state && state.lodgingEndpointPrimaryType),
       lodgingLat: state && typeof state.lodgingEndpointLat === "number"
         ? String(state.lodgingEndpointLat)
         : "",
@@ -412,10 +390,7 @@
   function buildField(name, type, autocomplete) {
     const wrapper = document.createElement("div");
     const label = document.createElement("label");
-    const field =
-      name === FIELD_NOTES
-        ? document.createElement("textarea")
-        : document.createElement("input");
+    const field = document.createElement("input");
     const error = document.createElement("p");
     const fieldId = "airport-mobile-contact-" + name;
 
@@ -431,11 +406,7 @@
     field.setAttribute("data-airport-mobile-contact-field", name);
     field.setAttribute("aria-describedby", fieldId + "-error");
 
-    if (name === FIELD_NOTES) {
-      field.rows = 2;
-    } else {
-      field.type = type || "text";
-    }
+    field.type = type || "text";
 
     if (autocomplete) {
       field.setAttribute("autocomplete", autocomplete);
@@ -459,58 +430,6 @@
     return wrapper;
   }
 
-  function buildNotesEditorNode() {
-    const editor = document.createElement("section");
-    const panel = document.createElement("div");
-    const header = document.createElement("div");
-    const title = document.createElement("p");
-    const close = document.createElement("button");
-    const body = document.createElement("div");
-    const textarea = document.createElement("textarea");
-    const clear = document.createElement("button");
-
-    editor.className = "airport-mobile-notes-editor";
-    editor.setAttribute("data-airport-mobile-notes-editor", "1");
-    editor.setAttribute("aria-hidden", "true");
-    editor.hidden = true;
-
-    panel.className = "airport-mobile-notes-editor__panel";
-
-    header.className = "airport-mobile-notes-editor__header";
-
-    title.className = "airport-mobile-notes-editor__title";
-    title.setAttribute("data-airport-mobile-notes-editor-title", "1");
-
-    close.type = "button";
-    close.className = "airport-mobile-notes-editor__close";
-    close.setAttribute("data-airport-mobile-notes-editor-close", "1");
-
-    body.className = "airport-mobile-notes-editor__body";
-
-    textarea.className = "airport-mobile-notes-editor__input";
-    textarea.rows = 8;
-    textarea.setAttribute("data-airport-mobile-notes-editor-input", "1");
-
-    clear.type = "button";
-    clear.className = "airport-mobile-notes-editor__clear";
-    clear.setAttribute("data-airport-mobile-notes-editor-clear", "1");
-    clear.hidden = true;
-    clear.setAttribute("aria-hidden", "true");
-
-    header.appendChild(title);
-    header.appendChild(close);
-
-    body.appendChild(textarea);
-    body.appendChild(clear);
-
-    panel.appendChild(header);
-    panel.appendChild(body);
-
-    editor.appendChild(panel);
-
-    return editor;
-  }
-
   function buildContactStepNode() {
     const root = document.createElement("section");
     const backRow = document.createElement("div");
@@ -519,10 +438,10 @@
     const summaryTitle = document.createElement("p");
     const summaryList = document.createElement("dl");
     const form = document.createElement("div");
+    const legalAcceptance = document.createElement("div");
     const actions = document.createElement("div");
     const submit = document.createElement("button");
     const globalError = document.createElement("p");
-    const notesEditor = buildNotesEditorNode();
 
     root.className = "airport-mobile-contact-step";
     root.setAttribute("data-airport-mobile-contact-step", "1");
@@ -560,10 +479,13 @@
     form.className = "airport-mobile-contact-step__form";
     form.setAttribute("data-airport-mobile-contact-form", "1");
 
+    legalAcceptance.className = "airport-mobile-contact-step__legal";
+    legalAcceptance.setAttribute("data-airport-mobile-legal-acceptance", "1");
+    legalAcceptance.hidden = true;
+
     form.appendChild(buildField(FIELD_NAME, "text", "name"));
     form.appendChild(buildField(FIELD_PHONE, "tel", "tel"));
     form.appendChild(buildField(FIELD_EMAIL, "email", "email"));
-    form.appendChild(buildField(FIELD_NOTES, "", ""));
 
     globalError.className = "airport-mobile-contact-step__global-error";
     globalError.setAttribute("data-airport-mobile-contact-global-error", "1");
@@ -585,9 +507,9 @@
     root.appendChild(backRow);
     root.appendChild(summary);
     root.appendChild(form);
+    root.appendChild(legalAcceptance);
     root.appendChild(globalError);
     root.appendChild(actions);
-    root.appendChild(notesEditor);
 
     return root;
   }
@@ -679,18 +601,6 @@
     const globalError = root
       ? root.querySelector("[data-airport-mobile-contact-global-error]")
       : null;
-    const notesEditorTitle = root
-      ? root.querySelector("[data-airport-mobile-notes-editor-title]")
-      : null;
-    const notesEditorClose = root
-      ? root.querySelector("[data-airport-mobile-notes-editor-close]")
-      : null;
-    const notesEditorInput = root
-      ? root.querySelector("[data-airport-mobile-notes-editor-input]")
-      : null;
-    const notesEditorClear = root
-      ? root.querySelector("[data-airport-mobile-notes-editor-clear]")
-      : null;
 
     if (!root) {
       return false;
@@ -717,35 +627,6 @@
       globalError,
       getI18nValue("airportMobileContactStep.validation.formIncomplete", "")
     );
-    setText(
-      notesEditorTitle,
-      getI18nValue("airportMobileContactStep.notesEditor.title", "")
-    );
-    setText(
-      notesEditorClose,
-      getI18nValue(
-        "airportMobileContactStep.notesEditor.save",
-        getI18nValue(
-          "airportMobileContactStep.notesEditor.close",
-          getI18nValue("airportMobileFlow.back", "")
-        )
-      )
-    );
-    setText(
-      notesEditorClear,
-      getI18nValue("airportMobileContactStep.notesEditor.clear", "")
-    );
-
-    if (notesEditorInput) {
-      notesEditorInput.setAttribute(
-        "placeholder",
-        getI18nValue("airportMobileContactStep.notesEditor.placeholder", "")
-      );
-      notesEditorInput.setAttribute(
-        "aria-label",
-        getI18nValue("airportMobileContactStep.notesEditor.title", "")
-      );
-    }
 
     ["airport", "hotel", "zone", "date", "time", "passengers", "luggage", "fare"]
       .forEach(function syncSummaryLabel(key) {
@@ -755,7 +636,7 @@
         );
       });
 
-    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL, FIELD_NOTES]
+    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL]
       .forEach(function syncFieldCopy(name) {
         const field = getContactField(name);
         const label = root.querySelector(
@@ -787,91 +668,6 @@
     return true;
   }
   
-    function getNotesEditorNode() {
-    return contactStepNode
-      ? contactStepNode.querySelector("[data-airport-mobile-notes-editor]")
-      : null;
-  }
-
-  function getNotesEditorInput() {
-    const editor = getNotesEditorNode();
-
-    return editor
-      ? editor.querySelector("[data-airport-mobile-notes-editor-input]")
-      : null;
-  }
-
-  function getCompactNotesInput() {
-    return getContactField(FIELD_NOTES);
-  }
-
-  function syncNotesEditorToCompact() {
-    const editorInput = getNotesEditorInput();
-    const compactInput = getCompactNotesInput();
-
-    if (!editorInput || !compactInput) {
-      return false;
-    }
-
-    compactInput.value = editorInput.value || "";
-    clearValidationForField(FIELD_NOTES);
-
-    return true;
-  }
-
-  function syncCompactNotesToEditor() {
-    const editorInput = getNotesEditorInput();
-    const compactInput = getCompactNotesInput();
-
-    if (!editorInput || !compactInput) {
-      return false;
-    }
-
-    editorInput.value = compactInput.value || "";
-    syncNotesEditorClear();
-
-    return true;
-  }
-
-  function openNotesEditor() {
-    const editor = getNotesEditorNode();
-    const editorInput = getNotesEditorInput();
-
-    if (!editor || !editorInput) {
-      return false;
-    }
-
-    syncCompactNotesToEditor();
-
-    editor.hidden = false;
-    editor.setAttribute("aria-hidden", "false");
-    document.body.setAttribute(NOTES_EDITOR_ACTIVE_ATTR, "true");
-
-    window.requestAnimationFrame(function focusNotesEditor() {
-      editorInput.focus({ preventScroll: true });
-      editorInput.setSelectionRange(editorInput.value.length, editorInput.value.length);
-    });
-
-    return true;
-  }
-
-  function closeNotesEditor() {
-    const editor = getNotesEditorNode();
-
-    if (!editor) {
-      return false;
-    }
-
-    syncNotesEditorToCompact();
-    blurActiveElementInside(editor);
-
-    editor.hidden = true;
-    editor.setAttribute("aria-hidden", "true");
-    document.body.setAttribute(NOTES_EDITOR_ACTIVE_ATTR, "false");
-
-    return true;
-  }
-
   function setFieldValidity(name, isValid) {
     const field = getContactField(name);
     const wrapper = contactStepNode
@@ -936,11 +732,96 @@
     return Boolean(name && isValidPhone(phone) && isValidEmail(email));
   }
 
+  function getLegalAcceptanceApi() {
+    return window.PixkuyForms &&
+      window.PixkuyForms.LegalAcceptance &&
+      typeof window.PixkuyForms.LegalAcceptance.create === "function"
+      ? window.PixkuyForms.LegalAcceptance
+      : null;
+  }
+
+  function getLegalAcceptanceHost() {
+    return contactStepNode
+      ? contactStepNode.querySelector(LEGAL_ACCEPTANCE_SELECTOR)
+      : null;
+  }
+
+  function getReservationForm() {
+    const formsApi = getReservationFormsApi();
+
+    return formsApi ? formsApi.getReservationForm() : null;
+  }
+
+  function isLegalAcceptanceAccepted() {
+    return Boolean(
+      legalAcceptanceInstance &&
+      typeof legalAcceptanceInstance.isAccepted === "function" &&
+      legalAcceptanceInstance.isAccepted()
+    );
+  }
+
+  function ensureLegalAcceptance() {
+    const api = getLegalAcceptanceApi();
+    const host = getLegalAcceptanceHost();
+    const form = getReservationForm();
+
+    if (!api || !host || !form) {
+      return null;
+    }
+
+    if (
+      legalAcceptanceInstance &&
+      typeof legalAcceptanceInstance.validate === "function"
+    ) {
+      return legalAcceptanceInstance;
+    }
+
+    legalAcceptanceInstance = api.create({
+      container: host,
+      form: form,
+      channel: "web_airport_mobile_checkout",
+      checkboxId: "pixkuy-airport-mobile-legal-acceptance"
+    });
+
+    if (
+      legalAcceptanceInstance.checkbox &&
+      legalAcceptanceInstance.checkbox.__pixkuyAirportMobileLegalBound !== true
+    ) {
+      legalAcceptanceInstance.checkbox.__pixkuyAirportMobileLegalBound = true;
+      legalAcceptanceInstance.checkbox.addEventListener("change", syncSubmitAvailability);
+    }
+
+    return legalAcceptanceInstance;
+  }
+
+  function syncLegalAcceptanceVisibility() {
+    const host = getLegalAcceptanceHost();
+
+    if (!host) {
+      return false;
+    }
+
+    host.hidden = false;
+    ensureLegalAcceptance();
+
+    return true;
+  }
+
+  function validateLegalAcceptance() {
+    const instance = ensureLegalAcceptance();
+
+    if (!instance || typeof instance.validate !== "function") {
+      return false;
+    }
+
+    return instance.validate();
+  }
+
   function syncSubmitAvailability() {
     const submit = contactStepNode
       ? contactStepNode.querySelector("[data-airport-mobile-contact-submit]")
       : null;
-    const isReady = hasFilledContactData();
+    const isReady = hasFilledContactData() && isLegalAcceptanceAccepted();
 
     if (!submit) {
       return false;
@@ -990,7 +871,7 @@
       name: normalizeText(getContactField(FIELD_NAME).value),
       phone: normalizePhoneValue(getContactField(FIELD_PHONE).value),
       email: normalizeText(getContactField(FIELD_EMAIL).value),
-      notes: normalizeText(getContactField(FIELD_NOTES).value)
+      notes: ""
     };
   }
 
@@ -1036,12 +917,13 @@
     return parts.filter(Boolean).join(" | ");
   }
 
-  function fillReservationForm(snapshot, contactData) {
+  function fillReservationForm(snapshot, contactData, options) {
     const formsApi = getReservationFormsApi();
     const form = formsApi ? formsApi.getReservationForm() : null;
     const fields = form && formsApi ? formsApi.getReservationRequestFields(form) : null;
     const summary = buildRequestSummary(snapshot);
     const isHotelOrigin = snapshot.direction === "hotel_to_airport";
+    const safeOptions = options && typeof options === "object" ? options : {};
 
     if (!form || !fields) {
       return false;
@@ -1090,15 +972,29 @@
       false
     );
 
-    writeFormValue(form, "origin_place_id", "", false);
+    writeFormValue(
+      form,
+      "origin_place_id",
+      isHotelOrigin ? snapshot.lodgingPlaceId : "",
+      false
+    );
     writeFormValue(form, "origin_lat", isHotelOrigin ? snapshot.lodgingLat : "", false);
     writeFormValue(form, "origin_lng", isHotelOrigin ? snapshot.lodgingLng : "", false);
 
-    writeFormValue(form, "destination_place_id", "", false);
+    writeFormValue(
+      form,
+      "destination_place_id",
+      isHotelOrigin ? "" : snapshot.lodgingPlaceId,
+      false
+    );
     writeFormValue(form, "destination_lat", isHotelOrigin ? "" : snapshot.lodgingLat, false);
     writeFormValue(form, "destination_lng", isHotelOrigin ? "" : snapshot.lodgingLng, false);
 
     formsApi.syncReservationRequestState(fields);
+
+    if (safeOptions.skipLegacyValidation === true) {
+      return true;
+    }
 
     if (typeof formsApi.refreshReservationRequestValidationUX === "function") {
       return formsApi.refreshReservationRequestValidationUX(fields);
@@ -1114,6 +1010,28 @@
     const numericValue = Number(normalizedValue);
 
     return Number.isFinite(numericValue) ? numericValue : NaN;
+  }
+  
+    function isAirportBookingApiCheckoutBridgeReady() {
+    return Boolean(
+      document.documentElement &&
+      document.documentElement.dataset.airportTransferBookingApiCheckoutBound === "1"
+    );
+  }
+
+  function dispatchTransactionalCheckoutSubmit(form) {
+    if (!form || !isAirportBookingApiCheckoutBridgeReady()) {
+      return false;
+    }
+
+    form.dispatchEvent(
+      new window.Event("submit", {
+        bubbles: true,
+        cancelable: true
+      })
+    );
+
+    return true;
   }
 
   function trackAirportMobileContactRequest(snapshot) {
@@ -1162,16 +1080,23 @@
       return false;
     }
 
-    isFormValid = fillReservationForm(snapshot, contactData);
+    isFormValid = fillReservationForm(snapshot, contactData, {
+      skipLegacyValidation: true
+    });
 
     if (!isFormValid) {
       showGlobalError();
       return false;
     }
 
-    if (form && typeof form.requestSubmit === "function") {
-      trackAirportMobileContactRequest(snapshot);
-      form.requestSubmit();
+    if (!validateLegalAcceptance()) {
+      syncSubmitAvailability();
+      return false;
+    }
+
+    trackAirportMobileContactRequest(snapshot);
+
+    if (dispatchTransactionalCheckoutSubmit(form)) {
       return true;
     }
 
@@ -1186,7 +1111,7 @@
 
     contactStepNode.dataset.airportMobileContactBound = "1";
 
-    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL, FIELD_NOTES]
+    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL]
       .forEach(function bindField(name) {
         const field = getContactField(name);
 
@@ -1215,55 +1140,14 @@
             syncSubmitAvailability();
           });
         }
-
-        if (name === FIELD_NOTES) {
-          field.addEventListener("focus", function onNotesFocus(event) {
-            event.preventDefault();
-            openNotesEditor();
-          });
-
-          field.addEventListener("click", function onNotesClick(event) {
-            event.preventDefault();
-            openNotesEditor();
-          });
-        }
       });
 
     contactStepNode.addEventListener("click", function onClick(event) {
-      const notesEditorClose = event.target.closest("[data-airport-mobile-notes-editor-close]");
-      const notesEditorClear = event.target.closest("[data-airport-mobile-notes-editor-clear]");
       const back = event.target.closest("[data-airport-mobile-contact-back]");
       const submit = event.target.closest("[data-airport-mobile-contact-submit]");
 
-      if (notesEditorClose) {
-        event.preventDefault();
-        closeNotesEditor();
-        return;
-      }
-
-      if (notesEditorClear) {
-        const notesEditorInput = getNotesEditorInput();
-
-        event.preventDefault();
-
-        if (notesEditorInput) {
-          notesEditorInput.value = "";
-          syncNotesEditorToCompact();
-          syncNotesEditorClear();
-          notesEditorInput.focus({ preventScroll: true });
-        }
-
-        return;
-      }
-
       if (back) {
         event.preventDefault();
-
-        if (getNotesEditorNode() && getNotesEditorNode().hidden !== true) {
-          closeNotesEditor();
-          return;
-        }
-
         close();
         return;
       }
@@ -1284,15 +1168,6 @@
       submitContactStep();
     });
 	
-	    const notesEditorInput = getNotesEditorInput();
-
-    if (notesEditorInput) {
-      notesEditorInput.addEventListener("input", function onNotesEditorInput() {
-        syncNotesEditorToCompact();
-        syncNotesEditorClear();
-      });
-    }
-
     return true;
   }
 
@@ -1308,6 +1183,7 @@
 
     syncCopy();
     syncSummary(snapshot);
+    syncLegalAcceptanceVisibility();
     syncSubmitAvailability();
 
     panel.setAttribute(PRIMARY_STEP_HIDDEN_ATTR, "true");
@@ -1329,10 +1205,6 @@
   function close() {
     if (!contactStepNode) {
       return false;
-    }
-
-    if (getNotesEditorNode() && getNotesEditorNode().hidden !== true) {
-      closeNotesEditor();
     }
 
     blurActiveElementInside(contactStepNode);

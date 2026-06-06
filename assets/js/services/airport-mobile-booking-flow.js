@@ -1638,8 +1638,8 @@
 
     return api && typeof api === "object" ? api : null;
   }
-  
-    function shouldReturnToDirectTransfer() {
+ 
+  function shouldReturnToDirectTransfer() {
     try {
       const params = new URLSearchParams(window.location.search || "");
 
@@ -1836,54 +1836,54 @@
   }
 
 
-  function bindContinue(panel) {
-    const cta = panel.querySelector(".services-expand__cta");
+  function openAirportMobileContactStepFromPanel(panel) {
+    const contactStep = getAirportMobileContactStepApi();
 
-    if (!cta || cta.dataset.airportMobileContinueBound === "1") {
+    if (!panel || !contactStep || !isMobileViewport() || !isRouteOpen) {
       return false;
     }
 
-    cta.dataset.airportMobileContinueBound = "1";
-
-    cta.addEventListener("click", function onContinueClick(event) {
-      const contactStep = getAirportMobileContactStepApi();
-
-      if (!isMobileViewport() || !isRouteOpen || !contactStep) {
-        return;
+    if (
+      typeof contactStep.isOpen === "function" &&
+      contactStep.isOpen()
+    ) {
+      if (typeof contactStep.submit === "function") {
+        contactStep.submit();
       }
 
-      event.preventDefault();
-      event.stopPropagation();
+      return true;
+    }
 
-      if (typeof event.stopImmediatePropagation === "function") {
-        event.stopImmediatePropagation();
-      }
+    if (
+      typeof contactStep.canOpen === "function" &&
+      !contactStep.canOpen(panel)
+    ) {
+      syncMobileFare(panel);
+      return false;
+    }
 
-      if (
-        typeof contactStep.isOpen === "function" &&
-        contactStep.isOpen()
-      ) {
-        if (typeof contactStep.submit === "function") {
-          contactStep.submit();
-        }
+    if (typeof contactStep.open !== "function") {
+      return false;
+    }
 
-        return;
-      }
+    if (!contactStep.open(panel)) {
+      return false;
+    }
 
-      if (
-        typeof contactStep.canOpen === "function" &&
-        !contactStep.canOpen(panel)
-      ) {
-        syncMobileFare(panel);
-        return;
-      }
+    trackAirportMobileContinueClick(panel);
+    return true;
+  }
 
-      if (typeof contactStep.open === "function") {
-        if (contactStep.open(panel)) {
-          trackAirportMobileContinueClick(panel);
-        }
-      }
-    }, true);
+  function bindContinue(panel) {
+    if (!panel || panel.dataset.airportMobileContinueBound === "1") {
+      return false;
+    }
+
+    panel.dataset.airportMobileContinueBound = "1";
+
+    window.addEventListener("pixkuy:airport-transfer-panel-submit", function onAirportPanelSubmit() {
+      openAirportMobileContactStepFromPanel(panel);
+    });
 
     return true;
   }

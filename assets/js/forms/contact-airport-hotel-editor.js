@@ -7,6 +7,8 @@
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
   const DEFAULT_DIRECTION = "airport_to_hotel";
+  const CHECKOUT_REVIEW_RETURN_KEY = "pixkuy_airport_transfer_checkout_review_return";
+  const CHECKOUT_REVIEW_SNAPSHOT_KEY = "pixkuy_airport_transfer_checkout_review_snapshot";
 
   function debugLog() {
     return;
@@ -385,6 +387,13 @@
     }
 
     field.value = typeof value === "string" ? value : "";
+  }
+
+  function getFormFieldValue(name) {
+    const form = getReservationForm();
+    const field = form ? form.querySelector('[name="' + name + '"]') : null;
+
+    return normalizeText(field && field.value);
   }
 
   function isAirportHotelServiceActive(form) {
@@ -1345,6 +1354,7 @@
         ? safeDetail.settleSelection
         : null;
     const label = normalizeText(safeDetail.label);
+    const placeId = normalizeText(safeDetail.placeId);
     const primaryType = normalizeText(safeDetail.primaryType).toLowerCase();
     const lat =
       typeof safeDetail.lat === "number" && Number.isFinite(safeDetail.lat)
@@ -1419,6 +1429,7 @@
 
     result = await bridge.resolveAndApplyDestination({
       placeLabel: label,
+      placeId: placeId,
       primaryType: primaryType,
       lat: lat,
       lng: lng
@@ -1777,7 +1788,68 @@
     return true;
   }
   
-    function getAirportHotelTripSnapshot(editorState, nodes) {
+    function getAirportHotelLodgingTechnicalSnapshot() {
+    const bridgeState = getBridgeState();
+
+    if (!bridgeState || typeof bridgeState !== "object") {
+      return {
+        placeId: "",
+        primaryType: "",
+        lat: "",
+        lng: "",
+        zoneId: "",
+        zoneLabelKey: "",
+        side: ""
+      };
+    }
+
+    return {
+      placeId: normalizeText(bridgeState.lodgingEndpointPlaceId),
+      primaryType: normalizeText(bridgeState.lodgingEndpointPrimaryType),
+      lat:
+        typeof bridgeState.lodgingEndpointLat === "number" &&
+        Number.isFinite(bridgeState.lodgingEndpointLat)
+          ? String(bridgeState.lodgingEndpointLat)
+          : "",
+      lng:
+        typeof bridgeState.lodgingEndpointLng === "number" &&
+        Number.isFinite(bridgeState.lodgingEndpointLng)
+          ? String(bridgeState.lodgingEndpointLng)
+          : "",
+      zoneId: normalizeText(
+        bridgeState.lodgingEndpointZoneId || bridgeState.resolvedZoneId
+      ),
+      zoneLabelKey: normalizeText(
+        bridgeState.lodgingEndpointZoneLabelKey || bridgeState.resolvedZoneLabelKey
+      ),
+      side: normalizeText(bridgeState.lodgingEndpointSide)
+    };
+  }
+
+  function getAirportIdFromSnapshotState(editorState) {
+    const bridgeState = getBridgeState();
+    const selectedAirport =
+      editorState && editorState.selectedAirport
+        ? editorState.selectedAirport
+        : null;
+
+    if (selectedAirport && typeof selectedAirport.id === "string") {
+      return normalizeText(selectedAirport.id);
+    }
+
+    if (bridgeState && bridgeState.originType === "airport") {
+      return normalizeText(bridgeState.originValue);
+    }
+
+    if (bridgeState && bridgeState.destinationType === "airport") {
+      return normalizeText(bridgeState.destinationValue);
+    }
+
+    return "";
+  }
+
+  function getAirportHotelTripSnapshot(editorState, nodes) {
+    const lodgingTechnical = getAirportHotelLodgingTechnicalSnapshot();
     const hotelValue =
       nodes && nodes.hotelInput ? normalizeText(nodes.hotelInput.value) : "";
     const airportValue =
@@ -1799,33 +1871,41 @@
       editorState && typeof editorState.serviceTime === "string"
         ? normalizeText(editorState.serviceTime)
         : "";
-
-    if (direction === "hotel_to_airport") {
-      return {
-        serviceType: "airport_hotel",
-        direction: direction,
-        origin: hotelValue,
-        destination: airportValue,
-        hotel: hotelValue,
-        airport: airportValue,
-        passengerFareKey: selectedFareKey,
-        passengerBucketLabel: passengerBucketLabel,
-        serviceDate: serviceDate,
-        serviceTime: serviceTime
-      };
-    }
+    const airportId = getAirportIdFromSnapshotState(editorState);
+    const zoneLabel = getAirportHotelZoneLabel();
+    const fareLabel = getAirportHotelTemporalFareLabel(editorState, nodes);
+    const isHotelOrigin = direction === "hotel_to_airport";
+    const origin = isHotelOrigin ? hotelValue : airportValue;
+    const destination = isHotelOrigin ? airportValue : hotelValue;
 
     return {
       serviceType: "airport_hotel",
       direction: direction,
-      origin: airportValue,
-      destination: hotelValue,
+      airportId: airportId,
+      origin: origin,
+      destination: destination,
       hotel: hotelValue,
       airport: airportValue,
       passengerFareKey: selectedFareKey,
       passengerBucketLabel: passengerBucketLabel,
       serviceDate: serviceDate,
-      serviceTime: serviceTime
+      serviceTime: serviceTime,
+      zoneId: lodgingTechnical.zoneId,
+      zoneLabel: zoneLabel,
+      zoneLabelKey: lodgingTechnical.zoneLabelKey,
+      fareLabel: fareLabel,
+      lodgingEndpointSide: lodgingTechnical.side || (isHotelOrigin ? "origin" : "destination"),
+      lodgingPlaceId: lodgingTechnical.placeId,
+      lodgingPrimaryType: lodgingTechnical.primaryType,
+      lodgingLat: lodgingTechnical.lat,
+      lodgingLng: lodgingTechnical.lng,
+      originPlaceId: isHotelOrigin ? lodgingTechnical.placeId : "",
+      originLat: isHotelOrigin ? lodgingTechnical.lat : "",
+      originLng: isHotelOrigin ? lodgingTechnical.lng : "",
+      destinationPlaceId: isHotelOrigin ? "" : lodgingTechnical.placeId,
+      destinationLat: isHotelOrigin ? "" : lodgingTechnical.lat,
+      destinationLng: isHotelOrigin ? "" : lodgingTechnical.lng,
+      luggage: getFormFieldValue("luggage")
     };
   }
 
@@ -1879,6 +1959,34 @@
         nodes.passengerBucketLabel.value = snapshot.passengerBucketLabel || "";
       }
 
+      const lodgingTechnical = getAirportHotelLodgingTechnicalSnapshot();
+      const isHotelOrigin = snapshot.direction === "hotel_to_airport";
+
+      writeHiddenValue(
+        nodes.originPlaceId,
+        isHotelOrigin ? lodgingTechnical.placeId : ""
+      );
+      writeHiddenValue(
+        nodes.originLat,
+        isHotelOrigin ? lodgingTechnical.lat : ""
+      );
+      writeHiddenValue(
+        nodes.originLng,
+        isHotelOrigin ? lodgingTechnical.lng : ""
+      );
+      writeHiddenValue(
+        nodes.destinationPlaceId,
+        isHotelOrigin ? "" : lodgingTechnical.placeId
+      );
+      writeHiddenValue(
+        nodes.destinationLat,
+        isHotelOrigin ? "" : lodgingTechnical.lat
+      );
+      writeHiddenValue(
+        nodes.destinationLng,
+        isHotelOrigin ? "" : lodgingTechnical.lng
+      );
+
       writeHiddenValue(
         nodes.hiddenAirportHotelTripSummary,
         buildAirportHotelTripSummary(snapshot, editorState, nodes)
@@ -1928,6 +2036,13 @@
     writeHiddenValue(nodes.passengerFareKey, "");
     writeHiddenValue(nodes.passengerBucketLabel, "");
 
+    writeHiddenValue(nodes.originPlaceId, "");
+    writeHiddenValue(nodes.originLat, "");
+    writeHiddenValue(nodes.originLng, "");
+    writeHiddenValue(nodes.destinationPlaceId, "");
+    writeHiddenValue(nodes.destinationLat, "");
+    writeHiddenValue(nodes.destinationLng, "");
+
     writeHiddenValue(nodes.hiddenAirportHotelTripSummary, "");
     writeHiddenValue(nodes.hiddenAirportHotelDirectionLabel, "");
     writeHiddenValue(nodes.hiddenAirportHotelAirportLabel, "");
@@ -1935,6 +2050,253 @@
     writeHiddenValue(nodes.hiddenAirportHotelZoneLabel, "");
     writeHiddenValue(nodes.hiddenAirportHotelFareLabel, "");
     writeHiddenValue(nodes.hiddenAirportHotelPassengerBucketLabel, "");
+
+    return true;
+  }
+  
+    function readCheckoutReviewReturnSnapshot() {
+    let raw;
+    let parsed;
+
+    try {
+      if (window.sessionStorage.getItem(CHECKOUT_REVIEW_RETURN_KEY) !== "1") {
+        return null;
+      }
+
+      raw = window.sessionStorage.getItem(CHECKOUT_REVIEW_SNAPSHOT_KEY);
+    } catch (error) {
+      return null;
+    }
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (error) {
+      return null;
+    }
+
+    return parsed && typeof parsed === "object" ? parsed : null;
+  }
+
+  function activateAirportHotelServiceForCheckoutReturn() {
+    const form = getReservationForm();
+    const serviceTypeField = form
+      ? form.querySelector('input[name="service_type"]')
+      : null;
+    const serviceStateApi = NAMESPACE.contactServiceState;
+
+    if (serviceTypeField) {
+      serviceTypeField.value = "airport_hotel";
+    }
+
+    if (
+      serviceStateApi &&
+      typeof serviceStateApi.setActiveServiceType === "function"
+    ) {
+      serviceStateApi.setActiveServiceType("airport_hotel", {
+        source: "airport-transfer-checkout-review-return",
+        skipConfirm: true
+      });
+    }
+
+    return true;
+  }
+
+  function scrollCheckoutReviewReturnToForm() {
+    const form = getReservationForm();
+
+    if (!form || typeof form.scrollIntoView !== "function") {
+      return false;
+    }
+
+    form.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    return true;
+  }
+
+  function applyHandoff(payload) {
+    const form = getReservationForm();
+    const nodes = getEditorNodes(form);
+    const safePayload = payload && typeof payload === "object" ? payload : {};
+    const bridge = getTariffBridge();
+    const destinationBridge = getDestinationBridge();
+    const direction = normalizeText(
+      safePayload.airport_hotel_direction ||
+        safePayload.direction
+    );
+    const airportId = normalizeText(
+      safePayload.airport_transfer_airport_id ||
+        safePayload.airportId
+    );
+    const lodgingSide =
+      direction === "hotel_to_airport" ? "origin" : "destination";
+    const placeLabel = normalizeText(
+      safePayload.airport_hotel_hotel ||
+        safePayload.airport_hotel_hotel_label ||
+        safePayload.hotel ||
+        safePayload.destination
+    );
+    const placeId = normalizeText(
+      safePayload.lodgingPlaceId ||
+        safePayload.destination_place_id ||
+        safePayload.origin_place_id ||
+        safePayload.destinationPlaceId ||
+        safePayload.originPlaceId
+    );
+    const primaryType = normalizeText(
+      safePayload.lodgingPrimaryType ||
+        safePayload.primaryType
+    );
+    const lat = Number(
+      safePayload.lodgingLat ||
+        safePayload.destination_lat ||
+        safePayload.origin_lat ||
+        safePayload.destinationLat ||
+        safePayload.originLat
+    );
+    const lng = Number(
+      safePayload.lodgingLng ||
+        safePayload.destination_lng ||
+        safePayload.origin_lng ||
+        safePayload.destinationLng ||
+        safePayload.originLng
+    );
+    const zoneId = normalizeText(
+      safePayload.zoneId ||
+        safePayload.airport_transfer_zone_id
+    );
+    const passengerFareKey = normalizeText(
+      safePayload.passenger_fare_key ||
+        safePayload.passengerFareKey
+    );
+    const serviceDate = normalizeText(
+      safePayload.airport_hotel_date ||
+        safePayload.serviceDate
+    );
+    const serviceTime = normalizeText(
+      safePayload.airport_hotel_time ||
+        safePayload.serviceTime
+    );
+    const airportOption = findAirportOptionById(airportId);
+
+    if (!nodes || !bridge || !airportId || !airportOption || !placeLabel || !zoneId) {
+      return false;
+    }
+
+    if (
+      typeof bridge.setAirportSelection === "function" &&
+      !bridge.setAirportSelection({
+        airportId: airportId,
+        direction: direction === "hotel_to_airport"
+          ? "hotel_to_airport"
+          : "airport_to_hotel"
+      })
+    ) {
+      return false;
+    }
+
+    if (
+      destinationBridge &&
+      typeof destinationBridge.setResolvedLodgingEndpoint === "function" &&
+      Number.isFinite(lat) &&
+      Number.isFinite(lng)
+    ) {
+      destinationBridge.setResolvedLodgingEndpoint({
+        side: lodgingSide,
+        placeLabel: placeLabel,
+        placeId: placeId,
+        primaryType: primaryType,
+        lat: lat,
+        lng: lng,
+        zoneId: zoneId
+      });
+    }
+
+    if (
+      destinationBridge &&
+      typeof destinationBridge.renderDestinationUi === "function"
+    ) {
+      destinationBridge.renderDestinationUi();
+    }
+
+    const editorState = {
+      direction: direction === "hotel_to_airport" ? "hotel_to_airport" : "airport_to_hotel",
+      selectedAirport: airportOption,
+      serviceDate: serviceDate,
+      serviceTime: serviceTime,
+      airportPanel: null,
+      airportPanelOpen: false
+    };
+
+    if (nodes.hotelInput) {
+      nodes.hotelInput.value = placeLabel;
+    }
+
+    if (nodes.serviceDateInput) {
+      nodes.serviceDateInput.value = serviceDate;
+    }
+
+    if (nodes.serviceTimeInput) {
+      nodes.serviceTimeInput.value = serviceTime;
+    }
+
+    if (
+      passengerFareKey &&
+      bridge &&
+      typeof bridge.setFareKeySelection === "function"
+    ) {
+      bridge.setFareKeySelection({
+        fareKey: passengerFareKey
+      });
+    }
+
+    syncHotelClear(nodes);
+    syncAirportTrigger(editorState, nodes);
+    syncSideAwareLayout(editorState, nodes);
+    syncPassengerSelectionFromBridge(nodes);
+    syncAirportHotelDateMinimum(nodes, editorState);
+    syncAirportHotelDateUiState(nodes);
+    syncAirportHotelPayloadFields(editorState, nodes);
+    syncPanelSummaryFromTariffBridge(editorState, nodes);
+    syncReservationRequestUiState({ skipValidation: true });
+
+    return true;
+  }
+
+  function restoreCheckoutReviewAirportState() {
+    const snapshot = readCheckoutReviewReturnSnapshot();
+
+    if (!snapshot) {
+      return false;
+    }
+
+    activateAirportHotelServiceForCheckoutReturn();
+
+    if (!applyHandoff(snapshot)) {
+      return false;
+    }
+
+    window.setTimeout(function reapplyCheckoutReviewSnapshot() {
+      activateAirportHotelServiceForCheckoutReturn();
+      applyHandoff(snapshot);
+      scrollCheckoutReviewReturnToForm();
+    }, 0);
+
+    window.setTimeout(function finalReapplyCheckoutReviewSnapshot() {
+      activateAirportHotelServiceForCheckoutReturn();
+      applyHandoff(snapshot);
+      scrollCheckoutReviewReturnToForm();
+
+      try {
+        window.sessionStorage.removeItem(CHECKOUT_REVIEW_RETURN_KEY);
+      } catch (error) {}
+    }, 250);
 
     return true;
   }
@@ -1994,6 +2356,10 @@
       return getAirportHotelTripSnapshot(editorState, nodes);
     };
 
+    window.setTimeout(function restoreCheckoutReviewReturn() {
+      restoreCheckoutReviewAirportState();
+    }, 0);
+
     debugLog("init:done", {
       direction: editorState.direction,
       panelOpen: editorState.airportPanelOpen,
@@ -2004,4 +2370,31 @@
   }
 
   NAMESPACE.initContactAirportHotelEditor = initContactAirportHotelEditor;
+  NAMESPACE.getContactAirportHotelSnapshot = function getContactAirportHotelSnapshot() {
+    const form = getReservationForm();
+    const nodes = getEditorNodes(form);
+    const bridgeState = getBridgeState();
+    const direction =
+      bridgeState && bridgeState.lodgingEndpointSide === "origin"
+        ? "hotel_to_airport"
+        : "airport_to_hotel";
+    const airportId =
+      bridgeState && bridgeState.originType === "airport"
+        ? normalizeText(bridgeState.originValue)
+        : bridgeState && bridgeState.destinationType === "airport"
+          ? normalizeText(bridgeState.destinationValue)
+          : "";
+    const airportOption = findAirportOptionById(airportId);
+    const editorState = {
+      direction: direction,
+      selectedAirport: airportOption,
+      serviceDate: getFormFieldValue("airport_hotel_date"),
+      serviceTime: getFormFieldValue("airport_hotel_time"),
+      airportPanel: null,
+      airportPanelOpen: false
+    };
+
+    return nodes ? getAirportHotelTripSnapshot(editorState, nodes) : null;
+  };
+  NAMESPACE.applyContactAirportHotelHandoff = applyHandoff;
 })(window, document);

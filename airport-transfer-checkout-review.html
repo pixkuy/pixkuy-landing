@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es" data-booking-status-i18n="pending">
+<head>
+  <meta charset="utf-8">
+  <title>Revisa tu traslado — Pixkuy Mobility</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0f1113">
+  <meta name="color-scheme" content="dark light">
+
+  <link rel="stylesheet" href="assets/css/00-tokens.css">
+  <link rel="stylesheet" href="assets/css/10-base.css">
+  <link rel="stylesheet" href="assets/css/20-components.css">
+  <link rel="stylesheet" href="assets/css/30-sections.css">
+  <link rel="stylesheet" href="assets/css/81-booking-status-page.css">
+  <link rel="stylesheet" href="assets/css/50-mobile-topbar.css">
+  <link rel="stylesheet" href="assets/css/90-a11y.css">
+</head>
+
+<body class="booking-status-shell">
+  <div class="mobile-topbar" data-mobile-topbar>
+    <div class="mobile-topbar__brand">
+      <img
+        src="assets/img/pixkuy-logo_only words-white.webp"
+        alt="Pixkuy Mobility"
+        width="224"
+        height="64"
+        loading="eager"
+        decoding="async"
+      >
+    </div>
+  </div>
+
+  <nav class="lang" aria-label="Language selector">
+    <button
+      class="lang-trigger"
+      id="lang-trigger"
+      type="button"
+      aria-haspopup="menu"
+      aria-expanded="false"
+    >
+      <span class="lang-current" aria-hidden="true"></span>
+      <span class="visually-hidden" data-i18n="ui.language"></span>
+    </button>
+
+    <ul
+      class="lang-menu"
+      role="menu"
+      aria-labelledby="lang-trigger"
+      hidden
+    ></ul>
+  </nav>
+
+  <main class="booking-status-page" data-airport-transfer-checkout-review-page>
+    <section
+      class="booking-status booking-status--desktop"
+      aria-labelledby="airport-transfer-checkout-review-title"
+      data-airport-transfer-checkout-review
+    >
+      <div class="booking-status__brand">
+        <img
+          class="booking-status__logo"
+          src="assets/img/pixkuy-logo-white.webp"
+          alt="Pixkuy Mobility"
+          width="154"
+          height="45"
+          loading="eager"
+          decoding="async"
+        >
+      </div>
+
+      <div
+        class="booking-status__content"
+        data-airport-transfer-checkout-review-empty
+        hidden
+      >
+        <h1
+          id="airport-transfer-checkout-review-title-empty"
+          class="booking-status__title"
+          data-airport-transfer-checkout-review-copy="airportTransferCheckoutReview.emptyTitle"
+        ></h1>
+
+        <p
+          class="booking-status__lead"
+          data-airport-transfer-checkout-review-copy="airportTransferCheckoutReview.emptyText"
+        ></p>
+
+        <div class="booking-status__actions">
+          <a
+            class="cta booking-status__primary"
+            href="/?service=airport_hotel#contact"
+            data-airport-transfer-checkout-review-copy="airportTransferCheckoutReview.emptyCta"
+          ></a>
+        </div>
+      </div>
+
+      <div
+        class="booking-status__content"
+        data-airport-transfer-checkout-review-content
+        hidden
+      >
+        <h1
+          id="airport-transfer-checkout-review-title"
+          class="booking-status__title"
+          data-airport-transfer-checkout-review-copy="airportTransferCheckoutReview.title"
+        ></h1>
+
+        <p
+          class="booking-status__lead"
+          data-airport-transfer-checkout-review-copy="airportTransferCheckoutReview.text"
+        ></p>
+
+        <dl
+          class="booking-status__details"
+          data-airport-transfer-checkout-review-details
+        ></dl>
+
+        <div
+          class="booking-status__notice"
+          data-airport-transfer-checkout-review-legal
+        ></div>
+
+        <div
+          class="booking-status__notice"
+          data-booking-status-tone="warning"
+          data-airport-transfer-checkout-review-error
+          hidden
+        ></div>
+
+        <div class="booking-status__actions">
+          <button
+            type="button"
+            class="cta booking-status__primary"
+            data-airport-transfer-checkout-review-proceed
+            data-airport-transfer-checkout-review-copy="airportTransferCheckoutReview.proceed"
+          ></button>
+
+          <a
+            class="booking-status__secondary"
+            href="/?service=airport_hotel#contact"
+            data-airport-transfer-checkout-review-edit
+            data-airport-transfer-checkout-review-copy="airportTransferCheckoutReview.edit"
+          ></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/i18n/fallback.es.js"></script>
+  <script src="assets/js/i18n/catalog.js"></script>
+  <script src="assets/js/i18n/loader.js"></script>
+  <script src="assets/js/i18n/dom.js"></script>
+  <script src="assets/js/i18n/selector.js"></script>
+  <script src="assets/js/i18n.js"></script>
+
+  <script>
+    window.PIXKUY_BOOKING_API_CONFIG = {
+      apiBaseUrl:
+        window.location.hostname === "192.168.0.14"
+          ? "http://192.168.0.14:3002"
+          : (
+              window.location.hostname === "localhost" ||
+              window.location.hostname === "127.0.0.1"
+                ? "http://localhost:3002"
+                : ""
+            ),
+      publicSiteKey: "local_pixkuy_site_key",
+      recaptchaSiteKey: ""
+    };
+  </script>
+  <script src="assets/js/forms/booking-public-config.js"></script>
+  <script src="assets/js/forms/recaptcha-enterprise.js"></script>
+  <script src="assets/js/forms/airport-transfer-checkout-review-page.js"></script>
+</body>
+</html>

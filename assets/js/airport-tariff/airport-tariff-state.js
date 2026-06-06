@@ -62,6 +62,8 @@
 
     state.lodgingEndpointSide = "";
     state.lodgingEndpointLabel = "";
+    state.lodgingEndpointPlaceId = "";
+    state.lodgingEndpointPrimaryType = "";
     state.lodgingEndpointLat = null;
     state.lodgingEndpointLng = null;
     state.lodgingEndpointZoneId = "";
@@ -103,6 +105,10 @@
       typeof payload.side === "string" ? payload.side.trim() : "";
     const placeLabel =
       typeof payload.placeLabel === "string" ? payload.placeLabel.trim() : "";
+    const placeId =
+      typeof payload.placeId === "string" ? payload.placeId.trim() : "";
+    const primaryType =
+      typeof payload.primaryType === "string" ? payload.primaryType.trim() : "";
     const zoneId =
       typeof payload.zoneId === "string" ? payload.zoneId.trim() : "";
     const zoneLabelKey =
@@ -124,6 +130,8 @@
 
     state.lodgingEndpointSide = side;
     state.lodgingEndpointLabel = placeLabel;
+    state.lodgingEndpointPlaceId = placeId;
+    state.lodgingEndpointPrimaryType = primaryType;
     state.lodgingEndpointLat = lat;
     state.lodgingEndpointLng = lng;
     state.lodgingEndpointZoneId = zoneId;
@@ -306,6 +314,8 @@
 
     state.lodgingEndpointSide = "";
     state.lodgingEndpointLabel = "";
+    state.lodgingEndpointPlaceId = "";
+    state.lodgingEndpointPrimaryType = "";
     state.lodgingEndpointLat = null;
     state.lodgingEndpointLng = null;
     state.lodgingEndpointZoneId = "";
@@ -487,6 +497,10 @@
       {
         side: activeLodgingSide,
         placeLabel: placeLabel,
+        placeId:
+          typeof payload.placeId === "string" ? payload.placeId.trim() : "",
+        primaryType:
+          typeof payload.primaryType === "string" ? payload.primaryType.trim() : "",
         lat: lat,
         lng: lng,
         zoneId: zoneId,

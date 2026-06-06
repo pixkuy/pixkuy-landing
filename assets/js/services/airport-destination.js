@@ -876,6 +876,7 @@ function bindClearAction() {
 
   function buildResolvedPayload(input, resolvedZone) {
   const placeLabel = normalizeText(input.placeLabel);
+  const placeId = normalizeText(input.placeId);
   const primaryType = normalizeText(input.primaryType);
   const point = normalizePoint(input.lat, input.lng);
 
@@ -885,6 +886,7 @@ function bindClearAction() {
 
   return {
     placeLabel: placeLabel,
+    placeId: placeId,
     primaryType: primaryType,
     lat: point.lat,
     lng: point.lng,
@@ -1003,6 +1005,7 @@ function bindClearAction() {
   }
 
   const placeLabel = normalizeText(input && input.placeLabel);
+  const placeId = normalizeText(input && input.placeId);
   const primaryType = normalizeText(input && input.primaryType);
   const point = normalizePoint(input && input.lat, input && input.lng);
 
@@ -1088,6 +1091,7 @@ function bindClearAction() {
   const payload = buildResolvedPayload(
     {
       placeLabel: placeLabel,
+      placeId: placeId,
       primaryType: primaryType,
       lat: point.lat,
       lng: point.lng

@@ -338,6 +338,14 @@
 
     return "";
   }
+  
+  function getLuggageCount(body) {
+    if (body && body.reservation && typeof body.reservation.luggageCount === "number") {
+      return body.reservation.luggageCount;
+    }
+
+    return null;
+  }
 
   function getVehicleDisplayName(body) {
     if (body && body.reservation && typeof body.reservation.vehicleDisplayName === "string") {
@@ -439,6 +447,7 @@
       durationHours: getDurationHours(body),
       passengerCount: getPassengerCount(body),
       passengerLabel: getPassengerLabel(body),
+      luggageCount: getLuggageCount(body),
       vehicleDisplayName: getVehicleDisplayName(body),
       customerFullName: getCustomerFullName(body),
       customerEmail: getCustomerEmail(body),
@@ -490,6 +499,7 @@
       durationHours: null,
       passengerCount: null,
       passengerLabel: "",
+      luggageCount: null,
       vehicleDisplayName: "",
       customerFullName: "",
       customerEmail: "",
@@ -515,6 +525,7 @@
       durationHours: null,
       passengerCount: null,
       passengerLabel: "",
+      luggageCount: null,
       vehicleDisplayName: "",
       customerFullName: "",
       customerEmail: "",

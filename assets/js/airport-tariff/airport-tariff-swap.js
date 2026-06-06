@@ -85,6 +85,14 @@
           typeof snapshot.lodgingEndpointLabel === "string"
             ? snapshot.lodgingEndpointLabel
             : "",
+        placeId:
+          typeof snapshot.lodgingEndpointPlaceId === "string"
+            ? snapshot.lodgingEndpointPlaceId
+            : "",
+        primaryType:
+          typeof snapshot.lodgingEndpointPrimaryType === "string"
+            ? snapshot.lodgingEndpointPrimaryType
+            : "",
         lat: snapshot.lodgingEndpointLat,
         lng: snapshot.lodgingEndpointLng,
         zoneId:
@@ -193,6 +201,8 @@
     if (swappedLodging) {
       legacyState.lodgingEndpointSide = swappedLodgingSide;
       legacyState.lodgingEndpointLabel = deps.normalizeText(swappedLodging.label);
+      legacyState.lodgingEndpointPlaceId = deps.normalizeText(swappedLodging.placeId);
+      legacyState.lodgingEndpointPrimaryType = deps.normalizeText(swappedLodging.primaryType);
       legacyState.lodgingEndpointLat = swappedLodging.lat;
       legacyState.lodgingEndpointLng = swappedLodging.lng;
       legacyState.lodgingEndpointZoneId = deps.normalizeText(swappedLodging.zoneId);
@@ -207,6 +217,8 @@
 
     legacyState.lodgingEndpointSide = "";
     legacyState.lodgingEndpointLabel = "";
+    legacyState.lodgingEndpointPlaceId = "";
+    legacyState.lodgingEndpointPrimaryType = "";
     legacyState.lodgingEndpointLat = null;
     legacyState.lodgingEndpointLng = null;
     legacyState.lodgingEndpointZoneId = "";
@@ -262,6 +274,8 @@
         resolvedZoneLabelKey: "",
         lodgingEndpointSide: "",
         lodgingEndpointLabel: "",
+        lodgingEndpointPlaceId: "",
+        lodgingEndpointPrimaryType: "",
         lodgingEndpointLat: null,
         lodgingEndpointLng: null,
         lodgingEndpointZoneId: "",
@@ -286,6 +300,8 @@
         resolvedZoneLabelKey: "",
         lodgingEndpointSide: "",
         lodgingEndpointLabel: "",
+        lodgingEndpointPlaceId: "",
+        lodgingEndpointPrimaryType: "",
         lodgingEndpointLat: null,
         lodgingEndpointLng: null,
         lodgingEndpointZoneId: "",

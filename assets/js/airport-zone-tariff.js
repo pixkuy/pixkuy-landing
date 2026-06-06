@@ -41,6 +41,8 @@
     lodgingEndpointSide: "",
     lodgingSearchSide: "destination",
     lodgingEndpointLabel: "",
+    lodgingEndpointPlaceId: "",
+    lodgingEndpointPrimaryType: "",
     lodgingEndpointLat: null,
     lodgingEndpointLng: null,
     lodgingEndpointZoneId: "",
@@ -130,6 +132,132 @@
     }
 
     return temporalPricingApi;
+  }
+
+  function getAirportTransferAvailabilityPrecheckApi() {
+    const api = window.PixkuyAirportTransferAvailabilityPrecheck;
+
+    return api && typeof api === "object" ? api : null;
+  }
+
+  function getDocumentLocale() {
+    const lang =
+      normalizeText(window.__pixkuyI18nLang) ||
+      normalizeText(document.documentElement && document.documentElement.lang) ||
+      "es";
+
+    if (lang.toLowerCase() === "zh-cn") {
+      return "zh-hans";
+    }
+
+    return lang.toLowerCase();
+  }
+
+  function getAirportTransferDirection(state) {
+    return getActiveLodgingSide(state) === "origin"
+      ? "destination_to_airport"
+      : "airport_to_destination";
+  }
+
+  function getSelectedAirportId(state) {
+    if (!state || typeof state !== "object") {
+      return "";
+    }
+
+    if (state.originType === "airport") {
+      return normalizeText(state.originValue).toLowerCase();
+    }
+
+    if (state.destinationType === "airport") {
+      return normalizeText(state.destinationValue).toLowerCase();
+    }
+
+    return "";
+  }
+
+  function getFinalAirportFarePrice(state) {
+    const fare = resolveFare(state);
+    const temporalPricing = getTemporalPricingApi();
+    const serviceDate =
+      state && typeof state.serviceDate === "string"
+        ? normalizeText(state.serviceDate)
+        : "";
+
+    if (!fare || typeof fare.price !== "number" || !Number.isFinite(fare.price)) {
+      return null;
+    }
+
+    if (temporalPricing && typeof temporalPricing.applyTemporalPricing === "function") {
+      return temporalPricing.applyTemporalPricing(fare.price, serviceDate);
+    }
+
+    return fare.price;
+  }
+
+  function buildAirportTransferPrecheckDetail(state) {
+    const finalPrice = getFinalAirportFarePrice(state);
+    const amountMinor =
+      typeof finalPrice === "number" && Number.isFinite(finalPrice)
+        ? Math.round(finalPrice * 100)
+        : null;
+
+    if (!amountMinor) {
+      return null;
+    }
+
+    return {
+      serviceType: "airport_transfer",
+      airportId: getSelectedAirportId(state),
+      direction: getAirportTransferDirection(state),
+      zoneId: getZoneIdForFare(state),
+      passengerFareKey: getSelectedFareKey(state),
+      date:
+        state && typeof state.serviceDate === "string"
+          ? normalizeText(state.serviceDate)
+          : "",
+      time:
+        state && typeof state.serviceTime === "string"
+          ? normalizeText(state.serviceTime)
+          : "",
+      expectedAmountMinor: amountMinor,
+      currency: "MXN",
+      locale: getDocumentLocale()
+    };
+  }
+
+  function setAirportCtaPrecheckBusy(nodes, isBusy) {
+    if (!nodes || !nodes.cta) {
+      return false;
+    }
+
+    nodes.cta.disabled = Boolean(isBusy);
+    nodes.cta.setAttribute("aria-disabled", isBusy ? "true" : "false");
+    nodes.cta.setAttribute("aria-busy", isBusy ? "true" : "false");
+
+    return true;
+  }
+
+  function runAirportTransferPrecheck(state) {
+    const api = getAirportTransferAvailabilityPrecheckApi();
+    const detail = buildAirportTransferPrecheckDetail(state);
+
+    if (!api || typeof api.precheck !== "function") {
+      return Promise.resolve({
+        available: false,
+        checkoutAllowed: false,
+        code: "AIRPORT_PRECHECK_API_UNAVAILABLE"
+      });
+    }
+
+    if (!detail) {
+      return Promise.resolve({
+        available: false,
+        checkoutAllowed: false,
+        code: "INVALID_AIRPORT_PRECHECK_DETAIL"
+      });
+    }
+
+    return api.precheck(detail);
   }
 
   function getStateDeps() {
@@ -535,6 +663,8 @@ function shouldUsePassengerChipUi(nodes) {
       lodgingEndpointSide: DEFAULT_STATE.lodgingEndpointSide,
       lodgingSearchSide: DEFAULT_STATE.lodgingSearchSide,
       lodgingEndpointLabel: DEFAULT_STATE.lodgingEndpointLabel,
+      lodgingEndpointPlaceId: DEFAULT_STATE.lodgingEndpointPlaceId,
+      lodgingEndpointPrimaryType: DEFAULT_STATE.lodgingEndpointPrimaryType,
       lodgingEndpointLat: DEFAULT_STATE.lodgingEndpointLat,
       lodgingEndpointLng: DEFAULT_STATE.lodgingEndpointLng,
       lodgingEndpointZoneId: DEFAULT_STATE.lodgingEndpointZoneId,
@@ -973,6 +1103,36 @@ function shouldUsePassengerChipUi(nodes) {
       state,
       getHandoffDeps()
     );
+  }
+
+  function dispatchAirportTransferPanelSubmit(state, precheckResult) {
+    const detail = {
+      serviceType: "airport_transfer",
+      legacyServiceType: "airport_hotel",
+      direction: getAirportTransferDirection(state),
+      airportId: getSelectedAirportId(state),
+      zoneId: getZoneIdForFare(state),
+      passengerFareKey: getSelectedFareKey(state),
+      date:
+        state && typeof state.serviceDate === "string"
+          ? normalizeText(state.serviceDate)
+          : "",
+      time:
+        state && typeof state.serviceTime === "string"
+          ? normalizeText(state.serviceTime)
+          : "",
+      precheck: precheckResult || null
+    };
+
+    window.dispatchEvent(
+      new CustomEvent("pixkuy:airport-transfer-panel-submit", {
+        bubbles: false,
+        cancelable: false,
+        detail: detail
+      })
+    );
+
+    return true;
   }
 
   function swapState(state) {
@@ -1643,6 +1803,8 @@ function shouldUsePassengerChipUi(nodes) {
   });
 
   nodes.cta.addEventListener("click", function (event) {
+    event.preventDefault();
+
     if (nodes.dateInput) {
       state.serviceDate = normalizeText(nodes.dateInput.value);
       syncTemporalDateInput(nodes, state);
@@ -1659,20 +1821,44 @@ function shouldUsePassengerChipUi(nodes) {
     );
 
     if (!eligibility.canNavigate) {
-      event.preventDefault();
-      return;
-    }
-
-    const handedOff = handoffPanelSelectionToContact(state);
-
-    if (!handedOff) {
-      event.preventDefault();
       renderCtaState(nodes, state);
       return;
     }
 
-    event.preventDefault();
-    closeDropdown(nodes, state);
+    setAirportCtaPrecheckBusy(nodes, true);
+
+    runAirportTransferPrecheck(state)
+      .then(function handleAirportPrecheckResult(result) {
+        const isAllowed = Boolean(
+          result &&
+            (result.available === true || result.checkoutAllowed === true)
+        );
+
+        if (!isAllowed) {
+          renderCtaState(nodes, state);
+          return false;
+        }
+
+        dispatchAirportTransferPanelSubmit(state, result);
+
+        const handedOff = handoffPanelSelectionToContact(state);
+
+        if (!handedOff) {
+          renderCtaState(nodes, state);
+          return false;
+        }
+
+        closeDropdown(nodes, state);
+        return true;
+      })
+      .catch(function handleAirportPrecheckError() {
+        renderCtaState(nodes, state);
+        return false;
+      })
+      .finally(function clearAirportPrecheckBusy() {
+        setAirportCtaPrecheckBusy(nodes, false);
+        renderCtaState(nodes, state);
+      });
   });
 
   bindControlToggle(nodes, state, nodes.originControl, "origin");
@@ -1860,6 +2046,8 @@ function shouldUsePassengerChipUi(nodes) {
           lodgingEndpointSide: state.lodgingEndpointSide,
           lodgingSearchSide: state.lodgingSearchSide,
           lodgingEndpointLabel: state.lodgingEndpointLabel,
+          lodgingEndpointPlaceId: state.lodgingEndpointPlaceId,
+          lodgingEndpointPrimaryType: state.lodgingEndpointPrimaryType,
           lodgingEndpointLat: state.lodgingEndpointLat,
           lodgingEndpointLng: state.lodgingEndpointLng,
           lodgingEndpointZoneId: state.lodgingEndpointZoneId,
