@@ -16,7 +16,13 @@
 
   const I18N_KEYS = {
     swapAriaLabel: "services.cards.airport.panel.swapAriaLabel",
-    fareValue: "services.cards.airport.panel.fareValue"
+    fareValue: "services.cards.airport.panel.fareValue",
+    availabilityChecking: "services.cards.airport.panel.availability.checking",
+    availabilityAvailable: "services.cards.airport.panel.availability.available",
+    availabilityUnavailable: "services.cards.airport.panel.availability.unavailable",
+    availabilityNextAvailableSlot: "services.cards.airport.panel.availability.nextAvailableSlot",
+    availabilityPriceMismatch: "services.cards.airport.panel.availability.priceMismatch",
+    availabilityError: "services.cards.airport.panel.availability.error"
   };
 
   const DROPDOWN_KEYS = {
@@ -139,6 +145,199 @@
 
     return api && typeof api === "object" ? api : null;
   }
+  
+    function getAirportAvailabilityCopy(key, fallback) {
+    const modules = window.__pixkuyI18nModules || {};
+    const getValue = modules.getValue;
+    const dict = window.__pixkuyI18nDict || null;
+    const path = I18N_KEYS[key];
+    const value =
+      typeof getValue === "function" && dict && path
+        ? getValue(dict, path)
+        : "";
+
+    return typeof value === "string" && value.trim()
+      ? value.trim()
+      : (fallback || "");
+  }
+
+  function ensureAirportAvailabilityStatusNode(nodes) {
+    const actions = nodes && nodes.cta ? nodes.cta.closest(".services-expand__actions") : null;
+    let statusNode = nodes ? nodes.availabilityStatus : null;
+
+    if (statusNode) {
+      return statusNode;
+    }
+
+    if (!actions) {
+      return null;
+    }
+
+    statusNode = document.createElement("p");
+    statusNode.className = "services-hourly-panel__availability";
+    statusNode.setAttribute("data-airport-tariff-availability", "1");
+    statusNode.setAttribute("role", "status");
+    statusNode.setAttribute("aria-live", "polite");
+    statusNode.hidden = true;
+
+    actions.appendChild(statusNode);
+    nodes.availabilityStatus = statusNode;
+
+    return statusNode;
+  }
+
+  function isAirportMobileViewport() {
+    return Boolean(
+      window &&
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(max-width: 720px)").matches
+    );
+  }
+
+  function revealAirportAvailabilityStatus(statusNode, tone) {
+    if (
+      !statusNode ||
+      statusNode.hidden ||
+      tone !== "error" ||
+      !isAirportMobileViewport()
+    ) {
+      return false;
+    }
+
+    window.requestAnimationFrame(function revealStatusOnMobile() {
+      if (typeof statusNode.scrollIntoView === "function") {
+        statusNode.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest"
+        });
+      }
+    });
+
+    return true;
+  }
+
+  function setAirportAvailabilityStatus(nodes, message, tone) {
+    const statusNode = ensureAirportAvailabilityStatusNode(nodes);
+
+    if (!statusNode) {
+      return false;
+    }
+
+    statusNode.textContent = message || "";
+    statusNode.hidden = !message;
+    statusNode.setAttribute("data-availability-tone", tone || "");
+
+    revealAirportAvailabilityStatus(statusNode, tone || "");
+
+    return true;
+  }
+
+  function clearAirportAvailabilityStatus(nodes) {
+    const statusNode = ensureAirportAvailabilityStatusNode(nodes);
+
+    if (!statusNode) {
+      return false;
+    }
+
+    statusNode.textContent = "";
+    statusNode.hidden = true;
+    statusNode.removeAttribute("data-availability-tone");
+
+    return true;
+  }
+  
+    function normalizeAirportPrecheckResult(result) {
+    const raw = result && result.raw && typeof result.raw === "object"
+      ? result.raw
+      : {};
+    const outerResult = raw.result && typeof raw.result === "object"
+      ? raw.result
+      : {};
+    const nestedResult = outerResult.result && typeof outerResult.result === "object"
+      ? outerResult.result
+      : {};
+    const availability =
+      nestedResult.availability && typeof nestedResult.availability === "object"
+        ? nestedResult.availability
+        : (
+            outerResult.availability && typeof outerResult.availability === "object"
+              ? outerResult.availability
+              : {}
+          );
+
+    return {
+      code:
+        normalizeText(result && result.code) ||
+        normalizeText(availability.code),
+      nextAvailableStartLocal:
+        normalizeText(result && result.nextAvailableStartLocal) ||
+        normalizeText(availability.nextAvailableStartLocal)
+    };
+  }
+
+  function getAirportNextAvailableTimeLabel(result) {
+    const value = normalizeText(result && result.nextAvailableStartLocal);
+
+    if (!value) {
+      return "";
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
+      return value.slice(11, 16);
+    }
+
+    return value;
+  }
+
+  function getAirportNextAvailableMessage(result) {
+    const time = getAirportNextAvailableTimeLabel(result);
+    const template = getAirportAvailabilityCopy(
+      "availabilityNextAvailableSlot",
+      "Siguiente hora disponible: {time}"
+    );
+
+    if (!time || !template) {
+      return "";
+    }
+
+    return template.replace("{time}", time);
+  }
+
+  function getAirportAvailabilityMessage(result) {
+    const normalizedResult = normalizeAirportPrecheckResult(result);
+    const code = normalizeText(normalizedResult && normalizedResult.code);
+    const nextAvailableMessage = getAirportNextAvailableMessage(normalizedResult);
+
+    if (code === "AIRPORT_TRANSFER_PRICE_MISMATCH") {
+      return getAirportAvailabilityCopy(
+        "availabilityPriceMismatch",
+        "La tarifa ha cambiado. Actualiza la configuración antes de continuar."
+      );
+    }
+
+    if (code === "PRECHECK_REQUEST_FAILED" || code === "INVALID_PRECHECK_PAYLOAD") {
+      return getAirportAvailabilityCopy(
+        "availabilityError",
+        "No pudimos confirmar disponibilidad. Revisa fecha, hora y dirección."
+      );
+    }
+
+    if (nextAvailableMessage) {
+      return [
+        getAirportAvailabilityCopy(
+          "availabilityUnavailable",
+          "No hay disponibilidad para esa fecha y hora. Elige otra opción."
+        ),
+        nextAvailableMessage
+      ].filter(Boolean).join(" ");
+    }
+
+    return getAirportAvailabilityCopy(
+      "availabilityUnavailable",
+      "No hay disponibilidad para esa fecha y hora. Elige otra opción."
+    );
+  }
 
   function getDocumentLocale() {
     const lang =
@@ -174,6 +373,66 @@
 
     return "";
   }
+  
+    function getPassengerCountForFareKey(fareKey) {
+    const safeFareKey = normalizeText(fareKey);
+
+    if (safeFareKey === "van_1_2") {
+      return 2;
+    }
+
+    if (safeFareKey === "van_3_4") {
+      return 4;
+    }
+
+    if (safeFareKey === "van_5_6") {
+      return 6;
+    }
+
+    return null;
+  }
+
+  function getAirportTransferNonAirportLocation(state) {
+    const address = normalizeText(
+      state && (
+        state.lodgingEndpointLabel ||
+        state.destinationPlaceLabel ||
+        state.destinationLabel
+      )
+    );
+    const placeId = normalizeText(state && state.lodgingEndpointPlaceId);
+    const lat =
+      state && typeof state.lodgingEndpointLat === "number" && Number.isFinite(state.lodgingEndpointLat)
+        ? state.lodgingEndpointLat
+        : (
+            state && typeof state.destinationLat === "number" && Number.isFinite(state.destinationLat)
+              ? state.destinationLat
+              : null
+          );
+    const lng =
+      state && typeof state.lodgingEndpointLng === "number" && Number.isFinite(state.lodgingEndpointLng)
+        ? state.lodgingEndpointLng
+        : (
+            state && typeof state.destinationLng === "number" && Number.isFinite(state.destinationLng)
+              ? state.destinationLng
+              : null
+          );
+    const location = {};
+
+    if (!address || lat === null || lng === null) {
+      return null;
+    }
+
+    location.address = address;
+    location.lat = lat;
+    location.lng = lng;
+
+    if (placeId) {
+      location.place_id = placeId;
+    }
+
+    return location;
+  }
 
   function getFinalAirportFarePrice(state) {
     const fare = resolveFare(state);
@@ -205,12 +464,18 @@
       return null;
     }
 
+    const passengerFareKey = getSelectedFareKey(state);
+    const nonAirportLocation = getAirportTransferNonAirportLocation(state);
+    const passengers = getPassengerCountForFareKey(passengerFareKey);
+
     return {
       serviceType: "airport_transfer",
       airportId: getSelectedAirportId(state),
       direction: getAirportTransferDirection(state),
       zoneId: getZoneIdForFare(state),
-      passengerFareKey: getSelectedFareKey(state),
+      passengerFareKey: passengerFareKey,
+      nonAirportLocation: nonAirportLocation,
+      passengers: passengers,
       date:
         state && typeof state.serviceDate === "string"
           ? normalizeText(state.serviceDate)
@@ -584,6 +849,7 @@
   const swapButton = panel.querySelector(SELECTORS.swapButton);
   const fareValue = panel.querySelector(SELECTORS.fareValue);
   const cta = panel.querySelector(SELECTORS.cta);
+  const availabilityStatus = panel.querySelector("[data-airport-tariff-availability]");
   const dateField = panel.querySelector('[data-airport-tariff-role="date"]');
   const dateInput = panel.querySelector('[data-airport-tariff-date]');
   const dateOverlay = panel.querySelector(".services-expand__date-overlay");
@@ -620,6 +886,7 @@
     swapButton,
     fareValue,
     cta,
+    availabilityStatus,
     dateField,
     dateInput,
     dateOverlay,
@@ -1822,8 +2089,25 @@ function shouldUsePassengerChipUi(nodes) {
 
     if (!eligibility.canNavigate) {
       renderCtaState(nodes, state);
+      setAirportAvailabilityStatus(
+        nodes,
+        getAirportAvailabilityCopy(
+          "availabilityError",
+          "No pudimos confirmar disponibilidad. Revisa fecha, hora y dirección."
+        ),
+        "error"
+      );
       return;
     }
+
+    setAirportAvailabilityStatus(
+      nodes,
+      getAirportAvailabilityCopy(
+        "availabilityChecking",
+        "Comprobando disponibilidad..."
+      ),
+      "checking"
+    );
 
     setAirportCtaPrecheckBusy(nodes, true);
 
@@ -1836,8 +2120,22 @@ function shouldUsePassengerChipUi(nodes) {
 
         if (!isAllowed) {
           renderCtaState(nodes, state);
+          setAirportAvailabilityStatus(
+            nodes,
+            getAirportAvailabilityMessage(result),
+            "error"
+          );
           return false;
         }
+
+        setAirportAvailabilityStatus(
+          nodes,
+          getAirportAvailabilityCopy(
+            "availabilityAvailable",
+            "Disponibilidad confirmada. Puedes continuar."
+          ),
+          "success"
+        );
 
         dispatchAirportTransferPanelSubmit(state, result);
 
@@ -1853,6 +2151,14 @@ function shouldUsePassengerChipUi(nodes) {
       })
       .catch(function handleAirportPrecheckError() {
         renderCtaState(nodes, state);
+        setAirportAvailabilityStatus(
+          nodes,
+          getAirportAvailabilityCopy(
+            "availabilityError",
+            "No pudimos confirmar disponibilidad. Revisa fecha, hora y dirección."
+          ),
+          "error"
+        );
         return false;
       })
       .finally(function clearAirportPrecheckBusy() {
@@ -1890,12 +2196,14 @@ function shouldUsePassengerChipUi(nodes) {
   if (nodes.dateInput) {
     nodes.dateInput.addEventListener("input", function () {
       state.serviceDate = normalizeText(nodes.dateInput.value);
+      clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
       renderPanel(nodes, state);
     });
 
     nodes.dateInput.addEventListener("change", function () {
       state.serviceDate = normalizeText(nodes.dateInput.value);
+      clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
       renderPanel(nodes, state);
     });
@@ -1904,12 +2212,14 @@ function shouldUsePassengerChipUi(nodes) {
   if (nodes.timeInput) {
     nodes.timeInput.addEventListener("input", function () {
       state.serviceTime = normalizeText(nodes.timeInput.value);
+      clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
       renderPanel(nodes, state);
     });
 
     nodes.timeInput.addEventListener("change", function () {
       state.serviceTime = normalizeText(nodes.timeInput.value);
+      clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
       renderPanel(nodes, state);
     });

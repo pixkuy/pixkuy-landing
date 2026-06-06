@@ -59,8 +59,16 @@
   "fareValuePendingPassengers": "Selecciona pasajeros",
   "fareLabel": "Tarifa",
   "fareValue": "—",
-  "cta": "Solicitar",
+"cta": "Solicitar",
 "back": "Volver",
+"availability": {
+  "checking": "Comprobando disponibilidad...",
+  "available": "Disponibilidad confirmada. Puedes continuar.",
+  "unavailable": "No hay disponibilidad para esa fecha y hora. Elige otra opción.",
+  "nextAvailableSlot": "Siguiente hora disponible: {time}",
+  "priceMismatch": "La tarifa ha cambiado. Actualiza la configuración antes de continuar.",
+  "error": "No pudimos confirmar disponibilidad. Revisa fecha, hora y dirección."
+},
 "catalog": {
   "airports": {
     "mex": "AICM · Aeropuerto Internacional Ciudad de México",

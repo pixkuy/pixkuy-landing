@@ -86,6 +86,58 @@
 
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }
+  
+    function parsePositiveInteger(value) {
+    var parsed;
+
+    if (typeof value === "number") {
+      parsed = value;
+    } else {
+      parsed = Number(normalizeText(value).replace(/[^\d]/g, ""));
+    }
+
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  function parseFiniteNumber(value) {
+    var parsed;
+
+    if (typeof value === "number") {
+      parsed = value;
+    } else {
+      parsed = Number(normalizeText(value));
+    }
+
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function buildNonAirportLocation(detail) {
+    var source =
+      detail && detail.nonAirportLocation && typeof detail.nonAirportLocation === "object"
+        ? detail.nonAirportLocation
+        : {};
+    var address = normalizeText(source.address);
+    var placeId = normalizeText(source.place_id || source.placeId);
+    var lat = parseFiniteNumber(source.lat);
+    var lng = parseFiniteNumber(source.lng);
+    var location;
+
+    if (!address || lat === null || lng === null) {
+      return null;
+    }
+
+    location = {
+      address: address,
+      lat: lat,
+      lng: lng
+    };
+
+    if (placeId) {
+      location.place_id = placeId;
+    }
+
+    return location;
+  }
 
   function isAirportTransferPrecheckDetail(detail) {
     return Boolean(
@@ -103,6 +155,8 @@
     var date = normalizeText(safeDetail.date);
     var time = normalizeText(safeDetail.time);
     var expectedAmountMinor = parsePositiveMoneyMinor(safeDetail.expectedAmountMinor);
+    var nonAirportLocation = buildNonAirportLocation(safeDetail);
+    var passengers = parsePositiveInteger(safeDetail.passengers);
     var currency = normalizeText(safeDetail.currency) || DEFAULT_CURRENCY;
     var locale = normalizeText(safeDetail.locale) || "es";
 
@@ -115,6 +169,9 @@
       !direction ||
       !zoneId ||
       !passengerFareKey ||
+      !nonAirportLocation ||
+      !passengers ||
+      passengers > 6 ||
       !date ||
       !time ||
       !expectedAmountMinor
@@ -128,6 +185,8 @@
       direction: direction,
       zoneId: zoneId,
       passengerFareKey: passengerFareKey,
+      nonAirportLocation: nonAirportLocation,
+      passengers: passengers,
       date: date,
       time: time,
       expectedAmountMinor: expectedAmountMinor,
@@ -139,10 +198,15 @@
   function normalizeResult(response, body) {
     var result = body && body.result ? body.result : {};
     var price = result && result.price ? result.price : {};
+    var availability = result && result.availability ? result.availability : {};
     var code =
       normalizeText(body && body.code) ||
       normalizeText(result && result.code) ||
+      normalizeText(availability && availability.code) ||
       "";
+    var nextAvailableStartLocal = normalizeText(
+      availability && availability.nextAvailableStartLocal
+    );
     var checkoutAllowed = Boolean(
       response &&
         response.ok &&
@@ -155,13 +219,25 @@
         )
     );
     var priceAvailable = Boolean(price && price.available === true);
-    var available = Boolean(checkoutAllowed && priceAvailable);
+    var availabilityAvailable = Boolean(
+      availability &&
+        (
+          availability.available === true ||
+          availability.status === "available"
+        )
+    );
+    var available = Boolean(
+      checkoutAllowed &&
+        priceAvailable &&
+        availabilityAvailable
+    );
 
     return {
       ok: Boolean(response && response.ok),
       statusCode: response ? response.status : 0,
       raw: body || {},
       code: code,
+      nextAvailableStartLocal: nextAvailableStartLocal,
       available: available,
       checkoutAllowed: checkoutAllowed
     };

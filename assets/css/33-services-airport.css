@@ -595,8 +595,19 @@
 .services-expand__actions{
   grid-column:1 / -1;
   display:flex;
+  flex-direction:column;
+  align-items:flex-start;
   justify-content:flex-start;
+  gap:10px;
   padding-top:4px;
+}
+
+.services-expand__actions .services-hourly-panel__availability{
+  margin:0;
+  max-width:100%;
+  font-size:13px;
+  line-height:1.35;
+  font-weight:700;
 }
 
 .services-expand__cta{
@@ -829,8 +840,27 @@
 
   .services-expand__actions{
     order:8;
+    align-items:stretch;
+    gap:8px;
     padding-top:0;
     margin-top:0;
+  }
+
+  .services-expand__actions .services-hourly-panel__availability{
+    display:block;
+    width:100%;
+    margin:0;
+    padding:0;
+    font-size:12.5px;
+    line-height:1.35;
+    font-weight:700;
+    color:rgba(255,205,190,.96);
+    text-align:left;
+    white-space:normal;
+  }
+
+  .services-expand__actions .services-hourly-panel__availability[hidden]{
+    display:none !important;
   }
 
   .services-expand__label{
@@ -1172,5 +1202,24 @@
     border-radius:9px;
     background:rgba(31,122,109,.94);
     box-shadow:none;
+  }
+  
+    #services-expand-airport .services-expand__actions{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
+  }
+
+  #services-expand-airport .services-expand__actions .services-hourly-panel__availability{
+    display:block;
+    width:100%;
+    margin:0;
+    color:rgba(255,205,190,.96);
+    text-align:left;
+  }
+
+  #services-expand-airport .services-expand__actions .services-hourly-panel__availability[hidden]{
+    display:none !important;
   }
 }
