@@ -799,13 +799,23 @@
 }
 
 .booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--date,
-.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--time,
-.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--passengers,
-.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--vehicle{
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--time{
   grid-column:span 3;
 }
 
-.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--price{
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--passengers,
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--luggage{
+  grid-column:span 3;
+}
+
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--vehicle{
+  grid-column:span 6;
+}
+
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--price,
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--customer-name,
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--customer-phone,
+.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--customer-email{
   grid-column:span 6;
 }
 
@@ -835,12 +845,6 @@
   aspect-ratio:16 / 9;
   object-fit:cover;
   object-position:center 83%;
-}
-
-.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--customer-name,
-.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--customer-phone,
-.booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--customer-email{
-  grid-column:span 4;
 }
 
 .booking-status-page[data-airport-transfer-checkout-review-page] .booking-status__detail--notes{
