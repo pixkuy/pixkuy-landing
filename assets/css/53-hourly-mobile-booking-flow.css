@@ -73,7 +73,7 @@
     padding:
       calc(60px + env(safe-area-inset-top))
       18px
-      env(safe-area-inset-bottom);
+      calc(18px + env(safe-area-inset-bottom));
   }
 
   .hourly-mobile-route #services-expand-hourly{
@@ -226,8 +226,8 @@
     max-height:100%;
     min-height:0;
     overflow:hidden;
-    display:grid;
-    grid-template-rows:auto auto auto minmax(0, 1fr) auto;
+    display:flex;
+    flex-direction:column;
     gap:8px;
     padding-right:0;
     padding-bottom:0;
@@ -237,7 +237,8 @@
   .hourly-mobile-route .services-hourly-panel__row--mobile-duration,
   .hourly-mobile-route .services-hourly-panel__row--mobile-notes,
   .hourly-mobile-route .services-hourly-panel__row--mobile-meta,
-  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer{
+  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer,
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions{
     display:grid !important;
     grid-template-columns:1fr !important;
     gap:10px !important;
@@ -606,7 +607,16 @@
     gap:10px;
   }
   
-    .hourly-mobile-route .services-hourly-panel__row--mobile-meta{
+  .hourly-mobile-route .services-hourly-panel__row--mobile-hero,
+  .hourly-mobile-route .services-hourly-panel__row--mobile-duration,
+  .hourly-mobile-route .services-hourly-panel__row--mobile-notes,
+  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer,
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions{
+    flex:0 0 auto !important;
+  }
+
+  .hourly-mobile-route .services-hourly-panel__row--mobile-meta{
+    flex:1 1 auto !important;
     min-height:0 !important;
     overflow:auto !important;
     -webkit-overflow-scrolling:touch;
@@ -662,15 +672,13 @@
   }
 
   .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer{
-    position:sticky !important;
-    bottom:0 !important;
+    position:static !important;
+    bottom:auto !important;
     z-index:30;
     display:grid !important;
     grid-template-columns:128px minmax(0, 1fr) !important;
     grid-template-areas:
-      "vehicle price"
-      "cta cta"
-      "availability availability" !important;
+      "vehicle price" !important;
     gap:6px 10px !important;
     align-items:start !important;
     padding:6px 0 0;
@@ -689,23 +697,43 @@
     order:2 !important;
   }
 
-  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer .services-hourly-panel__cta{
-    grid-area:cta !important;
-    order:3 !important;
-  }
-  
-  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer .services-hourly-panel__availability{
-    grid-area:availability !important;
-    order:4 !important;
-    width:100% !important;
-    max-width:none !important;
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+    gap:8px !important;
     min-width:0 !important;
     margin:0 !important;
-    font-size:12.5px !important;
-    line-height:1.25 !important;
-    text-align:center !important;
+    padding:0 !important;
+    background:#0f1113;
   }
 
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__cta{
+    width:100% !important;
+  }
+
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:rgba(255,205,190,.96) !important;
+    font-size:12.5px !important;
+    line-height:1.35 !important;
+    font-weight:700 !important;
+    text-align:left !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    overflow-wrap:break-word !important;
+  }
+
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability[hidden]{
+    display:none !important;
+  }
+  
   .hourly-mobile-route .services-hourly-panel__price--inline{
     width:100%;
     min-width:0;

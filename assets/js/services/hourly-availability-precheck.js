@@ -151,13 +151,42 @@
   }
 
   function normalizeResult(response, body) {
-    var availability = body && body.availability ? body.availability : {};
+    var result = body && body.result && typeof body.result === "object"
+      ? body.result
+      : {};
+    var availability =
+      body && body.availability && typeof body.availability === "object"
+        ? body.availability
+        : (
+            result && result.availability && typeof result.availability === "object"
+              ? result.availability
+              : {}
+          );
     var code =
       normalizeText(body && body.code) ||
+      normalizeText(result && result.code) ||
       normalizeText(availability && availability.code) ||
       "";
     var nextAvailableStartLocal = normalizeText(
       availability && availability.nextAvailableStartLocal
+    );
+    var checkoutAllowed = Boolean(
+      response &&
+        response.ok &&
+        body &&
+        (
+          body.checkoutAllowed === true ||
+          body.precheckAllowed === true ||
+          result.checkoutAllowed === true ||
+          result.precheckAllowed === true
+        )
+    );
+    var availabilityAvailable = Boolean(
+      availability &&
+        (
+          availability.available === true ||
+          availability.status === "available"
+        )
     );
 
     return {
@@ -166,14 +195,7 @@
       raw: body || {},
       code: code,
       nextAvailableStartLocal: nextAvailableStartLocal,
-      available: Boolean(
-        response &&
-          response.ok &&
-          body &&
-          body.checkoutAllowed === true &&
-          availability &&
-          availability.available === true
-      )
+      available: Boolean(checkoutAllowed && availabilityAvailable)
     };
   }
 

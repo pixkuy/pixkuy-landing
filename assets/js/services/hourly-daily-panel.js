@@ -980,7 +980,9 @@ onClearSelection: function () {
           <p class="services-hourly-panel__price-label">${priceLabelText}</p>
           <strong class="services-hourly-panel__price-value">${priceText}</strong>
         </div>
+      </div>
 
+      <div class="services-hourly-panel__row services-hourly-panel__row--mobile-actions">
         <button
           type="button"
           class="services-hourly-panel__cta services-hourly-panel__cta--full"
