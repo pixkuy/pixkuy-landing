@@ -278,10 +278,28 @@
 
     return hours + "h";
   }
+  
+    function getSnapshotFormPayloadRaw(snapshot) {
+    var raw = snapshot && snapshot.form_payload_raw;
+
+    return raw && typeof raw === "object" ? raw : {};
+  }
+
+  function getReviewNotes(snapshot) {
+    var raw = getSnapshotFormPayloadRaw(snapshot);
+
+    return (
+      normalizeText(snapshot && snapshot.hourly_daily_notes) ||
+      normalizeText(snapshot && snapshot.notes) ||
+      normalizeText(raw.hourly_daily_notes) ||
+      normalizeText(raw.message)
+    );
+  }
 
   function renderDetails(snapshot, dictionary) {
     var details = getNode("[data-hourly-checkout-review-details]");
     var base = "services.cards.hourly.panel.reviewPage.";
+    var notes = getReviewNotes(snapshot);
 
     if (!details) {
       return false;
@@ -300,8 +318,8 @@
       buildRow(t(dictionary, "services.cards.hourly.mobileFlow.contactStep.fields.name"), snapshot.name, "customer-name"),
       buildRow(t(dictionary, "services.cards.hourly.mobileFlow.contactStep.fields.phone"), snapshot.phone, "customer-phone"),
       buildRow(t(dictionary, "services.cards.hourly.mobileFlow.contactStep.fields.email"), snapshot.email, "customer-email"),
-      snapshot.hourly_daily_notes
-        ? buildRow(t(dictionary, base + "details.notes"), snapshot.hourly_daily_notes, "notes")
+      notes
+        ? buildRow(t(dictionary, base + "details.notes"), notes, "notes")
         : ""
     ].join("");
 
