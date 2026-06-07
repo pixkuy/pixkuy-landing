@@ -196,8 +196,103 @@ body.booking-status-mobile-lock{
     grid-row:span 3;
   }
 
-  .booking-status-mobile__detail:has([data-booking-status-label="amount"]){
+  .booking-status-page[data-booking-status-page="success"] .booking-status-mobile__detail:has([data-booking-status-label="amount"]){
+    grid-column:auto;
+  }
+  
+    .booking-status-mobile__amount-currency{
+    color:rgba(61,158,122,.98);
+  }
+
+  .booking-status-mobile__detail:has([data-booking-status-label="notes"]){
     grid-column:1 / -1;
+    cursor:pointer;
+  }
+
+  .booking-status-mobile__detail:has([data-booking-status-label="notes"]) dd{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    text-decoration:underline;
+    text-decoration-color:rgba(255,245,228,.30);
+    text-underline-offset:3px;
+  }
+
+  .booking-status-mobile__notes-sheet{
+    position:fixed;
+    inset:0;
+    z-index:150;
+    display:grid;
+    align-items:end;
+  }
+
+  .booking-status-mobile__notes-sheet[hidden]{
+    display:none !important;
+  }
+
+  .booking-status-mobile__notes-backdrop{
+    position:absolute;
+    inset:0;
+    border:0;
+    background:rgba(0,0,0,.54);
+  }
+
+  .booking-status-mobile__notes-panel{
+    position:relative;
+    z-index:1;
+    max-height:58svh;
+    min-height:0;
+    padding:16px 16px calc(18px + env(safe-area-inset-bottom));
+    border:1px solid rgba(236,220,189,.18);
+    border-radius:18px 18px 0 0;
+    background:#111315;
+    box-shadow:0 -18px 50px rgba(0,0,0,.36);
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .booking-status-mobile__notes-panel:focus{
+    outline:none;
+  }
+
+  .booking-status-mobile__notes-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+  }
+
+  .booking-status-mobile__notes-title{
+    margin:0;
+    color:rgba(255,249,238,.96);
+    font-size:16px;
+    line-height:1.2;
+    font-weight:800;
+  }
+
+  .booking-status-mobile__notes-close{
+    width:32px;
+    height:32px;
+    padding:0;
+    border:0;
+    border-radius:999px;
+    background:rgba(255,255,255,.06);
+    color:rgba(255,245,228,.86);
+    font:inherit;
+    font-size:22px;
+    line-height:1;
+    font-weight:500;
+  }
+
+  .booking-status-mobile__notes-text{
+    margin:0;
+    color:rgba(255,249,238,.90);
+    font-size:14px;
+    line-height:1.45;
+    font-weight:650;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
   }
 
   .booking-status-mobile__vehicle-value{

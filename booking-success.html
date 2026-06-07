@@ -158,7 +158,16 @@
             <dd data-booking-status-amount></dd>
           </div>
 		  
-		            <div class="booking-status__detail booking-status__detail--customer-name">
+		  <div
+            class="booking-status__detail booking-status__detail--notes"
+            data-booking-status-notes-row
+            hidden
+          >
+            <dt data-booking-status-label="notes"></dt>
+            <dd data-booking-status-notes></dd>
+          </div>
+		  
+		   <div class="booking-status__detail booking-status__detail--customer-name">
             <dt data-booking-status-label="customerName"></dt>
             <dd data-booking-status-customer-name></dd>
           </div>
@@ -317,7 +326,61 @@
             <dt data-booking-status-label="amount"></dt>
             <dd data-booking-status-amount></dd>
           </div>
+		  
+		  <div
+            class="booking-status-mobile__detail"
+            data-booking-status-notes-row
+            role="button"
+            tabindex="0"
+            hidden
+          >
+            <dt data-booking-status-label="notes"></dt>
+            <dd data-booking-status-notes></dd>
+          </div>
         </dl>
+		
+		        <section
+          class="booking-status-mobile__notes-sheet"
+          data-booking-status-notes-sheet
+          aria-hidden="true"
+          hidden
+        >
+          <button
+            type="button"
+            class="booking-status-mobile__notes-backdrop"
+            data-booking-status-notes-close
+            aria-label="Cerrar notas"
+          ></button>
+
+          <div
+            class="booking-status-mobile__notes-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-status-mobile-notes-title"
+            tabindex="-1"
+            data-booking-status-notes-panel
+          >
+            <div class="booking-status-mobile__notes-header">
+              <h3
+                id="booking-status-mobile-notes-title"
+                class="booking-status-mobile__notes-title"
+                data-booking-status-notes-title
+              ></h3>
+
+              <button
+                type="button"
+                class="booking-status-mobile__notes-close"
+                data-booking-status-notes-close
+                aria-label="Cerrar notas"
+              >×</button>
+            </div>
+
+            <p
+              class="booking-status-mobile__notes-text"
+              data-booking-status-notes-full
+            ></p>
+          </div>
+        </section>
 
         <div
           class="booking-status-mobile__notice"

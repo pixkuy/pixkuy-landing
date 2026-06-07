@@ -125,15 +125,30 @@
   }
 
   function durationLabel(dictionary, value) {
-    if (typeof value !== "number") {
+    var totalMinutes;
+    var hours;
+    var minutes;
+    var parts = [];
+
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
       return emptyValue(dictionary);
     }
 
-    if (value === 1) {
-      return t(dictionary, "details.durationOneHour") || "1 hora";
+    totalMinutes = Math.round(value * 60);
+    hours = Math.floor(totalMinutes / 60);
+    minutes = totalMinutes % 60;
+
+    if (hours === 1) {
+      parts.push(t(dictionary, "details.durationOneHour") || "1 hora");
+    } else if (hours > 1) {
+      parts.push(String(hours) + " " + (t(dictionary, "details.durationHours") || "horas"));
     }
 
-    return String(value) + " " + (t(dictionary, "details.durationHours") || "horas");
+    if (minutes > 0) {
+      parts.push(String(minutes).padStart(2, "0") + " min");
+    }
+
+    return parts.length ? parts.join(" ") : "0 min";
   }
 
   function passengerLabel(dictionary, result) {
@@ -150,6 +165,26 @@
     }
 
     return String(result.passengerCount) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
+  }
+
+  function shouldShowLuggage(result) {
+    return Boolean(
+      result &&
+      result.serviceType === "airport_transfer" &&
+      typeof result.luggageCount === "number"
+    );
+  }
+
+  function luggageLabel(dictionary, result) {
+    if (!shouldShowLuggage(result)) {
+      return emptyValue(dictionary);
+    }
+
+    if (result.luggageCount === 1) {
+      return t(dictionary, "details.luggageOne") || "1 maleta";
+    }
+
+    return String(result.luggageCount) + " " + (t(dictionary, "details.luggageMany") || "maletas");
   }
   
     function getVehicleThumbnailSrc(vehicleDisplayName) {
@@ -349,6 +384,7 @@
         result.serviceStartLocalTime ||
         typeof result.durationHours === "number" ||
         typeof result.passengerCount === "number" ||
+        typeof result.luggageCount === "number" ||
         typeof result.paymentAmountPaid === "number" ||
         typeof result.paymentAmountExpected === "number" ||
         result.customerFullName ||
@@ -412,6 +448,24 @@
     );
     setText(
       root,
+      "[data-booking-status-luggage]",
+      luggageLabel(dictionary, result)
+    );
+    setHidden(
+      root,
+      "[data-booking-status-luggage-row]",
+      !shouldShowLuggage(result)
+    );
+
+    var detailsNode = root ? root.querySelector("[data-booking-status-details]") : null;
+    if (detailsNode) {
+      detailsNode.setAttribute(
+        "data-booking-status-has-luggage",
+        shouldShowLuggage(result) ? "true" : "false"
+      );
+    }
+    setText(
+      root,
       "[data-booking-status-payment]",
       paymentLabel(dictionary, result.paymentStatus)
     );
@@ -419,6 +473,16 @@
       root,
       "[data-booking-status-amount]",
       amountLabel(dictionary, result)
+    );
+	setText(
+      root,
+      "[data-booking-status-notes]",
+      result.customerNotes || emptyValue(dictionary)
+    );
+    setHidden(
+      root,
+      "[data-booking-status-notes-row]",
+      !result.customerNotes
     );
     setText(
       root,
@@ -547,12 +611,14 @@ function syncActions(root, dictionary, result) {
     setText(root, '[data-booking-status-label="time"]', t(dictionary, "details.time"));
     setText(root, '[data-booking-status-label="duration"]', t(dictionary, "details.duration"));
     setText(root, '[data-booking-status-label="passengers"]', t(dictionary, "details.passengers"));
+    setText(root, '[data-booking-status-label="luggage"]', t(dictionary, "details.luggage") || "Maletas");
     setText(root, '[data-booking-status-label="payment"]', t(dictionary, "details.payment"));
     setText(
       root,
       '[data-booking-status-label="amount"]',
       tFallback(dictionary, "cancelled.details.amount", "details.amount")
     );
+	setText(root, '[data-booking-status-label="notes"]', t(dictionary, "details.notes"));
 	setText(root, '[data-booking-status-label="customerName"]', t(dictionary, "details.customerName"));
     setText(root, '[data-booking-status-label="customerPhone"]', t(dictionary, "details.customerPhone"));
     setText(root, '[data-booking-status-label="customerEmail"]', t(dictionary, "details.customerEmail"));

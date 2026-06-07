@@ -20,6 +20,8 @@
   var MOBILE_QUERY = "(max-width: 720px)";
   var LOCK_CLASS = "booking-status-mobile-lock";
   var previousFocus = null;
+  var previousNotesFocus = null;
+  var currentNotes = "";
 
   function isMobileViewport() {
     return Boolean(
@@ -80,6 +82,39 @@
     node.textContent = value || "";
     return true;
   }
+  
+    function normalizeText(value) {
+    return typeof value === "string" ? value.trim() : "";
+  }
+
+  function setAmountText(root, selector, value) {
+    var node = root ? root.querySelector(selector) : null;
+    var text = normalizeText(value);
+    var currencyMatch;
+    var currency;
+
+    if (!node) {
+      return false;
+    }
+
+    node.textContent = "";
+
+    currencyMatch = text.match(/^(.*?)(\s+MXN)$/);
+
+    if (!currencyMatch) {
+      node.textContent = text;
+      return true;
+    }
+
+    node.appendChild(document.createTextNode(normalizeText(currencyMatch[1]) + " "));
+
+    currency = document.createElement("span");
+    currency.className = "booking-status-mobile__amount-currency";
+    currency.textContent = "MXN";
+    node.appendChild(currency);
+
+    return true;
+  }
 
   function setHidden(root, selector, hidden) {
     var node = root ? root.querySelector(selector) : null;
@@ -114,6 +149,63 @@
     notice.hidden = !message;
     notice.setAttribute("data-booking-status-tone", tone || "");
 
+    return true;
+  }
+  
+    function getNotesSheet(root) {
+    return root ? root.querySelector("[data-booking-status-notes-sheet]") : null;
+  }
+
+  function getNotesPanel(root) {
+    return root ? root.querySelector("[data-booking-status-notes-panel]") : null;
+  }
+
+  function getNotesFullText(root) {
+    return root ? root.querySelector("[data-booking-status-notes-full]") : null;
+  }
+
+  function openNotesSheet(root) {
+    var sheet = getNotesSheet(root);
+    var panel = getNotesPanel(root);
+    var text = getNotesFullText(root);
+
+    if (!sheet || !panel || !text || !currentNotes) {
+      return false;
+    }
+
+    previousNotesFocus = document.activeElement;
+    text.textContent = currentNotes;
+    sheet.hidden = false;
+    sheet.setAttribute("aria-hidden", "false");
+
+    window.requestAnimationFrame(function focusNotesPanel() {
+      if (typeof panel.focus === "function") {
+        panel.focus({ preventScroll: true });
+      }
+    });
+
+    return true;
+  }
+
+  function closeNotesSheet(root) {
+    var sheet = getNotesSheet(root);
+
+    if (!sheet) {
+      return false;
+    }
+
+    sheet.setAttribute("aria-hidden", "true");
+    sheet.hidden = true;
+
+    if (
+      previousNotesFocus &&
+      typeof previousNotesFocus.focus === "function" &&
+      document.contains(previousNotesFocus)
+    ) {
+      previousNotesFocus.focus({ preventScroll: true });
+    }
+
+    previousNotesFocus = null;
     return true;
   }
 
@@ -500,6 +592,7 @@
       return false;
     }
 
+    closeNotesSheet(root);
     blurActiveElementInside(root);
 
     root.setAttribute("aria-hidden", "true");
@@ -543,6 +636,35 @@
         event.preventDefault();
         close();
       });
+    });
+	
+	    root.addEventListener("click", function onMobileClick(event) {
+      var notesClose = event.target.closest("[data-booking-status-notes-close]");
+      var notesRow = event.target.closest("[data-booking-status-notes-row]");
+
+      if (notesClose) {
+        event.preventDefault();
+        closeNotesSheet(root);
+        return;
+      }
+
+      if (notesRow && currentNotes) {
+        event.preventDefault();
+        openNotesSheet(root);
+      }
+    });
+
+    root.addEventListener("keydown", function onMobileNotesKeydown(event) {
+      var notesRow = event.target.closest("[data-booking-status-notes-row]");
+
+      if (!notesRow || !currentNotes) {
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openNotesSheet(root);
+      }
     });
 
     document.addEventListener("keydown", function onKeydown(event) {
@@ -627,10 +749,21 @@
       "[data-booking-status-payment]",
       statusPaymentLabel(dictionary, result)
     );
-    setText(
+    setAmountText(
       root,
       "[data-booking-status-amount]",
       amountLabel(dictionary, result)
+    );
+    currentNotes = normalizeText(result.customerNotes);
+    setText(
+      root,
+      "[data-booking-status-notes]",
+      currentNotes || emptyValue(dictionary)
+    );
+    setHidden(
+      root,
+      "[data-booking-status-notes-row]",
+      !currentNotes
     );
     setHidden(root, "[data-booking-status-details]", false);
   }
@@ -709,6 +842,16 @@
       root,
       '[data-booking-status-label="amount"]',
       tFallback(dictionary, "mobile.details.amount", "details.amount")
+    );
+	    setText(
+      root,
+      '[data-booking-status-label="notes"]',
+      tFallback(dictionary, "mobile.details.notes", "details.notes")
+    );
+    setText(
+      root,
+      "[data-booking-status-notes-title]",
+      tFallback(dictionary, "mobile.details.notes", "details.notes")
     );
 
     setText(root, "[data-booking-status-primary]", t(dictionary, "actions.primary"));

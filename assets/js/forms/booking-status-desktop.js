@@ -391,6 +391,16 @@
       "[data-booking-status-amount]",
       amountLabel(dictionary, result)
     );
+	    setText(
+      root,
+      "[data-booking-status-notes]",
+      result.customerNotes || emptyValue(dictionary)
+    );
+    setHidden(
+      root,
+      "[data-booking-status-notes-row]",
+      !result.customerNotes
+    );
     setText(
       root,
       "[data-booking-status-customer-name]",
@@ -436,7 +446,7 @@
     setText(root, '[data-booking-status-label="luggage"]', t(dictionary, "details.luggage") || "Maletas");
     setText(root, '[data-booking-status-label="payment"]', t(dictionary, "details.payment"));
     setText(root, '[data-booking-status-label="amount"]', t(dictionary, "details.amount"));
-	
+	setText(root, '[data-booking-status-label="notes"]', t(dictionary, "details.notes"));
 	setText(root, '[data-booking-status-label="customerName"]', t(dictionary, "details.customerName"));
     setText(root, '[data-booking-status-label="customerPhone"]', t(dictionary, "details.customerPhone"));
     setText(root, '[data-booking-status-label="customerEmail"]', t(dictionary, "details.customerEmail"));

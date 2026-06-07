@@ -162,15 +162,30 @@
   }
 
   function durationLabel(dictionary, value) {
-    if (typeof value !== "number") {
+    var totalMinutes;
+    var hours;
+    var minutes;
+    var parts = [];
+
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
       return emptyValue(dictionary);
     }
 
-    if (value === 1) {
-      return t(dictionary, "details.durationOneHour") || "1 hora";
+    totalMinutes = Math.round(value * 60);
+    hours = Math.floor(totalMinutes / 60);
+    minutes = totalMinutes % 60;
+
+    if (hours === 1) {
+      parts.push(t(dictionary, "details.durationOneHour") || "1 hora");
+    } else if (hours > 1) {
+      parts.push(String(hours) + " " + (t(dictionary, "details.durationHours") || "horas"));
     }
 
-    return String(value) + " " + (t(dictionary, "details.durationHours") || "horas");
+    if (minutes > 0) {
+      parts.push(String(minutes).padStart(2, "0") + " min");
+    }
+
+    return parts.length ? parts.join(" ") : "0 min";
   }
 
   function passengerLabel(dictionary, result) {
@@ -187,6 +202,26 @@
     }
 
     return String(result.passengerCount) + " " + (t(dictionary, "details.passengerMany") || "pasajeros");
+  }
+
+  function shouldShowLuggage(result) {
+    return Boolean(
+      result &&
+      result.serviceType === "airport_transfer" &&
+      typeof result.luggageCount === "number"
+    );
+  }
+
+  function luggageLabel(dictionary, result) {
+    if (!shouldShowLuggage(result)) {
+      return emptyValue(dictionary);
+    }
+
+    if (result.luggageCount === 1) {
+      return t(dictionary, "details.luggageOne") || "1 maleta";
+    }
+
+    return String(result.luggageCount) + " " + (t(dictionary, "details.luggageMany") || "maletas");
   }
 
   function getVehicleThumbnailSrc(vehicleDisplayName) {
@@ -249,6 +284,7 @@
         result.serviceStartLocalTime ||
         typeof result.durationHours === "number" ||
         typeof result.passengerCount === "number" ||
+        typeof result.luggageCount === "number" ||
         typeof result.paymentAmountPaid === "number" ||
         typeof result.paymentAmountExpected === "number"
       )
@@ -650,6 +686,16 @@
     );
     setText(
       root,
+      "[data-booking-status-luggage]",
+      luggageLabel(dictionary, result)
+    );
+    setHidden(
+      root,
+      "[data-booking-status-luggage-row]",
+      !shouldShowLuggage(result)
+    );
+    setText(
+      root,
       "[data-booking-status-payment]",
       cancelledPaymentLabel(dictionary, result)
     );
@@ -657,6 +703,16 @@
       root,
       "[data-booking-status-amount]",
       amountLabel(dictionary, result)
+    );
+	    setText(
+      root,
+      "[data-booking-status-notes]",
+      result.customerNotes || emptyValue(dictionary)
+    );
+    setHidden(
+      root,
+      "[data-booking-status-notes-row]",
+      !result.customerNotes
     );
     setHidden(root, "[data-booking-status-details]", false);
   }
@@ -812,6 +868,11 @@ function syncActions(root, dictionary, result) {
     );
     setText(
       root,
+      '[data-booking-status-label="luggage"]',
+      tFallback(dictionary, "mobile.details.luggage", "details.luggage") || "Maletas"
+    );
+    setText(
+      root,
       '[data-booking-status-label="payment"]',
       tFallback(dictionary, "mobile.details.payment", "details.payment")
     );
@@ -821,6 +882,11 @@ function syncActions(root, dictionary, result) {
       result.view === "confirmed"
         ? tFallback(dictionary, "mobile.details.amount", "details.amount")
         : tFallback(dictionary, "cancelled.details.amount", "details.amount")
+    );
+	setText(
+      root,
+      '[data-booking-status-label="notes"]',
+      tFallback(dictionary, "mobile.details.notes", "details.notes")
     );
 
     if (
