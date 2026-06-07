@@ -14,7 +14,7 @@
     return;
   }
 
-  var DEFAULT_BOOKING_API_BASE_URL = "http://localhost:3002";
+var DEFAULT_BOOKING_API_BASE_URL = "http://localhost:3002";
 var DEFAULT_PUBLIC_SITE_KEY = "local_pixkuy_site_key";
 var CHECKOUT_ENDPOINT = "/v1/public/reservations/checkout";
 var RECAPTCHA_ACTION = "hourly_checkout";
@@ -67,6 +67,12 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     }
 
     return api;
+  }
+  
+  function getAvailabilityPrecheckApi() {
+    var api = window.PixkuyHourlyAvailabilityPrecheck;
+
+    return api && typeof api.precheck === "function" ? api : null;
   }
 
   function getForm() {
@@ -330,6 +336,23 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     return payload;
   }
   
+  function buildAvailabilityPrecheckDetail(data) {
+    return {
+      serviceType: "hourly_daily",
+      hourly_daily_mode: data.hourlyDailyMode,
+      hourly_daily_vehicle_type: data.hourlyDailyVehicleType,
+      hourly_daily_pickup: data.hourlyDailyPickup,
+      hourly_daily_pickup_place_id: data.hourlyDailyPickupPlaceId,
+      hourly_daily_pickup_lat: data.hourlyDailyPickupLat,
+      hourly_daily_pickup_lng: data.hourlyDailyPickupLng,
+      hourly_daily_date: data.hourlyDailyDate,
+      hourly_daily_start_time: data.hourlyDailyStartTime,
+      hourly_daily_duration_hours: data.hourlyDailyDurationHours,
+      hourly_daily_price: data.hourlyDailyPrice,
+      hourly_daily_currency: data.hourlyDailyCurrency || "MXN"
+    };
+  }
+  
     function buildCheckoutReviewSnapshot(form, data) {
     var snapshot = getFormPayloadRaw(form);
 
@@ -344,6 +367,10 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     snapshot.hourly_daily_duration_hours = data.hourlyDailyDurationHours;
     snapshot.hourly_daily_price = data.hourlyDailyPrice;
     snapshot.hourly_daily_currency = data.hourlyDailyCurrency || "MXN";
+    snapshot.hourly_daily_notes =
+      data.hourlyDailyNotes ||
+      getFieldValue(form, "hourly_daily_notes") ||
+      getFieldValue(form, "message");
     snapshot.hourly_daily_pickup_place_id = data.hourlyDailyPickupPlaceId || "";
     snapshot.hourly_daily_pickup_lat = data.hourlyDailyPickupLat || "";
     snapshot.hourly_daily_pickup_lng = data.hourlyDailyPickupLng || "";
@@ -434,6 +461,83 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
       button.disabled = Boolean(isBusy);
       button.setAttribute("aria-disabled", isBusy ? "true" : "false");
     });
+
+    return true;
+  }
+  
+    function getAvailabilityErrorMessage(result) {
+    var nextAvailableStartLocal =
+      result && result.nextAvailableStartLocal
+        ? normalizeText(result.nextAvailableStartLocal)
+        : "";
+    var nextAvailableTime = "";
+    var baseMessage = getI18nValue(
+      "services.cards.hourly.panel.availability.unavailable",
+      "No hay disponibilidad para esa fecha y hora. Elige otra opción."
+    );
+    var nextAvailableTemplate = getI18nValue(
+      "services.cards.hourly.panel.availability.nextAvailableSlot",
+      "Siguiente hora disponible: {time}"
+    );
+
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(nextAvailableStartLocal)) {
+      nextAvailableTime = nextAvailableStartLocal.slice(11, 16);
+    } else {
+      nextAvailableTime = nextAvailableStartLocal;
+    }
+
+    if (nextAvailableTime) {
+      return baseMessage + " " + nextAvailableTemplate.replace("{time}", nextAvailableTime);
+    }
+
+    return baseMessage;
+  }
+
+  function focusHourlyDailyTimeField(fields) {
+    var timeField = fields ? fields.hourlyDailyVisibleTime : null;
+
+    if (!timeField || typeof timeField.focus !== "function") {
+      return false;
+    }
+
+    if (typeof timeField.scrollIntoView === "function") {
+      timeField.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    window.setTimeout(function focusTimeFieldAfterScroll() {
+      timeField.focus({
+        preventScroll: true
+      });
+    }, 120);
+
+    return true;
+  }
+
+  function showAvailabilityError(form, result) {
+    var fields;
+    var message;
+
+    if (!form) {
+      return false;
+    }
+
+    fields =
+      window.PixkuyForms &&
+      typeof window.PixkuyForms.getReservationRequestFields === "function"
+        ? window.PixkuyForms.getReservationRequestFields(form)
+        : null;
+
+    message = getAvailabilityErrorMessage(result);
+
+    if (fields && fields.formError) {
+      fields.formError.textContent = message;
+      fields.formError.hidden = false;
+    }
+
+    focusHourlyDailyTimeField(fields);
 
     return true;
   }
@@ -710,6 +814,19 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
 
     return true;
   }
+  
+  function verifyAvailabilityBeforeCheckout(data) {
+    var precheckApi = getAvailabilityPrecheckApi();
+
+    if (!precheckApi) {
+      return Promise.resolve({
+        available: false,
+        code: "PRECHECK_UNAVAILABLE"
+      });
+    }
+
+    return precheckApi.precheck(buildAvailabilityPrecheckDetail(data));
+  }
 
   function requestCheckout(input) {
     return window.fetch(buildCheckoutUrl(input.config), {
@@ -839,9 +956,25 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
     hideCheckoutError(form);
 
     if (isDesktopViewport()) {
-      if (!redirectToCheckoutReview(form, data)) {
-        showCheckoutError(form);
-      }
+      setFormBusy(form, true);
+
+      verifyAvailabilityBeforeCheckout(data)
+        .then(function onAvailabilityPrecheckResult(result) {
+          if (!result || result.available !== true) {
+            setFormBusy(form, false);
+            showAvailabilityError(form, result);
+            return;
+          }
+
+          if (!redirectToCheckoutReview(form, data)) {
+            setFormBusy(form, false);
+            showCheckoutError(form);
+          }
+        })
+        .catch(function onAvailabilityPrecheckError() {
+          setFormBusy(form, false);
+          showCheckoutError(form);
+        });
 
       return;
     }
