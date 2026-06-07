@@ -119,16 +119,43 @@
     return formatMoney(dictionary, result.paymentAmountExpected, result.paymentCurrency);
   }
   
-    function durationLabel(dictionary, value) {
+  function durationLabel(dictionary, value) {
+    var totalMinutes;
+    var hours;
+    var minutes;
+    var hourLabel;
+    var hoursLabel;
+    var minuteLabel;
+
     if (typeof value !== "number") {
       return emptyValue(dictionary);
     }
 
-    if (value === 1) {
-      return t(dictionary, "details.durationOneHour") || "1 hora";
+    totalMinutes = Math.round(value * 60);
+
+    if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
+      return emptyValue(dictionary);
     }
 
-    return String(value) + " " + (t(dictionary, "details.durationHours") || "horas");
+    hours = Math.floor(totalMinutes / 60);
+    minutes = totalMinutes % 60;
+    hourLabel = t(dictionary, "details.durationOneHour") || "1 hora";
+    hoursLabel = t(dictionary, "details.durationHours") || "horas";
+    minuteLabel = "min";
+
+    if (hours === 0) {
+      return String(minutes) + " " + minuteLabel;
+    }
+
+    if (minutes === 0) {
+      if (hours === 1) {
+        return hourLabel;
+      }
+
+      return String(hours) + " " + hoursLabel;
+    }
+
+    return String(hours) + " h " + String(minutes).padStart(2, "0") + " " + minuteLabel;
   }
 
   function passengerLabel(dictionary, result) {
@@ -318,6 +345,20 @@
 
     return true;
   }
+  
+  function syncDetailsMetadata(root, result) {
+    var details = root ? root.querySelector("[data-booking-status-details]") : null;
+
+    if (!details || !result) {
+      return false;
+    }
+
+    details.setAttribute("data-booking-status-service-type", result.serviceType || "");
+    details.setAttribute("data-booking-status-view", result.view || "");
+    details.setAttribute("data-booking-status-reservation-status", result.reservationStatus || "");
+
+    return true;
+  }
 
   function renderDetails(root, dictionary, result) {
     setText(
@@ -417,6 +458,7 @@
       result.customerEmail || emptyValue(dictionary)
     );
     syncCustomerDetailsVisibility(root, result);
+    syncDetailsMetadata(root, result);
     setHidden(root, "[data-booking-status-details]", false);
   }
 
