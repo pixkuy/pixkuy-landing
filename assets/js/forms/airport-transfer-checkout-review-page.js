@@ -159,15 +159,6 @@
     return parsed;
   }
 
-  function writeSnapshot(snapshot) {
-    try {
-      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
   function writeBookingHandoff(input) {
     var token = normalizeText(input && input.bookingStatusToken);
     var checkoutUrl = normalizeText(input && input.checkoutUrl);
@@ -999,11 +990,9 @@
     var edit = getNode("[data-airport-transfer-checkout-review-edit]");
 
     if (edit) {
-      edit.setAttribute("href", "/?service=airport_hotel#contact");
+      edit.setAttribute("href", "/#contact");
 
       edit.addEventListener("click", function onEditClick() {
-        writeSnapshot(snapshot);
-
         try {
           window.sessionStorage.setItem(RETURN_KEY, "1");
         } catch (error) {

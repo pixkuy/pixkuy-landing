@@ -2120,6 +2120,69 @@
     return true;
   }
 
+  function writeCheckoutReviewReturnField(form, name, value) {
+    const field = form ? form.querySelector('[name="' + name + '"]') : null;
+    const normalizedValue =
+      typeof value === "boolean"
+        ? (value ? "true" : "")
+        : normalizeText(value);
+
+    if (!field) {
+      return false;
+    }
+
+    if (field.type === "checkbox") {
+      field.checked = normalizedValue === "true" || normalizedValue === "1";
+      field.value = normalizedValue || field.value;
+      return true;
+    }
+
+    field.value = normalizedValue;
+    return true;
+  }
+
+  function restoreCheckoutReviewCommonFields(snapshot) {
+    const form = getReservationForm();
+    const safeSnapshot =
+      snapshot && typeof snapshot === "object" ? snapshot : {};
+    const notes = normalizeText(
+      safeSnapshot.message ||
+        safeSnapshot.notes ||
+        safeSnapshot.airport_transfer_notes
+    );
+
+    if (!form) {
+      return false;
+    }
+
+    writeCheckoutReviewReturnField(form, "name", safeSnapshot.name);
+    writeCheckoutReviewReturnField(form, "phone", safeSnapshot.phone);
+    writeCheckoutReviewReturnField(form, "email", safeSnapshot.email);
+    writeCheckoutReviewReturnField(
+      form,
+      "luggage",
+      safeSnapshot.airport_transfer_luggage || safeSnapshot.luggage
+    );
+    writeCheckoutReviewReturnField(form, "message", notes);
+    writeCheckoutReviewReturnField(form, "notes", notes);
+
+    [
+      "legal_acceptance_accepted",
+      "legal_acceptance_terms_version",
+      "legal_acceptance_cancellation_policy_version",
+      "legal_acceptance_privacy_version",
+      "legal_acceptance_accepted_at",
+      "legal_acceptance_channel",
+      "legal_acceptance_terms_url",
+      "legal_acceptance_cancellations_url",
+      "legal_acceptance_privacy_url"
+    ].forEach(function restoreLegalField(fieldName) {
+      writeCheckoutReviewReturnField(form, fieldName, safeSnapshot[fieldName]);
+    });
+
+    return true;
+  }
+
   function applyHandoff(payload) {
     const form = getReservationForm();
     const nodes = getEditorNodes(form);
@@ -2264,6 +2327,7 @@
     syncAirportHotelDateUiState(nodes);
     syncAirportHotelPayloadFields(editorState, nodes);
     syncPanelSummaryFromTariffBridge(editorState, nodes);
+    restoreCheckoutReviewCommonFields(safePayload);
     syncReservationRequestUiState({ skipValidation: true });
 
     return true;
