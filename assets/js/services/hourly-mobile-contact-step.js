@@ -38,6 +38,7 @@
   let currentPanel = null;
   let currentSnapshot = null;
   let legalAcceptanceInstance = null;
+  let previousNotesFocus = null;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -313,6 +314,33 @@
     node.textContent = value || "";
     return true;
   }
+  
+    function setPriceText(node, value) {
+    var text = normalizeText(value);
+    var currencyMatch;
+
+    if (!node) {
+      return false;
+    }
+
+    node.textContent = "";
+
+    currencyMatch = text.match(/^(.*?)(\s+MXN)$/);
+
+    if (!currencyMatch) {
+      node.textContent = text;
+      return true;
+    }
+
+    node.appendChild(document.createTextNode(normalizeText(currencyMatch[1]) + " "));
+
+    var currency = document.createElement("span");
+    currency.className = "hourly-mobile-contact-step__summary-currency";
+    currency.textContent = "MXN";
+    node.appendChild(currency);
+
+    return true;
+  }
 
   function setHidden(node, isHidden) {
     if (!node) {
@@ -441,6 +469,13 @@
     const actions = document.createElement("div");
     const submit = document.createElement("button");
     const globalError = document.createElement("p");
+	const notesSheet = document.createElement("section");
+    const notesBackdrop = document.createElement("button");
+    const notesPanel = document.createElement("div");
+    const notesHeader = document.createElement("div");
+    const notesTitle = document.createElement("h3");
+    const notesClose = document.createElement("button");
+    const notesText = document.createElement("p");
 
     root.className = "hourly-mobile-contact-step";
     root.setAttribute("data-hourly-mobile-contact-step", "1");
@@ -497,6 +532,45 @@
     submit.setAttribute("data-hourly-mobile-contact-submit", "1");
 
     actions.appendChild(submit);
+	
+	notesSheet.className = "hourly-mobile-contact-step__notes-sheet";
+    notesSheet.setAttribute("data-hourly-mobile-notes-sheet", "1");
+    notesSheet.setAttribute("aria-hidden", "true");
+    notesSheet.hidden = true;
+
+    notesBackdrop.type = "button";
+    notesBackdrop.className = "hourly-mobile-contact-step__notes-backdrop";
+    notesBackdrop.setAttribute("data-hourly-mobile-notes-close", "1");
+    notesBackdrop.setAttribute("aria-label", "Cerrar notas");
+
+    notesPanel.className = "hourly-mobile-contact-step__notes-panel";
+    notesPanel.setAttribute("role", "dialog");
+    notesPanel.setAttribute("aria-modal", "true");
+    notesPanel.setAttribute("aria-labelledby", "hourly-mobile-contact-notes-title");
+    notesPanel.setAttribute("tabindex", "-1");
+    notesPanel.setAttribute("data-hourly-mobile-notes-panel", "1");
+
+    notesHeader.className = "hourly-mobile-contact-step__notes-header";
+
+    notesTitle.id = "hourly-mobile-contact-notes-title";
+    notesTitle.className = "hourly-mobile-contact-step__notes-title";
+    notesTitle.setAttribute("data-hourly-mobile-notes-title", "1");
+
+    notesClose.type = "button";
+    notesClose.className = "hourly-mobile-contact-step__notes-close";
+    notesClose.setAttribute("data-hourly-mobile-notes-close", "1");
+    notesClose.setAttribute("aria-label", "Cerrar notas");
+    notesClose.textContent = "×";
+
+    notesText.className = "hourly-mobile-contact-step__notes-text";
+    notesText.setAttribute("data-hourly-mobile-notes-text", "1");
+
+    notesHeader.appendChild(notesTitle);
+    notesHeader.appendChild(notesClose);
+    notesPanel.appendChild(notesHeader);
+    notesPanel.appendChild(notesText);
+    notesSheet.appendChild(notesBackdrop);
+    notesSheet.appendChild(notesPanel);
 
     backRow.appendChild(back);
 
@@ -509,6 +583,7 @@
     root.appendChild(legalAcceptance);
     root.appendChild(globalError);
     root.appendChild(actions);
+    root.appendChild(notesSheet);
 
     return root;
   }
@@ -577,9 +652,79 @@
     };
 
     Object.keys(values).forEach(function syncValue(key) {
+      if (key === "price") {
+        setPriceText(getSummaryValueNode(key), values[key]);
+        return;
+      }
+
       setText(getSummaryValueNode(key), values[key]);
     });
 
+    return true;
+  }
+  
+  function getNotesSheetNode() {
+    return contactStepNode
+      ? contactStepNode.querySelector("[data-hourly-mobile-notes-sheet]")
+      : null;
+  }
+
+  function getNotesPanelNode() {
+    return contactStepNode
+      ? contactStepNode.querySelector("[data-hourly-mobile-notes-panel]")
+      : null;
+  }
+
+  function getNotesTextNode() {
+    return contactStepNode
+      ? contactStepNode.querySelector("[data-hourly-mobile-notes-text]")
+      : null;
+  }
+
+  function openNotesSheet() {
+    const sheet = getNotesSheetNode();
+    const panel = getNotesPanelNode();
+    const text = getNotesTextNode();
+    const notes = normalizeText(currentSnapshot && currentSnapshot.hourly_daily_notes);
+
+    if (!sheet || !panel || !text || !notes) {
+      return false;
+    }
+
+    previousNotesFocus = document.activeElement;
+
+    text.textContent = notes;
+    sheet.hidden = false;
+    sheet.setAttribute("aria-hidden", "false");
+
+    window.requestAnimationFrame(function focusNotesPanel() {
+      if (typeof panel.focus === "function") {
+        panel.focus({ preventScroll: true });
+      }
+    });
+
+    return true;
+  }
+
+  function closeNotesSheet() {
+    const sheet = getNotesSheetNode();
+
+    if (!sheet) {
+      return false;
+    }
+
+    sheet.setAttribute("aria-hidden", "true");
+    sheet.hidden = true;
+
+    if (
+      previousNotesFocus &&
+      typeof previousNotesFocus.focus === "function" &&
+      document.contains(previousNotesFocus)
+    ) {
+      previousNotesFocus.focus({ preventScroll: true });
+    }
+
+    previousNotesFocus = null;
     return true;
   }
 
@@ -593,6 +738,9 @@
       : null;
     const globalError = root
       ? root.querySelector("[data-hourly-mobile-contact-global-error]")
+      : null;
+	const notesTitle = root
+      ? root.querySelector("[data-hourly-mobile-notes-title]")
       : null;
 
     if (!root) {
@@ -613,6 +761,13 @@
     setText(
       globalError,
       getI18nValue("services.cards.hourly.mobileFlow.contactStep.validation.formIncomplete", "")
+    );
+	setText(
+      notesTitle,
+      getI18nValue(
+        "services.cards.hourly.mobileFlow.contactStep.summary.notes",
+        "Notas"
+      )
     );
 
     ["mode", "pickup", "date", "time", "duration", "vehicle", "price", "notes"]
@@ -1138,8 +1293,25 @@
       });
 
     contactStepNode.addEventListener("click", function onClick(event) {
+      const notesClose = event.target.closest("[data-hourly-mobile-notes-close]");
+      const notesRow = event.target.closest('[data-hourly-mobile-contact-summary-row="notes"]');
       const back = event.target.closest("[data-hourly-mobile-contact-back]");
       const submit = event.target.closest("[data-hourly-mobile-contact-submit]");
+
+      if (notesClose) {
+        event.preventDefault();
+        closeNotesSheet();
+        return;
+      }
+
+      if (
+        notesRow &&
+        normalizeText(currentSnapshot && currentSnapshot.hourly_daily_notes)
+      ) {
+        event.preventDefault();
+        openNotesSheet();
+        return;
+      }
 
       if (back) {
         event.preventDefault();
@@ -1231,6 +1403,9 @@
 
     currentPanel = null;
     hideGlobalError();
+    closeNotesSheet();
+
+    window.dispatchEvent(new CustomEvent("pixkuy:hourly-mobile-contact-step-closed"));
 
     return true;
   }

@@ -1564,6 +1564,11 @@ function dispatchHourlySubmit(detail) {
   return true;
 }
 
+function restoreHourlyContinueAfterMobileContactClose() {
+  setHourlyContinueBusy(false);
+  return true;
+}
+
 function handleHourlyContinue() {
   const precheckApi = getHourlyAvailabilityPrecheckApi();
   const detail = buildHourlySubmitDetail();
@@ -1744,6 +1749,10 @@ if (ctaButton && !ctaButton.disabled) {
   window.addEventListener('pixkuy:contact-hourly-daily-sync', (event) => {
   const detail = event && event.detail ? event.detail : {};
   applyContactHourlyDailySync(detail.snapshot);
+});
+
+  window.addEventListener('pixkuy:hourly-mobile-contact-step-closed', () => {
+  restoreHourlyContinueAfterMobileContactClose();
 });
 
 bindEvents();

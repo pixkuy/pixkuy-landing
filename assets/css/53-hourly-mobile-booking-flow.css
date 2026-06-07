@@ -729,6 +729,10 @@
     overflow:visible !important;
     overflow-wrap:break-word !important;
   }
+  
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability[data-availability-tone="success"]{
+    color:rgba(61,158,122,.98) !important;
+  }
 
   .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability[hidden]{
     display:none !important;
