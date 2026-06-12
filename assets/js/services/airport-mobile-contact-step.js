@@ -26,6 +26,7 @@
   const FIELD_NAME = "name";
   const FIELD_PHONE = "phone";
   const FIELD_EMAIL = "email";
+  const FIELD_NOTES = "notes";
 
   const mobileQuery = window.matchMedia ? window.matchMedia(MOBILE_QUERY) : null;
 
@@ -430,6 +431,40 @@
     return wrapper;
   }
 
+  function buildNotesField(name) {
+    const wrapper = document.createElement("div");
+    const label = document.createElement("label");
+    const field = document.createElement("textarea");
+    const error = document.createElement("p");
+    const fieldId = "airport-mobile-contact-" + name;
+
+    wrapper.className = "airport-mobile-contact-step__field";
+    wrapper.setAttribute("data-airport-mobile-contact-field-wrapper", name);
+
+    label.className = "airport-mobile-contact-step__label";
+    label.setAttribute("for", fieldId);
+    label.setAttribute("data-airport-mobile-contact-label", name);
+
+    field.id = fieldId;
+    field.className = "airport-mobile-contact-step__control airport-mobile-contact-step__control--notes";
+    field.setAttribute("data-airport-mobile-contact-field", name);
+    field.setAttribute("aria-describedby", fieldId + "-error");
+    field.setAttribute("autocomplete", "off");
+    field.setAttribute("maxlength", "300");
+    field.setAttribute("rows", "1");
+
+    error.id = fieldId + "-error";
+    error.className = "airport-mobile-contact-step__error";
+    error.setAttribute("data-airport-mobile-contact-error", name);
+    error.hidden = true;
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(field);
+    wrapper.appendChild(error);
+
+    return wrapper;
+  }
+
   function buildContactStepNode() {
     const root = document.createElement("section");
     const backRow = document.createElement("div");
@@ -486,6 +521,7 @@
     form.appendChild(buildField(FIELD_NAME, "text", "name"));
     form.appendChild(buildField(FIELD_PHONE, "tel", "tel"));
     form.appendChild(buildField(FIELD_EMAIL, "email", "email"));
+    form.appendChild(buildNotesField(FIELD_NOTES));
 
     globalError.className = "airport-mobile-contact-step__global-error";
     globalError.setAttribute("data-airport-mobile-contact-global-error", "1");
@@ -636,7 +672,7 @@
         );
       });
 
-    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL]
+    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL, FIELD_NOTES]
       .forEach(function syncFieldCopy(name) {
         const field = getContactField(name);
         const label = root.querySelector(
@@ -871,7 +907,7 @@
       name: normalizeText(getContactField(FIELD_NAME).value),
       phone: normalizePhoneValue(getContactField(FIELD_PHONE).value),
       email: normalizeText(getContactField(FIELD_EMAIL).value),
-      notes: ""
+      notes: normalizeText(getContactField(FIELD_NOTES).value)
     };
   }
 
@@ -1111,7 +1147,7 @@
 
     contactStepNode.dataset.airportMobileContactBound = "1";
 
-    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL]
+    [FIELD_NAME, FIELD_PHONE, FIELD_EMAIL, FIELD_NOTES]
       .forEach(function bindField(name) {
         const field = getContactField(name);
 

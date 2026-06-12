@@ -23,7 +23,7 @@
   }
 
   .airport-mobile-route .airport-mobile-contact-step{
-    --airport-mobile-contact-bottom-shift:-12px;
+    --airport-mobile-contact-bottom-shift:0px;
     display:grid;
     grid-template-rows:auto auto auto minmax(24px, 1fr) auto auto auto;
     gap:0;
@@ -71,7 +71,7 @@
 
   .airport-mobile-route .airport-mobile-contact-step__summary-list{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-template-columns:repeat(4, minmax(0, 1fr));
     gap:7px 6px;
     margin:0;
   }
@@ -155,6 +155,16 @@
     line-height:38px;
     font-weight:650;
     color-scheme:dark;
+  }
+  
+    .airport-mobile-route .airport-mobile-contact-step__control--notes{
+    min-height:38px;
+    height:38px;
+    max-height:38px;
+    padding:0 11px;
+    line-height:38px;
+    resize:none;
+    overflow:hidden;
   }
  
   .airport-mobile-route .airport-mobile-contact-step__control::placeholder{

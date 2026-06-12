@@ -203,6 +203,10 @@ body.booking-status-mobile-lock{
     .booking-status-mobile__amount-currency{
     color:rgba(61,158,122,.98);
   }
+  
+  .booking-status-page[data-booking-status-page="cancelled"] .booking-status-mobile__details[data-booking-status-service-type="airport_transfer"] .booking-status-mobile__detail:has([data-booking-status-label="payment"]){
+    grid-column:1 / -1;
+  }
 
   .booking-status-mobile__detail:has([data-booking-status-label="notes"]){
     grid-column:1 / -1;

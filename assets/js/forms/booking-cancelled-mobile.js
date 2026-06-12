@@ -633,6 +633,12 @@
   }
 
   function renderDetails(root, dictionary, result) {
+    var details = root ? root.querySelector("[data-booking-status-details]") : null;
+
+    if (details) {
+      details.setAttribute("data-booking-status-service-type", result.serviceType || "");
+    }
+
     setText(
       root,
       "[data-booking-status-public-code]",
