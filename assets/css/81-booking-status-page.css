@@ -581,6 +581,10 @@
   .booking-status-page[data-booking-status-page="success"] .booking-status__details[data-booking-status-service-type="airport_transfer"][data-booking-status-view="manualReview"] .booking-status__detail--customer-email{
     grid-column:1 / -1;
   }
+  
+  .booking-status-page[data-booking-status-page="success"] .booking-status__details[data-booking-status-service-type="airport_transfer"][data-booking-status-view="confirmed"] .booking-status__detail--amount{
+    grid-column:1 / -1;
+  }
 
   .booking-status-page[data-booking-status-page="success"] .booking-status__detail--notes{
     grid-column:1 / -1;
