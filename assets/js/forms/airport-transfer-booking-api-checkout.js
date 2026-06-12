@@ -71,6 +71,12 @@
     return api;
   }
 
+  function getAvailabilityPrecheckApi() {
+    var api = window.PixkuyAirportTransferAvailabilityPrecheck;
+
+    return api && typeof api.precheck === "function" ? api : null;
+  }
+
   function getForm() {
     var api = window.PixkuyForms;
 
@@ -525,6 +531,34 @@
 
     return payload;
   }
+  
+    function buildAvailabilityPrecheckDetail(form, data) {
+    var amountMinor = parseMoneyMinorUnitsFromMxn(data.fare);
+    var direction = getAirportTransferDirection(data, form);
+    var apiDirection = getAirportTransferDirectionForApi(direction);
+    var zoneId = getAirportTransferZoneId(data);
+    var passengers = getAirportTransferPassengers(data);
+    var nonAirportLocation = getNonAirportLocation(data, apiDirection);
+
+    if (!amountMinor || !zoneId || !passengers || !nonAirportLocation) {
+      return null;
+    }
+
+    return {
+      serviceType: "airport_transfer",
+      airportId: getAirportId(form),
+      direction: apiDirection,
+      zoneId: zoneId,
+      passengerFareKey: data.passengerFareKey,
+      nonAirportLocation: nonAirportLocation,
+      passengers: passengers,
+      date: data.airportHotelDate,
+      time: data.airportHotelTime,
+      expectedAmountMinor: amountMinor,
+      currency: "MXN",
+      locale: getDocumentLocale()
+    };
+  }
 
   function buildCheckoutReviewSnapshot(form, data) {
     var snapshot = getFormPayloadRaw(form);
@@ -645,6 +679,115 @@
       .catch(function ignoreRecaptchaError() {
         return "";
       });
+  }
+  
+    function getAvailabilityErrorMessage(result) {
+    var normalized = result && result.raw && typeof result.raw === "object"
+      ? result.raw
+      : result;
+    var resultNode = normalized && normalized.result && typeof normalized.result === "object"
+      ? normalized.result
+      : {};
+    var availability = resultNode.availability && typeof resultNode.availability === "object"
+      ? resultNode.availability
+      : {};
+    var nextAvailableStartLocal =
+      normalizeText(result && result.nextAvailableStartLocal) ||
+      normalizeText(resultNode.nextAvailableStartLocal) ||
+      normalizeText(availability.nextAvailableStartLocal);
+    var nextAvailableTime = "";
+    var baseMessage = getI18nValue(
+      "services.cards.airport.panel.availability.unavailable",
+      "No hay disponibilidad para esa fecha y hora. Elige otra opción."
+    );
+    var nextAvailableTemplate = getI18nValue(
+      "services.cards.airport.panel.availability.nextAvailableSlot",
+      "Siguiente hora disponible: {time}"
+    );
+
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(nextAvailableStartLocal)) {
+      nextAvailableTime = nextAvailableStartLocal.slice(11, 16);
+    } else {
+      nextAvailableTime = nextAvailableStartLocal;
+    }
+
+    if (nextAvailableTime) {
+      return baseMessage + " " + nextAvailableTemplate.replace("{time}", nextAvailableTime);
+    }
+
+    return baseMessage;
+  }
+
+  function focusAirportTransferTimeField(form) {
+    var fields =
+      window.PixkuyForms &&
+      typeof window.PixkuyForms.getReservationRequestFields === "function"
+        ? window.PixkuyForms.getReservationRequestFields(form)
+        : null;
+    var timeField =
+      fields && fields.airportHotelVisibleTime
+        ? fields.airportHotelVisibleTime
+        : getField(form, "airport_hotel_time");
+
+    if (!timeField || typeof timeField.focus !== "function") {
+      return false;
+    }
+
+    if (typeof timeField.scrollIntoView === "function") {
+      timeField.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    window.setTimeout(function focusTimeFieldAfterScroll() {
+      timeField.focus({
+        preventScroll: true
+      });
+    }, 120);
+
+    return true;
+  }
+
+  function showAvailabilityError(form, result) {
+    var fields;
+    var message;
+
+    if (!form) {
+      return false;
+    }
+
+    fields =
+      window.PixkuyForms &&
+      typeof window.PixkuyForms.getReservationRequestFields === "function"
+        ? window.PixkuyForms.getReservationRequestFields(form)
+        : null;
+
+    message = getAvailabilityErrorMessage(result);
+
+    if (fields && fields.formError) {
+      fields.formError.textContent = message;
+      fields.formError.hidden = false;
+    }
+
+    focusAirportTransferTimeField(form);
+
+    return true;
+  }
+
+  function verifyAvailabilityBeforeCheckout(form, data) {
+    var precheckApi = getAvailabilityPrecheckApi();
+    var detail = buildAvailabilityPrecheckDetail(form, data);
+
+    if (!precheckApi || !detail) {
+      return Promise.resolve({
+        available: false,
+        checkoutAllowed: false,
+        code: "PRECHECK_UNAVAILABLE"
+      });
+    }
+
+    return precheckApi.precheck(detail);
   }
 
   function setFormBusy(form, isBusy) {
@@ -1091,9 +1234,30 @@
     hideCheckoutError(form);
 
     if (isDesktopViewport()) {
-      if (!redirectToCheckoutReview(form, data)) {
-        showCheckoutError(form);
-      }
+      setFormBusy(form, true);
+
+      verifyAvailabilityBeforeCheckout(form, data)
+        .then(function onAvailabilityPrecheckResult(result) {
+          var isAllowed = Boolean(
+            result &&
+              (result.available === true || result.checkoutAllowed === true)
+          );
+
+          if (!isAllowed) {
+            setFormBusy(form, false);
+            showAvailabilityError(form, result);
+            return;
+          }
+
+          if (!redirectToCheckoutReview(form, data)) {
+            setFormBusy(form, false);
+            showCheckoutError(form);
+          }
+        })
+        .catch(function onAvailabilityPrecheckError() {
+          setFormBusy(form, false);
+          showCheckoutError(form);
+        });
 
       return;
     }

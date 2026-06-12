@@ -30,6 +30,8 @@
       fare: form.querySelector('input[name="fare"]'),
       airportHotelDate: form.querySelector('input[name="airport_hotel_date"]'),
       airportHotelTime: form.querySelector('input[name="airport_hotel_time"]'),
+      airportHotelVisibleDate: form.querySelector('[data-contact-airport-hotel-date]'),
+      airportHotelVisibleTime: form.querySelector('[data-contact-airport-hotel-time]'),
       passengerFareKey: form.querySelector('input[name="passenger_fare_key"]'),
 
       tourPrivateTourId: form.querySelector('input[name="tour_private_tour_id"]'),
