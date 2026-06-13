@@ -1,5 +1,27 @@
 const VALID_PASSENGER_KEYS = new Set(["van_1_2", "van_3_4", "van_5_6"]);
 
+const STANDARD_PRICING = {
+  currency: "MXN",
+  roundingStep: 50,
+  baseFee: 125,
+  kmRate: 6.9,
+  minuteRate: 4.25,
+  minimum: 150,
+  referenceMinutesPerKm: 2.35,
+  congestionSoftCapMinutes: 18,
+  capacityPremiums: {
+    van_1_2: {
+      minimum: 150
+    },
+    van_3_4: {
+      minimum: 200
+    },
+    van_5_6: {
+      minimum: 300
+    }
+  }
+};
+
 const PRICING_V2 = {
   currency: "MXN",
   roundingStep: 50,
@@ -235,6 +257,123 @@ function calculateTechnicalFloor(input) {
   };
 }
 
+function calculateStandardPricing(input) {
+  const passengerFareKey = getPassengerFareKey(input.passengerFareKey);
+  const distanceKm = Number(input.distanceKm);
+  const durationMinutes = Number(input.durationMinutes);
+  const roundingStep = getRoundingStep(input.roundingStep);
+  const airportCeiling = normalizeAirportCeiling(input.airportCeiling, roundingStep);
+  const capacityPricing = STANDARD_PRICING.capacityPremiums[passengerFareKey];
+
+  if (
+    !passengerFareKey ||
+    !capacityPricing ||
+    !Number.isFinite(distanceKm) ||
+    !Number.isFinite(durationMinutes)
+  ) {
+    return null;
+  }
+
+  const referenceMinutes = distanceKm * STANDARD_PRICING.referenceMinutesPerKm;
+  const structuralMinutes = Math.min(durationMinutes, referenceMinutes);
+  const congestionMinutes = Math.max(0, durationMinutes - referenceMinutes);
+  const softenedCongestionMinutes = STANDARD_PRICING.congestionSoftCapMinutes *
+    (1 - Math.exp(-congestionMinutes / STANDARD_PRICING.congestionSoftCapMinutes));
+  const effectiveMinutes = structuralMinutes + softenedCongestionMinutes;
+
+  const baseRaw =
+    STANDARD_PRICING.baseFee +
+    (distanceKm * STANDARD_PRICING.kmRate) +
+    (effectiveMinutes * STANDARD_PRICING.minuteRate);
+
+  const congestionStress = congestionMinutes / (congestionMinutes + 14);
+  const fareScale = 1 - Math.exp(-baseRaw / 650);
+  const congestionSignal = smoothstep(congestionStress);
+  const fareSignal = smoothstep(fareScale);
+
+  if (!Number.isFinite(congestionSignal) || !Number.isFinite(fareSignal)) {
+    return null;
+  }
+
+  const marketStress = clamp(
+    (0.78 * congestionSignal) + (0.22 * fareSignal),
+    0,
+    1
+  );
+
+  if (!Number.isFinite(marketStress)) {
+    return null;
+  }
+
+  const premiumFiveSix = clamp(
+    105 + (110 * Math.pow(marketStress, 0.85)),
+    115,
+    225
+  );
+  const premiumThreeFour = clamp(
+    25 + (0.26 * premiumFiveSix),
+    45,
+    85
+  );
+
+  if (!Number.isFinite(premiumFiveSix) || !Number.isFinite(premiumThreeFour)) {
+    return null;
+  }
+
+  let capacityPremium = 0;
+
+  if (passengerFareKey === "van_3_4") {
+    capacityPremium = premiumThreeFour;
+  }
+
+  if (passengerFareKey === "van_5_6") {
+    capacityPremium = premiumFiveSix;
+  }
+
+  const rawBeforeCeiling = Math.max(
+    baseRaw + capacityPremium,
+    capacityPricing.minimum
+  );
+  const rawAfterCeiling = airportCeiling !== null
+    ? Math.min(rawBeforeCeiling, airportCeiling)
+    : rawBeforeCeiling;
+  const airportCeilingApplied = airportCeiling !== null && rawAfterCeiling < rawBeforeCeiling;
+  const price = airportCeilingApplied
+    ? floorToStep(rawAfterCeiling, roundingStep)
+    : ceilToStep(rawAfterCeiling, roundingStep);
+
+  if (!Number.isFinite(price) || price <= 0) {
+    return null;
+  }
+
+  return {
+    price,
+    currency: STANDARD_PRICING.currency,
+    passengerFareKey,
+    pricingMode: "standard",
+    pricingModel: "standard_legacy",
+    roundingStep,
+    distanceKm: roundToDecimals(distanceKm, 3),
+    durationMinutes: roundToDecimals(durationMinutes, 2),
+    baseFee: STANDARD_PRICING.baseFee,
+    kmRate: STANDARD_PRICING.kmRate,
+    minuteRate: STANDARD_PRICING.minuteRate,
+    minimum: capacityPricing.minimum,
+    referenceMinutes: roundToDecimals(referenceMinutes, 2),
+    congestionMinutes: roundToDecimals(congestionMinutes, 2),
+    softenedCongestionMinutes: roundToDecimals(softenedCongestionMinutes, 2),
+    effectiveMinutes: roundToDecimals(effectiveMinutes, 2),
+    capacityPremium: roundToDecimals(capacityPremium, 2),
+    marketStress: roundToDecimals(marketStress, 3),
+    baseRaw: roundToDecimals(baseRaw, 2),
+    rawBeforeCeiling: roundToDecimals(rawBeforeCeiling, 2),
+    rawAfterCeiling: roundToDecimals(rawAfterCeiling, 2),
+    airportCeiling,
+    airportCeilingApplied,
+    technicalFloorBreachedByCeiling: false
+  };
+}
+
 function normalizeAirportCeiling(value, roundingStep) {
   const ceiling = toPositiveNumber(value);
 
@@ -250,6 +389,7 @@ function normalizeAirportCeiling(value, roundingStep) {
 function calculateDirectTransferPricingV2(options) {
   const safeOptions = options && typeof options === "object" ? options : {};
   const passengerFareKey = getPassengerFareKey(safeOptions.passengerFareKey);
+  const pricingMode = normalizeText(safeOptions.pricingMode);
   const distanceKm = getDistanceKm(safeOptions.distanceMeters);
   const durationMinutes = getDurationMinutes(safeOptions.durationSeconds);
   const roundingStep = getRoundingStep(safeOptions.roundingStep);
@@ -258,8 +398,18 @@ function calculateDirectTransferPricingV2(options) {
     roundingStep
   );
 
-  if (!passengerFareKey || distanceKm === null || durationMinutes === null) {
+  if (!passengerFareKey || !pricingMode || distanceKm === null || durationMinutes === null) {
     return null;
+  }
+
+  if (pricingMode === "standard") {
+    return calculateStandardPricing({
+      distanceKm,
+      durationMinutes,
+      passengerFareKey,
+      airportCeiling,
+      roundingStep
+    });
   }
 
   const market = calculateMarketPrice({
@@ -294,6 +444,8 @@ function calculateDirectTransferPricingV2(options) {
     price,
     currency: PRICING_V2.currency,
     passengerFareKey,
+    pricingMode,
+    pricingModel: "extended_v2",
     roundingStep,
     distanceKm: roundToDecimals(distanceKm, 3),
     durationMinutes: roundToDecimals(durationMinutes, 2),
@@ -317,6 +469,7 @@ function calculateDirectTransferPricingV2(options) {
 }
 
 module.exports = {
+  STANDARD_PRICING,
   PRICING_V2,
   VALID_PASSENGER_KEYS,
   ceilToStep,
@@ -324,5 +477,6 @@ module.exports = {
   smoothstep,
   calculateMarketPrice,
   calculateTechnicalFloor,
+  calculateStandardPricing,
   calculateDirectTransferPricingV2
 };

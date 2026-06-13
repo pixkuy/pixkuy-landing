@@ -29,6 +29,26 @@ const romaNorte = {
   types: ["neighborhood"]
 };
 
+const colimaRomaNorte = {
+  label: "Colima 71, Roma Norte, Ciudad de México",
+  placeId: "smoke_origin_colima_roma_norte",
+  lat: 19.4192,
+  lng: -99.1629,
+  countryCode: "MX",
+  locality: "Ciudad de México",
+  types: ["street_address"]
+};
+
+const estadioCiudadMexico = {
+  label: "Estadio Ciudad de México, Santa Úrsula Coapa, Ciudad de México",
+  placeId: "smoke_destination_estadio_ciudad_de_mexico",
+  lat: 19.3029,
+  lng: -99.1505,
+  countryCode: "MX",
+  locality: "Ciudad de México",
+  types: ["stadium"]
+};
+
 const pueblaCentro = {
   label: "Puebla Centro, Puebla",
   placeId: "smoke_destination_puebla_centro",
@@ -131,15 +151,58 @@ function buildPayload(originAddress, destinationAddress, passengerFareKey) {
 function getCoreCases() {
   return [
     {
+      name: "CDMX urban standard 1-2 regression",
+      expectedStatus: 200,
+      payload: buildPayload(colimaRomaNorte, estadioCiudadMexico, "van_1_2"),
+      expect: {
+        ok: true,
+        pricingVersion: "direct_transfer_v2",
+        pricingMode: "standard",
+        pricingModel: "standard_legacy",
+        priceMin: 250,
+        priceMax: 650,
+        technicalFloorBreachedByCeiling: false
+      }
+    },
+    {
+      name: "CDMX urban standard 3-4 regression",
+      expectedStatus: 200,
+      payload: buildPayload(colimaRomaNorte, estadioCiudadMexico, "van_3_4"),
+      expect: {
+        ok: true,
+        pricingVersion: "direct_transfer_v2",
+        pricingMode: "standard",
+        pricingModel: "standard_legacy",
+        priceMin: 300,
+        priceMax: 750,
+        technicalFloorBreachedByCeiling: false
+      }
+    },
+    {
+      name: "CDMX urban standard 5-6 regression",
+      expectedStatus: 200,
+      payload: buildPayload(colimaRomaNorte, estadioCiudadMexico, "van_5_6"),
+      expect: {
+        ok: true,
+        pricingVersion: "direct_transfer_v2",
+        pricingMode: "standard",
+        pricingModel: "standard_legacy",
+        priceMin: 350,
+        priceMax: 950,
+        technicalFloorBreachedByCeiling: false
+      }
+    },
+    {
       name: "Puebla corridor 1-2",
       expectedStatus: 200,
       payload: buildPayload(cdmxCentro, pueblaCentro, "van_1_2"),
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
+        pricingMode: "extended",
+        pricingModel: "extended_v2",
         originCoverageId: "centro",
         destinationCoverageId: "airport_extended_corridor_puebla_angelopolis",
-        pricingMode: "extended",
         airportCeilingApplied: true,
         priceEqualsAirportCeiling: true,
         technicalFloorBreachedByCeiling: false
@@ -152,9 +215,10 @@ function getCoreCases() {
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
+        pricingMode: "extended",
+        pricingModel: "extended_v2",
         originCoverageId: "centro",
         destinationCoverageId: "airport_extended_ring_400km",
-        pricingMode: "extended",
         airportCeilingApplied: true,
         priceEqualsAirportCeiling: true,
         technicalFloorBreachedByCeiling: false
@@ -208,8 +272,9 @@ function getFullCases() {
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
-        destinationCoverageId: "airport_extended_corridor_puebla_angelopolis",
         pricingMode: "extended",
+        pricingModel: "extended_v2",
+        destinationCoverageId: "airport_extended_corridor_puebla_angelopolis",
         priceEqualsAirportCeiling: true,
         technicalFloorBreachedByCeiling: false
       }
@@ -221,8 +286,9 @@ function getFullCases() {
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
-        destinationCoverageId: "airport_extended_ring_400km",
         pricingMode: "extended",
+        pricingModel: "extended_v2",
+        destinationCoverageId: "airport_extended_ring_400km",
         priceEqualsAirportCeiling: true,
         technicalFloorBreachedByCeiling: false
       }
@@ -234,8 +300,9 @@ function getFullCases() {
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
-        destinationCoverageId: "airport_extended_ring_300km",
         pricingMode: "extended",
+        pricingModel: "extended_v2",
+        destinationCoverageId: "airport_extended_ring_300km",
         technicalFloorBreachedByCeiling: false
       }
     },
@@ -246,8 +313,9 @@ function getFullCases() {
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
-        destinationCoverageId: "airport_extended_corridor_morelia_michoacan",
         pricingMode: "extended",
+        pricingModel: "extended_v2",
+        destinationCoverageId: "airport_extended_corridor_morelia_michoacan",
         technicalFloorBreachedByCeiling: false
       }
     },
@@ -258,8 +326,9 @@ function getFullCases() {
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
-        destinationCoverageId: "airport_extended_corridor_taxco_guerrero",
         pricingMode: "extended",
+        pricingModel: "extended_v2",
+        destinationCoverageId: "airport_extended_corridor_taxco_guerrero",
         technicalFloorBreachedByCeiling: false
       }
     },
@@ -270,8 +339,9 @@ function getFullCases() {
       expect: {
         ok: true,
         pricingVersion: "direct_transfer_v2",
-        destinationCoverageId: "airport_extended_ring_700km",
         pricingMode: "extended",
+        pricingModel: "extended_v2",
+        destinationCoverageId: "airport_extended_ring_700km",
         technicalFloorBreachedByCeiling: false
       }
     }
@@ -343,6 +413,25 @@ function assertPositiveNumber(failures, label, value) {
   }
 }
 
+function assertPriceRange(failures, quote, expect) {
+  const price = Number(quote && quote.price);
+  const priceMin = Number(expect && expect.priceMin);
+  const priceMax = Number(expect && expect.priceMax);
+
+  if (!Number.isFinite(price)) {
+    addFailure(failures, `quote.price must be finite, got ${JSON.stringify(quote && quote.price)}`);
+    return;
+  }
+
+  if (Number.isFinite(priceMin) && price < priceMin) {
+    addFailure(failures, `quote.price below expected minimum: ${price} < ${priceMin}`);
+  }
+
+  if (Number.isFinite(priceMax) && price > priceMax) {
+    addFailure(failures, `quote.price above expected maximum: ${price} > ${priceMax}`);
+  }
+}
+
 function assertQuoteInvariants(failures, quote) {
   assertPositiveNumber(failures, "quote.price", quote.price);
   assertPositiveNumber(failures, "quote.distanceMeters", quote.distanceMeters);
@@ -393,9 +482,14 @@ function assertOkCase(failures, responseBody, expect) {
   }
 
   assertQuoteInvariants(failures, quote);
+  assertPriceRange(failures, quote, expect || {});
 
   if (expect.pricingVersion) {
     assertEqual(failures, "quote.pricingVersion", quote.pricingVersion, expect.pricingVersion);
+  }
+
+  if (expect.pricingModel) {
+    assertEqual(failures, "quote.pricingModel", quote.pricingModel, expect.pricingModel);
   }
 
   if (expect.originCoverageId) {

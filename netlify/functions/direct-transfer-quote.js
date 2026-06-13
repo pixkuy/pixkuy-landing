@@ -265,6 +265,7 @@ function buildQuotePayload(options) {
       distanceMeters: route.distanceMeters,
       pricingVersion: "direct_transfer_v2",
       pricingMode,
+      pricingModel: normalizeText(pricing.pricingModel),
       roundingStep: pricing.roundingStep,
       route: {
         durationSeconds: route.durationSeconds,
@@ -302,6 +303,17 @@ function buildQuotePayload(options) {
       slowdownMinutes: pricing.slowdownMinutes,
       longTailKm: pricing.longTailKm,
       distanceStress: pricing.distanceStress,
+      baseFee: pricing.baseFee,
+      kmRate: pricing.kmRate,
+      minuteRate: pricing.minuteRate,
+      minimum: pricing.minimum,
+      referenceMinutes: pricing.referenceMinutes,
+      congestionMinutes: pricing.congestionMinutes,
+      softenedCongestionMinutes: pricing.softenedCongestionMinutes,
+      effectiveMinutes: pricing.effectiveMinutes,
+      capacityPremium: pricing.capacityPremium,
+      marketStress: pricing.marketStress,
+      baseRaw: pricing.baseRaw,
       airportCeiling: pricing.airportCeiling,
       airportCeilingApplied: pricing.airportCeilingApplied === true,
       airportFare: ceiling.airportFare === null || ceiling.airportFare === undefined
@@ -412,10 +424,12 @@ exports.handler = async function handler(event) {
     return fail(503, "AIRPORT_EQUIVALENT_CONFIGURATION_ERROR", "directTransferMobileFlow.fare.unavailable");
   }
 
+  const pricingMode = getPricingMode(originCoverage, destinationCoverage);
   const pricing = calculateDirectTransferPricingV2({
     distanceMeters: route.distanceMeters,
     durationSeconds: route.durationSeconds,
     passengerFareKey,
+    pricingMode,
     airportCeiling: airportCeiling.airportCeiling
   });
 
