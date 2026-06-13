@@ -15,12 +15,18 @@
 
   const DEFAULT_MODE = MODES.HOURLY;
   const DEFAULT_VEHICLE_TYPE = "executive_van";
-  const DEFAULT_DURATION_HOURS = 2;
-  const DEFAULT_CURRENCY = "MXN";
+  const HOURLY_PRICING_API = getHourlyPricingApi();
+  const HOURLY_PRICING_CONSTANTS = HOURLY_PRICING_API.constants;
+  const DEFAULT_CURRENCY = HOURLY_PRICING_CONSTANTS.currency;
   const CHECKOUT_REVIEW_RETURN_KEY = "pixkuy_hourly_checkout_review_return";
   const CHECKOUT_REVIEW_SNAPSHOT_KEY = "pixkuy_hourly_checkout_review_snapshot";
 
-  const HOURLY_DURATION_OPTIONS = Object.freeze([2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  const HOURLY_DURATION_OPTIONS = Object.freeze(
+    HOURLY_PRICING_API.getDurationOptions().filter(function filterHourlyDuration(durationHours) {
+      return durationHours < HOURLY_PRICING_CONSTANTS.fullDayHours;
+    })
+  );
+  const DEFAULT_DURATION_HOURS = HOURLY_DURATION_OPTIONS[0];
   const LONG_TERM_OPTIONS = Object.freeze(["week", "fortnight", "monthly", "custom"]);
 
   const state = {
@@ -43,6 +49,33 @@
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
+  }
+
+  function getHourlyPricingApi() {
+    const api = window.PixkuyHourlyDailyPricing;
+    const durationOptions =
+      api && typeof api.getDurationOptions === "function"
+        ? api.getDurationOptions()
+        : [];
+
+    if (
+      !api ||
+      typeof api !== "object" ||
+      !api.constants ||
+      typeof api.constants.currency !== "string" ||
+      typeof api.constants.fullDayHours !== "number" ||
+      typeof api.constants.extraKmPrice !== "number" ||
+      typeof api.constants.outOfZoneSupplement !== "number" ||
+      !Array.isArray(durationOptions) ||
+      durationOptions.length === 0 ||
+      typeof api.getDurationOptions !== "function" ||
+      typeof api.getIncludedKilometers !== "function" ||
+      typeof api.getPrice !== "function"
+    ) {
+      throw new Error("HOURLY_DAILY_PRICING_UNAVAILABLE");
+    }
+
+    return api;
   }
 
   function getReservationForm() {
@@ -227,46 +260,29 @@
     return true;
   }
 
+  function isIsoDateLiteral(value) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(normalizeText(value));
+  }
+
   function getComputedPriceNumber() {
-    const temporalApi = window.PixkuyHourlyDailyTemporalPricing;
     const serviceDateLiteral = normalizeText(state.tripDate);
-    let basePrice = null;
-
-    if (state.mode === MODES.HOURLY) {
-      basePrice = state.durationHours <= 2
-        ? 3500
-        : 3500 + ((state.durationHours - 2) * 1000);
-    } else if (state.mode === MODES.FULL_DAY) {
-      basePrice = 12500;
-    }
-
-    if (typeof basePrice !== "number" || !Number.isFinite(basePrice)) {
-      return null;
-    }
 
     if (shouldShowDateField()) {
       if (!serviceDateLiteral) {
         return null;
       }
 
-      if (
-        temporalApi &&
-        typeof temporalApi.isIsoDateLiteral === "function" &&
-        !temporalApi.isIsoDateLiteral(serviceDateLiteral)
-      ) {
+      if (!isIsoDateLiteral(serviceDateLiteral)) {
         return null;
-      }
-
-      if (
-        temporalApi &&
-        typeof temporalApi.applyTemporalPricing === "function"
-      ) {
-        return temporalApi.applyTemporalPricing(basePrice, serviceDateLiteral);
       }
     }
 
-    return basePrice;
+    return HOURLY_PRICING_API.getPrice({
+      mode: state.mode,
+      durationHours: state.durationHours
+    });
   }
+
 
   function getPriceLabelValue() {
     const labels = getLabels();
@@ -500,7 +516,7 @@
 
   function syncDerivedState() {
     if (state.mode === MODES.FULL_DAY) {
-      state.durationHours = 12;
+      state.durationHours = HOURLY_PRICING_CONSTANTS.fullDayHours;
       state.longTermOption = "";
     }
 
@@ -739,20 +755,14 @@
   }
 
   function getKmIncludedValue() {
-    if (state.mode === MODES.LONG_TERM) {
-      return "";
-    }
+    const includedKilometers = HOURLY_PRICING_API.getIncludedKilometers({
+      mode: state.mode,
+      durationHours: state.durationHours
+    });
 
-    if (state.mode === MODES.FULL_DAY) {
-      return "500";
-    }
-
-    if (HOURLY_DURATION_OPTIONS.indexOf(Number(state.durationHours)) >= 0) {
-      return String(Number(state.durationHours) * 40);
-    }
-
-    return "";
+    return includedKilometers === null ? "" : String(includedKilometers);
   }
+
 
   function clearHiddenFields(nodes) {
     writeHiddenValue(nodes.hiddenMode, "");
@@ -813,8 +823,14 @@
     writeHiddenValue(nodes.hiddenPrice, state.price);
     writeHiddenValue(nodes.hiddenCurrency, state.currency);
     writeHiddenValue(nodes.hiddenKmIncluded, getKmIncludedValue());
-    writeHiddenValue(nodes.hiddenExtraKmPrice, "35");
-    writeHiddenValue(nodes.hiddenOutOfZoneSupplement, "4500");
+    writeHiddenValue(
+      nodes.hiddenExtraKmPrice,
+      String(HOURLY_PRICING_CONSTANTS.extraKmPrice)
+    );
+    writeHiddenValue(
+      nodes.hiddenOutOfZoneSupplement,
+      String(HOURLY_PRICING_CONSTANTS.outOfZoneSupplement)
+    );
 
     writeHiddenValue(nodes.hiddenServiceLabel, getLabels().serviceLabel);
     writeHiddenValue(nodes.hiddenRequestSummary, tripSummary);
@@ -1091,7 +1107,11 @@
     state.durationHours =
       HOURLY_DURATION_OPTIONS.indexOf(nextDuration) >= 0
         ? nextDuration
-        : (state.mode === MODES.FULL_DAY ? 12 : DEFAULT_DURATION_HOURS);
+        : (
+            state.mode === MODES.FULL_DAY
+              ? HOURLY_PRICING_CONSTANTS.fullDayHours
+              : DEFAULT_DURATION_HOURS
+          );
     state.longTermOption =
       LONG_TERM_OPTIONS.indexOf(nextCustomTerm) >= 0
         ? nextCustomTerm
@@ -1239,7 +1259,7 @@
       }
 
       if (state.mode === MODES.FULL_DAY) {
-        state.durationHours = 12;
+        state.durationHours = HOURLY_PRICING_CONSTANTS.fullDayHours;
       } else if (
         state.mode === MODES.HOURLY &&
         HOURLY_DURATION_OPTIONS.indexOf(Number(state.durationHours)) === -1

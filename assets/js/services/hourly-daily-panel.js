@@ -10,6 +10,9 @@
     LONG_TERM: 'custom_long_term'
   });
 
+  const HOURLY_PRICING_API = getHourlyPricingApi();
+  const HOURLY_PRICING_CONSTANTS = HOURLY_PRICING_API.constants;
+
   const VEHICLES = Object.freeze({
     executive_van: {
       id: 'executive_van',
@@ -18,9 +21,11 @@
     }
   });
 
-  const HOURLY_DURATION_OPTIONS = Object.freeze([
-    2, 3, 4, 5, 6, 7, 8, 9, 10
-  ]);
+  const HOURLY_DURATION_OPTIONS = Object.freeze(
+    HOURLY_PRICING_API.getDurationOptions().filter(function filterHourlyDuration(durationHours) {
+      return durationHours < HOURLY_PRICING_CONSTANTS.fullDayHours;
+    })
+  );
 
   const LONG_TERM_OPTIONS = Object.freeze([
     'week',
@@ -60,6 +65,26 @@
 
   function normalizeText(value) {
     return typeof value === 'string' ? value.trim() : '';
+  }
+
+  function getHourlyPricingApi() {
+    const api = window.PixkuyHourlyDailyPricing;
+
+    if (
+      !api ||
+      typeof api !== 'object' ||
+      !api.constants ||
+      typeof api.constants.fullDayHours !== 'number' ||
+      typeof api.constants.extraKmPrice !== 'number' ||
+      typeof api.constants.outOfZoneSupplement !== 'number' ||
+      typeof api.getDurationOptions !== 'function' ||
+      typeof api.getIncludedKilometers !== 'function' ||
+      typeof api.getPrice !== 'function'
+    ) {
+      throw new Error('HOURLY_DAILY_PRICING_UNAVAILABLE');
+    }
+
+    return api;
   }
 
   function getSafariTimeSelectApi() {
@@ -247,14 +272,14 @@ tabs: {
         mobileIncludedTitle: getI18nValue('services.cards.hourly.panel.disclaimers.mobileIncludedTitle') || 'Incluido',
         supplementsTitle: getI18nValue('services.cards.hourly.panel.disclaimers.supplementsTitle') || 'Suplementos posibles',
         includesServiceKm: getI18nValue('services.cards.hourly.panel.disclaimers.includesServiceKm') || '40 km incluidos por hora contratada',
-        fullDayIncludesKm: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayIncludesKm') || '500 km incluidos por día',
+        fullDayIncludesKm: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayIncludesKm') || '480 km incluidos por jornada completa',
         includesServiceWifi: getI18nValue('services.cards.hourly.panel.disclaimers.includesServiceWifi') || 'Wi-Fi propia a bordo',
         includesServiceWater: getI18nValue('services.cards.hourly.panel.disclaimers.includesServiceWater') || 'Agua y cortesías',
         includesVanPassengers: getI18nValue('services.cards.hourly.panel.disclaimers.includesVanPassengers') || 'Hasta 6 pasajeros',
         includesVanUsb: getI18nValue('services.cards.hourly.panel.disclaimers.includesVanUsb') || 'Conectores USB y USB-C',
         includesVanSeats: getI18nValue('services.cards.hourly.panel.disclaimers.includesVanSeats') || 'Asientos capitán en segunda fila con climatización independiente',
         extraHourExtension: getI18nValue('services.cards.hourly.panel.disclaimers.extraHourExtension') || 'Ampliación del servicio en bloques completos de 1 hora: 1.000 MXN',
-        fullDayExtraKm: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayExtraKm') || '35 MXN por km adicional a partir de 500 km',
+        fullDayExtraKm: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayExtraKm') || '35 MXN por km adicional a partir de 480 km',
         fullDayExtensionPolicy: getI18nValue('services.cards.hourly.panel.disclaimers.fullDayExtensionPolicy') || 'Extensiones sujetas a disponibilidad y validación operativa',
         extraKm: getI18nValue('services.cards.hourly.panel.disclaimers.extraKm') || '35 MXN por km adicional',
         outOfZone: getI18nValue('services.cards.hourly.panel.disclaimers.outOfZone') || '+4.500 MXN si finaliza fuera de la zona operativa',
@@ -384,29 +409,8 @@ onClearSelection: function () {
 	return Boolean(pickupControllerHandle);
   }
 
-  function getTemporalPricingApi() {
-    const api = window.PixkuyHourlyDailyTemporalPricing;
-    return api && typeof api === 'object' ? api : null;
-  }
-
   function shouldShowDateFieldInServices() {
-    const api = getTemporalPricingApi();
-
-    if (!api || typeof api.shouldShowDateFieldInServices !== 'function') {
-      return false;
-    }
-
-    return api.shouldShowDateFieldInServices();
-  }
-
-  function applyTemporalPricing(basePrice, serviceDateLiteral) {
-    const api = getTemporalPricingApi();
-
-    if (!api || typeof api.applyTemporalPricing !== 'function') {
-      return basePrice;
-    }
-
-    return api.applyTemporalPricing(basePrice, serviceDateLiteral);
+    return true;
   }
 
   function getReservationMinimumDateLiteral() {
@@ -441,29 +445,8 @@ onClearSelection: function () {
     return safeDate >= minimumDateLiteral;
   }
 
-  function getBasePrice() {
-    if (state.mode === MODES.HOURLY) {
-      if (state.durationHours <= 2) {
-        return 3500;
-      }
-
-      return 3500 + ((state.durationHours - 2) * 1000);
-    }
-
-    if (state.mode === MODES.FULL_DAY) {
-      return 12500;
-    }
-
-    return null;
-  }
-
   function getComputedPrice() {
-    const basePrice = getBasePrice();
     const serviceDateLiteral = normalizeText(state.tripDate);
-
-    if (typeof basePrice !== 'number') {
-      return null;
-    }
 
     if (shouldShowDateFieldInServices() && !serviceDateLiteral) {
       return null;
@@ -473,12 +456,15 @@ onClearSelection: function () {
       return null;
     }
 
-    return applyTemporalPricing(basePrice, serviceDateLiteral);
+    return HOURLY_PRICING_API.getPrice({
+      mode: state.mode,
+      durationHours: state.durationHours
+    });
   }
 
   function syncDerivedState() {
     if (state.mode === MODES.FULL_DAY) {
-      state.durationHours = 12;
+      state.durationHours = HOURLY_PRICING_CONSTANTS.fullDayHours;
       state.longTermOption = '';
     }
 
@@ -646,50 +632,55 @@ onClearSelection: function () {
 
   function buildDurationChipMarkup(hours) {
     const isSelected = state.durationHours === hours;
-    const isFullWidth = hours === 10;
 
     return `
       <button
         type="button"
-        class="services-hourly-panel__chip${isSelected ? ' is-active' : ''}${isFullWidth ? ' services-hourly-panel__chip--full' : ''}"
+        class="services-hourly-panel__chip${isSelected ? ' is-active' : ''}"
         data-services-hourly-duration="${hours}"
         aria-pressed="${isSelected ? 'true' : 'false'}"
       >${hours}h</button>
     `;
   }
 
+  function buildDurationRowMarkup(options, modifier) {
+    return `
+      <div class="services-hourly-panel__duration-row ${modifier}">
+        ${options.map(buildDurationChipMarkup).join('')}
+      </div>
+    `;
+  }
+
   function buildDurationOptionsMarkup() {
     if (isMobileHourlyViewport()) {
-      const firstRow = [2, 3, 4, 5, 6, 7];
-      const secondRow = [8, 9, 10];
-
       return `
         <div class="services-hourly-panel__duration-rows">
-          <div class="services-hourly-panel__duration-row services-hourly-panel__duration-row--six">
-            ${firstRow.map(buildDurationChipMarkup).join('')}
-          </div>
-          <div class="services-hourly-panel__duration-row services-hourly-panel__duration-row--three-centered">
-            ${secondRow.map(buildDurationChipMarkup).join('')}
-          </div>
+          ${buildDurationRowMarkup(
+            HOURLY_DURATION_OPTIONS.slice(0, 6),
+            'services-hourly-panel__duration-row--six'
+          )}
+          ${buildDurationRowMarkup(
+            HOURLY_DURATION_OPTIONS.slice(6),
+            'services-hourly-panel__duration-row--three-centered'
+          )}
         </div>
       `;
     }
 
-    const firstRow = [2, 3, 4, 5];
-    const secondRow = [6, 7, 8, 9];
-    const thirdRow = [10];
-
     return `
       <div class="services-hourly-panel__duration-rows">
-        <div class="services-hourly-panel__duration-row services-hourly-panel__duration-row--four">
-          ${firstRow.map(buildDurationChipMarkup).join('')}
-        </div>
-        <div class="services-hourly-panel__duration-row services-hourly-panel__duration-row--four">
-          ${secondRow.map(buildDurationChipMarkup).join('')}
-        </div>
-        <div class="services-hourly-panel__duration-row services-hourly-panel__duration-row--single">
-          ${thirdRow.map(buildDurationChipMarkup).join('')}
-        </div>
+        ${buildDurationRowMarkup(
+          HOURLY_DURATION_OPTIONS.slice(0, 4),
+          'services-hourly-panel__duration-row--four'
+        )}
+        ${buildDurationRowMarkup(
+          HOURLY_DURATION_OPTIONS.slice(4, 8),
+          'services-hourly-panel__duration-row--four'
+        )}
+        ${buildDurationRowMarkup(
+          HOURLY_DURATION_OPTIONS.slice(8),
+          'services-hourly-panel__duration-row--three-centered'
+        )}
       </div>
     `;
   }
@@ -1309,7 +1300,7 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
   state.currency = normalizeText(safeSnapshot.currency) || 'MXN';
 
   if (state.mode === MODES.FULL_DAY) {
-    state.durationHours = 12;
+    state.durationHours = HOURLY_PRICING_CONSTANTS.fullDayHours;
   } else if (
     state.mode === MODES.HOURLY &&
     HOURLY_DURATION_OPTIONS.indexOf(nextDuration) >= 0
@@ -1546,13 +1537,12 @@ function buildHourlySubmitDetail() {
     hourly_daily_km_included:
       state.mode === MODES.LONG_TERM
         ? ''
-        : (
-            state.mode === MODES.FULL_DAY
-              ? '500'
-              : String((state.durationHours || 0) * 40)
-          ),
-    hourly_daily_extra_km_price: '35',
-    hourly_daily_out_of_zone_supplement: '4500'
+        : String(HOURLY_PRICING_API.getIncludedKilometers({
+            mode: state.mode,
+            durationHours: state.durationHours
+          }) || ''),
+    hourly_daily_extra_km_price: String(HOURLY_PRICING_CONSTANTS.extraKmPrice),
+    hourly_daily_out_of_zone_supplement: String(HOURLY_PRICING_CONSTANTS.outOfZoneSupplement)
   };
 }
 
