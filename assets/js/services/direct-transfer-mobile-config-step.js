@@ -765,6 +765,17 @@
     ].filter(Boolean).join(" ");
   }
 
+  function formatDurationHoursMinutes(seconds) {
+    const totalMinutes = Math.max(1, Math.round(Number(seconds) / 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return [
+      String(hours),
+      String(minutes).padStart(2, "0")
+    ].join(":");
+  }
+
   function formatDurationLabel() {
     const seconds = getQuoteNumberValue([
       "durationSeconds",
@@ -776,12 +787,10 @@
       return "";
     }
 
-    const minutes = Math.max(1, Math.round(seconds / 60));
-
     return getI18nValue(
-      "directTransferMobileFlow.estimate.minutesApprox",
-      "{minutes} minutos aprox."
-    ).replace("{minutes}", String(minutes));
+      "directTransferMobileFlow.estimate.hoursMinutesApprox",
+      "{duration} h aprox."
+    ).replace("{duration}", formatDurationHoursMinutes(seconds));
   }
 
   function getTodayDateValue() {

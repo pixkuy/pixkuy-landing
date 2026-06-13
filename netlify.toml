@@ -7,5 +7,9 @@
   included_files = [
     "assets/js/data/events-special-venues.json",
     "assets/js/data/events-special-catalog.json",
-    "assets/js/data/events-special-pricing.json"
+    "assets/js/data/events-special-pricing.json",
+    "assets/js/data/direct-transfer-coverage.geojson",
+    "assets/js/data/airport-zone-catalog.js",
+    "assets/js/data/airport-extended-rings-catalog.js",
+    "assets/js/data/airport-extended-corridors-catalog.js"
   ]

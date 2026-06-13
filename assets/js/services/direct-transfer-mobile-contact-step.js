@@ -236,6 +236,17 @@
     ].filter(Boolean).join(" ");
   }
 
+  function formatDurationHoursMinutes(seconds) {
+    const totalMinutes = Math.max(1, Math.round(Number(seconds) / 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return [
+      String(hours),
+      String(minutes).padStart(2, "0")
+    ].join(":");
+  }
+
   function formatDurationSummaryLabel(snapshot) {
     const seconds = Number(snapshot && snapshot.direct_transfer_duration_seconds);
 
@@ -243,12 +254,10 @@
       return "";
     }
 
-    const minutes = Math.max(1, Math.round(seconds / 60));
-
     return getI18nValue(
-      "directTransferMobileFlow.estimate.minutesApproxShort",
-      "{minutes} min aprox."
-    ).replace("{minutes}", String(minutes));
+      "directTransferMobileFlow.estimate.hoursMinutesApproxShort",
+      "{duration} h aprox."
+    ).replace("{duration}", formatDurationHoursMinutes(seconds));
   }
 
   function buildEstimateSummaryLabel(snapshot) {

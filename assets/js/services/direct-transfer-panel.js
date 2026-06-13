@@ -33,6 +33,7 @@
 
   let quoteTimer = 0;
   let quoteRequestId = 0;
+  let addressControllerMountRequestId = 0;
   let controllers = [];
 
   const state = {
@@ -211,6 +212,44 @@
     const api = window.PixkuyDirectTransferCoverage;
 
     return api && typeof api === "object" ? api : null;
+  }
+  
+    function isValidPlacesLocationRestriction(value) {
+    return Boolean(
+      value &&
+        typeof value === "object" &&
+        Number.isFinite(Number(value.north)) &&
+        Number.isFinite(Number(value.south)) &&
+        Number.isFinite(Number(value.east)) &&
+        Number.isFinite(Number(value.west)) &&
+        Number(value.north) > Number(value.south) &&
+        Number(value.east) > Number(value.west)
+    );
+  }
+
+  function clonePlacesLocationRestriction(value) {
+    if (!isValidPlacesLocationRestriction(value)) {
+      return null;
+    }
+
+    return {
+      north: Number(value.north),
+      south: Number(value.south),
+      east: Number(value.east),
+      west: Number(value.west)
+    };
+  }
+
+  function getDirectTransferSearchLocationRestriction() {
+    const api = getDirectTransferCoverageApi();
+
+    if (!api || typeof api.getSearchLocationRestriction !== "function") {
+      return Promise.resolve(null);
+    }
+
+    return api.getSearchLocationRestriction(false).then(function onSearchLocationRestriction(value) {
+      return clonePlacesLocationRestriction(value);
+    });
   }
 
   function getNeutralPanelCoverageApi() {
@@ -682,6 +721,17 @@
     ].filter(Boolean).join(" ");
   }
 
+  function formatDurationHoursMinutes(seconds) {
+    const totalMinutes = Math.max(1, Math.round(Number(seconds) / 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return [
+      String(hours),
+      String(minutes).padStart(2, "0")
+    ].join(":");
+  }
+
   function formatDurationLabel() {
     const seconds = getQuoteNumberValue([
       "durationSeconds",
@@ -693,12 +743,10 @@
       return "";
     }
 
-    const minutes = Math.max(1, Math.round(seconds / 60));
-
     return getI18nValue(
-      "directTransferMobileFlow.estimate.minutesApprox",
-      "{minutes} minutos aprox."
-    ).replace("{minutes}", String(minutes));
+      "directTransferMobileFlow.estimate.hoursMinutesApprox",
+      "{duration} h aprox."
+    ).replace("{duration}", formatDurationHoursMinutes(seconds));
   }
 
   function getTodayDateValue() {
@@ -1202,59 +1250,74 @@
   function mountAddressControllers() {
     const googlePlacesApi = getGooglePlacesApi();
     const language = normalizeGoogleLanguage(getDocumentLanguage());
+    const mountRequestId = addressControllerMountRequestId + 1;
 
+    addressControllerMountRequestId = mountRequestId;
     destroyControllers();
 
     if (!googlePlacesApi) {
       return false;
     }
 
-    ["origin", "destination"].forEach(function mountAddress(role) {
-      const input = configMount.querySelector('[data-direct-transfer-panel-address-input="' + role + '"]');
-      const mountNode = configMount.querySelector('[data-direct-transfer-panel-address-mount="' + role + '"]');
-      const clearButton = configMount.querySelector('[data-direct-transfer-panel-address-clear="' + role + '"]');
+    getDirectTransferSearchLocationRestriction()
+      .then(function onLocationRestrictionReady(locationRestriction) {
+        if (mountRequestId !== addressControllerMountRequestId) {
+          return;
+        }
 
-      if (!input || !mountNode) {
-        return;
-      }
+        if (!isValidPlacesLocationRestriction(locationRestriction)) {
+          return;
+        }
 
-      const controller = googlePlacesApi.createAutocompleteController({
-        fieldName: "direct_transfer_" + role,
-        input,
-        mountNode,
-        hiddenFields: {},
-        language,
-        region: "mx",
-        includedRegionCodes: ["mx"],
-        coverageApi: getNeutralPanelCoverageApi(),
-        onSelection: function onSelection(selectedPlace, meta) {
-          const safeMeta = meta && typeof meta === "object" ? meta : {};
-          const shouldPreserveVisibleInput = safeMeta.preserveInputValue === true;
+        ["origin", "destination"].forEach(function mountAddress(role) {
+          const input = configMount.querySelector('[data-direct-transfer-panel-address-input="' + role + '"]');
+          const mountNode = configMount.querySelector('[data-direct-transfer-panel-address-mount="' + role + '"]');
+          const clearButton = configMount.querySelector('[data-direct-transfer-panel-address-clear="' + role + '"]');
 
-          if (!selectedPlace) {
-            if (!shouldPreserveVisibleInput) {
-              setAddressValue(role, input.value);
-            }
-            syncView();
+          if (!input || !mountNode) {
             return;
           }
 
-          setAddressPlace(role, selectedPlace).then(function onAddressPlaceApplied() {
-            if (clearButton) {
-              clearButton.hidden = !normalizeText(input.value);
-            }
+          const controller = googlePlacesApi.createAutocompleteController({
+            fieldName: "direct_transfer_" + role,
+            input,
+            mountNode,
+            hiddenFields: {},
+            language,
+            region: "mx",
+            includedRegionCodes: ["mx"],
+            locationRestriction: clonePlacesLocationRestriction(locationRestriction),
+            coverageApi: getNeutralPanelCoverageApi(),
+            onSelection: function onSelection(selectedPlace, meta) {
+              const safeMeta = meta && typeof meta === "object" ? meta : {};
+              const shouldPreserveVisibleInput = safeMeta.preserveInputValue === true;
 
-            syncView();
+              if (!selectedPlace) {
+                if (!shouldPreserveVisibleInput) {
+                  setAddressValue(role, input.value);
+                }
+                syncView();
+                return;
+              }
+
+              setAddressPlace(role, selectedPlace).then(function onAddressPlaceApplied() {
+                if (clearButton) {
+                  clearButton.hidden = !normalizeText(input.value);
+                }
+
+                syncView();
+              });
+            },
+            onCoverageReject: function onCoverageReject() {},
+            onManualFallback: function onManualFallback() {},
+            onError: function onError() {}
           });
-        },
-        onCoverageReject: function onCoverageReject() {},
-        onManualFallback: function onManualFallback() {},
-        onError: function onError() {}
-      });
 
-      controllers.push(controller);
-      controller.mount();
-    });
+          controllers.push(controller);
+          controller.mount();
+        });
+      })
+      .catch(function onLocationRestrictionError() {});
 
     return true;
   }

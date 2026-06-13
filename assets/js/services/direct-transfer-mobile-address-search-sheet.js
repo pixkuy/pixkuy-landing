@@ -29,6 +29,7 @@
 
   let activeSourceInput = null;
   let activeController = null;
+  let controllerMountRequestId = 0;
   let hasCommittedSelection = false;
   let hasSearchEdited = false;
   let openingValue = "";
@@ -102,6 +103,50 @@
     )
       ? window.PixkuyForms.googlePlaces
       : null;
+  }
+  
+    function getDirectTransferCoverageApi() {
+    const api = window.PixkuyDirectTransferCoverage;
+
+    return api && typeof api === "object" ? api : null;
+  }
+
+  function isValidPlacesLocationRestriction(value) {
+    return Boolean(
+      value &&
+        typeof value === "object" &&
+        Number.isFinite(Number(value.north)) &&
+        Number.isFinite(Number(value.south)) &&
+        Number.isFinite(Number(value.east)) &&
+        Number.isFinite(Number(value.west)) &&
+        Number(value.north) > Number(value.south) &&
+        Number(value.east) > Number(value.west)
+    );
+  }
+
+  function clonePlacesLocationRestriction(value) {
+    if (!isValidPlacesLocationRestriction(value)) {
+      return null;
+    }
+
+    return {
+      north: Number(value.north),
+      south: Number(value.south),
+      east: Number(value.east),
+      west: Number(value.west)
+    };
+  }
+
+  function getDirectTransferSearchLocationRestriction() {
+    const api = getDirectTransferCoverageApi();
+
+    if (!api || typeof api.getSearchLocationRestriction !== "function") {
+      return Promise.resolve(null);
+    }
+
+    return api.getSearchLocationRestriction(false).then(function onSearchLocationRestriction(value) {
+      return clonePlacesLocationRestriction(value);
+    });
   }
   
   function getNeutralSheetCoverageApi() {
@@ -369,6 +414,8 @@
   }
 
   function destroyController() {
+    controllerMountRequestId += 1;
+
     if (activeController && typeof activeController.destroy === "function") {
       activeController.destroy();
     }
@@ -409,49 +456,74 @@
       return false;
     }
 
+    const mountRequestId = controllerMountRequestId;
+
     mountNode.innerHTML = "";
     mountNode.setAttribute("aria-hidden", "false");
 
-    activeController = placesApi.createAutocompleteController({
-      fieldName,
-      input,
-      mountNode,
-      hiddenFields: {},
-      language: normalizeGoogleLanguage(getDocumentLanguage()),
-      region: "mx",
-      includedRegionCodes: ["mx"],
-      coverageApi: getNeutralSheetCoverageApi(),
-      onSelection: function onAddressSheetSelection(selectedPlace) {
-        blurActiveElementInside(mountNode);
-
-        const label = normalizeText(
-          selectedPlace &&
-            (
-              selectedPlace.label ||
-              selectedPlace.formattedAddress ||
-              selectedPlace.displayName
-            )
-        );
-
-        if (!selectedPlace || !label) {
-          return;
+    getDirectTransferSearchLocationRestriction()
+      .then(function onLocationRestrictionReady(locationRestriction) {
+        if (mountRequestId !== controllerMountRequestId) {
+          return false;
         }
 
-        hasCommittedSelection = true;
-        setInternalValue(label);
-        syncSourceInputValue(label, selectedPlace);
-        resetSourceInputScroll();
-        closeSheet({ refocus: false });
-      },
-      onCoverageReject: function onCoverageReject() {
-        hasSearchEdited = true;
-        setInternalValue("");
-        syncSourceInputValue("", null);
-      },
-      onError: function onAddressSheetError() {}
-    });
+        if (!isValidPlacesLocationRestriction(locationRestriction)) {
+          return false;
+        }
 
-    activeController.mount();
+        activeController = placesApi.createAutocompleteController({
+          fieldName,
+          input,
+          mountNode,
+          hiddenFields: {},
+          language: normalizeGoogleLanguage(getDocumentLanguage()),
+          region: "mx",
+          includedRegionCodes: ["mx"],
+          locationRestriction: clonePlacesLocationRestriction(locationRestriction),
+          coverageApi: getNeutralSheetCoverageApi(),
+          onSelection: function onAddressSheetSelection(selectedPlace) {
+            blurActiveElementInside(mountNode);
+
+            const label = normalizeText(
+              selectedPlace &&
+                (
+                  selectedPlace.label ||
+                  selectedPlace.formattedAddress ||
+                  selectedPlace.displayName
+                )
+            );
+
+            if (!selectedPlace || !label) {
+              return;
+            }
+
+            hasCommittedSelection = true;
+            setInternalValue(label);
+            syncSourceInputValue(label, selectedPlace);
+            resetSourceInputScroll();
+            closeSheet({ refocus: false });
+          },
+          onCoverageReject: function onCoverageReject() {
+            hasSearchEdited = true;
+            setInternalValue("");
+            syncSourceInputValue("", null);
+          },
+          onError: function onAddressSheetError() {}
+        });
+
+        return Promise.resolve(activeController.mount()).then(function onControllerMounted() {
+          if (mountRequestId !== controllerMountRequestId) {
+            return false;
+          }
+
+          if (normalizeText(input.value).length >= 3) {
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+          }
+
+          return true;
+        });
+      })
+      .catch(function onLocationRestrictionError() {});
 
     return true;
   }

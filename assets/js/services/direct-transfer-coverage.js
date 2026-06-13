@@ -17,10 +17,12 @@
   }
 
   const DEFAULT_GEOJSON_URL = "assets/js/data/direct-transfer-coverage.geojson";
+  const SEARCH_LOCATION_RESTRICTION_PADDING_DEGREES = 0.15;
 
   const state = {
     geojsonUrl: DEFAULT_GEOJSON_URL,
     features: null,
+    searchLocationRestriction: null,
     loadPromise: null
   };
 
@@ -195,6 +197,106 @@
       point.lat <= boundingBox.maxLat
     );
   }
+  
+    function mergeBoundingBoxes(left, right) {
+    if (!left) {
+      return right || null;
+    }
+
+    if (!right) {
+      return left;
+    }
+
+    return {
+      minLng: Math.min(left.minLng, right.minLng),
+      minLat: Math.min(left.minLat, right.minLat),
+      maxLng: Math.max(left.maxLng, right.maxLng),
+      maxLat: Math.max(left.maxLat, right.maxLat)
+    };
+  }
+
+  function getPolygonBoundingBox(polygonCoordinates) {
+    if (!isPolygonCoordinates(polygonCoordinates)) {
+      return null;
+    }
+
+    return polygonCoordinates.reduce(function reducePolygonBoundingBox(currentBox, ring) {
+      return mergeBoundingBoxes(currentBox, getRingBoundingBox(ring));
+    }, null);
+  }
+
+  function getFeatureBoundingBox(feature) {
+    const geometry = feature && feature.geometry ? feature.geometry : {};
+    const coordinates = geometry.coordinates;
+
+    if (geometry.type === "Polygon") {
+      return getPolygonBoundingBox(coordinates);
+    }
+
+    if (geometry.type === "MultiPolygon" && isMultiPolygonCoordinates(coordinates)) {
+      return coordinates.reduce(function reduceMultiPolygonBoundingBox(currentBox, polygonCoordinates) {
+        return mergeBoundingBoxes(currentBox, getPolygonBoundingBox(polygonCoordinates));
+      }, null);
+    }
+
+    return null;
+  }
+
+  function getFeaturesBoundingBox(features) {
+    const safeFeatures = Array.isArray(features) ? features : [];
+
+    return safeFeatures.reduce(function reduceFeaturesBoundingBox(currentBox, feature) {
+      return mergeBoundingBoxes(currentBox, getFeatureBoundingBox(feature));
+    }, null);
+  }
+
+  function clampCoordinate(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function buildSearchLocationRestriction(features) {
+    const boundingBox = getFeaturesBoundingBox(features);
+
+    if (!boundingBox) {
+      return null;
+    }
+
+    return {
+      west: clampCoordinate(
+        boundingBox.minLng - SEARCH_LOCATION_RESTRICTION_PADDING_DEGREES,
+        -180,
+        180
+      ),
+      south: clampCoordinate(
+        boundingBox.minLat - SEARCH_LOCATION_RESTRICTION_PADDING_DEGREES,
+        -90,
+        90
+      ),
+      east: clampCoordinate(
+        boundingBox.maxLng + SEARCH_LOCATION_RESTRICTION_PADDING_DEGREES,
+        -180,
+        180
+      ),
+      north: clampCoordinate(
+        boundingBox.maxLat + SEARCH_LOCATION_RESTRICTION_PADDING_DEGREES,
+        -90,
+        90
+      )
+    };
+  }
+
+  function cloneLocationRestriction(value) {
+    if (!value || typeof value !== "object") {
+      return null;
+    }
+
+    return {
+      west: value.west,
+      south: value.south,
+      east: value.east,
+      north: value.north
+    };
+  }
 
   function isPointOnSegment(point, start, end) {
     const px = point.lng;
@@ -337,6 +439,7 @@
     state.loadPromise = fetchGeoJson(state.geojsonUrl)
       .then(function onCoverageLoaded(payload) {
         state.features = normalizeFeatureCollection(payload);
+        state.searchLocationRestriction = buildSearchLocationRestriction(state.features);
         return state.features;
       })
       .finally(function onCoverageLoadFinished() {
@@ -401,6 +504,16 @@
   function getLoadedCoverageFeatures() {
     return Array.isArray(state.features) ? state.features.slice() : [];
   }
+  
+  function getSearchLocationRestrictionSync() {
+    return cloneLocationRestriction(state.searchLocationRestriction);
+  }
+
+  async function getSearchLocationRestriction(forceReload) {
+    await loadCoverage(forceReload === true);
+
+    return getSearchLocationRestrictionSync();
+  }
 
   function setGeoJsonUrl(url) {
     const safeUrl = normalizeText(url);
@@ -411,6 +524,7 @@
 
     state.geojsonUrl = safeUrl;
     state.features = null;
+    state.searchLocationRestriction = null;
     state.loadPromise = null;
   }
 
@@ -423,6 +537,8 @@
       return loadCoverage(forceReload === true);
     },
     getLoadedCoverageFeatures: getLoadedCoverageFeatures,
+    getSearchLocationRestriction: getSearchLocationRestriction,
+    getSearchLocationRestrictionSync: getSearchLocationRestrictionSync,
     resolveCoverageFromPoint: resolveCoverageFromPoint,
     resolveCoverageFromPointSync: resolveCoverageFromPointSync
   };

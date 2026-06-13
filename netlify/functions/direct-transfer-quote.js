@@ -1,71 +1,31 @@
+const {
+  resolveCoverageFromPoint
+} = require("./_shared/direct-transfer/directTransferGeojsonResolver");
+
+const {
+  getDirectTransferAirportRestriction
+} = require("./_shared/direct-transfer/directTransferAirportGuard");
+
+const {
+  calculateDirectTransferPricingV2
+} = require("./_shared/direct-transfer/directTransferPricingV2");
+
+const {
+  resolveAirportCeilingForDirectTransfer
+} = require("./_shared/direct-transfer/directTransferAirportCeiling");
+
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store"
 };
 
 const VALID_PASSENGER_KEYS = new Set(["van_1_2", "van_3_4", "van_5_6"]);
+
 /*
-  Direct Transfer opera solo en CDMX/ZMVM.
-  La hora del usuario se trata como hora local literal.
+  Direct Transfer opera con hora local literal de CDMX.
   Este offset no convierte la hora: solo serializa esa hora local en formato RFC3339 para Google Routes.
 */
 const DIRECT_TRANSFER_OPERATIONAL_UTC_OFFSET = "-06:00";
-
-const DIRECT_TRANSFER_COVERAGE = {
-  centerLat: 19.36,
-  centerLng: -99.16,
-  primaryRadiusKm: 38,
-  outerRadiusKm: 78
-};
-
-const CATALOGUED_AIRPORT_CODES = new Set(["MEX", "NLU", "TLC", "PBC", "QRO"]);
-
-const CATALOGUED_AIRPORT_KEYWORDS = [
-  "aeropuerto internacional de la ciudad de mexico",
-  "aeropuerto internacional de la ciudad de méxico",
-  "benito juarez international airport",
-  "benito juárez international airport",
-  "aicm",
-  "aeropuerto internacional felipe angeles",
-  "aeropuerto internacional felipe ángeles",
-  "felipe angeles international airport",
-  "felipe ángeles international airport",
-  "aifa",
-  "aeropuerto internacional de toluca",
-  "toluca international airport",
-  "licenciado adolfo lopez mateos international airport",
-  "licenciado adolfo lópez mateos international airport",
-  "aeropuerto internacional de puebla",
-  "puebla international airport",
-  "hermanos serdan international airport",
-  "hermanos serdán international airport",
-  "aeropuerto intercontinental de queretaro",
-  "aeropuerto intercontinental de querétaro",
-  "queretaro intercontinental airport",
-  "querétaro intercontinental airport"
-];
-
-const PRICING = {
-  currency: "MXN",
-  roundingStep: 50,
-  baseFee: 125,
-  kmRate: 6.9,
-  minuteRate: 4.25,
-  minimum: 150,
-  referenceMinutesPerKm: 2.35,
-  congestionSoftCapMinutes: 18,
-  capacityPremiums: {
-    van_1_2: {
-      minimum: 150
-    },
-    van_3_4: {
-      minimum: 200
-    },
-    van_5_6: {
-      minimum: 300
-    }
-  }
-};
 
 function buildResponse(statusCode, payload) {
   return {
@@ -106,7 +66,9 @@ function normalizeArray(value, limit) {
 }
 
 function normalizeAddress(value) {
-  if (!isObject(value)) return null;
+  if (!isObject(value)) {
+    return null;
+  }
 
   const lat = normalizeCoordinate(value.lat);
   const lng = normalizeCoordinate(value.lng);
@@ -137,153 +99,6 @@ function normalizeAddress(value) {
     types: normalizeArray(value.types, 12),
     addressComponents: normalizeArray(value.addressComponents, 16)
   };
-}
-
-function normalizeComparisonText(value) {
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
-function getAddressComponentText(address) {
-  return address.addressComponents
-    .map(function mapComponent(component) {
-      if (!component || typeof component !== "object") {
-        return "";
-      }
-
-      return [
-        component.shortText,
-        component.short_name,
-        component.longText,
-        component.long_name
-      ].map(normalizeText).filter(Boolean).join(" ");
-    })
-    .filter(Boolean)
-    .join(" | ");
-}
-
-function getAddressSearchText(address) {
-  return [
-    address.label,
-    address.placeId,
-    address.countryCode,
-    address.administrativeAreaLevel1,
-    address.administrativeAreaLevel2,
-    address.locality,
-    address.iataCode,
-    address.types.join(" "),
-    getAddressComponentText(address)
-  ].map(normalizeComparisonText).filter(Boolean).join(" | ");
-}
-
-function getDistanceKmBetweenCoordinates(left, right) {
-  const earthRadiusKm = 6371;
-  const leftLat = Number(left && left.lat);
-  const leftLng = Number(left && left.lng);
-  const rightLat = Number(right && right.lat);
-  const rightLng = Number(right && right.lng);
-
-  if (
-    !Number.isFinite(leftLat) ||
-    !Number.isFinite(leftLng) ||
-    !Number.isFinite(rightLat) ||
-    !Number.isFinite(rightLng)
-  ) {
-    return null;
-  }
-
-  const toRadians = Math.PI / 180;
-  const deltaLat = (rightLat - leftLat) * toRadians;
-  const deltaLng = (rightLng - leftLng) * toRadians;
-  const lat1 = leftLat * toRadians;
-  const lat2 = rightLat * toRadians;
-
-  const haversine =
-    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-    Math.cos(lat1) *
-      Math.cos(lat2) *
-      Math.sin(deltaLng / 2) *
-      Math.sin(deltaLng / 2);
-
-  return 2 * earthRadiusKm * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
-}
-
-function getDirectTransferCoverage(address) {
-  const distanceKm = getDistanceKmBetweenCoordinates(
-    {
-      lat: DIRECT_TRANSFER_COVERAGE.centerLat,
-      lng: DIRECT_TRANSFER_COVERAGE.centerLng
-    },
-    address
-  );
-
-  if (!Number.isFinite(distanceKm)) {
-    return {
-      isWithinCoverage: false,
-      coverageId: "",
-      pricingMode: ""
-    };
-  }
-
-  if (distanceKm <= DIRECT_TRANSFER_COVERAGE.primaryRadiusKm) {
-    return {
-      isWithinCoverage: true,
-      coverageId: "primary_area",
-      pricingMode: "standard"
-    };
-  }
-
-  if (distanceKm <= DIRECT_TRANSFER_COVERAGE.outerRadiusKm) {
-    return {
-      isWithinCoverage: true,
-      coverageId: "extended_ring",
-      pricingMode: "extended"
-    };
-  }
-
-  return {
-    isWithinCoverage: false,
-    coverageId: "",
-    pricingMode: ""
-  };
-}
-
-function isInsideDirectTransferCoverage(address) {
-  const coverage = getDirectTransferCoverage(address);
-
-  return Boolean(coverage && coverage.isWithinCoverage === true);
-}
-
-function isCataloguedAirportAddress(address) {
-  const text = getAddressSearchText(address);
-  let index;
-
-  if (address.iataCode && CATALOGUED_AIRPORT_CODES.has(address.iataCode)) {
-    return true;
-  }
-
-  for (index = 0; index < CATALOGUED_AIRPORT_KEYWORDS.length; index += 1) {
-    if (text.indexOf(normalizeComparisonText(CATALOGUED_AIRPORT_KEYWORDS[index])) !== -1) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-function getDirectTransferServerRestriction(originAddress, destinationAddress) {
-  if (isCataloguedAirportAddress(originAddress) || isCataloguedAirportAddress(destinationAddress)) {
-    return "DIRECT_TRANSFER_AIRPORT_ROUTE_NOT_ALLOWED";
-  }
-
-  if (!isInsideDirectTransferCoverage(originAddress) || !isInsideDirectTransferCoverage(destinationAddress)) {
-    return "DIRECT_TRANSFER_OUT_OF_COVERAGE";
-  }
-
-  return "";
 }
 
 function buildWaypointFromAddress(address) {
@@ -373,243 +188,135 @@ async function computeRoute(options) {
   };
 }
 
-function ceilToStep(value, step) {
-  const safeStep = Number.isFinite(Number(step)) && Number(step) > 0
-    ? Number(step)
-    : 50;
-
-  return Math.ceil(value / safeStep) * safeStep;
-}
-
-function clamp(value, min, max) {
-  const number = Number(value);
-  const minValue = Number(min);
-  const maxValue = Number(max);
-
-  if (!Number.isFinite(number)) {
-    return null;
-  }
-
-  if (!Number.isFinite(minValue) || !Number.isFinite(maxValue) || minValue > maxValue) {
-    return number;
-  }
-
-  return Math.min(Math.max(number, minValue), maxValue);
-}
-
-function smoothstep(value) {
-  const number = clamp(value, 0, 1);
-
-  if (!Number.isFinite(number)) {
-    return null;
-  }
-
-  return number * number * (3 - (2 * number));
-}
-
-function getExtendedPricingContext(originAddress, destinationAddress) {
-  const originCoverage = getDirectTransferCoverage(originAddress);
-  const destinationCoverage = getDirectTransferCoverage(destinationAddress);
-  const isExtended = Boolean(
-    (originCoverage && originCoverage.pricingMode === "extended") ||
-      (destinationCoverage && destinationCoverage.pricingMode === "extended")
-  );
-
-  return {
-    pricingMode: isExtended ? "extended" : "standard",
-    originCoverage,
-    destinationCoverage
-  };
-}
-
-function isWeekdayMorningExtendedScarcitySlot(pickupDate, pickupTime) {
-  const date = normalizeText(pickupDate);
-  const time = normalizeText(pickupTime);
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
-    return false;
-  }
-
-  const day = new Date(date + "T12:00:00Z").getUTCDay();
-  const minutes = Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
-
-  return day >= 1 && day <= 5 && minutes >= 390 && minutes <= 570;
-}
-
-function isWestExtendedCorridor(originAddress, destinationAddress) {
-  const originCoverage = getDirectTransferCoverage(originAddress);
-  const destinationCoverage = getDirectTransferCoverage(destinationAddress);
-  const extendedAddress =
-    originCoverage && originCoverage.pricingMode === "extended"
-      ? originAddress
-      : destinationCoverage && destinationCoverage.pricingMode === "extended"
-        ? destinationAddress
-        : null;
-
-  if (!extendedAddress) {
-    return false;
-  }
-
-  return Number(extendedAddress.lng) < DIRECT_TRANSFER_COVERAGE.centerLng;
-}
-
-function applyExtendedPricing(options) {
-  const price = options.price;
-  const passengerFareKey = normalizeText(options.passengerFareKey);
-  const distanceKm = Number(options.route.distanceMeters) / 1000;
-  const basePrice = Number(price && price.price);
-  const scarcity =
-    passengerFareKey === "van_5_6" &&
-    isWestExtendedCorridor(options.originAddress, options.destinationAddress) &&
-    isWeekdayMorningExtendedScarcitySlot(options.pickupDate, options.pickupTime)
-      ? 1
-      : 0;
-
-  let extendedRaw = basePrice;
-
-  if (!Number.isFinite(basePrice) || !Number.isFinite(distanceKm)) {
-    return price;
-  }
-
-  if (passengerFareKey === "van_1_2") {
-    extendedRaw = 775 + (0.30 * basePrice) + (4.00 * distanceKm);
-  }
-
-  if (passengerFareKey === "van_3_4") {
-    extendedRaw = 1000 + (0.55 * basePrice) + (2.75 * distanceKm);
-  }
-
-  if (passengerFareKey === "van_5_6") {
-    extendedRaw = 750 + (0.30 * basePrice) + (14.00 * distanceKm) + (450 * scarcity);
-  }
-
-  return Object.assign({}, price, {
-    price: ceilToStep(extendedRaw, PRICING.roundingStep),
-    extendedRaw: extendedRaw,
-    extendedDistanceKm: distanceKm,
-    extendedScarcity: scarcity
+function resolveAddressCoverage(address) {
+  return resolveCoverageFromPoint({
+    lat: address.lat,
+    lng: address.lng
   });
 }
 
-function calculatePrice(options) {
-  const distanceKm = Number(options.distanceMeters) / 1000;
-  const durationMinutes = Number(options.durationSeconds) / 60;
-  const capacityPricing = PRICING.capacityPremiums[options.passengerFareKey];
-
+function getDirectTransferCoverageRestriction(originCoverage, destinationCoverage) {
   if (
-    !capacityPricing ||
-    !Number.isFinite(distanceKm) ||
-    !Number.isFinite(durationMinutes)
+    !originCoverage ||
+    originCoverage.isWithinCoverage !== true ||
+    !destinationCoverage ||
+    destinationCoverage.isWithinCoverage !== true
   ) {
-    return null;
+    return "DIRECT_TRANSFER_OUT_OF_COVERAGE";
   }
 
-  const referenceMinutes = distanceKm * PRICING.referenceMinutesPerKm;
-  const structuralMinutes = Math.min(durationMinutes, referenceMinutes);
-  const congestionMinutes = Math.max(0, durationMinutes - referenceMinutes);
-  const softenedCongestionMinutes = PRICING.congestionSoftCapMinutes *
-    (1 - Math.exp(-congestionMinutes / PRICING.congestionSoftCapMinutes));
-  const effectiveMinutes = structuralMinutes + softenedCongestionMinutes;
+  return "";
+}
 
-  const baseRaw =
-    PRICING.baseFee +
-    (distanceKm * PRICING.kmRate) +
-    (effectiveMinutes * PRICING.minuteRate);
-
-  const congestionStress = congestionMinutes / (congestionMinutes + 14);
-  const fareScale = 1 - Math.exp(-baseRaw / 650);
-  const congestionSignal = smoothstep(congestionStress);
-  const fareSignal = smoothstep(fareScale);
-
-  if (!Number.isFinite(congestionSignal) || !Number.isFinite(fareSignal)) {
-    return null;
-  }
-
-  const marketStress = clamp(
-    (0.78 * congestionSignal) + (0.22 * fareSignal),
-    0,
-    1
+function getDirectTransferServerRestriction(originAddress, destinationAddress, originCoverage, destinationCoverage) {
+  const airportRestriction = getDirectTransferAirportRestriction(
+    originAddress,
+    destinationAddress
   );
 
-  if (!Number.isFinite(marketStress)) {
+  if (airportRestriction) {
+    return airportRestriction;
+  }
+
+  return getDirectTransferCoverageRestriction(originCoverage, destinationCoverage);
+}
+
+function getPricingMode(originCoverage, destinationCoverage) {
+  const originMode = normalizeText(originCoverage && originCoverage.pricingMode);
+  const destinationMode = normalizeText(destinationCoverage && destinationCoverage.pricingMode);
+
+  if (originMode && originMode !== "standard") {
+    return originMode;
+  }
+
+  if (destinationMode && destinationMode !== "standard") {
+    return destinationMode;
+  }
+
+  return originMode || destinationMode || "standard";
+}
+
+function roundNumber(value, decimals) {
+  const number = Number(value);
+  const factor = Math.pow(10, Number(decimals) || 0);
+
+  if (!Number.isFinite(number) || !Number.isFinite(factor) || factor <= 0) {
     return null;
   }
 
-  const premiumFiveSix = clamp(
-    105 + (110 * Math.pow(marketStress, 0.85)),
-    115,
-    225
-  );
-  const premiumThreeFour = clamp(
-    25 + (0.26 * premiumFiveSix),
-    45,
-    85
-  );
-
-  if (!Number.isFinite(premiumFiveSix) || !Number.isFinite(premiumThreeFour)) {
-    return null;
-  }
-
-  let capacityPremium = 0;
-
-  if (options.passengerFareKey === "van_3_4") {
-    capacityPremium = premiumThreeFour;
-  }
-
-  if (options.passengerFareKey === "van_5_6") {
-    capacityPremium = premiumFiveSix;
-  }
-
-  const withCapacity = baseRaw + capacityPremium;
-  const withMinimum = Math.max(withCapacity, capacityPricing.minimum);
-
-  return {
-    price: ceilToStep(withMinimum, PRICING.roundingStep),
-    baseRaw,
-    referenceMinutes,
-    congestionMinutes,
-    softenedCongestionMinutes,
-    effectiveMinutes,
-    capacityPremium,
-    marketStress
-  };
+  return Math.round(number * factor) / factor;
 }
 
 function buildQuotePayload(options) {
-  const capacityPricing = PRICING.capacityPremiums[options.passengerFareKey];
+  const ceiling = options.airportCeiling || {};
+  const pricing = options.pricing || {};
+  const route = options.route || {};
+  const originCoverage = options.originCoverage || {};
+  const destinationCoverage = options.destinationCoverage || {};
+  const pricingMode = getPricingMode(originCoverage, destinationCoverage);
 
   return {
     ok: true,
     quote: {
-      price: options.price.price,
-      currency: PRICING.currency,
+      price: pricing.price,
+      currency: pricing.currency || ceiling.currency || "MXN",
       passengerFareKey: options.passengerFareKey,
-      durationSeconds: options.route.durationSeconds,
-      distanceMeters: options.route.distanceMeters,
-      baseFee: PRICING.baseFee,
-      kmRate: PRICING.kmRate,
-      minuteRate: PRICING.minuteRate,
-      minimum: capacityPricing.minimum,
-      roundingStep: PRICING.roundingStep,
-      referenceMinutes: Math.round(options.price.referenceMinutes * 100) / 100,
-      congestionMinutes: Math.round(options.price.congestionMinutes * 100) / 100,
-      softenedCongestionMinutes: Math.round(options.price.softenedCongestionMinutes * 100) / 100,
-      effectiveMinutes: Math.round(options.price.effectiveMinutes * 100) / 100,
-      capacityPremium: Math.round(options.price.capacityPremium * 100) / 100,
-      marketStress: Math.round(options.price.marketStress * 1000) / 1000,
-      baseRaw: Math.round(options.price.baseRaw * 100) / 100,
-      pricingMode: options.pricingContext && options.pricingContext.pricingMode
-        ? options.pricingContext.pricingMode
-        : "standard",
-      extendedRaw: Number.isFinite(Number(options.price.extendedRaw))
-        ? Math.round(options.price.extendedRaw * 100) / 100
-        : null,
-      extendedDistanceKm: Number.isFinite(Number(options.price.extendedDistanceKm))
-        ? Math.round(options.price.extendedDistanceKm * 100) / 100
-        : null,
-      extendedScarcity: Number.isFinite(Number(options.price.extendedScarcity))
-        ? Number(options.price.extendedScarcity)
-        : 0
+      durationSeconds: route.durationSeconds,
+      distanceMeters: route.distanceMeters,
+      pricingVersion: "direct_transfer_v2",
+      pricingMode,
+      roundingStep: pricing.roundingStep,
+      route: {
+        durationSeconds: route.durationSeconds,
+        distanceMeters: route.distanceMeters
+      },
+      originCoverage: {
+        isWithinCoverage: originCoverage.isWithinCoverage === true,
+        coverageId: normalizeText(originCoverage.coverageId),
+        pricingMode: normalizeText(originCoverage.pricingMode),
+        priority: Number.isFinite(Number(originCoverage.priority))
+          ? Number(originCoverage.priority)
+          : 0,
+        shape: normalizeText(originCoverage.shape)
+      },
+      destinationCoverage: {
+        isWithinCoverage: destinationCoverage.isWithinCoverage === true,
+        coverageId: normalizeText(destinationCoverage.coverageId),
+        pricingMode: normalizeText(destinationCoverage.pricingMode),
+        priority: Number.isFinite(Number(destinationCoverage.priority))
+          ? Number(destinationCoverage.priority)
+          : 0,
+        shape: normalizeText(destinationCoverage.shape)
+      },
+      marketRaw: pricing.marketRaw,
+      marketOneTwoRaw: pricing.marketOneTwoRaw,
+      technicalFloor: pricing.technicalFloor,
+      technicalRaw: pricing.technicalRaw,
+      capacityMinimum: pricing.capacityMinimum,
+      rawBeforeCeiling: pricing.rawBeforeCeiling,
+      rawAfterCeiling: pricing.rawAfterCeiling,
+      passengerMultiplier: pricing.passengerMultiplier,
+      distanceRate: pricing.distanceRate,
+      distanceKm: pricing.distanceKm,
+      durationMinutes: pricing.durationMinutes,
+      slowdownMinutes: pricing.slowdownMinutes,
+      longTailKm: pricing.longTailKm,
+      distanceStress: pricing.distanceStress,
+      airportCeiling: pricing.airportCeiling,
+      airportCeilingApplied: pricing.airportCeilingApplied === true,
+      airportFare: ceiling.airportFare === null || ceiling.airportFare === undefined
+        ? null
+        : Number(ceiling.airportFare),
+      airportEquivalentZoneId: normalizeText(ceiling.airportEquivalentZoneId),
+      airportEquivalentZoneType: normalizeText(ceiling.airportEquivalentZoneType),
+      airportEquivalentSource: normalizeText(ceiling.airportEquivalentSource),
+      airportCeilingMultiplier: ceiling.airportCeilingMultiplier === undefined
+        ? null
+        : roundNumber(ceiling.airportCeilingMultiplier, 4),
+      airportCeilingRoundingStep: ceiling.airportCeilingRoundingStep === undefined
+        ? null
+        : Number(ceiling.airportCeilingRoundingStep),
+      technicalFloorBreachedByCeiling: pricing.technicalFloorBreachedByCeiling === true
     }
   };
 }
@@ -649,7 +356,22 @@ exports.handler = async function handler(event) {
     return fail(400, "INVALID_DEPARTURE_TIME", "directTransferMobileFlow.fare.unavailable");
   }
 
-  const serverRestriction = getDirectTransferServerRestriction(originAddress, destinationAddress);
+  let originCoverage;
+  let destinationCoverage;
+
+  try {
+    originCoverage = resolveAddressCoverage(originAddress);
+    destinationCoverage = resolveAddressCoverage(destinationAddress);
+  } catch (error) {
+    return fail(503, "DIRECT_TRANSFER_COVERAGE_CONFIGURATION_ERROR", "directTransferMobileFlow.fare.unavailable");
+  }
+
+  const serverRestriction = getDirectTransferServerRestriction(
+    originAddress,
+    destinationAddress,
+    originCoverage,
+    destinationCoverage
+  );
 
   if (serverRestriction) {
     return fail(400, serverRestriction, "directTransferMobileFlow.fare.unavailable");
@@ -673,33 +395,40 @@ exports.handler = async function handler(event) {
     return fail(503, "ROUTE_UNAVAILABLE", "directTransferMobileFlow.fare.unavailable");
   }
 
-  const pricingContext = getExtendedPricingContext(originAddress, destinationAddress);
-  let price = calculatePrice({
-    distanceMeters: route.distanceMeters,
-    durationSeconds: route.durationSeconds,
-    passengerFareKey
-  });
+  let airportCeiling;
 
-  if (pricingContext.pricingMode === "extended") {
-    price = applyExtendedPricing({
-      price,
-      route,
+  try {
+    airportCeiling = resolveAirportCeilingForDirectTransfer({
       passengerFareKey,
-      originAddress,
-      destinationAddress,
-      pickupDate,
-      pickupTime
+      distanceMeters: route.distanceMeters,
+      originCoverage,
+      destinationCoverage,
+      coverages: [
+        originCoverage,
+        destinationCoverage
+      ]
     });
+  } catch (error) {
+    return fail(503, "AIRPORT_EQUIVALENT_CONFIGURATION_ERROR", "directTransferMobileFlow.fare.unavailable");
   }
 
-  if (!price || !Number.isFinite(Number(price.price))) {
+  const pricing = calculateDirectTransferPricingV2({
+    distanceMeters: route.distanceMeters,
+    durationSeconds: route.durationSeconds,
+    passengerFareKey,
+    airportCeiling: airportCeiling.airportCeiling
+  });
+
+  if (!pricing || !Number.isFinite(Number(pricing.price))) {
     return fail(503, "QUOTE_UNAVAILABLE", "directTransferMobileFlow.fare.unavailable");
   }
 
   return buildResponse(200, buildQuotePayload({
     route,
-    price,
+    pricing,
+    airportCeiling,
     passengerFareKey,
-    pricingContext
+    originCoverage,
+    destinationCoverage
   }));
 };
