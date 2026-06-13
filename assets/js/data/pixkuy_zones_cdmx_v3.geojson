@@ -2,8 +2,8 @@
   "type": "FeatureCollection",
   "name": "pixkuy_airport_hotel_zones_with_extended_rings_to_queretaro_v1_visual",
   "metadata": {
-    "purpose": "Visual proposal for Airport/Hotel core zones plus extended concentric internal pricing rings up to Querétaro.",
-    "productionStatus": "visual_draft_not_for_direct_production",
+    "purpose": "Airport Transfer operational zones, extended rings and pricing corridors for Pixkuy landing zone resolution.",
+    "productionStatus": "pricing_v2_1_candidate_requires_backend_frontend_smoke_validation",
     "coreSource": "pixkuy_airport_hotel_zones_competitor_partition_v1.visual.geojson",
     "ringBasis": "buffers around union of the competitor-aligned core Airport/Hotel polygon; distances are approximate in UTM 14N",
     "customerFacingZones": [
@@ -24,7 +24,20 @@
       "airport_extended_ring_140km",
       "airport_extended_ring_200km"
     ],
-    "failClosedNote": "Extended ring features are active=false to avoid accidental use by current PixkuyZoneResolver/catalog. Production would require explicit catalog/pricing changes."
+    "failClosedNote": "Features are resolved by PixkuyZoneResolver using active=true and priority descending. Urban zones must keep higher priority than corridors; corridors must keep higher priority than rings when they intentionally override a regional ring.",
+    "corridorPolicy": "Corridor polygons are active operational pricing overlays. They must remain below urban zone priorities and above ring priorities.",
+    "internalExtendedCorridors": [
+      "airport_extended_corridor_taxco_guerrero",
+      "airport_extended_corridor_morelia_michoacan",
+      "airport_extended_corridor_sierra_norte_puebla",
+      "airport_extended_corridor_puebla_angelopolis",
+      "airport_extended_corridor_bajio_sma",
+      "airport_extended_corridor_queretaro",
+      "airport_extended_corridor_teotihuacan",
+      "airport_extended_corridor_valle_de_bravo",
+      "airport_extended_corridor_morelos_pachuca",
+      "airport_extended_corridor_toluca_cdmx"
+    ]
   },
   "features": [
     {
@@ -15772,6 +15785,347 @@
             [
               -98.34,
               19.7
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "airport_hotel_extended_corridor",
+        "active": true,
+        "corridorId": "airport_extended_corridor_puebla_angelopolis",
+        "zoneId": "airport_extended_corridor_puebla_angelopolis",
+        "labelKey": "services.cards.airport.panel.catalog.zones.airport_extended_corridor_puebla_angelopolis",
+        "label": "Corredor Puebla / Angelópolis",
+        "priority": 500,
+        "city": "Puebla",
+        "zoneCode": "PUEBLA_ANGELÓPOLIS",
+        "marketPolicy": "Corredor operativo de pricing V2.1 para ajustar rutas regionales donde el ring radial no refleja coste/competitividad de mercado.",
+        "pricingPolicyDraft": "Tarifa específica por corredor. Gana sobre rings regionales y queda por debajo de zonas urbanas.",
+        "model": "airport_transfer_pricing_corridors_v2_1",
+        "notes": "Cubre Puebla centro, Angelópolis y entorno metropolitano directo. Prioridad superior a rings 90/115/140 para evitar precios regionales excesivos."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -98.42,
+              18.82
+            ],
+            [
+              -97.98,
+              18.82
+            ],
+            [
+              -97.98,
+              19.24
+            ],
+            [
+              -98.42,
+              19.24
+            ],
+            [
+              -98.42,
+              18.82
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "airport_hotel_extended_corridor",
+        "active": true,
+        "corridorId": "airport_extended_corridor_bajio_sma",
+        "zoneId": "airport_extended_corridor_bajio_sma",
+        "labelKey": "services.cards.airport.panel.catalog.zones.airport_extended_corridor_bajio_sma",
+        "label": "Corredor San Miguel de Allende / Bajío",
+        "priority": 495,
+        "city": "Guanajuato / Bajío",
+        "zoneCode": "BAJIO_SMA",
+        "marketPolicy": "Corredor operativo de pricing V2.1 para ajustar rutas regionales donde el ring radial no refleja coste/competitividad de mercado.",
+        "pricingPolicyDraft": "Tarifa específica por corredor. Gana sobre rings regionales y queda por debajo de zonas urbanas.",
+        "model": "airport_transfer_pricing_corridors_v2_1",
+        "notes": "Cubre San Miguel de Allende y área operativa Bajío inmediata. No sustituye el corredor Querétaro/San Juan del Río."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -101.12,
+              20.72
+            ],
+            [
+              -100.48,
+              20.72
+            ],
+            [
+              -100.48,
+              21.12
+            ],
+            [
+              -101.12,
+              21.12
+            ],
+            [
+              -101.12,
+              20.72
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "airport_hotel_extended_corridor",
+        "active": true,
+        "corridorId": "airport_extended_corridor_queretaro",
+        "zoneId": "airport_extended_corridor_queretaro",
+        "labelKey": "services.cards.airport.panel.catalog.zones.airport_extended_corridor_queretaro",
+        "label": "Corredor Querétaro / San Juan del Río",
+        "priority": 490,
+        "city": "Querétaro",
+        "zoneCode": "QUERETARO_SJR",
+        "marketPolicy": "Corredor operativo de pricing V2.1 para ajustar rutas regionales donde el ring radial no refleja coste/competitividad de mercado.",
+        "pricingPolicyDraft": "Tarifa específica por corredor. Gana sobre rings regionales y queda por debajo de zonas urbanas.",
+        "model": "airport_transfer_pricing_corridors_v2_1",
+        "notes": "Cubre Santiago de Querétaro, San Juan del Río y entorno operativo del corredor. Corrige pricing frente a ring 140/200."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -100.62,
+              20.22
+            ],
+            [
+              -99.78,
+              20.22
+            ],
+            [
+              -99.78,
+              20.84
+            ],
+            [
+              -100.62,
+              20.84
+            ],
+            [
+              -100.62,
+              20.22
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "airport_hotel_extended_corridor",
+        "active": true,
+        "corridorId": "airport_extended_corridor_teotihuacan",
+        "zoneId": "airport_extended_corridor_teotihuacan",
+        "labelKey": "services.cards.airport.panel.catalog.zones.airport_extended_corridor_teotihuacan",
+        "label": "Corredor Teotihuacán",
+        "priority": 485,
+        "city": "Estado de México / Teotihuacán",
+        "zoneCode": "TEOTIHUACAN",
+        "marketPolicy": "Corredor operativo de pricing V2.1 para ajustar rutas regionales donde el ring radial no refleja coste/competitividad de mercado.",
+        "pricingPolicyDraft": "Tarifa específica por corredor. Gana sobre rings regionales y queda por debajo de zonas urbanas.",
+        "model": "airport_transfer_pricing_corridors_v2_1",
+        "notes": "Cubre Teotihuacán como traslado Airport Transfer punto a punto. No modifica tours ni itinerarios con espera turística."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -99.06,
+              19.56
+            ],
+            [
+              -98.7,
+              19.56
+            ],
+            [
+              -98.7,
+              19.84
+            ],
+            [
+              -99.06,
+              19.84
+            ],
+            [
+              -99.06,
+              19.56
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "airport_hotel_extended_corridor",
+        "active": true,
+        "corridorId": "airport_extended_corridor_valle_de_bravo",
+        "zoneId": "airport_extended_corridor_valle_de_bravo",
+        "labelKey": "services.cards.airport.panel.catalog.zones.airport_extended_corridor_valle_de_bravo",
+        "label": "Corredor Valle de Bravo",
+        "priority": 480,
+        "city": "Estado de México / Valle de Bravo",
+        "zoneCode": "VALLE_DE_BRAVO",
+        "marketPolicy": "Corredor operativo de pricing V2.1 para ajustar rutas regionales donde el ring radial no refleja coste/competitividad de mercado.",
+        "pricingPolicyDraft": "Tarifa específica por corredor. Gana sobre rings regionales y queda por debajo de zonas urbanas.",
+        "model": "airport_transfer_pricing_corridors_v2_1",
+        "notes": "Cubre Valle de Bravo y entorno inmediato para evitar fallback a ring regional con precio no competitivo."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -100.36,
+              18.98
+            ],
+            [
+              -99.88,
+              18.98
+            ],
+            [
+              -99.88,
+              19.42
+            ],
+            [
+              -100.36,
+              19.42
+            ],
+            [
+              -100.36,
+              18.98
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "airport_hotel_extended_corridor",
+        "active": true,
+        "corridorId": "airport_extended_corridor_morelos_pachuca",
+        "zoneId": "airport_extended_corridor_morelos_pachuca",
+        "labelKey": "services.cards.airport.panel.catalog.zones.airport_extended_corridor_morelos_pachuca",
+        "label": "Corredor Morelos / Pachuca",
+        "priority": 475,
+        "city": "Morelos / Hidalgo",
+        "zoneCode": "MORELOS_PACHUCA",
+        "marketPolicy": "Corredor operativo de pricing V2.1 para ajustar rutas regionales donde el ring radial no refleja coste/competitividad de mercado.",
+        "pricingPolicyDraft": "Tarifa específica por corredor. Gana sobre rings regionales y queda por debajo de zonas urbanas.",
+        "model": "airport_transfer_pricing_corridors_v2_1",
+        "notes": "MultiPolygon operativo para Cuernavaca/Tepoztlán y Pachuca. Unifica rutas regionales cortas donde ring 75/90/115 queda caro frente a mercado."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                -99.46,
+                18.72
+              ],
+              [
+                -98.94,
+                18.72
+              ],
+              [
+                -98.94,
+                19.14
+              ],
+              [
+                -99.46,
+                19.14
+              ],
+              [
+                -99.46,
+                18.72
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                -98.96,
+                19.92
+              ],
+              [
+                -98.52,
+                19.92
+              ],
+              [
+                -98.52,
+                20.28
+              ],
+              [
+                -98.96,
+                20.28
+              ],
+              [
+                -98.96,
+                19.92
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "airport_hotel_extended_corridor",
+        "active": true,
+        "corridorId": "airport_extended_corridor_toluca_cdmx",
+        "zoneId": "airport_extended_corridor_toluca_cdmx",
+        "labelKey": "services.cards.airport.panel.catalog.zones.airport_extended_corridor_toluca_cdmx",
+        "label": "Corredor Toluca / CDMX",
+        "priority": 470,
+        "city": "Estado de México / Toluca",
+        "zoneCode": "TOLUCA_CDMX",
+        "marketPolicy": "Corredor operativo de pricing V2.1 para ajustar rutas regionales donde el ring radial no refleja coste/competitividad de mercado.",
+        "pricingPolicyDraft": "Tarifa específica por corredor. Gana sobre rings regionales y queda por debajo de zonas urbanas.",
+        "model": "airport_transfer_pricing_corridors_v2_1",
+        "notes": "Cubre Toluca y corredor TLC/CDMX sin invadir Santa Fe ni zonas urbanas centrales. Prioridad inferior a zonas urbanas."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -99.86,
+              19.12
+            ],
+            [
+              -99.38,
+              19.12
+            ],
+            [
+              -99.38,
+              19.46
+            ],
+            [
+              -99.86,
+              19.46
+            ],
+            [
+              -99.86,
+              19.12
             ]
           ]
         ]

@@ -16,23 +16,58 @@
       id: "airport_extended_corridor_sierra_norte_puebla",
       labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_sierra_norte_puebla",
       active: true
+    },
+    {
+      id: "airport_extended_corridor_puebla_angelopolis",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_puebla_angelopolis",
+      active: true
+    },
+    {
+      id: "airport_extended_corridor_bajio_sma",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_bajio_sma",
+      active: true
+    },
+    {
+      id: "airport_extended_corridor_queretaro",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_queretaro",
+      active: true
+    },
+    {
+      id: "airport_extended_corridor_teotihuacan",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_teotihuacan",
+      active: true
+    },
+    {
+      id: "airport_extended_corridor_valle_de_bravo",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_valle_de_bravo",
+      active: true
+    },
+    {
+      id: "airport_extended_corridor_morelos_pachuca",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_morelos_pachuca",
+      active: true
+    },
+    {
+      id: "airport_extended_corridor_toluca_cdmx",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_toluca_cdmx",
+      active: true
     }
   ];
 
   const PRICEBOOK = {
     airport_extended_corridor_taxco_guerrero: {
-      mex: [4200, 5000, 6500],
-      nlu: [5200, 6200, 7800],
-      tlc: [4200, 5000, 6500],
-      pbc: [5200, 6300, 7900],
-      qro: [9200, 10200, 12800]
+      mex: [3300, 4600, 5800],
+      nlu: [4300, 5500, 7000],
+      tlc: [3300, 4500, 5800],
+      pbc: [4800, 5900, 7400],
+      qro: [8700, 9700, 12000]
     },
     airport_extended_corridor_morelia_michoacan: {
-      mex: [6800, 7900, 9500],
-      nlu: [7600, 8900, 10800],
-      tlc: [6200, 7300, 8900],
-      pbc: [8600, 10100, 12200],
-      qro: [5300, 6400, 8000]
+      mex: [6200, 7900, 9500],
+      nlu: [7000, 8900, 10800],
+      tlc: [5800, 7300, 8900],
+      pbc: [8100, 10100, 12200],
+      qro: [4900, 6400, 8000]
     },
     airport_extended_corridor_sierra_norte_puebla: {
       mex: [4200, 5000, 6500],
@@ -40,6 +75,55 @@
       tlc: [3900, 4700, 6200],
       pbc: [3800, 4600, 5800],
       qro: [5200, 6400, 7800]
+    },
+    airport_extended_corridor_puebla_angelopolis: {
+      mex: [2700, 3800, 4800],
+      nlu: [3300, 4500, 5600],
+      tlc: [3400, 4600, 5700],
+      pbc: [1700, 2300, 2900],
+      qro: [4800, 6000, 7400]
+    },
+    airport_extended_corridor_bajio_sma: {
+      mex: [5200, 7400, 9000],
+      nlu: [4700, 6900, 8500],
+      tlc: [4900, 6800, 8300],
+      pbc: [7400, 9200, 11400],
+      qro: [2900, 4100, 5300]
+    },
+    airport_extended_corridor_queretaro: {
+      mex: [3500, 5000, 6500],
+      nlu: [3300, 5000, 6500],
+      tlc: [3400, 4900, 6400],
+      pbc: [5600, 7100, 8800],
+      qro: [1500, 2200, 2900]
+    },
+    airport_extended_corridor_teotihuacan: {
+      mex: [1200, 2200, 3000],
+      nlu: [1000, 1900, 2600],
+      tlc: [2300, 3100, 4100],
+      pbc: [3600, 4700, 5900],
+      qro: [4800, 6000, 7400]
+    },
+    airport_extended_corridor_valle_de_bravo: {
+      mex: [3200, 4700, 5800],
+      nlu: [3700, 5200, 6500],
+      tlc: [2900, 4400, 5600],
+      pbc: [6100, 7800, 9600],
+      qro: [6500, 8200, 10000]
+    },
+    airport_extended_corridor_morelos_pachuca: {
+      mex: [1850, 2700, 3400],
+      nlu: [2400, 3300, 4300],
+      tlc: [2200, 3200, 4200],
+      pbc: [3400, 4500, 5700],
+      qro: [4100, 5400, 6800]
+    },
+    airport_extended_corridor_toluca_cdmx: {
+      mex: [1400, 2000, 2600],
+      nlu: [2500, 3500, 4500],
+      tlc: [900, 1400, 1900],
+      pbc: [3700, 4900, 6100],
+      qro: [3700, 4900, 6100]
     }
   };
 

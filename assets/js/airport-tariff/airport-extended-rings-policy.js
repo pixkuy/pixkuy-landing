@@ -45,6 +45,48 @@
       labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_sierra_norte_puebla",
       includesEstimatedTolls: true,
       requiresOvernight: false
+    },
+    {
+      id: "airport_extended_corridor_puebla_angelopolis",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_puebla_angelopolis",
+      includesEstimatedTolls: true,
+      requiresOvernight: false
+    },
+    {
+      id: "airport_extended_corridor_bajio_sma",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_bajio_sma",
+      includesEstimatedTolls: true,
+      requiresOvernight: false
+    },
+    {
+      id: "airport_extended_corridor_queretaro",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_queretaro",
+      includesEstimatedTolls: true,
+      requiresOvernight: false
+    },
+    {
+      id: "airport_extended_corridor_teotihuacan",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_teotihuacan",
+      includesEstimatedTolls: true,
+      requiresOvernight: false
+    },
+    {
+      id: "airport_extended_corridor_valle_de_bravo",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_valle_de_bravo",
+      includesEstimatedTolls: true,
+      requiresOvernight: false
+    },
+    {
+      id: "airport_extended_corridor_morelos_pachuca",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_morelos_pachuca",
+      includesEstimatedTolls: true,
+      requiresOvernight: false
+    },
+    {
+      id: "airport_extended_corridor_toluca_cdmx",
+      labelKey: "services.cards.airport.panel.catalog.zones.airport_extended_corridor_toluca_cdmx",
+      includesEstimatedTolls: true,
+      requiresOvernight: false
     }
   ];
 
