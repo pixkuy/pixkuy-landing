@@ -15,6 +15,8 @@
   if (!window) {
     return;
   }
+  
+  var lastConfirmedResult = null;
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -44,6 +46,20 @@
 
     return analytics;
   }
+  
+  function getGoogleAdsConversions() {
+    var conversions = window.PixkuyGoogleAdsConversions;
+
+    if (
+      !conversions ||
+      typeof conversions.trackPaidReservationConversion !== "function"
+    ) {
+      return null;
+    }
+
+    return conversions;
+  }
+
 
   function isConfirmedReservation(result) {
     return Boolean(
@@ -72,30 +88,54 @@
     return payload;
   }
 
+  function trackPaidReservationGoogleAdsConversion(payload, publicCode) {
+    var googleAdsConversions = getGoogleAdsConversions();
+
+    if (
+      !googleAdsConversions ||
+      typeof payload.value !== "number" ||
+      !normalizeText(payload.currency)
+    ) {
+      return false;
+    }
+
+    return googleAdsConversions.trackPaidReservationConversion({
+      transaction_id: publicCode,
+      value: payload.value,
+      currency: payload.currency
+    });
+  }
+
   function trackConfirmedReservation(result) {
     var analytics = getAnalytics();
     var publicCode = normalizeText(result && result.publicCode);
     var payload;
+    var didTrack = false;
 
-    if (!analytics || !isConfirmedReservation(result) || !publicCode) {
+    if (!isConfirmedReservation(result) || !publicCode) {
       return false;
     }
 
+    lastConfirmedResult = result;
     payload = buildPayload(result);
 
-    analytics.trackOnce(
-      "purchase",
-      payload,
-      publicCode
-    );
+    if (analytics) {
+      didTrack = analytics.trackOnce(
+        "purchase",
+        payload,
+        publicCode
+      ) || didTrack;
 
-    analytics.trackOnce(
-      "pixkuy_booking_confirmed",
-      payload,
-      publicCode
-    );
+      didTrack = analytics.trackOnce(
+        "pixkuy_booking_confirmed",
+        payload,
+        publicCode
+      ) || didTrack;
+    }
 
-    return true;
+    didTrack = trackPaidReservationGoogleAdsConversion(payload, publicCode) || didTrack;
+
+    return didTrack;
   }
 
   function onBookingStatusReady(event) {
@@ -105,10 +145,19 @@
     trackConfirmedReservation(result);
   }
 
+  function onAnalyticsConsentReady() {
+    if (!lastConfirmedResult) {
+      return;
+    }
+
+    trackConfirmedReservation(lastConfirmedResult);
+  }
+
   if (window.__pixkuyBookingStatusAnalyticsBound === true) {
     return;
   }
 
   window.__pixkuyBookingStatusAnalyticsBound = true;
   window.addEventListener("pixkuy:booking-status-ready", onBookingStatusReady);
+  window.addEventListener("pixkuy:analytics-consent-ready", onAnalyticsConsentReady);
 })(window);

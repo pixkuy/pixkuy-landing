@@ -5,13 +5,19 @@
   var GOOGLE_ANALYTICS_ID = 'G-1N23WLB73N';
   var GOOGLE_ADS_LEAD_CONVERSION_SEND_TO = 'AW-18114199280/JkAeCOvxvKEcEPD9wr1D';
   var GOOGLE_ADS_WHATSAPP_CONVERSION_SEND_TO = 'AW-18114199280/yfbjCPOSl6scEPD9wr1D';
+  var GOOGLE_ADS_PAID_RESERVATION_CONVERSION_SEND_TO = 'AW-18114199280/jWSbCK7p1b4cEPD9wr1D';
   var STORAGE_KEY = 'pixkuy_google_ads_consent';
   var LEAD_SUCCESS_SIGNAL_KEY = 'pixkuy_lead_success';
   var LEAD_CONVERSION_STORAGE_KEY = 'pixkuy_google_ads_lead_conversion';
+  var PAID_RESERVATION_CONVERSION_STORAGE_KEY = 'pixkuy_google_ads_paid_reservation_conversion';
   var ENHANCED_CONVERSION_DATA_STORAGE_KEY = 'pixkuy_google_ads_enhanced_conversion_data';
   var BANNER_ID = 'pixkuy-google-ads-consent';
   var ACCEPTED = 'accepted';
   var REJECTED = 'rejected';
+
+  function normalizeText(value) {
+    return typeof value === 'string' ? value.trim() : '';
+  }
 
   function getI18nValue(path) {
     var dict = window.__pixkuyI18nDict;
@@ -233,6 +239,93 @@
 
     return true;
   }
+  
+    function normalizeConversionValue(value) {
+    var parsed;
+
+    if (typeof value === 'number') {
+      parsed = value;
+    } else if (typeof value === 'string') {
+      parsed = Number(value.trim().replace(',', '.'));
+    } else {
+      parsed = NaN;
+    }
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return null;
+    }
+
+    return Math.round(parsed * 100) / 100;
+  }
+
+  function normalizeConversionCurrency(value) {
+    var currency = normalizeText(value).toUpperCase();
+
+    return /^[A-Z]{3}$/.test(currency) ? currency : '';
+  }
+
+  function getPaidReservationConversionKey(transactionId) {
+    return [
+      PAID_RESERVATION_CONVERSION_STORAGE_KEY,
+      GOOGLE_ADS_PAID_RESERVATION_CONVERSION_SEND_TO,
+      transactionId
+    ].join(':');
+  }
+
+  function hasTrackedPaidReservationConversion(transactionId) {
+    if (!transactionId) {
+      return false;
+    }
+
+    try {
+      return window.sessionStorage.getItem(getPaidReservationConversionKey(transactionId)) === '1';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function markPaidReservationConversionTracked(transactionId) {
+    if (!transactionId) {
+      return false;
+    }
+
+    try {
+      window.sessionStorage.setItem(getPaidReservationConversionKey(transactionId), '1');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function trackPaidReservationConversion(input) {
+    var conversion = input && typeof input === 'object' ? input : {};
+    var transactionId = normalizeText(conversion.transaction_id || conversion.transactionId);
+    var value = normalizeConversionValue(conversion.value);
+    var currency = normalizeConversionCurrency(conversion.currency);
+
+    if (
+      getStoredConsent() !== ACCEPTED ||
+      !transactionId ||
+      value === null ||
+      !currency ||
+      hasTrackedPaidReservationConversion(transactionId)
+    ) {
+      return false;
+    }
+
+    ensureGtagBase();
+
+    window.gtag('event', 'conversion', {
+      send_to: GOOGLE_ADS_PAID_RESERVATION_CONVERSION_SEND_TO,
+      value: value,
+      currency: currency,
+      transaction_id: transactionId
+    });
+
+    markPaidReservationConversionTracked(transactionId);
+    return true;
+  }
+
 
   function ensureGtagBase() {
     window.dataLayer = window.dataLayer || [];
@@ -465,6 +558,16 @@
 
     showBanner();
   }
+
+  window.PixkuyGoogleAdsConversions = Object.assign(
+    {},
+    window.PixkuyGoogleAdsConversions && typeof window.PixkuyGoogleAdsConversions === 'object'
+      ? window.PixkuyGoogleAdsConversions
+      : {},
+    {
+      trackPaidReservationConversion: trackPaidReservationConversion
+    }
+  );
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
