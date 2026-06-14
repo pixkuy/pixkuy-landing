@@ -742,6 +742,8 @@ function syncActions(root, dictionary, result) {
 
   setNodeText(retry, t(dictionary, "cancelled.actions.retry"));
   setNodeText(newBooking, t(dictionary, "cancelled.actions.newBooking"));
+  setText(root, "[data-booking-cancelled-home]", t(dictionary, "cancelled.actions.home"));
+  setAttribute(root, "[data-booking-cancelled-home]", "href", "/");
   setText(root, "[data-booking-status-whatsapp]", t(dictionary, "actions.whatsapp"));
   setAttribute(
     root,
