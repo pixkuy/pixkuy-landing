@@ -13,3 +13,8 @@
     "assets/js/data/airport-extended-rings-catalog.js",
     "assets/js/data/airport-extended-corridors-catalog.js"
   ]
+
+[[redirects]]
+  from = "/qr/:code"
+  to = "/.netlify/functions/qr-redirect?code=:code"
+  status = 200
