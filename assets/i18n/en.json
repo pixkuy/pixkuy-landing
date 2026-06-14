@@ -31,7 +31,7 @@
     "Human support"
   ],
   "priceLabel": "Price from",
-  "priceValue": "1.200 MXN",
+  "priceValue": "725 MXN",
   "ctaClosed": "View fares",
   "ctaOpen": "Hide fares",
   "panel": {
@@ -61,6 +61,14 @@
     "fareValue": "—",
     "cta": "Request",
     "back": "Back",
+    "availability": {
+      "checking": "Checking availability...",
+      "available": "Availability confirmed. You can continue.",
+      "unavailable": "No availability for that date and time. Choose another option.",
+      "nextAvailableSlot": "Next available time: {time}",
+      "priceMismatch": "The fare has changed. Refresh the configuration before continuing.",
+      "error": "We could not confirm availability. Check date, time and address."
+    },
     "catalog": {
       "airports": {
         "mex": "MEX — Mexico City International Airport",
@@ -88,6 +96,13 @@
         "airport_extended_corridor_taxco_guerrero": "Taxco / northern Guerrero corridor",
         "airport_extended_corridor_morelia_michoacan": "Morelia / Michoacán corridor · overnight included",
         "airport_extended_corridor_sierra_norte_puebla": "Sierra Norte / Puebla corridor",
+        "airport_extended_corridor_puebla_angelopolis": "Puebla / Angelópolis corridor",
+        "airport_extended_corridor_bajio_sma": "San Miguel de Allende / Bajío corridor",
+        "airport_extended_corridor_queretaro": "Querétaro / San Juan del Río corridor",
+        "airport_extended_corridor_teotihuacan": "Teotihuacán corridor",
+        "airport_extended_corridor_valle_de_bravo": "Valle de Bravo corridor",
+        "airport_extended_corridor_morelos_pachuca": "Morelos / Pachuca corridor",
+        "airport_extended_corridor_toluca_cdmx": "Toluca / CDMX corridor",
         "airport_extended_ring_200km": "Regional 140–200 km",
         "airport_extended_ring_300km": "Regional 200–300 km · overnight included",
         "airport_extended_ring_400km": "Regional 300–400 km · overnight included",
@@ -117,7 +132,7 @@
         "Continuity"
       ],
       "priceLabel": "Price from",
-      "priceValue": "1.450 MXN / hour"
+      "priceValue": "1.500 MXN"
     },
     "events": {
       "title": "Events and special occasions",

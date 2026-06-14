@@ -31,7 +31,7 @@
     "Persönlicher Support"
   ],
   "priceLabel": "Preis ab",
-  "priceValue": "1.200 MXN",
+  "priceValue": "725 MXN",
   "ctaClosed": "Tarife ansehen",
   "ctaOpen": "Tarife ausblenden",
   "panel": {
@@ -61,6 +61,14 @@
     "fareValue": "—",
     "cta": "Anfragen",
     "back": "Zurück",
+    "availability": {
+      "checking": "Verfügbarkeit wird geprüft...",
+      "available": "Verfügbarkeit bestätigt. Sie können fortfahren.",
+      "unavailable": "Für dieses Datum und diese Uhrzeit ist keine Verfügbarkeit vorhanden. Wählen Sie eine andere Option.",
+      "nextAvailableSlot": "Nächste verfügbare Uhrzeit: {time}",
+      "priceMismatch": "Der Tarif hat sich geändert. Aktualisieren Sie die Konfiguration, bevor Sie fortfahren.",
+      "error": "Wir konnten die Verfügbarkeit nicht bestätigen. Prüfen Sie Datum, Uhrzeit und Adresse."
+    },
     "catalog": {
       "airports": {
         "mex": "MEX — Internationaler Flughafen von Mexiko-Stadt",
@@ -88,6 +96,13 @@
         "airport_extended_corridor_taxco_guerrero": "Korridor Taxco / nördliches Guerrero",
         "airport_extended_corridor_morelia_michoacan": "Korridor Morelia / Michoacán · Übernachtung inklusive",
         "airport_extended_corridor_sierra_norte_puebla": "Korridor Sierra Norte / Puebla",
+        "airport_extended_corridor_puebla_angelopolis": "Korridor Puebla / Angelópolis",
+        "airport_extended_corridor_bajio_sma": "Korridor San Miguel de Allende / Bajío",
+        "airport_extended_corridor_queretaro": "Korridor Querétaro / San Juan del Río",
+        "airport_extended_corridor_teotihuacan": "Korridor Teotihuacán",
+        "airport_extended_corridor_valle_de_bravo": "Korridor Valle de Bravo",
+        "airport_extended_corridor_morelos_pachuca": "Korridor Morelos / Pachuca",
+        "airport_extended_corridor_toluca_cdmx": "Korridor Toluca / CDMX",
         "airport_extended_ring_200km": "Regional 140–200 km",
         "airport_extended_ring_300km": "Regional 200–300 km · Übernachtung inklusive",
         "airport_extended_ring_400km": "Regional 300–400 km · Übernachtung inklusive",
@@ -117,7 +132,7 @@
         "Kontinuität"
       ],
       "priceLabel": "Preis ab",
-      "priceValue": "1.450 MXN / Stunde"
+      "priceValue": "1.500 MXN"
     },
     "events": {
       "title": "Events und besondere Anlässe",

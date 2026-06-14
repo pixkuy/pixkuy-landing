@@ -31,7 +31,7 @@
     "Поддержка человека"
   ],
   "priceLabel": "Цена от",
-  "priceValue": "1.200 MXN",
+  "priceValue": "725 MXN",
   "ctaClosed": "Посмотреть тарифы",
   "ctaOpen": "Скрыть тарифы",
   "panel": {
@@ -61,6 +61,14 @@
     "fareValue": "—",
     "cta": "Запросить",
     "back": "Назад",
+    "availability": {
+      "checking": "Проверяем доступность...",
+      "available": "Доступность подтверждена. Можно продолжить.",
+      "unavailable": "На выбранные дату и время нет доступности. Выберите другой вариант.",
+      "nextAvailableSlot": "Ближайшее доступное время: {time}",
+      "priceMismatch": "Тариф изменился. Обновите конфигурацию перед продолжением.",
+      "error": "Не удалось подтвердить доступность. Проверьте дату, время и адрес."
+    },
     "catalog": {
       "airports": {
         "mex": "MEX — Международный аэропорт Мехико",
@@ -88,6 +96,13 @@
         "airport_extended_corridor_taxco_guerrero": "Коридор Taxco / север Герреро",
         "airport_extended_corridor_morelia_michoacan": "Коридор Morelia / Michoacán · ночёвка включена",
         "airport_extended_corridor_sierra_norte_puebla": "Коридор Sierra Norte / Puebla",
+        "airport_extended_corridor_puebla_angelopolis": "Коридор Puebla / Angelópolis",
+        "airport_extended_corridor_bajio_sma": "Коридор San Miguel de Allende / Bajío",
+        "airport_extended_corridor_queretaro": "Коридор Querétaro / San Juan del Río",
+        "airport_extended_corridor_teotihuacan": "Коридор Teotihuacán",
+        "airport_extended_corridor_valle_de_bravo": "Коридор Valle de Bravo",
+        "airport_extended_corridor_morelos_pachuca": "Коридор Morelos / Pachuca",
+        "airport_extended_corridor_toluca_cdmx": "Коридор Toluca / CDMX",
         "airport_extended_ring_200km": "Регион 140–200 км",
         "airport_extended_ring_300km": "Регион 200–300 км · ночёвка включена",
         "airport_extended_ring_400km": "Регион 300–400 км · ночёвка включена",
@@ -117,7 +132,7 @@
         "Непрерывность"
       ],
       "priceLabel": "Цена от",
-      "priceValue": "1.450 MXN / час"
+      "priceValue": "1.500 MXN"
     },
     "events": {
       "title": "События и особые случаи",

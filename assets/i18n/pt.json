@@ -31,7 +31,7 @@
     "Suporte humano"
   ],
   "priceLabel": "Preço desde",
-  "priceValue": "1.200 MXN",
+  "priceValue": "725 MXN",
   "ctaClosed": "Ver tarifas",
   "ctaOpen": "Ocultar tarifas",
   "panel": {
@@ -61,6 +61,14 @@
     "fareValue": "—",
     "cta": "Solicitar",
     "back": "Voltar",
+    "availability": {
+      "checking": "A verificar disponibilidade...",
+      "available": "Disponibilidade confirmada. Pode continuar.",
+      "unavailable": "Não há disponibilidade para essa data e hora. Escolha outra opção.",
+      "nextAvailableSlot": "Próxima hora disponível: {time}",
+      "priceMismatch": "A tarifa mudou. Atualize a configuração antes de continuar.",
+      "error": "Não foi possível confirmar a disponibilidade. Verifique a data, a hora e o endereço."
+    },
     "catalog": {
       "airports": {
         "mex": "MEX — Aeroporto Internacional da Cidade do México",
@@ -88,6 +96,13 @@
         "airport_extended_corridor_taxco_guerrero": "Corredor Taxco / norte de Guerrero",
         "airport_extended_corridor_morelia_michoacan": "Corredor Morelia / Michoacán · pernoite incluído",
         "airport_extended_corridor_sierra_norte_puebla": "Corredor Sierra Norte / Puebla",
+        "airport_extended_corridor_puebla_angelopolis": "Corredor Puebla / Angelópolis",
+        "airport_extended_corridor_bajio_sma": "Corredor San Miguel de Allende / Bajío",
+        "airport_extended_corridor_queretaro": "Corredor Querétaro / San Juan del Río",
+        "airport_extended_corridor_teotihuacan": "Corredor Teotihuacán",
+        "airport_extended_corridor_valle_de_bravo": "Corredor Valle de Bravo",
+        "airport_extended_corridor_morelos_pachuca": "Corredor Morelos / Pachuca",
+        "airport_extended_corridor_toluca_cdmx": "Corredor Toluca / CDMX",
         "airport_extended_ring_200km": "Regional 140–200 km",
         "airport_extended_ring_300km": "Regional 200–300 km · pernoite incluído",
         "airport_extended_ring_400km": "Regional 300–400 km · pernoite incluído",
@@ -117,7 +132,7 @@
         "Continuidade"
       ],
       "priceLabel": "Preço desde",
-      "priceValue": "1.450 MXN / hora"
+      "priceValue": "1.500 MXN"
     },
     "events": {
       "title": "Eventos e ocasiões especiais",

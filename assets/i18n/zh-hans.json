@@ -31,7 +31,7 @@
     "人工支持"
   ],
   "priceLabel": "价格起",
-  "priceValue": "1.200 MXN",
+  "priceValue": "725 MXN",
   "ctaClosed": "查看价格",
   "ctaOpen": "隐藏价格",
   "panel": {
@@ -61,6 +61,14 @@
     "fareValue": "—",
     "cta": "请求",
     "back": "返回",
+    "availability": {
+      "checking": "正在确认可用性...",
+      "available": "可用性已确认。您可以继续。",
+      "unavailable": "该日期和时间没有可用服务。请选择其他选项。",
+      "nextAvailableSlot": "下一个可用时间：{time}",
+      "priceMismatch": "价格已发生变化。继续前请刷新配置。",
+      "error": "无法确认可用性。请检查日期、时间和地址。"
+    },
     "catalog": {
       "airports": {
         "mex": "MEX — 墨西哥城国际机场",
@@ -88,6 +96,13 @@
         "airport_extended_corridor_taxco_guerrero": "Taxco / Guerrero 北部走廊",
         "airport_extended_corridor_morelia_michoacan": "Morelia / Michoacán 走廊 · 含过夜",
         "airport_extended_corridor_sierra_norte_puebla": "Sierra Norte / Puebla 走廊",
+        "airport_extended_corridor_puebla_angelopolis": "Puebla / Angelópolis 走廊",
+        "airport_extended_corridor_bajio_sma": "San Miguel de Allende / Bajío 走廊",
+        "airport_extended_corridor_queretaro": "Querétaro / San Juan del Río 走廊",
+        "airport_extended_corridor_teotihuacan": "Teotihuacán 走廊",
+        "airport_extended_corridor_valle_de_bravo": "Valle de Bravo 走廊",
+        "airport_extended_corridor_morelos_pachuca": "Morelos / Pachuca 走廊",
+        "airport_extended_corridor_toluca_cdmx": "Toluca / CDMX 走廊",
         "airport_extended_ring_200km": "区域 140–200 km",
         "airport_extended_ring_300km": "区域 200–300 km · 含过夜",
         "airport_extended_ring_400km": "区域 300–400 km · 含过夜",
@@ -117,7 +132,7 @@
         "连续服务"
       ],
       "priceLabel": "价格起",
-      "priceValue": "1.450 MXN / 小时"
+      "priceValue": "1.500 MXN"
     },
     "events": {
       "title": "活动与特殊场合",
