@@ -51,6 +51,8 @@
       "distanceUnit": "km",
       "minutesApprox": "약 {minutes}분",
       "minutesApproxShort": "약 {minutes}분",
+      "hoursMinutesApprox": "약 {duration}시간",
+      "hoursMinutesApproxShort": "약 {duration}시간",
       "separator": " · "
     },
     "vehicle": {

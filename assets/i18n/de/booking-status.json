@@ -19,11 +19,15 @@
       "publicCode": "Reservierungscode",
       "service": "Service",
       "pickup": "Abholung",
+      "destination": "Ziel",
       "vehicle": "Fahrzeug",
       "date": "Servicedatum",
       "time": "Servicezeit",
       "duration": "Dauer",
       "passengers": "Passagiere",
+      "luggage": "Gepäck",
+      "luggageOne": "1 Gepäckstück",
+      "luggageMany": "Gepäckstücke",
       "payment": "Zahlungsstatus",
       "amount": "Gezahlter Betrag",
       "customerName": "Name",
@@ -37,6 +41,7 @@
     },
     "serviceLabels": {
       "hourly_daily": "Privatfahrzeug mit Fahrer",
+      "airport_transfer": "Flughafentransfer",
       "notAvailable": "Pixkuy-Service"
     },
     "paymentLabels": {

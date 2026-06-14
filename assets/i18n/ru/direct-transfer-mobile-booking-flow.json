@@ -51,6 +51,8 @@
       "distanceUnit": "км",
       "minutesApprox": "около {minutes} мин",
       "minutesApproxShort": "около {minutes} мин",
+      "hoursMinutesApprox": "около {duration} ч",
+      "hoursMinutesApproxShort": "около {duration} ч",
       "separator": " · "
     },
     "vehicle": {

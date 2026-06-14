@@ -19,11 +19,15 @@
       "publicCode": "Код бронирования",
       "service": "Сервис",
       "pickup": "Подача",
+      "destination": "Куда",
       "vehicle": "Автомобиль",
       "date": "Дата сервиса",
       "time": "Время сервиса",
       "duration": "Длительность",
       "passengers": "Пассажиры",
+      "luggage": "Багаж",
+      "luggageOne": "1 место багажа",
+      "luggageMany": "мест багажа",
       "payment": "Статус оплаты",
       "amount": "Оплаченная сумма",
       "customerName": "Имя",
@@ -37,6 +41,7 @@
     },
     "serviceLabels": {
       "hourly_daily": "Частный автомобиль с водителем",
+      "airport_transfer": "Трансфер из аэропорта",
       "notAvailable": "Сервис Pixkuy"
     },
     "paymentLabels": {

@@ -19,11 +19,15 @@
       "publicCode": "예약 코드",
       "service": "서비스",
       "pickup": "픽업",
+      "destination": "도착지",
       "vehicle": "차량",
       "date": "서비스 날짜",
       "time": "서비스 시간",
       "duration": "기간",
       "passengers": "승객",
+      "luggage": "수하물",
+      "luggageOne": "수하물 1개",
+      "luggageMany": "수하물",
       "payment": "결제 상태",
       "amount": "결제 금액",
       "customerName": "이름",
@@ -37,6 +41,7 @@
     },
     "serviceLabels": {
       "hourly_daily": "전용 기사 포함 차량",
+      "airport_transfer": "공항 이동 서비스",
       "notAvailable": "Pixkuy 서비스"
     },
     "paymentLabels": {

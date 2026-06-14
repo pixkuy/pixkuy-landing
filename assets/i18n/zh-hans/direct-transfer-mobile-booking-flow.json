@@ -51,6 +51,8 @@
       "distanceUnit": "公里",
       "minutesApprox": "约 {minutes} 分钟",
       "minutesApproxShort": "约 {minutes} 分钟",
+      "hoursMinutesApprox": "约 {duration} 小时",
+      "hoursMinutesApproxShort": "约 {duration} 小时",
       "separator": " · "
     },
     "vehicle": {

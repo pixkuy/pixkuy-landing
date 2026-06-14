@@ -19,11 +19,15 @@
       "publicCode": "Codice prenotazione",
       "service": "Servizio",
       "pickup": "Raccolta",
+      "destination": "Destinazione",
       "vehicle": "Veicolo",
       "date": "Data del servizio",
       "time": "Ora del servizio",
       "duration": "Durata",
       "passengers": "Passeggeri",
+      "luggage": "Bagagli",
+      "luggageOne": "1 bagaglio",
+      "luggageMany": "bagagli",
       "payment": "Stato del pagamento",
       "amount": "Importo pagato",
       "customerName": "Nome",
@@ -37,6 +41,7 @@
     },
     "serviceLabels": {
       "hourly_daily": "Veicolo privato con autista",
+      "airport_transfer": "Transfer aeroporto",
       "notAvailable": "Servizio Pixkuy"
     },
     "paymentLabels": {

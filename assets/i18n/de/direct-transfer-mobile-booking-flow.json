@@ -51,6 +51,8 @@
       "distanceUnit": "km",
       "minutesApprox": "{minutes} Min. ca.",
       "minutesApproxShort": "{minutes} Min. ca.",
+      "hoursMinutesApprox": "{duration} h ca.",
+      "hoursMinutesApproxShort": "{duration} h ca.",
       "separator": " · "
     },
     "vehicle": {

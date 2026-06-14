@@ -19,11 +19,15 @@
       "publicCode": "预订代码",
       "service": "服务",
       "pickup": "接载",
+      "destination": "目的地",
       "vehicle": "车辆",
       "date": "服务日期",
       "time": "服务时间",
       "duration": "时长",
       "passengers": "乘客",
+      "luggage": "行李",
+      "luggageOne": "1 件行李",
+      "luggageMany": "件行李",
       "payment": "付款状态",
       "amount": "已付金额",
       "customerName": "姓名",
@@ -37,6 +41,7 @@
     },
     "serviceLabels": {
       "hourly_daily": "私人车辆与司机",
+      "airport_transfer": "机场接送",
       "notAvailable": "Pixkuy 服务"
     },
     "paymentLabels": {

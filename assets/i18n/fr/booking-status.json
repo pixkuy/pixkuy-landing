@@ -19,11 +19,15 @@
       "publicCode": "Code de réservation",
       "service": "Service",
       "pickup": "Prise en charge",
+      "destination": "Destination",
       "vehicle": "Véhicule",
       "date": "Date du service",
       "time": "Heure du service",
       "duration": "Durée",
       "passengers": "Passagers",
+      "luggage": "Bagages",
+      "luggageOne": "1 bagage",
+      "luggageMany": "bagages",
       "payment": "État du paiement",
       "amount": "Montant payé",
       "customerName": "Nom",
@@ -37,6 +41,7 @@
     },
     "serviceLabels": {
       "hourly_daily": "Véhicule privé avec chauffeur",
+      "airport_transfer": "Transfert aéroport",
       "notAvailable": "Service Pixkuy"
     },
     "paymentLabels": {
