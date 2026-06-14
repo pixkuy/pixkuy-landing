@@ -1,6 +1,7 @@
 (function () {
   "use strict";
 
+  const TEMPORAL_PRICING_ENABLED = false;
   const UI_VISIBLE_UNTIL = "2026-07-05";
   const PRICE_WINDOW_START = "2026-06-11";
   const PRICE_WINDOW_END = "2026-07-05";
@@ -68,7 +69,10 @@
       return null;
     }
 
-    if (!isSpecialPricingDate(serviceDateLiteral)) {
+    if (
+      TEMPORAL_PRICING_ENABLED !== true ||
+      !isSpecialPricingDate(serviceDateLiteral)
+    ) {
       return basePrice;
     }
 
@@ -84,6 +88,7 @@
     isSpecialPricingDate: isSpecialPricingDate,
     applyTemporalPricing: applyTemporalPricing,
     constants: {
+      temporalPricingEnabled: TEMPORAL_PRICING_ENABLED,
       uiVisibleUntil: UI_VISIBLE_UNTIL,
       priceWindowStart: PRICE_WINDOW_START,
       priceWindowEnd: PRICE_WINDOW_END,
