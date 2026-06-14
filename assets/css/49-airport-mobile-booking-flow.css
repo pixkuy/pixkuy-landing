@@ -630,7 +630,7 @@
 
   .airport-mobile-route #services-expand-airport .services-expand__field--time{
     order:4 !important;
-    flex:0 0 72px;
+    flex:0 0 86px;
     display:grid;
     grid-template-rows:auto 48px;
     gap:6px;
