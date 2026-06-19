@@ -35,10 +35,14 @@ function getHeader(headers, name) {
 }
 
 function buildPublicOrigin(event) {
-  const host = getHeader(event.headers, "host");
+  const host = getHeader(event.headers, "host").toLowerCase();
 
   if (!host) {
     return "";
+  }
+
+  if (host === "partners.pixkuy.com") {
+    return "https://partners.pixkuy.com";
   }
 
   const forwardedProto = getHeader(event.headers, "x-forwarded-proto");
@@ -63,7 +67,10 @@ exports.handler = async function handler(event) {
     return buildTextResponse(405, "Method not allowed");
   }
 
-  const code = normalizeCode(event.queryStringParameters && event.queryStringParameters.code);
+  const host = getHeader(event.headers, "host").toLowerCase();
+  const code = normalizeCode(
+    event.queryStringParameters && event.queryStringParameters.code,
+  ) || (host === "partners.pixkuy.com" ? "partners" : "");
 
   if (!code) {
     return buildTextResponse(400, "QR code is required");
