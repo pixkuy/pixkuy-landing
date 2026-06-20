@@ -33,6 +33,12 @@
   force = true
 
 [[redirects]]
+  from = "/qr/partners"
+  to = "/.netlify/functions/qr-redirect?code=partners"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/qr/:code"
   to = "/.netlify/functions/qr-redirect?code=:code"
   status = 200
