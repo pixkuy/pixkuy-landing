@@ -23,6 +23,29 @@ function buildTextResponse(statusCode, message) {
   };
 }
 
+function resolvePathCode(event) {
+  const path = normalizeText(event && event.path);
+
+  if (!path) {
+    return "";
+  }
+
+  const pathWithoutQuery = path.split("?")[0] || "";
+  const segments = pathWithoutQuery.split("/").map(normalizeText).filter(Boolean);
+  const qrIndex = segments.lastIndexOf("qr");
+  const functionIndex = segments.lastIndexOf("qr-redirect");
+
+  if (qrIndex >= 0 && segments[qrIndex + 1]) {
+    return normalizeCode(segments[qrIndex + 1]);
+  }
+
+  if (functionIndex >= 0 && segments[functionIndex + 1]) {
+    return normalizeCode(segments[functionIndex + 1]);
+  }
+
+  return "";
+}
+
 function getHeader(headers, name) {
   if (!headers || typeof headers !== "object") {
     return "";
@@ -70,7 +93,7 @@ exports.handler = async function handler(event) {
   const host = getHeader(event.headers, "host").toLowerCase();
   const code = normalizeCode(
     event.queryStringParameters && event.queryStringParameters.code,
-  ) || (host === "partners.pixkuy.com" ? "partners" : "");
+  ) || resolvePathCode(event) || (host === "partners.pixkuy.com" ? "partners" : "");
 
   if (!code) {
     return buildTextResponse(400, "QR code is required");
