@@ -134,22 +134,7 @@
       : null;
   }
 
-  function getCoverageApi() {
-    const api = NAMESPACE.coverage;
-    return api && typeof api === "object" ? api : null;
-  }
-
-  function getCoverageDecision(place) {
-    const api = getCoverageApi();
-
-    if (!api || typeof api.getCoverageDecision !== "function") {
-      return null;
-    }
-
-    return api.getCoverageDecision(place);
-  }
-  
-    function getDirectTransferCoverageApi() {
+  function getDirectTransferCoverageApi() {
     const api = window.PixkuyDirectTransferCoverage;
 
     return api && typeof api === "object" ? api : null;
@@ -280,80 +265,28 @@
     };
   }
 
-  function getPlaceSearchText(place) {
-    const safePlace = place && typeof place === "object" ? place : {};
+  function getAirportGuardApi() {
+    const api = window.PixkuyDirectTransferAirportGuard;
 
-    return [
-      safePlace.label,
-      safePlace.displayName,
-      safePlace.formattedAddress,
-      safePlace.primaryText,
-      safePlace.secondaryText,
-      safePlace.text,
-      safePlace.address,
-      safePlace.iataCode
-    ].map(normalizeLocationComparisonValue).filter(Boolean).join(" | ");
+    if (
+      !api ||
+      typeof api.getCataloguedAirportTransferId !== "function" ||
+      typeof api.isCataloguedAirportTransferPlace !== "function"
+    ) {
+      throw new Error("[Pixkuy Contact Direct Transfer Editor] Airport guard is not available.");
+    }
+
+    return api;
   }
 
   function getCataloguedAirportTransferId(place) {
-    const decision = getCoverageDecision(place);
-    const airportCode = normalizeText(decision && decision.airportIataCode).toUpperCase();
-    const explicitIataCode = normalizeText(place && place.iataCode).toUpperCase();
-    const text = getPlaceSearchText(place);
-
-    if (
-      explicitIataCode === "NLU" ||
-      text.indexOf("aifa") !== -1 ||
-      text.indexOf("aeropuerto internacional felipe angeles") !== -1 ||
-      text.indexOf("felipe angeles international airport") !== -1
-    ) {
-      return "nlu";
-    }
-
-    if (
-      explicitIataCode === "TLC" ||
-      airportCode === "TLC" ||
-      text.indexOf("aeropuerto internacional de toluca") !== -1 ||
-      text.indexOf("toluca international airport") !== -1 ||
-      text.indexOf("licenciado adolfo lopez mateos international airport") !== -1
-    ) {
-      return "tlc";
-    }
-
-    if (
-      explicitIataCode === "PBC" ||
-      airportCode === "PBC" ||
-      text.indexOf("aeropuerto internacional de puebla") !== -1 ||
-      text.indexOf("puebla international airport") !== -1 ||
-      text.indexOf("hermanos serdan international airport") !== -1
-    ) {
-      return "pbc";
-    }
-
-    if (
-      explicitIataCode === "QRO" ||
-      airportCode === "QRO" ||
-      text.indexOf("aeropuerto intercontinental de queretaro") !== -1 ||
-      text.indexOf("queretaro intercontinental airport") !== -1
-    ) {
-      return "qro";
-    }
-
-    if (
-      explicitIataCode === "MEX" ||
-      text.indexOf("aicm") !== -1 ||
-      text.indexOf("aeropuerto internacional de la ciudad de mexico") !== -1 ||
-      text.indexOf("benito juarez international airport") !== -1
-    ) {
-      return "mex";
-    }
-
-    return "";
+    return getAirportGuardApi().getCataloguedAirportTransferId(place);
   }
 
   function isCataloguedAirportTransferPlace(place) {
-    return Boolean(getCataloguedAirportTransferId(place));
+    return getAirportGuardApi().isCataloguedAirportTransferPlace(place);
   }
+
 
   function isDirectTransferCoveredPlace(role) {
     const coverage = role === "destination"

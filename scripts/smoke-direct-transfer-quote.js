@@ -109,6 +109,28 @@ const puertoVallartaCentro = {
   types: ["locality"]
 };
 
+const queretaroCentro = {
+  label: "Centro Histórico, Santiago de Querétaro, Querétaro",
+  placeId: "smoke_destination_queretaro_centro",
+  lat: 20.5888,
+  lng: -100.3899,
+  countryCode: "MX",
+  administrativeAreaLevel1: "Querétaro",
+  locality: "Santiago de Querétaro",
+  types: ["locality"]
+};
+
+const qroAirport = {
+  label: "Aeropuerto Internacional de Querétaro, Carretera Estatal 200, Querétaro",
+  placeId: "smoke_destination_qro_airport_without_iata",
+  lat: 20.6173,
+  lng: -100.1857,
+  countryCode: "MX",
+  administrativeAreaLevel1: "Querétaro",
+  locality: "Querétaro",
+  types: ["airport"]
+};
+
 const mexAirport = {
   label: "Aeropuerto Internacional Benito Juárez, Ciudad de México (MEX)",
   placeId: "smoke_origin_mex_airport",
@@ -225,7 +247,30 @@ function getCoreCases() {
       }
     },
     {
-      name: "MEX airport blocked",
+      name: "Queretaro city corridor 1-2 regression",
+      expectedStatus: 200,
+      payload: buildPayload(cdmxCentro, queretaroCentro, "van_1_2"),
+      expect: {
+        ok: true,
+        pricingVersion: "direct_transfer_v2",
+        pricingMode: "extended",
+        pricingModel: "extended_v2",
+        originCoverageId: "centro",
+        destinationCoverageId: "airport_extended_corridor_queretaro",
+        technicalFloorBreachedByCeiling: false
+      }
+    },
+    {
+      name: "QRO airport blocked",
+      expectedStatus: 400,
+      payload: buildPayload(cdmxCentro, qroAirport, "van_1_2"),
+      expect: {
+        ok: false,
+        code: "DIRECT_TRANSFER_AIRPORT_ROUTE_NOT_ALLOWED"
+      }
+    },
+    {
+	  name: "MEX airport blocked",
       expectedStatus: 400,
       payload: buildPayload(mexAirport, romaNorte, "van_1_2"),
       expect: {

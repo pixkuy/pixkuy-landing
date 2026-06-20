@@ -21,8 +21,12 @@ const CATALOGUED_AIRPORT_KEYWORDS = [
   "hermanos serdán international airport",
   "aeropuerto intercontinental de queretaro",
   "aeropuerto intercontinental de querétaro",
+  "aeropuerto internacional de queretaro",
+  "aeropuerto internacional de querétaro",
   "queretaro intercontinental airport",
-  "querétaro intercontinental airport"
+  "querétaro intercontinental airport",
+  "queretaro international airport",
+  "querétaro international airport"
 ];
 
 function normalizeText(value) {
@@ -70,7 +74,6 @@ function getAddressSearchText(address) {
 
   return [
     safeAddress.label,
-    safeAddress.placeId,
     safeAddress.countryCode,
     safeAddress.administrativeAreaLevel1,
     safeAddress.administrativeAreaLevel2,
@@ -80,6 +83,7 @@ function getAddressSearchText(address) {
     getAddressComponentText(safeAddress)
   ].map(normalizeComparisonText).filter(Boolean).join(" | ");
 }
+
 
 function hasCataloguedAirportCode(address) {
   const iataCode = normalizeText(address && address.iataCode).toUpperCase();
