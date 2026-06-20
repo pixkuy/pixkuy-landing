@@ -1649,6 +1649,51 @@
     }
   }
   
+    function getDirectTransferAirportHandoffApi() {
+    const api = window.PixkuyDirectTransferAirportHandoff;
+
+    if (
+      !api ||
+      typeof api.consumePendingHandoff !== "function" ||
+      typeof api.applyToAirport !== "function"
+    ) {
+      throw new Error("[Pixkuy Airport Mobile Booking Flow] Direct Transfer handoff bridge is not available.");
+    }
+
+    return api;
+  }
+
+  function applyDirectTransferAirportHandoff(panel) {
+    const api = shouldReturnToDirectTransfer()
+      ? getDirectTransferAirportHandoffApi()
+      : null;
+    let payload;
+
+    if (!panel || !api) {
+      return false;
+    }
+
+    payload = api.consumePendingHandoff();
+
+    if (!payload) {
+      return false;
+    }
+
+    api.applyToAirport(payload).then(function syncAfterDirectTransferAirportHandoff(applied) {
+      if (!applied) {
+        return;
+      }
+
+      syncCopy(panel);
+      syncDirectionButtons(panel);
+      ensureMobilePassengers(panel);
+      ensureMobileLuggage(panel);
+      ensureMobileFare(panel);
+    });
+
+    return true;
+  }
+  
   function getInMotionReturnContextFromUrl() {
     try {
       const params = new URLSearchParams(window.location.search || "");
@@ -1988,6 +2033,7 @@
     bindAirportMobilePicker(panel);
     applyAirportDirectionPrefillFromUrl(panel);
     applyAirportPrefillFromUrl(panel);
+    applyDirectTransferAirportHandoff(panel);
     syncDirectionButtons(panel);
 
     if (!movePanelToRoute(panel)) {

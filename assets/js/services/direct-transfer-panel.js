@@ -182,23 +182,6 @@
     return api && typeof api === "object" ? api : null;
   }
 
-  function getCoverageApi() {
-    const forms = window.PixkuyForms || {};
-    const coverage = forms.coverage;
-
-    return coverage && typeof coverage === "object" ? coverage : null;
-  }
-
-  function getCoverageDecision(place) {
-    const coverage = getCoverageApi();
-
-    if (!coverage || typeof coverage.getCoverageDecision !== "function") {
-      return null;
-    }
-
-    return coverage.getCoverageDecision(place);
-  }
-
   function getGooglePlacesApi() {
     const forms = window.PixkuyForms || {};
     const api = forms.googlePlaces;
@@ -280,80 +263,39 @@
     }
   }
 
-  function getPlaceSearchText(place) {
-    const safePlace = place && typeof place === "object" ? place : {};
+  function getAirportGuardApi() {
+    const api = window.PixkuyDirectTransferAirportGuard;
 
-    return [
-      safePlace.label,
-      safePlace.displayName,
-      safePlace.formattedAddress,
-      safePlace.primaryText,
-      safePlace.secondaryText,
-      safePlace.text,
-      safePlace.address,
-      safePlace.placeId,
-      safePlace.iataCode
-    ].map(normalizeLocationComparisonValue).filter(Boolean).join(" | ");
+    if (
+      !api ||
+      typeof api.getCataloguedAirportTransferId !== "function" ||
+      typeof api.isCataloguedAirportTransferPlace !== "function"
+    ) {
+      throw new Error("[Pixkuy Direct Transfer Panel] Airport guard is not available.");
+    }
+
+    return api;
+  }
+  
+    function getAirportHandoffApi() {
+    const api = window.PixkuyDirectTransferAirportHandoff;
+
+    if (
+      !api ||
+      typeof api.applyToAirport !== "function"
+    ) {
+      throw new Error("[Pixkuy Direct Transfer Panel] Airport handoff bridge is not available.");
+    }
+
+    return api;
   }
 
   function getCataloguedAirportTransferId(place) {
-    const decision = getCoverageDecision(place);
-    const airportCode = normalizeText(decision && decision.airportIataCode).toUpperCase();
-    const text = getPlaceSearchText(place);
-    const explicitIataCode = normalizeText(place && place.iataCode).toUpperCase();
-
-    if (
-      explicitIataCode === "NLU" ||
-      text.indexOf("aifa") !== -1 ||
-      text.indexOf("aeropuerto internacional felipe angeles") !== -1 ||
-      text.indexOf("felipe angeles international airport") !== -1
-    ) {
-      return "nlu";
-    }
-
-    if (
-      explicitIataCode === "TLC" ||
-      airportCode === "TLC" ||
-      text.indexOf("aeropuerto internacional de toluca") !== -1 ||
-      text.indexOf("toluca international airport") !== -1 ||
-      text.indexOf("licenciado adolfo lopez mateos international airport") !== -1
-    ) {
-      return "tlc";
-    }
-
-    if (
-      explicitIataCode === "PBC" ||
-      airportCode === "PBC" ||
-      text.indexOf("aeropuerto internacional de puebla") !== -1 ||
-      text.indexOf("puebla international airport") !== -1 ||
-      text.indexOf("hermanos serdan international airport") !== -1
-    ) {
-      return "pbc";
-    }
-
-    if (
-      explicitIataCode === "QRO" ||
-      airportCode === "QRO" ||
-      text.indexOf("aeropuerto intercontinental de queretaro") !== -1 ||
-      text.indexOf("queretaro intercontinental airport") !== -1
-    ) {
-      return "qro";
-    }
-
-    if (
-      explicitIataCode === "MEX" ||
-      text.indexOf("aicm") !== -1 ||
-      text.indexOf("aeropuerto internacional de la ciudad de mexico") !== -1 ||
-      text.indexOf("benito juarez international airport") !== -1
-    ) {
-      return "mex";
-    }
-
-    return "";
+    return getAirportGuardApi().getCataloguedAirportTransferId(place);
   }
 
   function isCataloguedAirportTransferPlace(place) {
-    return Boolean(getCataloguedAirportTransferId(place));
+    return getAirportGuardApi().isCataloguedAirportTransferPlace(place);
   }
 
   function isDirectTransferCoveredPlace(role) {
@@ -406,6 +348,17 @@
     return {
       airportId: "",
       direction: ""
+    };
+  }
+  
+    function buildAirportHandoffInput(context) {
+    const safeContext = context && typeof context === "object" ? context : {};
+
+    return {
+      airportId: normalizeText(safeContext.airportId),
+      direction: normalizeText(safeContext.direction),
+      originPlace: state.originPlace,
+      destinationPlace: state.destinationPlace
     };
   }
 
@@ -828,7 +781,7 @@
     function openAirportPanelFromRestriction() {
     const context = getAirportTransferContext();
     const servicesExpandApi = window.PixkuyServicesExpand;
-    const airportTariffApi = window.PixkuyAirportZoneTariff;
+    const airportHandoffApi = getAirportHandoffApi();
     const url = buildAirportUrl();
     let opened = false;
 
@@ -852,12 +805,7 @@
       });
     }
 
-    if (airportTariffApi && typeof airportTariffApi.setAirportSelection === "function") {
-      airportTariffApi.setAirportSelection({
-        airportId: context.airportId,
-        direction: context.direction
-      });
-    }
+    airportHandoffApi.applyToAirport(buildAirportHandoffInput(context));
 
     return opened;
   }
