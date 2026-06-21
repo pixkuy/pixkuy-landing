@@ -4,6 +4,24 @@
     "yes": "是",
     "no": "否"
   },
+  "mobileMenu": {
+    "open": "打开菜单",
+    "close": "关闭菜单",
+    "ariaLabel": "移动端导航",
+    "reservations": "预订",
+    "pixkuy": "Pixkuy",
+    "items": {
+      "airport": "机场接送",
+      "hourly": "带司机车辆",
+      "direct": "直达接送",
+      "tours": "私人游览",
+      "events": "近期活动",
+      "inMotion": "Pixkuy 动态",
+      "brands": "同行品牌",
+      "fleet": "我们的车辆",
+      "whatsapp": "通过 WhatsApp 联系"
+    }
+  },
   "hero": {
     "title": "从第一公里开始，以舒适、克制与精准完成每一次出行。",
     "subtitle": "严格甄选的司机。高端电动车辆。<br>为不把出行交给即兴决策的人，在墨西哥城建立一致而可靠的标准。",

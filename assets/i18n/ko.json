@@ -4,6 +4,24 @@
     "yes": "예",
     "no": "아니요"
   },
+  "mobileMenu": {
+    "open": "메뉴 열기",
+    "close": "메뉴 닫기",
+    "ariaLabel": "모바일 내비게이션",
+    "reservations": "예약",
+    "pixkuy": "Pixkuy",
+    "items": {
+      "airport": "공항 이동",
+      "hourly": "기사 포함 차량",
+      "direct": "직행 이동",
+      "tours": "프라이빗 투어",
+      "events": "다가오는 이벤트",
+      "inMotion": "움직이는 Pixkuy",
+      "brands": "함께하는 브랜드",
+      "fleet": "우리 차량",
+      "whatsapp": "WhatsApp으로 상담하기"
+    }
+  },
   "hero": {
     "title": "첫 순간부터 편안함, 절제, 그리고 정확함으로 이어지는 이동.",
     "subtitle": "엄선된 드라이버. 프리미엄 전기차.<br>멕시코시티에서 이동을 즉흥에 맡기지 않는 이들을 위한 일관된 기준.",

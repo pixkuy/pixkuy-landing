@@ -4,6 +4,24 @@
     "yes": "Sí",
     "no": "No"
   },
+  "mobileMenu": {
+    "open": "Abrir menú",
+    "close": "Cerrar menú",
+    "ariaLabel": "Navegación móvil",
+    "reservations": "Reservas",
+    "pixkuy": "Pixkuy",
+    "items": {
+      "airport": "Transfer Aeropuerto",
+      "hourly": "Vehículo con conductor",
+      "direct": "Traslados directos",
+      "tours": "Tours privados",
+      "events": "Próximos eventos",
+      "inMotion": "Pixkuy en movimiento",
+      "brands": "Marcas que nos acompañan",
+      "fleet": "Nuestros vehículos",
+      "whatsapp": "Hablar por WhatsApp"
+    }
+  },
   "hero": {
     "title": "Cada trayecto, con confort, discreción y precisión desde el primer kilómetro.",
     "subtitle": "Conductores seleccionados. Vehículos eléctricos premium.<br>Un estándar consistente para quienes no improvisan su movilidad en Ciudad de México.",

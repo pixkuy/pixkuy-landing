@@ -4,6 +4,24 @@
     "yes": "Yes",
     "no": "No"
   },
+  "mobileMenu": {
+    "open": "Open menu",
+    "close": "Close menu",
+    "ariaLabel": "Mobile navigation",
+    "reservations": "Reservations",
+    "pixkuy": "Pixkuy",
+    "items": {
+      "airport": "Airport transfer",
+      "hourly": "Chauffeured vehicle",
+      "direct": "Direct transfers",
+      "tours": "Private tours",
+      "events": "Upcoming events",
+      "inMotion": "Pixkuy in motion",
+      "brands": "Brands that accompany us",
+      "fleet": "Our vehicles",
+      "whatsapp": "Talk on WhatsApp"
+    }
+  },
   "hero": {
     "title": "Every journey, handled with comfort, discretion and precision from the very first mile.",
     "subtitle": "Carefully selected drivers. Premium electric vehicles.<br>A solid, reliable standard for those who do not improvise their mobility in Mexico City.",

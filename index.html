@@ -157,6 +157,21 @@
 
 <body>
   <div class="mobile-topbar" data-mobile-topbar>
+    <button
+      type="button"
+      class="mobile-topbar__menu-trigger"
+      data-mobile-topbar-menu-trigger
+      aria-controls="mobile-topbar-menu"
+      aria-expanded="false"
+    >
+      <span class="mobile-topbar__menu-icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      <span class="visually-hidden" data-i18n="mobileMenu.open">Abrir menú</span>
+    </button>
+
     <div class="mobile-topbar__brand">
       <img
         src="assets/img/pixkuy-logo_only words-white.webp"
@@ -166,6 +181,230 @@
         loading="eager"
         decoding="async"
       />
+    </div>
+  </div>
+
+  <div
+    id="mobile-topbar-menu"
+    class="mobile-topbar-menu"
+    data-mobile-topbar-menu
+    aria-hidden="true"
+    hidden
+  >
+    <button
+      type="button"
+      class="mobile-topbar-menu__backdrop"
+      data-mobile-topbar-menu-dismiss
+    >
+      <span class="visually-hidden" data-i18n="mobileMenu.close">Cerrar menú</span>
+    </button>
+
+    <div
+      class="mobile-topbar-menu__panel"
+      data-mobile-topbar-menu-panel
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mobile-topbar-menu-title"
+      tabindex="-1"
+    >
+      <div class="mobile-topbar-menu__handle" aria-hidden="true"></div>
+
+      <h2
+        id="mobile-topbar-menu-title"
+        class="visually-hidden"
+        data-i18n="mobileMenu.ariaLabel"
+      >Navegación móvil</h2>
+
+      <nav class="mobile-topbar-menu__nav" aria-labelledby="mobile-topbar-menu-title">
+        <div class="mobile-topbar-menu__group">
+          <p class="mobile-topbar-menu__group-title" data-i18n="mobileMenu.reservations">Reservas</p>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item mobile-topbar-menu__item--featured mobile-topbar-menu__item--primary"
+            data-mobile-topbar-menu-action="hourly"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--hourly"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.hourly"
+              >Vehículo con conductor</span>
+              <span
+                class="mobile-topbar-menu__item-text"
+                data-i18n="services.cards.hourly.text"
+              >Un servicio flexible para agendas, reuniones y desplazamientos con varias paradas.</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item mobile-topbar-menu__item--featured"
+            data-mobile-topbar-menu-action="airport"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--airport"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.airport"
+              >Transfer Aeropuerto</span>
+              <span
+                class="mobile-topbar-menu__item-text"
+                data-i18n="services.cards.airport.text"
+              >Traslados programados para llegadas y salidas con una experiencia clara y cuidada.</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item mobile-topbar-menu__item--featured"
+            data-mobile-topbar-menu-action="tours"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--tours"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.tours"
+              >Tours privados</span>
+              <span
+                class="mobile-topbar-menu__item-text"
+                data-i18n="services.cards.tours.text"
+              >Recorridos privados a lugares emblemáticos y planes a medida con chofer dedicado.</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item"
+            data-mobile-topbar-menu-action="direct"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--direct"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.direct"
+              >Traslados directos</span>
+              <span
+                class="mobile-topbar-menu__item-text"
+                data-i18n="services.cards.direct.text"
+              >Un trayecto claro entre dos puntos con el mismo estándar de servicio puerta a puerta.</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item"
+            data-mobile-topbar-menu-action="events"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--events"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.events"
+              >Próximos eventos</span>
+              <span
+                class="mobile-topbar-menu__item-text"
+                data-i18n="services.cards.events.text"
+              >Cuando el traslado acompaña una ocasión importante y debe estar a la altura del momento.</span>
+            </span>
+          </button>
+        </div>
+
+        <div class="mobile-topbar-menu__group">
+          <p class="mobile-topbar-menu__group-title" data-i18n="mobileMenu.pixkuy">Pixkuy</p>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item"
+            data-mobile-topbar-menu-action="inMotion"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--in-motion"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.inMotion"
+              >Pixkuy en movimiento</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item"
+            data-mobile-topbar-menu-action="brands"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--brands"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.brands"
+              >Marcas que nos acompañan</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item"
+            data-mobile-topbar-menu-action="fleet"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--fleet"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.fleet"
+              >Nuestros vehículos</span>
+            </span>
+          </button>
+        </div>
+
+        <a
+          class="mobile-topbar-menu__item mobile-topbar-menu__item--whatsapp"
+          href="#contact"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-contact-whatsapp="1"
+          data-contact-whatsapp-mode="general"
+          data-mobile-topbar-menu-action="whatsapp"
+        >
+          <span
+            class="mobile-topbar-menu__media mobile-topbar-menu__media--whatsapp"
+            aria-hidden="true"
+          ></span>
+          <span class="mobile-topbar-menu__copy">
+            <span
+              class="mobile-topbar-menu__item-title"
+              data-i18n="mobileMenu.items.whatsapp"
+            >Hablar por WhatsApp</span>
+            <span
+              class="mobile-topbar-menu__item-text"
+              data-i18n="contact.whatsappNote"
+            >Habla con una persona del equipo y continúa tu solicitud por WhatsApp.</span>
+          </span>
+        </a>
+      </nav>
     </div>
   </div>
 
@@ -4038,6 +4277,7 @@
 <script src="assets/js/services/hourly-mobile-vehicle-gallery.js"></script>
 <script src="assets/js/services/hourly-desktop-vehicle-gallery.js"></script>
 <script src="assets/js/services/hourly-mobile-date-sheet.js"></script>
+<script src="assets/js/services/mobile-topbar-menu.js"></script>
 <script src="assets/js/campaign/campaign-attribution.js"></script>
 <script src="assets/js/analytics/pixkuy-analytics.js"></script>
 <script src="assets/js/consent/google-ads-consent.js"></script>

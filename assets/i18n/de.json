@@ -4,6 +4,24 @@
     "yes": "Ja",
     "no": "Nein"
   },
+  "mobileMenu": {
+    "open": "Menü öffnen",
+    "close": "Menü schließen",
+    "ariaLabel": "Mobile Navigation",
+    "reservations": "Reservierungen",
+    "pixkuy": "Pixkuy",
+    "items": {
+      "airport": "Flughafentransfer",
+      "hourly": "Fahrzeug mit Fahrer",
+      "direct": "Direkttransfers",
+      "tours": "Private Touren",
+      "events": "Kommende Events",
+      "inMotion": "Pixkuy in Bewegung",
+      "brands": "Marken, die uns begleiten",
+      "fleet": "Unsere Fahrzeuge",
+      "whatsapp": "Per WhatsApp sprechen"
+    }
+  },
   "hero": {
     "title": "Jede Fahrt, mit Komfort, Diskretion und Präzision ab dem ersten Kilometer.",
     "subtitle": "Sorgfältig ausgewählte Fahrer. Premium-Elektrofahrzeuge.<br>Ein konsistenter Standard für alle, die ihre Mobilität in Mexiko-Stadt nicht improvisieren.",

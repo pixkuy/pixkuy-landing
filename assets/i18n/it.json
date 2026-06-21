@@ -4,6 +4,24 @@
     "yes": "Sì",
     "no": "No"
   },
+  "mobileMenu": {
+    "open": "Apri menu",
+    "close": "Chiudi menu",
+    "ariaLabel": "Navigazione mobile",
+    "reservations": "Prenotazioni",
+    "pixkuy": "Pixkuy",
+    "items": {
+      "airport": "Transfer aeroporto",
+      "hourly": "Veicolo con autista",
+      "direct": "Trasferimenti diretti",
+      "tours": "Tour privati",
+      "events": "Prossimi eventi",
+      "inMotion": "Pixkuy in movimento",
+      "brands": "Marchi che ci accompagnano",
+      "fleet": "I nostri veicoli",
+      "whatsapp": "Parla su WhatsApp"
+    }
+  },
   "hero": {
     "title": "Ogni tragitto, con comfort, discrezione e precisione fin dal primo chilometro.",
     "subtitle": "Autisti selezionati con cura. Veicoli elettrici premium.<br>Uno standard coerente per chi non improvvisa la propria mobilità a Città del Messico.",

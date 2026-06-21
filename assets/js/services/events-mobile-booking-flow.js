@@ -1030,6 +1030,14 @@
     return true;
   }
 
+  window.PixkuyEventsMobileBookingFlow = {
+    open: openEventsRoute,
+    close: closeEventsRoute,
+    isOpen: function isOpen() {
+      return isRouteOpen;
+    }
+  };
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
