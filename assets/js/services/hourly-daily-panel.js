@@ -1442,9 +1442,13 @@ function getNextAvailableMessage(result, labels) {
 function getAvailabilityMessage(result) {
   const labels = getLabels();
   const code = normalizeText(result && result.code);
+  const nextAvailableMessage = getNextAvailableMessage(result, labels);
 
   if (code === 'HOURLY_MINIMUM_LEAD_TIME_NOT_MET') {
-    return labels.availability.minimumLeadTime;
+    return [
+      labels.availability.minimumLeadTime,
+      nextAvailableMessage
+    ].filter(Boolean).join(' ');
   }
 
   if (code === 'PRICE_MISMATCH') {
@@ -1454,8 +1458,6 @@ function getAvailabilityMessage(result) {
   if (code === 'PRECHECK_REQUEST_FAILED' || code === 'INVALID_PRECHECK_PAYLOAD') {
     return labels.availability.error;
   }
-
-  const nextAvailableMessage = getNextAvailableMessage(result, labels);
 
   if (nextAvailableMessage) {
     return labels.availability.unavailable + ' ' + nextAvailableMessage;
