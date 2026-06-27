@@ -1,0 +1,48 @@
+{
+  "mobileMenu": {
+    "items": {
+      "chauffeurs": "Autisti professionisti"
+    }
+  },
+  "chauffeursMobileScreen": {
+    "back": "Indietro",
+    "title": "Autista assegnato da Pixkuy",
+    "body": "Una volta confermata la prenotazione, Pixkuy prepara il trasferimento con te: assegna l’autista, verifica i dati del viaggio e condivide le informazioni necessarie tramite il canale indicato durante la richiesta.",
+    "imageAlt": "Servizio privato con autista Pixkuy e veicolo executive assegnato.",
+    "proofs": {
+      "assigned": {
+        "title": "Autista assegnato",
+        "text": "Prima del servizio ricevi i dati operativi dell’autista assegnato, così sai chi ti viene a prendere e puoi coordinare l’arrivo con tranquillità."
+      },
+      "operations": {
+        "title": "Prelievo preparato",
+        "text": "Verifichiamo l’orario, il punto esatto di prelievo, accesso o lobby, volo e terminal quando applicabile, bagagli previsti e veicolo assegnato."
+      },
+      "service": {
+        "title": "Standard alla guida",
+        "text": "Guida tranquilla, presenza curata, discrezione e attenzione dal prelievo fino alla destinazione, con assistenza per i bagagli quando necessario."
+      },
+      "privacy": {
+        "title": "Dati del viaggio",
+        "text": "Le informazioni della prenotazione vengono utilizzate per preparare il trasferimento, coordinare l’autista e gestire eventuali adeguamenti operativi del servizio."
+      },
+      "documents": {
+        "title": "Autista verificato",
+        "text": "Ogni autista passa attraverso una verifica preventiva di patente valida, referenze, documentazione lavorativa e precedenti prima di prestare servizio con Pixkuy."
+      },
+      "insurance": {
+        "title": "Assicurazione completa",
+        "text": "Il veicolo assegnato dispone di copertura completa per servizio con autista e trasporto passeggeri, con responsabilità civile, copertura occupanti e assistenza stradale."
+      }
+    },
+    "closure": "Il tuo trasferimento viene coordinato da Pixkuy prima del servizio: autista assegnato, prelievo verificato e comunicazione preventiva con la persona che prenota.",
+    "trust": [
+      "Autista assegnato",
+      "Prelievo preparato",
+      "Bagagli previsti",
+      "Autista verificato",
+      "Assicurazione completa",
+      "Comunicazione preventiva"
+    ]
+  }
+}

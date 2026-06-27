@@ -1,0 +1,300 @@
+/* assets/css/85-chauffeurs-mobile-screen.css
+   Chauffeurs mobile trust screen.
+   Alcance:
+   - solo móvil
+   - pantalla informativa dedicada para Choferes profesionales
+   - no toca desktop
+   - no toca #services, #contact, pricing, checkout, Places ni WhatsApp runtime
+*/
+
+.chauffeurs-mobile-route,
+.chauffeurs-mobile-screen{
+  display:none;
+}
+
+.chauffeurs-mobile-route[hidden]{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  html:has(body[data-chauffeurs-mobile-screen="true"]){
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  body[data-chauffeurs-mobile-screen="true"]{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100svh;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  body[data-chauffeurs-mobile-screen="true"] .lang,
+  body[data-chauffeurs-mobile-screen="true"] .whatsapp-floating,
+  body[data-chauffeurs-mobile-screen="true"] .events-special-spotlight{
+    display:none !important;
+  }
+
+  .chauffeurs-mobile-route{
+    position:fixed;
+    inset:0;
+    z-index:76;
+
+    display:block;
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+
+    background:#0f1113;
+    color:#f4f2ee;
+
+    overscroll-behavior:none;
+    touch-action:manipulation;
+  }
+
+  .chauffeurs-mobile-route__screen{
+    height:100svh;
+    min-height:100svh;
+    overflow:hidden;
+  }
+
+  .chauffeurs-mobile-route__content{
+    box-sizing:border-box;
+
+    display:flex;
+    flex-direction:column;
+
+    width:100%;
+    height:100svh;
+    min-height:0;
+    overflow:hidden;
+
+    padding:
+      calc(60px + env(safe-area-inset-top))
+      18px
+      calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .chauffeurs-mobile-route .chauffeurs-mobile-screen{
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    min-height:0;
+    overflow:auto;
+    gap:12px;
+
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .chauffeurs-mobile-screen__back-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    min-height:28px;
+  }
+
+  .chauffeurs-mobile-screen__back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    min-height:28px;
+    padding:0;
+
+    border:0;
+    border-radius:0;
+    background:transparent;
+
+    color:rgba(255,245,228,.78);
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    font-weight:700;
+
+    cursor:pointer;
+  }
+
+  .chauffeurs-mobile-screen__back::before{
+    content:"←";
+    display:inline-block;
+    font-size:16px;
+    line-height:1;
+    font-weight:600;
+    transform:translateY(-.5px);
+  }
+
+  .chauffeurs-mobile-screen__back:focus-visible{
+    outline:2px solid rgba(31,122,109,.95);
+    outline-offset:2px;
+  }
+
+  .chauffeurs-mobile-screen__media{
+    position:relative;
+
+    min-height:154px;
+    margin:0;
+    overflow:hidden;
+
+    border:1px solid rgba(244,242,238,.12);
+    border-radius:12px;
+
+    background:
+      linear-gradient(180deg, rgba(15,17,19,.16), rgba(15,17,19,.74)),
+      #171a1d;
+  }
+
+  .chauffeurs-mobile-screen__media::after{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:
+      linear-gradient(180deg, rgba(15,17,19,0) 44%, rgba(15,17,19,.72) 100%),
+      linear-gradient(90deg, rgba(31,122,109,.18), rgba(15,17,19,0) 48%);
+
+    pointer-events:none;
+  }
+
+  .chauffeurs-mobile-screen__image{
+    display:block;
+    width:100%;
+    height:184px;
+
+    object-fit:cover;
+    object-position:center;
+
+    background:#171a1d;
+  }
+
+  .chauffeurs-mobile-screen__header{
+    display:grid;
+    gap:8px;
+  }
+
+  .chauffeurs-mobile-screen__title{
+    margin:0;
+
+    color:#f4f2ee;
+    font-size:24px;
+    line-height:1.08;
+    font-weight:720;
+    letter-spacing:-.028em;
+  }
+
+  .chauffeurs-mobile-screen__body{
+    margin:0;
+
+    color:rgba(244,242,238,.74);
+    font-size:13.5px;
+    line-height:1.46;
+    font-weight:430;
+  }
+
+  .chauffeurs-mobile-screen__proofs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .chauffeurs-mobile-screen__proof{
+    min-width:0;
+    min-height:112px;
+
+    display:grid;
+    align-content:start;
+    gap:6px;
+
+    padding:11px 10px;
+
+    border:1px solid rgba(244,242,238,.11);
+    border-radius:10px;
+
+    background:rgba(244,242,238,.035);
+  }
+
+  .chauffeurs-mobile-screen__proof-title{
+    margin:0;
+
+    color:rgba(255,249,238,.96);
+    font-size:13px;
+    line-height:1.16;
+    font-weight:760;
+    letter-spacing:-.01em;
+  }
+
+  .chauffeurs-mobile-screen__proof-text{
+    margin:0;
+
+    color:rgba(244,242,238,.66);
+    font-size:11.8px;
+    line-height:1.36;
+    font-weight:430;
+  }
+
+  .chauffeurs-mobile-screen__closure{
+    margin:2px 0 0;
+    padding:13px 14px;
+
+    border:1px solid rgba(31,122,109,.36);
+    border-radius:10px;
+
+    background:rgba(31,122,109,.14);
+    color:rgba(255,249,238,.94);
+
+    font-size:13.5px;
+    line-height:1.38;
+    font-weight:720;
+    letter-spacing:-.01em;
+  }
+
+  .chauffeurs-mobile-screen__trust{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+
+    margin:0;
+    padding:0 0 2px;
+
+    list-style:none;
+  }
+
+  .chauffeurs-mobile-screen__trust-item{
+    display:inline-flex;
+    align-items:center;
+
+    min-height:26px;
+    padding:0 8px;
+
+    border:1px solid rgba(244,242,238,.10);
+    border-radius:7px;
+
+    background:rgba(244,242,238,.035);
+    color:rgba(244,242,238,.66);
+
+    font-size:11px;
+    line-height:1;
+    font-weight:680;
+    white-space:nowrap;
+  }
+}
+
+@media (max-width:360px){
+  .chauffeurs-mobile-screen__proofs{
+    grid-template-columns:1fr;
+  }
+
+  .chauffeurs-mobile-screen__proof{
+    min-height:0;
+  }
+}
+
+@media (max-width:720px) and (prefers-reduced-motion:reduce){
+  .chauffeurs-mobile-route .chauffeurs-mobile-screen{
+    scroll-behavior:auto;
+  }
+}

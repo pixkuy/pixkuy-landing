@@ -49,6 +49,12 @@
       apiName: "PixkuyEventsMobileBookingFlow"
     }
   };
+  
+  const SCREENS = {
+    chauffeurs: {
+      apiName: "PixkuyChauffeursMobileScreen"
+    }
+  };
 
   const ANCHORS = {
     inMotion: "pixkuy-in-motion",
@@ -270,9 +276,55 @@
       closeRoute(route);
     });
   }
+  
+  function getScreenApi(screen) {
+    const api = screen && screen.apiName ? window[screen.apiName] : null;
+
+    if (!api || typeof api !== "object") {
+      throw new Error("[Pixkuy Mobile Topbar Menu] Missing screen API: " + screen.apiName);
+    }
+
+    if (typeof api.open !== "function" || typeof api.close !== "function") {
+      throw new Error("[Pixkuy Mobile Topbar Menu] Incomplete screen API: " + screen.apiName);
+    }
+
+    return api;
+  }
+
+  function closeScreen(screen) {
+    const api = window[screen.apiName];
+    const isScreenOpen = Boolean(
+      api &&
+        typeof api.isOpen === "function" &&
+        api.isOpen()
+    );
+
+    if (!isScreenOpen || typeof api.close !== "function") {
+      return false;
+    }
+
+    api.close({
+      updateUrl: false
+    });
+
+    return true;
+  }
+
+  function closeAllScreens(exceptScreen) {
+    Object.keys(SCREENS).forEach(function closeScreenByKey(key) {
+      const screen = SCREENS[key];
+
+      if (exceptScreen && screen.apiName === exceptScreen.apiName) {
+        return;
+      }
+
+      closeScreen(screen);
+    });
+  }
 
   function cleanRouteParams(url) {
     [
+      "view",
       "step",
       "tour",
       "event",
@@ -313,10 +365,29 @@
     }
 
     closeMenu();
+    closeAllScreens(null);
     closeAllRoutes(route);
     pushServiceUrl(route);
 
     return api.open();
+  }
+
+  function openScreen(action) {
+    const screen = SCREENS[action];
+    const api = screen ? getScreenApi(screen) : null;
+    const result = api ? null : false;
+
+    if (!screen || !api) {
+      return result;
+    }
+
+    closeMenu();
+    closeAllRoutes(null);
+    closeAllScreens(screen);
+
+    return api.open({
+      updateUrl: true
+    });
   }
 
   function pushAnchorUrl(anchorId) {
@@ -342,6 +413,7 @@
 
     closeMenu();
     closeAllRoutes(null);
+    closeAllScreens(null);
     pushAnchorUrl(anchorId);
 
     window.requestAnimationFrame(function scrollAfterClose() {
@@ -360,6 +432,11 @@
       return true;
     }
 
+    if (SCREENS[action]) {
+      openScreen(action);
+      return true;
+    }
+
     if (ANCHORS[action]) {
       scrollToAnchor(ANCHORS[action]);
       return true;
@@ -367,6 +444,7 @@
 
     if (action === "whatsapp") {
       closeMenu();
+      closeAllScreens(null);
       return true;
     }
 

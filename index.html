@@ -95,6 +95,8 @@
   <link rel="stylesheet" href="assets/css/43-services-events-sheet-mobile.css" />
   <link rel="stylesheet" href="assets/css/35-wc2026.css" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/85-chauffeurs-mobile-screen.css" />
+  <link rel="stylesheet" href="assets/css/86-chauffeurs-desktop-section.css" />
   <link rel="stylesheet" href="assets/css/50-mobile-topbar.css" />
   <link rel="stylesheet" href="assets/css/90-a11y.css" />
 
@@ -327,6 +329,23 @@
 
         <div class="mobile-topbar-menu__group">
           <p class="mobile-topbar-menu__group-title" data-i18n="mobileMenu.pixkuy">Pixkuy</p>
+
+          <button
+            type="button"
+            class="mobile-topbar-menu__item"
+            data-mobile-topbar-menu-action="chauffeurs"
+          >
+            <span
+              class="mobile-topbar-menu__media mobile-topbar-menu__media--chauffeurs"
+              aria-hidden="true"
+            ></span>
+            <span class="mobile-topbar-menu__copy">
+              <span
+                class="mobile-topbar-menu__item-title"
+                data-i18n="mobileMenu.items.chauffeurs"
+              >Choferes profesionales</span>
+            </span>
+          </button>
 
           <button
             type="button"
@@ -596,8 +615,8 @@
       </div>
     </div>
   </section>
-  
-    <!-- PANTALLA 4 — ADAPTABILIDAD -->
+
+  <!-- PANTALLA 4 — ADAPTABILIDAD -->
   <section id="services" class="screen services services--local-bg">
     <div class="content">
       <h2 data-i18n="services.title"></h2>
@@ -1293,7 +1312,139 @@
     </div>
   </section>
 
+  <section
+    class="chauffeurs-desktop-section"
+    aria-labelledby="chauffeurs-desktop-title"
+  >
+    <div class="chauffeurs-desktop-section__inner">
+      <div class="chauffeurs-desktop-section__media" aria-hidden="true">
+        <img
+          class="chauffeurs-desktop-section__image"
+          src="assets/img/chauffeurs/chauffeurs-mobile-hero.webp"
+          alt=""
+          width="1280"
+          height="720"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
 
+      <div class="chauffeurs-desktop-section__content">
+        <div class="chauffeurs-desktop-section__header">
+          <h2
+            id="chauffeurs-desktop-title"
+            class="chauffeurs-desktop-section__title"
+            data-i18n="chauffeursMobileScreen.title"
+          ></h2>
+
+          <p
+            class="chauffeurs-desktop-section__lead"
+            data-i18n="chauffeursMobileScreen.body"
+          ></p>
+        </div>
+
+        <div class="chauffeurs-desktop-section__proofs">
+          <article class="chauffeurs-desktop-section__proof">
+            <h3
+              class="chauffeurs-desktop-section__proof-title"
+              data-i18n="chauffeursMobileScreen.proofs.assigned.title"
+            ></h3>
+            <p
+              class="chauffeurs-desktop-section__proof-text"
+              data-i18n="chauffeursMobileScreen.proofs.assigned.text"
+            ></p>
+          </article>
+
+          <article class="chauffeurs-desktop-section__proof">
+            <h3
+              class="chauffeurs-desktop-section__proof-title"
+              data-i18n="chauffeursMobileScreen.proofs.operations.title"
+            ></h3>
+            <p
+              class="chauffeurs-desktop-section__proof-text"
+              data-i18n="chauffeursMobileScreen.proofs.operations.text"
+            ></p>
+          </article>
+
+          <article class="chauffeurs-desktop-section__proof">
+            <h3
+              class="chauffeurs-desktop-section__proof-title"
+              data-i18n="chauffeursMobileScreen.proofs.service.title"
+            ></h3>
+            <p
+              class="chauffeurs-desktop-section__proof-text"
+              data-i18n="chauffeursMobileScreen.proofs.service.text"
+            ></p>
+          </article>
+
+          <article class="chauffeurs-desktop-section__proof">
+            <h3
+              class="chauffeurs-desktop-section__proof-title"
+              data-i18n="chauffeursMobileScreen.proofs.privacy.title"
+            ></h3>
+            <p
+              class="chauffeurs-desktop-section__proof-text"
+              data-i18n="chauffeursMobileScreen.proofs.privacy.text"
+            ></p>
+          </article>
+
+          <article class="chauffeurs-desktop-section__proof">
+            <h3
+              class="chauffeurs-desktop-section__proof-title"
+              data-i18n="chauffeursMobileScreen.proofs.documents.title"
+            ></h3>
+            <p
+              class="chauffeurs-desktop-section__proof-text"
+              data-i18n="chauffeursMobileScreen.proofs.documents.text"
+            ></p>
+          </article>
+
+          <article class="chauffeurs-desktop-section__proof">
+            <h3
+              class="chauffeurs-desktop-section__proof-title"
+              data-i18n="chauffeursMobileScreen.proofs.insurance.title"
+            ></h3>
+            <p
+              class="chauffeurs-desktop-section__proof-text"
+              data-i18n="chauffeursMobileScreen.proofs.insurance.text"
+            ></p>
+          </article>
+        </div>
+
+        <p
+          class="chauffeurs-desktop-section__closure"
+          data-i18n="chauffeursMobileScreen.closure"
+        ></p>
+
+        <ul class="chauffeurs-desktop-section__trust">
+          <li
+            class="chauffeurs-desktop-section__trust-item"
+            data-i18n="chauffeursMobileScreen.trust.0"
+          ></li>
+          <li
+            class="chauffeurs-desktop-section__trust-item"
+            data-i18n="chauffeursMobileScreen.trust.1"
+          ></li>
+          <li
+            class="chauffeurs-desktop-section__trust-item"
+            data-i18n="chauffeursMobileScreen.trust.2"
+          ></li>
+          <li
+            class="chauffeurs-desktop-section__trust-item"
+            data-i18n="chauffeursMobileScreen.trust.3"
+          ></li>
+          <li
+            class="chauffeurs-desktop-section__trust-item"
+            data-i18n="chauffeursMobileScreen.trust.4"
+          ></li>
+          <li
+            class="chauffeurs-desktop-section__trust-item"
+            data-i18n="chauffeursMobileScreen.trust.5"
+          ></li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
   <!-- PANTALLA 2 — PIXKUY EN MOVIMIENTO -->
   <section
@@ -4277,6 +4428,7 @@
 <script src="assets/js/services/hourly-mobile-vehicle-gallery.js"></script>
 <script src="assets/js/services/hourly-desktop-vehicle-gallery.js"></script>
 <script src="assets/js/services/hourly-mobile-date-sheet.js"></script>
+<script src="assets/js/services/chauffeurs-mobile-screen.js"></script>
 <script src="assets/js/services/mobile-topbar-menu.js"></script>
 <script src="assets/js/campaign/campaign-attribution.js"></script>
 <script src="assets/js/analytics/pixkuy-analytics.js"></script>

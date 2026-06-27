@@ -1,0 +1,179 @@
+/* assets/css/86-chauffeurs-desktop-section.css
+   Chofer asignado por Pixkuy — desktop section.
+   Alcance:
+   - solo desktop/tablet ancho
+   - sección editorial de confianza
+   - no modifica mobile route
+   - no toca servicios, contacto, flota ni hero
+*/
+
+.chauffeurs-desktop-section{
+  display:none;
+}
+
+@media (min-width:721px){
+  .chauffeurs-desktop-section{
+    display:block;
+    padding:76px 6vw;
+    background:#0f1113;
+    color:var(--fg);
+  }
+
+  .chauffeurs-desktop-section__inner{
+    width:min(1180px, 100%);
+    margin:0 auto;
+
+    display:grid;
+    grid-template-columns:minmax(360px, .9fr) minmax(0, 1.1fr);
+    gap:42px;
+    align-items:center;
+  }
+
+  .chauffeurs-desktop-section__media{
+    position:relative;
+    overflow:hidden;
+    min-height:430px;
+
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    background:#151719;
+  }
+
+  .chauffeurs-desktop-section__image{
+    display:block;
+    width:100%;
+    height:100%;
+    min-height:430px;
+    object-fit:cover;
+    object-position:center;
+  }
+
+  .chauffeurs-desktop-section__content{
+    display:grid;
+    gap:22px;
+    min-width:0;
+  }
+
+  .chauffeurs-desktop-section__header{
+    display:grid;
+    gap:14px;
+  }
+
+  .chauffeurs-desktop-section__title{
+    margin:0;
+    max-width:680px;
+
+    color:var(--fg);
+    font-size:clamp(34px, 3.6vw, 52px);
+    line-height:1.02;
+    letter-spacing:-.04em;
+  }
+
+  .chauffeurs-desktop-section__lead{
+    max-width:690px;
+    margin:0;
+
+    color:rgba(244,242,238,.74);
+    font-size:17px;
+    line-height:1.62;
+  }
+
+  .chauffeurs-desktop-section__proofs{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    column-gap:28px;
+    row-gap:18px;
+    margin-top:4px;
+  }
+
+  .chauffeurs-desktop-section__proof{
+    display:grid;
+    gap:5px;
+    min-width:0;
+    padding:0 0 0 15px;
+
+    border-left:1px solid rgba(216,199,166,.36);
+  }
+
+  .chauffeurs-desktop-section__proof-title{
+    margin:0;
+
+    color:rgba(244,242,238,.96);
+    font-size:15px;
+    line-height:1.25;
+    font-weight:720;
+  }
+
+  .chauffeurs-desktop-section__proof-text{
+    margin:0;
+
+    color:rgba(244,242,238,.62);
+    font-size:14px;
+    line-height:1.5;
+  }
+
+  .chauffeurs-desktop-section__closure{
+    margin:2px 0 0;
+    padding-top:18px;
+
+    border-top:1px solid rgba(255,255,255,.10);
+    color:rgba(244,242,238,.78);
+    font-size:15px;
+    line-height:1.55;
+  }
+
+  .chauffeurs-desktop-section__trust{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin:0;
+    padding:0;
+
+    color:rgba(244,242,238,.58);
+    font-size:13px;
+    line-height:1.4;
+  }
+
+  .chauffeurs-desktop-section__trust-item{
+    display:inline-flex;
+    align-items:center;
+    gap:14px;
+  }
+
+  .chauffeurs-desktop-section__trust-item + .chauffeurs-desktop-section__trust-item::before{
+    content:"";
+    width:4px;
+    height:4px;
+    border-radius:999px;
+    background:rgba(216,199,166,.45);
+  }
+}
+
+@media (min-width:721px) and (max-width:1040px){
+  .chauffeurs-desktop-section{
+    padding:64px 5vw;
+  }
+
+  .chauffeurs-desktop-section__inner{
+    grid-template-columns:1fr;
+    gap:30px;
+  }
+
+  .chauffeurs-desktop-section__media{
+    min-height:360px;
+  }
+
+  .chauffeurs-desktop-section__image{
+    min-height:360px;
+  }
+
+  .chauffeurs-desktop-section__proofs{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (min-width:721px) and (prefers-reduced-motion:reduce){
+  .chauffeurs-desktop-section *{
+    scroll-behavior:auto;
+  }
+}

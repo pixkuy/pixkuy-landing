@@ -1,0 +1,48 @@
+{
+  "mobileMenu": {
+    "items": {
+      "chauffeurs": "Chauffeurs professionnels"
+    }
+  },
+  "chauffeursMobileScreen": {
+    "back": "Retour",
+    "title": "Chauffeur assigné par Pixkuy",
+    "body": "Une fois la réservation confirmée, Pixkuy prépare le transfert avec vous : assignation du chauffeur, vérification des détails du trajet et partage des informations nécessaires via le canal indiqué lors de la demande.",
+    "imageAlt": "Service privé avec chauffeur Pixkuy et véhicule exécutif assigné.",
+    "proofs": {
+      "assigned": {
+        "title": "Chauffeur assigné",
+        "text": "Avant le service, vous recevez les informations opérationnelles du chauffeur assigné afin de savoir qui vient vous chercher et de coordonner l’arrivée sereinement."
+      },
+      "operations": {
+        "title": "Prise en charge préparée",
+        "text": "Nous vérifions l’heure, le point exact de prise en charge, l’accès ou le lobby, le vol et le terminal le cas échéant, les bagages prévus et le véhicule assigné."
+      },
+      "service": {
+        "title": "Standard au volant",
+        "text": "Conduite calme, présentation soignée, discrétion et attention du point de prise en charge jusqu’à la destination, avec assistance pour les bagages si nécessaire."
+      },
+      "privacy": {
+        "title": "Données du trajet",
+        "text": "Les informations de réservation sont utilisées pour préparer le transfert, coordonner le chauffeur et gérer tout ajustement opérationnel du service."
+      },
+      "documents": {
+        "title": "Chauffeur vérifié",
+        "text": "Chaque chauffeur fait l’objet d’une vérification préalable du permis en cours de validité, des références, des documents professionnels et des antécédents avant de fournir un service avec Pixkuy."
+      },
+      "insurance": {
+        "title": "Assurance complète",
+        "text": "Le véhicule assigné dispose d’une assurance complète pour service avec chauffeur et transport de passagers, avec couverture de responsabilité civile, occupants et assistance routière."
+      }
+    },
+    "closure": "Votre transfert est coordonné par Pixkuy avant le service : chauffeur assigné, prise en charge vérifiée et communication préalable avec la personne qui réserve.",
+    "trust": [
+      "Chauffeur assigné",
+      "Prise en charge préparée",
+      "Bagages prévus",
+      "Chauffeur vérifié",
+      "Assurance complète",
+      "Communication préalable"
+    ]
+  }
+}

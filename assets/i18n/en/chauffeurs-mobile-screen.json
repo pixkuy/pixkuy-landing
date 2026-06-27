@@ -1,0 +1,48 @@
+{
+  "mobileMenu": {
+    "items": {
+      "chauffeurs": "Professional chauffeurs"
+    }
+  },
+  "chauffeursMobileScreen": {
+    "back": "Back",
+    "title": "Chauffeur assigned by Pixkuy",
+    "body": "Once the booking is confirmed, Pixkuy prepares the transfer with you: assigning the chauffeur, reviewing the trip details and sharing the necessary information through the channel indicated during the request.",
+    "imageAlt": "Private chauffeur service by Pixkuy with an assigned executive vehicle.",
+    "proofs": {
+      "assigned": {
+        "title": "Assigned chauffeur",
+        "text": "Before the service, you receive the operational details of the assigned chauffeur so you know who is picking you up and can coordinate the arrival with peace of mind."
+      },
+      "operations": {
+        "title": "Pickup prepared",
+        "text": "We review the time, exact pickup point, access or lobby, flight and terminal when applicable, expected luggage and assigned vehicle."
+      },
+      "service": {
+        "title": "Standard behind the wheel",
+        "text": "Calm driving, careful presentation, discretion and attentive service from pickup to destination, with luggage assistance when needed."
+      },
+      "privacy": {
+        "title": "Trip data",
+        "text": "Booking information is used to prepare the transfer, coordinate the chauffeur and handle any operational adjustment to the service."
+      },
+      "documents": {
+        "title": "Reviewed chauffeur",
+        "text": "Each chauffeur goes through a prior review of valid license, references, employment documentation and background checks before providing service with Pixkuy."
+      },
+      "insurance": {
+        "title": "Comprehensive insurance",
+        "text": "The assigned vehicle has comprehensive coverage for chauffeur service and passenger transport, including civil liability, occupant coverage and roadside assistance."
+      }
+    },
+    "closure": "Your transfer is coordinated by Pixkuy before the service: assigned chauffeur, reviewed pickup and prior communication with the person making the booking.",
+    "trust": [
+      "Assigned chauffeur",
+      "Pickup prepared",
+      "Expected luggage",
+      "Reviewed chauffeur",
+      "Comprehensive insurance",
+      "Prior communication"
+    ]
+  }
+}

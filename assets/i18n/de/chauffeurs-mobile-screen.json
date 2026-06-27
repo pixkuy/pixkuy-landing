@@ -1,0 +1,48 @@
+{
+  "mobileMenu": {
+    "items": {
+      "chauffeurs": "Professionelle Chauffeure"
+    }
+  },
+  "chauffeursMobileScreen": {
+    "back": "Zurück",
+    "title": "Von Pixkuy zugewiesener Chauffeur",
+    "body": "Nach Bestätigung der Buchung bereitet Pixkuy den Transfer mit Ihnen vor: Der Chauffeur wird zugewiesen, die Reisedaten werden geprüft und die erforderlichen Informationen über den bei der Anfrage angegebenen Kanal geteilt.",
+    "imageAlt": "Privater Chauffeurservice von Pixkuy mit zugewiesenem Executive-Fahrzeug.",
+    "proofs": {
+      "assigned": {
+        "title": "Zugewiesener Chauffeur",
+        "text": "Vor dem Service erhalten Sie die operativen Daten des zugewiesenen Chauffeurs, damit Sie wissen, wer Sie abholt, und die Ankunft in Ruhe koordinieren können."
+      },
+      "operations": {
+        "title": "Abholung vorbereitet",
+        "text": "Wir prüfen Uhrzeit, genauen Abholpunkt, Zugang oder Lobby, Flug und Terminal, falls zutreffend, erwartetes Gepäck und zugewiesenes Fahrzeug."
+      },
+      "service": {
+        "title": "Standard am Steuer",
+        "text": "Ruhige Fahrweise, gepflegtes Auftreten, Diskretion und aufmerksamer Service von der Abholung bis zum Ziel, mit Gepäckhilfe bei Bedarf."
+      },
+      "privacy": {
+        "title": "Reisedaten",
+        "text": "Die Buchungsinformationen werden verwendet, um den Transfer vorzubereiten, den Chauffeur zu koordinieren und operative Anpassungen des Service zu bearbeiten."
+      },
+      "documents": {
+        "title": "Geprüfter Chauffeur",
+        "text": "Jeder Chauffeur durchläuft vor dem Einsatz bei Pixkuy eine Prüfung von gültiger Fahrerlaubnis, Referenzen, Arbeitsunterlagen und Hintergrundnachweisen."
+      },
+      "insurance": {
+        "title": "Umfassende Versicherung",
+        "text": "Das zugewiesene Fahrzeug verfügt über eine umfassende Versicherung für Chauffeurservice und Personentransport, einschließlich Haftpflicht, Insassenschutz und Pannenhilfe."
+      }
+    },
+    "closure": "Ihr Transfer wird vor dem Service von Pixkuy koordiniert: zugewiesener Chauffeur, geprüfte Abholung und vorherige Kommunikation mit der buchenden Person.",
+    "trust": [
+      "Zugewiesener Chauffeur",
+      "Abholung vorbereitet",
+      "Gepäck eingeplant",
+      "Geprüfter Chauffeur",
+      "Umfassende Versicherung",
+      "Vorherige Kommunikation"
+    ]
+  }
+}

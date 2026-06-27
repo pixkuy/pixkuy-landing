@@ -1,0 +1,48 @@
+{
+  "mobileMenu": {
+    "items": {
+      "chauffeurs": "Choferes profesionales"
+    }
+  },
+  "chauffeursMobileScreen": {
+    "back": "Volver",
+    "title": "Chofer asignado por Pixkuy",
+    "body": "Al confirmar la reserva, Pixkuy prepara el traslado contigo: asigna el chofer, revisa los datos del viaje y comparte la información necesaria en el canal indicado durante la solicitud.",
+    "imageAlt": "Servicio privado con chofer de Pixkuy y vehículo ejecutivo asignado.",
+    "proofs": {
+      "assigned": {
+        "title": "Chofer asignado",
+        "text": "Antes del servicio recibes los datos operativos del chofer asignado para saber quién te recoge y coordinar la llegada con tranquilidad."
+      },
+      "operations": {
+        "title": "Recogida preparada",
+        "text": "Revisamos la hora, el punto exacto de recogida, acceso o lobby, vuelo y terminal cuando aplica, equipaje previsto y vehículo asignado."
+      },
+      "service": {
+        "title": "Estándar al volante",
+        "text": "Conducción tranquila, presentación cuidada, discreción y trato atento desde la recogida hasta el destino, con ayuda para el equipaje cuando sea necesario."
+      },
+      "privacy": {
+        "title": "Datos del viaje",
+        "text": "La información de la reserva se utiliza para preparar el traslado, coordinar al chofer y atender cualquier ajuste operativo del servicio."
+      },
+      "documents": {
+        "title": "Chofer revisado",
+        "text": "Cada chofer pasa por una revisión previa de licencia vigente, referencias, documentación laboral y antecedentes antes de prestar servicio con Pixkuy."
+      },
+      "insurance": {
+        "title": "Seguro amplio",
+        "text": "El vehículo asignado cuenta con póliza amplia para servicio con chofer y transporte de pasajeros, con cobertura de responsabilidad civil, ocupantes y asistencia vial."
+      }
+    },
+    "closure": "Tu traslado queda coordinado por Pixkuy antes del servicio: chofer asignado, recogida revisada y comunicación previa con quien reserva.",
+    "trust": [
+      "Chofer asignado",
+      "Recogida preparada",
+      "Equipaje previsto",
+      "Chofer revisado",
+      "Seguro amplio",
+      "Comunicación previa"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "mobileMenu": {
+    "items": {
+      "chauffeurs": "Motoristas profissionais"
+    }
+  },
+  "chauffeursMobileScreen": {
+    "back": "Voltar",
+    "title": "Motorista atribuído pela Pixkuy",
+    "body": "Ao confirmar a reserva, a Pixkuy prepara o traslado com você: atribui o motorista, revisa os dados da viagem e compartilha as informações necessárias pelo canal indicado durante a solicitação.",
+    "imageAlt": "Serviço privado com motorista da Pixkuy e veículo executivo atribuído.",
+    "proofs": {
+      "assigned": {
+        "title": "Motorista atribuído",
+        "text": "Antes do serviço, você recebe os dados operacionais do motorista atribuído para saber quem irá buscá-lo e coordenar a chegada com tranquilidade."
+      },
+      "operations": {
+        "title": "Recolha preparada",
+        "text": "Revisamos o horário, o ponto exato de recolha, acesso ou lobby, voo e terminal quando aplicável, bagagem prevista e veículo atribuído."
+      },
+      "service": {
+        "title": "Padrão ao volante",
+        "text": "Condução tranquila, apresentação cuidada, discrição e atendimento atencioso desde a recolha até o destino, com ajuda para a bagagem quando necessário."
+      },
+      "privacy": {
+        "title": "Dados da viagem",
+        "text": "As informações da reserva são utilizadas para preparar o traslado, coordenar o motorista e atender qualquer ajuste operacional do serviço."
+      },
+      "documents": {
+        "title": "Motorista revisado",
+        "text": "Cada motorista passa por uma revisão prévia de licença válida, referências, documentação laboral e antecedentes antes de prestar serviço com a Pixkuy."
+      },
+      "insurance": {
+        "title": "Seguro amplo",
+        "text": "O veículo atribuído conta com cobertura ampla para serviço com motorista e transporte de passageiros, incluindo responsabilidade civil, ocupantes e assistência em viagem."
+      }
+    },
+    "closure": "O seu traslado fica coordenado pela Pixkuy antes do serviço: motorista atribuído, recolha revisada e comunicação prévia com quem reserva.",
+    "trust": [
+      "Motorista atribuído",
+      "Recolha preparada",
+      "Bagagem prevista",
+      "Motorista revisado",
+      "Seguro amplo",
+      "Comunicação prévia"
+    ]
+  }
+}
