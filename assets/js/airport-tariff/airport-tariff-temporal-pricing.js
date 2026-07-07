@@ -2,7 +2,7 @@
   "use strict";
 
   const TEMPORAL_PRICING_ENABLED = false;
-  const UI_VISIBLE_UNTIL = "2026-07-05";
+  const UI_VISIBLE_UNTIL = "9999-12-31";
   const PRICE_WINDOW_START = "2026-06-11";
   const PRICE_WINDOW_END = "2026-07-05";
   const PRICE_MULTIPLIER = 1.5;
