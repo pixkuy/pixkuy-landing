@@ -83,6 +83,7 @@
       "checking": "正在确认可用性...",
       "available": "可用性已确认。您可以继续。",
       "unavailable": "该日期和时间没有可用服务。请选择其他选项。",
+      "nonAirportLocationIsSelectedAirport": "请选择与所选机场不同的接送或目的地地址。",
       "nextAvailableSlot": "下一个可用时间：{time}",
       "priceMismatch": "价格已发生变化。继续前请刷新配置。",
       "error": "无法确认可用性。请检查日期、时间和地址。"

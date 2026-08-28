@@ -24,6 +24,8 @@
   var AIRPORT_TRANSFER_CHECKOUT_REVIEW_PATH = "/airport-transfer-checkout-review.html";
   var AIRPORT_TRANSFER_CHECKOUT_REVIEW_STORAGE_KEY =
     "pixkuy_airport_transfer_checkout_review_snapshot";
+  var AIRPORT_TRANSFER_LOCATION_COLLISION_CODE =
+    "AIRPORT_TRANSFER_NON_AIRPORT_LOCATION_IS_SELECTED_AIRPORT";
   var LEGAL_ACCEPTANCE_HOST_SELECTOR =
     "[data-airport-transfer-checkout-legal-acceptance]";
 
@@ -257,8 +259,15 @@
   }
 
   function getAirportTransferDirection(data, form) {
+    var snapshotApi = window.PixkuyForms &&
+      typeof window.PixkuyForms.getContactAirportHotelSnapshot === "function"
+        ? window.PixkuyForms.getContactAirportHotelSnapshot
+        : null;
+    var snapshot = snapshotApi ? snapshotApi() : null;
+
     return normalizeText(
-      getFieldValue(form, "airport_hotel_direction") ||
+      (snapshot && snapshot.direction) ||
+        getFieldValue(form, "airport_hotel_direction") ||
         data.airportHotelDirection ||
         data.direction
     );
@@ -343,6 +352,25 @@
         : null;
 
     return snapshotApi ? snapshotApi() : null;
+  }
+
+  function isNonAirportLocationSelectedAirport() {
+    var snapshot = getAirportTransferSnapshot();
+    var airportGuard = window.PixkuyDirectTransferAirportGuard;
+
+    if (
+      !airportGuard ||
+      typeof airportGuard.isSelectedAirportTransferLocation !== "function"
+    ) {
+      return false;
+    }
+
+    return airportGuard.isSelectedAirportTransferLocation({
+      airportId: normalizeText(snapshot && snapshot.airportId),
+      address: normalizeText(snapshot && snapshot.hotel),
+      placeId: normalizeText(snapshot && snapshot.lodgingPlaceId),
+      primaryType: normalizeText(snapshot && snapshot.lodgingPrimaryType)
+    });
   }
 
   function isTechnicalAirportZoneId(value) {
@@ -681,6 +709,183 @@
       });
   }
   
+  function getResultCode(result) {
+    var normalized = result && result.raw && typeof result.raw === "object"
+      ? result.raw
+      : result;
+    var resultNode = normalized && normalized.result && typeof normalized.result === "object"
+      ? normalized.result
+      : {};
+
+    return normalizeText(result && result.code) ||
+      normalizeText(normalized && normalized.code) ||
+      normalizeText(resultNode.code) ||
+      normalizeText(result && result.body && result.body.code);
+  }
+
+  function getAirportLocationCollisionMessage() {
+    return getI18nValue(
+      "services.cards.airport.panel.availability.nonAirportLocationIsSelectedAirport",
+      "Elige una dirección de recogida o destino diferente del aeropuerto seleccionado."
+    );
+  }
+
+  function getAirportTransferNonAirportRole(data, form) {
+    var direction = getAirportTransferDirection(data || {}, form);
+
+    return direction === "hotel_to_airport" || direction === "destination_to_airport"
+      ? "origin"
+      : "destination";
+  }
+
+  function focusNode(node) {
+    if (!node || typeof node.focus !== "function") {
+      return false;
+    }
+
+    if (typeof node.scrollIntoView === "function") {
+      node.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    window.setTimeout(function focusNodeAfterScroll() {
+      node.focus({
+        preventScroll: true
+      });
+    }, 120);
+
+    return true;
+  }
+
+  function restoreAirportCollisionMessage() {
+    var mobileHelper = document.querySelector(
+      "#services-expand-airport [data-airport-mobile-flow-helper]"
+    );
+    var form = getForm();
+    var fields =
+      form && window.PixkuyForms &&
+      typeof window.PixkuyForms.getReservationRequestFields === "function"
+        ? window.PixkuyForms.getReservationRequestFields(form)
+        : null;
+
+    if (
+      fields &&
+      fields.formError &&
+      fields.formError.getAttribute("data-airport-location-collision-error") === "1"
+    ) {
+      fields.formError.hidden = true;
+      fields.formError.removeAttribute("data-airport-location-collision-error");
+    }
+
+    if (
+      mobileHelper &&
+      mobileHelper.getAttribute("data-airport-location-collision-error") === "1"
+    ) {
+      mobileHelper.textContent = getI18nValue(
+        "airportMobileFlow.helper",
+        getI18nValue("services.cards.airport.text", "")
+      );
+      mobileHelper.removeAttribute("data-airport-location-collision-error");
+      mobileHelper.removeAttribute("role");
+      mobileHelper.removeAttribute("aria-live");
+    }
+
+    return true;
+  }
+
+  function focusAirportTransferNonAirportLocation(form, data) {
+    var role = getAirportTransferNonAirportRole(data, form);
+    var roleNode;
+    var clearButton;
+    var input;
+    var mobileContactStep;
+
+    if (isDesktopViewport()) {
+      input = form.querySelector(
+        '[data-contact-airport-hotel-role="' + role + '"] ' +
+          "[data-contact-airport-hotel-hotel-input]"
+      );
+
+      return focusNode(
+        input || form.querySelector("[data-contact-airport-hotel-hotel-input]")
+      );
+    }
+
+    mobileContactStep = window.PixkuyAirportMobileContactStep;
+
+    if (mobileContactStep && typeof mobileContactStep.close === "function") {
+      mobileContactStep.close();
+    }
+
+    roleNode = document.querySelector(
+      '#services-expand-airport [data-airport-tariff-role="' + role + '"]'
+    );
+    clearButton = roleNode
+      ? roleNode.querySelector("[data-airport-destination-clear]")
+      : null;
+
+    if (clearButton && clearButton.hidden !== true) {
+      clearButton.click();
+    }
+
+    window.requestAnimationFrame(function focusAfterLocationClear() {
+      window.requestAnimationFrame(function focusCanonicalLodgingInput() {
+        var activeRoleNode = document.querySelector(
+          '#services-expand-airport [data-airport-tariff-role="' + role + '"]'
+        );
+        var activeInput = activeRoleNode
+          ? activeRoleNode.querySelector("[data-airport-lodging-input]")
+          : null;
+
+        focusNode(activeInput);
+      });
+    });
+
+    return true;
+  }
+
+  function showAirportLocationCollisionError(form, data) {
+    var fields;
+    var message;
+    var mobileHelper;
+
+    if (!form) {
+      return false;
+    }
+
+    fields =
+      window.PixkuyForms &&
+      typeof window.PixkuyForms.getReservationRequestFields === "function"
+        ? window.PixkuyForms.getReservationRequestFields(form)
+        : null;
+    message = getAirportLocationCollisionMessage();
+
+    if (fields && fields.formError) {
+      fields.formError.textContent = message;
+      fields.formError.hidden = false;
+      fields.formError.setAttribute("data-airport-location-collision-error", "1");
+    }
+
+    focusAirportTransferNonAirportLocation(form, data);
+
+    if (!isDesktopViewport()) {
+      mobileHelper = document.querySelector(
+        "#services-expand-airport [data-airport-mobile-flow-helper]"
+      );
+
+      if (mobileHelper) {
+        mobileHelper.setAttribute("role", "alert");
+        mobileHelper.setAttribute("aria-live", "assertive");
+        mobileHelper.setAttribute("data-airport-location-collision-error", "1");
+        mobileHelper.textContent = message;
+      }
+    }
+
+    return true;
+  }
+
     function getAvailabilityErrorMessage(result) {
     var normalized = result && result.raw && typeof result.raw === "object"
       ? result.raw
@@ -749,12 +954,16 @@
     return true;
   }
 
-  function showAvailabilityError(form, result) {
+  function showAvailabilityError(form, result, data) {
     var fields;
     var message;
 
     if (!form) {
       return false;
+    }
+
+    if (getResultCode(result) === AIRPORT_TRANSFER_LOCATION_COLLISION_CODE) {
+      return showAirportLocationCollisionError(form, data);
     }
 
     fields =
@@ -1233,6 +1442,11 @@
 
     hideCheckoutError(form);
 
+    if (isNonAirportLocationSelectedAirport()) {
+      showAirportLocationCollisionError(form, data);
+      return;
+    }
+
     if (isDesktopViewport()) {
       setFormBusy(form, true);
 
@@ -1245,7 +1459,7 @@
 
           if (!isAllowed) {
             setFormBusy(form, false);
-            showAvailabilityError(form, result);
+            showAvailabilityError(form, result, data);
             return;
           }
 
@@ -1287,19 +1501,28 @@
           result && result.body ? result.body.bookingStatusToken : "";
 
         if (!result.ok || !checkoutUrl || !bookingStatusToken) {
-          throw new Error(
+          var checkoutError = new Error(
             result && result.body && result.body.code
               ? result.body.code
               : "BOOKING_API_CHECKOUT_FAILED"
           );
+
+          checkoutError.code = getResultCode(result) || "BOOKING_API_CHECKOUT_FAILED";
+          throw checkoutError;
         }
 
         if (!redirectToCheckout(checkoutUrl, bookingStatusToken)) {
           throw new Error("BOOKING_CHECKOUT_HANDOFF_FAILED");
         }
       })
-      .catch(function () {
+      .catch(function (error) {
         setFormBusy(form, false);
+
+        if (error && error.code === AIRPORT_TRANSFER_LOCATION_COLLISION_CODE) {
+          showAirportLocationCollisionError(form, data);
+          return;
+        }
+
         showCheckoutError(form);
       });
   }
@@ -1313,7 +1536,17 @@
 
     document.addEventListener("submit", handleSubmit, true);
 
-    document.addEventListener("input", function onDocumentInput() {
+    document.addEventListener("input", function onDocumentInput(event) {
+      if (
+        event.target &&
+        typeof event.target.matches === "function" &&
+        event.target.matches(
+          "[data-airport-lodging-input], [data-contact-airport-hotel-hotel-input]"
+        )
+      ) {
+        restoreAirportCollisionMessage();
+      }
+
       scheduleLegalAcceptanceVisibilitySync(getForm());
     }, true);
 

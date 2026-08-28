@@ -154,12 +154,28 @@
     return "";
   }
 
+  function isSelectedAirportTransferLocation(input) {
+    const safeInput = input && typeof input === "object" ? input : {};
+    const selectedAirportId = normalizeText(safeInput.airportId).toLowerCase();
+    const primaryType = normalizeText(safeInput.primaryType);
+    const matchedAirportId = getCataloguedAirportTransferId({
+      formattedAddress: normalizeText(safeInput.address),
+      placeId: normalizeText(safeInput.placeId),
+      types: primaryType ? [primaryType] : []
+    });
+
+    return Boolean(
+      selectedAirportId && matchedAirportId === selectedAirportId
+    );
+  }
+
   function isCataloguedAirportTransferPlace(place) {
     return Boolean(getCataloguedAirportTransferId(place));
   }
 
   window.PixkuyDirectTransferAirportGuard = {
     getCataloguedAirportTransferId,
+    isSelectedAirportTransferLocation,
     isCataloguedAirportTransferPlace,
     getPlaceSearchText
   };

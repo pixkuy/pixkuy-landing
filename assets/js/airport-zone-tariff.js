@@ -22,7 +22,9 @@
     availabilityUnavailable: "services.cards.airport.panel.availability.unavailable",
     availabilityNextAvailableSlot: "services.cards.airport.panel.availability.nextAvailableSlot",
     availabilityPriceMismatch: "services.cards.airport.panel.availability.priceMismatch",
-    availabilityError: "services.cards.airport.panel.availability.error"
+    availabilityError: "services.cards.airport.panel.availability.error",
+    availabilityNonAirportLocationIsSelectedAirport:
+      "services.cards.airport.panel.availability.nonAirportLocationIsSelectedAirport"
   };
 
   const DROPDOWN_KEYS = {
@@ -240,6 +242,12 @@
       return false;
     }
 
+    if (
+      statusNode.getAttribute("data-airport-location-collision-error") === "1"
+    ) {
+      return false;
+    }
+
     statusNode.textContent = "";
     statusNode.hidden = true;
     statusNode.removeAttribute("data-availability-tone");
@@ -372,6 +380,80 @@
     }
 
     return "";
+  }
+
+  function isNonAirportLocationSelectedAirport(state) {
+    const airportGuard = window.PixkuyDirectTransferAirportGuard;
+
+    if (
+      !airportGuard ||
+      typeof airportGuard.isSelectedAirportTransferLocation !== "function"
+    ) {
+      return false;
+    }
+
+    return airportGuard.isSelectedAirportTransferLocation({
+      airportId: getSelectedAirportId(state),
+      address: normalizeText(state && state.lodgingEndpointLabel),
+      placeId: normalizeText(state && state.lodgingEndpointPlaceId),
+      primaryType: normalizeText(state && state.lodgingEndpointPrimaryType)
+    });
+  }
+
+  function getNonAirportLocationRoleNode(state) {
+    const role = getActiveLodgingSide(state);
+
+    return document.querySelector(
+      SELECTORS.panel + ' [data-airport-tariff-role="' + role + '"]'
+    );
+  }
+
+  function setNonAirportLocationInvalidState(state, isInvalid) {
+    const roleNode = getNonAirportLocationRoleNode(state);
+    const input = roleNode
+      ? roleNode.querySelector("[data-airport-lodging-input]")
+      : null;
+
+    if (!input) {
+      return false;
+    }
+
+    input.setAttribute("aria-invalid", isInvalid ? "true" : "false");
+    return true;
+  }
+
+  function clearAirportLocationCollisionStatus(nodes, state) {
+    const statusNode = ensureAirportAvailabilityStatusNode(nodes);
+
+    if (statusNode) {
+      statusNode.removeAttribute("data-airport-location-collision-error");
+    }
+
+    setNonAirportLocationInvalidState(state, false);
+    return clearAirportAvailabilityStatus(nodes);
+  }
+
+  function focusNonAirportLocation(state) {
+    const roleNode = getNonAirportLocationRoleNode(state);
+    const clearButton = roleNode
+      ? roleNode.querySelector("[data-airport-destination-clear]")
+      : null;
+
+    if (clearButton && clearButton.hidden !== true) {
+      clearButton.click();
+    }
+
+    window.requestAnimationFrame(function focusAirportLodgingInput() {
+      const input = roleNode
+        ? roleNode.querySelector("[data-airport-lodging-input]")
+        : null;
+
+      if (input && typeof input.focus === "function") {
+        input.focus({ preventScroll: true });
+      }
+    });
+
+    return true;
   }
   
     function getPassengerCountForFareKey(fareKey) {
@@ -2072,6 +2154,32 @@ function shouldUsePassengerChipUi(nodes) {
   nodes.cta.addEventListener("click", function (event) {
     event.preventDefault();
 
+    if (isNonAirportLocationSelectedAirport(state)) {
+      setAirportAvailabilityStatus(
+        nodes,
+        getAirportAvailabilityCopy(
+          "availabilityNonAirportLocationIsSelectedAirport",
+          "Elige una dirección de recogida o destino diferente del aeropuerto seleccionado."
+        ),
+        "error"
+      );
+
+      if (nodes.availabilityStatus) {
+        nodes.availabilityStatus.setAttribute(
+          "data-airport-location-collision-error",
+          "1"
+        );
+      }
+
+      setNonAirportLocationInvalidState(state, true);
+
+      if (!isAirportMobileViewport()) {
+        focusNonAirportLocation(state);
+      }
+
+      return;
+    }
+
     if (nodes.dateInput) {
       state.serviceDate = normalizeText(nodes.dateInput.value);
       syncTemporalDateInput(nodes, state);
@@ -2277,6 +2385,10 @@ function shouldUsePassengerChipUi(nodes) {
           return false;
         }
 
+        if (!isNonAirportLocationSelectedAirport(state)) {
+          clearAirportLocationCollisionStatus(nodes, state);
+        }
+
         renderPanel(nodes, state);
         rerenderAirportDestinationUi();
         closeDropdown(nodes, state);
@@ -2286,6 +2398,10 @@ function shouldUsePassengerChipUi(nodes) {
         const applied = applyAirportSelectionState(state, payload);
         if (!applied) {
           return false;
+        }
+
+        if (!isNonAirportLocationSelectedAirport(state)) {
+          clearAirportLocationCollisionStatus(nodes, state);
         }
 
         renderPanel(nodes, state);

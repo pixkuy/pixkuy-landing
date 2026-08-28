@@ -83,6 +83,7 @@
       "checking": "A verificar disponibilidade...",
       "available": "Disponibilidade confirmada. Pode continuar.",
       "unavailable": "Não há disponibilidade para essa data e hora. Escolha outra opção.",
+      "nonAirportLocationIsSelectedAirport": "Escolha um endereço de recolha ou destino diferente do aeroporto selecionado.",
       "nextAvailableSlot": "Próxima hora disponível: {time}",
       "priceMismatch": "A tarifa mudou. Atualize a configuração antes de continuar.",
       "error": "Não foi possível confirmar a disponibilidade. Verifique a data, a hora e o endereço."

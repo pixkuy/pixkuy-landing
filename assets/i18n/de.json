@@ -83,6 +83,7 @@
       "checking": "Verfügbarkeit wird geprüft...",
       "available": "Verfügbarkeit bestätigt. Sie können fortfahren.",
       "unavailable": "Für dieses Datum und diese Uhrzeit ist keine Verfügbarkeit vorhanden. Wählen Sie eine andere Option.",
+      "nonAirportLocationIsSelectedAirport": "Wählen Sie eine Abhol- oder Zieladresse, die nicht dem ausgewählten Flughafen entspricht.",
       "nextAvailableSlot": "Nächste verfügbare Uhrzeit: {time}",
       "priceMismatch": "Der Tarif hat sich geändert. Aktualisieren Sie die Konfiguration, bevor Sie fortfahren.",
       "error": "Wir konnten die Verfügbarkeit nicht bestätigen. Prüfen Sie Datum, Uhrzeit und Adresse."

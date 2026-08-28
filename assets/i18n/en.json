@@ -83,6 +83,7 @@
       "checking": "Checking availability...",
       "available": "Availability confirmed. You can continue.",
       "unavailable": "No availability for that date and time. Choose another option.",
+      "nonAirportLocationIsSelectedAirport": "Choose a pickup or destination address different from the selected airport.",
       "nextAvailableSlot": "Next available time: {time}",
       "priceMismatch": "The fare has changed. Refresh the configuration before continuing.",
       "error": "We could not confirm availability. Check date, time and address."
