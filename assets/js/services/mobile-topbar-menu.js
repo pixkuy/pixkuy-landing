@@ -467,6 +467,14 @@
       ? actionNode.getAttribute("data-mobile-topbar-menu-action")
       : "";
 
+    if (
+      actionNode &&
+      actionNode.matches("a[href][data-mobile-topbar-menu-native='true']")
+    ) {
+      closeMenu();
+      return;
+    }
+
     if (actionNode && action !== "whatsapp") {
       event.preventDefault();
       handleAction(action);

@@ -106,6 +106,22 @@
     updateLangUI(finalLang);
   }
 
+  function applyLangFromSelector(lang) {
+    var normalized = normalizeLangCode(lang) || "es";
+
+    if (
+      typeof location !== "undefined" &&
+      typeof history !== "undefined" &&
+      typeof history.replaceState === "function"
+    ) {
+      var url = new URL(location.href);
+      url.searchParams.set("lang", normalized);
+      history.replaceState(history.state, document.title, url.pathname + url.search + url.hash);
+    }
+
+    return applyLang(normalized);
+  }
+
   // -----------------------------
   // Bootstrap
   // -----------------------------
@@ -113,7 +129,7 @@
   (async function bootstrapI18n() {
     // Inicializa selector (pro si existe, legacy si no)
     if (typeof initLangSelector === "function") {
-      initLangSelector(applyLang);
+      initLangSelector(applyLangFromSelector);
     }
 
     // Aplica idioma inicial (esto también setea UI)

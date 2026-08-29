@@ -56,6 +56,17 @@
     transform:translateY(-17px);
   }
 
+  @media (max-width:359px){
+    .mobile-topbar__brand{
+      width:calc(100vw - 40px);
+    }
+
+    .mobile-topbar__brand img{
+      width:100%;
+      transform:translateY(-12px);
+    }
+  }
+
   .mobile-topbar__menu-trigger{
     position:fixed;
     top:calc(10px + env(safe-area-inset-top));
