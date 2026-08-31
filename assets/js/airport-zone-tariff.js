@@ -22,6 +22,7 @@
     availabilityUnavailable: "services.cards.airport.panel.availability.unavailable",
     availabilityNextAvailableSlot: "services.cards.airport.panel.availability.nextAvailableSlot",
     availabilityPriceMismatch: "services.cards.airport.panel.availability.priceMismatch",
+    availabilityOperationalConfirmation: "fleet.operational",
     availabilityError: "services.cards.airport.panel.availability.error",
     availabilityNonAirportLocationIsSelectedAirport:
       "services.cards.airport.panel.availability.nonAirportLocationIsSelectedAirport"
@@ -61,6 +62,8 @@
     openRole: "",
     activeIndex: -1
   };
+
+  let airportMobilePrecheckRequestId = 0;
   
   const utils = window.PixkuyAirportTariffUtils || null;
 
@@ -284,11 +287,22 @@
     };
   }
 
-  function getAirportNextAvailableTimeLabel(result) {
+  function getAirportNextAvailableTimeLabel(result, requestedLocalDate) {
     const value = normalizeText(result && result.nextAvailableStartLocal);
+    const formatter =
+      window.__pixkuyI18nModules &&
+      window.__pixkuyI18nModules.formatNextAvailabilityLabel;
 
     if (!value) {
       return "";
+    }
+
+    if (typeof formatter === "function") {
+      return formatter({
+        requestedLocalDate: requestedLocalDate,
+        nextAvailableStartLocal: value,
+        locale: getDocumentLocale()
+      });
     }
 
     if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
@@ -298,8 +312,8 @@
     return value;
   }
 
-  function getAirportNextAvailableMessage(result) {
-    const time = getAirportNextAvailableTimeLabel(result);
+  function getAirportNextAvailableMessage(result, requestedLocalDate) {
+    const time = getAirportNextAvailableTimeLabel(result, requestedLocalDate);
     const template = getAirportAvailabilityCopy(
       "availabilityNextAvailableSlot",
       "Siguiente hora disponible: {time}"
@@ -312,16 +326,37 @@
     return template.replace("{time}", time);
   }
 
-  function getAirportAvailabilityMessage(result) {
+  function getAirportAvailabilityMessage(result, requestedLocalDate) {
     const normalizedResult = normalizeAirportPrecheckResult(result);
     const code = normalizeText(normalizedResult && normalizedResult.code);
-    const nextAvailableMessage = getAirportNextAvailableMessage(normalizedResult);
+    const nextAvailableMessage = getAirportNextAvailableMessage(
+      normalizedResult,
+      requestedLocalDate
+    );
 
     if (code === "AIRPORT_TRANSFER_PRICE_MISMATCH") {
       return getAirportAvailabilityCopy(
         "availabilityPriceMismatch",
         "La tarifa ha cambiado. Actualiza la configuración antes de continuar."
       );
+    }
+
+    if (code === "AIRPORT_TRANSFER_OPERATIONAL_CONFIRMATION_REQUIRED") {
+      return getAirportAvailabilityCopy(
+        "availabilityOperationalConfirmation",
+        "Este traslado requiere confirmación operativa antes de reservar."
+      );
+    }
+
+    if (code === "AIRPORT_TRANSFER_SALE_MODE_UNAVAILABLE") {
+      return "Este traslado no está disponible para reserva en línea.";
+    }
+
+    if (
+      code === "AIRPORT_TRANSFER_ZONE_NOT_TARIFFED" ||
+      code === "AIRPORT_TRANSFER_FARE_NOT_FOUND"
+    ) {
+      return "No hay una tarifa reservable para este traslado.";
     }
 
     if (code === "PRECHECK_REQUEST_FAILED" || code === "INVALID_PRECHECK_PAYLOAD") {
@@ -384,20 +419,24 @@
 
   function isNonAirportLocationSelectedAirport(state) {
     const airportGuard = window.PixkuyDirectTransferAirportGuard;
+    const selectedAirportId = getSelectedAirportId(state);
+    let matchedAirportId = "";
 
     if (
       !airportGuard ||
-      typeof airportGuard.isSelectedAirportTransferLocation !== "function"
+      typeof airportGuard.getCataloguedAirportTransferId !== "function" ||
+      !selectedAirportId
     ) {
       return false;
     }
 
-    return airportGuard.isSelectedAirportTransferLocation({
-      airportId: getSelectedAirportId(state),
-      address: normalizeText(state && state.lodgingEndpointLabel),
+    matchedAirportId = airportGuard.getCataloguedAirportTransferId({
+      formattedAddress: normalizeText(state && state.lodgingEndpointLabel),
       placeId: normalizeText(state && state.lodgingEndpointPlaceId),
       primaryType: normalizeText(state && state.lodgingEndpointPrimaryType)
     });
+
+    return normalizeText(matchedAirportId).toLowerCase() === selectedAirportId;
   }
 
   function getNonAirportLocationRoleNode(state) {
@@ -605,6 +644,199 @@
     }
 
     return api.precheck(detail);
+  }
+
+  function buildAirportMobilePrecheckKey(detail) {
+    if (!detail || typeof detail !== "object") {
+      return "";
+    }
+
+    return JSON.stringify([
+      detail.airportId,
+      detail.direction,
+      detail.zoneId,
+      detail.passengerFareKey,
+      detail.passengers,
+      detail.date,
+      detail.time,
+      detail.expectedAmountMinor,
+      detail.currency,
+      detail.nonAirportLocation && detail.nonAirportLocation.address,
+      detail.nonAirportLocation && detail.nonAirportLocation.place_id,
+      detail.nonAirportLocation && detail.nonAirportLocation.lat,
+      detail.nonAirportLocation && detail.nonAirportLocation.lng
+    ]);
+  }
+
+  function isAirportMobilePrecheckAllowed(result) {
+    return Boolean(
+      result &&
+        result.available === true &&
+        result.checkoutAllowed === true
+    );
+  }
+
+  function setAirportMobileAvailabilityState(nodes, state, status, key, result) {
+    if (!state || typeof state !== "object") {
+      return false;
+    }
+
+    state.mobileAvailabilityStatus = status;
+    state.mobileAvailabilityKey = key || "";
+    state.mobileAvailabilityResult = result || null;
+
+    if (nodes && nodes.panel) {
+      nodes.panel.setAttribute(
+        "data-airport-mobile-availability-state",
+        status
+      );
+
+      renderFare(nodes, state);
+      renderCtaState(nodes, state);
+    }
+
+    return true;
+  }
+
+  function invalidateAirportMobileAvailability(nodes, state) {
+    airportMobilePrecheckRequestId += 1;
+    return setAirportMobileAvailabilityState(nodes, state, "idle", "", null);
+  }
+
+  function isCurrentAirportMobileAvailability(state, detail) {
+    const key = buildAirportMobilePrecheckKey(detail);
+
+    return Boolean(
+      key &&
+        state &&
+        state.mobileAvailabilityStatus === "available" &&
+        state.mobileAvailabilityKey === key &&
+        isAirportMobilePrecheckAllowed(state.mobileAvailabilityResult)
+    );
+  }
+
+  function syncAirportMobileAvailability(nodes, state) {
+    const detail = buildAirportTransferPrecheckDetail(state);
+    const key = buildAirportMobilePrecheckKey(detail);
+    let requestId;
+
+    if (!isAirportMobileViewport()) {
+      return false;
+    }
+
+    if (isNonAirportLocationSelectedAirport(state)) {
+      invalidateAirportMobileAvailability(nodes, state);
+      setAirportAvailabilityStatus(
+        nodes,
+        getAirportAvailabilityCopy(
+          "availabilityNonAirportLocationIsSelectedAirport",
+          "Elige una dirección de recogida o destino diferente del aeropuerto seleccionado."
+        ),
+        "error"
+      );
+
+      if (nodes.availabilityStatus) {
+        nodes.availabilityStatus.setAttribute(
+          "data-airport-location-collision-error",
+          "1"
+        );
+      }
+
+      setNonAirportLocationInvalidState(state, true);
+      return false;
+    }
+
+    if (nodes.availabilityStatus) {
+      nodes.availabilityStatus.removeAttribute(
+        "data-airport-location-collision-error"
+      );
+    }
+    setNonAirportLocationInvalidState(state, false);
+
+    if (!detail || !key) {
+      invalidateAirportMobileAvailability(nodes, state);
+      clearAirportAvailabilityStatus(nodes);
+      return false;
+    }
+
+    if (
+      state.mobileAvailabilityKey === key &&
+      state.mobileAvailabilityStatus !== "idle"
+    ) {
+      return true;
+    }
+
+    airportMobilePrecheckRequestId += 1;
+    requestId = airportMobilePrecheckRequestId;
+    setAirportMobileAvailabilityState(nodes, state, "loading", key, null);
+    setAirportAvailabilityStatus(
+      nodes,
+      getAirportAvailabilityCopy(
+        "availabilityChecking",
+        "Comprobando disponibilidad..."
+      ),
+      "checking"
+    );
+
+    runAirportTransferPrecheck(state)
+      .then(function handleAirportMobilePrecheckResult(result) {
+        const isCurrent = Boolean(
+          requestId === airportMobilePrecheckRequestId &&
+            state.mobileAvailabilityKey === key
+        );
+
+        if (!isCurrent) {
+          return false;
+        }
+
+        const isAllowed = isAirportMobilePrecheckAllowed(result);
+
+        setAirportMobileAvailabilityState(
+          nodes,
+          state,
+          isAllowed ? "available" : "unavailable",
+          key,
+          result
+        );
+        setAirportAvailabilityStatus(
+          nodes,
+          isAllowed
+            ? getAirportAvailabilityCopy(
+                "availabilityAvailable",
+                "Disponibilidad confirmada. Puedes continuar."
+              )
+            : getAirportAvailabilityMessage(result, state.serviceDate),
+          isAllowed ? "success" : "error"
+        );
+        return isAllowed;
+      })
+      .catch(function handleAirportMobilePrecheckError() {
+        if (
+          requestId !== airportMobilePrecheckRequestId ||
+          state.mobileAvailabilityKey !== key
+        ) {
+          return false;
+        }
+
+        setAirportMobileAvailabilityState(
+          nodes,
+          state,
+          "error",
+          key,
+          null
+        );
+        setAirportAvailabilityStatus(
+          nodes,
+          getAirportAvailabilityCopy(
+            "availabilityError",
+            "No pudimos confirmar disponibilidad. Revisa fecha, hora y dirección."
+          ),
+          "error"
+        );
+        return false;
+      });
+
+    return true;
   }
 
   function getStateDeps() {
@@ -1021,6 +1253,9 @@ function shouldUsePassengerChipUi(nodes) {
       selectedFareKey: DEFAULT_STATE.selectedFareKey,
       serviceDate: DEFAULT_STATE.serviceDate,
       serviceTime: DEFAULT_STATE.serviceTime,
+      mobileAvailabilityStatus: "idle",
+      mobileAvailabilityKey: "",
+      mobileAvailabilityResult: null,
       openRole: DEFAULT_STATE.openRole,
       activeIndex: DEFAULT_STATE.activeIndex
     };
@@ -1212,6 +1447,15 @@ function shouldUsePassengerChipUi(nodes) {
         ? normalizeText(state.serviceDate)
         : "";
 
+    if (
+      isAirportMobileViewport() &&
+      state.mobileAvailabilityStatus !== "available"
+    ) {
+      nodes.fareValue.textContent = getFareFallbackValue();
+      nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
+      return;
+    }
+
     if (!fareKey) {
       nodes.fareValue.textContent = getFareFallbackValue();
       nodes.fareValue.setAttribute("data-i18n", I18N_KEYS.fareValue);
@@ -1259,6 +1503,15 @@ function shouldUsePassengerChipUi(nodes) {
     );
 
     requireCtaApi().applyCtaState(nodes.cta, eligibility);
+
+    if (
+      isAirportMobileViewport() &&
+      state.mobileAvailabilityStatus !== "available"
+    ) {
+      nodes.cta.disabled = true;
+      nodes.cta.setAttribute("aria-disabled", "true");
+      nodes.cta.dataset.airportTariffCtaState = "disabled";
+    }
 
     return eligibility;
   }
@@ -1402,6 +1655,7 @@ function shouldUsePassengerChipUi(nodes) {
     renderFare(nodes, state);
     renderCtaState(nodes, state);
     renderAccessibility(nodes);
+    syncAirportMobileAvailability(nodes, state);
   }
 
   function getEndpointsStateApi() {
@@ -1481,6 +1735,29 @@ function shouldUsePassengerChipUi(nodes) {
       })
     );
 
+    return true;
+  }
+
+  function completeAirportTransferPanelSubmit(nodes, state, precheckResult) {
+    setAirportAvailabilityStatus(
+      nodes,
+      getAirportAvailabilityCopy(
+        "availabilityAvailable",
+        "Disponibilidad confirmada. Puedes continuar."
+      ),
+      "success"
+    );
+
+    dispatchAirportTransferPanelSubmit(state, precheckResult);
+
+    const handedOff = handoffPanelSelectionToContact(state);
+
+    if (!handedOff) {
+      renderCtaState(nodes, state);
+      return false;
+    }
+
+    closeDropdown(nodes, state);
     return true;
   }
 
@@ -2208,6 +2485,22 @@ function shouldUsePassengerChipUi(nodes) {
       return;
     }
 
+    if (isAirportMobileViewport()) {
+      const currentDetail = buildAirportTransferPrecheckDetail(state);
+
+      if (!isCurrentAirportMobileAvailability(state, currentDetail)) {
+        syncAirportMobileAvailability(nodes, state);
+        return;
+      }
+
+      completeAirportTransferPanelSubmit(
+        nodes,
+        state,
+        state.mobileAvailabilityResult
+      );
+      return;
+    }
+
     setAirportAvailabilityStatus(
       nodes,
       getAirportAvailabilityCopy(
@@ -2230,32 +2523,13 @@ function shouldUsePassengerChipUi(nodes) {
           renderCtaState(nodes, state);
           setAirportAvailabilityStatus(
             nodes,
-            getAirportAvailabilityMessage(result),
+            getAirportAvailabilityMessage(result, state.serviceDate),
             "error"
           );
           return false;
         }
 
-        setAirportAvailabilityStatus(
-          nodes,
-          getAirportAvailabilityCopy(
-            "availabilityAvailable",
-            "Disponibilidad confirmada. Puedes continuar."
-          ),
-          "success"
-        );
-
-        dispatchAirportTransferPanelSubmit(state, result);
-
-        const handedOff = handoffPanelSelectionToContact(state);
-
-        if (!handedOff) {
-          renderCtaState(nodes, state);
-          return false;
-        }
-
-        closeDropdown(nodes, state);
-        return true;
+        return completeAirportTransferPanelSubmit(nodes, state, result);
       })
       .catch(function handleAirportPrecheckError() {
         renderCtaState(nodes, state);
@@ -2303,6 +2577,7 @@ function shouldUsePassengerChipUi(nodes) {
 
   if (nodes.dateInput) {
     nodes.dateInput.addEventListener("input", function () {
+      invalidateAirportMobileAvailability(nodes, state);
       state.serviceDate = normalizeText(nodes.dateInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
@@ -2310,6 +2585,7 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     nodes.dateInput.addEventListener("change", function () {
+      invalidateAirportMobileAvailability(nodes, state);
       state.serviceDate = normalizeText(nodes.dateInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
@@ -2319,6 +2595,7 @@ function shouldUsePassengerChipUi(nodes) {
 
   if (nodes.timeInput) {
     nodes.timeInput.addEventListener("input", function () {
+      invalidateAirportMobileAvailability(nodes, state);
       state.serviceTime = normalizeText(nodes.timeInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
@@ -2326,12 +2603,26 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     nodes.timeInput.addEventListener("change", function () {
+      invalidateAirportMobileAvailability(nodes, state);
       state.serviceTime = normalizeText(nodes.timeInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
       renderPanel(nodes, state);
     });
   }
+
+  nodes.panel.addEventListener("change", function (event) {
+    if (
+      !event.target ||
+      typeof event.target.matches !== "function" ||
+      !event.target.matches("[data-airport-mobile-luggage-select]")
+    ) {
+      return;
+    }
+
+    invalidateAirportMobileAvailability(nodes, state);
+    renderPanel(nodes, state);
+  });
 
   bindOptionSelection(nodes, state);
   bindDocumentDismiss(nodes, state);

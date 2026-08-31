@@ -608,9 +608,20 @@
     var passengerFareKey = getAirportTransferPassengerFareKey(snapshot);
     var requestSummary = getRequestSummary(snapshot);
     var zoneId = getAirportTransferZoneId(snapshot);
+    var pricingVersion = normalizeText(snapshot.airport_transfer_pricing_version);
+    var quoteFingerprint = normalizeText(snapshot.airport_transfer_quote_fingerprint);
     var payload;
 
-    if (!amountMinor || !nonAirportLocation || !passengerCount || !passengerFareKey || !requestSummary || !zoneId) {
+    if (
+      !amountMinor ||
+      !nonAirportLocation ||
+      !passengerCount ||
+      !passengerFareKey ||
+      !requestSummary ||
+      !zoneId ||
+      !pricingVersion ||
+      !/^[a-f0-9]{64}$/.test(quoteFingerprint)
+    ) {
       return null;
     }
 
@@ -645,6 +656,8 @@
       airport_transfer_passengers: passengerCount,
       airport_transfer_price: amountMinor,
       airport_transfer_currency: "MXN",
+      airport_transfer_pricing_version: pricingVersion,
+      airport_transfer_quote_fingerprint: quoteFingerprint,
       request_summary: requestSummary,
       locale: normalizeText(snapshot.locale) || getDocumentLocale(),
       customer: {
@@ -765,7 +778,11 @@
       getNonAirportLocation(snapshot) &&
       getAirportTransferPassengers(snapshot) &&
       getRequestSummary(snapshot) &&
-      getAmountMinor(snapshot)
+      getAmountMinor(snapshot) &&
+      normalizeText(snapshot.airport_transfer_pricing_version) &&
+      /^[a-f0-9]{64}$/.test(
+        normalizeText(snapshot.airport_transfer_quote_fingerprint)
+      )
     );
   }
 

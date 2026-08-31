@@ -199,10 +199,13 @@
     var result = body && body.result ? body.result : {};
     var price = result && result.price ? result.price : {};
     var availability = result && result.availability ? result.availability : {};
+    var pricingVersion = normalizeText(price && price.pricingVersion);
+    var quoteFingerprint = normalizeText(price && price.quoteFingerprint);
     var code =
       normalizeText(body && body.code) ||
       normalizeText(result && result.code) ||
       normalizeText(availability && availability.code) ||
+      normalizeText(price && price.reason) ||
       "";
     var nextAvailableStartLocal = normalizeText(
       availability && availability.nextAvailableStartLocal
@@ -239,7 +242,9 @@
       code: code,
       nextAvailableStartLocal: nextAvailableStartLocal,
       available: available,
-      checkoutAllowed: checkoutAllowed
+      checkoutAllowed: checkoutAllowed,
+      pricingVersion: pricingVersion,
+      quoteFingerprint: quoteFingerprint
     };
   }
 

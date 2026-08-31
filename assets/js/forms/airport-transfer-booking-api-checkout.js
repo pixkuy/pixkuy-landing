@@ -28,9 +28,102 @@
     "AIRPORT_TRANSFER_NON_AIRPORT_LOCATION_IS_SELECTED_AIRPORT";
   var LEGAL_ACCEPTANCE_HOST_SELECTOR =
     "[data-airport-transfer-checkout-legal-acceptance]";
+  var latestAirportTransferQuoteBinding = null;
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
+  }
+
+  function invalidateAirportTransferQuoteBinding() {
+    latestAirportTransferQuoteBinding = null;
+    return true;
+  }
+
+  function getAirportTransferQuoteBinding(result) {
+    var rawPrice =
+      result &&
+      result.raw &&
+      result.raw.result &&
+      result.raw.result.price
+        ? result.raw.result.price
+        : {};
+    var pricingVersion = normalizeText(
+      result && result.pricingVersion
+    ) || normalizeText(rawPrice.pricingVersion);
+    var quoteFingerprint = normalizeText(
+      result && result.quoteFingerprint
+    ) || normalizeText(rawPrice.quoteFingerprint);
+
+    if (!pricingVersion || !/^[a-f0-9]{64}$/.test(quoteFingerprint)) {
+      return null;
+    }
+
+    return {
+      pricingVersion: pricingVersion,
+      quoteFingerprint: quoteFingerprint
+    };
+  }
+
+  function buildAirportTransferQuoteBindingKey(input) {
+    var airportId = normalizeText(input && input.airportId);
+    var direction = getAirportTransferDirectionForApi(
+      input && input.direction
+    );
+    var zoneId = normalizeText(input && input.zoneId);
+    var passengerFareKey = normalizeText(input && input.passengerFareKey);
+    var date = normalizeText(input && input.date);
+    var time = normalizeText(input && input.time);
+
+    if (!airportId || !zoneId || !passengerFareKey || !date || !time) {
+      return "";
+    }
+
+    return [airportId, direction, zoneId, passengerFareKey, date, time].join("|");
+  }
+
+  function rememberAirportTransferQuoteBinding(result, input) {
+    var binding = getAirportTransferQuoteBinding(result);
+    var key = buildAirportTransferQuoteBindingKey(input);
+
+    if (
+      !result ||
+      result.available !== true ||
+      result.checkoutAllowed !== true ||
+      !binding ||
+      !key
+    ) {
+      invalidateAirportTransferQuoteBinding();
+      return false;
+    }
+
+    latestAirportTransferQuoteBinding = {
+      key: key,
+      pricingVersion: binding.pricingVersion,
+      quoteFingerprint: binding.quoteFingerprint
+    };
+    return true;
+  }
+
+  function getCurrentAirportTransferQuoteBinding(form, data) {
+    var key = buildAirportTransferQuoteBindingKey({
+      airportId: getAirportId(form),
+      direction: getAirportTransferDirection(data, form),
+      zoneId: getAirportTransferZoneId(data),
+      passengerFareKey: data && data.passengerFareKey,
+      date: data && data.airportHotelDate,
+      time: data && data.airportHotelTime
+    });
+
+    if (
+      !key ||
+      !latestAirportTransferQuoteBinding ||
+      latestAirportTransferQuoteBinding.key !== key
+    ) {
+      invalidateAirportTransferQuoteBinding();
+      return null;
+    }
+
+    return latestAirportTransferQuoteBinding;
   }
 
   function getConfig() {
@@ -507,9 +600,10 @@
     var zoneId = getAirportTransferZoneId(data);
     var passengers = getAirportTransferPassengers(data);
     var nonAirportLocation = getNonAirportLocation(data, apiDirection);
+    var quoteBinding = getCurrentAirportTransferQuoteBinding(form, data);
     var payload;
 
-    if (!amountMinor || !zoneId || !passengers || !nonAirportLocation) {
+    if (!amountMinor || !zoneId || !passengers || !nonAirportLocation || !quoteBinding) {
       return null;
     }
 
@@ -528,6 +622,8 @@
       airport_transfer_luggage: data.luggage,
       airport_transfer_price: amountMinor,
       airport_transfer_currency: "MXN",
+      airport_transfer_pricing_version: quoteBinding.pricingVersion,
+      airport_transfer_quote_fingerprint: quoteBinding.quoteFingerprint,
       request_summary: getFieldValue(form, "request_summary") || buildRequestSummary(data, form),
       locale: getDocumentLocale(),
       customer: {
@@ -590,11 +686,16 @@
 
   function buildCheckoutReviewSnapshot(form, data) {
     var snapshot = getFormPayloadRaw(form);
+    var quoteBinding = getCurrentAirportTransferQuoteBinding(form, data);
     var airportSnapshot =
       window.PixkuyForms &&
       typeof window.PixkuyForms.getContactAirportHotelSnapshot === "function"
         ? window.PixkuyForms.getContactAirportHotelSnapshot()
         : null;
+
+    if (!quoteBinding) {
+      return null;
+    }
 
     snapshot.name = data.name;
     snapshot.email = data.email;
@@ -616,6 +717,8 @@
     snapshot.airport_transfer_luggage = data.luggage;
     snapshot.airport_transfer_price = data.fare;
     snapshot.airport_transfer_currency = "MXN";
+    snapshot.airport_transfer_pricing_version = quoteBinding.pricingVersion;
+    snapshot.airport_transfer_quote_fingerprint = quoteBinding.quoteFingerprint;
     snapshot.airport_transfer_origin_place_id = data.originPlaceId || "";
     snapshot.airport_transfer_origin_lat = data.originLat || "";
     snapshot.airport_transfer_origin_lng = data.originLng || "";
@@ -658,10 +761,16 @@
   }
 
   function redirectToCheckoutReview(form, data) {
+    var snapshot = buildCheckoutReviewSnapshot(form, data);
+
+    if (!snapshot) {
+      return false;
+    }
+
     try {
       window.sessionStorage.setItem(
         AIRPORT_TRANSFER_CHECKOUT_REVIEW_STORAGE_KEY,
-        JSON.stringify(buildCheckoutReviewSnapshot(form, data))
+        JSON.stringify(snapshot)
       );
     } catch (error) {
       return false;
@@ -886,7 +995,7 @@
     return true;
   }
 
-    function getAvailabilityErrorMessage(result) {
+    function getAvailabilityErrorMessage(result, requestedLocalDate) {
     var normalized = result && result.raw && typeof result.raw === "object"
       ? result.raw
       : result;
@@ -901,6 +1010,9 @@
       normalizeText(resultNode.nextAvailableStartLocal) ||
       normalizeText(availability.nextAvailableStartLocal);
     var nextAvailableTime = "";
+    var formatter =
+      window.__pixkuyI18nModules &&
+      window.__pixkuyI18nModules.formatNextAvailabilityLabel;
     var baseMessage = getI18nValue(
       "services.cards.airport.panel.availability.unavailable",
       "No hay disponibilidad para esa fecha y hora. Elige otra opción."
@@ -910,7 +1022,13 @@
       "Siguiente hora disponible: {time}"
     );
 
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(nextAvailableStartLocal)) {
+    if (typeof formatter === "function") {
+      nextAvailableTime = formatter({
+        requestedLocalDate: requestedLocalDate,
+        nextAvailableStartLocal: nextAvailableStartLocal,
+        locale: getDocumentLocale()
+      });
+    } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(nextAvailableStartLocal)) {
       nextAvailableTime = nextAvailableStartLocal.slice(11, 16);
     } else {
       nextAvailableTime = nextAvailableStartLocal;
@@ -972,7 +1090,10 @@
         ? window.PixkuyForms.getReservationRequestFields(form)
         : null;
 
-    message = getAvailabilityErrorMessage(result);
+    message = getAvailabilityErrorMessage(
+      result,
+      data && data.airportHotelDate
+    );
 
     if (fields && fields.formError) {
       fields.formError.textContent = message;
@@ -1454,12 +1575,22 @@
         .then(function onAvailabilityPrecheckResult(result) {
           var isAllowed = Boolean(
             result &&
-              (result.available === true || result.checkoutAllowed === true)
+              result.available === true &&
+              result.checkoutAllowed === true
           );
 
           if (!isAllowed) {
             setFormBusy(form, false);
             showAvailabilityError(form, result, data);
+            return;
+          }
+
+          if (!rememberAirportTransferQuoteBinding(
+            result,
+            buildAvailabilityPrecheckDetail(form, data)
+          )) {
+            setFormBusy(form, false);
+            showCheckoutError(form);
             return;
           }
 
@@ -1536,7 +1667,26 @@
 
     document.addEventListener("submit", handleSubmit, true);
 
+    window.addEventListener(
+      "pixkuy:airport-transfer-panel-submit",
+      function onAirportTransferPanelSubmit(event) {
+        var detail = event && event.detail ? event.detail : {};
+
+        rememberAirportTransferQuoteBinding(detail.precheck, detail);
+      }
+    );
+
     document.addEventListener("input", function onDocumentInput(event) {
+      if (
+        event.target &&
+        typeof event.target.matches === "function" &&
+        event.target.matches(
+          "[data-airport-tariff-date], [data-airport-tariff-time]"
+        )
+      ) {
+        invalidateAirportTransferQuoteBinding();
+      }
+
       if (
         event.target &&
         typeof event.target.matches === "function" &&
@@ -1550,7 +1700,17 @@
       scheduleLegalAcceptanceVisibilitySync(getForm());
     }, true);
 
-    document.addEventListener("change", function onDocumentChange() {
+    document.addEventListener("change", function onDocumentChange(event) {
+      if (
+        event.target &&
+        typeof event.target.matches === "function" &&
+        event.target.matches(
+          "[data-airport-tariff-date], [data-airport-tariff-time]"
+        )
+      ) {
+        invalidateAirportTransferQuoteBinding();
+      }
+
       scheduleLegalAcceptanceVisibilitySync(getForm());
     }, true);
 

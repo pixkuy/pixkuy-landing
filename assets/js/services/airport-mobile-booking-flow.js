@@ -1196,7 +1196,12 @@
       : null;
     const parts = getMobileFareParts(getMobileFareRawValue(fare));
     const missingKeys = getMobileFareMissingFieldKeys(panel);
-    const shouldShowPending = missingKeys.length > 0 || !parts.currency;
+    const availabilityReady = Boolean(
+      panel &&
+        panel.getAttribute("data-airport-mobile-availability-state") === "available"
+    );
+    const shouldShowPending =
+      missingKeys.length > 0 || !parts.currency || !availabilityReady;
     const amount = document.createElement("span");
     const currency = document.createElement("span");
 
