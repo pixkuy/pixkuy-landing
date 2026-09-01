@@ -24,6 +24,7 @@ var BOOKING_CHECKOUT_STORAGE_PREFIX = "pixkuy_booking_checkout:";
 var HOURLY_CHECKOUT_REVIEW_PATH = "/hourly-checkout-review.html";
 var HOURLY_CHECKOUT_REVIEW_STORAGE_KEY = "pixkuy_hourly_checkout_review_snapshot";
 var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
+var availabilityPrecheckSequence = 0;
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -465,12 +466,9 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     return true;
   }
   
-    function getAvailabilityErrorMessage(result) {
-    var nextAvailableStartLocal =
-      result && result.nextAvailableStartLocal
-        ? normalizeText(result.nextAvailableStartLocal)
-        : "";
-    var nextAvailableTime = "";
+    function getAvailabilityErrorMessage(result, requestedLocalDate) {
+    var code = normalizeText(result && result.code);
+    var suggestion = window.PixkuySharedAvailabilitySuggestion;
     var baseMessage = getI18nValue(
       "services.cards.hourly.panel.availability.unavailable",
       "No hay disponibilidad para esa fecha y hora. Elige otra opción."
@@ -480,17 +478,29 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
       "Siguiente hora disponible: {time}"
     );
 
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(nextAvailableStartLocal)) {
-      nextAvailableTime = nextAvailableStartLocal.slice(11, 16);
-    } else {
-      nextAvailableTime = nextAvailableStartLocal;
+    if (code === "HOURLY_MINIMUM_LEAD_TIME_NOT_MET") {
+      baseMessage = getI18nValue(
+        "services.cards.hourly.panel.availability.minimumLeadTime",
+        baseMessage
+      );
     }
 
-    if (nextAvailableTime) {
-      return baseMessage + " " + nextAvailableTemplate.replace("{time}", nextAvailableTime);
+    if (code === "PRICE_MISMATCH") {
+      baseMessage = getI18nValue(
+        "services.cards.hourly.panel.availability.priceMismatch",
+        baseMessage
+      );
     }
 
-    return baseMessage;
+    var description = suggestion && typeof suggestion.describe === "function"
+      ? suggestion.describe(result, {
+          requestedLocalDate: requestedLocalDate,
+          locale: getDocumentLocale(),
+          template: nextAvailableTemplate
+        })
+      : { message: "" };
+
+    return [baseMessage, description.message].filter(Boolean).join(" ");
   }
 
   function focusHourlyDailyTimeField(fields) {
@@ -519,6 +529,7 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
   function showAvailabilityError(form, result) {
     var fields;
     var message;
+    var mobileApi;
 
     if (!form) {
       return false;
@@ -530,52 +541,270 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
         ? window.PixkuyForms.getReservationRequestFields(form)
         : null;
 
-    message = getAvailabilityErrorMessage(result);
+    message = getAvailabilityErrorMessage(
+      result,
+      getFieldValue(form, "hourly_daily_date")
+    );
 
-    if (fields && fields.formError) {
-      fields.formError.textContent = message;
-      fields.formError.hidden = false;
+    showCheckoutMessage(form, message, "availability");
+
+    if (isDesktopViewport()) {
+      focusHourlyDailyTimeField(fields);
+    } else {
+      mobileApi = window.PixkuyHourlyMobileContactStep;
+
+      if (mobileApi && typeof mobileApi.showAvailabilityError === "function") {
+        mobileApi.showAvailabilityError(result || {}, message);
+      }
     }
-
-    focusHourlyDailyTimeField(fields);
 
     return true;
   }
 
-  function showCheckoutError(form) {
+  function getMobileCheckoutErrorNode() {
+    return document.querySelector(
+      '[data-hourly-mobile-contact-step][aria-hidden="false"] [data-hourly-mobile-contact-global-error]'
+    );
+  }
+
+  function showCheckoutMessage(form, message, category) {
     var fields;
+    var mobileError;
+    var normalizedCategory = normalizeText(category);
+
+    if (!form || !normalizeText(message)) {
+      return false;
+    }
+
+    fields =
+      window.PixkuyForms &&
+      typeof window.PixkuyForms.getReservationRequestFields === "function"
+        ? window.PixkuyForms.getReservationRequestFields(form)
+        : null;
+    mobileError = getMobileCheckoutErrorNode();
+
+    if (fields && fields.formError) {
+      fields.formError.textContent = message;
+      fields.formError.hidden = false;
+      fields.formError.setAttribute(
+        "data-hourly-checkout-error-category",
+        normalizedCategory
+      );
+    }
+
+    if (mobileError) {
+      mobileError.textContent = message;
+      mobileError.hidden = false;
+      mobileError.setAttribute(
+        "data-hourly-checkout-error-category",
+        normalizedCategory
+      );
+    }
+
+    form.setAttribute(
+      "data-hourly-checkout-error-category",
+      normalizedCategory
+    );
+    return true;
+  }
+
+  function showCheckoutError(form) {
     var message;
 
     if (!form) {
       return false;
     }
 
-    fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
-        : null;
-
     message = getI18nValue(
       "contact.validation.formIncomplete",
       "Revisa los datos del formulario."
     );
 
-    if (fields && fields.formError) {
-      fields.formError.textContent = message;
-      fields.formError.hidden = false;
+    return showCheckoutMessage(form, message, "validation");
+  }
+
+  function normalizeCheckoutFieldName(value) {
+    var normalizedValue = Array.isArray(value) ? value.join(".") : value;
+    var normalized = normalizeText(normalizedValue)
+      .replace(/\[(?:"|')?([^\]"']+)(?:"|')?\]/g, ".$1")
+      .split(".")
+      .filter(Boolean)
+      .pop();
+
+    if (normalized === "full_name") {
+      return "name";
     }
 
-    var mobileError = document.querySelector(
-      '[data-hourly-mobile-contact-step][aria-hidden="false"] [data-hourly-mobile-contact-global-error]'
+    if (normalized === "hourly_daily_pickup") {
+      return "pickup";
+    }
+
+    if (normalized === "hourly_daily_date") {
+      return "date";
+    }
+
+    if (normalized === "hourly_daily_start_time") {
+      return "time";
+    }
+
+    return ["name", "phone", "email", "pickup", "date", "time"]
+      .indexOf(normalized) >= 0
+        ? normalized
+        : "";
+  }
+
+  function getFirstCheckoutFieldName(body) {
+    var safeBody = body && typeof body === "object" ? body : {};
+    var errors = safeBody.errors;
+    var fieldErrors = safeBody.issues && safeBody.issues.fieldErrors;
+    var candidate =
+      normalizeCheckoutFieldName(safeBody.field) ||
+      normalizeCheckoutFieldName(safeBody.fieldName);
+    var errorKeys;
+
+    if (candidate) {
+      return candidate;
+    }
+
+    if (Array.isArray(errors)) {
+      errors.some(function findFieldError(error) {
+        candidate = normalizeCheckoutFieldName(
+          error && (error.field || error.path || error.name)
+        );
+        return Boolean(candidate);
+      });
+    } else if (errors && typeof errors === "object") {
+      errorKeys = Object.keys(errors);
+      errorKeys.some(function findErrorKey(key) {
+        candidate = normalizeCheckoutFieldName(key);
+        return Boolean(candidate);
+      });
+    }
+
+    if (!candidate && fieldErrors && typeof fieldErrors === "object") {
+      Object.keys(fieldErrors).some(function findIssueField(key) {
+        candidate = normalizeCheckoutFieldName(key);
+        return Boolean(candidate);
+      });
+    }
+
+    return candidate || "";
+  }
+
+  function getCheckoutFieldErrorMessage(fieldName) {
+    var keyByField = {
+      name: "contact.validation.nameRequired",
+      phone: "contact.validation.phoneRequired",
+      email: "contact.validation.emailRequired",
+      pickup: "contact.validation.hourlyDailyPickupRequired",
+      date: "contact.validation.hourlyDailyDateRequired",
+      time: "contact.validation.hourlyDailyTimeRequired"
+    };
+    var messageKey = keyByField[fieldName];
+
+    if (!messageKey) {
+      return getI18nValue(
+        "contact.validation.formIncomplete",
+        "Revisa los datos del formulario."
+      );
+    }
+
+    return getI18nValue(
+      messageKey,
+      getI18nValue(
+        "contact.validation.formIncomplete",
+        "Revisa los datos del formulario."
+      )
     );
+  }
 
-    if (mobileError) {
-      mobileError.textContent = message;
-      mobileError.hidden = false;
+  function showCheckoutFieldResponseError(form, body) {
+    var fieldName = getFirstCheckoutFieldName(body);
+    var message = getCheckoutFieldErrorMessage(fieldName);
+    var mobileApi = window.PixkuyHourlyMobileContactStep;
+
+    showCheckoutMessage(form, message, "validation");
+
+    if (
+      fieldName &&
+      mobileApi &&
+      typeof mobileApi.showFieldError === "function" &&
+      mobileApi.showFieldError(fieldName, message)
+    ) {
+      return true;
     }
 
-    return true;
+    return showCheckoutError(form);
+  }
+
+  function showCheckoutOperationalError(form, category) {
+    var isNetworkError = category === "network";
+    var message = isNetworkError
+      ? getI18nValue(
+          "bookingStatus.requestError.lead",
+          "No pudimos conectar con Booking API. Inténtalo de nuevo en unos instantes."
+        )
+      : getI18nValue(
+          "bookingStatus.checkout.notice",
+          "No se ha podido abrir el pago. Inténtalo de nuevo o contacta con Pixkuy."
+        );
+
+    return showCheckoutMessage(form, message, category);
+  }
+
+  function getCheckoutResultCode(result) {
+    return normalizeText(result && result.body && result.body.code);
+  }
+
+  function isCheckoutValidationResult(result) {
+    var statusCode = Number(result && result.statusCode);
+    var code = getCheckoutResultCode(result);
+    var body = result && result.body;
+
+    return Boolean(
+      (statusCode === 400 || statusCode === 422) &&
+      (
+        code.indexOf("INVALID_") === 0 ||
+        code === "LEGAL_ACCEPTANCE_REQUIRED" ||
+        code === "LEGAL_ACCEPTANCE_INVALID" ||
+        (body && body.issues) ||
+        (body && body.errors) ||
+        (body && (body.field || body.fieldName))
+      )
+    );
+  }
+
+  function isCheckoutAvailabilityResult(result) {
+    var code = getCheckoutResultCode(result);
+
+    return [
+      "HOURLY_DURATION_BELOW_BASE_HOURS",
+      "HOURLY_MINIMUM_LEAD_TIME_NOT_MET",
+      "NO_COMPATIBLE_VEHICLE",
+      "PRICE_MISMATCH",
+      "VEHICLE_NOT_AVAILABLE"
+    ].indexOf(code) >= 0;
+  }
+
+  function showCheckoutResultError(form, result) {
+    var code = getCheckoutResultCode(result);
+
+    if (isCheckoutValidationResult(result)) {
+      return showCheckoutFieldResponseError(form, result.body);
+    }
+
+    if (isCheckoutAvailabilityResult(result)) {
+      return showAvailabilityError(form, {
+        code: code,
+        nextAvailableStartLocal:
+          result && result.body && result.body.nextAvailableStartLocal
+      });
+    }
+
+    return showCheckoutOperationalError(
+      form,
+      code.indexOf("STRIPE") >= 0 ? "payment" : "server"
+    );
   }
 
   function hideCheckoutError(form) {
@@ -584,9 +813,20 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
       typeof window.PixkuyForms.getReservationRequestFields === "function"
         ? window.PixkuyForms.getReservationRequestFields(form)
         : null;
+    var mobileError = getMobileCheckoutErrorNode();
 
     if (fields && fields.formError) {
       fields.formError.hidden = true;
+      fields.formError.removeAttribute("data-hourly-checkout-error-category");
+    }
+
+    if (mobileError) {
+      mobileError.hidden = true;
+      mobileError.removeAttribute("data-hourly-checkout-error-category");
+    }
+
+    if (form) {
+      form.removeAttribute("data-hourly-checkout-error-category");
     }
 
     return true;
@@ -828,6 +1068,68 @@ var LEGAL_ACCEPTANCE_HOST_SELECTOR = "[data-hourly-checkout-legal-acceptance]";
     return precheckApi.precheck(buildAvailabilityPrecheckDetail(data));
   }
 
+  function isAvailabilityRequestFailure(result) {
+    var code = normalizeText(result && result.code);
+
+    return code === "PRECHECK_REQUEST_FAILED" || code === "PRECHECK_UNAVAILABLE";
+  }
+
+  function getAvailabilityPrecheckContextKey(data) {
+    var detail = buildAvailabilityPrecheckDetail(data);
+
+    return JSON.stringify([
+      normalizeText(detail.serviceType),
+      normalizeText(detail.hourly_daily_mode),
+      normalizeText(detail.hourly_daily_vehicle_type),
+      normalizeText(detail.hourly_daily_pickup),
+      normalizeText(detail.hourly_daily_pickup_place_id),
+      normalizeText(String(detail.hourly_daily_pickup_lat || "")),
+      normalizeText(String(detail.hourly_daily_pickup_lng || "")),
+      normalizeText(detail.hourly_daily_date),
+      normalizeText(detail.hourly_daily_start_time),
+      normalizeText(String(detail.hourly_daily_duration_hours || "")),
+      normalizeText(String(detail.hourly_daily_price || "")),
+      normalizeText(detail.hourly_daily_currency)
+    ]);
+  }
+
+  function isCurrentAvailabilityPrecheck(form, requestId, contextKey) {
+    var api = getReservationApi();
+    var fields = api && form ? api.getReservationRequestFields(form) : null;
+    var currentData = fields ? api.getReservationRequestData(fields) : null;
+
+    return Boolean(
+      requestId === availabilityPrecheckSequence &&
+      currentData &&
+      contextKey === getAvailabilityPrecheckContextKey(currentData)
+    );
+  }
+
+  function isAvailabilityContextField(target) {
+    var name = normalizeText(target && target.name);
+
+    return [
+      "service_type",
+      "hourly_daily_mode",
+      "hourly_daily_vehicle_type",
+      "hourly_daily_pickup",
+      "hourly_daily_pickup_place_id",
+      "hourly_daily_pickup_lat",
+      "hourly_daily_pickup_lng",
+      "hourly_daily_date",
+      "hourly_daily_start_time",
+      "hourly_daily_duration_hours",
+      "hourly_daily_price",
+      "hourly_daily_currency"
+    ].indexOf(name) >= 0;
+  }
+
+  function invalidateAvailabilityPrecheckForEvent(event) {
+    if (isAvailabilityContextField(event && event.target)) {
+      availabilityPrecheckSequence += 1;
+    }
+  }
+
   function requestCheckout(input) {
     return window.fetch(buildCheckoutUrl(input.config), {
       method: "POST",
@@ -909,6 +1211,8 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
     var data;
     var config;
     var idempotencyKey;
+    var availabilityRequestId;
+    var availabilityContextKey;
 
     if (
       !form ||
@@ -956,10 +1260,28 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
     hideCheckoutError(form);
 
     if (isDesktopViewport()) {
+      availabilityRequestId = availabilityPrecheckSequence + 1;
+      availabilityPrecheckSequence = availabilityRequestId;
+      availabilityContextKey = getAvailabilityPrecheckContextKey(data);
       setFormBusy(form, true);
 
       verifyAvailabilityBeforeCheckout(data)
         .then(function onAvailabilityPrecheckResult(result) {
+          if (!isCurrentAvailabilityPrecheck(
+            form,
+            availabilityRequestId,
+            availabilityContextKey
+          )) {
+            setFormBusy(form, false);
+            return;
+          }
+
+          if (isAvailabilityRequestFailure(result)) {
+            setFormBusy(form, false);
+            showCheckoutOperationalError(form, "network");
+            return;
+          }
+
           if (!result || result.available !== true) {
             setFormBusy(form, false);
             showAvailabilityError(form, result);
@@ -972,8 +1294,17 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
           }
         })
         .catch(function onAvailabilityPrecheckError() {
+          if (!isCurrentAvailabilityPrecheck(
+            form,
+            availabilityRequestId,
+            availabilityContextKey
+          )) {
+            setFormBusy(form, false);
+            return;
+          }
+
           setFormBusy(form, false);
-          showCheckoutError(form);
+          showCheckoutOperationalError(form, "network");
         });
 
       return;
@@ -1003,20 +1334,24 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
   var bookingStatusToken = result && result.body ? result.body.bookingStatusToken : "";
 
   if (!result.ok || !checkoutUrl || !bookingStatusToken) {
-    throw new Error(
-      result && result.body && result.body.code
-        ? result.body.code
-        : "BOOKING_API_CHECKOUT_FAILED"
-    );
+    setFormBusy(form, false);
+    showCheckoutResultError(form, result);
+    return;
   }
 
   if (!redirectToCheckout(checkoutUrl, bookingStatusToken)) {
-    throw new Error("BOOKING_CHECKOUT_HANDOFF_FAILED");
+    setFormBusy(form, false);
+    showCheckoutOperationalError(form, "payment");
   }
 })
-      .catch(function (error) {        
+      .catch(function (error) {
         setFormBusy(form, false);
-        showCheckoutError(form);
+        if (error && error.message === "INVALID_HOURLY_CHECKOUT_PAYLOAD") {
+          showCheckoutError(form);
+          return;
+        }
+
+        showCheckoutOperationalError(form, "network");
       });
   }
 
@@ -1029,11 +1364,13 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
 
     document.addEventListener("submit", handleSubmit, true);
 
-    document.addEventListener("input", function onDocumentInput() {
+    document.addEventListener("input", function onDocumentInput(event) {
+      invalidateAvailabilityPrecheckForEvent(event);
       scheduleLegalAcceptanceVisibilitySync(getForm());
     }, true);
 
-    document.addEventListener("change", function onDocumentChange() {
+    document.addEventListener("change", function onDocumentChange(event) {
+      invalidateAvailabilityPrecheckForEvent(event);
       scheduleLegalAcceptanceVisibilitySync(getForm());
     }, true);
 

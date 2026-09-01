@@ -48,14 +48,15 @@
     position:absolute;
     inset:0;
     z-index:3;
-    display:grid;
-    grid-template-rows:auto auto minmax(0, 1fr) auto auto;
+    display:flex;
+    flex-direction:column;
     gap:0;
     height:100svh;
     min-height:100svh;
-    overflow:hidden;
+    overflow-x:hidden;
+    overflow-y:hidden;
     overscroll-behavior:none;
-    touch-action:pan-y;
+    touch-action:none;
     box-sizing:border-box;
     padding:
       calc(60px + env(safe-area-inset-top))
@@ -72,6 +73,7 @@
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary{
     display:grid;
+    flex:0 0 auto;
     gap:6px;
     padding:10px 11px 5px;
     border:1px solid rgba(236,220,189,.22);
@@ -89,7 +91,7 @@
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-list{
     display:grid;
-    grid-template-columns:minmax(0, 1.25fr) minmax(112px, .75fr);
+    grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:5px 8px;
     margin:0;
   }
@@ -101,10 +103,18 @@
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="origin"],
-  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="destination"],
-  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="estimate"],
-  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="price"]{
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="destination"]{
     grid-column:1 / -1;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="estimate"]{
+    grid-column:1 / -1;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="price"]{
+    grid-column:2;
+    grid-row:5;
+    text-align:left;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="date"],
@@ -143,38 +153,45 @@
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="estimate"]{
     padding-top:1px;
+    width:calc((100% - 8px) / 2);
+    grid-row:5;
+    transform:none;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="estimate"] .direct-transfer-mobile-contact-step__summary-value{
     color:rgba(255,249,238,.88);
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__summary-row[data-direct-transfer-mobile-contact-summary-row="price"] .direct-transfer-mobile-contact-step__summary-value{
     color:rgba(61,158,122,.98);
+    white-space:nowrap;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__form{
-    min-height:0;
-    overflow:hidden;
-    overscroll-behavior:none;
+    flex:0 0 auto;
+    min-height:auto;
+    overflow:visible;
     display:grid;
     grid-template-columns:1fr;
-    gap:6px;
-    padding-top:7px;
-    padding-right:2px;
-    padding-bottom:3px;
+    gap:5px;
+    padding-top:6px;
+    padding-right:0;
+    padding-bottom:6px;
     -webkit-overflow-scrolling:touch;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__field{
     display:grid;
-    gap:4px;
+    gap:3px;
     min-width:0;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__label{
     color:rgba(255,245,228,.74);
-    font-size:11px;
+    font-size:10.75px;
     line-height:1.15;
     font-weight:700;
   }
@@ -182,10 +199,10 @@
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__control{
     width:100%;
     min-width:0;
-    min-height:44px;
-    height:44px;
-    max-height:44px;
-    padding:0 12px;
+    min-height:38px;
+    height:38px;
+    max-height:38px;
+    padding:0 11px;
     border:1px solid rgba(236,220,189,.38);
     border-radius:9px;
     background:rgba(15,17,19,.46);
@@ -194,17 +211,17 @@
     box-sizing:border-box;
     font:inherit;
     font-size:13.5px;
-    line-height:44px;
+    line-height:38px;
     font-weight:650;
     color-scheme:dark;
   }
 
   .direct-transfer-mobile-route textarea.direct-transfer-mobile-contact-step__control{
-    min-height:44px;
-    height:44px;
-    max-height:44px;
-    padding:0 12px;
-    line-height:44px;
+    min-height:38px;
+    height:38px;
+    max-height:38px;
+    padding:0 11px;
+    line-height:38px;
     resize:none;
     overflow:hidden;
   }
@@ -238,16 +255,66 @@
     display:none !important;
   }
 
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal{
+    position:static;
+    flex:0 0 auto;
+    min-height:0;
+    padding-top:0;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal[hidden]{
+    display:none !important;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal .legal-acceptance{
+    grid-template-columns:15px minmax(0, 1fr);
+    gap:4px 7px;
+    margin:0;
+    padding:6px 9px;
+    border-radius:8px;
+    border-color:rgba(236,220,189,.16);
+    background:rgba(255,255,255,.018);
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal .legal-acceptance__checkbox{
+    width:15px;
+    height:15px;
+    min-width:15px;
+    min-height:15px;
+    margin-top:1px;
+    border-radius:4px;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal .legal-acceptance__label{
+    color:rgba(255,249,238,.82);
+    font-size:10.75px;
+    line-height:1.22;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal .legal-acceptance__links{
+    grid-column:2;
+    gap:2px 6px;
+    font-size:10.75px;
+    line-height:1.2;
+  }
+
+  .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal .legal-acceptance__error{
+    grid-column:2;
+    font-size:10.75px;
+    line-height:1.2;
+  }
+
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__actions{
     display:block;
-    align-self:end;
-    padding-top:2px;
-    margin-bottom:-4px;
+    flex:0 0 auto;
+    padding-top:6px;
+    padding-bottom:4px;
+    margin-bottom:0;
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__submit{
     width:100%;
-    min-height:50px;
+    min-height:44px;
     padding:0 16px;
     border:0;
     border-radius:9px;

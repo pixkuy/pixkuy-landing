@@ -42,6 +42,7 @@
     "serviceLabels": {
       "hourly_daily": "Privatfahrzeug mit Fahrer",
       "airport_transfer": "Flughafentransfer",
+      "direct_transfer": "Direct Transfer",
       "notAvailable": "Pixkuy-Service"
     },
     "paymentLabels": {

@@ -39,6 +39,12 @@
       "finalSeparator": "和",
       "loading": "正在计算价格…",
       "unavailable": "无法计算该路线的价格。",
+      "priceUpdated": "价格已变更。请检查后再次继续以接受该价格。",
+      "requoteRequired": "继续前请重新获取并检查当前价格。",
+      "quoteStale": "此报价已过期。请检查更新后的价格并再次继续。",
+      "acceptUpdated": "请再次继续以接受更新后的价格。",
+      "quoteMismatch": "已接受的价格与当前报价不一致。",
+      "quoteTampered": "报价信息不一致。继续前请检查当前价格。",
       "airportTransfer": "该路线应作为机场 / 酒店服务处理。",
       "outOfCoverage": "该路线可通过 WhatsApp 咨询，或选择带司机车辆服务。",
       "readySuffix": "MXN"

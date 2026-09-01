@@ -1,0 +1,50 @@
+{
+  "directTransferCheckout": {
+    "emptyTitle": "No hay un traslado directo para revisar",
+    "emptyText": "Vuelve al formulario y configura de nuevo tu traslado.",
+    "emptyCta": "Volver a traslados directos",
+    "title": "Revisa tu traslado directo",
+    "text": "Confirma ruta, horario, vehiculo y datos de contacto antes de continuar al pago.",
+    "proceed": "Continuar al pago",
+    "edit": "Editar datos",
+    "error": "Revisa los datos del traslado antes de continuar.",
+    "quote": {
+      "priceUpdated": "El precio cambió. Revisa el precio actualizado y continúa de nuevo para aceptarlo.",
+      "requoteRequired": "Solicita y revisa el precio actual antes de continuar.",
+      "stale": "Esta cotización venció. Revisa el precio actualizado y continúa de nuevo.",
+      "acceptUpdated": "Continúa de nuevo para aceptar el precio actualizado.",
+      "mismatch": "El precio aceptado no coincide con la cotización actual.",
+      "tampered": "Los datos de la cotización no coinciden. Revisa el precio actual antes de continuar."
+    },
+    "serviceValue": "Traslado directo",
+    "vehicleValue": "BYD M9",
+    "legalTitle": "Condiciones",
+    "legalText": "Aceptaste los terminos, la politica de cancelaciones y el aviso de privacidad antes de continuar.",
+    "legalTextFallback": "Debes aceptar las condiciones legales antes de continuar.",
+    "estimateSeparator": " | ",
+    "units": {
+      "km": "km",
+      "minutes": "min"
+    },
+    "passengerBuckets": {
+      "van_1_2": "1-2 pasajeros",
+      "van_3_4": "3-4 pasajeros",
+      "van_5_6": "5-6 pasajeros"
+    },
+    "details": {
+      "service": "Servicio",
+      "origin": "Origen",
+      "destination": "Destino",
+      "date": "Fecha",
+      "time": "Hora",
+      "passengers": "Pasajeros",
+      "vehicle": "Vehiculo",
+      "estimate": "Ruta",
+      "price": "Precio",
+      "name": "Nombre",
+      "phone": "Telefono",
+      "email": "Email",
+      "notes": "Notas"
+    }
+  }
+}

@@ -39,6 +39,12 @@
       "finalSeparator": " and ",
       "loading": "Calculating price…",
       "unavailable": "We could not calculate the price for this route.",
+      "priceUpdated": "The price changed. Review it and continue again to accept it.",
+      "requoteRequired": "Request and review the current price before continuing.",
+      "quoteStale": "This quote expired. Review the refreshed price and continue again.",
+      "acceptUpdated": "Continue again to accept the updated price.",
+      "quoteMismatch": "The accepted price does not match the current quote.",
+      "quoteTampered": "The quote details do not match. Review the current price before continuing.",
       "airportTransfer": "This route must be handled as Airport / Hotel.",
       "outOfCoverage": "For this route, we can help you via WhatsApp or with a private driver service.",
       "readySuffix": "MXN"

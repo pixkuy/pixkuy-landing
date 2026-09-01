@@ -39,6 +39,12 @@
       "finalSeparator": " et ",
       "loading": "Calcul du prix…",
       "unavailable": "Nous n’avons pas pu calculer le prix de ce trajet.",
+      "priceUpdated": "Le prix a changé. Vérifiez-le et continuez à nouveau pour l’accepter.",
+      "requoteRequired": "Demandez et vérifiez le prix actuel avant de continuer.",
+      "quoteStale": "Ce devis a expiré. Vérifiez le prix actualisé et continuez à nouveau.",
+      "acceptUpdated": "Continuez à nouveau pour accepter le prix actualisé.",
+      "quoteMismatch": "Le prix accepté ne correspond pas au devis actuel.",
+      "quoteTampered": "Les données du devis ne correspondent pas. Vérifiez le prix actuel avant de continuer.",
       "airportTransfer": "Ce trajet doit être traité comme Aéroport / Hôtel.",
       "outOfCoverage": "Pour ce trajet, nous pouvons vous aider par WhatsApp ou avec un service de véhicule avec chauffeur.",
       "readySuffix": "MXN"

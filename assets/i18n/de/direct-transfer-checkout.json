@@ -1,0 +1,50 @@
+{
+  "directTransferCheckout": {
+    "emptyTitle": "Kein Direkttransfer zur Pruefung",
+    "emptyText": "Gehe zurueck zum Formular und konfiguriere deinen Transfer erneut.",
+    "emptyCta": "Zurueck zu Direkttransfers",
+    "title": "Direkttransfer pruefen",
+    "text": "Pruefe Route, Uhrzeit, Fahrzeug und Kontaktdaten vor der Zahlung.",
+    "proceed": "Weiter zur Zahlung",
+    "edit": "Daten bearbeiten",
+    "error": "Pruefe die Transferdaten, bevor du fortfaehrst.",
+    "quote": {
+      "priceUpdated": "Der Preis hat sich geändert. Prüfe den aktualisierten Preis und fahre erneut fort, um ihn zu akzeptieren.",
+      "requoteRequired": "Fordere den aktuellen Preis an und prüfe ihn, bevor du fortfährst.",
+      "stale": "Dieses Angebot ist abgelaufen. Prüfe den aktualisierten Preis und fahre erneut fort.",
+      "acceptUpdated": "Fahre erneut fort, um den aktualisierten Preis zu akzeptieren.",
+      "mismatch": "Der akzeptierte Preis stimmt nicht mit dem aktuellen Angebot überein.",
+      "tampered": "Die Angebotsdaten stimmen nicht überein. Prüfe den aktuellen Preis, bevor du fortfährst."
+    },
+    "serviceValue": "Direkttransfer",
+    "vehicleValue": "BYD M9",
+    "legalTitle": "Bedingungen",
+    "legalText": "Du hast die Bedingungen, die Stornierungsrichtlinie und den Datenschutzhinweis vor dem Fortfahren akzeptiert.",
+    "legalTextFallback": "Du musst die rechtlichen Bedingungen akzeptieren, bevor du fortfaehrst.",
+    "estimateSeparator": " | ",
+    "units": {
+      "km": "km",
+      "minutes": "Min."
+    },
+    "passengerBuckets": {
+      "van_1_2": "1-2 Passagiere",
+      "van_3_4": "3-4 Passagiere",
+      "van_5_6": "5-6 Passagiere"
+    },
+    "details": {
+      "service": "Service",
+      "origin": "Start",
+      "destination": "Ziel",
+      "date": "Datum",
+      "time": "Zeit",
+      "passengers": "Passagiere",
+      "vehicle": "Fahrzeug",
+      "estimate": "Route",
+      "price": "Preis",
+      "name": "Name",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "notes": "Notizen"
+    }
+  }
+}

@@ -39,6 +39,12 @@
       "finalSeparator": " 및 ",
       "loading": "요금을 계산 중입니다…",
       "unavailable": "이 경로의 요금을 계산할 수 없습니다.",
+      "priceUpdated": "가격이 변경되었습니다. 확인한 뒤 다시 계속하여 수락하세요.",
+      "requoteRequired": "계속하기 전에 현재 가격을 다시 요청하고 확인하세요.",
+      "quoteStale": "견적이 만료되었습니다. 갱신된 가격을 확인하고 다시 계속하세요.",
+      "acceptUpdated": "업데이트된 가격을 수락하려면 다시 계속하세요.",
+      "quoteMismatch": "수락한 가격이 현재 견적과 일치하지 않습니다.",
+      "quoteTampered": "견적 정보가 일치하지 않습니다. 계속하기 전에 현재 가격을 확인하세요.",
       "airportTransfer": "이 경로는 공항 / 호텔 서비스로 진행해야 합니다.",
       "outOfCoverage": "이 경로는 WhatsApp 또는 전용 기사 차량 서비스로 도와드릴 수 있습니다.",
       "readySuffix": "MXN"

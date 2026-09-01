@@ -199,6 +199,21 @@ body.booking-status-mobile-lock{
   .booking-status-page[data-booking-status-page="success"] .booking-status-mobile__detail:has([data-booking-status-label="amount"]){
     grid-column:auto;
   }
+
+  .booking-status-page[data-booking-status-page="success"] .booking-status-mobile[data-booking-status-direct-transfer="true"] .booking-status-mobile__detail:has([data-booking-status-label="amount"]){
+    position:relative;
+  }
+
+  .booking-status-page[data-booking-status-page="success"] .booking-status-mobile[data-booking-status-direct-transfer="true"] .booking-status-mobile__detail:has([data-booking-status-label="amount"])::after{
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:calc(100% + 1px);
+    width:100%;
+    background:#111315;
+    pointer-events:none;
+  }
   
     .booking-status-mobile__amount-currency{
     color:rgba(61,158,122,.98);

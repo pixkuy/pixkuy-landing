@@ -579,6 +579,10 @@
     0 10px 22px rgba(0,0,0,.12);
 }
 
+.services-hourly-panel__price--inline[hidden]{
+  display:none !important;
+}
+
 .services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__price--inline{
   border-color:rgba(31,122,109,.34);
   background:linear-gradient(180deg, rgba(31,122,109,.16) 0%, rgba(31,122,109,.08) 100%);
@@ -694,6 +698,28 @@
 
 .services-hourly-panel__availability[data-availability-tone="error"]{
   color:rgba(255,188,166,.96);
+}
+
+.services-hourly-panel__availability a[data-services-hourly-next-available],
+.shared-availability-suggestion__link,
+.shared-availability-suggestion__link:visited,
+.shared-availability-suggestion__link:active{
+  color:rgba(61,158,122,.98);
+  font-weight:650;
+  text-decoration:underline;
+  text-decoration-color:rgba(61,158,122,.72);
+  text-underline-offset:3px;
+}
+
+.services-hourly-panel__availability a[data-services-hourly-next-available]:hover,
+.shared-availability-suggestion__link:hover{
+  color:rgba(166,224,204,.98);
+}
+
+.services-hourly-panel__availability a[data-services-hourly-next-available]:focus-visible,
+.shared-availability-suggestion__link:focus-visible{
+  outline:2px solid rgba(61,158,122,.95);
+  outline-offset:2px;
 }
 
 @media (max-width: 1024px){

@@ -710,6 +710,12 @@
   }
 
   function renderDetails(root, dictionary, result) {
+    if (result.serviceType === "direct_transfer") {
+      root.setAttribute("data-booking-status-direct-transfer", "true");
+    } else {
+      root.removeAttribute("data-booking-status-direct-transfer");
+    }
+
     setText(
       root,
       "[data-booking-status-public-code]",

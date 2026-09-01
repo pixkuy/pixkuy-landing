@@ -996,23 +996,7 @@
   }
 
     function getAvailabilityErrorMessage(result, requestedLocalDate) {
-    var normalized = result && result.raw && typeof result.raw === "object"
-      ? result.raw
-      : result;
-    var resultNode = normalized && normalized.result && typeof normalized.result === "object"
-      ? normalized.result
-      : {};
-    var availability = resultNode.availability && typeof resultNode.availability === "object"
-      ? resultNode.availability
-      : {};
-    var nextAvailableStartLocal =
-      normalizeText(result && result.nextAvailableStartLocal) ||
-      normalizeText(resultNode.nextAvailableStartLocal) ||
-      normalizeText(availability.nextAvailableStartLocal);
-    var nextAvailableTime = "";
-    var formatter =
-      window.__pixkuyI18nModules &&
-      window.__pixkuyI18nModules.formatNextAvailabilityLabel;
+    var suggestion = window.PixkuySharedAvailabilitySuggestion;
     var baseMessage = getI18nValue(
       "services.cards.airport.panel.availability.unavailable",
       "No hay disponibilidad para esa fecha y hora. Elige otra opción."
@@ -1022,23 +1006,15 @@
       "Siguiente hora disponible: {time}"
     );
 
-    if (typeof formatter === "function") {
-      nextAvailableTime = formatter({
-        requestedLocalDate: requestedLocalDate,
-        nextAvailableStartLocal: nextAvailableStartLocal,
-        locale: getDocumentLocale()
-      });
-    } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(nextAvailableStartLocal)) {
-      nextAvailableTime = nextAvailableStartLocal.slice(11, 16);
-    } else {
-      nextAvailableTime = nextAvailableStartLocal;
-    }
+    var description = suggestion && typeof suggestion.describe === "function"
+      ? suggestion.describe(result, {
+          requestedLocalDate: requestedLocalDate,
+          locale: getDocumentLocale(),
+          template: nextAvailableTemplate
+        })
+      : { message: "" };
 
-    if (nextAvailableTime) {
-      return baseMessage + " " + nextAvailableTemplate.replace("{time}", nextAvailableTime);
-    }
-
-    return baseMessage;
+    return [baseMessage, description.message].filter(Boolean).join(" ");
   }
 
   function focusAirportTransferTimeField(form) {

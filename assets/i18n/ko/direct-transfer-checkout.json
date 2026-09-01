@@ -1,0 +1,50 @@
+{
+  "directTransferCheckout": {
+    "emptyTitle": "검토할 직행 이동이 없습니다",
+    "emptyText": "양식으로 돌아가 이동 정보를 다시 설정하세요.",
+    "emptyCta": "직행 이동으로 돌아가기",
+    "title": "직행 이동 검토",
+    "text": "결제로 계속하기 전에 경로, 시간, 차량, 연락처 정보를 확인하세요.",
+    "proceed": "결제로 계속",
+    "edit": "정보 수정",
+    "error": "계속하기 전에 이동 정보를 확인하세요.",
+    "quote": {
+      "priceUpdated": "가격이 변경되었습니다. 업데이트된 가격을 확인하고 다시 계속하여 수락하세요.",
+      "requoteRequired": "계속하기 전에 현재 가격을 다시 요청하고 확인하세요.",
+      "stale": "견적이 만료되었습니다. 갱신된 가격을 확인하고 다시 계속하세요.",
+      "acceptUpdated": "업데이트된 가격을 수락하려면 다시 계속하세요.",
+      "mismatch": "수락한 가격이 현재 견적과 일치하지 않습니다.",
+      "tampered": "견적 정보가 일치하지 않습니다. 계속하기 전에 현재 가격을 확인하세요."
+    },
+    "serviceValue": "직행 이동",
+    "vehicleValue": "BYD M9",
+    "legalTitle": "조건",
+    "legalText": "계속하기 전에 이용 약관, 취소 정책, 개인정보 고지를 수락했습니다.",
+    "legalTextFallback": "계속하려면 법적 조건을 수락해야 합니다.",
+    "estimateSeparator": " | ",
+    "units": {
+      "km": "km",
+      "minutes": "분"
+    },
+    "passengerBuckets": {
+      "van_1_2": "승객 1-2명",
+      "van_3_4": "승객 3-4명",
+      "van_5_6": "승객 5-6명"
+    },
+    "details": {
+      "service": "서비스",
+      "origin": "출발지",
+      "destination": "도착지",
+      "date": "날짜",
+      "time": "시간",
+      "passengers": "승객",
+      "vehicle": "차량",
+      "estimate": "경로",
+      "price": "가격",
+      "name": "이름",
+      "phone": "전화",
+      "email": "이메일",
+      "notes": "메모"
+    }
+  }
+}

@@ -42,6 +42,7 @@
     "serviceLabels": {
       "hourly_daily": "Частный автомобиль с водителем",
       "airport_transfer": "Трансфер из аэропорта",
+      "direct_transfer": "Direct Transfer",
       "notAvailable": "Сервис Pixkuy"
     },
     "paymentLabels": {

@@ -702,20 +702,161 @@
     ).replace("{duration}", formatDurationHoursMinutes(seconds));
   }
 
-  function getTodayDateValue() {
+  function getMexicoCityNowParts() {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Mexico_City",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      hourCycle: "h23"
+    });
+    const parts = formatter.formatToParts(new Date()).reduce(function reduceParts(acc, part) {
+      if (part && part.type && part.value) {
+        acc[part.type] = part.value;
+      }
+
+      return acc;
+    }, {});
+
+    return {
+      year: Number(parts.year),
+      month: Number(parts.month),
+      day: Number(parts.day),
+      hour: Number(parts.hour),
+      minute: Number(parts.minute)
+    };
+  }
+
+  function getFallbackNowParts() {
     const now = new Date();
-    const year = String(now.getFullYear()).padStart(4, "0");
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
+
+    return {
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+      day: now.getDate(),
+      hour: now.getHours(),
+      minute: now.getMinutes()
+    };
+  }
+
+  function getCivilTimestamp(parts) {
+    const safeParts = parts && typeof parts === "object" ? parts : {};
+    const year = Number(safeParts.year);
+    const month = Number(safeParts.month);
+    const day = Number(safeParts.day);
+    const hour = Number(safeParts.hour);
+    const minute = Number(safeParts.minute);
+
+    if (
+      !Number.isFinite(year) ||
+      !Number.isFinite(month) ||
+      !Number.isFinite(day) ||
+      !Number.isFinite(hour) ||
+      !Number.isFinite(minute)
+    ) {
+      return NaN;
+    }
+
+    return Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+  }
+
+  function getMexicoCityNowCivilTimestamp() {
+    let timestamp = NaN;
+
+    try {
+      timestamp = getCivilTimestamp(getMexicoCityNowParts());
+    } catch (error) {
+      timestamp = NaN;
+    }
+
+    if (Number.isFinite(timestamp)) {
+      return timestamp;
+    }
+
+    return getCivilTimestamp(getFallbackNowParts());
+  }
+
+  function getDirectTransferMinimumCivilTimestamp() {
+    return getMexicoCityNowCivilTimestamp() + (24 * 60 * 60 * 1000);
+  }
+
+  function formatCivilDateForInput(timestamp) {
+    const date = new Date(timestamp);
+    const year = String(date.getUTCFullYear()).padStart(4, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
 
     return year + "-" + month + "-" + day;
   }
 
-  function isPastDate(value) {
-    const date = normalizeText(value);
-    const today = getTodayDateValue();
+  function getSharedReservationMinimumDateValue() {
+    const formsApi = window.PixkuyForms || {};
+    const getMinimumDateTime = typeof formsApi.getReservationMinimumDateTime === "function"
+      ? formsApi.getReservationMinimumDateTime
+      : null;
+    const formatDate = typeof formsApi.formatReservationDateForInput === "function"
+      ? formsApi.formatReservationDateForInput
+      : null;
+    const minimumDateTime = getMinimumDateTime ? getMinimumDateTime() : null;
 
-    return Boolean(date && /^\d{4}-\d{2}-\d{2}$/.test(date) && date < today);
+    if (!minimumDateTime || !formatDate) {
+      return "";
+    }
+
+    return normalizeText(formatDate(minimumDateTime));
+  }
+
+  function getDirectTransferMinimumDateValue() {
+    return getSharedReservationMinimumDateValue() ||
+      formatCivilDateForInput(getDirectTransferMinimumCivilTimestamp());
+  }
+
+  function getSelectedDateTimeCivilTimestamp(dateValue, timeValue) {
+    const date = normalizeText(dateValue);
+    const time = normalizeText(timeValue);
+    const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+    const timeMatch = /^(\d{2}):(\d{2})$/.exec(time);
+
+    if (!dateMatch || !timeMatch) {
+      return NaN;
+    }
+
+    return Date.UTC(
+      Number(dateMatch[1]),
+      Number(dateMatch[2]) - 1,
+      Number(dateMatch[3]),
+      Number(timeMatch[1]),
+      Number(timeMatch[2]),
+      0,
+      0
+    );
+  }
+
+  function isDateBeforeDirectTransferMinimum(dateValue) {
+    const date = normalizeText(dateValue);
+    const minimumDate = getDirectTransferMinimumDateValue();
+
+    return Boolean(date && /^\d{4}-\d{2}-\d{2}$/.test(date) && minimumDate && date < minimumDate);
+  }
+
+  function hasDirectTransferMinimumLeadTime(dateValue, timeValue) {
+    const selected = getSelectedDateTimeCivilTimestamp(dateValue, timeValue);
+
+    if (!Number.isFinite(selected)) {
+      return false;
+    }
+
+    return selected >= getDirectTransferMinimumCivilTimestamp();
+  }
+
+  function getMinimumLeadTimeMessage() {
+    return getI18nValue(
+      "services.cards.hourly.panel.availability.minimumLeadTime",
+      "Necesitamos al menos 24 horas de antelación para confirmar este servicio."
+    );
   }
 
   function getFareText() {
@@ -852,6 +993,21 @@
     return phone ? "https://wa.me/" + phone + "?text=" + encodeURIComponent(lines.filter(Boolean).join("\n")) : "#contact";
   }
 
+  function clearAvailabilityStatus() {
+    const statusNode = configMount
+      ? configMount.querySelector("[data-direct-transfer-panel-availability]")
+      : null;
+
+    if (!statusNode) {
+      return false;
+    }
+
+    statusNode.textContent = "";
+    statusNode.hidden = true;
+    statusNode.removeAttribute("data-availability-tone");
+    return true;
+  }
+
   function resetQuote() {
     quoteRequestId += 1;
     state.quoteStatus = "pending";
@@ -921,10 +1077,15 @@
             return;
           }
 
-          state.quoteStatus = "ready";
           state.quote = result.quote;
           state.quoteErrorCode = "";
+          state.quoteStatus = "loading";
           syncView();
+          window.dispatchEvent(
+            new CustomEvent("pixkuy:direct-transfer-provisional-quote", {
+              detail: buildPanelQuoteDetail("panel")
+            })
+          );
         })
         .catch(function onQuoteError(error) {
           if (requestId !== quoteRequestId) {
@@ -945,6 +1106,8 @@
     const label = getSelectedPlaceLabel(selectedPlace, "");
     const coverage = await resolveDirectTransferCoverage(selectedPlace);
 
+    clearAvailabilityStatus();
+
     if (role === "destination") {
       state.destination = label || state.destination;
       state.destinationPlace = selectedPlace || null;
@@ -961,6 +1124,8 @@
   }
 
   function setAddressValue(role, value) {
+    clearAvailabilityStatus();
+
     if (role === "destination") {
       state.destination = normalizeText(value);
       state.destinationPlace = null;
@@ -1009,13 +1174,14 @@
   }
 
   function syncFieldStateFromDom(target) {
-    if (target && target.getAttribute("data-direct-transfer-panel-field") === "date" && isPastDate(target.value)) {
+    if (target && target.getAttribute("data-direct-transfer-panel-field") === "date" && isDateBeforeDirectTransferMinimum(target.value)) {
       target.value = "";
     }
 
     state.date = getDateValue();
     state.time = getTimeValue();
     state.passengerFareKey = getPassengerFareKeyValue();
+    clearAvailabilityStatus();
 
     return true;
   }
@@ -1122,7 +1288,7 @@
           '<div class="services-direct-transfer-panel__field services-direct-transfer-panel__field--date services-expand__field--date">',
             '<label class="services-expand__label" for="direct-transfer-desktop-date">' + escapeHtml(dateLabel) + '</label>',
             '<div class="services-expand__date-wrap services-direct-transfer-panel__date-wrap">',
-              '<input id="direct-transfer-desktop-date" type="date" class="services-expand__control" min="' + escapeHtml(getTodayDateValue()) + '" value="' + escapeHtml(state.date) + '" data-direct-transfer-panel-field="date" />',
+              '<input id="direct-transfer-desktop-date" type="date" class="services-expand__control" min="' + escapeHtml(getDirectTransferMinimumDateValue()) + '" value="' + escapeHtml(state.date) + '" data-direct-transfer-panel-field="date" />',
               '<span class="services-expand__date-overlay" aria-hidden="true">' + escapeHtml(getI18nValue("directTransferMobileFlow.fields.datePlaceholder", "dd/mm/aaaa")) + '</span>',
               '<span class="services-expand__date-icon" aria-hidden="true">',
                 '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">',
@@ -1179,6 +1345,7 @@
           '<button type="button" class="services-expand__cta services-direct-transfer-panel__cta" data-direct-transfer-panel-cta' + (isReady ? '' : ' disabled aria-disabled="true"') + '>',
             escapeHtml(ctaText),
           '</button>',
+          '<p class="services-direct-transfer-panel__availability" data-direct-transfer-panel-availability role="status" aria-live="polite" hidden></p>',
         '</div>',
       '</div>'
     ].join("");
@@ -1270,10 +1437,55 @@
     return true;
   }
 
+  function buildPanelQuoteDetail(surface) {
+    const originAddress = normalizeQuoteAddress(state.originPlace, state.origin);
+    const destinationAddress = normalizeQuoteAddress(state.destinationPlace, state.destination);
+
+    return {
+      surface,
+      contextKey: [
+        state.date,
+        state.time,
+        state.passengerFareKey,
+        originAddress && (originAddress.placeId || originAddress.place_id),
+        originAddress && originAddress.lat,
+        originAddress && originAddress.lng,
+        destinationAddress && (destinationAddress.placeId || destinationAddress.place_id),
+        destinationAddress && destinationAddress.lat,
+        destinationAddress && destinationAddress.lng
+      ].map(function normalizeContextValue(value) {
+        return normalizeText(value == null ? "" : String(value));
+      }).join("|"),
+      originAddress,
+      destinationAddress,
+      direct_transfer_date: state.date,
+      direct_transfer_time: state.time,
+      direct_transfer_passenger_fare_key: state.passengerFareKey,
+      direct_transfer_passenger_bucket_label: getPassengerBucketLabel(state.passengerFareKey),
+      direct_transfer_price: state.quote && state.quote.price != null ? String(state.quote.price) : "",
+      direct_transfer_currency: state.quote && state.quote.currency ? state.quote.currency : DEFAULT_CURRENCY,
+      direct_transfer_duration_seconds: state.quote && state.quote.durationSeconds != null ? String(Math.round(Number(state.quote.durationSeconds))) : "",
+      direct_transfer_distance_meters: state.quote && state.quote.distanceMeters != null ? String(Math.round(Number(state.quote.distanceMeters))) : "",
+      direct_transfer_vehicle_label: getI18nValue("directTransferMobileFlow.vehicle.title", "BYD M9"),
+      direct_transfer_price_label: formatPriceLabel(),
+      quote: state.quote
+    };
+  }
+
+  function isRecoverableCanonicalQuoteCode(code) {
+    return [
+      "DIRECT_TRANSFER_PRICE_MISMATCH",
+      "DIRECT_TRANSFER_QUOTE_STALE",
+      "DIRECT_TRANSFER_PRICING_VERSION_MISMATCH",
+      "DIRECT_TRANSFER_QUOTE_FINGERPRINT_MISMATCH"
+    ].indexOf(normalizeText(code)) !== -1;
+  }
+
   function syncView() {
     const fare = configMount.querySelector(".services-direct-transfer-panel__fare");
     const fareValue = configMount.querySelector(".services-direct-transfer-panel__fare-value");
     const cta = configMount.querySelector("[data-direct-transfer-panel-cta]");
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
     const sameRoute = configMount.querySelector(".services-direct-transfer-panel__same-route");
     const originClear = configMount.querySelector('[data-direct-transfer-panel-address-clear="origin"]');
     const destinationClear = configMount.querySelector('[data-direct-transfer-panel-address-clear="destination"]');
@@ -1286,7 +1498,11 @@
     const airportAction = configMount.querySelector("[data-direct-transfer-panel-airport-action]");
     const airportLink = configMount.querySelector("[data-direct-transfer-panel-airport-link]");
     const restrictionType = getDirectTransferRestrictionType();
-    const isReady = state.quoteStatus === "ready" && state.quote && state.quote.price;
+    const isReady = state.quoteStatus === "ready" &&
+      state.quote &&
+      state.quote.price &&
+      state.quote.quoteFingerprint &&
+      state.quote.pricingVersion;
 
     syncSafariDesktopTimeSelect();
 
@@ -1334,7 +1550,26 @@
       }
     }
 
-    if (cta) {
+    if (suggestion && typeof suggestion.syncUiState === "function") {
+      suggestion.syncUiState({
+        priceVisible: Boolean(isReady),
+        ctaEnabled: Boolean(isReady),
+        setPriceVisible: function setDirectTransferPriceVisible(visible) {
+          if (fare) {
+            fare.toggleAttribute(
+              "data-direct-transfer-panel-price-neutralized",
+              !visible
+            );
+          }
+        },
+        setCtaEnabled: function setDirectTransferCtaEnabled(enabled) {
+          if (cta) {
+            cta.disabled = !enabled;
+            cta.setAttribute("aria-disabled", enabled ? "false" : "true");
+          }
+        }
+      });
+    } else if (cta) {
       cta.disabled = !isReady;
       cta.setAttribute("aria-disabled", isReady ? "false" : "true");
     }
@@ -1443,6 +1678,7 @@
         }
 
         state.passengerFareKey = nextFareKey;
+        clearAvailabilityStatus();
         syncView();
         requestQuoteIfReady();
         return;
@@ -1457,21 +1693,7 @@
 
         window.dispatchEvent(
           new CustomEvent("pixkuy:direct-transfer-panel-submit", {
-            detail: {
-              originAddress: normalizeQuoteAddress(state.originPlace, state.origin),
-              destinationAddress: normalizeQuoteAddress(state.destinationPlace, state.destination),
-              direct_transfer_date: state.date,
-              direct_transfer_time: state.time,
-              direct_transfer_passenger_fare_key: state.passengerFareKey,
-              direct_transfer_passenger_bucket_label: getPassengerBucketLabel(state.passengerFareKey),
-              direct_transfer_price: state.quote && state.quote.price != null ? String(state.quote.price) : "",
-              direct_transfer_currency: state.quote && state.quote.currency ? state.quote.currency : DEFAULT_CURRENCY,
-              direct_transfer_duration_seconds: state.quote && state.quote.durationSeconds != null ? String(Math.round(Number(state.quote.durationSeconds))) : "",
-              direct_transfer_distance_meters: state.quote && state.quote.distanceMeters != null ? String(Math.round(Number(state.quote.distanceMeters))) : "",
-              direct_transfer_vehicle_label: getI18nValue("directTransferMobileFlow.vehicle.title", "BYD M9"),
-              direct_transfer_price_label: formatPriceLabel(),
-              quote: state.quote
-            }
+            detail: buildPanelQuoteDetail("panel")
           })
         );
       }
@@ -1482,6 +1704,77 @@
 
   render();
   bindEvents();
+
+  window.addEventListener("pixkuy:direct-transfer-canonical-price", function onCanonicalPrice(event) {
+    const detail = event && event.detail && typeof event.detail === "object"
+      ? event.detail
+      : {};
+    const price = Number(detail.price);
+
+    if (
+      !Number.isFinite(price) ||
+      price <= 0 ||
+      !state.quote ||
+      normalizeText(detail.contextKey) !== buildPanelQuoteDetail("panel").contextKey
+    ) {
+      return;
+    }
+
+    state.quote = Object.assign({}, state.quote, {
+      price,
+      currency: normalizeText(detail.currency) || DEFAULT_CURRENCY,
+      durationSeconds: Number(detail.durationSeconds) || state.quote.durationSeconds,
+      distanceMeters: Number(detail.distanceMeters) || state.quote.distanceMeters,
+      pricingVersion: normalizeText(detail.pricingVersion),
+      quoteFingerprint: normalizeText(detail.quoteFingerprint),
+      quoteExpiresAt: normalizeText(detail.quoteExpiresAt),
+      quoteAcceptedAt: normalizeText(detail.quoteAcceptedAt)
+    });
+    state.quoteStatus = detail.checkoutAllowed === true ||
+      isRecoverableCanonicalQuoteCode(detail.code)
+      ? "ready"
+      : "error";
+    syncView();
+  });
+
+  window.addEventListener(
+    "pixkuy:direct-transfer-next-available-applied",
+    function onNextAvailableApplied(event) {
+      const suggestion = window.PixkuySharedAvailabilitySuggestion;
+      const nextAvailableStartLocal = normalizeText(
+        event && event.detail && event.detail.nextAvailableStartLocal
+      );
+      const dateInput = configMount.querySelector(
+        '[data-direct-transfer-panel-field="date"]'
+      );
+      const timeInput = configMount.querySelector(
+        '[data-direct-transfer-panel-field="time"]'
+      );
+
+      if (
+        !suggestion ||
+        typeof suggestion.isLocalDateTime !== "function" ||
+        !suggestion.isLocalDateTime(nextAvailableStartLocal)
+      ) {
+        return;
+      }
+
+      state.date = normalizeText(event.detail.date);
+      state.time = normalizeText(event.detail.time);
+
+      if (dateInput) {
+        dateInput.value = state.date;
+      }
+
+      if (timeInput) {
+        timeInput.value = state.time;
+      }
+
+      clearAvailabilityStatus();
+      resetQuote();
+      requestQuoteIfReady();
+    }
+  );
 
   window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
     render();

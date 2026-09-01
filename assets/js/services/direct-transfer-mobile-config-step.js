@@ -42,6 +42,8 @@
   let parentRoute = null;
   let quoteRequestId = 0;
   let quoteTimer = 0;
+  let activeCanonicalContextKey = "";
+  let continueBusy = false;
 
   let state = {
     origin: "",
@@ -55,7 +57,11 @@
     passengerFareKey: "van_1_2",
     quoteStatus: "pending",
     quote: null,
-    quoteErrorCode: ""
+    quoteState: "none",
+    quoteErrorCode: "",
+    quoteErrorMessage: "",
+    precheckAllowed: false,
+    quoteReviewRequired: false
   };
 
   function isMobileViewport() {
@@ -115,6 +121,12 @@
 
   function getQuoteApi() {
     const api = window.PixkuyDirectTransferQuote;
+
+    return api && typeof api === "object" ? api : null;
+  }
+
+  function getTransactionalStateApi() {
+    const api = window.PixkuyDirectTransferTransactionalState;
 
     return api && typeof api === "object" ? api : null;
   }
@@ -633,8 +645,167 @@
     ).replace("{fields}", buildNaturalList(missingFields));
   }
 
+  function hasCanonicalMobileQuote(currentState) {
+    const safeState = currentState && typeof currentState === "object"
+      ? currentState
+      : {};
+    const quote = safeState.quote && typeof safeState.quote === "object"
+      ? safeState.quote
+      : {};
+    const amountMinor = Number(quote.amountMinor);
+
+    return Boolean(
+      safeState.quoteState === "canonical" &&
+      Number.isInteger(amountMinor) &&
+      amountMinor > 0 &&
+      normalizeText(quote.pricingVersion) &&
+      normalizeText(quote.quoteFingerprint) &&
+      normalizeText(quote.quoteExpiresAt)
+    );
+  }
+
+  function isCanonicalRequoteCode(code) {
+    return [
+      "DIRECT_TRANSFER_PRICE_MISMATCH",
+      "DIRECT_TRANSFER_QUOTE_STALE",
+      "DIRECT_TRANSFER_PRICING_VERSION_MISMATCH",
+      "DIRECT_TRANSFER_QUOTE_FINGERPRINT_MISMATCH"
+    ].indexOf(normalizeText(code)) !== -1;
+  }
+
+  function buildCanonicalMobileQuote(currentQuote, detail) {
+    const safeCurrentQuote = currentQuote && typeof currentQuote === "object"
+      ? currentQuote
+      : {};
+    const safeDetail = detail && typeof detail === "object" ? detail : {};
+    const price = Number(safeDetail.price);
+    const amountMinor = Number(safeDetail.amountMinor);
+    const quote = Object.assign({}, safeCurrentQuote, {
+      price,
+      amountMinor,
+      currency: normalizeText(safeDetail.currency) || "MXN",
+      durationSeconds: Number(safeDetail.durationSeconds) || safeCurrentQuote.durationSeconds,
+      distanceMeters: Number(safeDetail.distanceMeters) || safeCurrentQuote.distanceMeters,
+      pricingVersion: normalizeText(safeDetail.pricingVersion),
+      quoteFingerprint: normalizeText(safeDetail.quoteFingerprint),
+      quoteExpiresAt: normalizeText(safeDetail.quoteExpiresAt),
+      quoteAcceptedAt: normalizeText(safeDetail.quoteAcceptedAt)
+    });
+
+    return Number.isFinite(price) && price > 0 &&
+      Number.isInteger(amountMinor) && amountMinor > 0
+      ? quote
+      : null;
+  }
+
+  function applyCanonicalPriceState(currentState, detail) {
+    const safeState = currentState && typeof currentState === "object"
+      ? currentState
+      : {};
+    const safeDetail = detail && typeof detail === "object" ? detail : {};
+    const hadCanonicalQuote = hasCanonicalMobileQuote(safeState);
+    const canonicalQuote = buildCanonicalMobileQuote(safeState.quote, safeDetail);
+    const canonicalState = canonicalQuote
+      ? Object.assign({}, safeState, {
+        quote: canonicalQuote,
+        quoteState: "canonical"
+      })
+      : safeState;
+    const code = normalizeText(safeDetail.code);
+
+    if (
+      safeDetail.checkoutAllowed === true &&
+      canonicalQuote &&
+      hasCanonicalMobileQuote(canonicalState)
+    ) {
+      return Object.assign({}, canonicalState, {
+        quoteStatus: "ready",
+        quoteErrorCode: "",
+        quoteErrorMessage: "",
+        precheckAllowed: true,
+        quoteReviewRequired: false
+      });
+    }
+
+    if (
+      safeDetail.checkoutAllowed !== true &&
+      hadCanonicalQuote &&
+      canonicalQuote &&
+      hasCanonicalMobileQuote(canonicalState) &&
+      isCanonicalRequoteCode(code)
+    ) {
+      return Object.assign({}, canonicalState, {
+        quoteStatus: "review",
+        quoteErrorCode: code,
+        quoteErrorMessage: normalizeText(safeDetail.availabilityMessage),
+        precheckAllowed: false,
+        quoteReviewRequired: true
+      });
+    }
+
+    return Object.assign({}, safeState, {
+      quote: null,
+      quoteState: "none",
+      quoteStatus: "error",
+      quoteErrorCode: code || "PRECHECK_UNAVAILABLE",
+      quoteErrorMessage: normalizeText(safeDetail.availabilityMessage),
+      precheckAllowed: false,
+      quoteReviewRequired: false
+    });
+  }
+
+  function resetCanonicalPriceState(currentState) {
+    return Object.assign({}, currentState && typeof currentState === "object" ? currentState : {}, {
+      quote: null,
+      quoteState: "none",
+      quoteStatus: "pending",
+      quoteErrorCode: "",
+      quoteErrorMessage: "",
+      precheckAllowed: false,
+      quoteReviewRequired: false
+    });
+  }
+
+  function canContinueCanonicalPriceState(currentState) {
+    const safeState = currentState && typeof currentState === "object"
+      ? currentState
+      : {};
+
+    return Boolean(
+      safeState.quoteStatus === "ready" &&
+      safeState.precheckAllowed === true &&
+      safeState.quoteReviewRequired !== true &&
+      hasCanonicalMobileQuote(safeState)
+    );
+  }
+
+  function canReacceptCanonicalPriceState(currentState) {
+    const safeState = currentState && typeof currentState === "object"
+      ? currentState
+      : {};
+
+    return Boolean(
+      safeState.quoteStatus === "review" &&
+      safeState.precheckAllowed !== true &&
+      safeState.quoteReviewRequired === true &&
+      hasCanonicalMobileQuote(safeState)
+    );
+  }
+
   function canContinue() {
-    return Boolean(hasRequiredFieldsForQuote() && state.quoteStatus === "ready" && state.quote);
+    return Boolean(
+      hasRequiredFieldsForQuote() &&
+      getMinimumLeadTimeValidation().valid === true &&
+      canContinueCanonicalPriceState(state)
+    );
+  }
+
+  function canReacceptCanonicalPrice() {
+    return Boolean(
+      hasRequiredFieldsForQuote() &&
+      getMinimumLeadTimeValidation().valid === true &&
+      canReacceptCanonicalPriceState(state)
+    );
   }
 
   function getPassengerBucketLabel(bucket) {
@@ -754,33 +925,81 @@
     ).replace("{duration}", formatDurationHoursMinutes(seconds));
   }
 
-  function getTodayDateValue() {
-    const now = new Date();
-    const year = String(now.getFullYear()).padStart(4, "0");
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
+  function getMinimumLeadTimeValidation() {
+    const api = getTransactionalStateApi();
 
-    return year + "-" + month + "-" + day;
+    if (!api || typeof api.validateDirectTransferMinimumLeadTime !== "function") {
+      return { valid: false };
+    }
+
+    return api.validateDirectTransferMinimumLeadTime(state.date, state.time);
   }
 
-  function isPastDate(value) {
-    const date = normalizeText(value);
-    const today = getTodayDateValue();
+  function getMinimumDateValue() {
+    const api = getTransactionalStateApi();
 
-    return Boolean(date && /^\d{4}-\d{2}-\d{2}$/.test(date) && date < today);
+    return api && typeof api.getDirectTransferMinimumDateValue === "function"
+      ? normalizeText(api.getDirectTransferMinimumDateValue())
+      : "";
   }
-  
-  function normalizePastDateField(target) {
+
+  function getMinimumTimeValue(dateValue) {
+    const api = getTransactionalStateApi();
+
+    return api && typeof api.getDirectTransferMinimumTimeValue === "function"
+      ? normalizeText(api.getDirectTransferMinimumTimeValue(dateValue))
+      : "";
+  }
+
+  function normalizeDateTimeField(target) {
+    const minimumDate = getMinimumDateValue();
+    const minimumTime = getMinimumTimeValue(state.date);
+
     if (
       target &&
       target.getAttribute("data-direct-transfer-mobile-config-field") === "date" &&
-      isPastDate(target.value)
+      minimumDate &&
+      normalizeText(target.value) < minimumDate
     ) {
-      target.value = "";
+      return true;
+    }
+
+    if (
+      target &&
+      target.getAttribute("data-direct-transfer-mobile-config-field") === "time" &&
+      minimumTime &&
+      normalizeText(target.value) < minimumTime
+    ) {
       return true;
     }
 
     return false;
+  }
+
+  function syncDateTimeConstraints() {
+    const step = getStep();
+    const dateField = step
+      ? step.querySelector('[data-direct-transfer-mobile-config-field="date"]')
+      : null;
+    const timeField = step
+      ? step.querySelector('[data-direct-transfer-mobile-config-field="time"]')
+      : null;
+    const minimumDate = getMinimumDateValue();
+    const minimumTime = getMinimumTimeValue(state.date);
+
+    if (dateField && minimumDate) {
+      dateField.setAttribute("min", minimumDate);
+    }
+
+    if (timeField) {
+      if (minimumTime) {
+        timeField.setAttribute("min", minimumTime);
+      } else {
+        timeField.removeAttribute("min");
+      }
+    }
+
+    return true;
   }
 
   function syncAddressClearState(role) {
@@ -902,7 +1121,31 @@
       );
     }
 
+    if (state.quoteStatus === "review") {
+      return [
+        state.quoteErrorMessage || getI18nValue(
+          "directTransferMobileFlow.fare.acceptUpdated",
+          "Continúa de nuevo para aceptar el precio actualizado."
+        ),
+        state.quote && state.quote.price
+          ? "$" + formatCurrencyAmount(state.quote.price) + " " +
+            getI18nValue("directTransferMobileFlow.fare.readySuffix", state.quote.currency || "MXN")
+          : ""
+      ].filter(Boolean).join(" ");
+    }
+
     if (state.quoteStatus === "error") {
+      if (state.quoteErrorMessage) {
+        return state.quoteErrorMessage;
+      }
+
+      if (state.quoteErrorCode === "DIRECT_TRANSFER_MINIMUM_LEAD_TIME_NOT_MET") {
+        return getI18nValue(
+          "services.cards.hourly.panel.availability.minimumLeadTime",
+          "Necesitamos al menos 24 horas de antelación para confirmar este servicio."
+        );
+      }
+
       return getI18nValue(
         "directTransferMobileFlow.fare.unavailable",
         "No pudimos calcular el precio para este trayecto."
@@ -1006,7 +1249,7 @@
   function syncCta() {
     const step = getStep();
     const cta = step ? step.querySelector(CONFIG_CTA_SELECTOR) : null;
-    const isReady = canContinue();
+    const isReady = canContinue() || canReacceptCanonicalPrice();
 
     syncSameRouteError();
     syncRestrictionNotice();
@@ -1024,9 +1267,8 @@
 
   function resetQuote() {
     quoteRequestId += 1;
-    state.quoteStatus = "pending";
-    state.quote = null;
-    state.quoteErrorCode = "";
+    activeCanonicalContextKey = "";
+    state = resetCanonicalPriceState(state);
 
     if (quoteTimer) {
       window.clearTimeout(quoteTimer);
@@ -1036,6 +1278,30 @@
     syncCta();
 
     return true;
+  }
+
+  function rejectMinimumLeadTime() {
+    quoteRequestId += 1;
+    activeCanonicalContextKey = "";
+
+    if (quoteTimer) {
+      window.clearTimeout(quoteTimer);
+      quoteTimer = 0;
+    }
+
+    state.quoteStatus = "error";
+    state.quote = null;
+    state.quoteErrorCode = "DIRECT_TRANSFER_MINIMUM_LEAD_TIME_NOT_MET";
+    state.quoteErrorMessage = getI18nValue(
+      "services.cards.hourly.panel.availability.minimumLeadTime",
+      "Necesitamos al menos 24 horas de antelación para confirmar este servicio."
+    );
+    state.precheckAllowed = false;
+    state.quoteReviewRequired = false;
+    state.quoteState = "none";
+    syncCta();
+
+    return false;
   }
 
   function buildQuoteInput() {
@@ -1063,7 +1329,45 @@
       quote: state.quote
     };
   }
-  
+
+  function buildCanonicalQuoteDetail() {
+    const originAddress = normalizeQuoteAddress(state.originPlace, state.origin);
+    const destinationAddress = normalizeQuoteAddress(state.destinationPlace, state.destination);
+
+    return {
+      surface: "mobile",
+      quoteState: state.quoteState,
+      contextKey: [
+        state.date,
+        state.time,
+        state.passengerFareKey,
+        originAddress && (originAddress.placeId || originAddress.place_id),
+        originAddress && originAddress.lat,
+        originAddress && originAddress.lng,
+        destinationAddress && (destinationAddress.placeId || destinationAddress.place_id),
+        destinationAddress && destinationAddress.lat,
+        destinationAddress && destinationAddress.lng
+      ].map(function normalizeContextValue(value) {
+        return normalizeText(value == null ? "" : String(value));
+      }).join("|"),
+      originAddress,
+      destinationAddress,
+      direct_transfer_date: state.date,
+      direct_transfer_time: state.time,
+      direct_transfer_passenger_fare_key: state.passengerFareKey,
+      direct_transfer_passenger_bucket_label: getPassengerBucketLabel(state.passengerFareKey),
+      direct_transfer_price: state.quote && state.quote.price != null ? String(state.quote.price) : "",
+      direct_transfer_currency: state.quote && state.quote.currency ? state.quote.currency : "MXN",
+      direct_transfer_duration_seconds: state.quote && state.quote.durationSeconds != null ? String(Math.round(Number(state.quote.durationSeconds))) : "",
+      direct_transfer_distance_meters: state.quote && state.quote.distanceMeters != null ? String(Math.round(Number(state.quote.distanceMeters))) : "",
+      direct_transfer_vehicle_label: getI18nValue("directTransferMobileFlow.vehicle.title", "BYD M9"),
+      direct_transfer_price_label: state.quote && state.quote.price
+        ? "$" + formatCurrencyAmount(state.quote.price) + " " + getI18nValue("directTransferMobileFlow.fare.readySuffix", state.quote.currency || "MXN")
+        : "",
+      quote: state.quote
+    };
+  }
+
     function trackDirectTransferMobileQuoteReady() {
     const analytics = window.PixkuyAnalytics;
     const quote = state.quote && typeof state.quote === "object" ? state.quote : {};
@@ -1112,18 +1416,31 @@
       return false;
     }
 
+    if (getMinimumLeadTimeValidation().valid !== true) {
+      return rejectMinimumLeadTime();
+    }
+
     if (!quoteApi || typeof quoteApi.requestQuote !== "function") {
       state.quoteStatus = "error";
       state.quote = null;
+      state.quoteState = "none";
       state.quoteErrorCode = "QUOTE_API_MISSING";
+      state.quoteErrorMessage = "";
+      state.precheckAllowed = false;
+      state.quoteReviewRequired = false;
       syncCta();
       return false;
     }
 
     quoteRequestId = requestId;
+    activeCanonicalContextKey = "";
     state.quoteStatus = "loading";
     state.quote = null;
+    state.quoteState = "none";
     state.quoteErrorCode = "";
+    state.quoteErrorMessage = "";
+    state.precheckAllowed = false;
+    state.quoteReviewRequired = false;
     syncCta();
 
     quoteTimer = window.setTimeout(function quoteDebounced() {
@@ -1136,16 +1453,38 @@
           if (!result || result.ok !== true || !result.quote || !result.quote.price) {
             state.quoteStatus = "error";
             state.quote = null;
+            state.quoteState = "none";
             state.quoteErrorCode = result && result.code ? result.code : "QUOTE_UNAVAILABLE";
+            state.quoteErrorMessage = "";
+            state.precheckAllowed = false;
+            state.quoteReviewRequired = false;
             syncCta();
             return;
           }
 
-          state.quoteStatus = "ready";
-          state.quote = result.quote;
+          state.quote = Object.assign({}, result.quote, {
+            provisionalPricingVersion: normalizeText(result.quote.pricingVersion),
+            amountMinor: null,
+            pricingVersion: "",
+            quoteFingerprint: "",
+            quoteExpiresAt: "",
+            quoteAcceptedAt: ""
+          });
+          state.quoteState = "provisional";
           state.quoteErrorCode = "";
+          state.quoteErrorMessage = "";
+          state.precheckAllowed = false;
+          state.quoteReviewRequired = false;
+          state.quoteStatus = "loading";
           syncCta();
-          trackDirectTransferMobileQuoteReady();
+          const canonicalDetail = buildCanonicalQuoteDetail();
+
+          activeCanonicalContextKey = canonicalDetail.contextKey;
+          window.dispatchEvent(
+            new CustomEvent("pixkuy:direct-transfer-provisional-quote", {
+              detail: canonicalDetail
+            })
+          );
         })
         .catch(function onQuoteError(error) {
           if (requestId !== quoteRequestId) {
@@ -1154,10 +1493,38 @@
 
           state.quoteStatus = "error";
           state.quote = null;
+          state.quoteState = "none";
           state.quoteErrorCode = error && error.message ? error.message : "QUOTE_ERROR";
+          state.quoteErrorMessage = "";
+          state.precheckAllowed = false;
+          state.quoteReviewRequired = false;
           syncCta();
         });
     }, 220);
+
+    return true;
+  }
+
+  function requestCanonicalPriceReacceptance() {
+    const canonicalDetail = buildCanonicalQuoteDetail();
+
+    if (!canReacceptCanonicalPrice()) {
+      return false;
+    }
+
+    state.quoteStatus = "loading";
+    state.quoteErrorCode = "";
+    state.quoteErrorMessage = "";
+    state.precheckAllowed = false;
+    state.quoteReviewRequired = false;
+    syncCta();
+
+    activeCanonicalContextKey = canonicalDetail.contextKey;
+    window.dispatchEvent(
+      new CustomEvent("pixkuy:direct-transfer-provisional-quote", {
+        detail: canonicalDetail
+      })
+    );
 
     return true;
   }
@@ -1277,7 +1644,7 @@
       '<div class="direct-transfer-mobile-config-step__field direct-transfer-mobile-config-step__field--date">',
       '<label class="direct-transfer-mobile-config-step__label" for="direct-transfer-mobile-date">' + escapeHtml(dateLabel) + '</label>',
       '<div class="direct-transfer-mobile-config-step__date-wrap" data-direct-transfer-mobile-date-state="' + (state.date ? 'value' : 'empty') + '">',
-      '<input id="direct-transfer-mobile-date" type="date" class="direct-transfer-mobile-config-step__control" data-direct-transfer-mobile-config-field="date" min="' + escapeHtml(getTodayDateValue()) + '" value="' + escapeHtml(state.date) + '" />',
+      '<input id="direct-transfer-mobile-date" type="date" class="direct-transfer-mobile-config-step__control" data-direct-transfer-mobile-config-field="date" min="' + escapeHtml(getMinimumDateValue()) + '" value="' + escapeHtml(state.date) + '" />',
       '<span class="direct-transfer-mobile-config-step__date-overlay" aria-hidden="true">' + escapeHtml(getI18nValue("directTransferMobileFlow.fields.datePlaceholder", "dd/mm/aaaa")) + '</span>',
       '<span class="direct-transfer-mobile-config-step__date-icon" aria-hidden="true">',
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">',
@@ -1297,7 +1664,7 @@
       '<div class="direct-transfer-mobile-config-step__field direct-transfer-mobile-config-step__field--time">',
       '<label class="direct-transfer-mobile-config-step__label" for="direct-transfer-mobile-time">' + escapeHtml(timeLabel) + '</label>',
       '<div class="direct-transfer-mobile-config-step__time-wrap" data-direct-transfer-mobile-time-state="' + (state.time ? 'value' : 'empty') + '">',
-      '<input id="direct-transfer-mobile-time" type="time" class="direct-transfer-mobile-config-step__control" data-direct-transfer-mobile-config-field="time" value="' + escapeHtml(state.time) + '" />',
+      '<input id="direct-transfer-mobile-time" type="time" class="direct-transfer-mobile-config-step__control" data-direct-transfer-mobile-config-field="time" min="' + escapeHtml(getMinimumTimeValue(state.date)) + '" value="' + escapeHtml(state.time) + '" />',
       '<span class="direct-transfer-mobile-config-step__time-overlay" aria-hidden="true">' + escapeHtml(getI18nValue("directTransferMobileFlow.fields.timePlaceholder", "--:--")) + '</span>',
       '<span class="direct-transfer-mobile-config-step__time-icon" aria-hidden="true">',
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">',
@@ -1397,6 +1764,7 @@
 
     bindStepEvents();
     syncStateFromFields();
+    syncDateTimeConstraints();
     syncAllAddressClearState();
     syncCta();
     requestQuoteIfReady();
@@ -1558,15 +1926,34 @@
 
         event.preventDefault();
 
-        if (cta.disabled || cta.getAttribute("aria-disabled") === "true") {
+        if (canReacceptCanonicalPrice()) {
+          requestCanonicalPriceReacceptance();
           return;
         }
+
+        if (
+          continueBusy ||
+          cta.disabled ||
+          cta.getAttribute("aria-disabled") === "true" ||
+          !canContinue()
+        ) {
+          return;
+        }
+
+        continueBusy = true;
+        cta.disabled = true;
+        cta.setAttribute("aria-disabled", "true");
 
         if (contactStepApi && typeof contactStepApi.open === "function") {
           if (contactStepApi.open(step, buildContactStepPayload())) {
             trackDirectTransferMobileContinueClick();
+            continueBusy = false;
+            return;
           }
         }
+
+        continueBusy = false;
+        syncCta();
       }
     });
 
@@ -1590,6 +1977,14 @@
         return;
       }
 
+      const fieldName = normalizeText(
+        event.target.getAttribute("data-direct-transfer-mobile-config-field")
+      );
+
+      if (fieldName === "date" || fieldName === "time") {
+        resetQuote();
+      }
+
       if (event.target.matches("[data-direct-transfer-mobile-address-input]")) {
         setAddressValue(
           normalizeText(event.target.getAttribute("data-direct-transfer-mobile-address-role")),
@@ -1598,9 +1993,10 @@
         syncAddressClearState(normalizeText(event.target.getAttribute("data-direct-transfer-mobile-address-role")));
       }
 
-      normalizePastDateField(event.target);
+      normalizeDateTimeField(event.target);
       syncDateTimeOverlayState(event.target);
       syncStateFromFields();
+      syncDateTimeConstraints();
       requestQuoteIfReady();
       syncCta();
     });
@@ -1610,9 +2006,18 @@
         return;
       }
 
-      normalizePastDateField(event.target);
+      const fieldName = normalizeText(
+        event.target.getAttribute("data-direct-transfer-mobile-config-field")
+      );
+
+      if (fieldName === "date" || fieldName === "time") {
+        resetQuote();
+      }
+
+      normalizeDateTimeField(event.target);
       syncDateTimeOverlayState(event.target);
       syncStateFromFields();
+      syncDateTimeConstraints();
       requestQuoteIfReady();
       syncCta();
     });
@@ -1625,6 +2030,36 @@
     close,
     isOpen
   };
+
+  window.PixkuyDirectTransferMobileQuoteContract = {
+    applyCanonicalPriceState,
+    resetCanonicalPriceState,
+    canContinueCanonicalPriceState,
+    canReacceptCanonicalPriceState,
+    hasCanonicalMobileQuote
+  };
+
+  window.addEventListener("pixkuy:direct-transfer-canonical-price", function onCanonicalPrice(event) {
+    const detail = event && event.detail && typeof event.detail === "object"
+      ? event.detail
+      : {};
+    const contextKey = normalizeText(detail.contextKey);
+    const contextMatches = Boolean(
+      contextKey && contextKey === activeCanonicalContextKey
+    );
+
+    if (!contextMatches) {
+      return;
+    }
+
+    activeCanonicalContextKey = "";
+    state = applyCanonicalPriceState(state, detail);
+    syncCta();
+
+    if (state.quoteStatus === "ready") {
+      trackDirectTransferMobileQuoteReady();
+    }
+  });
 
   window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
     if (isOpen()) {

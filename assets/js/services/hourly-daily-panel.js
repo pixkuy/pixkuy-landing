@@ -52,6 +52,10 @@
   
   let pickupControllerHandle = null;
   let availabilityBlockReason = '';
+  let availabilityBusy = false;
+  let lastAvailabilityResult = null;
+  let availabilityRequestSequence = 0;
+  let activeAvailabilityContextKey = '';
 
   function getI18nValue(path) {
     const dict = window.__pixkuyI18nDict;
@@ -137,7 +141,7 @@
             return state.startTime || '';
           },
           onValueChange: function onValueChange(value) {
-            clearAvailabilityBlock();
+            invalidateAvailabilityState();
             state.startTime = normalizeText(value);
             syncDerivedState();
             syncLiveFieldValues();
@@ -333,6 +337,7 @@ tabs: {
       input: input,
       mountNode: mountNode,
       onManualInput: function (value) {
+  invalidateAvailabilityState();
   state.pickup = typeof value === 'string' ? value : '';
   state.pickupPlaceId = '';
   state.pickupLat = '';
@@ -341,6 +346,7 @@ tabs: {
   syncLiveFieldValues();
 },
 onPlaceSelected: function (selectedPlace) {
+  invalidateAvailabilityState();
   state.pickup = normalizeText(
     selectedPlace &&
     (selectedPlace.label || selectedPlace.formattedAddress || selectedPlace.displayName)
@@ -360,6 +366,7 @@ onPlaceSelected: function (selectedPlace) {
   syncLiveFieldValues();
 },
 onClearSelection: function () {
+  invalidateAvailabilityState();
   state.pickup = '';
   state.pickupPlaceId = '';
   state.pickupLat = '';
@@ -384,6 +391,7 @@ onClearSelection: function () {
     return;
   }
 
+  invalidateAvailabilityState();
   state.pickup = normalizeText(
     label ||
       selectedPlace.label ||
@@ -497,16 +505,60 @@ onClearSelection: function () {
   }
 
   function shouldDisableHourlyContinue() {
-    return !isConfigComplete() || isHourlyContinueBlockedByAvailability();
+    return !isConfigComplete() || isHourlyContinueBlockedByAvailability() || availabilityBusy;
   }
 
-  function setAvailabilityBlock(reason) {
+  function setAvailabilityBlock(reason, result) {
     availabilityBlockReason = normalizeText(reason) || 'availability_unavailable';
+    lastAvailabilityResult = result && typeof result === 'object' ? result : null;
+    syncAvailabilityPricePresentation();
   }
 
   function clearAvailabilityBlock() {
     availabilityBlockReason = '';
+    lastAvailabilityResult = null;
     clearAvailabilityStatus();
+    syncAvailabilityPricePresentation();
+  }
+
+  function syncAvailabilityPricePresentation() {
+    const priceNode = configMount.querySelector('.services-hourly-panel__price');
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
+    const shouldHide = Boolean(
+      priceNode &&
+      isTransactionalHourlyMode() &&
+      isHourlyContinueBlockedByAvailability()
+    );
+
+    if (!priceNode) {
+      return false;
+    }
+
+    if (suggestion && typeof suggestion.syncUiState === 'function') {
+      suggestion.syncUiState({
+        priceVisible: !shouldHide,
+        ctaEnabled: false,
+        setPriceVisible: (visible) => {
+          priceNode.hidden = !visible;
+          priceNode.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        }
+      });
+    } else {
+      priceNode.hidden = shouldHide;
+      priceNode.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
+    }
+
+    return true;
+  }
+
+  function invalidateAvailabilityState() {
+    availabilityRequestSequence += 1;
+    activeAvailabilityContextKey = '';
+    availabilityBlockReason = '';
+    lastAvailabilityResult = null;
+    clearAvailabilityStatus();
+    syncAvailabilityPricePresentation();
+    setHourlyContinueBusy(false);
   }
 
   function getHourlyCtaText(labels) {
@@ -1266,6 +1318,12 @@ onClearSelection: function () {
     configMount.innerHTML = buildConfigMarkup();
     ensureSafariDesktopTimeFallback();
     mountPickupController();
+    syncAvailabilityPricePresentation();
+
+    if (isHourlyContinueBlockedByAvailability() && lastAvailabilityResult) {
+      setUnavailableAvailabilityStatus(lastAvailabilityResult);
+    }
+
     trackHourlyQuoteReady();
   }
 
@@ -1288,6 +1346,7 @@ function applyContactHourlyDailySync(snapshot) {
     return false;
   }
 
+  invalidateAvailabilityState();
   state.mode = nextMode;
   state.vehicleType = normalizeText(safeSnapshot.vehicleType) || 'executive_van';
 state.pickup = normalizeText(safeSnapshot.pickup);
@@ -1394,6 +1453,8 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
       priceValue.textContent = priceText;
     }
 
+    syncAvailabilityPricePresentation();
+
     if (ctaButton) {
       ctaButton.disabled = ctaDisabled;
       ctaButton.setAttribute('aria-disabled', ctaDisabled ? 'true' : 'false');
@@ -1415,34 +1476,38 @@ function isTransactionalHourlyMode() {
   return state.mode === MODES.HOURLY || state.mode === MODES.FULL_DAY;
 }
 
-function getNextAvailableTimeLabel(result) {
-  const value = normalizeText(result && result.nextAvailableStartLocal);
+function getNextAvailableTimeLabel(result, requestedLocalDate) {
+  const suggestion = window.PixkuySharedAvailabilitySuggestion;
 
-  if (!value) {
-    return '';
-  }
-
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
-    return value.slice(11, 16);
-  }
-
-  return value;
+  return suggestion && typeof suggestion.describe === 'function'
+    ? suggestion.describe(result, {
+        requestedLocalDate: requestedLocalDate,
+        compact: isMobileHourlyViewport()
+      }).label
+    : '';
 }
 
-function getNextAvailableMessage(result, labels) {
-  const time = getNextAvailableTimeLabel(result);
+function getNextAvailableMessage(result, labels, requestedLocalDate) {
+  const suggestion = window.PixkuySharedAvailabilitySuggestion;
 
-  if (!time) {
-    return '';
-  }
-
-  return labels.availability.nextAvailableSlot.replace('{time}', time);
+  return suggestion && typeof suggestion.describe === 'function'
+    ? suggestion.describe(result, {
+        requestedLocalDate: requestedLocalDate,
+        compact: isMobileHourlyViewport(),
+        compactTemplate: 'Próxima: {time}',
+        template: labels.availability.nextAvailableSlot
+      }).message
+    : '';
 }
 
 function getAvailabilityMessage(result) {
   const labels = getLabels();
   const code = normalizeText(result && result.code);
-  const nextAvailableMessage = getNextAvailableMessage(result, labels);
+  const nextAvailableMessage = getNextAvailableMessage(
+    result,
+    labels,
+    state.tripDate
+  );
 
   if (code === 'HOURLY_MINIMUM_LEAD_TIME_NOT_MET') {
     return [
@@ -1466,6 +1531,72 @@ function getAvailabilityMessage(result) {
   return labels.availability.unavailable;
 }
 
+function isAvailabilityRequestFailure(result) {
+  const code = normalizeText(result && result.code);
+
+  return code === 'PRECHECK_REQUEST_FAILED' || code === 'PRECHECK_UNAVAILABLE';
+}
+
+function getHourlyAvailabilityContextKey(detail) {
+  const safeDetail = detail && typeof detail === 'object' ? detail : {};
+
+  return JSON.stringify([
+    normalizeText(safeDetail.serviceType),
+    normalizeText(safeDetail.hourly_daily_mode),
+    normalizeText(safeDetail.hourly_daily_vehicle_type),
+    normalizeText(safeDetail.hourly_daily_pickup),
+    normalizeText(safeDetail.hourly_daily_pickup_place_id),
+    normalizeText(String(safeDetail.hourly_daily_pickup_lat || '')),
+    normalizeText(String(safeDetail.hourly_daily_pickup_lng || '')),
+    normalizeText(safeDetail.hourly_daily_date),
+    normalizeText(safeDetail.hourly_daily_start_time),
+    normalizeText(String(safeDetail.hourly_daily_duration_hours || '')),
+    normalizeText(String(safeDetail.hourly_daily_price || '')),
+    normalizeText(safeDetail.hourly_daily_currency)
+  ]);
+}
+
+function isCurrentHourlyAvailabilityRequest(requestId, contextKey) {
+  const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+  return Boolean(
+    suggestion &&
+    typeof suggestion.isCurrentRequest === 'function' &&
+    suggestion.isCurrentRequest({
+      requestId: requestId,
+      currentRequestId: availabilityRequestSequence,
+      contextKey: contextKey,
+      currentContextKey: activeAvailabilityContextKey,
+      liveContextKey: getHourlyAvailabilityContextKey(buildHourlySubmitDetail())
+    })
+  );
+}
+
+function restoreAvailabilityStatusPlacement(statusNode) {
+  const actionsNode = configMount.querySelector(
+    '.services-hourly-panel__row--mobile-actions'
+  );
+
+  if (actionsNode && statusNode.parentElement !== actionsNode) {
+    actionsNode.appendChild(statusNode);
+  }
+}
+
+function placeUnavailableStatusInMobileFooter(statusNode) {
+  const footerNode = configMount.querySelector(
+    '.services-hourly-panel__row--mobile-footer-spacer'
+  );
+
+  if (!isMobileHourlyViewport() || !footerNode) {
+    restoreAvailabilityStatusPlacement(statusNode);
+    return;
+  }
+
+  if (statusNode.parentElement !== footerNode) {
+    footerNode.appendChild(statusNode);
+  }
+}
+
 function setAvailabilityStatus(message, tone) {
   const statusNode = configMount.querySelector('[data-services-hourly-availability]');
 
@@ -1473,10 +1604,69 @@ function setAvailabilityStatus(message, tone) {
     return false;
   }
 
+  restoreAvailabilityStatusPlacement(statusNode);
   statusNode.textContent = message || '';
   statusNode.hidden = !message;
   statusNode.setAttribute('data-availability-tone', tone || '');
+  statusNode.removeAttribute('data-availability-compact');
 
+  return true;
+}
+
+function setUnavailableAvailabilityStatus(result) {
+  const statusNode = configMount.querySelector('[data-services-hourly-availability]');
+  const labels = getLabels();
+  const nextAvailableStartLocal = normalizeText(
+    result && result.nextAvailableStartLocal
+  );
+  const nextAvailableMessage = getNextAvailableMessage(
+    result,
+    labels,
+    state.tripDate
+  );
+  const fullMessage = getAvailabilityMessage(result);
+  let baseMessage = fullMessage;
+
+  if (!statusNode) {
+    return false;
+  }
+
+  placeUnavailableStatusInMobileFooter(statusNode);
+
+  if (nextAvailableStartLocal && nextAvailableMessage) {
+    baseMessage = fullMessage.endsWith(nextAvailableMessage)
+      ? fullMessage.slice(0, -nextAvailableMessage.length).trim()
+      : labels.availability.unavailable;
+
+    if (isMobileHourlyViewport()) {
+      baseMessage = getI18nValue('bookingStatus.paymentLabels.notAvailable') || 'No disponible';
+      statusNode.setAttribute('data-availability-compact', 'true');
+    } else {
+      statusNode.removeAttribute('data-availability-compact');
+    }
+  } else {
+    statusNode.removeAttribute('data-availability-compact');
+  }
+
+  const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+  if (suggestion && typeof suggestion.render === 'function') {
+    suggestion.render({
+      container: statusNode,
+      result: result,
+      baseMessage: baseMessage,
+      requestedLocalDate: state.tripDate,
+      compact: isMobileHourlyViewport(),
+      compactTemplate: 'Próxima: {time}',
+      template: labels.availability.nextAvailableSlot,
+      actionAttribute: 'data-services-hourly-next-available'
+    });
+  } else {
+    statusNode.textContent = baseMessage;
+  }
+
+  statusNode.hidden = false;
+  statusNode.setAttribute('data-availability-tone', 'error');
   return true;
 }
 
@@ -1487,9 +1677,11 @@ function clearAvailabilityStatus() {
     return false;
   }
 
+  restoreAvailabilityStatusPlacement(statusNode);
   statusNode.textContent = '';
   statusNode.hidden = true;
   statusNode.removeAttribute('data-availability-tone');
+  statusNode.removeAttribute('data-availability-compact');
 
   return true;
 }
@@ -1497,20 +1689,45 @@ function clearAvailabilityStatus() {
 function setHourlyContinueBusy(isBusy) {
   const labels = getLabels();
   const ctaButton = configMount.querySelector('[data-services-hourly-cta]');
+  const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+  availabilityBusy = Boolean(isBusy);
 
   if (!ctaButton) {
     return false;
   }
 
   if (isBusy) {
-    ctaButton.disabled = true;
-    ctaButton.setAttribute('aria-disabled', 'true');
+    if (suggestion && typeof suggestion.syncUiState === 'function') {
+      suggestion.syncUiState({
+        priceVisible: true,
+        ctaEnabled: false,
+        setCtaEnabled: (enabled) => {
+          ctaButton.disabled = !enabled;
+          ctaButton.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+        }
+      });
+    } else {
+      ctaButton.disabled = true;
+      ctaButton.setAttribute('aria-disabled', 'true');
+    }
     ctaButton.textContent = labels.availability.checking;
     return true;
   }
 
-  ctaButton.disabled = shouldDisableHourlyContinue();
-  ctaButton.setAttribute('aria-disabled', shouldDisableHourlyContinue() ? 'true' : 'false');
+  if (suggestion && typeof suggestion.syncUiState === 'function') {
+    suggestion.syncUiState({
+      priceVisible: true,
+      ctaEnabled: !shouldDisableHourlyContinue(),
+      setCtaEnabled: (enabled) => {
+        ctaButton.disabled = !enabled;
+        ctaButton.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+      }
+    });
+  } else {
+    ctaButton.disabled = shouldDisableHourlyContinue();
+    ctaButton.setAttribute('aria-disabled', shouldDisableHourlyContinue() ? 'true' : 'false');
+  }
   ctaButton.textContent = getHourlyCtaText(labels);
 
   return true;
@@ -1561,10 +1778,71 @@ function restoreHourlyContinueAfterMobileContactClose() {
   return true;
 }
 
-function handleHourlyContinue() {
+function runHourlyAvailabilityPrecheck(detail, options) {
   const precheckApi = getHourlyAvailabilityPrecheckApi();
-  const detail = buildHourlySubmitDetail();
   const labels = getLabels();
+  const safeOptions = options && typeof options === 'object' ? options : {};
+  const contextKey = getHourlyAvailabilityContextKey(detail);
+  const requestId = availabilityRequestSequence + 1;
+
+  clearAvailabilityStatus();
+
+  if (!precheckApi || typeof precheckApi.precheck !== 'function') {
+    clearAvailabilityBlock();
+    setAvailabilityStatus(labels.availability.error, 'error');
+    return Promise.resolve(false);
+  }
+
+  availabilityRequestSequence = requestId;
+  activeAvailabilityContextKey = contextKey;
+  setAvailabilityStatus(labels.availability.checking, 'checking');
+  setHourlyContinueBusy(true);
+
+  return precheckApi.precheck(detail)
+    .then(function (result) {
+      if (!isCurrentHourlyAvailabilityRequest(requestId, contextKey)) {
+        return false;
+      }
+
+      if (result && result.available === true) {
+        clearAvailabilityBlock();
+        setAvailabilityStatus(labels.availability.available, 'success');
+        setHourlyContinueBusy(false);
+
+        if (safeOptions.dispatchOnAvailable !== false) {
+          trackHourlyContinueClick();
+          dispatchHourlySubmit(detail);
+        }
+
+        return true;
+      }
+
+      if (isAvailabilityRequestFailure(result)) {
+        clearAvailabilityBlock();
+        setAvailabilityStatus(labels.availability.error, 'error');
+        setHourlyContinueBusy(false);
+        return false;
+      }
+
+      setAvailabilityBlock(result && result.code, result);
+      setUnavailableAvailabilityStatus(result);
+      setHourlyContinueBusy(false);
+      return false;
+    })
+    .catch(function () {
+      if (!isCurrentHourlyAvailabilityRequest(requestId, contextKey)) {
+        return false;
+      }
+
+      clearAvailabilityBlock();
+      setAvailabilityStatus(labels.availability.error, 'error');
+      setHourlyContinueBusy(false);
+      return false;
+    });
+}
+
+function handleHourlyContinue() {
+  const detail = buildHourlySubmitDetail();
 
   clearAvailabilityStatus();
 
@@ -1574,33 +1852,30 @@ function handleHourlyContinue() {
     return Promise.resolve(true);
   }
 
-  if (!precheckApi || typeof precheckApi.precheck !== 'function') {
-    setAvailabilityStatus(labels.availability.error, 'error');
-    return Promise.resolve(false);
-  }
+  return runHourlyAvailabilityPrecheck(detail, {
+    dispatchOnAvailable: true
+  });
+}
 
-  setAvailabilityStatus(labels.availability.checking, 'checking');
-  setHourlyContinueBusy(true);
+function applyNextAvailableSuggestion(nextAvailableStartLocal) {
+  const suggestion = window.PixkuySharedAvailabilitySuggestion;
 
-  return precheckApi.precheck(detail)
-    .then(function (result) {
-      if (result && result.available === true) {
-        setAvailabilityStatus(labels.availability.available, 'success');
-        trackHourlyContinueClick();
-        dispatchHourlySubmit(detail);
-        return true;
-      }
-
-      setAvailabilityBlock(result && result.code);
-      setAvailabilityStatus(getAvailabilityMessage(result), 'error');
-      setHourlyContinueBusy(false);
-      return false;
-    })
-    .catch(function () {
-      setAvailabilityStatus(labels.availability.error, 'error');
-      setHourlyContinueBusy(false);
-      return false;
-    });
+  return suggestion && typeof suggestion.apply === 'function'
+    ? suggestion.apply({
+        nextAvailableStartLocal: nextAvailableStartLocal,
+        invalidate: invalidateAvailabilityState,
+        applyDateTime: ({ date, time }) => {
+          state.tripDate = date;
+          state.startTime = time;
+          syncDerivedState();
+          syncLiveFieldValues();
+        },
+        recheck: () => runHourlyAvailabilityPrecheck(
+          buildHourlySubmitDetail(),
+          { dispatchOnAvailable: false }
+        )
+      })
+    : Promise.resolve(false);
 }
 
   function bindEvents() {
@@ -1616,6 +1891,7 @@ function handleHourlyContinue() {
         const nextMode = normalizeText(modeButton.getAttribute('data-services-hourly-mode')) || MODES.HOURLY;
         const shouldSyncWithoutRemount = isMobileModeSwitchWithoutRemount(nextMode);
 
+        invalidateAvailabilityState();
         state.mode = nextMode;
 
         if (state.mode === MODES.HOURLY && HOURLY_DURATION_OPTIONS.indexOf(state.durationHours) === -1) {
@@ -1643,6 +1919,7 @@ function handleHourlyContinue() {
           return;
         }
 
+        invalidateAvailabilityState();
         state.durationHours = nextDuration;
 
         if (isMobileHourlyViewport() && state.mode === MODES.HOURLY) {
@@ -1677,6 +1954,15 @@ function handleHourlyContinue() {
         return;
       }
 
+      const nextAvailableAction = event.target.closest('[data-services-hourly-next-available]');
+      if (nextAvailableAction) {
+        event.preventDefault();
+        applyNextAvailableSuggestion(
+          nextAvailableAction.getAttribute('data-services-hourly-next-available')
+        );
+        return;
+      }
+
       const ctaButton = event.target.closest('[data-services-hourly-cta]');
 if (ctaButton && !ctaButton.disabled) {
   event.preventDefault();
@@ -1689,7 +1975,7 @@ if (ctaButton && !ctaButton.disabled) {
       const target = event.target;
 
       if (target.matches('[data-services-hourly-date]')) {
-        clearAvailabilityBlock();
+        invalidateAvailabilityState();
         state.tripDate = target.value || '';
 
         if (state.tripDate && !isServicesDateAtOrAfterMinimum(state.tripDate)) {
@@ -1704,7 +1990,7 @@ if (ctaButton && !ctaButton.disabled) {
       }
 
       if (target.matches('[data-services-hourly-time]')) {
-        clearAvailabilityBlock();
+        invalidateAvailabilityState();
         state.startTime = target.value || '';
         syncDerivedState();
         syncLiveFieldValues();
@@ -1722,7 +2008,7 @@ if (ctaButton && !ctaButton.disabled) {
       const target = event.target;
 
       if (target.matches('[data-services-hourly-date]')) {
-        clearAvailabilityBlock();
+        invalidateAvailabilityState();
         state.tripDate = target.value || '';
 
         if (state.tripDate && !isServicesDateAtOrAfterMinimum(state.tripDate)) {
@@ -1741,6 +2027,26 @@ if (ctaButton && !ctaButton.disabled) {
   window.addEventListener('pixkuy:contact-hourly-daily-sync', (event) => {
   const detail = event && event.detail ? event.detail : {};
   applyContactHourlyDailySync(detail.snapshot);
+});
+
+  window.addEventListener('pixkuy:hourly-next-available-applied', (event) => {
+  const detail = event && event.detail ? event.detail : {};
+  const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+  if (!suggestion || typeof suggestion.apply !== 'function') {
+    return;
+  }
+
+  suggestion.apply({
+    nextAvailableStartLocal: detail.nextAvailableStartLocal,
+    invalidate: invalidateAvailabilityState,
+    applyDateTime: ({ date, time }) => {
+      state.tripDate = date;
+      state.startTime = time;
+      syncDerivedState();
+      syncLiveFieldValues();
+    }
+  });
 });
 
   window.addEventListener('pixkuy:hourly-mobile-contact-step-closed', () => {

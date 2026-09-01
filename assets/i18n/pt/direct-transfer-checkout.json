@@ -1,0 +1,50 @@
+{
+  "directTransferCheckout": {
+    "emptyTitle": "Nenhum transfer direto para rever",
+    "emptyText": "Volte ao formulario e configure novamente o transfer.",
+    "emptyCta": "Voltar aos transfers diretos",
+    "title": "Reveja o seu transfer direto",
+    "text": "Confirme rota, horario, veiculo e contactos antes de continuar para o pagamento.",
+    "proceed": "Continuar para pagamento",
+    "edit": "Editar dados",
+    "error": "Reveja os dados do transfer antes de continuar.",
+    "quote": {
+      "priceUpdated": "O preço mudou. Reveja o preço atualizado e continue novamente para aceitá-lo.",
+      "requoteRequired": "Solicite e reveja o preço atual antes de continuar.",
+      "stale": "Esta cotação expirou. Reveja o preço atualizado e continue novamente.",
+      "acceptUpdated": "Continue novamente para aceitar o preço atualizado.",
+      "mismatch": "O preço aceito não corresponde à cotação atual.",
+      "tampered": "Os dados da cotação não correspondem. Reveja o preço atual antes de continuar."
+    },
+    "serviceValue": "Transfer direto",
+    "vehicleValue": "BYD M9",
+    "legalTitle": "Condicoes",
+    "legalText": "Aceitou os termos, a politica de cancelamento e o aviso de privacidade antes de continuar.",
+    "legalTextFallback": "Tem de aceitar as condicoes legais antes de continuar.",
+    "estimateSeparator": " | ",
+    "units": {
+      "km": "km",
+      "minutes": "min"
+    },
+    "passengerBuckets": {
+      "van_1_2": "1-2 passageiros",
+      "van_3_4": "3-4 passageiros",
+      "van_5_6": "5-6 passageiros"
+    },
+    "details": {
+      "service": "Servico",
+      "origin": "Origem",
+      "destination": "Destino",
+      "date": "Data",
+      "time": "Hora",
+      "passengers": "Passageiros",
+      "vehicle": "Veiculo",
+      "estimate": "Rota",
+      "price": "Preco",
+      "name": "Nome",
+      "phone": "Telefone",
+      "email": "Email",
+      "notes": "Notas"
+    }
+  }
+}

@@ -42,6 +42,7 @@
     "serviceLabels": {
       "hourly_daily": "私人车辆与司机",
       "airport_transfer": "机场接送",
+      "direct_transfer": "Direct Transfer",
       "notAvailable": "Pixkuy 服务"
     },
     "paymentLabels": {

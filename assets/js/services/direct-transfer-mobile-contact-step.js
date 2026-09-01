@@ -42,6 +42,18 @@
     return typeof value === "string" ? value.trim() : "";
   }
 
+  function normalizeCoordinateValue(value) {
+    const coordinate = Number(value);
+
+    return Number.isFinite(coordinate) ? String(coordinate) : "";
+  }
+
+  function normalizePositiveIntegerValue(value) {
+    const parsed = Number(value);
+
+    return Number.isInteger(parsed) && parsed > 0 ? String(parsed) : "";
+  }
+
   function normalizePhoneValue(value) {
     return String(value || "")
       .trim()
@@ -300,13 +312,13 @@
 
       direct_transfer_origin_address: normalizeText(originAddress.label),
       direct_transfer_origin_place_id: normalizeText(originAddress.placeId),
-      direct_transfer_origin_lat: normalizeText(originAddress.lat),
-      direct_transfer_origin_lng: normalizeText(originAddress.lng),
+      direct_transfer_origin_lat: normalizeCoordinateValue(originAddress.lat),
+      direct_transfer_origin_lng: normalizeCoordinateValue(originAddress.lng),
 
       direct_transfer_destination_address: normalizeText(destinationAddress.label),
       direct_transfer_destination_place_id: normalizeText(destinationAddress.placeId),
-      direct_transfer_destination_lat: normalizeText(destinationAddress.lat),
-      direct_transfer_destination_lng: normalizeText(destinationAddress.lng),
+      direct_transfer_destination_lat: normalizeCoordinateValue(destinationAddress.lat),
+      direct_transfer_destination_lng: normalizeCoordinateValue(destinationAddress.lng),
 
       direct_transfer_date: normalizeText(safePayload.date),
       direct_transfer_time: normalizeText(safePayload.time),
@@ -315,6 +327,7 @@
       direct_transfer_passenger_bucket_label: normalizeText(safePayload.passengerBucketLabel),
 
       direct_transfer_price: price,
+      direct_transfer_amount_minor: normalizePositiveIntegerValue(quote.amountMinor),
       direct_transfer_currency: price ? currency : "",
       direct_transfer_price_label:
         normalizeText(safePayload.priceLabel) ||
@@ -322,6 +335,10 @@
 
       direct_transfer_duration_seconds: normalizeSnapshotNumber(durationSeconds),
       direct_transfer_distance_meters: normalizeSnapshotNumber(distanceMeters),
+      direct_transfer_pricing_version: normalizeText(quote.pricingVersion),
+      direct_transfer_quote_fingerprint: normalizeText(quote.quoteFingerprint),
+      direct_transfer_quote_expires_at: normalizeText(quote.quoteExpiresAt),
+      direct_transfer_quote_accepted_at: normalizeText(quote.quoteAcceptedAt),
       direct_transfer_vehicle_label: normalizeText(safePayload.vehicleLabel) || "BYD M9",
       direct_transfer_notes: normalizeText(safePayload.notes)
     };
@@ -333,13 +350,21 @@
     return Boolean(
       safeSnapshot.direct_transfer_origin_address &&
       safeSnapshot.direct_transfer_origin_place_id &&
+      safeSnapshot.direct_transfer_origin_lat &&
+      safeSnapshot.direct_transfer_origin_lng &&
       safeSnapshot.direct_transfer_destination_address &&
       safeSnapshot.direct_transfer_destination_place_id &&
+      safeSnapshot.direct_transfer_destination_lat &&
+      safeSnapshot.direct_transfer_destination_lng &&
       safeSnapshot.direct_transfer_date &&
       safeSnapshot.direct_transfer_time &&
       safeSnapshot.direct_transfer_passenger_fare_key &&
       safeSnapshot.direct_transfer_price &&
-      safeSnapshot.direct_transfer_currency
+      safeSnapshot.direct_transfer_amount_minor &&
+      safeSnapshot.direct_transfer_currency &&
+      safeSnapshot.direct_transfer_pricing_version &&
+      safeSnapshot.direct_transfer_quote_fingerprint &&
+      safeSnapshot.direct_transfer_quote_expires_at
     );
   }
 
@@ -852,7 +877,7 @@
     );
     setText(
       submit,
-      getI18nValue("directTransferMobileFlow.contactStep.cta.submit", "")
+      getI18nValue("airportMobileContactStep.cta.submit", "")
     );
     setText(
       globalError,
@@ -997,6 +1022,7 @@
     const submit = contactStepNode
       ? contactStepNode.querySelector("[data-direct-transfer-mobile-contact-submit]")
       : null;
+    const transactionalBridge = window.PixkuyDirectTransferMobileTransactionalBridge;
     const isReady = hasFilledContactData();
 
     if (!submit) {
@@ -1007,6 +1033,10 @@
     submit.setAttribute("aria-disabled", isReady ? "false" : "true");
     submit.setAttribute("data-direct-transfer-mobile-contact-submit-ready", isReady ? "true" : "false");
 
+    if (transactionalBridge && typeof transactionalBridge.sync === "function") {
+      transactionalBridge.sync();
+    }
+
     return true;
   }
 
@@ -1015,16 +1045,21 @@
     hideGlobalError();
   }
 
-  function validateContactStep() {
-    const name = normalizeText(getContactField(FIELD_NAME).value);
-    const phone = normalizePhoneValue(getContactField(FIELD_PHONE).value);
-    const email = normalizeText(getContactField(FIELD_EMAIL).value);
-    const validity = {
-      name: Boolean(name),
-      phone: isValidPhone(phone),
-      email: isValidEmail(email),
+  function getContactValidity(contactData) {
+    const safeContactData = contactData && typeof contactData === "object"
+      ? contactData
+      : {};
+
+    return {
+      name: Boolean(normalizeText(safeContactData.name)),
+      phone: isValidPhone(normalizePhoneValue(safeContactData.phone)),
+      email: isValidEmail(normalizeText(safeContactData.email)),
       notes: true
     };
+  }
+
+  function validateContactStep() {
+    const validity = getContactValidity(getContactData());
     const hasErrors = Object.keys(validity).some(function hasInvalidField(key) {
       return validity[key] !== true;
     });
@@ -1039,6 +1074,24 @@
     }
 
     hideGlobalError();
+    return true;
+  }
+
+  function ensureHiddenFormValue(form, name, value) {
+    let field = form ? form.querySelector('[name="' + name + '"]') : null;
+
+    if (!form) {
+      return false;
+    }
+
+    if (!field) {
+      field = document.createElement("input");
+      field.type = "hidden";
+      field.name = name;
+      form.appendChild(field);
+    }
+
+    setInputValue(field, value);
     return true;
   }
 
@@ -1103,11 +1156,12 @@
     return parts.filter(Boolean).join(" | ");
   }
 
-  function fillReservationForm(snapshot, contactData) {
+  function fillReservationForm(snapshot, contactData, options) {
     const formsApi = getReservationFormsApi();
     const form = formsApi ? formsApi.getReservationForm() : null;
     const fields = form && formsApi ? formsApi.getReservationRequestFields(form) : null;
     const summary = buildRequestSummary(snapshot);
+    const safeOptions = options && typeof options === "object" ? options : {};
 
     if (!form || !fields) {
       return false;
@@ -1151,9 +1205,14 @@
     writeFormValue(form, "direct_transfer_passenger_fare_key", snapshot.direct_transfer_passenger_fare_key, false);
     writeFormValue(form, "direct_transfer_passenger_bucket_label", snapshot.direct_transfer_passenger_bucket_label, false);
     writeFormValue(form, "direct_transfer_price", snapshot.direct_transfer_price, false);
+    ensureHiddenFormValue(form, "direct_transfer_amount_minor", snapshot.direct_transfer_amount_minor);
     writeFormValue(form, "direct_transfer_currency", snapshot.direct_transfer_currency, false);
     writeFormValue(form, "direct_transfer_duration_seconds", snapshot.direct_transfer_duration_seconds, false);
     writeFormValue(form, "direct_transfer_distance_meters", snapshot.direct_transfer_distance_meters, false);
+    writeFormValue(form, "direct_transfer_pricing_version", snapshot.direct_transfer_pricing_version, false);
+    writeFormValue(form, "direct_transfer_quote_fingerprint", snapshot.direct_transfer_quote_fingerprint, false);
+    writeFormValue(form, "direct_transfer_quote_expires_at", snapshot.direct_transfer_quote_expires_at, false);
+    writeFormValue(form, "direct_transfer_quote_accepted_at", snapshot.direct_transfer_quote_accepted_at, false);
     writeFormValue(form, "direct_transfer_vehicle_label", snapshot.direct_transfer_vehicle_label, false);
     writeFormValue(form, "direct_transfer_notes", contactData.notes, false);
 
@@ -1167,9 +1226,105 @@
 
     formsApi.syncReservationRequestState(fields);
 
+    if (safeOptions.skipLegacyValidation === true) {
+      return true;
+    }
+
     if (typeof formsApi.refreshReservationRequestValidationUX === "function") {
       return formsApi.refreshReservationRequestValidationUX(fields);
     }
+
+    return true;
+  }
+
+  function validateLegalAcceptance() {
+    const bridge = window.PixkuyDirectTransferMobileTransactionalBridge;
+
+    return Boolean(
+      bridge &&
+        typeof bridge.validateLegalAcceptance === "function" &&
+        bridge.validateLegalAcceptance()
+    );
+  }
+
+  function applyCanonicalQuoteToSnapshot(snapshot, detail) {
+    const safeDetail = detail && typeof detail === "object" ? detail : {};
+    const amountMinor = normalizePositiveIntegerValue(safeDetail.amountMinor);
+    const price = Number(safeDetail.price);
+    const currency = normalizeText(safeDetail.currency) || "MXN";
+    const pricingVersion = normalizeText(safeDetail.pricingVersion);
+    const quoteFingerprint = normalizeText(safeDetail.quoteFingerprint);
+    const quoteExpiresAt = normalizeText(safeDetail.quoteExpiresAt);
+    const durationSeconds = Number(safeDetail.durationSeconds);
+    const distanceMeters = Number(safeDetail.distanceMeters);
+
+    if (
+      !snapshot ||
+      !amountMinor ||
+      !Number.isFinite(price) ||
+      price <= 0 ||
+      Math.round(price * 100) !== Number(amountMinor) ||
+      currency !== "MXN" ||
+      !pricingVersion ||
+      !quoteFingerprint ||
+      !quoteExpiresAt
+    ) {
+      return false;
+    }
+
+    snapshot.direct_transfer_price = String(price);
+    snapshot.direct_transfer_amount_minor = amountMinor;
+    snapshot.direct_transfer_currency = currency;
+    snapshot.direct_transfer_price_label =
+      normalizeText(safeDetail.priceLabel) || formatCurrencyValue(price, currency);
+    snapshot.direct_transfer_pricing_version = pricingVersion;
+    snapshot.direct_transfer_quote_fingerprint = quoteFingerprint;
+    snapshot.direct_transfer_quote_expires_at = quoteExpiresAt;
+    snapshot.direct_transfer_quote_accepted_at = normalizeText(safeDetail.quoteAcceptedAt);
+
+    if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
+      snapshot.direct_transfer_duration_seconds = String(Math.round(durationSeconds));
+    }
+
+    if (Number.isFinite(distanceMeters) && distanceMeters > 0) {
+      snapshot.direct_transfer_distance_meters = String(Math.round(distanceMeters));
+    }
+
+    return true;
+  }
+
+  function applyCanonicalQuoteToCurrentSnapshot(detail) {
+    if (
+      !currentSnapshot ||
+      !isOpen() ||
+      !applyCanonicalQuoteToSnapshot(currentSnapshot, detail)
+    ) {
+      return false;
+    }
+
+    syncSummary(currentSnapshot);
+    syncSubmitAvailability();
+    return true;
+  }
+
+  function isDirectTransferBookingApiCheckoutBridgeReady() {
+    return Boolean(
+      document.documentElement &&
+        document.documentElement.dataset.directTransferBookingApiCheckoutBound === "1"
+    );
+  }
+
+  function dispatchTransactionalCheckoutSubmit(form) {
+    if (!form || !isDirectTransferBookingApiCheckoutBridgeReady()) {
+      return false;
+    }
+
+    form.dispatchEvent(
+      new window.Event("submit", {
+        bubbles: true,
+        cancelable: true
+      })
+    );
 
     return true;
   }
@@ -1228,16 +1383,27 @@
       return false;
     }
 
-    isFormValid = fillReservationForm(snapshot, contactData);
+    isFormValid = fillReservationForm(snapshot, contactData, {
+      skipLegacyValidation: true
+    });
 
     if (!isFormValid) {
       showGlobalError();
       return false;
     }
 
-    if (form && typeof form.requestSubmit === "function") {
-      trackDirectTransferMobileContactRequest(snapshot);
-      form.requestSubmit();
+    if (!validateLegalAcceptance()) {
+      const transactionalBridge = window.PixkuyDirectTransferMobileTransactionalBridge;
+
+      if (transactionalBridge && typeof transactionalBridge.sync === "function") {
+        transactionalBridge.sync();
+      }
+      return false;
+    }
+
+    trackDirectTransferMobileContactRequest(snapshot);
+
+    if (dispatchTransactionalCheckoutSubmit(form)) {
       return true;
     }
 
@@ -1436,8 +1602,23 @@
     isOpen,
     canOpen,
     syncCopy,
-    submit: submitContactStep
+    submit: submitContactStep,
+    applyCanonicalQuote: applyCanonicalQuoteToCurrentSnapshot
   };
+
+  window.PixkuyDirectTransferMobileContactContract = {
+    buildSnapshotFromPayload,
+    hasCompleteDirectTransferSnapshot,
+    getContactValidity,
+    fillReservationForm,
+    dispatchTransactionalCheckoutSubmit,
+    validateLegalAcceptance,
+    applyCanonicalQuoteToSnapshot
+  };
+
+  window.addEventListener("pixkuy:direct-transfer-canonical-price", function onCanonicalPrice(event) {
+    applyCanonicalQuoteToCurrentSnapshot(event && event.detail);
+  });
 
   window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
     if (contactStepNode) {

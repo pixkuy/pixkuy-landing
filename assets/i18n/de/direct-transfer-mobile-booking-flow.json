@@ -39,6 +39,12 @@
       "finalSeparator": " und ",
       "loading": "Preis wird berechnet…",
       "unavailable": "Wir konnten den Preis für diese Strecke nicht berechnen.",
+      "priceUpdated": "Der Preis hat sich geändert. Prüfe ihn und fahre erneut fort, um ihn zu akzeptieren.",
+      "requoteRequired": "Fordere den aktuellen Preis an und prüfe ihn, bevor du fortfährst.",
+      "quoteStale": "Dieses Angebot ist abgelaufen. Prüfe den aktualisierten Preis und fahre erneut fort.",
+      "acceptUpdated": "Fahre erneut fort, um den aktualisierten Preis zu akzeptieren.",
+      "quoteMismatch": "Der akzeptierte Preis stimmt nicht mit dem aktuellen Angebot überein.",
+      "quoteTampered": "Die Angebotsdaten stimmen nicht überein. Prüfe den aktuellen Preis, bevor du fortfährst.",
       "airportTransfer": "Diese Strecke muss als Flughafen / Hotel verwaltet werden.",
       "outOfCoverage": "Für diese Strecke können wir dir per WhatsApp oder mit einem Fahrzeug-mit-Chauffeur-Service helfen.",
       "readySuffix": "MXN"

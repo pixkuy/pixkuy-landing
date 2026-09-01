@@ -61,6 +61,10 @@
     gap:2px;
   }
 
+  .hourly-mobile-route .hourly-mobile-contact-step__summary-row[hidden]{
+    display:none !important;
+  }
+
   .hourly-mobile-route .hourly-mobile-contact-step__summary-row[data-hourly-mobile-contact-summary-row="pickup"]{
     grid-column:1 / -1;
   }
@@ -195,6 +199,22 @@
   .hourly-mobile-route .hourly-mobile-contact-step__error[hidden],
   .hourly-mobile-route .hourly-mobile-contact-step__global-error[hidden]{
     display:none !important;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__global-error[data-hourly-mobile-availability-compact] a[data-hourly-mobile-next-available]{
+    color:rgba(61,158,122,.98);
+    text-decoration-color:rgba(61,158,122,.72);
+    text-underline-offset:3px;
+    white-space:nowrap;
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__global-error[data-hourly-mobile-availability-compact] a[data-hourly-mobile-next-available]:hover{
+    color:rgba(166,224,204,.98);
+  }
+
+  .hourly-mobile-route .hourly-mobile-contact-step__global-error[data-hourly-mobile-availability-compact] a[data-hourly-mobile-next-available]:focus-visible{
+    outline:2px solid rgba(61,158,122,.95);
+    outline-offset:2px;
   }
   
     .hourly-mobile-route .hourly-mobile-contact-step__legal{

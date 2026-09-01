@@ -1,0 +1,50 @@
+{
+  "directTransferCheckout": {
+    "emptyTitle": "Aucun transfert direct a verifier",
+    "emptyText": "Revenez au formulaire et configurez a nouveau votre transfert.",
+    "emptyCta": "Retour aux transferts directs",
+    "title": "Verifiez votre transfert direct",
+    "text": "Confirmez trajet, horaire, vehicule et coordonnees avant de passer au paiement.",
+    "proceed": "Continuer vers le paiement",
+    "edit": "Modifier les donnees",
+    "error": "Verifiez les donnees du transfert avant de continuer.",
+    "quote": {
+      "priceUpdated": "Le prix a changé. Vérifiez le prix actualisé et continuez à nouveau pour l’accepter.",
+      "requoteRequired": "Demandez et vérifiez le prix actuel avant de continuer.",
+      "stale": "Ce devis a expiré. Vérifiez le prix actualisé et continuez à nouveau.",
+      "acceptUpdated": "Continuez à nouveau pour accepter le prix actualisé.",
+      "mismatch": "Le prix accepté ne correspond pas au devis actuel.",
+      "tampered": "Les données du devis ne correspondent pas. Vérifiez le prix actuel avant de continuer."
+    },
+    "serviceValue": "Transfert direct",
+    "vehicleValue": "BYD M9",
+    "legalTitle": "Conditions",
+    "legalText": "Vous avez accepte les conditions, la politique d'annulation et l'avis de confidentialite avant de continuer.",
+    "legalTextFallback": "Vous devez accepter les conditions legales avant de continuer.",
+    "estimateSeparator": " | ",
+    "units": {
+      "km": "km",
+      "minutes": "min"
+    },
+    "passengerBuckets": {
+      "van_1_2": "1-2 passagers",
+      "van_3_4": "3-4 passagers",
+      "van_5_6": "5-6 passagers"
+    },
+    "details": {
+      "service": "Service",
+      "origin": "Origine",
+      "destination": "Destination",
+      "date": "Date",
+      "time": "Heure",
+      "passengers": "Passagers",
+      "vehicle": "Vehicule",
+      "estimate": "Trajet",
+      "price": "Prix",
+      "name": "Nom",
+      "phone": "Telephone",
+      "email": "E-mail",
+      "notes": "Notes"
+    }
+  }
+}

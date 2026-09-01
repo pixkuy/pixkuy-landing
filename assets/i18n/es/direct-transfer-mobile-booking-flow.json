@@ -39,6 +39,12 @@
       "finalSeparator": " y ",
       "loading": "Calculando precio…",
       "unavailable": "No pudimos calcular el precio para este trayecto.",
+      "priceUpdated": "El precio cambió. Revísalo y continúa de nuevo para aceptarlo.",
+      "requoteRequired": "Solicita y revisa el precio actual antes de continuar.",
+      "quoteStale": "Esta cotización venció. Revisa el precio actualizado y continúa de nuevo.",
+      "acceptUpdated": "Continúa de nuevo para aceptar el precio actualizado.",
+      "quoteMismatch": "El precio aceptado no coincide con la cotización actual.",
+      "quoteTampered": "Los datos de la cotización no coinciden. Revisa el precio actual antes de continuar.",
       "airportTransfer": "Este trayecto debe gestionarse como Aeropuerto / Hotel.",
       "outOfCoverage": "Para este trayecto, podemos ayudarte por WhatsApp o con servicio de vehículo con conductor.",
       "readySuffix": "MXN"

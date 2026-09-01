@@ -1,0 +1,50 @@
+{
+  "directTransferCheckout": {
+    "emptyTitle": "没有可确认的直达接送",
+    "emptyText": "返回表单并重新配置接送。",
+    "emptyCta": "返回直达接送",
+    "title": "确认直达接送",
+    "text": "付款前请确认路线、时间、车辆和联系方式。",
+    "proceed": "继续付款",
+    "edit": "编辑信息",
+    "error": "继续前请检查接送信息。",
+    "quote": {
+      "priceUpdated": "价格已变更。请检查更新后的价格，并再次继续以接受该价格。",
+      "requoteRequired": "继续前请重新获取并检查当前价格。",
+      "stale": "此报价已过期。请检查更新后的价格并再次继续。",
+      "acceptUpdated": "请再次继续以接受更新后的价格。",
+      "mismatch": "已接受的价格与当前报价不一致。",
+      "tampered": "报价信息不一致。继续前请检查当前价格。"
+    },
+    "serviceValue": "直达接送",
+    "vehicleValue": "BYD M9",
+    "legalTitle": "条款",
+    "legalText": "继续前你已接受条款、取消政策和隐私声明。",
+    "legalTextFallback": "继续前必须接受法律条款。",
+    "estimateSeparator": " | ",
+    "units": {
+      "km": "公里",
+      "minutes": "分钟"
+    },
+    "passengerBuckets": {
+      "van_1_2": "1-2 位乘客",
+      "van_3_4": "3-4 位乘客",
+      "van_5_6": "5-6 位乘客"
+    },
+    "details": {
+      "service": "服务",
+      "origin": "出发地",
+      "destination": "目的地",
+      "date": "日期",
+      "time": "时间",
+      "passengers": "乘客",
+      "vehicle": "车辆",
+      "estimate": "路线",
+      "price": "价格",
+      "name": "姓名",
+      "phone": "电话",
+      "email": "Email",
+      "notes": "备注"
+    }
+  }
+}

@@ -39,6 +39,10 @@
   let currentSnapshot = null;
   let legalAcceptanceInstance = null;
   let previousNotesFocus = null;
+  let availabilityRequestSequence = 0;
+  let availabilityBusy = false;
+  let availabilityBlocked = false;
+  let lastAvailabilityResult = null;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -230,6 +234,83 @@
     }
 
     return price ? formatCurrencyValue(price, currency) : "";
+  }
+
+  function getAvailabilityPrecheckApi() {
+    const api = window.PixkuyHourlyAvailabilityPrecheck;
+
+    return api && typeof api.precheck === "function" ? api : null;
+  }
+
+  function getAvailabilityContextKey(snapshot) {
+    const safeSnapshot = snapshot && typeof snapshot === "object" ? snapshot : {};
+
+    return JSON.stringify([
+      normalizeText(safeSnapshot.serviceType),
+      normalizeText(safeSnapshot.hourly_daily_mode),
+      normalizeText(safeSnapshot.hourly_daily_vehicle_type),
+      normalizeText(safeSnapshot.hourly_daily_pickup),
+      normalizeText(safeSnapshot.hourly_daily_pickup_place_id),
+      normalizeText(safeSnapshot.hourly_daily_pickup_lat),
+      normalizeText(safeSnapshot.hourly_daily_pickup_lng),
+      normalizeText(safeSnapshot.hourly_daily_date),
+      normalizeText(safeSnapshot.hourly_daily_start_time),
+      normalizeText(safeSnapshot.hourly_daily_duration_hours),
+      normalizeText(safeSnapshot.hourly_daily_price),
+      normalizeText(safeSnapshot.hourly_daily_currency)
+    ]);
+  }
+
+  function getNextAvailableLabel(result) {
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+    return suggestion && typeof suggestion.describe === "function"
+      ? suggestion.describe(result, {
+          requestedLocalDate:
+            currentSnapshot && currentSnapshot.hourly_daily_date,
+          compact: true,
+          compactTemplate: "Próxima: {time}"
+        }).message
+      : "";
+  }
+
+  function getAvailabilityMessage(result) {
+    const code = normalizeText(result && result.code);
+    const fallback = getI18nValue(
+      "services.cards.hourly.panel.availability.unavailable",
+      "No hay disponibilidad para esa fecha y hora. Elige otra opción."
+    );
+    const nextAvailableLabel = getNextAvailableLabel(result);
+    let message = fallback;
+
+    if (code === "HOURLY_MINIMUM_LEAD_TIME_NOT_MET") {
+      message = getI18nValue(
+        "services.cards.hourly.panel.availability.minimumLeadTime",
+        fallback
+      );
+    } else if (code === "PRICE_MISMATCH") {
+      message = getI18nValue(
+        "services.cards.hourly.panel.availability.priceMismatch",
+        fallback
+      );
+    } else if (
+      code === "PRECHECK_REQUEST_FAILED" ||
+      code === "PRECHECK_UNAVAILABLE" ||
+      code === "INVALID_PRECHECK_PAYLOAD"
+    ) {
+      return getI18nValue(
+        "services.cards.hourly.panel.availability.error",
+        fallback
+      );
+    }
+
+    return [message, nextAvailableLabel].filter(Boolean).join(" ");
+  }
+
+  function isAvailabilityRequestFailure(result) {
+    const code = normalizeText(result && result.code);
+
+    return code === "PRECHECK_REQUEST_FAILED" || code === "PRECHECK_UNAVAILABLE";
   }
 
   function buildSnapshotFromPayload(payload) {
@@ -858,6 +939,161 @@
     return true;
   }
 
+  function syncAvailabilityPricePresentation() {
+    const priceRow = contactStepNode
+      ? contactStepNode.querySelector(
+          '[data-hourly-mobile-contact-summary-row="price"]'
+        )
+      : null;
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+    if (!priceRow) {
+      return false;
+    }
+
+    if (suggestion && typeof suggestion.syncUiState === "function") {
+      suggestion.syncUiState({
+        priceVisible: !availabilityBlocked,
+        ctaEnabled: false,
+        setPriceVisible: function setHourlyMobilePriceVisible(visible) {
+          priceRow.hidden = !visible;
+          priceRow.setAttribute("aria-hidden", visible ? "false" : "true");
+        }
+      });
+    } else {
+      priceRow.hidden = availabilityBlocked;
+      priceRow.setAttribute("aria-hidden", availabilityBlocked ? "true" : "false");
+    }
+    return true;
+  }
+
+  function showAvailabilityError(result, messageOverride) {
+    const error = contactStepNode
+      ? contactStepNode.querySelector("[data-hourly-mobile-contact-global-error]")
+      : null;
+    const message = normalizeText(messageOverride) || getAvailabilityMessage(result);
+    const nextAvailableStartLocal = normalizeText(
+      result && result.nextAvailableStartLocal
+    );
+    const nextAvailableLabel = getNextAvailableLabel(result);
+    const baseMessage = nextAvailableStartLocal && nextAvailableLabel
+      ? getI18nValue("bookingStatus.paymentLabels.notAvailable", "No disponible")
+      : message;
+
+    availabilityBusy = false;
+    availabilityBlocked = true;
+    lastAvailabilityResult = result && typeof result === "object" ? result : {};
+
+    if (error) {
+      const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+      if (suggestion && typeof suggestion.render === "function") {
+        suggestion.render({
+          container: error,
+          result: result,
+          baseMessage: baseMessage,
+          requestedLocalDate:
+            currentSnapshot && currentSnapshot.hourly_daily_date,
+          compact: true,
+          compactTemplate: "Próxima: {time}",
+          actionAttribute: "data-hourly-mobile-next-available"
+        });
+      } else {
+        error.textContent = baseMessage;
+      }
+
+      error.hidden = false;
+      error.setAttribute("data-hourly-mobile-error-category", "availability");
+      error.toggleAttribute(
+        "data-hourly-mobile-availability-compact",
+        Boolean(nextAvailableStartLocal && nextAvailableLabel)
+      );
+    }
+
+    syncAvailabilityPricePresentation();
+    syncSubmitAvailability();
+    return true;
+  }
+
+  function showAvailabilityRequestError(result) {
+    const error = contactStepNode
+      ? contactStepNode.querySelector("[data-hourly-mobile-contact-global-error]")
+      : null;
+
+    availabilityBusy = false;
+    availabilityBlocked = false;
+    lastAvailabilityResult = null;
+
+    if (error) {
+      error.textContent = getAvailabilityMessage(result);
+      error.hidden = false;
+      error.setAttribute("data-hourly-mobile-error-category", "availability_request");
+      error.removeAttribute("data-hourly-mobile-availability-compact");
+    }
+
+    syncAvailabilityPricePresentation();
+    syncSubmitAvailability();
+    return true;
+  }
+
+  function clearAvailabilityState() {
+    const error = contactStepNode
+      ? contactStepNode.querySelector("[data-hourly-mobile-contact-global-error]")
+      : null;
+
+    availabilityRequestSequence += 1;
+    availabilityBusy = false;
+    availabilityBlocked = false;
+    lastAvailabilityResult = null;
+
+    if (error) {
+      error.removeAttribute("data-hourly-mobile-error-category");
+      error.hidden = true;
+    }
+
+    syncAvailabilityPricePresentation();
+    syncSubmitAvailability();
+  }
+
+  function focusContactField(name) {
+    const field = getContactField(name);
+
+    if (!field || typeof field.focus !== "function") {
+      return false;
+    }
+
+    if (typeof field.scrollIntoView === "function") {
+      field.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    window.setTimeout(function focusInvalidContactField() {
+      field.focus({ preventScroll: true });
+    }, 120);
+
+    return true;
+  }
+
+  function showFieldError(name, message) {
+    const error = getContactError(name);
+
+    if (!getContactField(name)) {
+      return false;
+    }
+
+    setFieldValidity(name, false);
+
+    if (error && normalizeText(message)) {
+      error.textContent = normalizeText(message);
+    }
+
+    showGlobalError();
+    focusContactField(name);
+    return true;
+  }
+
   function hasFilledContactData() {
     const nameField = getContactField(FIELD_NAME);
     const phoneField = getContactField(FIELD_PHONE);
@@ -974,16 +1210,30 @@
       ? contactStepNode.querySelector("[data-hourly-mobile-contact-submit]")
       : null;
     const requiresLegalAcceptance = isTransactionalHourlySnapshot(currentSnapshot);
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
     const isReady =
       hasFilledContactData() &&
-      (!requiresLegalAcceptance || isLegalAcceptanceAccepted());
+      (!requiresLegalAcceptance || isLegalAcceptanceAccepted()) &&
+      !availabilityBusy &&
+      !availabilityBlocked;
 
     if (!submit) {
       return false;
     }
 
-    submit.disabled = !isReady;
-    submit.setAttribute("aria-disabled", isReady ? "false" : "true");
+    if (suggestion && typeof suggestion.syncUiState === "function") {
+      suggestion.syncUiState({
+        priceVisible: true,
+        ctaEnabled: isReady,
+        setCtaEnabled: function setHourlyMobileCtaEnabled(enabled) {
+          submit.disabled = !enabled;
+          submit.setAttribute("aria-disabled", enabled ? "false" : "true");
+        }
+      });
+    } else {
+      submit.disabled = !isReady;
+      submit.setAttribute("aria-disabled", isReady ? "false" : "true");
+    }
     submit.setAttribute("data-hourly-mobile-contact-submit-ready", isReady ? "true" : "false");
 
     return true;
@@ -991,7 +1241,10 @@
 
   function clearValidationForField(name) {
     setFieldValidity(name, true);
-    hideGlobalError();
+
+    if (!availabilityBusy && !availabilityBlocked) {
+      hideGlobalError();
+    }
   }
 
   function validateContactStep() {
@@ -1006,6 +1259,9 @@
     const hasErrors = Object.keys(validity).some(function hasInvalidField(key) {
       return validity[key] !== true;
     });
+    const firstInvalidField = Object.keys(validity).find(function findInvalidField(key) {
+      return validity[key] !== true;
+    });
 
     Object.keys(validity).forEach(function applyValidity(key) {
       setFieldValidity(key, validity[key]);
@@ -1013,6 +1269,7 @@
 
     if (hasErrors) {
       showGlobalError();
+      focusContactField(firstInvalidField);
       return false;
     }
 
@@ -1202,6 +1459,104 @@
     return true;
   }
 
+  function precheckTransactionalSnapshot(snapshot, onAvailable) {
+    const precheckApi = getAvailabilityPrecheckApi();
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
+    const contextKey = getAvailabilityContextKey(snapshot);
+    const requestId = availabilityRequestSequence + 1;
+
+    if (!precheckApi) {
+      showAvailabilityRequestError({ code: "PRECHECK_UNAVAILABLE" });
+      return false;
+    }
+
+    availabilityRequestSequence = requestId;
+    availabilityBusy = true;
+    availabilityBlocked = false;
+    lastAvailabilityResult = null;
+    hideGlobalError();
+    syncAvailabilityPricePresentation();
+    syncSubmitAvailability();
+
+    precheckApi.precheck(snapshot)
+      .then(function onPrecheckResult(result) {
+        if (!suggestion || !suggestion.isCurrentRequest({
+          requestId: requestId,
+          currentRequestId: availabilityRequestSequence,
+          contextKey: contextKey,
+          currentContextKey: getAvailabilityContextKey(currentSnapshot),
+          liveContextKey: getAvailabilityContextKey(currentSnapshot)
+        })) {
+          return false;
+        }
+
+        availabilityBusy = false;
+
+        if (isAvailabilityRequestFailure(result)) {
+          showAvailabilityRequestError(result);
+          return false;
+        }
+
+        if (!result || result.available !== true) {
+          showAvailabilityError(result || {});
+          return false;
+        }
+
+        availabilityBlocked = false;
+        lastAvailabilityResult = null;
+        syncAvailabilityPricePresentation();
+        hideGlobalError();
+        syncSubmitAvailability();
+        return typeof onAvailable === "function" ? onAvailable() : true;
+      })
+      .catch(function onPrecheckFailure() {
+        if (suggestion && suggestion.isCurrentRequest({
+          requestId: requestId,
+          currentRequestId: availabilityRequestSequence,
+          contextKey: contextKey,
+          currentContextKey: getAvailabilityContextKey(currentSnapshot),
+          liveContextKey: getAvailabilityContextKey(currentSnapshot)
+        })) {
+          showAvailabilityRequestError({ code: "PRECHECK_REQUEST_FAILED" });
+        }
+      });
+
+    return true;
+  }
+
+  function applyNextAvailableSuggestion(nextAvailableStartLocal) {
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+    if (!currentSnapshot || !suggestion || typeof suggestion.apply !== "function") {
+      return false;
+    }
+
+    return suggestion.apply({
+      nextAvailableStartLocal: nextAvailableStartLocal,
+      invalidate: function invalidateMobileSuggestion() {
+        availabilityRequestSequence += 1;
+        availabilityBusy = false;
+        availabilityBlocked = false;
+        lastAvailabilityResult = null;
+      },
+      applyDateTime: function applyMobileDateTime(value) {
+        currentSnapshot = Object.assign({}, currentSnapshot, {
+          hourly_daily_date: value.date,
+          hourly_daily_start_time: value.time
+        });
+        syncSummary(currentSnapshot);
+        syncAvailabilityPricePresentation();
+        hideGlobalError();
+        syncSubmitAvailability();
+        window.dispatchEvent(new CustomEvent(
+          "pixkuy:hourly-next-available-applied",
+          { detail: { nextAvailableStartLocal: value.value } }
+        ));
+      },
+      recheck: submitContactStep
+    });
+  }
+
   function submitContactStep() {
     const formsApi = getReservationFormsApi();
     const form = formsApi ? formsApi.getReservationForm() : null;
@@ -1233,15 +1588,20 @@
       return false;
     }
 
-    trackHourlyMobileContactRequest(snapshot);
-
     if (isTransactionalHourlySnapshot(snapshot)) {
-      if (dispatchTransactionalCheckoutSubmit(form)) {        
-        return true;
-      }
-      showGlobalError();
-      return false;
+      return precheckTransactionalSnapshot(snapshot, function continueCheckout() {
+        trackHourlyMobileContactRequest(snapshot);
+
+        if (dispatchTransactionalCheckoutSubmit(form)) {
+          return true;
+        }
+
+        showGlobalError();
+        return false;
+      });
     }
+
+    trackHourlyMobileContactRequest(snapshot);
 
     if (form && typeof form.requestSubmit === "function") {
       form.requestSubmit();
@@ -1297,6 +1657,17 @@
       const notesRow = event.target.closest('[data-hourly-mobile-contact-summary-row="notes"]');
       const back = event.target.closest("[data-hourly-mobile-contact-back]");
       const submit = event.target.closest("[data-hourly-mobile-contact-submit]");
+      const nextAvailableAction = event.target.closest(
+        "[data-hourly-mobile-next-available]"
+      );
+
+      if (nextAvailableAction) {
+        event.preventDefault();
+        applyNextAvailableSuggestion(
+          nextAvailableAction.getAttribute("data-hourly-mobile-next-available")
+        );
+        return;
+      }
 
       if (notesClose) {
         event.preventDefault();
@@ -1348,6 +1719,7 @@
 
     currentPanel = panel;
     currentSnapshot = snapshot;
+    clearAvailabilityState();
 
     syncCopy();
     syncSummary(snapshot);
@@ -1402,6 +1774,10 @@
     document.body.setAttribute(CONTACT_STEP_ACTIVE_ATTR, "false");
 
     currentPanel = null;
+    availabilityRequestSequence += 1;
+    availabilityBusy = false;
+    availabilityBlocked = false;
+    lastAvailabilityResult = null;
     hideGlobalError();
     closeNotesSheet();
 
@@ -1428,6 +1804,8 @@
     isOpen: isOpen,
     canOpen: canOpen,
     syncCopy: syncCopy,
+    showFieldError: showFieldError,
+    showAvailabilityError: showAvailabilityError,
     submit: submitContactStep
   };
 
@@ -1437,6 +1815,10 @@
 
       if (currentSnapshot && isOpen()) {
         syncSummary(currentSnapshot);
+
+        if (availabilityBlocked) {
+          showAvailabilityError(lastAvailabilityResult || {});
+        }
       }
     }
   });

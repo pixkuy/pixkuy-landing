@@ -713,7 +713,8 @@
     width:100% !important;
   }
 
-  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability{
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability,
+  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer .services-hourly-panel__availability{
     display:block !important;
     width:100% !important;
     max-width:100% !important;
@@ -728,14 +729,29 @@
     white-space:normal !important;
     overflow:visible !important;
     overflow-wrap:break-word !important;
+    position:static !important;
+  }
+
+  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer .services-hourly-panel__availability{
+    grid-area:price !important;
+    align-self:center !important;
+    padding:8px 0 !important;
   }
   
   .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability[data-availability-tone="success"]{
     color:rgba(61,158,122,.98) !important;
   }
 
-  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability[hidden]{
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability[hidden],
+  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer .services-hourly-panel__availability[hidden]{
     display:none !important;
+  }
+
+  .hourly-mobile-route .services-hourly-panel__row--mobile-actions .services-hourly-panel__availability[data-availability-compact="true"] a[data-services-hourly-next-available],
+  .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer .services-hourly-panel__availability[data-availability-compact="true"] a[data-services-hourly-next-available]{
+    color:rgba(61,158,122,.98) !important;
+    text-decoration-color:rgba(61,158,122,.72) !important;
+    white-space:nowrap;
   }
   
   .hourly-mobile-route .services-hourly-panel__price--inline{
@@ -843,6 +859,10 @@
     min-height:112px !important;
     height:112px !important;
     max-height:112px !important;
+  }
+
+  .hourly-mobile-route .services-hourly-panel__price--inline[hidden]{
+    display:none !important;
   }
 
   .hourly-mobile-route .services-hourly-panel__price--inline[data-hourly-mobile-price-state="pending"] .services-hourly-panel__price-label,

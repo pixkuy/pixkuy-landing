@@ -382,20 +382,161 @@
     return originText === destinationText;
   }
 
-  function getTodayDateValue() {
+  function getMexicoCityNowParts() {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Mexico_City",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      hourCycle: "h23"
+    });
+    const parts = formatter.formatToParts(new Date()).reduce(function reduceParts(acc, part) {
+      if (part && part.type && part.value) {
+        acc[part.type] = part.value;
+      }
+
+      return acc;
+    }, {});
+
+    return {
+      year: Number(parts.year),
+      month: Number(parts.month),
+      day: Number(parts.day),
+      hour: Number(parts.hour),
+      minute: Number(parts.minute)
+    };
+  }
+
+  function getFallbackNowParts() {
     const now = new Date();
-    const year = String(now.getFullYear()).padStart(4, "0");
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
+
+    return {
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+      day: now.getDate(),
+      hour: now.getHours(),
+      minute: now.getMinutes()
+    };
+  }
+
+  function getCivilTimestamp(parts) {
+    const safeParts = parts && typeof parts === "object" ? parts : {};
+    const year = Number(safeParts.year);
+    const month = Number(safeParts.month);
+    const day = Number(safeParts.day);
+    const hour = Number(safeParts.hour);
+    const minute = Number(safeParts.minute);
+
+    if (
+      !Number.isFinite(year) ||
+      !Number.isFinite(month) ||
+      !Number.isFinite(day) ||
+      !Number.isFinite(hour) ||
+      !Number.isFinite(minute)
+    ) {
+      return NaN;
+    }
+
+    return Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+  }
+
+  function getMexicoCityNowCivilTimestamp() {
+    let timestamp = NaN;
+
+    try {
+      timestamp = getCivilTimestamp(getMexicoCityNowParts());
+    } catch (error) {
+      timestamp = NaN;
+    }
+
+    if (Number.isFinite(timestamp)) {
+      return timestamp;
+    }
+
+    return getCivilTimestamp(getFallbackNowParts());
+  }
+
+  function getDirectTransferMinimumCivilTimestamp() {
+    return getMexicoCityNowCivilTimestamp() + (24 * 60 * 60 * 1000);
+  }
+
+  function formatCivilDateForInput(timestamp) {
+    const date = new Date(timestamp);
+    const year = String(date.getUTCFullYear()).padStart(4, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
 
     return year + "-" + month + "-" + day;
   }
 
-  function isPastDate(value) {
-    const date = normalizeText(value);
-    const today = getTodayDateValue();
+  function getSharedReservationMinimumDateValue() {
+    const formsApi = window.PixkuyForms || {};
+    const getMinimumDateTime = typeof formsApi.getReservationMinimumDateTime === "function"
+      ? formsApi.getReservationMinimumDateTime
+      : null;
+    const formatDate = typeof formsApi.formatReservationDateForInput === "function"
+      ? formsApi.formatReservationDateForInput
+      : null;
+    const minimumDateTime = getMinimumDateTime ? getMinimumDateTime() : null;
 
-    return Boolean(date && /^\d{4}-\d{2}-\d{2}$/.test(date) && date < today);
+    if (!minimumDateTime || !formatDate) {
+      return "";
+    }
+
+    return normalizeText(formatDate(minimumDateTime));
+  }
+
+  function getDirectTransferMinimumDateValue() {
+    return getSharedReservationMinimumDateValue() ||
+      formatCivilDateForInput(getDirectTransferMinimumCivilTimestamp());
+  }
+
+  function getSelectedDateTimeCivilTimestamp(dateValue, timeValue) {
+    const date = normalizeText(dateValue);
+    const time = normalizeText(timeValue);
+    const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+    const timeMatch = /^(\d{2}):(\d{2})$/.exec(time);
+
+    if (!dateMatch || !timeMatch) {
+      return NaN;
+    }
+
+    return Date.UTC(
+      Number(dateMatch[1]),
+      Number(dateMatch[2]) - 1,
+      Number(dateMatch[3]),
+      Number(timeMatch[1]),
+      Number(timeMatch[2]),
+      0,
+      0
+    );
+  }
+
+  function isDateBeforeDirectTransferMinimum(dateValue) {
+    const date = normalizeText(dateValue);
+    const minimumDate = getDirectTransferMinimumDateValue();
+
+    return Boolean(date && /^\d{4}-\d{2}-\d{2}$/.test(date) && minimumDate && date < minimumDate);
+  }
+
+  function hasDirectTransferMinimumLeadTime(dateValue, timeValue) {
+    const selected = getSelectedDateTimeCivilTimestamp(dateValue, timeValue);
+
+    if (!Number.isFinite(selected)) {
+      return false;
+    }
+
+    return selected >= getDirectTransferMinimumCivilTimestamp();
+  }
+
+  function getMinimumLeadTimeMessage() {
+    return getI18nValue(
+      "services.cards.hourly.panel.availability.minimumLeadTime",
+      "Necesitamos al menos 24 horas de antelación para confirmar este servicio."
+    );
   }
 
   function formatCurrency(value, currency) {
@@ -870,6 +1011,7 @@
       state.quoteStatus === "loading" ||
       state.quoteStatus === "error" ||
       restrictionType ||
+      (state.tripDate && state.tripTime && !hasDirectTransferMinimumLeadTime(state.tripDate, state.tripTime)) ||
       (areSameLocations(nodes) && state.origin && state.destination)
     );
 
@@ -1109,7 +1251,7 @@
     });
 
     nodes.dateInput.addEventListener("change", function () {
-      if (isPastDate(nodes.dateInput.value)) {
+      if (isDateBeforeDirectTransferMinimum(nodes.dateInput.value)) {
         nodes.dateInput.value = "";
       }
 
@@ -1389,7 +1531,7 @@
       return false;
     }
 
-    nodes.dateInput.setAttribute("min", getTodayDateValue());
+    nodes.dateInput.setAttribute("min", getDirectTransferMinimumDateValue());
 
     bindEvents(nodes);
     bindSubmitGuard(nodes);
