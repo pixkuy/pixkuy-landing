@@ -40,6 +40,10 @@
   "services": {
   "title": "Tous les besoins ne sont pas identiques.",
   "cards": {
+    "desktop": {
+      "priceAvailability": "Prix et disponibilité au moment de la réservation",
+      "bookOnline": "Réserver en ligne"
+    },
     "airport": {
   "title": "Transfert aéroport",
   "text": "Des transferts planifiés pour les arrivées et les départs, avec une expérience claire et soignée.",

@@ -40,6 +40,10 @@
   "services": {
   "title": "모든 필요는 같지 않습니다.",
   "cards": {
+    "desktop": {
+      "priceAvailability": "예약 시점의 요금 및 예약 가능 여부",
+      "bookOnline": "온라인 예약"
+    },
     "airport": {
   "title": "공항 이동 서비스",
   "text": "도착과 출발을 위한 사전 예약 이동 서비스로, 명확하고 세심하게 설계된 경험을 제공합니다.",

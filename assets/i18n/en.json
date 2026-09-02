@@ -40,6 +40,10 @@
   "services": {
   "title": "Not every need is the same.",
   "cards": {
+    "desktop": {
+      "priceAvailability": "Price and availability at the time of booking",
+      "bookOnline": "Book online"
+    },
     "airport": {
   "title": "Airport transfer",
   "text": "Planned transfers for arrivals and departures with a clear and carefully handled experience.",

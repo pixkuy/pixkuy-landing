@@ -967,7 +967,10 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
 
     if (
       data &&
-      data.serviceType === 'airport_hotel' &&
+      (
+        data.serviceType === 'airport_hotel' ||
+        data.serviceType === 'direct_transfer'
+      ) &&
       isDesktopViewport()
     ) {
       return getSubmitLabel(

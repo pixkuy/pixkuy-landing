@@ -186,6 +186,11 @@
   display:block;
 }
 
+.service-card__desktop-price-note,
+.service-card__desktop-action{
+  display:none;
+}
+
 .service-card--active{
   border-color: rgba(255,255,255,.18);
   background: rgba(255,255,255,.07);
@@ -198,6 +203,57 @@
 }
 
 @media (min-width: 721px){
+  .service-card--desktop-booking .service-card__action{
+    display:none;
+  }
+
+  .service-card--desktop-booking .service-card__price{
+    min-width:0;
+  }
+
+  .service-card--desktop-booking .service-card__desktop-price-note{
+    display:block;
+    margin-top:2px;
+    max-width:190px;
+    font-size:13px;
+    line-height:1.35;
+    color:rgba(244,242,238,.68);
+  }
+
+  .service-card--desktop-booking .service-card__desktop-action{
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+    flex:0 0 176px;
+    width:min(100%, 176px);
+    gap:16px;
+    padding:9px 12px;
+    border:1px solid rgba(74,211,190,.62);
+    border-radius:10px;
+    color:var(--fg);
+    background:rgba(31,122,109,.18);
+  }
+
+  .service-card__desktop-action-label{
+    min-width:0;
+    font-size:14px;
+    line-height:1.2;
+    font-weight:600;
+    text-align:left;
+  }
+
+  .service-card__desktop-action-arrow{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    color:rgba(244,242,238,.92);
+  }
+
+  .service-card__desktop-action-arrow svg{
+    display:block;
+  }
+
   .service-card[role="button"]{
     cursor:pointer;
     transition:

@@ -40,6 +40,10 @@
   "services": {
   "title": "Nem todas as necessidades são iguais.",
   "cards": {
+    "desktop": {
+      "priceAvailability": "Preço e disponibilidade no momento da reserva",
+      "bookOnline": "Reservar online"
+    },
     "airport": {
   "title": "Transfer aeroporto",
   "text": "Transfers planeados para chegadas e partidas, com uma experiência clara e cuidada.",

@@ -40,6 +40,10 @@
   "services": {
   "title": "并非所有需求都相同。",
   "cards": {
+    "desktop": {
+      "priceAvailability": "预订时确认价格和可用性",
+      "bookOnline": "在线预订"
+    },
     "airport": {
   "title": "机场接送",
   "text": "为到达和离开安排的接送服务，提供清晰且周到的体验。",
