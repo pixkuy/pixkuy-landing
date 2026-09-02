@@ -238,7 +238,20 @@
     );
   }
 
-  function hasRequiredAirportTransferCheckoutData(data) {
+  function hasCanonicalAirportTransferNonAirportLocation(data, form) {
+    var direction = getAirportTransferDirection(data || {}, form);
+    var apiDirection = getAirportTransferDirectionForApi(direction);
+    var location = getNonAirportLocation(data || {}, apiDirection);
+
+    return Boolean(
+      location &&
+      normalizeText(location.place_id) &&
+      Number.isFinite(location.lat) &&
+      Number.isFinite(location.lng)
+    );
+  }
+
+  function hasRequiredAirportTransferCheckoutData(data, form) {
     return Boolean(
       data &&
       isAirportTransferTransactionalData(data) &&
@@ -249,7 +262,8 @@
       normalizeText(data.airportHotelTime) &&
       normalizeText(data.zone) &&
       normalizeText(data.fare) &&
-      normalizeText(data.passengerFareKey)
+      normalizeText(data.passengerFareKey) &&
+      hasCanonicalAirportTransferNonAirportLocation(data, form)
     );
   }
 
@@ -1371,7 +1385,7 @@
 
       setLegalAcceptanceSubmitDisabled(
         form,
-        !hasRequiredAirportTransferCheckoutData(data)
+        !hasRequiredAirportTransferCheckoutData(data, form)
       );
 
       return true;
@@ -1386,7 +1400,7 @@
 
     setLegalAcceptanceSubmitDisabled(
       form,
-      !hasRequiredAirportTransferCheckoutData(data) ||
+      !hasRequiredAirportTransferCheckoutData(data, form) ||
         !isLegalAcceptanceInstanceAccepted(instance)
     );
 
@@ -1528,7 +1542,7 @@
 
     syncLegalAcceptanceVisibility(form);
 
-    if (!hasRequiredAirportTransferCheckoutData(data)) {
+    if (!hasRequiredAirportTransferCheckoutData(data, form)) {
       showCheckoutError(form);
       return;
     }

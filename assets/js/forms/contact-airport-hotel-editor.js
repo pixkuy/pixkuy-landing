@@ -1556,11 +1556,24 @@
     });
 
     nodes.hotelInput.addEventListener("input", function () {
+      const destinationBridge = getDestinationBridge();
+
       debugLog("hotelInput:input", {
         value: normalizeText(nodes.hotelInput.value)
       });
 
+      if (
+        destinationBridge &&
+        typeof destinationBridge.clearResolvedDestination === "function"
+      ) {
+        destinationBridge.clearResolvedDestination();
+      }
+
       syncHotelClear(nodes);
+      syncSideAwareLayout(editorState, nodes);
+      syncAirportHotelPayloadFields(editorState, nodes);
+      syncPanelSummaryFromTariffBridge(editorState, nodes);
+      syncReservationRequestUiState({ skipValidation: true });
     });
 	
 	  nodes.serviceDateInput.addEventListener("input", function () {

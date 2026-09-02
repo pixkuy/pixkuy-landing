@@ -175,7 +175,6 @@
     const safeInput = input && typeof input === "object" ? input : {};
     const selectedAirportId = normalizeText(safeInput.airportId).toLowerCase();
     const matchedAirportId = getCataloguedAirportTransferId({
-      airportId: selectedAirportId,
       formattedAddress: normalizeText(safeInput.address),
       placeId: normalizeText(safeInput.placeId),
       primaryType: normalizeText(safeInput.primaryType)
