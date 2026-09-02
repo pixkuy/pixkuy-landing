@@ -1489,12 +1489,15 @@ function getNextAvailableTimeLabel(result, requestedLocalDate) {
 
 function getNextAvailableMessage(result, labels, requestedLocalDate) {
   const suggestion = window.PixkuySharedAvailabilitySuggestion;
+  const mobileTemplate = getI18nValue(
+    'services.cards.airport.panel.availability.nextAvailableSlot'
+  ) || labels.availability.nextAvailableSlot;
 
   return suggestion && typeof suggestion.describe === 'function'
     ? suggestion.describe(result, {
         requestedLocalDate: requestedLocalDate,
         compact: isMobileHourlyViewport(),
-        compactTemplate: 'Próxima: {time}',
+        compactTemplate: mobileTemplate,
         template: labels.availability.nextAvailableSlot
       }).message
     : '';
@@ -1616,6 +1619,13 @@ function setAvailabilityStatus(message, tone) {
 function setUnavailableAvailabilityStatus(result) {
   const statusNode = configMount.querySelector('[data-services-hourly-availability]');
   const labels = getLabels();
+  const isMobile = isMobileHourlyViewport();
+  const mobileUnavailableMessage = getI18nValue(
+    'services.cards.airport.panel.availability.unavailable'
+  ) || labels.availability.unavailable;
+  const mobileNextAvailableTemplate = getI18nValue(
+    'services.cards.airport.panel.availability.nextAvailableSlot'
+  ) || labels.availability.nextAvailableSlot;
   const nextAvailableStartLocal = normalizeText(
     result && result.nextAvailableStartLocal
   );
@@ -1638,8 +1648,8 @@ function setUnavailableAvailabilityStatus(result) {
       ? fullMessage.slice(0, -nextAvailableMessage.length).trim()
       : labels.availability.unavailable;
 
-    if (isMobileHourlyViewport()) {
-      baseMessage = getI18nValue('bookingStatus.paymentLabels.notAvailable') || 'No disponible';
+    if (isMobile) {
+      baseMessage = mobileUnavailableMessage;
       statusNode.setAttribute('data-availability-compact', 'true');
     } else {
       statusNode.removeAttribute('data-availability-compact');
@@ -1656,8 +1666,8 @@ function setUnavailableAvailabilityStatus(result) {
       result: result,
       baseMessage: baseMessage,
       requestedLocalDate: state.tripDate,
-      compact: isMobileHourlyViewport(),
-      compactTemplate: 'Próxima: {time}',
+      compact: isMobile,
+      compactTemplate: mobileNextAvailableTemplate,
       template: labels.availability.nextAvailableSlot,
       actionAttribute: 'data-services-hourly-next-available'
     });

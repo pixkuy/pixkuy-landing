@@ -180,6 +180,14 @@
       : "";
   }
 
+  function getNextAvailableStartLocal(result) {
+    var suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+    return suggestion && typeof suggestion.extract === "function"
+      ? suggestion.extract(result).nextAvailableStartLocal
+      : "";
+  }
+
   function getNextAvailableMessage(result) {
     var suggestion = window.PixkuySharedAvailabilitySuggestion;
 
@@ -854,6 +862,7 @@
           code: normalizeText(code),
           availabilityMessage: getPrecheckErrorMessage(result),
           nextAvailableTime: getNextAvailableTimeLabel(result),
+          nextAvailableStartLocal: getNextAvailableStartLocal(result),
           contextKey: getCanonicalQuoteContextKey(snapshot),
           price: Number(snapshot && snapshot.direct_transfer_price),
           amountMinor: amountMinor,

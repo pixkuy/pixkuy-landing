@@ -711,6 +711,19 @@
   text-underline-offset:3px;
 }
 
+button.shared-availability-suggestion__link[data-direct-transfer-mobile-next-available]{
+  appearance:none;
+  -webkit-appearance:none;
+  margin:0;
+  border:0;
+  padding:0;
+  background:transparent;
+  font:inherit;
+  cursor:pointer;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
 .services-hourly-panel__availability a[data-services-hourly-next-available]:hover,
 .shared-availability-suggestion__link:hover{
   color:rgba(166,224,204,.98);
@@ -720,6 +733,24 @@
 .shared-availability-suggestion__link:focus-visible{
   outline:2px solid rgba(61,158,122,.95);
   outline-offset:2px;
+}
+
+@media (max-width: 720px){
+  .hourly-mobile-route .services-hourly-panel__availability[data-availability-compact="true"] a[data-services-hourly-next-available]{
+    max-width:100%;
+    white-space:normal !important;
+    overflow-wrap:anywhere;
+  }
+
+  .direct-transfer-mobile-config-step__fare[data-direct-transfer-mobile-fare-state="error"]{
+    height:auto !important;
+    max-height:none !important;
+  }
+
+  .direct-transfer-mobile-config-step__fare-pending{
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
 }
 
 @media (max-width: 1024px){

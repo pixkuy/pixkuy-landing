@@ -60,6 +60,7 @@
     quoteState: "none",
     quoteErrorCode: "",
     quoteErrorMessage: "",
+    nextAvailableStartLocal: "",
     precheckAllowed: false,
     quoteReviewRequired: false
   };
@@ -722,6 +723,7 @@
         quoteStatus: "ready",
         quoteErrorCode: "",
         quoteErrorMessage: "",
+        nextAvailableStartLocal: "",
         precheckAllowed: true,
         quoteReviewRequired: false
       });
@@ -738,6 +740,7 @@
         quoteStatus: "review",
         quoteErrorCode: code,
         quoteErrorMessage: normalizeText(safeDetail.availabilityMessage),
+        nextAvailableStartLocal: normalizeText(safeDetail.nextAvailableStartLocal),
         precheckAllowed: false,
         quoteReviewRequired: true
       });
@@ -749,6 +752,7 @@
       quoteStatus: "error",
       quoteErrorCode: code || "PRECHECK_UNAVAILABLE",
       quoteErrorMessage: normalizeText(safeDetail.availabilityMessage),
+      nextAvailableStartLocal: normalizeText(safeDetail.nextAvailableStartLocal),
       precheckAllowed: false,
       quoteReviewRequired: false
     });
@@ -761,6 +765,7 @@
       quoteStatus: "pending",
       quoteErrorCode: "",
       quoteErrorMessage: "",
+      nextAvailableStartLocal: "",
       precheckAllowed: false,
       quoteReviewRequired: false
     });
@@ -1177,6 +1182,92 @@
 
     return getPendingFareText();
   }
+
+  function applyNextAvailableSuggestion(nextAvailableStartLocal) {
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
+    let fieldsUpdated = false;
+
+    if (!suggestion || typeof suggestion.apply !== "function") {
+      return Promise.resolve(false);
+    }
+
+    return suggestion.apply({
+      nextAvailableStartLocal,
+      invalidate: resetQuote,
+      applyDateTime: function applyDirectTransferDateTime(applied) {
+        const step = getStep();
+        const dateField = step
+          ? step.querySelector('[data-direct-transfer-mobile-config-field="date"]')
+          : null;
+        const timeField = step
+          ? step.querySelector('[data-direct-transfer-mobile-config-field="time"]')
+          : null;
+
+        if (!dateField || !timeField) {
+          return;
+        }
+
+        dateField.value = applied.date;
+        timeField.value = applied.time;
+        syncStateFromFields();
+        syncDateTimeOverlayState(dateField);
+        syncDateTimeOverlayState(timeField);
+        syncDateTimeConstraints();
+        fieldsUpdated = true;
+      },
+      recheck: function recheckDirectTransferSuggestion() {
+        return fieldsUpdated ? requestQuoteIfReady() : false;
+      }
+    });
+  }
+
+  function renderNextAvailableFareSuggestion(fareValue) {
+    const suggestion = window.PixkuySharedAvailabilitySuggestion;
+    const template = getI18nValue(
+      "services.cards.hourly.panel.availability.nextAvailableSlot",
+      "Siguiente hora disponible: {time}"
+    );
+    const result = {
+      nextAvailableStartLocal: state.nextAvailableStartLocal,
+      requestedLocalDate: state.date
+    };
+    const description = suggestion && typeof suggestion.describe === "function"
+      ? suggestion.describe(result, {
+          requestedLocalDate: state.date,
+          template
+        })
+      : { message: "", nextAvailableStartLocal: "" };
+    const baseMessage = description.message && state.quoteErrorMessage.endsWith(description.message)
+      ? state.quoteErrorMessage.slice(0, -description.message.length).trim()
+      : state.quoteErrorMessage;
+
+    if (!description.nextAvailableStartLocal || !description.message || !suggestion) {
+      return false;
+    }
+
+    fareValue.textContent = baseMessage;
+
+    if (baseMessage) {
+      fareValue.appendChild(document.createTextNode(" "));
+    }
+
+    const action = document.createElement("button");
+    action.type = "button";
+    action.textContent = description.message;
+    action.setAttribute("aria-label", description.message);
+    action.setAttribute(
+      "data-direct-transfer-mobile-next-available",
+      description.nextAvailableStartLocal
+    );
+    action.className = "shared-availability-suggestion__link";
+    action.addEventListener("click", function applyDirectTransferSuggestion(event) {
+      event.preventDefault();
+      applyNextAvailableSuggestion(description.nextAvailableStartLocal);
+    });
+    fareValue.appendChild(action);
+
+    return true;
+  }
   
     function getFareReadyMarkup() {
     if (state.quoteStatus !== "ready" || !state.quote || !state.quote.price) {
@@ -1238,6 +1329,13 @@
     if (fareValue) {
       if (state.quoteStatus === "ready" && state.quote && state.quote.price) {
         fareValue.innerHTML = getFareReadyMarkup();
+      } else if (
+        state.quoteStatus === "error" &&
+        state.quoteErrorMessage &&
+        state.nextAvailableStartLocal &&
+        renderNextAvailableFareSuggestion(fareValue)
+      ) {
+        return true;
       } else {
         fareValue.textContent = getFareText();
       }
@@ -1296,6 +1394,7 @@
       "services.cards.hourly.panel.availability.minimumLeadTime",
       "Necesitamos al menos 24 horas de antelación para confirmar este servicio."
     );
+    state.nextAvailableStartLocal = "";
     state.precheckAllowed = false;
     state.quoteReviewRequired = false;
     state.quoteState = "none";

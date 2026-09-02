@@ -863,17 +863,21 @@ function loadLandingQuoteContracts() {
   };
 }
 
-function createMobileUiNode(value) {
+function createMobileUiNode(value, tagName) {
   const attributes = {};
   const listeners = {};
+  const childNodes = [];
   let html = "";
   let text = "";
   const node = {
+    tagName: String(tagName || "div").toUpperCase(),
     value: value || "",
     dataset: {},
+    childNodes,
     hidden: false,
     disabled: false,
     querySelector: function querySelector() { return null; },
+    appendChild: function appendChild(child) { childNodes.push(child); return child; },
     addEventListener: function addEventListener(type, listener) { listeners[type] = listener; },
     setAttribute: function setAttribute(name, nextValue) { attributes[name] = String(nextValue); },
     getAttribute: function getAttribute(name) { return attributes[name] || null; },
@@ -889,17 +893,41 @@ function createMobileUiNode(value) {
 
   Object.defineProperty(node, "innerHTML", {
     get: function getInnerHtml() { return html; },
-    set: function setInnerHtml(nextValue) { html = String(nextValue); text = html.replace(/<[^>]*>/g, ""); }
+    set: function setInnerHtml(nextValue) {
+      html = String(nextValue);
+      text = html.replace(/<[^>]*>/g, "");
+      childNodes.length = 0;
+    }
   });
   Object.defineProperty(node, "textContent", {
-    get: function getTextContent() { return text; },
-    set: function setTextContent(nextValue) { text = String(nextValue); html = ""; }
+    get: function getTextContent() {
+      return text + childNodes.map(function getChildText(child) {
+        return child && child.textContent ? child.textContent : "";
+      }).join("");
+    },
+    set: function setTextContent(nextValue) {
+      text = String(nextValue);
+      html = "";
+      childNodes.length = 0;
+    }
   });
 
   return node;
 }
 
-async function runMobileUiConsumerSmoke() {
+function getMobileUiDictionary(locale) {
+  const root = JSON.parse(fs.readFileSync(path.resolve(__dirname, `../assets/i18n/${locale}.json`), "utf8"));
+  const hourly = JSON.parse(fs.readFileSync(path.resolve(__dirname, `../assets/i18n/${locale}/services-hourly.json`), "utf8"));
+  const direct = JSON.parse(fs.readFileSync(path.resolve(__dirname, `../assets/i18n/${locale}/direct-transfer-mobile-booking-flow.json`), "utf8"));
+
+  return Object.assign({}, root, direct, {
+    services: Object.assign({}, root.services, {
+      cards: Object.assign({}, root.services && root.services.cards, hourly.services.cards)
+    })
+  });
+}
+
+async function runMobileUiConsumerSmoke(locale) {
   const windowListeners = {};
   const origin = createMobileUiNode("Hotel NH Collection Mexico City Reforma");
   const destination = createMobileUiNode("Puerto Vallarta, Jalisco");
@@ -967,10 +995,15 @@ async function runMobileUiConsumerSmoke() {
     constructor(type, init) { this.type = type; this.bubbles = Boolean(init && init.bubbles); }
   }
   const document = {
-    documentElement: { lang: "es", dataset: {} },
+    documentElement: { lang: locale, dataset: {} },
     body: createMobileUiNode(),
     activeElement: null,
-    createElement: function createElement() { return createMobileUiNode(); },
+    createElement: function createElement(tagName) { return createMobileUiNode("", tagName); },
+    createTextNode: function createTextNode(value) {
+      const textNode = createMobileUiNode("", "#text");
+      textNode.textContent = value;
+      return textNode;
+    },
     querySelector: function querySelector(selector) {
       return selector === "[data-direct-transfer-mobile-config-step]" ? step : null;
     },
@@ -994,6 +1027,8 @@ async function runMobileUiConsumerSmoke() {
     setTimeout: function setTimeoutImmediately(callback) { return setTimeout(callback, 0); },
     clearTimeout,
     sessionStorage: { getItem: function getItem() { return null; }, removeItem: function removeItem() {} },
+    __pixkuyI18nLang: locale,
+    __pixkuyI18nDict: getMobileUiDictionary(locale),
     PixkuyDirectTransferAirportGuard: {
       getCataloguedAirportTransferId: function getCataloguedAirportTransferId() { return ""; },
       isCataloguedAirportTransferPlace: function isCataloguedAirportTransferPlace() { return false; }
@@ -1031,6 +1066,23 @@ async function runMobileUiConsumerSmoke() {
     const absolutePath = path.resolve(__dirname, relativePath);
     vm.runInNewContext(fs.readFileSync(absolutePath, "utf8"), context, { filename: absolutePath });
   });
+  window.__pixkuyI18nModules.getValue = function getValue(dict, key) {
+    return String(key || "").split(".").reduce(function findValue(value, part) {
+      return value && typeof value === "object" ? value[part] : "";
+    }, dict);
+  };
+  const airportAvailability = window.__pixkuyI18nDict.services.cards.airport.panel.availability;
+  const hourlyCanonicalMessage = [
+    airportAvailability.unavailable,
+    window.PixkuySharedAvailabilitySuggestion.describe({
+      nextAvailableStartLocal: "2027-01-15T15:30",
+      requestedLocalDate: "2027-01-15"
+    }, {
+      compact: true,
+      compactTemplate: airportAvailability.nextAvailableSlot,
+      locale
+    }).message
+  ].join(" ");
   window.addEventListener("pixkuy:direct-transfer-canonical-price", function capture(event) { canonicalEvents.push(event.detail); });
 
   function flush() {
@@ -1074,7 +1126,7 @@ async function runMobileUiConsumerSmoke() {
     resolvePrecheck(input.fetchIndex, { result: {
       checkoutAllowed: false,
       date: input.date,
-      locale: "es",
+      locale,
       availability: {
         available: false,
         code: input.code,
@@ -1091,8 +1143,51 @@ async function runMobileUiConsumerSmoke() {
       ctaDisabled: cta.disabled,
       fareState: fare.getAttribute("data-direct-transfer-mobile-fare-state"),
       fareText: fareValue.textContent,
-      detail: canonicalEvents[canonicalEvents.length - 1]
+      detail: canonicalEvents[canonicalEvents.length - 1],
+      suggestionAction: fareValue.childNodes.find(function findSuggestionAction(node) {
+        return node && node.getAttribute && node.getAttribute("data-direct-transfer-mobile-next-available");
+      })
     };
+  }
+
+  async function applyCurrentSuggestion(fetchIndex, fingerprintCharacter) {
+    const action = fareValue.childNodes.find(function findSuggestionAction(node) {
+      return node && node.getAttribute && node.getAttribute("data-direct-transfer-mobile-next-available");
+    });
+    const fetchCountBefore = pendingFetches.length;
+    const canonicalEventCountBefore = canonicalEvents.length;
+
+    action.__listeners.click({ preventDefault: function preventDefault() {} });
+    await waitForFetchCount(fetchIndex + 1);
+    const loading = {
+      date: date.value,
+      time: time.value,
+      fareState: fare.getAttribute("data-direct-transfer-mobile-fare-state"),
+      ctaDisabled: cta.disabled,
+      requestCount: pendingFetches.length - fetchCountBefore,
+      actionTagName: action.tagName,
+      actionType: action.type,
+      actionText: action.textContent,
+      rawSuggestion: action.getAttribute("data-direct-transfer-mobile-next-available")
+    };
+
+    resolvePrecheck(fetchIndex, { result: { checkoutAllowed: true, code: "VEHICLE_AVAILABLE", price: {
+      amountMinor: 1660000,
+      currency: "MXN",
+      pricingVersion: "direct_transfer_v2_booking_authority_v1",
+      quoteFingerprint: fingerprintCharacter.repeat(64),
+      quoteExpiresAt: "2027-01-13T16:49:00.000Z",
+      distanceMeters: 839000,
+      durationSeconds: 48360
+    } } }, true);
+    await flush();
+    await flush();
+
+    return Object.assign(loading, {
+      finalFareState: fare.getAttribute("data-direct-transfer-mobile-fare-state"),
+      finalCtaDisabled: cta.disabled,
+      canonicalEventCount: canonicalEvents.length - canonicalEventCountBefore
+    });
   }
 
   const availabilityMatrix = [];
@@ -1108,12 +1203,14 @@ async function runMobileUiConsumerSmoke() {
     code: "VEHICLE_NOT_AVAILABLE",
     fetchIndex: 2
   }));
+  const nextDaySuggestion = await applyCurrentSuggestion(3, "b");
   availabilityMatrix.push(await requestUnavailableScenario({
     date: "2027-01-15",
     time: "14:48",
     code: "PREVIOUS_TRANSITION_NOT_FEASIBLE",
-    fetchIndex: 3
+    fetchIndex: 4
   }));
+  const sameDaySuggestion = await applyCurrentSuggestion(5, "c");
   const errorState = availabilityMatrix[0].fareState;
 
   date.value = "2026-01-15";
@@ -1151,17 +1248,17 @@ async function runMobileUiConsumerSmoke() {
   date.value = "2027-01-15";
   time.value = "15:30";
   step.__listeners.change({ target: date });
-  await waitForFetchCount(5);
+  await waitForFetchCount(7);
   const requoteLoading = {
     fareState: fare.getAttribute("data-direct-transfer-mobile-fare-state"),
     ctaDisabled: cta.disabled,
     fetchCount: pendingFetches.length
   };
-  resolvePrecheck(4, { result: { checkoutAllowed: true, code: "VEHICLE_AVAILABLE", price: {
+  resolvePrecheck(6, { result: { checkoutAllowed: true, code: "VEHICLE_AVAILABLE", price: {
     amountMinor: 1660000,
     currency: "MXN",
     pricingVersion: "direct_transfer_v2_booking_authority_v1",
-    quoteFingerprint: "b".repeat(64),
+    quoteFingerprint: "d".repeat(64),
     quoteExpiresAt: "2027-01-13T16:49:00.000Z",
     distanceMeters: 839000,
     durationSeconds: 48360
@@ -1171,15 +1268,15 @@ async function runMobileUiConsumerSmoke() {
   const requoteSuccess = {
     fareState: fare.getAttribute("data-direct-transfer-mobile-fare-state"),
     ctaDisabled: cta.disabled,
-    detail: canonicalEvents[4]
+    detail: canonicalEvents[6]
   };
 
   time.value = "15:31";
   step.__listeners.change({ target: time });
-  await waitForFetchCount(6);
+  await waitForFetchCount(8);
   window.PixkuyDirectTransferMobileConfigStep.close();
   const cancelStateBeforeResponse = fare.getAttribute("data-direct-transfer-mobile-fare-state");
-  resolvePrecheck(5, { result: { checkoutAllowed: true, code: "VEHICLE_AVAILABLE", price: {
+  resolvePrecheck(7, { result: { checkoutAllowed: true, code: "VEHICLE_AVAILABLE", price: {
     amountMinor: 1660000,
     currency: "MXN",
     pricingVersion: "direct_transfer_v2_booking_authority_v1",
@@ -1190,11 +1287,14 @@ async function runMobileUiConsumerSmoke() {
   await flush();
 
   return {
+    hourlyCanonicalMessage,
     loadingOnSuccess,
     success,
     errorState,
     errorDetail: availabilityMatrix[0].detail,
     availabilityMatrix,
+    nextDaySuggestion,
+    sameDaySuggestion,
     pastDate,
     leadTime,
     requoteLoading,
@@ -1360,7 +1460,8 @@ async function runOfflineStateSmoke() {
     durationSeconds: 48360,
     distanceMeters: 839000
   };
-  const mobileUi = await runMobileUiConsumerSmoke();
+  const mobileUi = await runMobileUiConsumerSmoke("es");
+  const mobileUiEn = await runMobileUiConsumerSmoke("en");
 
   assertEqual(failures, "real mobile UI shows loading during canonical precheck", mobileUi.loadingOnSuccess, "Calculando precio…");
   assertEqual(failures, "real mobile UI exits loading on success", mobileUi.success.fareState, "ready");
@@ -1370,23 +1471,29 @@ async function runOfflineStateSmoke() {
   assertEqual(failures, "real mobile UI preserves canonical pricing version", mobileUi.success.detail.pricingVersion, canonicalPrice.pricingVersion);
   assertEqual(failures, "real mobile UI preserves canonical fingerprint", mobileUi.success.detail.quoteFingerprint, canonicalPrice.quoteFingerprint);
   assertEqual(failures, "real mobile UI preserves canonical expiry", mobileUi.success.detail.quoteExpiresAt, canonicalPrice.quoteExpiresAt);
+  assertEqual(failures, "Hourly mobile Spanish matches the complete Airport canonical message", mobileUi.hourlyCanonicalMessage, "No hay disponibilidad para esa fecha y hora. Elige otra opción. Siguiente hora disponible: 15:30");
+  assertEqual(failures, "Hourly mobile English matches the complete Airport canonical message", mobileUiEn.hourlyCanonicalMessage, "No availability for that date and time. Choose another option. Next available time: 15:30");
+  assertEqual(failures, "Hourly mobile English contains no Spanish compact literal", mobileUiEn.hourlyCanonicalMessage.includes("Próxima"), false);
   assertEqual(failures, "real mobile UI exits loading on error", mobileUi.errorState, "error");
   assertEqual(
     failures,
     "real Direct mobile consumer shows later local date and time",
     mobileUi.errorDetail && mobileUi.errorDetail.availabilityMessage,
-    "No pudimos confirmar disponibilidad para este traslado. Siguiente hora disponible: 15/01/2027 a las 15:30"
+    "No pudimos calcular el precio para este trayecto. Siguiente hora disponible: 15/01/2027 a las 15:30"
   );
   assertEqual(failures, "real mobile availability matrix has A B and C", mobileUi.availabilityMatrix.length, 3);
   mobileUi.availabilityMatrix.forEach(function assertUnavailableMobileScenario(scenario) {
     const label = scenario.date + " " + scenario.time;
     const expectedAvailabilityMessage = scenario.date === "2027-01-15"
-      ? "No pudimos confirmar disponibilidad para este traslado. Siguiente hora disponible: 15:30"
-      : "No pudimos confirmar disponibilidad para este traslado. Siguiente hora disponible: 15/01/2027 a las 15:30";
+      ? "No pudimos calcular el precio para este trayecto. Siguiente hora disponible: 15:30"
+      : "No pudimos calcular el precio para este trayecto. Siguiente hora disponible: 15/01/2027 a las 15:30";
     assertEqual(failures, label + " disables CTA during precheck", scenario.ctaDisabledDuringPrecheck, true);
     assertEqual(failures, label + " exits as unavailable", scenario.fareState, "error");
     assertEqual(failures, label + " keeps CTA disabled", scenario.ctaDisabled, true);
     assertEqual(failures, label + " renders no canonical price", /16[.,]600/.test(scenario.fareText), false);
+    assertEqual(failures, label + " renders a semantic suggestion button", scenario.suggestionAction && scenario.suggestionAction.tagName, "BUTTON");
+    assertEqual(failures, label + " keeps suggestion button out of form submission", scenario.suggestionAction && scenario.suggestionAction.type, "button");
+    assertEqual(failures, label + " exposes the canonical raw suggestion", scenario.detail && scenario.detail.nextAvailableStartLocal, "2027-01-15T15:30");
     assertEqual(
       failures,
       label + " preserves localized next availability",
@@ -1394,10 +1501,28 @@ async function runOfflineStateSmoke() {
       expectedAvailabilityMessage
     );
   });
+  assertEqual(failures, "Direct mobile English renders the localized suggestion action", mobileUiEn.availabilityMatrix[0].suggestionAction && mobileUiEn.availabilityMatrix[0].suggestionAction.textContent, "Next available time: 01/15/2027 at 15:30");
+  assertEqual(failures, "Direct mobile English contains no Spanish compact literal", mobileUiEn.availabilityMatrix[0].fareText.includes("Próxima"), false);
+  assertEqual(failures, "Direct mobile Spanish renders the localized suggestion action", mobileUi.availabilityMatrix[0].suggestionAction && mobileUi.availabilityMatrix[0].suggestionAction.textContent, "Siguiente hora disponible: 15/01/2027 a las 15:30");
+  [
+    { label: "next-day", result: mobileUi.nextDaySuggestion, date: "2027-01-15", time: "15:30" },
+    { label: "same-day", result: mobileUi.sameDaySuggestion, date: "2027-01-15", time: "15:30" }
+  ].forEach(function assertAppliedSuggestion(expectation) {
+    assertEqual(failures, expectation.label + " suggestion updates date", expectation.result.date, expectation.date);
+    assertEqual(failures, expectation.label + " suggestion updates time", expectation.result.time, expectation.time);
+    assertEqual(failures, expectation.label + " suggestion performs one reevaluation", expectation.result.requestCount, 1);
+    assertEqual(failures, expectation.label + " suggestion receives one canonical response", expectation.result.canonicalEventCount, 1);
+    assertEqual(failures, expectation.label + " suggestion is a semantic button", expectation.result.actionTagName, "BUTTON");
+    assertEqual(failures, expectation.label + " suggestion cannot submit the form", expectation.result.actionType, "button");
+    assertEqual(failures, expectation.label + " suggestion uses the raw local timestamp", expectation.result.rawSuggestion, "2027-01-15T15:30");
+    assertEqual(failures, expectation.label + " suggestion keeps CTA disabled while loading", expectation.result.ctaDisabled, true);
+    assertEqual(failures, expectation.label + " suggestion ends with a canonical quote", expectation.result.finalFareState, "ready");
+    assertEqual(failures, expectation.label + " suggestion enables CTA only after canonical quote", expectation.result.finalCtaDisabled, false);
+  });
   assertEqual(failures, "past date leaves real mobile UI in error", mobileUi.pastDate.fareState, "error");
   assertEqual(failures, "past date disables real mobile CTA", mobileUi.pastDate.ctaDisabled, true);
-  assertEqual(failures, "past date does not request a new quote", mobileUi.pastDate.fetchCount, 4);
-  assertEqual(failures, "past date does not reuse canonical precheck", mobileUi.pastDate.canonicalEventCount, 4);
+  assertEqual(failures, "past date does not request a new quote", mobileUi.pastDate.fetchCount, 6);
+  assertEqual(failures, "past date does not reuse canonical precheck", mobileUi.pastDate.canonicalEventCount, 6);
   assertEqual(
     failures,
     "past date uses the approved minimum lead-time message",
@@ -1407,8 +1532,8 @@ async function runOfflineStateSmoke() {
   assertEqual(failures, "past date clears the prior canonical price", /16[.,]600/.test(mobileUi.pastDate.fareText), false);
   assertEqual(failures, "inside lead time leaves real mobile UI in error", mobileUi.leadTime.fareState, "error");
   assertEqual(failures, "inside lead time disables real mobile CTA", mobileUi.leadTime.ctaDisabled, true);
-  assertEqual(failures, "inside lead time does not request a new quote", mobileUi.leadTime.fetchCount, 4);
-  assertEqual(failures, "inside lead time does not reuse canonical precheck", mobileUi.leadTime.canonicalEventCount, 4);
+  assertEqual(failures, "inside lead time does not request a new quote", mobileUi.leadTime.fetchCount, 6);
+  assertEqual(failures, "inside lead time does not reuse canonical precheck", mobileUi.leadTime.canonicalEventCount, 6);
   assertEqual(
     failures,
     "inside lead time keeps desktop message parity",
@@ -1417,10 +1542,10 @@ async function runOfflineStateSmoke() {
   );
   assertEqual(failures, "valid date requires a fresh quote", mobileUi.requoteLoading.fareState, "loading");
   assertEqual(failures, "valid date keeps CTA disabled during fresh precheck", mobileUi.requoteLoading.ctaDisabled, true);
-  assertEqual(failures, "valid date performs one fresh precheck", mobileUi.requoteLoading.fetchCount, 5);
+  assertEqual(failures, "valid date performs one fresh precheck", mobileUi.requoteLoading.fetchCount, 7);
   assertEqual(failures, "fresh valid quote returns real mobile UI to ready", mobileUi.requoteSuccess.fareState, "ready");
   assertEqual(failures, "fresh valid precheck re-enables real mobile CTA", mobileUi.requoteSuccess.ctaDisabled, false);
-  assertEqual(failures, "fresh valid quote gets a new fingerprint", mobileUi.requoteSuccess.detail.quoteFingerprint, "b".repeat(64));
+  assertEqual(failures, "fresh valid quote gets a new fingerprint", mobileUi.requoteSuccess.detail.quoteFingerprint, "d".repeat(64));
   assertEqual(failures, "fresh valid quote preserves canonical minor units", mobileUi.requoteSuccess.detail.amountMinor, productionManualOracleMinor);
   assertEqual(failures, "fresh valid quote preserves canonical pricing version", mobileUi.requoteSuccess.detail.pricingVersion, canonicalPrice.pricingVersion);
   assertEqual(failures, "real mobile UI cancellation exits loading", mobileUi.cancelStateBeforeResponse, "pending");
@@ -1601,6 +1726,27 @@ async function runOfflineStateSmoke() {
     "rejected precheck keeps specific error",
     rejected.quoteErrorMessage,
     "No hay disponibilidad para esa fecha y hora."
+  );
+  assertEqual(
+    failures,
+    "legacy rejection keeps optional action timestamp absent",
+    Object.prototype.hasOwnProperty.call(rejected, "nextAvailableStartLocal")
+      ? rejected.nextAvailableStartLocal
+      : "",
+    ""
+  );
+
+  const rejectedWithSuggestion = mobile.applyCanonicalPriceState(provisionalMobileState, {
+    checkoutAllowed: false,
+    code: "DIRECT_TRANSFER_VEHICLE_UNAVAILABLE",
+    availabilityMessage: "No hay disponibilidad. Siguiente hora disponible: 15:30",
+    nextAvailableStartLocal: "2027-01-13T15:30"
+  });
+  assertEqual(
+    failures,
+    "structured Direct mobile rejection preserves the canonical action timestamp",
+    rejectedWithSuggestion.nextAvailableStartLocal,
+    "2027-01-13T15:30"
   );
 
   const boundaryNow = new Date("2026-08-30T12:00:00.000Z");
@@ -2096,6 +2242,18 @@ async function runOfflineStateSmoke() {
     path.resolve(__dirname, "../assets/js/forms/direct-transfer-booking-api-checkout.js"),
     "utf8"
   ).split("\r\n").join("\n");
+  const directMobileSource = fs.readFileSync(
+    path.resolve(__dirname, "../assets/js/services/direct-transfer-mobile-config-step.js"),
+    "utf8"
+  );
+  const hourlyPanelSource = fs.readFileSync(
+    path.resolve(__dirname, "../assets/js/services/hourly-daily-panel.js"),
+    "utf8"
+  );
+  const availabilityCssSource = fs.readFileSync(
+    path.resolve(__dirname, "../assets/css/38-services-hourly.css"),
+    "utf8"
+  ).split("\r\n").join("\n");
   [
     {
       label: "Airport panel",
@@ -2160,6 +2318,14 @@ async function runOfflineStateSmoke() {
   assertEqual(failures, "legal bridge validates the dedicated acceptance component", legalBridgeSource.includes("instance.validate()"), true);
   assertEqual(failures, "legal acceptance renders a dedicated visible error", legalAcceptanceSource.includes('error.className = "form-error legal-acceptance__error"'), true);
   assertEqual(failures, "canonical precheck sync writes amount minor with the complete binding", directCheckoutSource.includes('"direct_transfer_price",\n      "direct_transfer_amount_minor",\n      "direct_transfer_currency"'), true);
+  assertEqual(failures, "Hourly mobile uses the canonical Airport unavailable key", hourlyPanelSource.includes("'services.cards.airport.panel.availability.unavailable'"), true);
+  assertEqual(failures, "Hourly mobile uses the canonical Airport next-availability key", hourlyPanelSource.includes("'services.cards.airport.panel.availability.nextAvailableSlot'"), true);
+  assertEqual(failures, "Hourly mobile contains no hard-coded Spanish compact template", hourlyPanelSource.includes("compactTemplate: 'Próxima: {time}'"), false);
+  assertEqual(failures, "Hourly keeps its existing next-availability action", hourlyPanelSource.includes("actionAttribute: 'data-services-hourly-next-available'"), true);
+  assertEqual(failures, "Direct mobile owns its semantic suggestion button without changing the shared renderer", directMobileSource.includes('document.createElement("button")'), true);
+  assertEqual(failures, "Direct mobile applies the canonical raw suggestion", directMobileSource.includes("nextAvailableStartLocal") && directMobileSource.includes("suggestion.apply({"), true);
+  assertEqual(failures, "Hourly mobile long availability text can wrap", availabilityCssSource.includes('data-services-hourly-next-available]{\n    max-width:100%;\n    white-space:normal !important;\n    overflow-wrap:anywhere;'), true);
+  assertEqual(failures, "Direct mobile unavailable fare has no fixed maximum height", availabilityCssSource.includes('data-direct-transfer-mobile-fare-state="error"]{\n    height:auto !important;\n    max-height:none !important;'), true);
   assertEqual(failures, "mobile handler no longer references Direct review", mobileCheckoutSource.includes("redirectToCheckoutReview"), false);
   assertEqual(failures, "mobile handler creates checkout before common handoff", mobileCheckoutSource.includes("requestCheckout({") && mobileCheckoutSource.includes("redirectToCheckout(checkoutUrl, bookingStatusToken)"), true);
   assertEqual(failures, "desktop Direct review branch remains intact", desktopCheckoutSource.includes("redirectToCheckoutReview(snapshot)"), true);
