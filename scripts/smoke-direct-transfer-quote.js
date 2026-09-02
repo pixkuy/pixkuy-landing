@@ -1023,6 +1023,7 @@ async function runMobileUiConsumerSmoke() {
   const context = { window, document, CustomEvent: LocalCustomEvent, Event: LocalEvent, Date, Intl, setTimeout, clearTimeout };
   [
     "../assets/js/i18n/catalog.js",
+    "../assets/js/services/shared-availability-suggestion.js",
     "../assets/js/services/direct-transfer-transactional-state.js",
     "../assets/js/forms/direct-transfer-booking-api-checkout.js",
     "../assets/js/services/direct-transfer-mobile-config-step.js"
@@ -2109,7 +2110,7 @@ async function runOfflineStateSmoke() {
     {
       label: "Direct checkout",
       path: "../assets/js/forms/direct-transfer-booking-api-checkout.js",
-      requestedDateAnchor: "requestedLocalDate: precheck.date"
+      requestedDateAnchor: "suggestion.describe(result)"
     },
     {
       label: "Hourly panel",
@@ -2130,12 +2131,12 @@ async function runOfflineStateSmoke() {
     assertEqual(
       failures,
       `${consumer.label} delegates next availability display to shared formatter`,
-      source.includes("formatNextAvailabilityLabel"),
+      source.includes("PixkuySharedAvailabilitySuggestion") && source.includes("suggestion.describe"),
       true
     );
     assertEqual(
       failures,
-      `${consumer.label} passes the requested local date explicitly`,
+      `${consumer.label} preserves the requested local date context`,
       source.includes(consumer.requestedDateAnchor),
       true
     );

@@ -696,7 +696,7 @@
             renderPanel(nodes, state);
           },
           recheck: function recheckAirportSuggestion() {
-            return refreshAirportMobileAvailability(nodes, state);
+            return syncAirportMobileAvailability(nodes, state);
           }
         })
       : Promise.resolve(false);
