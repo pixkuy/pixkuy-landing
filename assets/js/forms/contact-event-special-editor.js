@@ -8,16 +8,14 @@
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
   const SERVICE_TYPE = "event_special";
   const DEFAULT_CURRENCY = "MXN";
-  const DATA_BASE = "assets/js/data";
   const MAX_VISIBLE_GROUPS = 10;
   const MIN_LEAD_HOURS = 6;
-  const HORIZON_DAYS = 30;
-  const CDMX_TIME_ZONE = "America/Mexico_City";
   const RETURN_PICKUP_NEXT_DAY_CUTOFF_MINUTES = 120;
 
   const state = {
     loaded: false,
     loading: false,
+    loadError: false,
     groups: [],
     venuesById: {},
     pricing: {},
@@ -111,108 +109,52 @@
     return "es";
   }
 
-  function parseLocalDateTimeToMinutes(value) {
-    const raw = String(value || "").trim();
-    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
-
-    if (!match) {
-      return null;
-    }
-
-    return (
-      (((Number(match[1]) * 12 + Number(match[2])) * 31 + Number(match[3])) * 24 +
-        Number(match[4])) *
-        60 +
-      Number(match[5])
-    );
-  }
-
-  function getCdmxNowParts() {
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone: CDMX_TIME_ZONE,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    });
-
-    const parts = formatter.formatToParts(new Date()).reduce(function reduceParts(acc, part) {
-      if (part.type !== "literal") {
-        acc[part.type] = part.value;
-      }
-
-      return acc;
-    }, {});
-
-    return {
-      year: Number(parts.year),
-      month: Number(parts.month),
-      day: Number(parts.day),
-      hour: Number(parts.hour),
-      minute: Number(parts.minute)
-    };
-  }
-
-  function getCdmxNowMinutes() {
-    const now = getCdmxNowParts();
-
-    return (((now.year * 12 + now.month) * 31 + now.day) * 24 + now.hour) * 60 + now.minute;
+  function getEventStartTime(event) {
+    const timestamp = Date.parse(event && event.startsAtUtc);
+    return Number.isFinite(timestamp) ? timestamp : null;
   }
 
   function isEventEligible(event, venuesById) {
     const venue = event && event.venueId ? venuesById[event.venueId] : null;
-    const eventMinutes = event ? parseLocalDateTimeToMinutes(event.startsAt) : null;
-    const nowMinutes = getCdmxNowMinutes();
-    const minVisibleMinutes = nowMinutes + MIN_LEAD_HOURS * 60;
-    const maxVisibleMinutes = nowMinutes + HORIZON_DAYS * 24 * 60;
-
+    const eventStartTime = getEventStartTime(event);
     return Boolean(
       event &&
         event.active === true &&
-        event.startsAt &&
+        event.startsAtUtc &&
         event.posterSrc &&
         venue &&
         venue.active === true &&
-        eventMinutes !== null &&
-        eventMinutes >= minVisibleMinutes &&
-        eventMinutes <= maxVisibleMinutes
+        eventStartTime !== null &&
+        eventStartTime >= Date.now() + MIN_LEAD_HOURS * 60 * 60 * 1000
     );
   }
 
   function sortEvents(a, b) {
     const aFeatured = a.featured === true ? 0 : 1;
     const bFeatured = b.featured === true ? 0 : 1;
-    const aMinutes = parseLocalDateTimeToMinutes(a.startsAt);
-    const bMinutes = parseLocalDateTimeToMinutes(b.startsAt);
+    const aMinutes = getEventStartTime(a) ?? Number.MAX_SAFE_INTEGER;
+    const bMinutes = getEventStartTime(b) ?? Number.MAX_SAFE_INTEGER;
 
     if (aFeatured !== bFeatured) {
       return aFeatured - bFeatured;
     }
 
-    if (aMinutes !== bMinutes) {
-      return aMinutes - bMinutes;
-    }
-
-    return Number(a.priority || 0) - Number(b.priority || 0);
+    const priorityDelta = Number(a.priority || 0) - Number(b.priority || 0);
+    return priorityDelta !== 0 ? priorityDelta : aMinutes - bMinutes;
   }
 
   function sortGroups(a, b) {
     const aFeatured = a.featured === true ? 0 : 1;
     const bFeatured = b.featured === true ? 0 : 1;
-    const aFirst = a.events[0] ? parseLocalDateTimeToMinutes(a.events[0].startsAt) : 0;
-    const bFirst = b.events[0] ? parseLocalDateTimeToMinutes(b.events[0].startsAt) : 0;
+    const aFirst = a.events[0] ? getEventStartTime(a.events[0]) ?? Number.MAX_SAFE_INTEGER : 0;
+    const bFirst = b.events[0] ? getEventStartTime(b.events[0]) ?? Number.MAX_SAFE_INTEGER : 0;
 
     if (aFeatured !== bFeatured) {
       return aFeatured - bFeatured;
     }
 
-    if (aFirst !== bFirst) {
-      return aFirst - bFirst;
-    }
-
-    return Number(a.priority || 0) - Number(b.priority || 0);
+    const priorityDelta = Number(a.priority || 0) - Number(b.priority || 0);
+    return priorityDelta !== 0 ? priorityDelta : aFirst - bFirst;
   }
 
   function buildVenuesById(venues) {
@@ -239,9 +181,11 @@
         if (!groupsById[groupId]) {
           groupsById[groupId] = {
             id: groupId,
+            title: event.title,
             titleKey: event.titleKey,
             type: event.type,
             venueId: event.venueId,
+            venue: event.venue,
             posterSrc: event.posterSrc,
             posterMobileSrc: event.posterMobileSrc || event.posterSrc,
             featured: event.featured === true,
@@ -271,25 +215,17 @@
       .slice(0, MAX_VISIBLE_GROUPS);
   }
 
-  async function fetchJson(path) {
-    const response = await fetch(path, { cache: "no-store" });
+  async function loadData() {
+    const source = window.PixkuyServicesEventsCatalogSource;
 
-    if (!response.ok) {
-      throw new Error("HTTP " + response.status + " loading " + path);
+    if (!source || typeof source.loadCatalog !== "function") {
+      throw new Error("SPECIAL_EVENT_CATALOG_SOURCE_UNAVAILABLE");
     }
 
-    return response.json();
-  }
-
-  async function loadData() {
-    const results = await Promise.all([
-      fetchJson(DATA_BASE + "/events-special-venues.json"),
-      fetchJson(DATA_BASE + "/events-special-catalog.json"),
-      fetchJson(DATA_BASE + "/events-special-pricing.json")
-    ]);
-    const venues = Array.isArray(results[0].venues) ? results[0].venues : [];
-    const events = Array.isArray(results[1].events) ? results[1].events : [];
-    const pricing = isObject(results[2]) ? results[2] : {};
+    const catalog = await source.loadCatalog();
+    const venues = Array.isArray(catalog.venues) ? catalog.venues : [];
+    const events = Array.isArray(catalog.events) ? catalog.events : [];
+    const pricing = isObject(catalog.pricing) ? catalog.pricing : {};
     const venuesById = buildVenuesById(venues);
     const groups = buildEventGroups(events, venuesById);
 
@@ -323,7 +259,11 @@
     const safeEvent = event || getSelectedEvent(safeGroup);
     const venueId = safeEvent && safeEvent.venueId ? safeEvent.venueId : safeGroup && safeGroup.venueId;
 
-    return venueId ? state.venuesById[venueId] || null : null;
+    return safeEvent && safeEvent.venue
+      ? safeEvent.venue
+      : venueId
+        ? state.venuesById[venueId] || null
+        : null;
   }
 
   function getEventTitle(entity) {
@@ -331,7 +271,7 @@
       return "";
     }
 
-    return getI18nValue(entity.titleKey, entity.id || "");
+    return normalizeText(entity.title) || getI18nValue(entity.titleKey, entity.id || "");
   }
 
   function getVenueName(venue) {
@@ -339,7 +279,7 @@
       return "";
     }
 
-    return getI18nValue(venue.nameKey, venue.id || "");
+    return normalizeText(venue.name) || getI18nValue(venue.nameKey, venue.id || "");
   }
 
   function getEventTypeLabel(type) {
@@ -375,7 +315,7 @@
       return "";
     }
 
-    return getI18nValue(event.dateLabelKey, formatEventDate(event.startsAt));
+    return normalizeText(event.dateLabel) || getI18nValue(event.dateLabelKey, formatEventDate(event.startsAt));
   }
 
   function getAvailableVariants() {
@@ -641,6 +581,8 @@
     input.eventId = selectedEvent.id || "";
     input.eventStartsAt = selectedEvent.startsAt || "";
     input.venueId = selectedEvent.venueId || group.venueId || "";
+    input.snapshotVersion = selectedEvent.snapshotVersion;
+    input.requestKey = "contact-event-special-editor";
     input.variant = state.selectedVariant;
     input.passengerFareKey = state.selectedPassengerFareKey;
 
@@ -1444,6 +1386,20 @@
     }
 
     if (!state.groups.length) {
+      if (state.loadError) {
+        const errorLabel = getI18nValue(
+          "services.cards.events.panel.quoteUnavailable",
+          "No podemos cargar los eventos en este momento."
+        );
+
+        return (
+          '<div class="contact-event-special-editor__empty" role="alert">' +
+            '<p class="muted small">' + escapeHtml(errorLabel) + "</p>" +
+            '<button type="button" class="cta" data-contact-event-special-catalog-retry aria-label="' + escapeHtml(errorLabel) + '">↻</button>' +
+          "</div>"
+        );
+      }
+
       return (
         '<div class="contact-event-special-editor__empty">' +
           '<p class="muted small">' + escapeHtml(getI18nValue("services.cards.events.panel.empty", "No hay eventos disponibles por ahora.")) + "</p>" +
@@ -1776,6 +1732,16 @@
 
     root.dataset.contactEventSpecialEditorBound = "1";
 
+    root.addEventListener("click", function handleClick(event) {
+      const retry = event.target.closest("[data-contact-event-special-catalog-retry]");
+      if (!retry) return;
+
+      const source = window.PixkuyServicesEventsCatalogSource;
+      if (source && typeof source.invalidate === "function") source.invalidate();
+      state.loadError = false;
+      void initContactEventSpecialEditor();
+    });
+
     root.addEventListener("pointerdown", function handlePointerDown(event) {
       const target = event.target;
 
@@ -1984,7 +1950,33 @@
         return;
       }
 
+      state.loading = true;
+      state.loadError = false;
       render();
+
+      loadData()
+        .then(function applyLocalizedCatalog(data) {
+          state.groups = data.groups;
+          state.venuesById = data.venuesById;
+          state.pricing = data.pricing;
+          state.loaded = true;
+          state.loading = false;
+          state.loadError = false;
+
+          if (!getSelectedGroup()) {
+            state.selectedGroupId = state.groups[0] ? state.groups[0].id : "";
+            state.selectedEventId = state.groups[0] && state.groups[0].events[0]
+              ? state.groups[0].events[0].id
+              : "";
+          }
+
+          render();
+        })
+        .catch(function showLocalizedCatalogError() {
+          state.loading = false;
+          state.loadError = true;
+          render();
+        });
     });
 
     return true;
@@ -2027,6 +2019,7 @@
         state.pricing = data.pricing;
         state.loaded = true;
         state.loading = false;
+        state.loadError = false;
         resetState();
       } catch (error) {
         state.groups = [];
@@ -2034,6 +2027,7 @@
         state.pricing = {};
         state.loaded = false;
         state.loading = false;
+        state.loadError = true;
       }
     }
 

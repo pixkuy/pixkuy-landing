@@ -6,7 +6,8 @@
   const NAMESPACE = window.PixkuyServicesEventsSpecialQuote =
     window.PixkuyServicesEventsSpecialQuote || {};
 
-  const ENDPOINT = "/.netlify/functions/event-special-quote";
+  const ENDPOINT = "/v1/public/special-events/quote";
+  const requestControllers = new Map();
 
   function isObject(value) {
     return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -27,14 +28,19 @@
     const lat = normalizeCoordinate(value.lat);
     const lng = normalizeCoordinate(value.lng);
 
-    if (lat === null || lng === null) return null;
+    const label = normalizeText(value.label);
+    const placeId = normalizeText(value.placeId);
 
-    return {
-      label: normalizeText(value.label),
-      placeId: normalizeText(value.placeId),
-      lat,
-      lng
-    };
+    if (!label || !placeId) return null;
+
+    const address = { label, placeId };
+
+    if (lat !== null && lng !== null) {
+      address.lat = lat;
+      address.lng = lng;
+    }
+
+    return address;
   }
 
   function buildQuotePayload(input) {
@@ -42,8 +48,8 @@
     const variant = normalizeText(safeInput.variant);
     const payload = {
       eventId: normalizeText(safeInput.eventId),
-      eventStartsAt: normalizeText(safeInput.eventStartsAt),
       venueId: normalizeText(safeInput.venueId),
+      snapshotVersion: Number(safeInput.snapshotVersion),
       variant,
       passengerFareKey: normalizeText(safeInput.passengerFareKey)
     };
@@ -68,6 +74,8 @@
     if (
       !payload.eventId ||
       !payload.venueId ||
+      !Number.isInteger(payload.snapshotVersion) ||
+      payload.snapshotVersion < 1 ||
       !payload.variant ||
       !payload.passengerFareKey
     ) {
@@ -105,27 +113,71 @@
       };
     }
 
-    const response = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    const configLoader = window.PixkuyBookingPublicConfig;
 
-    const data = await response.json().catch(() => null);
+    if (configLoader && configLoader.ready && typeof configLoader.ready.then === "function") {
+      await configLoader.ready;
+    }
 
-    if (!response.ok || !data || data.ok !== true) {
+    const config = window.PIXKUY_BOOKING_API_CONFIG;
+    const safeConfig = config && typeof config === "object" ? config : {};
+    const apiBaseUrl = normalizeText(safeConfig.apiBaseUrl).replace(/\/+$/, "");
+    const publicSiteKey = normalizeText(safeConfig.publicSiteKey);
+
+    if (!publicSiteKey) {
       return {
         ok: false,
-        code: data && data.code ? data.code : "QUOTE_UNAVAILABLE",
-        messageKey: data && data.messageKey
-          ? data.messageKey
-          : "services.cards.events.panel.quoteUnavailable"
+        code: "PUBLIC_CONFIG_UNAVAILABLE",
+        messageKey: "services.cards.events.panel.quoteUnavailable"
       };
     }
 
-    return data;
+    const requestKey = normalizeText(input && input.requestKey) || "default";
+    const previousController = requestControllers.get(requestKey);
+    const controller = typeof window.AbortController === "function"
+      ? new window.AbortController()
+      : null;
+
+    if (previousController) previousController.abort();
+    if (controller) requestControllers.set(requestKey, controller);
+
+    try {
+      const response = await window.fetch(apiBaseUrl + ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Pixkuy-Site-Key": publicSiteKey
+        },
+        body: JSON.stringify(payload),
+        signal: controller ? controller.signal : undefined
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data || data.ok !== true) {
+        return {
+          ok: false,
+          code: data && data.code ? data.code : "QUOTE_UNAVAILABLE",
+          messageKey: data && data.messageKey
+            ? data.messageKey
+            : "services.cards.events.panel.quoteUnavailable"
+        };
+      }
+
+      if (Number(data.snapshotVersion) !== payload.snapshotVersion) {
+        return {
+          ok: false,
+          code: "EVENT_SNAPSHOT_CONFLICT",
+          messageKey: "services.cards.events.panel.quoteUnavailable"
+        };
+      }
+
+      return data;
+    } finally {
+      if (controller && requestControllers.get(requestKey) === controller) {
+        requestControllers.delete(requestKey);
+      }
+    }
   }
 
   NAMESPACE.buildQuotePayload = buildQuotePayload;
