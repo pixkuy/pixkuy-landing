@@ -431,6 +431,7 @@
       eventId: normalizeText(selectedEvent && selectedEvent.id),
       eventStartsAt: normalizeText(selectedEvent && selectedEvent.startsAt),
       venueId: getSelectedVenueId(),
+      snapshotVersion: selectedEvent ? selectedEvent.snapshotVersion : null,
       variant: state.selectedVariant,
       passengerFareKey: state.selectedPassengerFareKey
     };
