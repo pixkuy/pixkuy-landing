@@ -208,12 +208,8 @@
       };
     }
 
-    if (
-      previousServiceType !== safeNextServiceType &&
-      hasSpecificDraftData(previousServiceType)
-    ) {
-      resetSpecificDraftData(previousServiceType);
-    }
+    // Category navigation preserves each service's own in-page draft.
+    // Destructive reset remains available only through the explicit reset operation.
 
     state.activeServiceType = safeNextServiceType;
     writeServiceTypeToDom(form, safeNextServiceType);

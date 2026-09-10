@@ -50,6 +50,7 @@
   let mobileLuggageValue = "0";
   let mobileFareObserver = null;
   let mobileFareObservedNode = null;
+  let airportPickerConsumer = null;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -1409,7 +1410,7 @@
     const list = picker.querySelector("[data-airport-mobile-airport-picker-list]");
     const title = picker.querySelector("[data-airport-mobile-airport-picker-title]");
     const close = picker.querySelector("[data-airport-mobile-airport-picker-close]");
-    const selectedAirportId = getSelectedAirportIdForDirection(direction);
+    const selectedAirportId = airportPickerConsumer ? airportPickerConsumer.selectedId : getSelectedAirportIdForDirection(direction);
     const airports =
       catalog && typeof catalog.getActiveItemsByType === "function"
         ? catalog.getActiveItemsByType("airport")
@@ -1429,7 +1430,9 @@
 
     list.innerHTML = "";
 
-    airports.forEach(function renderAirportOption(item) {
+    airports.filter(function allowedAirport(item) {
+      return !airportPickerConsumer || airportPickerConsumer.allowedIds.includes(item.id);
+    }).forEach(function renderAirportOption(item) {
       const airportId = normalizeText(item && item.id);
       const label =
         catalog && typeof catalog.resolveItemLabel === "function"
@@ -1455,7 +1458,9 @@
   }
 
   function openAirportMobilePicker(panel) {
+    airportPickerConsumer = null;
     const picker = ensureAirportMobilePicker();
+    if (routeNode && picker.parentElement !== routeNode) routeNode.appendChild(picker);
     const direction = getCurrentDirection(panel);
 
     picker.dataset.airportMobileAirportPickerDirection = direction;
@@ -1465,6 +1470,25 @@
     picker.hidden = false;
     picker.setAttribute("aria-hidden", "false");
 
+    return true;
+  }
+
+  // Reuse the single picker as presentation only. The consumer owns its state,
+  // allowed IDs and selection callback; no ordinary booking operation is used.
+  function openAirportPickerForConsumer(consumer) {
+    if (!isMobileViewport() || !consumer || !consumer.host || !Array.isArray(consumer.allowedIds) || typeof consumer.onSelect !== 'function') return false;
+    closeAirportMobilePicker();
+    const picker = ensureAirportMobilePicker();
+    airportPickerConsumer = consumer;
+    consumer.host.appendChild(picker);
+    renderAirportMobilePickerOptions(picker, '');
+    picker.hidden = false;
+    picker.setAttribute('aria-hidden', 'false');
+    picker.setAttribute('role', 'dialog');
+    picker.setAttribute('aria-modal', 'true');
+    picker.setAttribute('aria-label', getI18nValue('contact.services.airportHotelAirportLabel', ''));
+    consumer.trigger?.setAttribute('aria-expanded', 'true');
+    picker.querySelector('[data-airport-mobile-airport-picker-close]')?.focus({preventScroll:true});
     return true;
   }
 
@@ -1491,16 +1515,31 @@
       return false;
     }
 
-    blurActiveElementInside(picker);
+    const consumer = airportPickerConsumer;
+    airportPickerConsumer = null;
+    if (!consumer) blurActiveElementInside(picker);
 
     picker.hidden = true;
     picker.setAttribute("aria-hidden", "true");
     picker.dataset.airportMobileAirportPickerDirection = "";
+    if (consumer) {
+      consumer.trigger?.setAttribute('aria-expanded', 'false');
+      if (consumer.trigger?.isConnected) consumer.trigger.focus({preventScroll:true});
+      picker.removeAttribute('role');
+      picker.removeAttribute('aria-modal');
+      picker.removeAttribute('aria-label');
+    }
 
     return true;
   }
 
   function selectAirportFromMobilePicker(airportId) {
+    if (airportPickerConsumer) {
+      const consumer = airportPickerConsumer;
+      if (!consumer.allowedIds.includes(airportId)) return false;
+      closeAirportMobilePicker();
+      return consumer.onSelect(airportId);
+    }
     const picker = getAirportMobilePicker();
     const api = getAirportTariffApi();
     const panel = getPanel();
@@ -1543,6 +1582,17 @@
     }
 
     picker.dataset.airportMobilePickerBound = "1";
+
+    picker.addEventListener('keydown', function onConsumerPickerKeydown(event) {
+      if (!airportPickerConsumer) return;
+      if (event.key === 'Escape') { event.preventDefault(); closeAirportMobilePicker(); }
+      if (event.key === 'Tab') {
+        const buttons = Array.from(picker.querySelectorAll('button'));
+        const first = buttons[0], last = buttons[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
 
     picker.addEventListener("click", function onPickerClick(event) {
       const close = event.target.closest("[data-airport-mobile-airport-picker-close]");
@@ -2290,6 +2340,11 @@
   window.PixkuyAirportMobileBookingFlow = {
     open: openAirportRoute,
     close: closeAirportRoute,
+    openAirportPicker: openAirportPickerForConsumer,
+    closeAirportPicker: function closeConsumerPicker(host) {
+      if (airportPickerConsumer?.host === host) return closeAirportMobilePicker();
+      return false;
+    },
     isOpen: function isOpen() {
       return isRouteOpen;
     }

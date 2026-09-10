@@ -643,6 +643,11 @@ function hasAttemptableHourlyDailyReservationData(data) {
 
 function hasAttemptableEventSpecialReservationData(data) {
   if (!data) return false;
+  if (window.PixkuyEventPackagesContact?.isActive()) {
+    return Boolean(data.serviceType === 'event_special' && data.name &&
+      isValidInternationalPhoneNumber(data.phone) && isValidEmail(data.email) &&
+      window.PixkuyEventPackagesContact.canSubmit());
+  }
 
   if (
     !data.name ||
@@ -814,6 +819,9 @@ function hasMinimumRequiredHourlyDailyReservationData(data) {
 
 function hasMinimumRequiredEventSpecialReservationData(data) {
   if (!data) return false;
+  if (window.PixkuyEventPackagesContact?.isActive()) {
+    return hasAttemptableEventSpecialReservationData(data);
+  }
 
   if (
     !data.name ||
@@ -1904,6 +1912,8 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       return false;
     }
 
+    if (fields.form.dataset.reservationSubmitBound === '1') return true;
+    fields.form.dataset.reservationSubmitBound = '1';
     fields.form.addEventListener('submit', function (event) {
       var guard;
       var data;
@@ -1921,6 +1931,15 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
 
       data = getReservationRequestData(fields);
       serviceType = data && data.serviceType ? data.serviceType : '';
+
+      if (window.PixkuyEventPackagesContact?.isActive()) {
+        // This context always uses the package endpoint, never the native lead channel.
+        event.preventDefault();
+        if (serviceType === 'event_special' && hasMinimumRequiredReservationData(data)) {
+          void window.PixkuyEventPackagesContact.submit(fields);
+        }
+        return;
+      }
 
       guard = getSubmissionGuard();
 

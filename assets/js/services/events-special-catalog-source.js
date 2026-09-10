@@ -336,6 +336,10 @@
 
   window.PixkuyServicesEventsCatalogSource = {
     loadCatalog,
+    loadOffers: async function loadOffers(locale) {
+      const results = await Promise.allSettled([loadCatalog(locale), window.PixkuyEventPackagesApi.load(locale)]);
+      return { transfer: results[0].status === "fulfilled" ? results[0].value : null, packages: results[1].status === "fulfilled" ? results[1].value : null, transferStatus: results[0].status, packagesStatus: results[1].status };
+    },
     invalidate
   };
 })(window);

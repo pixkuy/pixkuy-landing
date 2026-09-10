@@ -16,11 +16,13 @@
     loaded: false,
     loading: false,
     loadError: false,
+    catalogRequestId: 0,
     groups: [],
     venuesById: {},
     pricing: {},
     selectedGroupId: "",
     selectedEventId: "",
+    selectedOfferKind: "special",
     selectedVariant: "arrival",
     selectedPassengerFareKey: "van_1_2",
     originAddress: "",
@@ -48,6 +50,7 @@
     pendingField: "",
     pendingValue: ""
   };
+  let retainedSpecialDraft = null;
 
   function isObject(value) {
     return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -236,8 +239,184 @@
     };
   }
 
+  // One selector projection over the two existing public sources. Package DTOs
+  // remain owned by their canonical state; no second catalog or selection store.
+  function getEventGroups() {
+    const packages = window.PixkuyEventPackagesState?.state.events || [];
+    const packageGroups = packages.map(event => ({
+      id: event.id, offerKind: 'packages',
+      title: event.snapshot.translations[getDocumentLanguage()]?.title || event.snapshot.translations.es.title,
+      featured: event.snapshot.featured === true, priority: Number(event.snapshot.priority || 0),
+      events: [{ id: event.id, startsAtUtc: event.snapshot.publicEventDates?.startLocalDate ?
+        event.snapshot.publicEventDates.startLocalDate + 'T00:00:00-06:00' : event.snapshot.servicePeriod?.from }]
+    }));
+    const packageIds = new Set(packageGroups.map(group => group.id));
+    return state.groups.filter(group => !packageIds.has(group.id)).concat(packageGroups).sort(sortGroups);
+  }
+
+  function getContactEventSelection() {
+    const group = getSelectedGroup();
+    return { eventId: state.selectedGroupId, occurrenceId: state.selectedEventId,
+      offerKind: state.selectedOfferKind, available: !!group };
+  }
+
+  function retainSelectedSpecialDraft() {
+    if (state.selectedOfferKind !== "special" || !state.selectedGroupId) return;
+    if (state.quoteStatus === "loading") {
+      state.quoteStatus = "pending";
+      state.quote = null;
+    }
+    retainedSpecialDraft = {
+      groupId: state.selectedGroupId,
+      eventId: state.selectedEventId
+    };
+  }
+
+  function createEventPicker(root) {
+    const host = document.createElement("div");
+    const label = document.createElement("span");
+    const shell = document.createElement("div");
+    const control = document.createElement("button");
+    const value = document.createElement("span");
+
+    host.className = "contact-event-special-editor__picker form-field";
+    host.setAttribute("data-contact-event-picker", "");
+    label.className = "services-expand__label";
+    label.id = "contact-event-special-picker-label";
+    label.textContent = getI18nValue("contact.services.eventSpecial.eventLabel", "Evento");
+    shell.className = "services-expand__airport-shell";
+    control.type = "button";
+    control.className = "services-expand__control services-expand__control--select";
+    control.setAttribute("data-contact-event-picker-control", "");
+    control.setAttribute("aria-labelledby", "contact-event-special-picker-label contact-event-special-picker-value");
+    control.setAttribute("aria-haspopup", "listbox");
+    control.setAttribute("aria-expanded", "false");
+    value.id = "contact-event-special-picker-value";
+    value.setAttribute("data-contact-event-picker-value", "");
+    control.appendChild(value);
+    shell.appendChild(control);
+    host.appendChild(label);
+    host.appendChild(shell);
+    root.__contactEventPicker = { host, label, shell, control, value, signature: "", close: null };
+    return host;
+  }
+
+  function bindEventPicker(picker) {
+    if (picker.close) return true;
+    const api = window.PixkuyAirportTariffDropdowns;
+    if (!api) return false;
+    const panel = api.createDropdownPanel("contact-event-special");
+    let activeIndex = -1;
+    picker.shell.appendChild(panel);
+
+    const close = function closePicker() {
+      api.closeDropdown({ panel, control: picker.control });
+    };
+    const open = function openPicker() {
+      const options = getEventGroups().map(function mapOption(group) {
+        return { id: group.id, label: getEventTitle(group), type: group.offerKind || "special" };
+      });
+      activeIndex = api.renderDropdown({
+        panel,
+        control: picker.control,
+        role: "contact-event-special",
+        options,
+        selectedIndex: options.findIndex(function findOption(option) { return option.id === state.selectedGroupId; })
+      }).activeIndex;
+      api.openDropdown({ panel, control: picker.control });
+    };
+    const commit = function commitPicker(index) {
+      const selected = api.commitActiveOption({ panel, activeIndex: index });
+      if (!selected) return false;
+      close();
+      const changed = selectGroup(selected.optionValue);
+      picker.control.focus({ preventScroll: true });
+      return changed;
+    };
+
+    picker.control.addEventListener("click", function togglePicker() {
+      if (panel.hidden) open(); else close();
+    });
+    picker.control.addEventListener("keydown", function handlePickerKeydown(event) {
+      if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+        event.preventDefault();
+        if (panel.hidden) { open(); return; }
+        activeIndex = api.moveActiveIndex({
+          panel,
+          control: picker.control,
+          currentIndex: activeIndex,
+          direction: event.key === "Home" ? -getEventGroups().length : event.key === "End" ? getEventGroups().length : event.key === "ArrowDown" ? 1 : -1
+        }).activeIndex;
+      } else if ((event.key === "Enter" || event.key === " ") && !picker.control.disabled) {
+        event.preventDefault();
+        if (panel.hidden) open(); else commit(activeIndex);
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+      } else if (event.key === "Tab") {
+        close();
+      }
+    });
+    panel.addEventListener("pointerdown", function retainPickerFocus(event) { event.preventDefault(); });
+    panel.addEventListener("click", function choosePickerOption(event) {
+      const option = event.target.closest('[data-airport-tariff-option-role="contact-event-special"]');
+      if (!option) return;
+      commit(Number(option.dataset.airportTariffOptionIndex));
+    });
+    document.addEventListener("pointerdown", function closePickerOutside(event) {
+      if (!picker.host.contains(event.target)) close();
+    });
+    document.addEventListener("focusin", function closePickerOnExternalFocus(event) {
+      if (!picker.host.contains(event.target)) close();
+    });
+    picker.panel = panel;
+    picker.close = close;
+    return true;
+  }
+
+  function syncEventPicker(root) {
+    const picker = root.__contactEventPicker;
+    if (!picker) return false;
+    const group = getSelectedGroup();
+    const options = getEventGroups();
+    const frozen = window.PixkuyEventPackagesRequest?.hasFrozenBody() === true;
+    const bound = bindEventPicker(picker);
+    const signature = JSON.stringify([state.selectedGroupId, frozen, options.map(function mapOption(option) {
+      return [option.id, getEventTitle(option), option.offerKind || "special"];
+    })]);
+    if (picker.signature !== signature && picker.close) picker.close();
+    picker.signature = signature;
+    picker.label.textContent = getI18nValue("contact.services.eventSpecial.eventLabel", "Evento");
+    picker.value.textContent = group ? getEventTitle(group) : window.PixkuyEventPackagesConfig?.t("choose") || "Seleccionar";
+    picker.control.disabled = frozen || !options.length || !bound;
+    picker.control.setAttribute("aria-disabled", picker.control.disabled ? "true" : "false");
+    return true;
+  }
+
+  function ensureEditorSurface(root) {
+    if (!root.__contactEventBody) {
+      const picker = createEventPicker(root);
+      const body = document.createElement("div");
+      body.setAttribute("data-contact-event-special-body", "");
+      root.replaceChildren(picker, body);
+      root.__contactEventBody = body;
+    }
+    syncEventPicker(root);
+    return root.__contactEventBody;
+  }
+
+  function selectContactPackageEvent(eventId) {
+    const group = getEventGroups().find(item => item.id === eventId && item.offerKind === 'packages');
+    if (!group) return false;
+    retainSelectedSpecialDraft();
+    state.quoteRequestId++;
+    state.selectedGroupId = group.id; state.selectedEventId = group.id; state.selectedOfferKind = 'packages';
+    render();
+    return true;
+  }
+
   function getSelectedGroup() {
-    return state.groups.find(function findGroup(group) {
+    return getEventGroups().find(function findGroup(group) {
       return group.id === state.selectedGroupId;
     }) || null;
   }
@@ -251,7 +430,7 @@
 
     return safeGroup.events.find(function findEvent(event) {
       return event.id === state.selectedEventId;
-    }) || safeGroup.events[0] || null;
+    }) || null;
   }
 
   function getSelectedVenue(group, event) {
@@ -603,6 +782,7 @@
   }
 
   function requestQuoteIfReady() {
+    if (state.selectedOfferKind === 'packages') return;
     const quoteModule = getQuoteModule();
     const quoteInput = buildQuoteInput();
     const quotePayload = quoteModule && typeof quoteModule.buildQuotePayload === "function"
@@ -1113,22 +1293,6 @@
     return state.selectedVariant === "departure" || state.selectedVariant === "round_trip";
   }
 
-  function buildEventOptionsMarkup() {
-    return state.groups.map(function mapGroup(group) {
-      const isSelected = group.id === state.selectedGroupId;
-
-      return (
-        '<option value="' +
-        escapeHtml(group.id) +
-        '"' +
-        (isSelected ? " selected" : "") +
-        ">" +
-        escapeHtml(getEventTitle(group)) +
-        "</option>"
-      );
-    }).join("");
-  }
-
   function buildDateOptionsMarkup(group) {
     if (!group) {
       return "";
@@ -1443,14 +1607,7 @@
         "</aside>" +
 
         '<div class="contact-event-special-editor__fields">' +
-          '<div class="contact-event-special-editor__control-grid contact-event-special-editor__control-grid--event">' +
-            '<div class="form-field">' +
-              '<label class="visually-hidden" for="contact-event-special-event">' + escapeHtml(getI18nValue("contact.services.eventSpecial.eventLabel", "Evento")) + "</label>" +
-              '<select id="contact-event-special-event" data-contact-event-special-event>' +
-                buildEventOptionsMarkup() +
-              "</select>" +
-            "</div>" +
-
+          '<div class="contact-event-special-editor__control-grid contact-event-special-editor__control-grid--date">' +
             '<div class="form-field">' +
               '<label class="visually-hidden" for="contact-event-special-date">' + escapeHtml(getI18nValue("contact.services.eventSpecial.dateLabel", "Fecha y hora")) + "</label>" +
               '<select id="contact-event-special-date" data-contact-event-special-date>' +
@@ -1525,6 +1682,7 @@
       return false;
     }
 
+    if (state.selectedOfferKind === 'packages') { clearHiddenFields(safeNodes); syncReservationRequestState(); return true; }
     syncHiddenFields(safeNodes);
     syncSelectedAddressSummaries(safeNodes.root);
     syncReservationRequestState();
@@ -1541,15 +1699,23 @@
     }
 
     destroyAddressControllers();
-    nodes.root.innerHTML = buildRootMarkup();
+    const missing = !!state.selectedGroupId && !getSelectedGroup();
+    const body = ensureEditorSurface(nodes.root);
+    body.innerHTML = state.selectedOfferKind === 'packages' || missing || (!getSelectedGroup() && getEventGroups().length) ?
+      (missing?'<p role="alert">'+escapeHtml(window.PixkuyEventPackagesConfig.t('eventUnavailable'))+'</p>':'') : buildRootMarkup();
+    if (missing) { clearHiddenFields(nodes); syncReservationRequestState(); }
+    else {
     mountAddressControllers(nodes.root);
     syncView(nodes);
+    }
+    window.PixkuyEventPackagesContact?.reconcile();
 
     return true;
   }
 
   function selectGroup(groupId) {
-    const group = state.groups.find(function findGroup(group) {
+    if (window.PixkuyEventPackagesRequest?.hasFrozenBody() || ['submitting','unknown'].includes(window.PixkuyEventPackagesState?.state.requestStatus)) return false;
+    const group = getEventGroups().find(function findGroup(group) {
       return group.id === groupId;
     });
 
@@ -1557,12 +1723,42 @@
       return false;
     }
 
+    if (group.offerKind !== 'packages' && state.selectedOfferKind === 'special' && state.selectedGroupId === group.id) {
+      return true;
+    }
+
+    if (group.offerKind === 'packages') {
+      const C = window.PixkuyEventPackagesState;
+      const event = C.state.events.find(item => item.id === group.id);
+      if (C.state.receipt && C.state.receipt.eventId !== group.id) return false;
+      retainSelectedSpecialDraft();
+      state.quoteRequestId++;
+      state.selectedGroupId = group.id; state.selectedEventId = group.id; state.selectedOfferKind = 'packages';
+      C.state.configurationSurface = 'contact';
+      if (!C.state.receipt && (C.state.selectedEvent?.id !== event.id || C.state.selection?.publicationVersion !== event.publicationVersion)) {
+        if (!C.selectEvent(event, !event.snapshot.packages.some(pkg=>pkg.active!==false))) return false;
+      }
+      render();
+      return true;
+    }
+
+    state.quoteRequestId++;
+    const restoringDraft = state.selectedOfferKind === 'packages' && retainedSpecialDraft?.groupId === group.id;
+    if (!restoringDraft && state.selectedGroupId !== group.id) resetState();
+    state.selectedOfferKind = 'special';
+    window.PixkuyEventPackagesState?.suspendQuote();
+
     state.selectedGroupId = group.id;
-    state.selectedEventId = group.events[0] ? group.events[0].id : "";
-    state.quoteStatus = "pending";
-    state.quote = null;
+    state.selectedEventId = restoringDraft && group.events.some(event => event.id === retainedSpecialDraft.eventId)
+      ? retainedSpecialDraft.eventId
+      : group.events[0] ? group.events[0].id : "";
+    if (!restoringDraft) {
+      state.quoteStatus = "pending";
+      state.quote = null;
+    }
+    retainedSpecialDraft = { groupId: state.selectedGroupId, eventId: state.selectedEventId };
     render();
-    requestQuoteIfReady();
+    if (!restoringDraft || state.quoteStatus !== "ready") requestQuoteIfReady();
 
     return true;
   }
@@ -1579,7 +1775,9 @@
       return false;
     }
 
+    state.quoteRequestId++;
     state.selectedEventId = event.id;
+    retainedSpecialDraft = { groupId: state.selectedGroupId, eventId: state.selectedEventId };
     state.quoteStatus = "pending";
     state.quote = null;
     render();
@@ -1780,11 +1978,6 @@
         return;
       }
 
-      if (target.matches("[data-contact-event-special-event]")) {
-        selectGroup(target.value || "");
-        return;
-      }
-
       if (target.matches("[data-contact-event-special-date]")) {
         selectEvent(target.value || "");
         return;
@@ -1858,6 +2051,8 @@
       : null;
 
     if (group) {
+      state.quoteRequestId++;
+      state.selectedOfferKind = 'special';
       state.selectedGroupId = group.id;
     }
 
@@ -1951,11 +2146,13 @@
       }
 
       state.loading = true;
+      const requestId = ++state.catalogRequestId;
       state.loadError = false;
       render();
 
       loadData()
         .then(function applyLocalizedCatalog(data) {
+          if (requestId !== state.catalogRequestId) return;
           state.groups = data.groups;
           state.venuesById = data.venuesById;
           state.pricing = data.pricing;
@@ -1963,7 +2160,7 @@
           state.loading = false;
           state.loadError = false;
 
-          if (!getSelectedGroup()) {
+          if (!state.selectedGroupId) {
             state.selectedGroupId = state.groups[0] ? state.groups[0].id : "";
             state.selectedEventId = state.groups[0] && state.groups[0].events[0]
               ? state.groups[0].events[0].id
@@ -1973,6 +2170,7 @@
           render();
         })
         .catch(function showLocalizedCatalogError() {
+          if (requestId !== state.catalogRequestId) return;
           state.loading = false;
           state.loadError = true;
           render();
@@ -2009,10 +2207,12 @@
 
     if (!state.loaded && !state.loading) {
       state.loading = true;
+      const requestId = ++state.catalogRequestId;
       render();
 
       try {
         const data = await loadData();
+        if (requestId !== state.catalogRequestId) return false;
 
         state.groups = data.groups;
         state.venuesById = data.venuesById;
@@ -2020,8 +2220,9 @@
         state.loaded = true;
         state.loading = false;
         state.loadError = false;
-        resetState();
+        if (!state.selectedGroupId) resetState();
       } catch (error) {
+        if (requestId !== state.catalogRequestId) return false;
         state.groups = [];
         state.venuesById = {};
         state.pricing = {};
@@ -2034,12 +2235,30 @@
     bindEvents(nodes.root);
     bindI18nLanguageSync(nodes.root);
     registerStateHooks();
+    if (!nodes.root.__nativeEventsBound) {
+      nodes.root.__nativeEventsBound = true;
+      let catalogEvents = null, catalogStatus = '';
+      window.PixkuyEventPackagesState?.subscribe(packages => {
+        if (catalogEvents === packages.events && catalogStatus === packages.catalogStatus) return;
+        catalogEvents = packages.events; catalogStatus = packages.catalogStatus; render();
+      });
+      form.addEventListener('pixkuy:contact-service-change', event => {
+        if (event.detail?.nextServiceType !== SERVICE_TYPE) {
+          state.quoteRequestId++;
+          if (state.quoteStatus === 'loading') { state.quoteStatus = 'pending'; state.quote = null; }
+        } else { render(); }
+      });
+    }
+    if (window.PixkuyEventPackagesState?.state.catalogStatus !== 'ready') void window.PixkuyEventPackagesConfig?.load();
+    void window.PixkuyEventPackagesRequest?.initialize();
     render();
 
     return true;
   }
 
   NAMESPACE.initContactEventSpecialEditor = initContactEventSpecialEditor;
+  NAMESPACE.getContactEventSelection = getContactEventSelection;
+  NAMESPACE.selectContactPackageEvent = selectContactPackageEvent;
   NAMESPACE.getContactEventSpecialSnapshot = getTripSnapshot;
   NAMESPACE.applyContactEventSpecialHandoff = applyHandoff;
 })(window, document);

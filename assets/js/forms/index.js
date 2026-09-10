@@ -473,6 +473,13 @@
         return;
       }
 
+      if (detail.contextKind === 'event_packages') {
+        if (!window.PixkuyEventPackagesContact?.activate(form)) return;
+        scrollToContactSection(form);
+        form.querySelector('#contact-name')?.focus({ preventScroll: true });
+        return;
+      }
+      window.PixkuyEventPackagesContact?.deactivate();
       formsNamespace.applyContactEventSpecialHandoff(detail);
       scrollToContactSection(form);
       focusEventSpecialPrimaryField(form);

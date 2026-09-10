@@ -27,9 +27,7 @@
   const BACK_SELECTOR = "[data-events-mobile-flow-back]";
   const STACK_SELECTOR = "[data-events-mobile-stack]";
   const EVENT_CARD_SELECTOR = "[data-events-mobile-event-group]";
-  const CONTINUE_SELECTOR = "[data-events-mobile-continue]";
 
-  const MAX_VISIBLE_GROUPS = 10;
   const MIN_LEAD_HOURS = 6;
 
   const mobileQuery = window.matchMedia ? window.matchMedia(MOBILE_QUERY) : null;
@@ -44,6 +42,8 @@
   let isLoading = false;
   let hasLoaded = false;
   let loadError = false;
+  let previousFocus = null;
+  let pageScrollY = 0;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -197,8 +197,7 @@
         group.events = group.events.sort(sortEvents);
         return group;
       })
-      .sort(sortGroups)
-      .slice(0, MAX_VISIBLE_GROUPS);
+      .sort(sortGroups);
   }
 
   function getEventTitle(entity) {
@@ -352,7 +351,6 @@
   }
 
   function buildEventCardMarkup(group) {
-    const isActive = group && group.id === selectedGroupId;
     const venue = group
       ? group.venue || (group.venueId ? venuesById[group.venueId] : null)
       : null;
@@ -362,15 +360,15 @@
     const dateSummary = getGroupDateSummary(group);
     const fromPrice = getFromPrice();
     const fromLabel = getI18nValue("services.cards.events.panel.priceFromLabel", "");
-    const ctaLabel = getI18nValue("services.cards.events.mobileFlow.continue", "");
+    const ctaLabel = getI18nValue("eventPackages.configureTransfer",
+      getI18nValue("services.cards.events.mobileFlow.continue", ""));
     const posterAlt = getI18nValue("services.cards.events.panel.posterAlt", "");
     const poster = group.posterMobileSrc || group.posterSrc || "";
 
     return [
       '<button type="button"',
-      ' class="events-mobile-stack-card' + (isActive ? ' is-active' : '') + '"',
-      ' data-events-mobile-event-group="' + escapeHtml(group.id) + '"',
-      ' aria-pressed="' + (isActive ? 'true' : 'false') + '">',
+      ' class="events-mobile-stack-card"',
+      ' data-events-mobile-event-group="' + escapeHtml(group.id) + '">',
       '<span class="events-mobile-stack-card__media">',
       '<img class="events-mobile-stack-card__image"',
       ' src="' + escapeHtml(poster) + '"',
@@ -388,12 +386,8 @@
       '<span class="events-mobile-stack-card__price-label">' + escapeHtml(fromLabel) + '</span>',
       '<strong class="events-mobile-stack-card__price-value">' + escapeHtml(formatCurrency(fromPrice, pricing.currency || "MXN")) + '</strong>',
       '</span>',
-      isActive
-        ? '<span class="events-mobile-stack-card__venue">' + escapeHtml(venueName) + '</span>'
-        : '',
-      isActive
-        ? '<span class="cta events-mobile-stack-card__action" data-events-mobile-continue="' + escapeHtml(group.id) + '">' + escapeHtml(ctaLabel) + '</span>'
-        : '',
+      '<span class="events-mobile-stack-card__venue">' + escapeHtml(venueName) + '</span>',
+      '<span class="cta events-mobile-stack-card__action" data-events-mobile-continue="' + escapeHtml(group.id) + '">' + escapeHtml(ctaLabel) + '</span>',
       '</span>',
       '</button>'
     ].join("");
@@ -411,7 +405,7 @@
     if (!groups.length) {
       if (loadError) {
         const errorLabel = getI18nValue(
-          "services.cards.events.panel.quoteUnavailable",
+          "eventPackages.error",
           "No podemos cargar los eventos en este momento."
         );
 
@@ -444,39 +438,6 @@
     stack.innerHTML = buildStackMarkup();
 
     return true;
-  }
-
-  function selectGroup(groupId) {
-    const safeGroupId = normalizeText(groupId);
-    const group = groups.find(function findGroup(groupItem) {
-      return groupItem.id === safeGroupId;
-    });
-
-    if (!group || selectedGroupId === group.id) {
-      return false;
-    }
-
-    selectedGroupId = group.id;
-    renderStack();
-
-    return true;
-  }
-
-  function runWithViewTransition(update) {
-    if (
-      document &&
-      typeof document.startViewTransition === "function" &&
-      typeof update === "function"
-    ) {
-      document.startViewTransition(update);
-      return true;
-    }
-
-    if (typeof update === "function") {
-      update();
-    }
-
-    return false;
   }
 
   function getEventsMobileConfigStepApi() {
@@ -563,6 +524,7 @@
     if (routeContent && !routeContent.querySelector("[data-events-mobile-flow]")) {
       routeContent.appendChild(buildFlowNode());
     }
+    if (routeContent && window.PixkuyEventPackagesConfig) window.PixkuyEventPackagesConfig.mount(routeContent, "mobile");
 
     return routeNode;
   }
@@ -625,9 +587,13 @@
     if (!routeNode) {
       return false;
     }
+    const wasVisible = isRouteOpen;
 
     if (!isVisible) {
       blurActiveElementInside(routeNode);
+    } else if (!isRouteOpen) {
+      previousFocus = document.activeElement;
+      pageScrollY = window.scrollY;
     }
 
     routeNode.hidden = !isVisible;
@@ -637,6 +603,13 @@
     document.body.setAttribute(BODY_FLOW_ATTR, isVisible ? "true" : "false");
 
     isRouteOpen = isVisible;
+
+    if (!isVisible && wasVisible) {
+      window.scrollTo({ top: pageScrollY, behavior: "instant" });
+      if (previousFocus && typeof previousFocus.focus === "function") {
+        previousFocus.focus({ preventScroll: true });
+      }
+    }
 
     return true;
   }
@@ -672,9 +645,7 @@
     ensureRoute();
     syncCopy();
 
-    runWithViewTransition(function updateEventsRoute() {
-      setRouteVisibility(true);
-    });
+    setRouteVisibility(true);
 
     if (window.PixkuyAnalytics && typeof window.PixkuyAnalytics.track === "function") {
       window.PixkuyAnalytics.track("pixkuy_mobile_route_open", {
@@ -694,13 +665,13 @@
     const settings = options || {};
     const configStep = getEventsMobileConfigStepApi();
 
+    window.PixkuyEventPackagesConfig?.closePackageDetailsDialog?.();
+
     if (configStep && typeof configStep.close === "function") {
       configStep.close();
     }
 
-    runWithViewTransition(function updateEventsRouteClose() {
-      setRouteVisibility(false);
-    });
+    setRouteVisibility(false);
 
     if (settings.updateUrl === true) {
       removeEventsServiceFromUrl();
@@ -840,7 +811,6 @@
         return;
       }
 
-      const continueButton = event.target.closest(CONTINUE_SELECTOR);
       const card = event.target.closest(EVENT_CARD_SELECTOR);
       const groupId = card
         ? normalizeText(card.getAttribute("data-events-mobile-event-group"))
@@ -850,16 +820,10 @@
         return;
       }
 
-      if (continueButton) {
-        event.preventDefault();
-        event.stopPropagation();
-        openEventsConfigStep(groupId);
-        return;
-      }
-
-      runWithViewTransition(function updateSelectedEvent() {
-        selectGroup(groupId);
-      });
+      event.preventDefault();
+      event.stopPropagation();
+      selectedGroupId = groupId;
+      openEventsConfigStep(groupId);
     });
 
     return true;

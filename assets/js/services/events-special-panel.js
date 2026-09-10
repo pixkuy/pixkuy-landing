@@ -1710,6 +1710,23 @@
     state.selectedEventId = group.events[0] ? group.events[0].id : "";
 
     renderAll();
+    window.dispatchEvent(new CustomEvent("pixkuy:events-detail-activated", {
+      detail: { source: "special" }
+    }));
+  }
+
+  function deactivateForPackageDetail() {
+    if (!state.selectedGroupId) return false;
+
+    state.selectedGroupId = "";
+    state.selectedEventId = "";
+    state.quoteRequestId += 1;
+    state.quoteStatus = "pending";
+    state.quote = null;
+    state.quoteMessageKey = "services.cards.events.panel.quotePending";
+    renderAll();
+
+    return true;
   }
 
   function selectEvent(eventId) {
@@ -1874,6 +1891,9 @@
     state.quote = null;
 
     renderAll();
+    window.dispatchEvent(new CustomEvent("pixkuy:events-detail-activated", {
+      detail: { source: "special" }
+    }));
     scrollExternalSelectedEventIntoView(targetGroup.id);
 
     return true;
@@ -2151,6 +2171,7 @@
   }
 
   bindEvents();
+  if (window.PixkuyEventPackagesConfig) window.PixkuyEventPackagesConfig.mount(panelRoot, "desktop");
   bindExpandedPanelObserver();
   init();
 
@@ -2160,6 +2181,12 @@
       : {};
 
     selectEventFromExternalRequest(detail.eventId);
+  });
+
+  window.addEventListener("pixkuy:events-detail-activated", (event) => {
+    if (event && event.detail && event.detail.source === "packages") {
+      deactivateForPackageDetail();
+    }
   });
 
   window.addEventListener("pixkuy:i18n-applied", init);

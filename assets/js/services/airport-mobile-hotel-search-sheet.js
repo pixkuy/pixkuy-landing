@@ -20,6 +20,7 @@
   let hasCommittedSelection = false;
   let hasSearchEdited = false;
   let openingSelectedLabel = "";
+  let fieldConsumer = null;
 
   function normalizeText(value) {
     return typeof value === "string" ? value : "";
@@ -292,7 +293,10 @@
   }
 
   function openSheet(sourceInput) {
+    closeConsumerField();
     const sheet = ensureSheet();
+    const route = document.querySelector(SELECTORS.route);
+    if (route && sheet.parentElement !== route) route.appendChild(sheet);
     const resolvedSourceInput = sourceInput || getActiveSourceInput();
     const value = resolvedSourceInput ? resolvedSourceInput.value : "";
 
@@ -321,6 +325,7 @@
   }
 
   function closeSheet(options) {
+    if (fieldConsumer) return closeConsumerField();
     const sheet = getSheet();
     const shouldRefocus = Boolean(options && options.refocus === true);
 
@@ -349,6 +354,13 @@
   }
 
   function clearSearch() {
+    if (fieldConsumer) {
+      const input = getSheet().querySelector(SELECTORS.input);
+      setInternalValue('');
+      input.dispatchEvent(new Event('input', {bubbles:true}));
+      input.focus({preventScroll:true});
+      return true;
+    }
     hasSearchEdited = true;
 
     setInternalValue("");
@@ -446,6 +458,8 @@
         return;
       }
 
+      if (fieldConsumer) { setInternalValue(input.value); return; }
+
       hasSearchEdited = true;
       setInternalValue(input.value);
       syncSourceInputValue(input.value);
@@ -453,6 +467,48 @@
 
     return true;
   }
+
+  function closeConsumerField(host) {
+    if (!fieldConsumer || (host && fieldConsumer.host !== host)) return false;
+    const consumer = fieldConsumer; fieldConsumer = null;
+    consumer.controller?.destroy();
+    const sheet = getSheet();
+    clearRenderedOptions();
+    sheet.setAttribute('aria-hidden', 'true');
+    sheet.removeAttribute('role');sheet.removeAttribute('aria-modal');sheet.removeAttribute('aria-label');
+    document.body.removeAttribute('data-airport-mobile-hotel-search-open');
+    if (consumer.trigger?.isConnected) consumer.trigger.focus({preventScroll:true});
+    return true;
+  }
+
+  function openForField(consumer) {
+    if (!window.matchMedia('(max-width:720px)').matches || !consumer?.host || typeof consumer.mount !== 'function') return false;
+    closeConsumerField();
+    const sheet = ensureSheet();
+    consumer.host.appendChild(sheet);
+    fieldConsumer = consumer;
+    syncSheetCopy(sheet);setInternalValue(consumer.value || '');clearRenderedOptions();
+    sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');
+    sheet.setAttribute('aria-label',getI18nValue(I18N_KEYS.title,''));
+    sheet.setAttribute('aria-hidden','false');
+    document.body.setAttribute('data-airport-mobile-hotel-search-open','true');
+    const input = sheet.querySelector(SELECTORS.input);
+    consumer.controller = consumer.mount(input, sheet.querySelector(SELECTORS.list));
+    input.focus({preventScroll:true});
+    return true;
+  }
+
+  window.PixkuyAirportMobileHotelSearchSheet = {openForField, closeForField:closeConsumerField};
+  document.addEventListener('keydown', function onConsumerKey(event) {
+    if (!fieldConsumer) return;
+    if (event.key === 'Escape') { event.preventDefault(); closeConsumerField(); }
+    if (event.key === 'Tab') {
+      const controls = Array.from(getSheet().querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex="0"]')).filter(node => node.getClientRects().length);
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+  });
 
   function bindGlobalEvents() {
     document.addEventListener("pointerdown", handleSourceActivation, true);

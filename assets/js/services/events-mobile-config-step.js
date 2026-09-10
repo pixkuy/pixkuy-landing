@@ -44,6 +44,7 @@
   let currentQuoteResult = null;
   let posterViewerNode = null;
   let posterPreviousFocus = null;
+  let catalogScrollTop = 0;
   let state = {
     selectedEventId: "",
     selectedVariant: DEFAULT_VARIANT,
@@ -146,7 +147,7 @@
       return "";
     }
 
-    return getI18nValue(entity.titleKey, entity.id || "");
+    return normalizeText(entity.title) || getI18nValue(entity.titleKey, entity.id || "");
   }
 
   function formatEventDate(value) {
@@ -1800,6 +1801,7 @@
     if (!isMobileViewport() || !route || !group) {
       return false;
     }
+    catalogScrollTop = route.scrollTop;
 
     currentPayload = safePayload;
     resetQuoteState();
@@ -1821,13 +1823,28 @@
 
     renderStep();
     setStepVisibility(true);
+    route.scrollTop = 0;
+    stepNode.querySelector(CONFIG_BACK_SELECTOR)?.focus({ preventScroll: true });
 
     return true;
   }
 
   function close() {
+    const wasOpen = isOpen();
+    closePosterViewer();
+    window.PixkuyEventsMobileContactStep?.close();
     destroyAddressControllers();
     setStepVisibility(false);
+    if (wasOpen) {
+      const route = getRoute();
+      if (route) {
+        route.scrollTop = catalogScrollTop;
+        const groupId = currentPayload?.group?.id;
+        Array.from(route.querySelectorAll('[data-events-mobile-event-group]'))
+          .find(node => node.getAttribute('data-events-mobile-event-group') === groupId)
+          ?.focus({ preventScroll: true });
+      }
+    }
     return true;
   }
 
