@@ -38,7 +38,7 @@
     const saved=drafts.get(draftKey(event,custom?'custom':'package'));
     state.selection=saved?clone(saved.selection):custom?{requestKind:'custom',eventId:event.id,publicationVersion:event.publicationVersion,inquiry:{reasonCode:'other',passengers:{status:'pending',count:null},services:[],needsFlags:[],notes:''}}:{requestKind:'package',eventId:event.id,publicationVersion:event.publicationVersion,packageId:'',optionId:'',passengerBand:"",services:[],additionalServiceIds:[],pendingCodes:[]};
     state.contact=saved?{...saved.contact}:{name:'',phone:'',email:''};state.step=saved?.step==='services'?'services':custom?'services':'package';
-    if(event.snapshot?.schemaVersion===3)state.selection.contractVersion=3;
+    if(event.snapshot?.schemaVersion===3){state.selection.contractVersion=3;state.selection.airportReturnVersion=1;state.selection.directReturnVersion=1;}
     state.quote=null;state.quoteStatus='idle';state.error='';state.screen='config';notify();return true;
   }
   function change(fn,options){if(!state.selection||['submitting','unknown','received'].includes(state.requestStatus)||window.PixkuyEventPackagesRequest?.hasFrozenBody())return;fn(state.selection);revision++;quoteSequence++;state.quote=null;state.quoteStatus='idle';state.error='';if(state.step==='review'){state.step='services';state.screen='config';}if(!options?.silent)notify();}

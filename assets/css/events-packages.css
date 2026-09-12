@@ -175,6 +175,14 @@
   line-height: 1.4;
 }
 
+.events-package-step-one .events-package-offer__details li.events-package-inclusion,
+.events-package-inclusion {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.events-package-inclusion .events-package-offer__highlight-icon,
 .events-package-offer__highlights .events-package-offer__highlight-icon {
   flex: 0 0 24px;
   opacity: 1;
@@ -507,14 +515,34 @@
 }
 
 @media (min-width: 721px) {
+  [data-event-package-root] [data-package-step-heading] { scroll-margin-top: 120px; }
+  [data-event-package-root] .events-package-config__header { gap: 12px; margin-bottom: 16px; align-items: start; }
+  [data-event-package-root] .events-package-event-heading { gap: 16px; align-items: start; }
+  [data-event-package-root] .events-package-event-heading h3 { margin: 0 0 8px; }
+  [data-event-package-root] .events-package-event-heading__meta { margin: 0; }
+  [data-event-package-root] .events-package-offer-heading { margin-block: 16px; }
+  .events-package-airport__shared-note { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .875rem; }
+  .events-package-airport--paired .events-package-airport__closing { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 16px 24px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .events-package-airport--paired .events-package-airport__closing .events-package-airport__fare { border: 0; padding: 0; }
+  .events-package-airport--paired .events-package-airport__closing .events-package-airport__actions { margin: 0; padding: 0; align-items: center; }
+  .events-package-airport__pending { margin: 8px 0 0; padding-left: 20px; columns: 2; font-size: .875rem; }
+  .events-package-airport--paired .events-package-airport__pending li { break-inside: avoid; margin: 0 0 4px; padding: 0; font-size: .875rem; line-height: 1.5; }
+  .events-package-airport--paired .events-package-airport__closing .events-package-airport__fare > p { margin: 8px 0; font-size: .875rem; }
+  .events-package-airport--paired .events-package-airport__conditions { margin: 0; max-width: 78ch; }
+  .events-package-airport--paired .services-hourly-panel__disclaimer-title { text-transform: none; letter-spacing: normal; }
+  .events-package-airport--paired .services-hourly-panel__disclaimers li { margin-bottom: 12px; }
+  .events-package-airport--paired .services-hourly-panel__disclaimers { margin: 0; padding-block: 0; }
+  .events-package-airport--paired .services-hourly-panel__disclaimers li:last-child { margin-bottom: 0; }
+  .events-package-airport--paired .services-hourly-panel__disclaimers strong { display: block; margin-bottom: 4px; }
   .events-package-step-one {
     width: 100%;
     max-width: 1156px;
     margin-inline: auto;
-    padding-block: 24px 40px;
+    padding-block: 16px 24px;
   }
 
   .events-package-step-one .events-package-config__header--package > .events-package-button--quiet {
+    margin-bottom: 12px;
     min-height: 24px;
     font-size: 0.9rem;
     font-weight: 400;
@@ -554,7 +582,7 @@
 
   .events-package-step-one .events-package-steps {
     gap: 32px;
-    margin: 0 0 28px;
+    margin: 0 0 16px;
     border-bottom-color: rgba(244, 242, 238, 0.25);
   }
 
@@ -1027,6 +1055,49 @@
   overflow-wrap: anywhere;
 }
 
+/* Desktop presentation only; the shared form and mobile flow retain their controls. */
+@media (min-width: 721px) {
+  .events-package-option-route { display: block; margin-top: 6px; color: var(--muted); font-size: .875rem; overflow-wrap: anywhere; }
+  .events-package-airport--paired { display: grid; gap: 16px; min-width: 0; }
+  .events-package-airport.events-package-airport--paired > h3,
+  .events-package-airport--paired > p { margin: 0; }
+  .events-package-airport--paired .events-package-airport__shared { padding: 0 0 12px; border: 0; border-bottom: 1px solid var(--border); }
+  .events-package-airport--paired legend { margin-bottom: 12px; padding: 0; color: var(--fg); font-size: 1rem; font-weight: 700; }
+  .events-package-airport__shared-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }
+  .events-package-airport__shared-fields > .events-package-passenger-bands { grid-column: 1 / -1; max-width: 420px; }
+  .events-package-airport__legs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .events-package-airport--paired .events-package-airport__leg { min-width: 0; gap: 12px; }
+  .events-package-airport__leg-route { margin: 0; color: var(--muted); overflow-wrap: anywhere; line-height: 1.5; }
+  .events-package-airport__leg-extras { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-width: 0; }
+  .events-package-airport__leg-extras > div { min-width: 0; }
+  .events-package-airport__leg-extras p { margin: 6px 0 0; }
+  .events-package-airport--paired .events-package-airport__fare { min-width: 0; padding-top: 16px; border-top: 1px solid var(--border); }
+  .events-package-airport--paired .events-package-airport__price { min-height: 0; max-width: 100%; overflow-wrap: anywhere; }
+  .events-package-airport--paired .events-package-airport__price:not(.is-quoted) { display: block; padding: 0; margin-top: 6px; border: 0; background: none; font-size: .875rem; font-weight: 400; line-height: 1.5; }
+  .events-package-review:has(.events-package-review__leg) ol { grid-template-columns: repeat(2, minmax(0, 1fr)); list-style: none; padding: 0; gap: 24px; }
+  .events-package-review__leg { min-width: 0; padding-top: 16px; border-top: 1px solid var(--border); overflow-wrap: anywhere; }
+  .events-package-review__leg h5 { margin: 0 0 8px; font-size: 1rem; }
+  .events-package-review__leg .events-package-review__route { margin: 0 0 12px; font-weight: 600; line-height: 1.5; }
+  .events-package-review__leg .events-package-review__time { margin-bottom: 8px; }
+  .events-package-review__leg .events-package-review__price { margin-bottom: 12px; }
+  form:has(.contact-event-package-context:not([hidden])) label.visually-hidden:is([for="contact-name"], [for="contact-phone"], [for="contact-email"]) {
+    position: static !important; display: block; width: auto !important; height: auto !important; margin: 0 0 8px !important; padding: 0 !important; overflow: visible !important; clip: auto !important; clip-path: none; white-space: normal !important;
+  }
+  .contact-event-package-context .events-package-receipt { max-width: 960px; gap: 20px; }
+  .contact-event-package-context .events-package-receipt__reference { padding-block: 16px; border-block: 1px solid var(--border); color: var(--fg); }
+  .contact-event-package-context .events-package-receipt__reference-value { display: block; margin-top: 6px; font-size: 1rem; font-weight: 600; }
+  .contact-event-package-context .events-package-receipt__summary { gap: 16px 24px; }
+  .contact-event-package-context .events-package-receipt__summary ol { list-style: none; padding: 0; display: grid; gap: 16px; }
+  .contact-event-package-context .events-package-receipt__summary li { margin: 0; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .contact-event-package-context .events-package-receipt__summary li p { margin-top: 6px; }
+  .contact-event-package-context .events-package-receipt__amount { font-size: 1.4rem; font-weight: 700; color: var(--fg); }
+}
+@media (min-width: 721px) and (max-width: 980px) {
+  .events-package-airport--paired .events-package-airport__closing { grid-template-columns: minmax(0, 1fr); }
+  .events-package-airport__legs,
+  .events-package-review:has(.events-package-review__leg) ol { grid-template-columns: minmax(0, 1fr); }
+}
+
 .contact-event-package-context[hidden],
 [data-event-package-root="contact"][hidden],
 [data-contact-event-special-editor][hidden],
@@ -1263,6 +1334,26 @@
   .events-mobile-route .events-package-offer-heading {
     margin-top: 20px;
   }
+
+  .events-mobile-route .events-package-config__header.events-package-mobile-header { gap: 8px; margin-bottom: 16px; }
+  .events-mobile-route .events-package-mobile-header > .events-package-button { min-height: 44px; padding: 8px 0; }
+  .events-mobile-route .events-package-mobile-header .events-package-event-heading__meta { display: grid; gap: 4px; margin: 8px 0 0; overflow-wrap: anywhere; }
+  .events-mobile-route .events-package-mobile-list__heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .events-mobile-route .events-package-mobile-list__heading .events-package-offer-heading { margin: 0; }
+  .events-mobile-route .events-package-mobile-list__count { color: var(--muted); margin: 0; }
+  .events-mobile-route .events-package-mobile-list > ul { display: grid; gap: 12px; list-style: none; padding: 0; margin: 12px 0 0; }
+  .events-mobile-route .events-package-mobile-list > ul > li { margin: 0; }
+  .events-mobile-route .events-package-mobile-list__row { display: grid; grid-template-columns: 28px minmax(0,1fr) 20px; gap: 12px; align-items: center; width: 100%; min-height: 80px; padding: 14px 12px; border: 1px solid rgba(236,220,189,.3); border-radius: 9px; background: #0f1113; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+  .events-mobile-route .events-package-mobile-list__icon { justify-self: center; color: var(--fg); }
+  .events-mobile-route .events-package-mobile-list__copy { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+  .events-mobile-route .events-package-mobile-list__row strong { font-size: 16px; line-height: 1.35; }
+  .events-mobile-route .events-package-mobile-list__copy > span { font-size: 14px; line-height: 1.5; color: var(--muted); }
+  .events-mobile-route .events-package-mobile-list__row:active { background: #101214; border-color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); }
+  .events-mobile-route .events-package-mobile-list__row:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+  .events-mobile-route .events-package-mobile-list .events-package-offer-footer { display: grid; justify-items: start; gap: 8px; border: 0; margin-top: 20px; padding: 0; }
+  .events-mobile-route .events-package-mobile-list .events-package-offer-footer p { margin: 0; color: var(--muted); }
+  .events-mobile-route .events-package-mobile-detail .events-package-offer-grid { display: block; }
+  .events-mobile-route .events-package-mobile-detail [data-package-step-heading]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
   .events-mobile-route .events-package-offer,
   .events-mobile-route .events-package-offer-grid--single .events-package-offer {
@@ -1809,10 +1900,36 @@ body[data-events-mobile-config-screen="true"]
   .events-package-mobile-airport .services-expand__form {
     margin-top: 0;
   }
-  .events-package-mobile-airport .events-package-mobile-address {
+  .events-mobile-route [data-package-airport-return] .events-package-airport-return__schedule {
+    align-items: stretch;
+    flex-wrap: nowrap;
+  }
+  .events-mobile-route [data-package-airport-return] > legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .events-mobile-route [data-package-airport-return] .services-expand__field--date {
+    /* Override the shared Airport rule, whose selector includes an ID. */
+    flex: 0 0 max(120px, 7em) !important;
+  }
+  .events-mobile-route [data-package-airport-return] .events-package-trip__temporal {
+    align-self: stretch;
+  }
+  .events-mobile-route [data-package-airport-return] .services-expand__field--time {
+    flex: 1 1 0 !important;
+  }
+  .events-mobile-route [data-package-airport-return] .services-expand__time-wrap {
+    width: var(--airport-time-basis, 86px);
+  }
+  :is(.events-package-mobile-airport, .events-package-direct) .events-package-mobile-address {
     position: relative;
   }
-  .events-package-mobile-airport .events-package-mobile-address__clear {
+  :is(.events-package-mobile-airport, .events-package-direct) .events-package-mobile-address__clear {
     position: absolute;
     z-index: 2;
     top: 50%;
@@ -1834,11 +1951,11 @@ body[data-events-mobile-config-screen="true"]
     line-height: 1;
     cursor: pointer;
   }
-  .events-package-mobile-airport .events-package-mobile-address__clear:hover {
+  :is(.events-package-mobile-airport, .events-package-direct) .events-package-mobile-address__clear:hover {
     color: rgba(255, 249, 238, 1);
     background: rgba(255, 249, 238, 0.08);
   }
-  .events-package-mobile-airport .events-package-mobile-address__clear:focus-visible {
+  :is(.events-package-mobile-airport, .events-package-direct) .events-package-mobile-address__clear:focus-visible {
     outline: 2px solid rgba(31, 122, 109, 0.95);
     outline-offset: 1px;
   }
@@ -2377,4 +2494,117 @@ body[data-events-mobile-config-screen="true"]
   .events-package-vehicle-card__currency {
     font-size: 12px;
   }
+}
+
+/* Public package review only. Existing contact nodes keep their values and listeners. */
+@media (min-width: 721px) {
+  .events-package-review__selectors { display: grid; gap: 16px; margin-bottom: 24px; }
+  .events-package-review__selectors .events-package-field { margin: 0; }
+  .events-package-review__selectors p { margin: 0; }
+  .events-package-review__selectors select { width: 100%; min-width: 0; min-height: 48px; font: inherit; font-size: .875rem; }
+  #contact .content:has(form[data-package-receipt-desktop]) { max-width: 880px; }
+  #contact .content:has(form[data-package-receipt-desktop]) > :is(h2, .subtitle) { display: none; }
+  form[data-package-receipt-desktop] .form-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  form[data-package-receipt-desktop] .form-grid > .form-row { display: none; }
+  form[data-package-receipt-desktop] [data-contact-service-panel="event_special"] { min-width: 0; }
+  .contact-event-package-context .events-package-receipt--desktop { max-width: 880px; gap: 24px; }
+  .events-package-receipt--desktop header { display: grid; gap: 8px; }
+  .events-package-receipt--desktop h3 { font-size: 1.5rem; line-height: 1.35; }
+  .events-package-receipt--desktop .events-package-receipt__reference { justify-content: space-between; padding-block: 16px; border-block: 1px solid rgba(236,220,189,.3); }
+  .events-package-receipt--desktop .events-package-receipt__reference > div { min-width: 0; }
+  .events-package-receipt--desktop .events-package-receipt__reference-value { display: block; margin-top: 6px; font-size: 1rem; font-weight: 600; }
+  .events-package-receipt--desktop [data-reference-status]:empty { display: none; }
+  .events-package-receipt--desktop .events-package-receipt__summary { margin: 0; gap: 8px 24px; grid-template-columns: 120px minmax(0, 1fr); }
+  .events-package-receipt--desktop .events-package-receipt__summary dd { overflow-wrap: anywhere; }
+  .events-package-receipt--desktop .events-package-receipt__itinerary { list-style: none; padding: 0; }
+  .events-package-receipt--desktop .events-package-receipt__itinerary > li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; margin: 0; border-top: 1px solid rgba(236,220,189,.3); align-items: start; }
+  .events-package-receipt--desktop .events-package-receipt__itinerary > li > p { grid-column: 2; }
+  .events-package-receipt--desktop .events-package-receipt__schedule { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin: 0; gap: 12px 24px; }
+  .events-package-receipt--desktop .events-package-receipt__schedule dt { color: var(--muted); font-size: .875rem; margin-bottom: 4px; }
+  .events-package-receipt--desktop .events-package-receipt__schedule dd { margin: 0; }
+  .events-package-receipt--desktop .events-package-receipt__total { border-top: 1px solid rgba(236,220,189,.3); padding-top: 20px; }
+  .events-package-receipt--desktop .events-package-receipt__total .events-package-receipt__amount { margin-top: 8px; font-size: 1.5rem; }
+  .events-package-receipt--desktop .events-package-receipt__actions button { border-radius: 8px; min-height: 48px; }
+  #contact .content:has(form[data-package-review-desktop]) { max-width: 1120px; }
+  #contact .content:has(form[data-package-review-desktop]) > :is(h2, .subtitle) { display: none; }
+  form[data-package-review-desktop] .form-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px 40px; align-items: start; }
+  form[data-package-review-desktop] .events-package-contact__title { grid-column: 1 / -1; margin: 0; font-size: 1.5rem; line-height: 1.35; }
+  form[data-package-review-desktop] .contact-service-switcher { grid-column: 1 / -1; }
+  form[data-package-review-desktop] [data-contact-service-panel="event_special"] { grid-column: 1; grid-row: 3; min-width: 0; }
+  form[data-package-review-desktop] .events-package-contact__fields { grid-column: 2; grid-row: 3; display: grid; gap: 16px; min-width: 0; }
+  form[data-package-review-desktop] .form-grid > .form-row { display: none; }
+  form[data-package-review-desktop] .events-package-contact__fields > h3 { font-size: 1.125rem; margin: 0 0 4px; }
+  form[data-package-review-desktop] .events-package-contact__fields :is(.form-field, .form-actions) { margin: 0; }
+  form[data-package-review-desktop] .events-package-contact__fields label.visually-hidden { position: static !important; display: block; width: auto !important; height: auto !important; margin: 0 0 8px !important; padding: 0 !important; overflow: visible !important; clip: auto !important; clip-path: none; white-space: normal !important; font-size: .875rem; font-weight: 600; }
+  form[data-package-review-desktop] .events-package-contact__fields :is(input, textarea) { width: 100%; min-width: 0; box-sizing: border-box; border: 1px solid rgba(236,220,189,.3); border-radius: 10px; background: rgba(22,18,17,.62); color: var(--fg); font: inherit; font-size: .875rem; padding: 12px; }
+  form[data-package-review-desktop] .events-package-contact__fields input { min-height: 48px; }
+  form[data-package-review-desktop] .events-package-contact__fields textarea { min-height: 112px; resize: vertical; }
+  form[data-package-review-desktop] .events-package-contact__fields #contact-submit { border-radius: 8px; min-height: 48px; font: inherit; font-weight: 600; }
+  form[data-package-review-desktop] .events-package-contact__fields :is(input, textarea):focus-visible { outline: 2px solid var(--accent, #1f7a6d); outline-offset: 2px; }
+  form[data-package-review-desktop] .events-package-contact__fields [aria-invalid="true"] { border-color: #d46a6a; }
+  form[data-package-review-desktop] .events-package-contact__fields [data-i18n="contact.footer"] { margin: 0; }
+  form[data-package-review-desktop] .contact-event-special-editor__picker { margin: 0 0 20px; }
+  form[data-package-review-desktop] .contact-event-special-editor { padding: 0; margin: 0; border: 0; border-radius: 0; background: none; gap: 0; }
+  form[data-package-review-desktop] [data-contact-event-special-body]:empty { display: none; }
+  form[data-package-review-desktop] [data-contact-event-picker-control] { width: 100%; white-space: normal; height: auto; min-height: 48px; padding: 10px 32px 10px 12px; font-size: .875rem; text-align: left; }
+  form[data-package-review-desktop] .contact-event-package-context { gap: 0; }
+  form[data-package-review-desktop] .events-package-review > :is(h4,p) { margin: 0 0 8px; }
+  form[data-package-review-desktop] .events-package-review > h4 { font-size: 1.125rem; }
+  form[data-package-review-desktop] .events-package-review__mode { color: var(--muted); }
+  form[data-package-review-desktop] .events-package-review__places { display: grid; gap: 16px; margin: 24px 0; }
+  form[data-package-review-desktop] .events-package-review__places dt { color: var(--muted); font-size: .875rem; margin-bottom: 4px; }
+  form[data-package-review-desktop] .events-package-review__places dd { margin: 0; font-size: .9375rem; line-height: 1.5; overflow-wrap: anywhere; }
+  form[data-package-review-desktop] .events-package-review ol { grid-template-columns: minmax(0, 1fr); gap: 0; margin: 20px 0; }
+  form[data-package-review-desktop] .events-package-review__leg { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 4px 12px; padding: 12px 0; }
+  form[data-package-review-desktop] .events-package-review__leg h5 { grid-row: 1 / span 2; margin: 0; font-size: .9375rem; }
+  form[data-package-review-desktop] .events-package-review__leg > :not(h5) { grid-column: 2; margin: 0; font-size: .875rem; line-height: 1.5; }
+  form[data-package-review-desktop] .events-package-review__leg .events-package-review__route { font-weight: 400; color: var(--muted); }
+  form[data-package-review-desktop] .events-package-review > .events-package-button { border: 1px solid var(--border, rgba(255,255,255,.14)); padding: 10px 14px; margin: 0 0 20px; }
+  form[data-package-review-desktop] .events-package-summary { padding: 20px 0 0; border: 0; border-top: 1px solid var(--border, rgba(255,255,255,.14)); border-radius: 0; background: none; }
+  form[data-package-review-desktop] .events-package-summary h4 { margin: 0 0 8px; font-size: 1rem; }
+  form[data-package-review-desktop] .events-package-summary__amount { font-size: 1.5rem; margin: 0 0 16px; }
+  form[data-package-review-desktop] .events-package-summary details { margin-top: 16px; }
+  form[data-package-review-desktop] .events-package-summary .events-package-help { margin: 12px 0 0; }
+}
+
+/* Linked Direct Transfer reuses the Airport controls without changing other Direct forms. */
+.events-package-direct { display: grid; gap: 20px; min-width: 0; }
+.events-package-direct > h3,
+.events-package-direct > p { margin: 0; }
+.events-package-direct .events-package-fields-grid { align-items: start; }
+.events-package-direct fieldset { min-width: 0; margin: 0; }
+.events-package-direct legend { font-weight: 700; }
+.events-package-direct .events-package-fixed strong,
+.events-package-direct .events-package-help { overflow-wrap: anywhere; }
+.events-package-direct__schedule,
+.events-package-direct__baggage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; align-items: start; }
+.events-package-direct__schedule.is-shared { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 850px; }
+.events-package-direct__schedule .services-expand__label { min-height: 2.5em; }
+.events-package-direct__schedule .events-package-primary-form { gap: 12px; }
+.events-package-direct__quote { display: grid; gap: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+.events-package-direct__quote [data-airport-price] { min-width: 0; overflow-wrap: anywhere; }
+.events-package-direct__quote .events-package-airport__price { display: block; margin-top: 8px; }
+.events-package-direct__quote .events-package-airport__price:not(.is-quoted) { font-size: 1rem; }
+.events-package-direct [data-airport-actions] { display: flex; gap: 16px; justify-content: space-between; align-items: center; }
+.events-package-direct [data-airport-actions] > .events-package-button--primary { margin-left: auto; }
+.events-package-direct .services-hourly-panel__disclaimer-title { text-transform: none; letter-spacing: normal; }
+.events-package-direct .events-package-airport__conditions { margin: 0; }
+@media (min-width: 721px) {
+  .events-package-offer-grid:not(.events-package-offer-grid--single) { grid-template-rows: auto auto; }
+  .events-package-offer-grid:not(.events-package-offer-grid--single) > .events-package-offer { grid-row: span 2; grid-template-rows: subgrid; row-gap: 16px; }
+  .events-package-step-one .events-package-offer-grid:not(.events-package-offer-grid--single) .events-package-offer__mode { margin: 12px 0; }
+  .events-package-direct .events-package-fields-grid > .events-package-passenger-bands { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  .events-package-direct { gap: 16px; }
+  .events-package-direct > fieldset > .events-package-fields-grid { grid-template-columns: minmax(0, 1fr); }
+  .events-package-direct__schedule,
+  .events-package-direct__schedule.is-shared,
+  .events-package-direct__baggage { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+  .events-package-direct__schedule .services-expand__field { order: 0; grid-column: auto; }
+  .events-package-direct__schedule.is-shared > .services-expand__field--date { grid-column: 1 / -1; }
+  .events-package-direct .services-expand__date-wrap { width: 144px; max-width: 100%; }
+  .events-package-direct .services-expand__time-wrap { width: var(--airport-time-basis, 86px); }
+  .events-package-direct .events-package-mobile-address__clear[hidden] { display: none; }
+  .events-package-direct [data-airport-actions] { flex-wrap: wrap; }
 }

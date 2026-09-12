@@ -47,6 +47,8 @@
     if(!valid){const invalid=root.querySelector?.('[aria-invalid="true"]');invalid?.focus?.({preventScroll:true});}
     return valid;
   }
+  Object.assign(fallback,{sharedTripData:"Datos compartidos",arrivalHeading:"Llegada",returnHeading:"Regreso",roundTripTotal:"Total de ida y vuelta",arrivalRoute:"Aeropuerto → Alojamiento",returnRoute:"Alojamiento → Aeropuerto",roundTripRoute:"Aeropuerto → Alojamiento → Mismo aeropuerto",returnDate:'Fecha de regreso',returnPickupTime:'Hora de recogida en el hotel (CDMX)'});
+  Object.assign(fallback,{"outboundHeading": "Ida", "directTransferLabel": "Direct Transfer", "directSharedData": "Datos compartidos", "directDestination": "Destino / dirección de llegada", "directSharedDate": "Fecha de ida y regreso (CDMX)", "directOutboundDate": "Fecha de ida", "directOutboundTime": "Hora de ida (CDMX)", "directReturnTime": "Hora de regreso (CDMX)", "directEndpointsHelp": "El regreso utiliza los mismos extremos en sentido inverso."});
   const ordinaryChoices={airportId:[['mex','MEX'],['nlu','NLU'],['tlc','TLC'],['pbc','PBC'],['qro','QRO']],direction:[['airport_to_destination','ordinaryArrival'],['destination_to_airport','ordinaryDeparture']],mode:[['hourly','ordinaryHourly'],['full_day','ordinaryFullDay']],baggageStatus:[['unknown','unknown'],['none','none'],['declared','declared']]};
   const ordinaryFieldLabels={airportId:'airport',direction:'ordinaryDirection',origin:'origin',destination:'address',date:'ordinaryDate',time:'ordinaryTime',mode:'ordinaryMode',durationHours:'ordinaryDuration',flight:'flight',baggageStatus:'baggage'};
   function serviceBounds(service,state=C.state){
@@ -56,12 +58,27 @@
     const selection=state.selection;
     const option=state.selectedEvent?.snapshot.packages.find(p=>p.id===selection?.packageId)?.options.find(o=>o.id===selection?.optionId);
     const r=option?.calculationModel==='ordinary_services'?service.ordinary?.restrictions:null;
-    return {minDate:[bounds.min.slice(0,10),r?.fromDate||''].sort().pop(),maxDate:[bounds.max.slice(0,10),r?.untilDate||''].filter(Boolean).sort()[0]||'',...bounds};
+    if(option?.services.some(item=>item.ordinary?.airportReturn||item.ordinary?.directReturn)){
+      const earliest=Math.ceil((Date.now()+(state.selectedEvent.snapshot.minimumLeadMinutes||0)*60000)/60000)*60000;
+      bounds.min=[bounds.min,localMinute(new Date(earliest).toISOString())].sort().pop();
+    }
+    if(service.ordinary?.airportReturn||service.ordinary?.directReturn){
+      const arrival=option.services.find(item=>item.id===(service.ordinary.airportReturn?.arrivalServiceId||service.ordinary.directReturn?.outboundServiceId));
+      const values=arrival&&resolvedOrdinaryValues(arrival,state);
+      if(values?.date&&values?.time){
+        const instant=Date.parse(values.date+'T'+values.time+':00-06:00');
+        if(Number.isFinite(instant))bounds.min=[bounds.min,localMinute(new Date(instant+60000).toISOString())].sort().pop();
+      }
+    }
+    const sharedReturn=option?.services.find(item=>item.ordinary?.directReturn?.outboundServiceId===service.id&&item.ordinary.directReturn.dateMode==='shared')?.ordinary?.restrictions;
+    return {minDate:[bounds.min.slice(0,10),r?.fromDate||'',sharedReturn?.fromDate||''].sort().pop(),maxDate:[bounds.max.slice(0,10),r?.untilDate||'',sharedReturn?.untilDate||''].filter(Boolean).sort()[0]||'',...bounds};
   }
   function airportQuoteReadiness(state,view){
     if(!view)return {ready:false,missing:[],invalid:[]};
+    if(view.service.ordinary?.baseService==='direct_transfer')return directQuoteReadiness(state,view);
     const {option,service,arrival}=view;const data=state.selection.services.find(item=>item.serviceId===service.id)||{};const inputs=service.ordinary.inputs;const values=data.ordinaryInputs||{};const missing=[];const invalid=[];
     const requireValue=(key,label,validate)=>{
+      if(service.ordinary.airportReturn&&['airportId','destination'].includes(key))return;
       const field=inputs[key];if(!field){invalid.push(t(label));return;}
       if(field.source!=='customer')return;
       const value=values[key];if(value===undefined||value===null||value===''){missing.push(t(label));return;}
@@ -71,9 +88,9 @@
     requireValue('airportId',arrival?'arrivalAirport':'departureAirport',value=>typeof value==='string'&&value!=='');
     requireValue('destination',arrival?'arrivalAddress':'departureAddress',value=>!!value&&typeof value==='object'&&!!value.address?.trim()&&!!value.placeId?.trim());
     const bounds=serviceBounds(service,state);
-    requireValue('date','transferDate',value=>/^\d{4}-\d{2}-\d{2}$/.test(value)&&(!bounds.minDate||value>=bounds.minDate)&&(!bounds.maxDate||value<=bounds.maxDate));
+    requireValue('date',service.ordinary.airportReturn?'returnDate':'transferDate',value=>/^\d{4}-\d{2}-\d{2}$/.test(value)&&(!bounds.minDate||value>=bounds.minDate)&&(!bounds.maxDate||value<=bounds.maxDate));
     const restrictions=service.ordinary.restrictions||{};
-    requireValue('time',arrival?'transferStartTime':'transferPickupTime',value=>{
+    requireValue('time',service.ordinary.airportReturn?'returnPickupTime':arrival?'transferStartTime':'transferPickupTime',value=>{
       if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(value))return false;
       if(restrictions.fromTime&&restrictions.untilTime)return restrictions.fromTime<=restrictions.untilTime?value>=restrictions.fromTime&&value<=restrictions.untilTime:value>=restrictions.fromTime||value<=restrictions.untilTime;
       return (!restrictions.fromTime||value>=restrictions.fromTime)&&(!restrictions.untilTime||value<=restrictions.untilTime);
@@ -84,6 +101,15 @@
       const value=values.baggageCount??(values.baggageStatus==='none'?0:undefined);
       if(value===undefined){if(!pendingBaggage)missing.push(t('baggageCount'));}
       else if(!Number.isSafeInteger(value)||value<0)invalid.push(t('baggageCount'));
+    }
+    const current=resolvedOrdinaryValues(service,state);
+    const start=current.date&&current.time?current.date+'T'+current.time:'';
+    if(start&&((bounds.min&&start<bounds.min)||(bounds.max&&start>bounds.max)))invalid.push(t(service.ordinary.airportReturn?'returnDate':'transferDate'));
+    if(view.returning){
+      const result=airportQuoteReadiness(state,{option,service:view.returning,arrival:false});
+      missing.push(...result.missing);invalid.push(...result.invalid);
+      const back=resolvedOrdinaryValues(view.returning,state);
+      if(start&&back.date&&back.time&&back.date+'T'+back.time<=start)invalid.push(t('returnPickupTime'));
     }
     return {ready:missing.length===0&&invalid.length===0,missing:[...new Set(missing)],invalid:[...new Set(invalid)]};
   }
@@ -99,10 +125,10 @@
     const input=service.ordinary?.inputs?.[key];
     if(!input)return '';
     const direction=service.ordinary?.inputs.direction?.value||data.ordinaryInputs?.direction;
-    const label=t(presentation?.label|| (key==='time'&&service.ordinary?.baseService==='airport_transfer'?(direction==='airport_to_destination'?'arrivalTime':'pickupTime'):ordinaryFieldLabels[key]||'pending'))+(presentation?.optional&&input.source==='customer'?' ('+t('optional')+')':'');
+    const label=(presentation?.textLabel||t(presentation?.label|| (key==='time'&&service.ordinary?.baseService==='airport_transfer'?(direction==='airport_to_destination'?'arrivalTime':'pickupTime'):ordinaryFieldLabels[key]||'pending')))+(presentation?.optional&&input.source==='customer'?' ('+t('optional')+')':'');
     if(input.source==='fixed'){
       const date=presentation&&key==='date'&&!input.redacted&&localDate(input.value);
-      const value=date?new Intl.DateTimeFormat(locale(),{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(date):input.redacted?t('ordinaryFixed'):displayOrdinaryValue(key,input.value);
+      const value=date?new Intl.DateTimeFormat(locale(),{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(date):input.redacted?(input.displayLabel||t('ordinaryFixed')):displayOrdinaryValue(key,input.value);
       return value?'<div class="events-package-fixed services-expand__field '+esc(className||'')+'"><span class="services-expand__label">'+esc(label)+'</span><strong>'+esc(value)+'</strong></div>':'';
     }
     if(input.source==='deferred')return '<div class="events-package-deferred services-expand__field '+esc(className||'')+'"><span class="services-expand__label">'+esc(label)+'</span><strong>'+esc(t('ordinaryDeferred'))+'</strong></div>';
@@ -110,7 +136,10 @@
     if(ordinaryChoices[key]){const restriction=service.ordinary.restrictions?.[key==='airportId'?'airportIds':key==='direction'?'directions':''];return '<label class="events-package-field services-expand__field '+esc(className||'')+'"><span class="services-expand__label">'+esc(label)+'</span><select class="services-expand__control" data-package-field="'+esc(name)+'">'+optionHtml('',t('choose'),!value)+ordinaryChoices[key].filter(([id])=>!restriction||restriction.includes(id)).map(([id,text])=>optionHtml(id,key==='airportId'?text:t(text),id===value)).join('')+'</select></label>';}
     if(key==='origin'||key==='destination')return addressField(name,label,value,className);
     const bounds=serviceBounds(service);
-    const constraints=key==='date'?((bounds.minDate?'min="'+esc(bounds.minDate)+'" ':'')+(bounds.maxDate?'max="'+esc(bounds.maxDate)+'"':'')):key==='time'?((service.ordinary.restrictions?.fromTime?'min="'+esc(service.ordinary.restrictions.fromTime)+'" ':'')+(service.ordinary.restrictions?.untilTime?'max="'+esc(service.ordinary.restrictions.untilTime)+'"':'')):key==='durationHours'?'min="1" max="24" step="1"':'maxlength="2000"';
+    const dateValue=resolvedOrdinaryValues(service,C.state).date;
+    const minTime=[service.ordinary.restrictions?.fromTime||'',dateValue===bounds.min.slice(0,10)?bounds.min.slice(11):''].filter(Boolean).sort().pop()||'';
+    const maxTime=[service.ordinary.restrictions?.untilTime||'',dateValue===bounds.max.slice(0,10)?bounds.max.slice(11):''].filter(Boolean).sort()[0]||'';
+    const constraints=key==='date'?((bounds.minDate?'min="'+esc(bounds.minDate)+'" ':'')+(bounds.maxDate?'max="'+esc(bounds.maxDate)+'"':'')):key==='time'?((minTime?'min="'+esc(minTime)+'" ':'')+(maxTime?'max="'+esc(maxTime)+'"':'')):key==='durationHours'?'min="1" max="24" step="1"':'maxlength="2000"';
     return field(name,label,value,key==='date'?'date':key==='time'?'time':key==='durationHours'?'number':'text',constraints,className);
   }
   function passengerField(selection){
@@ -158,7 +187,7 @@
   }
   function mobileTemporalInput(service,data,prefix,key,label){
     const source=service.ordinary.inputs[key];if(!source)return '';
-    if(source.source!=='customer')return ordinaryInput(service,data,prefix,key);
+    if(source.source!=='customer')return ordinaryInput(service,data,prefix,key,'',{textLabel:label});
     const raw=ordinaryInput(service,data,prefix,key);let control=raw.match(/<input\b[^>]*>/)?.[0];
     const icon=document.querySelector?.('#services-expand-airport .services-expand__'+(key==='date'?'date':'time')+'-icon')?.outerHTML||'';
     const overlay=document.querySelector?.('#services-expand-airport .services-expand__'+(key==='date'?'date':'time')+'-overlay')?.textContent||'';
@@ -209,7 +238,7 @@
     const bagInput=binding.inputs.baggageCount||binding.inputs.baggageStatus;
     const pendingAllowed=bagInput?.source==='deferred'||state.selectedEvent.snapshot.packages.find(p=>p.id===state.selection.packageId)?.options.find(o=>o.id===state.selection.optionId)?.baggagePolicy?.allowUnknown!==false;
     const bags=bagInput?.source==='customer'?'<label class="airport-mobile-luggage"><span class="airport-mobile-luggage__label">'+esc(shared('airportMobileFlow.fields.luggage','baggageCount'))+'</span>'+ordinaryQuantity(prefix,data.ordinaryInputs?.baggageCount??(data.ordinaryInputs?.baggageStatus==='none'?0:''),!pendingAllowed,pendingAllowed).match(/<input\b[^>]*>/)?.[0].replace('class="services-expand__control"','class="airport-mobile-luggage__select"')+'</label>':baggageField(service,data,prefix);
-    return '<div class="events-package-mobile-airport"><div class="services-expand__form">'+(binding.inputs.direction?.source==='customer'?ordinaryInput(service,data,prefix,'direction'):'')+(direction==='destination_to_airport'?role('destination',address)+role('origin',airport):role('origin',airport)+role('destination',address))+mobileAirportZone(state,service,data)+bands+bags+dateTime('date')+dateTime('time')+'<div class="events-package-airport-flight">'+ordinaryInput(service,data,prefix,'flight','',{label:'transferFlight',optional:true})+'</div></div></div>';
+    return '<div class="events-package-mobile-airport"><div class="services-expand__form">'+(binding.inputs.direction?.source==='customer'?ordinaryInput(service,data,prefix,'direction'):'')+(direction==='destination_to_airport'?role('destination',address)+role('origin',airport):role('origin',airport)+role('destination',address))+mobileAirportZone(state,service,data)+bands+bags+dateTime('date')+dateTime('time')+'<div class="events-package-airport-flight">'+ordinaryInput(service,data,prefix,'flight','',{label:'transferFlight',optional:true})+'</div></div>'+returnSchedule(state,configuredAirportOption(state),true)+'</div>';
   }
   function mobileOrdinaryInputs(service,data,prefix,state,includePassengers){
     const binding=service.ordinary;
@@ -254,23 +283,32 @@
     const keys=binding.baseService==='direct_transfer'?['origin','destination','date','time']:['origin','mode','durationHours','date','time'];
     return '<p class="events-package-help">'+esc(t('ordinaryPricing'))+'</p><div class="events-package-fields-grid">'+(includePassengers?passengerField(state.selection):'')+keys.map(key=>ordinaryInput(service,data,prefix,key)).join('')+baggageField(service,data,prefix)+'</div>';
   }
+  Object.assign(fallback,{"sharedTripData": "Su traslado", "sharedEndpointsHelp": "El regreso utiliza el mismo aeropuerto y alojamiento.", "arrivalDate": "Fecha de llegada", "sharedLocalTime": "Fecha y hora locales de Ciudad de México", "returnHotelPickup": "Hora de recogida en el hotel", "completeTransfer": "Completar mi traslado", "completeRequest": "Completar mi solicitud", "chooseOptionRequired": "Elija una modalidad para continuar.", "completeQuoteFields": "Complete estos datos para calcular el total:", "reviewQuoteFields": "Revise estos datos para calcular el total:", "serviceLabel": "Servicio"});
+  function quoteServiceLabel(state,serviceId){
+    const pkg=activePackages(state.selectedEvent).find(item=>item.id===state.selection.packageId);
+    const option=pkg?.options.find(item=>item.id===state.selection.optionId);
+    const direct=option&&optionDirectView(state,pkg,option);if(direct)return t(serviceId===direct.returning.id?'returnHeading':'outboundHeading');
+    const view=option&&optionAirportView(state,pkg,option);
+    return view?.returning&&serviceId===view.returning.id?t('returnHeading'):view?.returning&&serviceId===view.service.id?t('arrivalHeading'):t('serviceLabel');
+  }
   function summary(state,surface){
     if(!state.quote)return '';
     const calculation=state.quote.calculation;
     const price=calculation.priceBreakdown;
     const complete=price.priceStatus==='quoted'&&price.pricedSubtotal!==null;
     const amount=complete?money(price.pricedSubtotal,price.currency):t('pending');
+    const packageOption=state.selection?.requestKind==='package';
+    const coordinationFields=[...new Set((calculation.serviceLines||[]).flatMap(line=>Object.entries(line.inputStatus||{}).filter(([,input])=>input.pending).map(([key])=>t(ordinaryFieldLabels[key]||'pending'))).concat(calculation.baggageAssessment==='pending'?[t('baggageCount')]:[]))];
     const conditions=surface==='mobile-review'
       ?'<button type="button" class="events-package-offer__details-trigger" data-package-action="details" data-package-details="'+esc(state.selection.packageId)+'" data-package-review-conditions aria-haspopup="dialog">'+esc(t('conditions'))+'</button>'
-      :'<details><summary>'+esc(t('breakdown'))+' · '+esc(t('conditions'))+'</summary>'+(calculation.serviceCount>1?(calculation.serviceLines||[]).map((line,index)=>'<p>'+esc(t('services'))+' '+(index+1)+': '+esc(line.resultMinorUnits===null?t('pending'):money(line.resultMinorUnits,line.currency))+'</p>').join(''):'')+'<h4>'+esc(t("conditions"))+'</h4><ul>'+(calculation.conditions||[]).map(condition=>'<li><strong>'+esc(local(condition.title))+'</strong> '+esc(local(condition.description))+'</li>').join('')+'</ul></details>';
+      :'<details><summary>'+esc(t('conditions'))+'</summary><ul>'+(calculation.conditions||[]).map(condition=>'<li><strong>'+esc(local(condition.title))+'</strong> '+esc(local(condition.description))+'</li>').join('')+'</ul></details>';
     return '<section class="events-package-summary" aria-live="polite">'
-      +'<h4>'+esc(t(complete?'groupTotal':'pending'))+'</h4>'
+      +'<h4>'+esc(t(packageOption?'packageTotal':complete?'groupTotal':'pending'))+'</h4>'
       +'<p class="events-package-summary__amount">'+esc(amount)+'</p>'
-      +'<p>'+esc(t("services"))+': '+esc(calculation.serviceCount===null?t("unknown"):calculation.serviceCount)+'</p>'
-      +(calculation.calculationModel==='ordinary_services'&&price.pricedSubtotal===null?[]:price.automaticAddOns||[]).map(line=>'<p>'+esc(t("additional"))+': '+esc(money(line.totalMinorUnits,price.currency))+'</p>').join('')
+      +(!packageOption?'<p>'+esc(t("services"))+': '+esc(calculation.serviceCount===null?t("unknown"):calculation.serviceCount)+'</p>':'')
+      +(packageOption||calculation.calculationModel==='ordinary_services'&&price.pricedSubtotal===null?[]:price.automaticAddOns||[]).map(line=>'<p>'+esc(t("additional"))+': '+esc(money(line.totalMinorUnits,price.currency))+'</p>').join('')
       +(calculation.pendingCodes.length?'<p class="events-package-help">'+esc(t("pending"))+'</p>':'')
-      +(calculation.coordinationPendingCodes?.length?'<p class="events-package-help">'+esc(t('ordinaryDeferred'))+'</p>':'')
-      +(calculation.serviceLines||[]).map((line,index)=>{const pending=Object.entries(line.inputStatus||{}).filter(([,input])=>input.pending).map(([key])=>t(ordinaryFieldLabels[key]||'pending'));return pending.length?'<p>'+esc(t('services'))+' '+(index+1)+': '+esc(pending.join(', '))+' · '+esc(t('ordinaryDeferred'))+'</p>':'';}).join('')
+      +(coordinationFields.length?'<p class="events-package-help">'+esc(coordinationFields.join(', '))+': '+esc(t('ordinaryDeferred'))+'</p>':calculation.coordinationPendingCodes?.length?'<p class="events-package-help">'+esc(t('pending'))+': '+esc(t('ordinaryDeferred'))+'</p>':'')
       +conditions
       +'<p class="events-package-help">'+esc(t("notBooking"))+'</p>'
       +'</section>';
@@ -296,7 +334,7 @@
       +button('contact',t('continueContact'),locked,'primary')+'</section>';
   }
   function mobileCalculationContent(state,option,locked){
-    const automaticView=configuredAirportOption(state);
+    const automaticView=configuredAirportOption(state)||configuredDirectOption(state);
     if(!automaticView||automaticView.option!==option)return summary(state)+calculationControls(state,locked);
     const card=mobileAirportQuoteCard(state,option,locked);
     if(card)return card;
@@ -387,6 +425,34 @@
   }
   const activePackages=event=>(event.snapshot.packages||[]).filter(p=>p.active!==false);
   const activeOptions=pkg=>pkg.options.filter(o=>o.active!==false);
+  // Exploration is presentation state, separate from the accepted selection/quote.
+  Object.assign(fallback,{allPackages:'Ver todos los paquetes',packageCount:'Paquetes disponibles: {count}'});
+  const mobilePackageViews=new Map();
+  function mobilePackageView(state){
+    const key=state.selectedEvent.id+':'+state.selectedEvent.publicationVersion;
+    if(!mobilePackageViews.has(key))mobilePackageViews.set(key,{packageId:'',options:{},scrollTop:0});
+    return mobilePackageViews.get(key);
+  }
+  function mobilePackageSelection(state,header){
+    const view=mobilePackageView(state),packages=activePackages(state.selectedEvent).filter(pkg=>activeOptions(pkg).length);
+    const pkg=packages.find(item=>item.id===view.packageId);
+    if(pkg){
+      const optionId=view.options[pkg.id]??(state.selection.packageId===pkg.id?state.selection.optionId:'');
+      return '<div class="events-package-step-one events-package-mobile-detail">'+header+offer(state,'mobile',{packageId:pkg.id,optionId})+'</div>';
+    }
+    const footer=state.selectedEvent.snapshot.customInquiryEnabled?'<div class="events-package-offer-footer"><p>'+esc(t('customTitle'))+'</p>'+button('ordinary-custom',t('proposal'),false,'secondary')+'</div>':'';
+    return '<section class="events-package-step-one events-package-mobile-list">'+header+'<div class="events-package-mobile-list__heading"><h3 class="events-package-offer-heading" tabindex="-1" data-package-step-heading>'+esc(t('choosePackage'))+'</h3><p class="events-package-mobile-list__count">'+esc(t('packageCount',{count:packages.length}))+'</p></div><ul>'+packages.map(pkg=>{
+      const brief=local(pkg.subtitle);
+      return '<li><button type="button" class="events-package-mobile-list__row" data-package-browse="'+esc(pkg.id)+'">'+mobilePackageIcon(state,pkg)+'<span class="events-package-mobile-list__copy"><strong>'+esc(local(pkg.title))+'</strong>'+(brief?'<span>'+esc(brief)+'</span>':'')+'</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></button></li>';
+    }).join('')+'</ul>'+(!packages.length?'<p>'+esc(t('empty'))+'</p>':'')+footer+'</section>';
+  }
+  function returnToPackageDetail(root){
+    if(root.getAttribute('data-event-package-root')==='mobile'&&C.state.selection?.requestKind==='package'){
+      const view=mobilePackageView(C.state);view.packageId=C.state.selection.packageId;
+      if(C.state.selection.optionId)view.options[view.packageId]=C.state.selection.optionId;
+    }
+    return C.go('package');
+  }
   function optionPrice(option){
     if(!option||option.calculationModel==='ordinary_services')return '<p class="events-package-help">'+esc(t('priceByDetails'))+'</p>';
     const bands=[['van_1_2','1–2'],['van_3_4','3–4'],['van_5_6','5–6']];
@@ -399,7 +465,7 @@
     const conditions=conditionSource===undefined?[...(event.snapshot.conditions||[]),...(pkg.conditions||[])]:conditionSource;
     const heading=forDialog?'h3':'h5';
     const condition=c=>forDialog?'<li><strong>'+esc(local(c.title))+'</strong><p>'+esc(local(c.description))+'</p></li>':'<li><strong>'+esc(local(c.title))+'</strong> '+esc(local(c.description))+'</li>';
-    return (conditionsOnly?'':'<section><'+heading+'>'+esc(t('inclusions'))+' ('+inclusions.length+')</'+heading+'><ul>'+inclusions.map(i=>'<li>'+esc(local(i))+'</li>').join('')+'</ul></section>')+'<section><'+heading+'>'+esc(t('conditions'))+' ('+conditions.length+')</'+heading+'><ul>'+conditions.map(condition).join('')+'</ul></section>';
+    return (conditionsOnly?'':'<section><'+heading+'>'+esc(t('inclusions'))+' ('+inclusions.length+')</'+heading+'><ul>'+inclusions.map(i=>inclusionHighlight(i,true)).join('')+'</ul></section>')+'<section><'+heading+'>'+esc(t('conditions'))+' ('+conditions.length+')</'+heading+'><ul>'+conditions.map(condition).join('')+'</ul></section>';
   }
   function offerDisclosures(event,pkg,surface){
     if(surface==='mobile')return '<button type="button" class="events-package-offer__details-trigger" data-package-action="details" data-package-details="'+esc(pkg.id)+'" aria-haspopup="dialog">'+esc(t('viewAllDetails'))+'</button>';
@@ -409,33 +475,52 @@
   const inclusionIconPaths={
     plane:'M2.5 16.5L10 14l4-8.5a1.4 1.4 0 1 1 2.5 1.2L13.8 15l5.7 2.1a1 1 0 0 1-.3 1.9h-4.6l-2.4 3.2a.9.9 0 0 1-1.6-.5v-4.1l-7-1.6a.8.8 0 0 1-.1-1.5Z',
     users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3a4 4 0 0 1 0 8M22 21v-2a4 4 0 0 0-3-3.87M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
+    round_trip:'M4 7h16l-4-4M20 7l-4 4M20 17H4l4-4M4 17l4 4',
     clock:'M20.5 12a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0ZM12 7.8v4.6l3.1 1.9'
   };
-  function inclusionHighlight(inclusion){
+  function inclusionHighlight(inclusion,fullText){
     const path=Object.prototype.hasOwnProperty.call(inclusionIconPaths,inclusion.iconId)?inclusionIconPaths[inclusion.iconId]:null;
     const icon=path?'<svg class="events-package-offer__highlight-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="'+path+'"/></svg>':'';
-    return '<li>'+icon+'<span>'+esc(local(inclusion.summary)||local(inclusion))+'</span></li>';
+    return '<li'+(fullText&&path?' class="events-package-inclusion"':'')+'>'+icon+'<span>'+esc(fullText?local(inclusion):(local(inclusion.summary)||local(inclusion)))+'</span></li>';
   }
-  function offer(state,surface){
+  function optionDirectView(state,pkg,option){return configuredDirectOption({...state,step:'services',screen:'config',selection:{...state.selection,requestKind:'package',packageId:pkg.id,optionId:option.id}});}
+  function optionAirportView(state,pkg,option){
+    return configuredAirportOption({...state,step:'services',screen:'config',selection:{...state.selection,requestKind:'package',packageId:pkg.id,optionId:option.id}});
+  }
+  function mobilePackageIcon(state,pkg){
+    // All active options must share an existing public capability: Airport, or
+    // exactly two Direct legs linked by directReturn. Titles/inclusions are not semantics.
+    // Mixed, unsupported or empty compositions use the neutral passenger symbol.
+    const options=activeOptions(pkg);
+    const key=options.length&&options.every(option=>optionAirportView(state,pkg,option))?'plane':options.length&&options.every(option=>optionDirectView(state,pkg,option))?'round_trip':'users';
+    return '<svg class="events-package-mobile-list__icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="'+inclusionIconPaths[key]+'"/></svg>';
+  }
+  function optionRouteCaption(state,pkg,option,surface){
+    if(surface==='mobile')return '';
+    const view=optionAirportView(state,pkg,option);
+    return view?'<span class="events-package-option-route">'+esc(t(view.returning?'roundTripRoute':view.arrival?'arrivalRoute':'returnRoute'))+'</span>':'';
+  }
+  function offer(state,surface,exploration){
     const event=state.selectedEvent;
-    const packages=activePackages(event);
+    const packages=activePackages(event).filter(pkg=>!exploration||pkg.id===exploration.packageId);
     return '<div class="events-package-offer-grid'+(packages.length===1?' events-package-offer-grid--single':'')+'">'+packages.map(pkg=>{
       const options=activeOptions(pkg);const selected=state.selection.packageId===pkg.id;
-      const chosen=options.find(o=>o.id===state.selection.optionId);
+      const chosen=exploration?options.find(o=>o.id===exploration.optionId):selected?options.find(o=>o.id===state.selection.optionId):null;
+      const optionField=exploration?'data-package-browse-option':'data-package-field="option"';
       let alternatives='';
-      if(selected&&options.length>1){
-        if(options.length<=4)alternatives='<fieldset class="events-package-options"><legend>'+esc(t('option'))+'</legend>'+options.map(o=>'<label class="events-package-check"><input type="radio" name="package-option" data-package-field="option" value="'+esc(o.id)+'"'+(o.id===chosen?.id?' checked':'')+'><span>'+esc(local(o.title))+' · '+esc(t('services'))+': '+o.services.length+'</span></label>').join('')+'</fieldset>';
-        else alternatives='<label class="events-package-field"><span>'+esc(t('option'))+'</span><select data-package-field="option">'+optionHtml('',t('choose'),!chosen)+options.map(o=>optionHtml(o.id,local(o.title),o===chosen)).join('')+'</select></label>';
+      if(options.length>1){
+        if(options.length<=4)alternatives='<fieldset class="events-package-options"><legend>'+esc(t('option'))+'</legend>'+options.map(o=>'<label class="events-package-check"><input type="radio" name="package-option" '+optionField+' data-package-option-package="'+esc(pkg.id)+'" value="'+esc(o.id)+'"'+(o.id===chosen?.id?' checked':'')+'><span>'+esc(local(o.title))+optionRouteCaption(state,pkg,o,surface)+'</span></label>').join('')+'</fieldset>';
+        else alternatives='<label class="events-package-field"><span>'+esc(t('option'))+'</span><select '+optionField+' data-package-option-package="'+esc(pkg.id)+'">'+optionHtml('',t('choose'),!chosen)+options.map(o=>optionHtml(o.id,local(o.title),o===chosen)).join('')+'</select></label>';
       }
       const detail=chosen||(options.length===1?options[0]:null);
       const additionalIds=new Set((event.snapshot.addOns||[]).filter(a=>a.packageId===pkg.id&&a.optionIds.includes(detail?.id)&&a.kind!=='airport_leg_supplement').flatMap(a=>a.serviceIds));
       const includedServices=detail?.services.filter(s=>!additionalIds.has(s.id))||[];
       const isTransfer=detail&&includedServices.length>0&&includedServices.every(service=>detail.calculationModel==='ordinary_services'?['airport_transfer','direct_transfer'].includes(service.ordinary?.baseService):service.kind==='trip');
       const transferLabel=isTransfer?(includedServices.length===1?t('transferOne'):t('transferMany',{count:includedServices.length})):t('services')+': '+includedServices.length;
-      const mode=detail?'<section class="events-package-offer__mode"><h5>'+esc(t('modeAvailable'))+'</h5><p>'+esc(local(detail.title))+(includedServices.length?' · '+esc(transferLabel):'')+'</p></section>':'';
+      const mode=detail?'<section class="events-package-offer__mode"><h5>'+esc(t('modeAvailable'))+'</h5><p>'+esc(local(detail.title))+(includedServices.length&&!optionDirectView(state,pkg,detail)?' · '+esc(transferLabel):'')+'</p>'+optionRouteCaption(state,pkg,detail,surface)+'</section>':'';
       const subtitle=local(pkg.subtitle);
-      return '<article class="events-package-offer"><div class="events-package-offer__content"><h4>'+esc(local(pkg.title))+'</h4>'+(subtitle?'<p class="events-package-offer__subtitle">'+esc(subtitle)+'</p>':'')+'<p class="events-package-offer__description">'+esc(local(pkg.description))+'</p>'+mode+'<ul class="events-package-offer__highlights">'+pkg.inclusions.slice(0,3).map(inclusionHighlight).join('')+'</ul>'+offerDisclosures(event,pkg,surface)+'</div><div class="events-package-offer__controls">'+optionPrice(detail)+alternatives+'<button type="button" class="events-package-button events-package-button--primary" data-package-configure="'+esc(pkg.id)+'">'+esc(surface==='mobile'?t('mobileConfigureTrip'):selected&&chosen?t('goServices'):isTransfer?t('configureTransfer'):t('configureServices'))+'</button></div></article>';
-    }).join('')+'</div>'+(event.snapshot.customInquiryEnabled?'<div class="events-package-offer-footer"><div><h4>'+esc(t('customTitle'))+'</h4><p>'+esc(t('customStepIntro'))+'</p></div>'+button('ordinary-custom',t('proposal'),false,'secondary')+'</div>':'');
+      return '<article class="events-package-offer"><div class="events-package-offer__content"><h4'+(exploration?' tabindex="-1" data-package-step-heading':'')+'>'+esc(local(pkg.title))+'</h4>'+(subtitle?'<p class="events-package-offer__subtitle">'+esc(subtitle)+'</p>':'')+'<p class="events-package-offer__description">'+esc(local(pkg.description))+'</p>'+mode+'<ul class="events-package-offer__highlights">'+pkg.inclusions.slice(0,3).map(i=>inclusionHighlight(i,false)).join('')+'</ul>'+offerDisclosures(event,pkg,surface)+'</div><div class="events-package-offer__controls">'+optionPrice(detail)+alternatives+'<button type="button" class="events-package-button events-package-button--primary" data-package-configure="'+esc(pkg.id)+'">'+esc(t((detail?(optionAirportView(state,pkg,detail)||optionDirectView(state,pkg,detail)):options.length&&options.every(o=>optionAirportView(state,pkg,o)||optionDirectView(state,pkg,o)))?'completeTransfer':'completeRequest'))+'</button></div></article>';
+    }).join('')+'</div>'+(!exploration&&event.snapshot.customInquiryEnabled?'<div class="events-package-offer-footer"><div><h4>'+esc(t('customTitle'))+'</h4><p>'+esc(t('customStepIntro'))+'</p></div>'+button('ordinary-custom',t('proposal'),false,'secondary')+'</div>':'');
   }
   function packageDetailsFocusables(){return packageDetailsDialog?Array.from(packageDetailsDialog.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(node=>!node.hidden):[];}
   function closePackageDetailsDialog(){
@@ -465,6 +550,7 @@
   }
   function navigation(state,surface){
     if(state.selection.requestKind==='custom')return button('packages',t('viewPackages'),false,'quiet');
+    if(surface==='mobile'&&state.step==='package')return '';
     const steps=surface==='mobile'?['package','services','review']:['package','services'];
     return '<nav class="events-package-steps" aria-label="'+esc(t('title'))+'">'+steps.map((step,index)=>'<button type="button" data-package-step="'+step+'"'+(state.step===step?' aria-current="step"':'')+((step==='services'&&!state.selection.optionId)||(step==='review'&&state.step!=='review')?' disabled':'')+'>'+(index+1)+'. '+esc(step==='review'?t('reviewContact'):t(surface==='mobile'&&step==='services'?'mobileTripData':step))+'</button>').join('')+'</nav>';
   }
@@ -480,18 +566,67 @@
     if(!Number.isFinite(date.getTime()))return t('ordinaryDeferred');
     return new Intl.DateTimeFormat(locale(),{dateStyle:'long',...(value.length>10?{timeStyle:'short'}:{}),timeZone:'UTC'}).format(date)+' · CDMX';
   }
-  function reviewItinerary(state){
+  function resolvedOrdinaryValues(service,state){
+    const data=state.selection.services.find(item=>item.serviceId===service.id)?.ordinaryInputs||{};
+    const values=Object.fromEntries(Object.entries(service.ordinary?.inputs||{}).map(([key,input])=>[key,input.source==='fixed'?(input.redacted?(input.displayLabel||t('ordinaryFixed')):input.value):input.source==='customer'?data[key]:undefined]));
+    const relation=service.ordinary?.airportReturn;
+    if(relation){
+      const option=state.selectedEvent.snapshot.packages.find(p=>p.id===state.selection.packageId)?.options.find(o=>o.id===state.selection.optionId);
+      const arrival=option?.services.find(item=>item.id===relation.arrivalServiceId&&!item.ordinary?.airportReturn);
+      if(arrival){const source=resolvedOrdinaryValues(arrival,state);values.airportId=source.airportId;values.destination=source.destination;}
+    }
+    const direct=service.ordinary?.directReturn;
+    if(direct){
+      const option=state.selectedEvent.snapshot.packages.find(p=>p.id===state.selection.packageId)?.options.find(o=>o.id===state.selection.optionId);
+      const outbound=option?.services.find(item=>item.id===direct.outboundServiceId&&!item.ordinary?.directReturn&&item.ordinary?.baseService==='direct_transfer');
+      if(outbound){const source=resolvedOrdinaryValues(outbound,state);values.origin=source.destination;values.destination=source.origin;if(direct.dateMode==='shared')values.date=source.date;}
+    }
+    return values;
+  }
+  function returnSchedule(state,view,mobile){
+    if(!view?.returning)return '';
+    const service=view.returning,data=state.selection.services.find(item=>item.serviceId===service.id)||{},prefix='service:'+service.id+':';
+    const control=(key,label)=>mobile?mobileTemporalInput(service,data,prefix,key,t(label)):ordinaryInput(service,data,prefix,key,'',{label});
+    return '<fieldset class="events-package-primary-form'+(mobile?'':' events-package-airport__leg')+'" data-package-airport-return="'+esc(service.id)+'"'+(window.PixkuyEventPackagesRequest.hasFrozenBody()?' disabled':'')+'><legend>'+esc(t('returnHeading'))+'</legend><div class="'+(mobile?'services-expand__form events-package-airport-return__schedule':'events-package-airport__extras')+'">'+control('date','returnDate')+control('time',mobile?'returnPickupTime':'returnHotelPickup')+'</div></fieldset>';
+  }
+  Object.assign(fallback,{"reviewIntro":"Revise su traslado y complete sus datos","contactDetails":"Datos de contacto","packageTotal":"Total del paquete","reviewPickup":"Recogida","reviewDestination":"Destino","reviewMode":"Modalidad","receiptRequestedTime":"Hora solicitada (CDMX)","receiptEnd":"Fin del servicio"});
+  function reviewSelectors(state,locked){
+    const selection=state.selection,packages=activePackages(state.selectedEvent).filter(pkg=>activeOptions(pkg).length);
+    const pkg=packages.find(item=>item.id===selection.packageId);
+    const options=(pkg?.options||[]).filter(item=>item.active!==false);
+    const control=(key,items,value)=>'<label class="events-package-field"><span>'+esc(t(key==='option'?'reviewMode':key))+'</span><select data-package-review-select="'+key+'"'+(locked?' disabled':'')+'><option value="" disabled'+(!value?' selected':'')+'>'+esc(t('choose'))+'</option>'+items.map(item=>'<option value="'+esc(item.id)+'"'+(item.id===value?' selected':'')+'>'+esc(local(item.title))+'</option>').join('')+'</select></label>';
+    return '<div class="events-package-review__selectors">'+control('package',packages,selection.packageId)+(options.length===1?'<div class="events-package-field"><span>'+esc(t('reviewMode'))+'</span><p>'+esc(local(options[0].title))+'</p></div>':options.length?control('option',options,selection.optionId):'')+'</div>';
+  }
+  function reviewItinerary(state,compact,omitTitle){
     const selection=state.selection,event=state.selectedEvent;
     if(selection.requestKind==='custom')return '<p>'+esc(selection.inquiry.notes)+'</p><p>'+esc(t('passengers'))+': '+esc(selection.inquiry.passengers.count??t('unknown'))+'</p>'+button('edit-services',t('editServices'),false,'quiet');
     const pkg=activePackages(event).find(p=>p.id===selection.packageId),option=pkg?.options.find(o=>o.id===selection.optionId);
-    return '<section class="events-package-review"><h4>'+esc(local(pkg?.title))+' · '+esc(local(option?.title))+'</h4><p>'+esc(t('passengers'))+': '+esc(passengerDescription(selection))+'</p><ol>'+(state.quote?.calculation?.itinerary?.services||option?.services||[]).map((service,index)=>{
+    const pair=optionDirectView(state,pkg,option)||optionAirportView(state,pkg,option);
+    const linked=compact&&pair?.returning;
+    let places='';
+    if(linked){
+      const values=resolvedOrdinaryValues(pair.service,state),airport=pair.service.ordinary.baseService==='airport_transfer';
+      const ends=airport?[window.PixkuyAirportTariffCatalog?.resolveDisplayLabel('airport',String(values.airportId).toLowerCase())||displayOrdinaryValue('airportId',values.airportId),values.destination]:[values.origin,values.destination];
+      places='<dl class="events-package-review__places">'+ends.map((value,i)=>'<div><dt>'+esc(t(airport?(i?'address':'airport'):(i?'reviewDestination':'reviewPickup')))+'</dt><dd>'+esc(typeof value==='object'?value?.address||t('ordinaryFixed'):value||t('ordinaryFixed'))+'</dd></div>').join('')+'</dl>';
+    }
+    const title=omitTitle?'':compact?'<h4>'+esc(local(pkg?.title))+'</h4><p class="events-package-review__mode">'+esc(local(option?.title))+'</p>':'<h4>'+esc(local(pkg?.title))+' · '+esc(local(option?.title))+'</h4>';
+    return '<section class="events-package-review'+(compact?' events-package-review--compact':'')+'">'+title+'<p>'+esc(t('passengers'))+': '+esc(passengerDescription(selection))+'</p>'+places+'<ol>'+(state.quote?.calculation?.itinerary?.services||option?.services||[]).map((service,index)=>{
       const template=option.services.find(s=>s.id===service.id);const data=selection.services.find(s=>s.serviceId===service.id)||{};
       const endpoint=role=>data[role]||data[role+'Airport']||template?.[role]?.airportCode||(template?.[role]?.kind==='venue'?eventVenue(event):t('unknown'));
-      const values=option.calculationModel==='ordinary_services'&&template?.ordinary?Object.fromEntries(Object.entries(template.ordinary.inputs).map(([key,input])=>[key,input.source==='fixed'?(input.redacted?t('ordinaryFixed'):input.value):input.source==='customer'?data.ordinaryInputs?.[key]:undefined])):{...data,from:endpoint('from'),to:endpoint('to')};
+      const values=option.calculationModel==='ordinary_services'&&template?.ordinary?resolvedOrdinaryValues(template,state):{...data,from:endpoint('from'),to:endpoint('to')};
       const airport=value=>window.PixkuyAirportTariffCatalog?.resolveDisplayLabel('airport',String(value).toLowerCase())||displayOrdinaryValue('airportId',value);
-      const route=values.airportId?(values.direction==='destination_to_airport'?[values.destination,airport(values.airportId)]:[airport(values.airportId),values.destination]):[values.origin||values.from,values.destination||values.to].map((value,i)=>value&&template?.[i?'to':'from']?.kind==='airport'?airport(value):value);
+      const route=values.airportId?(values.direction==='destination_to_airport'?[values.destination,airport(values.airportId)]:[airport(values.airportId),values.destination]):[values.origin||values.from,values.destination||values.to].map((value,i)=>value&&template?.ordinary?.baseService!=='direct_transfer'&&template?.[i?'to':'from']?.kind==='airport'?airport(value):value);
       const count=state.quote?.calculation?.serviceLines?.find(line=>line.serviceId===service.id)?.baggage?.count??data.ordinaryInputs?.baggageCount;
-      return '<li><strong>'+esc(t('services'))+' '+(index+1)+'</strong><span>'+esc(localServiceDate(service.startLocal||[values.date,values.time].filter(Boolean).join('T')))+'</span><span>'+route.filter(Boolean).map(value=>esc(typeof value==='object'?value.address||t('ordinaryFixed'):value)).join(' → ')+'</span>'+(values.flight?'<span>'+esc(t('flight'))+': '+esc(values.flight)+'</span>':'')+(count!==undefined?'<span>'+esc(t('baggageCount'))+': '+esc(count)+'</span>':'')+'</li>';
+      const directView=optionDirectView(state,pkg,option);
+      const airportView=directView||optionAirportView(state,pkg,option);
+      if(airportView?.returning&&(directView||!window.matchMedia('(max-width:720px)').matches)){
+        const heading=service.id===airportView.returning.id?'returnHeading':directView?'outboundHeading':'arrivalHeading';
+        const labels=directView?['reviewPickup','reviewDestination']:['airport','address'];
+        if(service.id===airportView.returning.id)labels.reverse();
+        const routeText=linked?labels.map(key=>esc(t(key))).join(' → '):route.filter(Boolean).map(value=>esc(typeof value==='object'?value.address||t('ordinaryFixed'):value)).join(' → ');
+        return '<li class="events-package-review__leg"><h5>'+esc(t(heading))+'</h5><p class="events-package-review__route">'+routeText+'</p><p class="events-package-review__time">'+esc(service.startsAtUtc?receiptServiceTime(service.startsAtUtc):localServiceDate(service.startLocal||[values.date,values.time].filter(Boolean).join('T')))+'</p>'+(values.flight?'<span>'+esc(t('flight'))+': '+esc(values.flight)+'</span>':'')+(count!==undefined?'<span>'+esc(t('baggageCount'))+': '+esc(count)+'</span>':'')+'</li>';
+      }
+      return '<li><strong>'+esc(airportView?.returning?quoteServiceLabel(state,service.id):t('serviceLabel')+' '+(index+1))+'</strong><span>'+esc(localServiceDate(service.startLocal||[values.date,values.time].filter(Boolean).join('T')))+'</span><span>'+route.filter(Boolean).map(value=>esc(typeof value==='object'?value.address||t('ordinaryFixed'):value)).join(' → ')+'</span>'+(values.flight?'<span>'+esc(t('flight'))+': '+esc(values.flight)+'</span>':'')+(count!==undefined?'<span>'+esc(t('baggageCount'))+': '+esc(count)+'</span>':'')+'</li>';
     }).join('')+'</ol>'+button('edit-services',t(option.services.length===1?'editTransfer':'editTransfers'),false,'quiet')+'</section>';
   }
   function mobileReviewContact(state){
@@ -511,16 +646,80 @@
       +'</fieldset><p class="events-package-mobile-contact__notice">'+esc(t('notBooking'))+'</p>'
       +'<div class="events-package-mobile-contact__actions"><button type="submit" class="events-package-button events-package-button--primary" data-package-action="submit"'+(locked||!airportCanReview(state)?' disabled aria-disabled="true"':'')+'>'+esc(state.requestStatus==='submitting'?t('sending'):t('submit'))+'</button></div></form></section>';
   }
+  Object.assign(fallback,{"directPickupAddress": "Alojamiento o dirección de recogida", "directReturnToLodging": "Regreso al mismo alojamiento", "directReturnToPickup": "Regreso al mismo punto de recogida"});
+  function configuredDirectOption(state){
+    if(state.step!=='services'||state.screen!=='config'||state.selection?.requestKind!=='package')return null;
+    const pkg=state.selectedEvent?.snapshot.packages.find(p=>p.id===state.selection.packageId),option=pkg?.options.find(o=>o.id===state.selection.optionId);
+    if(option?.calculationModel!=='ordinary_services'||option.services.length!==2)return null;
+    const returning=option.services.find(item=>item.ordinary?.directReturn?.version===1);
+    const service=returning&&option.services.find(item=>item.id===returning.ordinary.directReturn.outboundServiceId);
+    if(!service||service===returning||service.ordinary?.baseService!=='direct_transfer'||returning.ordinary.baseService!=='direct_transfer'||service.ordinary.directReturn||service.ordinary.airportReturn||returning.ordinary.airportReturn)return null;
+    if(state.selectedEvent.snapshot.addOns.some(a=>a.packageId===pkg.id&&a.optionIds.includes(option.id)&&a.serviceIds.some(id=>id===service.id||id===returning.id)))return null;
+    return {pkg,option,service,returning,sharedDate:returning.ordinary.directReturn.dateMode==='shared',customerPickup:service.ordinary.inputs.origin?.source==='customer'&&service.ordinary.inputs.destination?.source==='fixed'};
+  }
+  function directQuoteReadiness(state,view){
+    const missing=[],invalid=[];
+    if(!state.selection.passengerBand)missing.push(t('passengers'));
+    for(const service of [view.service,view.returning]){
+      const inputs=service.ordinary.inputs,values=resolvedOrdinaryValues(service,state),back=service===view.returning,bounds=serviceBounds(service,state),r=service.ordinary.restrictions||{};
+      for(const key of ['origin','destination'])if(inputs[key]?.source==='customer'){
+        if(!values[key]?.address?.trim())missing.push(t(key==='origin'?(view.customerPickup?'directPickupAddress':'origin'):'directDestination'));
+        else if(!values[key]?.placeId?.trim())invalid.push(t(key==='origin'?(view.customerPickup?'directPickupAddress':'origin'):'directDestination'));
+      }
+      const dateLabel=view.sharedDate?'directSharedDate':back?'returnDate':'directOutboundDate',timeLabel=back?'directReturnTime':'directOutboundTime';
+      if(!values.date)missing.push(t(dateLabel));
+      else if(!localDate(values.date)||bounds.minDate&&values.date<bounds.minDate||bounds.maxDate&&values.date>bounds.maxDate)invalid.push(t(dateLabel));
+      if(!values.time)missing.push(t(timeLabel));
+      else if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(values.time)||(r.fromTime&&r.untilTime?(r.fromTime<=r.untilTime?(values.time<r.fromTime||values.time>r.untilTime):(values.time<r.fromTime&&values.time>r.untilTime)):(r.fromTime&&values.time<r.fromTime||r.untilTime&&values.time>r.untilTime)))invalid.push(t(timeLabel));
+      const start=values.date&&values.time?values.date+'T'+values.time:'';
+      if(start&&(bounds.min&&start<bounds.min||bounds.max&&start>bounds.max))invalid.push(t(timeLabel));
+      const bag=inputs.baggageCount||inputs.baggageStatus;
+      if(bag?.source==='customer'){
+        const count=values.baggageCount??(values.baggageStatus==='none'?0:undefined);
+        if(count===undefined&&view.option.baggagePolicy?.allowUnknown===false)missing.push(t('baggageCount')+' · '+t(back?'returnHeading':'outboundHeading'));
+        else if(count!==undefined&&(!Number.isSafeInteger(count)||count<0))invalid.push(t('baggageCount'));
+      }
+    }
+    const first=resolvedOrdinaryValues(view.service,state),back=resolvedOrdinaryValues(view.returning,state);
+    if(first.date&&first.time&&back.date&&back.time&&back.date+'T'+back.time<=first.date+'T'+first.time)invalid.push(t('directReturnTime'));
+    return {ready:!missing.length&&!invalid.length,missing:[...new Set(missing)],invalid:[...new Set(invalid)]};
+  }
+  function directSchedule(state,view,service,surface){
+    const back=service===view.returning,data=state.selection.services.find(item=>item.serviceId===service.id)||{},prefix='service:'+service.id+':';
+    const input=(key,label)=>surface==='mobile'?mobileTemporalInput(service,data,prefix,key,t(label)):ordinaryInput(service,data,prefix,key,'',{label});
+    return '<fieldset class="events-package-primary-form events-package-direct__leg" aria-label="'+esc(t(back?'returnHeading':'outboundHeading'))+'"'+(back?' data-package-direct-return="'+esc(service.id)+'"':'')+(window.PixkuyEventPackagesRequest.hasFrozenBody()?' disabled':'')+'>'+(!view.sharedDate?input('date',back?'returnDate':'directOutboundDate'):'')+input('time',back?'directReturnTime':'directOutboundTime')+'</fieldset>';
+  }
+  function directBaggage(state,view){
+    const legs=[view.service,view.returning],markup=legs.map(service=>baggageField(service,state.selection.services.find(item=>item.serviceId===service.id)||{},'service:'+service.id+':'));
+    const pending=service=>{const input=service.ordinary.inputs.baggageCount||service.ordinary.inputs.baggageStatus;return !input||input.source==='deferred';};
+    if(legs.every(pending)&&markup[0]===markup[1])return markup[0];
+    return '<div class="events-package-direct__baggage">'+markup.map((html,index)=>'<fieldset class="events-package-primary-form"'+(window.PixkuyEventPackagesRequest.hasFrozenBody()?' disabled':'')+'><legend>'+esc(t('baggage'))+' · '+esc(t(index?'returnHeading':'outboundHeading'))+'</legend>'+html+'</fieldset>').join('')+'</div>';
+  }
+  function directConfiguration(state,view,locked,surface){
+    const {pkg,option,service}=view,data=state.selection.services.find(item=>item.serviceId===service.id)||{},prefix='service:'+service.id+':';
+    const endpoint=key=>{
+      const label=key==='origin'?(view.customerPickup?'directPickupAddress':'origin'):'directDestination';
+      if(surface==='mobile'&&service.ordinary.inputs[key]?.source==='customer')return mobileAddressInput(service,data,prefix,key,t(label),true).replace(esc(t(ordinaryFieldLabels[key])),esc(t(label)));
+      let html=ordinaryInput(service,data,prefix,key,'',{label});
+      if(service.ordinary.inputs[key]?.source==='customer')html=html.replace('<span data-package-address-mount>','<button type="button" class="place-autocomplete__clear" data-package-address-clear aria-label="'+esc(t(key==='origin'?'clearPickup':'clearDestination'))+'"'+(data.ordinaryInputs?.[key]?.address?'':' hidden')+'><span aria-hidden="true">×</span></button><span data-package-address-mount>');
+      return html;
+    };
+    const sharedDateControl=view.sharedDate?(surface==='mobile'?mobileTemporalInput(service,data,prefix,'date',t('directSharedDate')):ordinaryInput(service,data,prefix,'date','',{label:'directSharedDate'})):'';
+    const sharedDate=locked?'<fieldset class="events-package-primary-form services-expand__field--date" disabled>'+sharedDateControl+'</fieldset>':sharedDateControl;
+    return '<section class="events-package-direct events-package-airport"><h3 tabindex="-1" data-package-step-heading>'+esc(t('configureTransferTitle'))+'</h3><p>'+esc(local(pkg.title))+' · '+esc(local(option.title))+'</p><fieldset class="events-package-primary-form"'+(locked?' disabled':'')+'><legend>'+esc(t('directSharedData'))+'</legend><div class="events-package-fields-grid">'+endpoint('origin')+endpoint('destination')+passengerField(state.selection)+'</div><p class="events-package-help">'+esc(t(view.customerPickup?'directReturnToLodging':'directReturnToPickup'))+'</p></fieldset><div class="events-package-direct__schedule'+(view.sharedDate?' is-shared':'')+'">'+sharedDate+directSchedule(state,view,service,surface)+directSchedule(state,view,view.returning,surface)+'</div>'+directBaggage(state,view)+airportConditions(state.selectedEvent,pkg)+'<div class="events-package-direct__quote"><div data-airport-price role="status" aria-live="polite">'+airportPrice(state,view)+'</div><div class="events-package-calculation-actions" data-airport-actions>'+airportActions(state)+'</div></div></section>';
+  }
   // This view is capability-bound; other service models keep their existing calculation controls.
   function configuredAirportOption(state){
     if(state.step!=='services'||state.screen!=='config'||state.selection?.requestKind!=='package')return null;
     const pkg=state.selectedEvent?.snapshot.packages.find(p=>p.id===state.selection.packageId);
     const option=pkg?.options.find(o=>o.id===state.selection.optionId);
-    const service=option?.services.length===1&&option.services[0];
+    const returning=option?.services.length===2&&option.services.find(item=>item.ordinary?.airportReturn?.version===1);
+    const service=returning?option.services.find(item=>item.id===returning.ordinary.airportReturn.arrivalServiceId):option?.services.length===1&&option.services[0];
+    if(returning&&(!service||service.ordinary?.airportReturn||returning.ordinary.baseService!=='airport_transfer'||returning.ordinary.inputs.direction?.source!=='fixed'||returning.ordinary.inputs.direction.value!=='destination_to_airport'||service.ordinary?.inputs.direction?.value!=='airport_to_destination'))return null;
     const binding=service?.ordinary;
     if(option?.calculationModel!=='ordinary_services'||binding?.baseService!=='airport_transfer'||binding.inputs.direction?.source!=='fixed'||!['airport_to_destination','destination_to_airport'].includes(binding.inputs.direction.value))return null;
-    if(state.selectedEvent.snapshot.addOns.some(a=>a.packageId===pkg.id&&a.optionIds.includes(option.id)&&a.kind!=='airport_leg_supplement'&&a.serviceIds.includes(service.id)))return null;
-    return {pkg,option,service,arrival:binding.inputs.direction.value==='airport_to_destination'};
+    if(state.selectedEvent.snapshot.addOns.some(a=>a.packageId===pkg.id&&a.optionIds.includes(option.id)&&a.kind!=='airport_leg_supplement'&&a.serviceIds.some(id=>id===service.id||id===returning?.id)))return null;
+    return {pkg,option,service,returning:returning||null,arrival:binding.inputs.direction.value==='airport_to_destination'};
   }
   function airportConfiguredView(state,surface,mobile){
     const mobileViewport=window.matchMedia?.('(max-width:720px)').matches;
@@ -528,7 +727,7 @@
     return configuredAirportOption(state);
   }
   function airportDesktop(state,surface){return airportConfiguredView(state,surface,false);}
-  function airportAutoQuoteView(state,surface){return airportConfiguredView(state,surface,surface==='mobile');}
+  function airportAutoQuoteView(state,surface){const mobile=window.matchMedia?.('(max-width:720px)').matches;if(surface==='mobile'?!mobile:!['desktop','contact'].includes(surface)||mobile)return null;return configuredAirportOption(state)||configuredDirectOption(state);}
   function airportCanReview(state){return state.quoteStatus==='ready'&&!!state.quote&&state.quote.calculation.coverageStatus!=='outside'&&!(state.quote.calculation.serviceLines||[]).some(line=>line.included?.quoteExpiresAt&&Date.parse(line.included.quoteExpiresAt)<=Date.now());}
   function airportSelector(service,data,prefix,label,mobile){
     const binding=service.ordinary;
@@ -595,7 +794,9 @@
     const quoted=price?.priceStatus==='quoted'&&price.pricedSubtotal!==null&&calculation.coverageStatus!=='outside';
     const readiness=airportQuoteReadiness(state,view);
     const text=state.quoteStatus==='loading'?t('transferCalculating'):state.quoteStatus==='error'?t('error'):calculation?.coverageStatus==='outside'?t('ordinaryOutside'):quoted?money(price.pricedSubtotal,price.currency):calculation?t('pending'):readiness.invalid.length?t('invalidForQuote',{fields:readiness.invalid.join(', ')}):readiness.missing.length?t('missingForQuote',{fields:readiness.missing.join(', ')}):t('automaticQuotePending');
-    return '<span class="services-expand__label">'+esc(t('transferPrice'))+'</span><strong class="events-package-airport__price'+(quoted?' is-quoted':'')+'">'+esc(text)+'</strong>';
+    const pendingFields=!calculation&&!['loading','error'].includes(state.quoteStatus)?(readiness.invalid.length?readiness.invalid:readiness.missing):[];
+    if(view.returning&&pendingFields.length)return '<span class="services-expand__label">'+esc(t('roundTripTotal'))+'</span><p>'+esc(t(readiness.invalid.length?'reviewQuoteFields':'completeQuoteFields'))+'</p><ul class="events-package-airport__pending">'+pendingFields.map(label=>'<li>'+esc(view.service.ordinary.baseService==='direct_transfer'?label:label===t('transferDate')?t('arrivalDate'):label===t('returnPickupTime')?t('returnHotelPickup'):label)+'</li>').join('')+'</ul>';
+    return '<span class="services-expand__label">'+esc(t(view.returning?'roundTripTotal':'transferPrice'))+'</span><strong class="events-package-airport__price'+(quoted?' is-quoted':'')+'">'+esc(text)+'</strong>';
   }
   function airportActions(state){
     const locked=window.PixkuyEventPackagesRequest.hasFrozenBody()||state.requestStatus==='submitting';
@@ -610,12 +811,20 @@
     const airport=airportSelector(service,data,prefix,arrival?'arrivalAirport':'departureAirport');
     let address=input('destination',arrival?'arrivalAddress':'departureAddress');
     if(service.ordinary.inputs.destination?.source==='customer')address=address.replace('<span data-package-address-mount>','<button type="button" class="place-autocomplete__clear" data-package-address-clear aria-label="'+esc(t(arrival?'clearDestination':'clearPickup'))+'"'+(data.ordinaryInputs?.destination?.address?'':' hidden')+'><span aria-hidden="true">×</span></button><span data-package-address-mount>');
-    return '<section class="events-package-airport"><h3>'+esc(t('configureTransferTitle'))+'</h3><p class="events-package-airport__selection">'+esc(local(pkg.title))+' · '+esc(local(option.title))+'</p>'
+    if(view.returning){
+      return '<section class="events-package-airport events-package-airport--paired"><h3 tabindex="-1" data-package-step-heading>'+esc(t('configureTransferTitle'))+'</h3><p class="events-package-airport__selection">'+esc(local(pkg.title))+' · '+esc(local(option.title))+'</p>'
+        +'<fieldset class="events-package-airport__shared"'+(locked?' disabled':'')+'><legend>'+esc(t('sharedTripData'))+'</legend><div class="events-package-airport__shared-fields">'+airport+address+'<p class="events-package-airport__shared-note">'+esc(t('sharedEndpointsHelp'))+'</p>'+passengerField(state.selection)+'</div></fieldset>'
+        +'<div class="events-package-airport__legs"><fieldset class="events-package-primary-form events-package-airport__leg"'+(locked?' disabled':'')+'><legend>'+esc(t('arrivalHeading'))+'</legend><div class="events-package-airport__extras">'+input('date','arrivalDate')+input('time','transferStartTime')+'</div><div class="events-package-airport__leg-extras"><div>'+input('flight','transferFlight',{optional:true})+(service.ordinary.inputs.flight?.source==='customer'?'<p class="events-package-help">'+esc(t('flightOptionalHelp'))+'</p>':'')+'</div><div>'+baggageField(service,data,prefix)+'</div></div></fieldset>'
+        +returnSchedule(state,view,false)+'</div><p class="events-package-airport__timezone">'+esc(t('sharedLocalTime'))+'</p>'
+        +airportConditions(state.selectedEvent,pkg)+'<div class="events-package-airport__closing"><div class="events-package-airport__fare" data-airport-price role="status" aria-live="polite" aria-atomic="true">'+airportPrice(state,view)+'</div><div class="events-package-airport__actions" data-airport-actions>'+airportActions(state)+'</div></div></section>';
+    }
+    return '<section class="events-package-airport"><h3 tabindex="-1" data-package-step-heading>'+esc(t('configureTransferTitle'))+'</h3><p class="events-package-airport__selection">'+esc(local(pkg.title))+' · '+esc(local(option.title))+'</p>'
       +'<fieldset class="events-package-airport__form" aria-label="'+esc(t('services'))+'"'+(locked?' disabled':'')+'>'
       +'<div class="events-package-airport__route">'+(arrival?airport+address:address+airport)+'<div class="events-package-airport__fare" data-airport-price role="status" aria-live="polite" aria-atomic="true">'+airportPrice(state,view)+'</div></div>'
       +'<div class="events-package-airport__schedule">'+passengerField(state.selection)+input('date','transferDate')+input('time',arrival?'transferStartTime':'transferPickupTime')+'</div>'
       +'<p class="events-package-airport__timezone">'+esc(t('transferLocalTime'))+'</p>'
       +'<div class="events-package-airport__extras">'+input('flight','transferFlight',{optional:true})+(service.ordinary.inputs.flight?.source==='customer'?'<p class="events-package-help">'+esc(t('flightOptionalHelp'))+'</p>':'')+baggageField(service,data,prefix)+'</div></fieldset>'
+      +returnSchedule(state,view,false)
       +airportConditions(state.selectedEvent,pkg)
       +'<div class="events-package-airport__actions" data-airport-actions>'+airportActions(state)+'</div></section>';
   }
@@ -657,8 +866,19 @@
         const option=pkg?.options.find(item=>item.id===C.state.selection?.optionId);
         if(area)area.innerHTML=mobileCalculationContent(C.state,option,window.PixkuyEventPackagesRequest.hasFrozenBody());
       }
+      const pair=configuredAirportOption(C.state)||configuredDirectOption(C.state),back=root.querySelector('[data-package-airport-return]')||root.querySelector('[data-package-direct-return]');
+      if(back&&pair?.returning&&!back.contains(document.activeElement)){
+        back.outerHTML=pair.service.ordinary.baseService==='direct_transfer'?directSchedule(C.state,pair,pair.returning,root.getAttribute('data-event-package-root')):returnSchedule(C.state,pair,root.getAttribute('data-event-package-root')==='mobile');
+      }
+      if(back&&pair?.returning&&back.contains(document.activeElement)){
+        // Changing the return date updates time constraints without replacing the focused control.
+        const service=pair.returning,data=C.state.selection.services.find(item=>item.serviceId===service.id)||{};
+        const raw=ordinaryInput(service,data,'service:'+service.id+':','time');
+        const input=back.querySelector?.('input[type="time"]');
+        for(const key of ['min','max']){const value=raw.match(new RegExp(' '+key+'="([^"]*)"'))?.[1];if(value)input?.setAttribute(key,value);else input?.removeAttribute(key);}
+      }
       const price=root.querySelector('[data-airport-price]'),actions=root.querySelector('[data-airport-actions]');
-      const view=airportDesktop(C.state,root.getAttribute('data-event-package-root'));
+      const view=airportDesktop(C.state,root.getAttribute('data-event-package-root'))||configuredDirectOption(C.state);
       if(price&&view)price.innerHTML=airportPrice(C.state,view);
       if(actions)actions.innerHTML=airportActions(C.state);
       if(['desktop','mobile'].includes(root.getAttribute('data-event-package-root')))scheduleAirportAutoQuote(root);
@@ -671,8 +891,16 @@
     const locked=window.PixkuyEventPackagesRequest.hasFrozenBody()||state.requestStatus==='submitting';
     const title=eventTitle(event);
     const isPackageStep=selection.requestKind==='package'&&state.step==='package';
-    const header=surface==='contact'?'<header class="events-package-config__header"><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3></header>'+navigation(state,surface):(isPackageStep||surface==='mobile')?'<header class="events-package-config__header events-package-config__header--package">'+button('back',t(isPackageStep?'backToEvents':'back'),locked,'quiet')+'<div class="events-package-event-heading"><div><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3>'+eventMetadata(event,true)+'</div>'+((surface!=='mobile'&&event.snapshot.customInquiryEnabled)?button('ordinary-custom',t('customLink'),locked,'quiet'):'')+'</div></header>'+navigation(state,surface):'<header class="events-package-config__header">'+button('back',t('back'),locked,'quiet')+'<div><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3>'+eventMetadata(event)+'</div>'+((surface!=='mobile'&&event.snapshot.customInquiryEnabled&&selection.requestKind==='package')?button('ordinary-custom',t('customLink'),locked,'quiet'):'')+'</header>'+navigation(state,surface);
-    if(isPackageStep)return '<div class="events-package-step-one">'+header+'<h3 class="events-package-offer-heading">'+esc(t('choosePackage'))+'</h3>'+offer(state,surface)+'</div>';
+    if(isPackageStep&&surface==='mobile'){
+      const view=mobilePackageView(state),detail=activePackages(event).some(pkg=>pkg.id===view.packageId&&activeOptions(pkg).length);
+      const metadata=[eventDates(event),eventVenue(event)].filter(Boolean).map(text=>'<span>'+esc(text)+'</span>').join('');
+      const mobileHeader='<header class="events-package-config__header events-package-mobile-header">'+button(detail?'package-list':'back',t(detail?'allPackages':'backToEvents'),locked,'quiet')+'<div class="events-package-event-heading"><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3>'+(metadata?'<p class="events-package-event-heading__meta">'+metadata+'</p>':'')+'</div></header>';
+      return mobilePackageSelection(state,mobileHeader);
+    }
+    const header=surface==='contact'?'<header class="events-package-config__header"><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3></header>'+navigation(state,surface):(isPackageStep||surface==='mobile')?'<header class="events-package-config__header events-package-config__header--package">'+button('back',t(isPackageStep?'backToEvents':'back'),locked,'quiet')+'<div class="events-package-event-heading"><div><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3>'+eventMetadata(event,true)+'</div>'+((surface!=='mobile'&&event.snapshot.customInquiryEnabled)?button('ordinary-custom',t('customLink'),locked,'quiet'):'')+'</div></header>'+navigation(state,surface):'<header class="events-package-config__header">'+button('back',t('back'),locked,'quiet')+'<div><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3>'+eventMetadata(event,true)+'</div>'+((surface!=='mobile'&&event.snapshot.customInquiryEnabled&&selection.requestKind==='package')?button('ordinary-custom',t('customLink'),locked,'quiet'):'')+'</header>'+navigation(state,surface);
+    if(isPackageStep)return '<div class="events-package-step-one">'+header+'<h3 class="events-package-offer-heading" tabindex="-1" data-package-step-heading>'+esc(t('choosePackage'))+'</h3>'+offer(state,surface)+'</div>';
+    const directView=configuredDirectOption(state);
+    if(directView)return header+directConfiguration(state,directView,locked,surface);
     const airportView=airportDesktop(state,surface);
     if(airportView)return header+airportConfiguration(state,airportView,locked);
     let mobileOption=null;
@@ -701,6 +929,7 @@
         form+='<div class="events-package-services">';
         const orderedServices=option.services.slice().sort((a,b)=>{const date=s=>(option.calculationModel==='ordinary_services'?s.ordinary?.inputs.date?.value:'')||(event.snapshot.days||[]).find(d=>d.id===s.dayId)?.date||s.startLocal||'';return date(a).localeCompare(date(b));});
         orderedServices.forEach((service,index)=>{
+          if(configuredAirportOption(state)?.returning?.id===service.id)return;
           const data=selection.services.find(s=>s.serviceId===service.id)||{};
           const prefix='service:'+service.id+':';
           const extra=extraIds.has(service.id);
@@ -781,12 +1010,12 @@
     const name=host.getAttribute('data-package-address'),clear=host.querySelector('[data-package-address-clear]'),error=host.querySelector('[data-package-address-error]');
     const capturedSelection=C.state.selection,capturedOption=capturedSelection?.optionId;
     let input=host.querySelector('input'),controller=null,generation=0;
-    const currentDestination=()=>{const [,id]=name.split(':');return C.state.selection?.services.find(service=>service.serviceId===id)?.ordinaryInputs?.destination;};
+    const currentDestination=()=>{const [,id,key]=name.split(':');return C.state.selection?.services.find(service=>service.serviceId===id)?.ordinaryInputs?.[key.slice(9)];};
     const showError=message=>{if(!error)return;error.textContent=message||'';error.hidden=!message;};
     const sync=preserveCanonical=>{
       clear.hidden=!input.value;showError('');
       const selected=currentDestination();
-      if(preserveCanonical&&selected?.placeId&&selected.address===input.value)return;
+      if(preserveCanonical&&selected?.address===input.value)return;
       changeField(input,true);
     };
     function bind(){
@@ -801,10 +1030,10 @@
           onPlaceSelected:place=>{
             if(!current())return;
             showError('');
-            const [,id]=name.split(':');
+            const [,id,key]=name.split(':');
             const address=place?.label||place?.formattedAddress||place?.displayName||'',placeId=place?.placeId||place?.id;
             if(!address||!placeId){sync(false);showError(t('placeDetailsError'));return;}
-            C.change(selection=>{let data=selection.services.find(s=>s.serviceId===id);if(!data){data={serviceId:id};selection.services.push(data);}data.ordinaryInputs=data.ordinaryInputs||{};data.ordinaryInputs.destination={address,placeId};});
+            C.change(selection=>{let data=selection.services.find(s=>s.serviceId===id);if(!data){data={serviceId:id};selection.services.push(data);}data.ordinaryInputs=data.ordinaryInputs||{};data.ordinaryInputs[key.slice(9)]={address,placeId};});
           },
           onError:()=>{if(current())showError(t('placeDetailsError'));}});
         if(controller)root.packageAddresses.push(controller);
@@ -843,12 +1072,21 @@
       };
       const sheet=window.PixkuyAirportMobileHotelSearchSheet;
       if(sheet&&input.hasAttribute('data-package-mobile-address-input')){
+        const linkedDirect=!!configuredDirectOption(C.state);
         input.readOnly=true;input.setAttribute('aria-haspopup','dialog');
         if(input.hasAttribute('data-package-mobile-lodging-input'))input.placeholder=document.querySelector('#services-expand-airport [data-airport-lodging-input]')?.getAttribute('placeholder')||'';
         const clear=host.querySelector('[data-package-mobile-address-clear]');
+        const editSearch=value=>{
+          if(!linkedDirect||!isRootInteractive(root)||C.state.selection!==capturedSelection)return;
+          input.value=value||'';
+          if(clear)clear.hidden=true;
+          host.classList?.remove('is-resolved');
+          changeField(input,true);
+        };
         if(clear)clear.addEventListener('click',event=>{
           event.preventDefault();event.stopPropagation();
           sheet.closeForField(root.closest('.events-mobile-route'));
+          if(linkedDirect){editSearch('');input.focus();return;}
           const [,id,fieldName]=name.split(':');
           input.value='';
           C.change(selection=>{const current=selection.services.find(service=>service.serviceId===id);if(!current)return;if(fieldName.startsWith('ordinary-'))delete current.ordinaryInputs?.[fieldName.slice(9)];else delete current[fieldName==='fromAddress'?'from':'to'];});
@@ -857,7 +1095,7 @@
           showError('');
           sheet.openForField({
             host:root.closest('.events-mobile-route'),trigger:input,value:input.value,
-            mount:(search,list)=>adapter.mount({root:list.parentElement,input:search,mountNode:list,fieldName:name,language:locale(),onManualInput:()=>{},onPlaceSelected:commit,onClearSelection:()=>{},onError:()=>{sheet.closeForField(root.closest('.events-mobile-route'));showError(t('placeDetailsError'));}})
+            mount:(search,list)=>adapter.mount({root:list.parentElement,input:search,mountNode:list,fieldName:name,language:locale(),onManualInput:editSearch,onPlaceSelected:commit,onClearSelection:()=>editSearch(''),onError:()=>{sheet.closeForField(root.closest('.events-mobile-route'));showError(t('placeDetailsError'));}})
           });
         };
         input.addEventListener('click',open);
@@ -871,13 +1109,14 @@
     });
   }
   function focusDetail(root){
-    const target=root.querySelector('[data-package-heading]');
-    if(!target)return;
-    target.focus({preventScroll:true});
-    if(root.getAttribute('data-event-package-root')==='mobile'){
-      const route=root.closest('.events-mobile-route');
-      if(route)route.scrollTop=0;
-    }else target.scrollIntoView({block:'nearest'});
+    window.requestAnimationFrame(()=>{
+      const target=root.querySelector('[data-package-step-heading]')||root.querySelector('[data-package-heading]');
+      if(!target||target.isConnected===false)return;
+      target.focus({preventScroll:true});
+      if(root.getAttribute('data-event-package-root')==='mobile'){
+        const route=root.closest('.events-mobile-route');if(route)route.scrollTop=0;
+      }else target.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    });
   }
   function settleMobileReceipt(root,receivedTransition){
     if(!receivedTransition)return;
@@ -911,6 +1150,18 @@
     if(root.getAttribute('data-event-package-root')!=='contact')state.configurationSurface='upper';
     const locked=window.PixkuyEventPackagesRequest.hasFrozenBody()||['submitting','unknown','received'].includes(state.requestStatus);
     const action=target.getAttribute('data-package-action');
+    const mobile=root.getAttribute('data-event-package-root')==='mobile';
+    const browseId=target.getAttribute('data-package-browse');
+    if(browseId&&mobile&&!locked){
+      const pkg=activePackages(state.selectedEvent).find(item=>item.id===browseId&&activeOptions(item).length);
+      if(!pkg)return;
+      const view=mobilePackageView(state);view.scrollTop=root.closest?.('.events-mobile-route')?.scrollTop||0;view.packageId=pkg.id;
+      C.notify();focusDetail(root);return;
+    }
+    if(action==='package-list'&&mobile&&!locked){
+      const view=mobilePackageView(state),id=view.packageId;view.packageId='';C.notify();
+      window.requestAnimationFrame(()=>{const route=root.closest?.('.events-mobile-route');if(route)route.scrollTop=view.scrollTop;root.querySelector('[data-package-browse="'+id+'"]')?.focus({preventScroll:true});});return;
+    }
     if(action==='details'){openPackageDetailsDialog(root,target.getAttribute('data-package-details'),target);return;}
     if(action==='vehicle-gallery'){
       if(root.getAttribute('data-event-package-root')!=='mobile'||!window.matchMedia('(max-width:720px)').matches)return;
@@ -947,8 +1198,8 @@
       return;
     }
     const eventId=target.getAttribute('data-package-event')||target.getAttribute('data-package-custom');
-    if(eventId){const item=state.events.find(e=>e.id===eventId);if(item&&C.selectEvent(item,target.hasAttribute('data-package-custom'))){state.customPicker=false;if(!target.hasAttribute('data-package-custom'))C.go('package');window.dispatchEvent(new CustomEvent('pixkuy:events-detail-activated',{detail:{source:'packages'}}));C.notify();focusDetail(root);}return;}
-    const step=target.getAttribute('data-package-step');if(step){if(C.go(step))focusDetail(root);return;}
+    if(eventId){const item=state.events.find(e=>e.id===eventId);if(item&&C.selectEvent(item,target.hasAttribute('data-package-custom'))){state.customPicker=false;if(!target.hasAttribute('data-package-custom')){C.go('package');if(mobile)mobilePackageView(state).packageId='';}window.dispatchEvent(new CustomEvent('pixkuy:events-detail-activated',{detail:{source:'packages'}}));C.notify();focusDetail(root);}return;}
+    const step=target.getAttribute('data-package-step');if(step){if(step==='package'?returnToPackageDetail(root):C.go(step))focusDetail(root);return;}
     const band=target.getAttribute('data-package-band');
     if(band&&!locked){
       const option=state.selectedEvent.snapshot.packages.find(p=>p.id===state.selection.packageId)?.options.find(o=>o.id===state.selection.optionId);
@@ -959,7 +1210,17 @@
       return;
     }
     const pkgId=target.getAttribute('data-package-configure');
-    if(pkgId){if(!locked&&C.choose(pkgId,state.selection.packageId===pkgId?state.selection.optionId:'',()=>window.confirm(t('changeLoss')))){if(state.selection.optionId)C.go('services');else C.notify();focusDetail(root);}return;}
+    if(pkgId){
+      if(locked)return;
+      const pkg=activePackages(state.selectedEvent).find(item=>item.id===pkgId);
+      const optionId=mobile?(mobilePackageView(state).options[pkgId]??(state.selection.packageId===pkgId?state.selection.optionId:'')):(state.selection.packageId===pkgId?state.selection.optionId:'');
+      if(pkg&&activeOptions(pkg).length>1&&!activeOptions(pkg).some(option=>option.id===optionId)){
+        const controls=target.closest('.events-package-offer__controls');
+        if(controls&&!controls.querySelector('[data-package-option-required]'))controls.insertAdjacentHTML('afterbegin','<p class="events-package-alert" role="alert" tabindex="-1" data-package-option-required>'+esc(t('chooseOptionRequired'))+'</p>');
+        controls?.querySelector('[data-package-option-required]')?.focus();return;
+      }
+      if(C.choose(pkgId,optionId,()=>window.confirm(t('changeLoss')))){if(mobile)mobilePackageView(state).packageId=pkgId;C.go('services');focusDetail(root);}return;
+    }
     const reuse=target.getAttribute('data-package-reuse');
     if(reuse&&!locked){const option=state.selectedEvent.snapshot.packages.find(p=>p.id===state.selection.packageId)?.options.find(o=>o.id===state.selection.optionId);const service=option?.services.find(s=>s.id===reuse);const candidate=service&&lodgingCandidate(state,service);const current=state.selection.services.find(s=>s.serviceId===reuse)?.ordinaryInputs?.destination;if(candidate&&(!current?.address||JSON.stringify(current)===JSON.stringify(candidate.ordinaryInputs.destination)||window.confirm(t('changeLoss'))))C.change(selection=>{let data=selection.services.find(s=>s.serviceId===reuse);if(!data){data={serviceId:reuse};selection.services.push(data);}data.ordinaryInputs=data.ordinaryInputs||{};data.ordinaryInputs.destination={...candidate.ordinaryInputs.destination};});return;}
     if(action==='quote'&&!locked){
@@ -974,15 +1235,15 @@
       }else{focusDetail(root);}
       if(state.error)root.querySelector('[role="alert"]')?.focus();
     }
-    else if(action==='airport-review'&&!locked&&airportDesktop(state,root.getAttribute('data-event-package-root'))&&airportCanReview(state)&&validFields(root)){contactHandoff(root);}
+    else if(action==='airport-review'&&!locked&&(airportDesktop(state,root.getAttribute('data-event-package-root'))||configuredDirectOption(state))&&airportCanReview(state)&&validFields(root)){contactHandoff(root);}
     else if(action==='retry-quote'&&!locked&&airportAutoQuoteView(state,root.getAttribute('data-event-package-root'))){airportQuoteAttemptedSignature='';C.change(()=>{},{silent:true});scheduleAirportAutoQuote(root,0);}
     else if(action==='custom-entry'&&!locked){const events=state.events.filter(e=>e.snapshot.customInquiryEnabled);const selected=state.screen!=='catalog'&&events.find(e=>e.id===state.selectedEvent?.id);if(selected||events.length===1){C.selectEvent(selected||events[0],true);window.dispatchEvent(new CustomEvent('pixkuy:events-detail-activated',{detail:{source:'packages'}}));focusDetail(root);}else{state.customPicker=!state.customPicker;C.notify();root.querySelector('[data-package-custom]')?.focus();}}
     else if(action==='ordinary-custom'&&!locked&&state.selectedEvent?.snapshot.customInquiryEnabled){C.selectEvent(state.selectedEvent,true);focusDetail(root);}
-    else if(action==='packages'&&!locked){C.selectEvent(state.selectedEvent,false);C.go('package');focusDetail(root);}
+    else if(action==='packages'&&!locked){C.selectEvent(state.selectedEvent,false);if(mobile)mobilePackageView(state).packageId='';C.go('package');focusDetail(root);}
     else if(action==='edit-services'){C.go('services');focusDetail(root);}
     else if(action==='contact'){contactHandoff(root);}
     else if(action==='submit'&&root.getAttribute('data-event-package-root')==='mobile'&&state.screen==='contact')return;
-    else if(action==='back'&&!locked){if(state.step==='review')C.go('services');else if(state.step==='services'&&state.selection?.requestKind==='package')C.go('package');else{state.screen='catalog';C.notify();root.querySelector('[data-package-event]')?.focus();}}
+    else if(action==='back'&&!locked){if(state.step==='review')C.go('services');else if(state.step==='services'&&state.selection?.requestKind==='package'){returnToPackageDetail(root);if(mobile)focusDetail(root);}else{state.screen='catalog';C.notify();root.querySelector('[data-package-event]')?.focus();}}
     else if(action==='reload')await load();
     else if(action==='recover')await window.PixkuyEventPackagesRequest.recover();
     else if(action==='retry')await window.PixkuyEventPackagesRequest.submit();
@@ -1000,7 +1261,7 @@
     if(root.getAttribute('data-event-package-root')==='mobile'){root.closePackageAirport?.();window.PixkuyAirportMobileHotelSearchSheet?.closeForField(root.closest('.events-mobile-route'));}
     const contactRoot=root.getAttribute('data-event-package-root')==='contact';
     if(contactRoot){root.hidden=!isRootInteractive(root);if(root.hidden){cancelAirportAutoQuote(root);(root.packageAddresses||[]).forEach(controller=>controller.destroy());root.packageAddresses=[];root.innerHTML='';return;}}
-    const active=document.activeElement;const caret=active&&root.contains(active)?[active.selectionStart,active.selectionEnd]:null;const focused=document.activeElement&&root.contains(document.activeElement)?document.activeElement.getAttribute('data-package-field'):null;
+    const active=document.activeElement;const caret=active&&root.contains(active)?[active.selectionStart,active.selectionEnd]:null;const focused=document.activeElement&&root.contains(document.activeElement)?document.activeElement.getAttribute('data-package-field'):null;const focusedValue=active?.value;
     const sharedContact=window.PixkuyEventPackagesContact?.isActive();
     const receipt=sharedContact||state.configurationSurface==='contact'?'':receiptContent(state);
     const mobileReview=root.getAttribute('data-event-package-root')==='mobile'&&state.screen==='contact'&&state.selection?mobileReviewContact(state):'';
@@ -1016,7 +1277,7 @@
     mountAddresses(root);
     mountAirportSelector(root);
     root.querySelectorAll('[data-package-service]').forEach(node=>node.addEventListener('toggle',()=>{C.state.expandedServiceIds=Array.from(root.querySelectorAll('[data-package-service][open]')).map(item=>item.getAttribute('data-package-service'));}));
-    if(focused){const target=Array.from(root.querySelectorAll('[data-package-field]')).find(node=>node.getAttribute('data-package-field')===focused);if(target){target.focus({preventScroll:true});if(caret&&typeof caret[0]==="number"){try{target.setSelectionRange(caret[0],caret[1]);}catch{}}}}
+    if(focused){const target=Array.from(root.querySelectorAll('[data-package-field]')).find(node=>node.getAttribute('data-package-field')===focused&&(node.type!=='radio'||node.value===focusedValue));if(target){target.focus({preventScroll:true});if(caret&&typeof caret[0]==="number"){try{target.setSelectionRange(caret[0],caret[1]);}catch{}}}}
     const legacy=root.parentElement&&root.parentElement.querySelector('[data-events-mobile-flow]');if(legacy)legacy.hidden=state.screen!=='catalog';
     if(desktop||contactRoot||root.getAttribute('data-event-package-root')==='mobile')scheduleAirportAutoQuote(root);
     settleMobileReceipt(root,receivedTransition);
@@ -1026,18 +1287,25 @@
     if(root.getAttribute?.('data-event-package-root')==='contact')return C.state.configurationSurface==='contact'&&C.state.screen==='config'&&window.PixkuyEventPackagesContact?.isActive()&&window.PixkuyEventPackagesContact.matchesSelection();
     return C.state.configurationSurface!=='contact';
   }
-  function changeField(target,silent){const name=target.getAttribute('data-package-field');if(!name)return;const value=target.value;const checked=target.checked;if(name.startsWith('contact:')){C.state.contact[name.slice(8)]=value;return;}if(name==='package'||name==='option'){if(!C.choose(name==='package'?value:C.state.selection.packageId,name==='option'?value:'',()=>window.confirm(t('changeLoss'))))C.notify();return;}
+  function changeField(target,silent){const name=target.getAttribute('data-package-field');if(!name)return;const value=target.value;const checked=target.checked;if(name.startsWith('contact:')){C.state.contact[name.slice(8)]=value;return;}if(name==='package'||name==='option'){if(!C.choose(name==='package'?value:(target.getAttribute('data-package-option-package')||C.state.selection.packageId),name==='option'?value:'',()=>window.confirm(t('changeLoss'))))C.notify();return;}
     C.change(selection=>{if(name.startsWith('need:')){const flag=name.slice(5);selection.inquiry.needsFlags=checked?[...new Set([...selection.inquiry.needsFlags,flag])]:selection.inquiry.needsFlags.filter(v=>v!==flag);}else if(name==='reason')selection.inquiry.reasonCode=value;else if(name==='inquiryNotes')selection.inquiry.notes=value;else if(name==='passengersKnown')selection.inquiry.passengers=checked?{status:'known',count:1}:{status:'pending',count:null};else if(name==='customPassengers')selection.inquiry.passengers={status:'known',count:Number(value)};else if(name.startsWith('service:')){const [,id,fieldName]=name.split(':');if(fieldName==='additional'){selection.additionalServiceIds=checked?[...selection.additionalServiceIds,id]:selection.additionalServiceIds.filter(v=>v!==id);if(!checked)selection.services=selection.services.filter(s=>s.serviceId!==id);return;}let data=selection.services.find(s=>s.serviceId===id);if(!data){data={serviceId:id};selection.services.push(data);}if(fieldName.startsWith('ordinary-')){const key=fieldName.slice(9);const option=C.state.selectedEvent.snapshot.packages.find(p=>p.id===selection.packageId)?.options.find(o=>o.id===selection.optionId);const input=option?.services.find(s=>s.id===id)?.ordinary?.inputs[key];if(option?.calculationModel!=='ordinary_services'||(input?.source!=='customer'&&!(key==='baggageCount'&&!input&&option.services.find(s=>s.id===id)?.ordinary?.inputs.baggageStatus?.source==='customer')))return;data.ordinaryInputs=data.ordinaryInputs||{};if(!value)delete data.ordinaryInputs[key];else data.ordinaryInputs[key]=key==='origin'||key==='destination'?{address:value}:key==='durationHours'||key==='baggageCount'?Number(value):value;if(key==='baggageCount')delete data.ordinaryInputs.baggageStatus;}else if(fieldName==='fromAddress'||fieldName==='toAddress')data[fieldName==='fromAddress'?'from':'to']={address:value};else if(fieldName==='baggage'){if(!value){delete data.baggage;return;}data.baggage={status:value,items:[],specialRequirementsPresent:false};}else if(fieldName.startsWith('bag-')){if(!data.baggage)return;const categoryId=fieldName.slice(4);data.baggage.items=data.baggage.items.filter(v=>v.categoryId!==categoryId);data.baggage.items.push({categoryId,count:Number(value)});}else if(fieldName==='specialNeeds'){if(!data.baggage)data.baggage={status:'unknown',items:[],specialRequirementsPresent:checked};else data.baggage.specialRequirementsPresent=checked;}else if(fieldName==='startLocal')data.startLocal=value||null;else if(value)data[fieldName]=value;else delete data[fieldName];}},{silent});
     if(silent)refreshAirportQuote();
   }
   function changeRootField(root,target){
+    if(root.getAttribute('data-event-package-root')==='mobile'&&target.getAttribute('data-package-browse-option')===''){
+      if(window.PixkuyEventPackagesRequest.hasFrozenBody()||['submitting','unknown','received'].includes(C.state.requestStatus))return;
+      const view=mobilePackageView(C.state),pkg=activePackages(C.state.selectedEvent).find(item=>item.id===view.packageId);
+      if(!pkg||!activeOptions(pkg).some(option=>option.id===target.value))return;
+      const value=target.value;view.options[pkg.id]=value;C.notify();
+      (root.querySelector('[data-package-browse-option][value="'+value+'"]')||root.querySelector('select[data-package-browse-option]'))?.focus({preventScroll:true});return;
+    }
     if(root.getAttribute('data-event-package-root')==='mobile'&&target.hasAttribute?.('data-package-mobile-band')){
       if(['','van_1_2','van_3_4','van_5_6'].includes(target.value)){C.change(selection=>{delete selection.passengerCount;selection.passengerBand=target.value;},{silent:true});refreshAirportQuote();}
       return;
     }
     // A blur/change between pointerdown and click must not replace the mobile
     // conditions trigger. Input already updates state; keep the same control.
-    const preserve=root.getAttribute('data-event-package-root')==='mobile'&&target.getAttribute('data-package-field')?.includes(':ordinary-')&&['text','date','time','number','select-one'].includes(target.type);
+    const preserve=(root.getAttribute('data-event-package-root')==='mobile'||configuredDirectOption(C.state))&&target.getAttribute('data-package-field')?.includes(':ordinary-')&&['text','date','time','number','select-one'].includes(target.type);
     changeField(target,preserve);
     const overlay=target.parentElement?.querySelector('.services-expand__date-overlay');if(overlay)overlay.hidden=Boolean(target.value);
     if(root.getAttribute('data-event-package-root')==='mobile'){
@@ -1069,7 +1337,10 @@
   function mount(parent,surface){if(!parent)return null;let root=parent.querySelector('[data-event-package-root="'+surface+'"]');if(root)return root;root=document.createElement('section');root.setAttribute('data-events-offer','packages');root.setAttribute('data-event-package-root',surface);let host=parent;if(surface==='desktop'){const legacyCatalog=parent.querySelector('[data-services-events-catalog]');let unified=parent.querySelector('[data-events-unified-catalog]');if(legacyCatalog&&!unified){unified=document.createElement('div');unified.className='events-catalog-grid';unified.setAttribute('data-events-unified-catalog','');legacyCatalog.before(unified);unified.appendChild(legacyCatalog);}if(unified)host=unified;}host.appendChild(root);roots.add(root);root.addEventListener('change',event=>changeRootField(root,event.target));root.addEventListener('input',event=>{const key=event.target.getAttribute('data-package-field');if(key&&key.startsWith('contact:')){C.state.contact[key.slice(8)]=event.target.value;clearMobileContactValidation(event.target);}else if(key&&['text','textarea','tel','email','date','time','datetime-local','number'].includes(event.target.type)){changeField(event.target,true);if(surface==='mobile'){const fields=Array.from(root.querySelectorAll('[data-package-field]'));validateField(root,event.target,Math.max(0,fields.indexOf(event.target)));}}});root.addEventListener('focusout',event=>{const key=event.target?.getAttribute?.('data-package-field');if(key?.startsWith('contact:'))validateMobilePackageContact(root,key.slice(8));});root.addEventListener('submit',event=>{if(!event.target?.matches?.('[data-package-mobile-contact-form]'))return;event.preventDefault();void submitMobilePackageContact(root);});root.addEventListener('click',event=>{void handleClick(root,event);});renderRoot(root);if(surface!=='contact'&&roots.size===1){void load();void window.PixkuyEventPackagesRequest.initialize();}return root;}
   async function open(eventId){C.state.configurationSurface='upper';if(window.matchMedia('(max-width:720px)').matches&&window.PixkuyEventsMobileBookingFlow){window.PixkuyEventsMobileConfigStep?.close();await window.PixkuyEventsMobileBookingFlow.open();}else{const toggle=document.querySelector('[data-service-expand-trigger="events"]');const panel=document.getElementById('services-expand-events');if(panel&&panel.hidden&&toggle)toggle.click();}if(C.state.catalogStatus!=='ready')await load();const item=C.state.events.find(e=>e.id===eventId);if(item&&C.selectEvent(item,!item.snapshot.packages.length))window.dispatchEvent(new CustomEvent('pixkuy:events-detail-activated',{detail:{source:'packages'}}));const root=Array.from(roots).find(r=>r.offsetParent!==null);if(root)root.scrollIntoView({block:'start',behavior:'smooth'});}
   C.subscribe(()=>roots.forEach(renderRoot));window.addEventListener('pixkuy:events-detail-activated',event=>{if(event.detail?.source!=='special'||C.state.screen==='catalog')return;closePackageDetailsDialog();C.state.screen='catalog';C.notify();});window.addEventListener('pixkuy:i18n-applied',()=>{closePackageDetailsDialog();roots.forEach(renderRoot);void load();});
-  window.matchMedia?.('(max-width:720px)').addEventListener?.('change',()=>roots.forEach(renderRoot));
+  window.matchMedia?.('(max-width:720px)').addEventListener?.('change',()=>{
+    // Reassign queued work to the newly active surface before hidden roots render.
+    cancelAirportAutoQuote();roots.forEach(renderRoot);
+  });
   document.addEventListener('click',event=>roots.forEach(root=>root.closePackageAirport?.(event.target)));
   document.addEventListener('focusin',event=>roots.forEach(root=>root.closePackageAirport?.(event.target)));
   function receiptServiceTime(value){
@@ -1091,16 +1362,36 @@
     const title=local(detail?.eventTitle)||receipt.eventTitle;
     const packageTitle=local(detail?.packageTitle)||receipt.packageTitle;
     const optionTitle=local(detail?.optionTitle)||receipt.optionTitle;
+    const desktop=receipt.requestKind!=='custom'&&!window.matchMedia('(max-width:720px)').matches;
     const services=(detail?.services||[]).map(service=>{
       const route=service.baseService==='airport_transfer'
         ? t(service.direction==='airport_to_destination'?'confirmationArrival':service.direction==='destination_to_airport'?'confirmationDeparture':'airport')
         : service.baseService==='hourly_daily'||service.kind==='block'?t('ordinaryHourly')
-        : service.baseService==='direct_transfer'?t('services')
+        : service.baseService==='direct_transfer'?(service.directLeg?t(service.directLeg==='return'?'returnHeading':'outboundHeading')+(desktop?'':' · '+t('directTransferLabel')):t('directTransferLabel'))
         : [t(service.from==='airport'?'airport':service.from==='venue'?'venueLabel':'address'),t(service.to==='airport'?'airport':service.to==='venue'?'venueLabel':'address')].join(' → ');
+      if(desktop){
+        const start=service.startsAtUtc&&Number.isFinite(Date.parse(service.startsAtUtc))?new Date(service.startsAtUtc):null;
+        const format=options=>start?new Intl.DateTimeFormat(locale(),{...options,timeZone:'America/Mexico_City'}).format(start):t('ordinaryDeferred');
+        // Direct endsAtUtc adds the route estimate to the requested start. It is
+        // operational evidence, not another requested pickup or a promised arrival.
+        const end=service.kind==='block'&&service.endsAtUtc&&service.endsAtUtc!==service.startsAtUtc
+          ?'<p>'+esc(t('receiptEnd'))+': '+esc(receiptServiceTime(service.endsAtUtc))+'</p>':'';
+        return '<li><strong>'+esc(route)+'</strong><dl class="events-package-receipt__schedule"><div><dt>'+esc(t('ordinaryDate'))+'</dt><dd>'+esc(format({dateStyle:'long'}))+'</dd></div><div><dt>'+esc(t('receiptRequestedTime'))+'</dt><dd>'+esc(format({hour:'2-digit',minute:'2-digit',hourCycle:'h23'}))+'</dd></div></dl>'+end+'</li>';
+      }
       return '<li><strong>'+esc(route)+'</strong><p>'+esc(receiptServiceTime(service.startsAtUtc))+'</p>'+
         (service.endsAtUtc&&service.endsAtUtc!==service.startsAtUtc?'<p>'+esc(receiptServiceTime(service.endsAtUtc))+'</p>':'')+'</li>';
     }).join('');
     const conditions=detail?.conditions||[];
+    if(desktop)return '<section class="events-package-receipt events-package-receipt--desktop" data-package-confirmation aria-label="'+esc(t('confirmationTitle'))+'">'+
+      '<header><h3 role="status" tabindex="-1" data-package-confirmation-title><span class="events-package-receipt__check" aria-hidden="true">✓</span>'+esc(t('confirmationTitle'))+'</h3><p>'+esc(t('confirmationNext'))+'</p><p>'+esc(t('confirmationNoRepeat'))+'</p></header>'+
+      '<div class="events-package-receipt__reference"><div><span>'+esc(t('receiptReference'))+'</span><span class="events-package-receipt__reference-value">'+esc(receipt.reference)+'</span></div>'+button('copy-reference',t('copyReference'),false,'secondary')+'<span role="status" data-reference-status></span></div>'+
+      '<dl class="events-package-receipt__summary"><dt>'+esc(t('receiptEvent'))+'</dt><dd>'+esc(title)+'</dd><dt>'+esc(t('package'))+'</dt><dd>'+esc(packageTitle||t('custom'))+'</dd>'+(optionTitle?'<dt>'+esc(t('reviewMode'))+'</dt><dd>'+esc(optionTitle)+'</dd>':'')+
+      (receipt.passengerBand?'<dt>'+esc(t('passengers'))+'</dt><dd>'+esc(passengerDescription(receipt))+'</dd>':'')+
+      (receipt.baggage?.some(item=>Number.isSafeInteger(item.count)&&item.count>=0)?'<dt>'+esc(t('baggage'))+'</dt><dd>'+baggageSummary(receipt.baggage.map(item=>Number.isSafeInteger(item.count)&&item.count>=0?{baggage:item}:{}))+'</dd>':'')+'</dl>'+
+      (services?'<ol class="events-package-receipt__itinerary">'+services+'</ol>':'')+
+      '<div class="events-package-receipt__total"><strong>'+esc(t('packageTotal'))+'</strong><p class="events-package-receipt__amount">'+esc(receipt.priceStatus==='quoted'&&receipt.pricedSubtotal!==null&&receipt.pricedSubtotal!==undefined?money(receipt.pricedSubtotal,receipt.currency):t('pending'))+'</p>'+(receipt.priceStatus!=='quoted'?'<p>'+esc(t(receipt.priceStatus==='conditional'?'conditional':'personalized'))+'</p>':'')+'</div>'+
+      (conditions.length?'<details><summary>'+esc(t('conditions'))+'</summary><ul>'+conditions.map(condition=>'<li><strong>'+esc(local(condition.title))+'</strong> '+esc(local(condition.description))+'</li>').join('')+'</ul></details>':'')+
+      '<p class="events-package-receipt__notice">'+esc(t('confirmationReservation'))+'</p><div class="events-package-receipt__actions">'+button('whatsapp',t('confirmationWhatsapp'),false,'secondary')+button('new',t('confirmationNew'),false,'quiet')+'</div></section>';
     return '<section class="events-package-receipt" data-package-confirmation aria-label="'+esc(t('confirmationTitle'))+'">'+
       '<h3 role="status" tabindex="-1" data-package-confirmation-title><span class="events-package-receipt__check" aria-hidden="true">✓</span>'+esc(t('confirmationTitle'))+'</h3><p>'+esc(t('confirmationNext'))+'</p><p>'+esc(t('confirmationNoRepeat'))+'</p>'+
       '<div class="events-package-receipt__reference"><span>'+esc(t('receiptReference'))+': <span class="events-package-receipt__reference-value">'+esc(receipt.reference)+'</span></span>'+
@@ -1110,12 +1401,12 @@
       (receipt.passengerBand?'<dt>'+esc(t('passengers'))+'</dt><dd>'+esc(passengerDescription(receipt))+'</dd>':'')+
       (services?'<dt>'+esc(t('services'))+'</dt><dd><ol>'+services+'</ol></dd>':'')+
       (receipt.baggage?.some(item=>Number.isSafeInteger(item.count)&&item.count>=0)?'<dt>'+esc(t('baggage'))+'</dt><dd>'+baggageSummary(receipt.baggage.map(item=>Number.isSafeInteger(item.count)&&item.count>=0?{baggage:item}:{}))+'</dd>':'')+
-      '<dt>'+esc(t(receipt.priceStatus==='quoted'?'quoted':receipt.priceStatus==='conditional'?'conditional':'personalized'))+'</dt><dd class="events-package-receipt__amount">'+
-      esc(receipt.pricedSubtotal!==null&&receipt.pricedSubtotal!==undefined?money(receipt.pricedSubtotal,receipt.currency):t('personalized'))+'</dd></dl>'+
+      '<dt>'+esc(t(receipt.priceStatus==='quoted'?'packageTotal':receipt.priceStatus==='conditional'?'conditional':'personalized'))+'</dt><dd class="events-package-receipt__amount">'+
+      esc(receipt.priceStatus==='quoted'&&receipt.pricedSubtotal!==null&&receipt.pricedSubtotal!==undefined?money(receipt.pricedSubtotal,receipt.currency):t('pending'))+'</dd></dl>'+
       (conditions.length?'<details><summary>'+esc(t('conditions'))+'</summary><ul>'+conditions.map(condition=>'<li><strong>'+esc(local(condition.title))+'</strong> '+esc(local(condition.description))+'</li>').join('')+'</ul></details>':'')+
       '<p class="events-package-receipt__notice">'+esc(t('confirmationReservation'))+'</p>'+
       '<div class="events-package-receipt__actions">'+button('whatsapp',t('confirmationWhatsapp'),false,'secondary')+button('new',t('confirmationNew'),false,'quiet')+'</div></section>';
   }
   window.PixkuyEventPackagesConfig={mount,open,t,money,load,closePackageDetailsDialog};
-  Object.assign(window.PixkuyEventPackagesConfig,{copyReference,quoteIsCurrent:airportCanReview,renderContact:renderRoot,contactHandoff,receiptContent,contactSummary:state=>'<h3>'+esc(eventTitle(state.selectedEvent))+'</h3>'+reviewItinerary(state)+summary(state),editServices:()=>{if(!C.go('services'))return false;if(window.matchMedia('(max-width:720px)').matches&&window.PixkuyEventsMobileBookingFlow){void open(C.state.selectedEvent.id);return true;}const root=Array.from(roots).find(r=>r.offsetParent!==null);if(root){root.scrollIntoView({block:'start',behavior:'smooth'});focusDetail(root);}return true;}});
+  Object.assign(window.PixkuyEventPackagesConfig,{copyReference,reviewSelectors,quoteIsCurrent:airportCanReview,renderContact:renderRoot,contactHandoff,receiptContent,contactSummary:(state,omitTitle)=>reviewItinerary(state,!window.matchMedia('(max-width:720px)').matches,omitTitle)+summary(state),editServices:()=>{if(!C.go('services'))return false;if(window.matchMedia('(max-width:720px)').matches&&window.PixkuyEventsMobileBookingFlow){void open(C.state.selectedEvent.id);return true;}const root=Array.from(roots).find(r=>r.offsetParent!==null);if(root){root.scrollIntoView({block:'start',behavior:'smooth'});focusDetail(root);}return true;}});
 })(window,document);

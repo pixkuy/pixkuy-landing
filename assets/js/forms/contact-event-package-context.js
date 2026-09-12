@@ -11,12 +11,44 @@
   let configurationHost = null;
   let configurationRoot = null;
   let summaryHost = null;
+  let selectionHost = null;
   let statusHost = null;
   let whatsappHidden = false;
   let confirmedReference = '';
   let summaryMarkup = '';
   const confirmationFields = new Set();
   const boundForms = new WeakSet();
+  let reviewLayout = null;
+
+  function syncReviewLayout(enabled) {
+    if (!enabled) {
+      if (!reviewLayout) return;
+      reviewLayout.fields.forEach(({node, marker}) => marker.replaceWith(node));
+      reviewLayout.heading.remove(); reviewLayout.column.remove();
+      form.removeAttribute('data-package-review-desktop'); reviewLayout = null;
+      return;
+    }
+    const grid = form.querySelector('.form-grid');
+    if (!grid) return;
+    if (!reviewLayout) {
+      const heading = document.createElement('h3');
+      heading.className = 'events-package-contact__title'; heading.tabIndex = -1;
+      const column = document.createElement('section'); column.className = 'events-package-contact__fields';
+      const title = document.createElement('h3'); title.id = 'events-package-contact-fields-title';
+      column.setAttribute('aria-labelledby', title.id); column.appendChild(title);
+      const fields = ['name','phone','email','message','submit'].map(name => form.querySelector('#contact-' + name)?.closest(name === 'submit' ? '.form-actions' : '.form-field'));
+      fields.push(form.parentElement?.querySelector('[data-i18n="contact.footer"]'));
+      const positions = fields.filter(Boolean).map(node => {
+        const marker = document.createComment('package review field position');
+        node.before(marker); column.appendChild(node); return {node,marker};
+      });
+      grid.prepend(heading); grid.appendChild(column);
+      reviewLayout = {heading,column,title,fields:positions};
+      form.setAttribute('data-package-review-desktop', '');
+    }
+    reviewLayout.heading.textContent = view().t('reviewIntro');
+    reviewLayout.title.textContent = view().t('contactDetails');
+  }
 
   const selectedContext = () => window.PixkuyForms?.getContactEventSelection?.();
   function isActive() {
@@ -66,14 +98,25 @@
     const state = C.state;
     const config = view();
     const t = config.t;
-    const locked = request().hasFrozenBody() || state.requestStatus === 'submitting' || !!state.receipt;
+    const locked = request().hasFrozenBody() || ['submitting','unknown'].includes(state.requestStatus) || !!state.receipt;
     const matched = matchesSelection();
     // The configuration host reuses the original renderer. Summary updates never
     // remount Places, the selector or the shared contact fields.
-    configurationHost.hidden = !!state.receipt || !matched || state.screen !== 'config';
-    const nextMarkup = state.receipt ? config.receiptContent(state) : matched && state.selection && state.screen === 'contact' ? config.contactSummary(state) : '';
+    const desktopSelection = matched && state.selection?.requestKind === 'package' && !state.receipt &&
+      !window.matchMedia('(max-width:720px)').matches && (state.screen === 'contact' || state.step === 'package');
+    selectionHost.hidden = !desktopSelection;
+    const selectorMarkup = desktopSelection ? config.reviewSelectors(state, locked) : '';
+    if (selectionHost.innerHTML !== selectorMarkup) selectionHost.innerHTML = selectorMarkup;
+    configurationHost.hidden = !!state.receipt || !matched || state.screen !== 'config' || desktopSelection;
+    const nextMarkup = state.receipt ? config.receiptContent(state) : matched && state.selection && state.screen === 'contact' ? config.contactSummary(state, desktopSelection) : '';
     if (summaryMarkup !== nextMarkup) { summaryHost.innerHTML = nextMarkup; summaryMarkup = nextMarkup; }
     syncConfirmationFields(!!state.receipt);
+    syncReviewLayout(desktopSelection);
+    if (state.receipt) form.setAttribute('data-package-receipt-desktop', '');
+    else form.removeAttribute('data-package-receipt-desktop');
+    // The accepted event is already projected by the receipt, never an editable picker.
+    if (state.receipt) legacy.setAttribute('data-package-confirmed-field', '');
+    else legacy.removeAttribute('data-package-confirmed-field');
     if (state.receipt && confirmedReference !== state.receipt.reference) {
       confirmedReference = state.receipt.reference;
       const heading = summaryHost.querySelector('[data-package-confirmation-title]');
@@ -106,6 +149,9 @@
   function deactivate() {
     if (!active) return;
     syncContact(); active = false;
+    syncReviewLayout(false);
+    form.removeAttribute('data-package-receipt-desktop');
+    legacy?.removeAttribute('data-package-confirmed-field');
     syncConfirmationFields(false);
     confirmedReference = '';
     if (root) root.hidden = true;
@@ -127,8 +173,25 @@
     if (!root) {
       root = document.createElement('section'); root.className = 'contact-event-package-context';
       root.setAttribute('data-contact-event-package-context', ''); legacy.after(root);
+      selectionHost = document.createElement('div');
+      selectionHost.setAttribute('data-events-offer', 'packages');
       configurationHost = document.createElement('div'); summaryHost = document.createElement('div'); statusHost = document.createElement('div');
-      root.appendChild(configurationHost); root.appendChild(summaryHost); root.appendChild(statusHost);
+      root.appendChild(selectionHost); root.appendChild(configurationHost); root.appendChild(summaryHost); root.appendChild(statusHost);
+      selectionHost.addEventListener('change', event => {
+        const field = event.target.getAttribute('data-package-review-select');
+        if (!field || !matchesSelection() || request().hasFrozenBody() || C.state.receipt || ['submitting','unknown'].includes(C.state.requestStatus)) return;
+        syncContact();
+        const selection = C.state.selection;
+        if (!C.choose(field === 'package' ? event.target.value : selection.packageId,
+          field === 'option' ? event.target.value : '', () => window.confirm(view().t('changeLoss')))) {
+          event.target.value = field === 'package' ? selection.packageId : selection.optionId;
+          update(); return;
+        }
+        C.state.configurationSurface = 'contact';
+        C.go(C.state.selection.optionId ? 'services' : 'package');
+        const focus = C.state.selection.optionId ? configurationRoot?.querySelector('[data-package-heading]') : selectionHost.querySelector('[data-package-review-select="option"]');
+        focus?.focus({preventScroll:true});
+      });
       root.addEventListener('click', event => {
         if (configurationHost.contains(event.target)) return;
         const button = event.target.closest('[data-package-action]');
@@ -182,5 +245,6 @@
   }
   C.subscribe(update);
   window.addEventListener('pixkuy:i18n-applied', update);
+  window.matchMedia('(max-width:720px)').addEventListener?.('change', () => { if (isActive()) update(); });
   window.PixkuyEventPackagesContact = { activate, deactivate, reconcile, matchesSelection, isActive, canSubmit, submit };
 })(window, document);

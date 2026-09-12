@@ -241,7 +241,7 @@ async function assertCompleteVariant(variant) {
 function packageRuntime(settings={}) {
   const storage=settings.storage||new Map();const calls=[];const quotes=[];let serial=0;
   const receipt=settings.receipt||{requestKind:'custom',reference:'EVT-'+('1'.repeat(32)),eventTitle:'Evento sintético',packageTitle:null,optionTitle:null,passengerBand:null,serviceCount:null,pricedSubtotal:null,currency:'MXN',priceStatus:'personalized',pendingCodes:['CUSTOM_ASSESSMENT']};
-  const window={setTimeout,clearTimeout,crypto:settings.noCrypto?undefined:{getRandomValues(bytes){bytes.fill(++serial);return bytes}},document:{querySelector(){return {href:'https://wa.me/520000000000'}}},sessionStorage:{getItem(key){if(settings.storageBlocked)throw Error('blocked');return storage.get(key)||null},setItem(key,value){if(settings.storageBlocked)throw Error('blocked');storage.set(key,value)},removeItem(key){storage.delete(key)}},PixkuyEventPackagesConfig:{t:key=>key,money:value=>String(value)},PixkuyEventPackagesApi:{config:async()=>({site:'synthetic-site'}),quote:()=>new Promise(resolve=>quotes.push(resolve)),recover:async attempt=>{calls.push({kind:'recover',attempt});if(settings.recoverReceipt)return {receipt};throw Error('RECOVERY_UNAVAILABLE')},submit:async(body,attempt)=>{calls.push({kind:'submit',body:JSON.parse(JSON.stringify(body)),attempt:{...attempt}});if(settings.failSubmit)throw Error('synthetic network failure');return {receipt}}}};
+  const window={matchMedia:()=>({matches:false,addEventListener(){}}),setTimeout,clearTimeout,requestAnimationFrame:callback=>callback(),crypto:settings.noCrypto?undefined:{getRandomValues(bytes){bytes.fill(++serial);return bytes}},document:{querySelector(){return {href:'https://wa.me/520000000000'}}},sessionStorage:{getItem(key){if(settings.storageBlocked)throw Error('blocked');return storage.get(key)||null},setItem(key,value){if(settings.storageBlocked)throw Error('blocked');storage.set(key,value)},removeItem(key){storage.delete(key)}},PixkuyEventPackagesConfig:{t:key=>key,money:value=>String(value)},PixkuyEventPackagesApi:{config:async()=>({site:'synthetic-site'}),quote:()=>new Promise(resolve=>quotes.push(resolve)),recover:async attempt=>{calls.push({kind:'recover',attempt});if(settings.recoverReceipt)return {receipt};throw Error('RECOVERY_UNAVAILABLE')},submit:async(body,attempt)=>{calls.push({kind:'submit',body:JSON.parse(JSON.stringify(body)),attempt:{...attempt}});if(settings.failSubmit)throw Error('synthetic network failure');return {receipt}}}};
   const context={window,URL,Uint8Array,Date,Intl,Set,JSON,setTimeout,clearTimeout};
   for(const name of ['state','request']){const file=path.join(ROOT,`assets/js/services/events-package-${name}.js`);vm.runInNewContext(fs.readFileSync(file,'utf8'),context,{filename:file});}
   return {window,context,controller:window.PixkuyEventPackagesState,request:window.PixkuyEventPackagesRequest,storage,calls,quotes,receipt};
@@ -252,13 +252,14 @@ async function assertOrdinaryPackageInputs() {
   const source=fs.readFileSync(file,'utf8');const anchor='  window.PixkuyEventPackagesConfig={mount,open,t,money,load,closePackageDetailsDialog};';
   assert.equal(source.split(anchor).length-1,1);
   const eventListeners=new Map();
+  window.matchMedia=query=>({matches:false,addEventListener(type,listener){if(query==='(max-width:720px)'&&!window.packageViewportChange)window.packageViewportChange=listener;}});
   window.addEventListener=(name,listener)=>{const listeners=eventListeners.get(name)||[];listeners.push(listener);eventListeners.set(name,listeners);};
   window.dispatchEvent=event=>{for(const listener of eventListeners.get(event.type)||[])listener(event);return true;};
   window.__pixkuyI18nDict={eventPackages:{choose:'Seleccionar',viewPackages:'Ver paquetes'},airportMobileContactStep:{fields:{phone:'Teléfono/WhatsApp con prefijo internacional'},placeholders:{phone:'Ej. +525512345678'},validation:{phone:'Indica un teléfono válido con formato internacional.'}},services:{cards:{events:{types:{festival:'Festival',other:'Evento'},panel:{dateLabel:'Fecha y hora',venueLabel:'Recinto',priceFromLabel:'Desde',posterAlt:'Cartel del evento',configurationTitle:'Configura tu traslado',quotePending:'Completa los datos para calcular el precio.',quoteLoading:'Calculando precio…',quoteUnavailable:'No se pudo calcular.'}},airport:{panel:{fareLabel:'Tarifa'}}}}};
   const bodyAttributes=new Map();let galleryFocus=0;
   context.document={documentElement:{lang:'es'},activeElement:null,addEventListener(){},querySelector(selector){return selector==='[data-events-mobile-vehicle-gallery-close]'?{focus(){galleryFocus++;}}:null;},body:{getAttribute(name){return bodyAttributes.has(name)?bodyAttributes.get(name):null;},setAttribute(name,value){bodyAttributes.set(name,value);},removeAttribute(name){bodyAttributes.delete(name);}},createElement(){return {attributes:{},setAttribute(name,value){this.attributes[name]=value;},remove(){this.removed=true;}};}};
   context.CustomEvent=class CustomEvent{constructor(type,init={}){this.type=type;this.detail=init.detail;}};
-  vm.runInNewContext(source.replace(anchor,'  window.packageTestHooks={catalog,configuration,changeField,renderRoot,offer,customStrip,handleClick,lodgingCandidate,serviceBounds,boundedDateChoices,dateChoiceLabel,mobileReviewContact,mobileContactValidationFields,validateMobilePackageContact,airportQuoteReadiness,airportCanReview,scheduleAirportAutoQuote,cancelAirportAutoQuote,mountAddresses,roots,mountAirportSelector,mountClearableAddress,packageDetailsContent,changeRootField,validateField,mobileOrdinaryInputs,mobileBaseRecognized,mobileCalculationContent,airportAutoQuoteView};\n'+anchor),context,{filename:file});
+  vm.runInNewContext(source.replace(anchor,'  window.packageTestHooks={catalog,configuration,changeField,renderRoot,offer,customStrip,handleClick,lodgingCandidate,serviceBounds,boundedDateChoices,dateChoiceLabel,mobileReviewContact,mobileContactValidationFields,validateMobilePackageContact,airportQuoteReadiness,airportCanReview,scheduleAirportAutoQuote,cancelAirportAutoQuote,mountAddresses,roots,mountAirportSelector,mountClearableAddress,packageDetailsContent,changeRootField,validateField,mobileOrdinaryInputs,mobileBaseRecognized,mobileCalculationContent,airportAutoQuoteView,configuredDirectOption,resolvedOrdinaryValues};\n'+anchor),context,{filename:file});
   const event={id:'synthetic-event',publicationVersion:1,snapshot:{schemaVersion:3,customInquiryEnabled:true,translations:{es:{title:'Evento sintético'}},type:'festival',media:{main:{url:'/synthetic-event.webp'},mobile:{url:'/synthetic-event-mobile.webp'}},publicEventDates:{startLocalDate:'2026-10-30',endLocalDateExclusive:'2026-11-02',timeZone:'America/Mexico_City'},servicePeriod:{from:'2026-10-23T06:00:00.000Z',until:'2026-11-03T06:00:00.000Z'},occurrences:[{sourceLocalDateTime:'2026-10-29T08:00',dateLabelOverrides:{}},{sourceLocalDateTime:'2026-11-02T08:00',dateLabelOverrides:{}}],venue:{baseName:'Recinto sintético',translations:{es:{name:'Recinto sintético'}}},addOns:[],packages:[{id:'welcome',title:{es:'Welcome'},description:{es:'Prueba'},inclusions:[{es:'Recepción identificada'},{es:'Seguimiento del vuelo'},{es:'Traslado privado'}],options:[{id:'arrival',title:{es:'Llegada'},calculationModel:'ordinary_services',services:[{id:'arrival-service',ordinary:{baseService:'airport_transfer',restrictions:{fromDate:'2026-10-24',untilDate:'2026-11-01'},inputs:{direction:{source:'fixed',value:'airport_to_destination'},airportId:{source:'fixed',value:'mex'},destination:{source:'customer'},date:{source:'customer'},time:{source:'customer'},flight:{source:'deferred'},baggageStatus:{source:'customer'}}}}]}]}]}};
   controller.selectEvent(event,false);
   const initialOffer=window.packageTestHooks.configuration(controller.state);
@@ -270,7 +271,7 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(initialOffer.includes('Elija su paquete'));
   assert.ok(initialOffer.includes('Modalidad disponible'));
   assert.ok(initialOffer.includes('Llegada · 1 traslado'));
-  assert.ok(initialOffer.includes('Configurar traslado'));
+  assert.ok(initialOffer.includes('Completar mi traslado'));
   assert.ok(initialOffer.includes('Ver todas las inclusiones y condiciones'));
   assert.equal((initialOffer.match(/class="events-package-offer__disclosure"/g)||[]).length,1);
   assert.ok(initialOffer.includes('<h5>Qué incluye (3)</h5>'));
@@ -280,11 +281,29 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(!initialOffer.includes('¿Ningún paquete se ajusta'));
   assert.ok(!initialOffer.includes('2026-10-29'));
   assert.equal(initialOffer.split('Seguimiento del vuelo').length-1,2,'the compact list and its disclosure retain published inclusions without injecting an operational date');
+  {
+  const multi=JSON.parse(JSON.stringify(event));
+  multi.snapshot.packages[0].options.push({...multi.snapshot.packages[0].options[0],id:'second',title:{es:'Segunda modalidad'}});
+  const selectionBefore={...controller.state.selection};
+  controller.state.selectedEvent=multi;
+  const initialOptions=window.packageTestHooks.configuration(controller.state,'desktop');
+  assert.equal((initialOptions.match(/data-package-field="option"/g)||[]).length,2,'all offered modes render before choosing a package');
+  assert.ok(initialOptions.includes('data-package-option-package="welcome"'),'initial choices identify their package');
+  window.packageTestHooks.changeField({value:'second',getAttribute:name=>name==='data-package-field'?'option':name==='data-package-option-package'?'welcome':null});
+  assert.equal(controller.state.selection.packageId,'welcome');assert.equal(controller.state.selection.optionId,'second');
+  const navigationRoot={querySelector:()=>null,getAttribute:()=> 'desktop'};
+  await window.packageTestHooks.handleClick(navigationRoot,{target:{closest:()=>({getAttribute:name=>name==='data-package-configure'?'welcome':null})}});
+  assert.equal(controller.state.step,'services','one configure activation opens the selected mode');
+  controller.go('package');assert.equal(controller.state.selection.optionId,'second','back navigation preserves the selected mode');
+  controller.state.selection=selectionBefore;controller.state.selectedEvent=event;
+  }
   const mobileOffer=window.packageTestHooks.configuration(controller.state,'mobile');
   const mobileHeader=mobileOffer.slice(0,mobileOffer.indexOf('</header>'));
   assert.ok(!mobileHeader.includes('data-package-action="ordinary-custom"'),'mobile removes the duplicated header entry');
-  assert.ok(mobileOffer.includes('data-package-action="details"'),'mobile opens complete editorial detail through its auxiliary window');
+  assert.ok(mobileOffer.includes('data-package-browse="welcome"'),'mobile starts with a compact package row');
+  assert.ok(!mobileOffer.includes('data-package-configure'),'configuration belongs to the selected detail');
   assert.ok(!mobileOffer.includes('events-package-offer__disclosure'),'mobile does not expand full detail inside the offer card');
+  await assertMobilePackageList(runtime,event,window.packageTestHooks);
   const detailCopy=window.packageTestHooks.packageDetailsContent({...event,snapshot:{...event.snapshot,conditions:[{title:{es:'Condición extensa'},description:{es:'Descripción completa de la condición'}}]}},event.snapshot.packages[0],true);
   assert.ok(detailCopy.includes('Condición extensa'));assert.ok(detailCopy.includes('Descripción completa de la condición'));
   assert.equal(controller.choose('welcome',''),true);
@@ -588,6 +607,22 @@ async function assertOrdinaryPackageInputs() {
   }
   window.__pixkuyI18nLang='es';
   assert.equal(JSON.stringify(editorial),sourceEditorial,'rendering never edits or fills source data');
+  for(const iconId of ['plane','users','clock','round_trip']){
+    const iconEvent=JSON.parse(sourceEditorial);iconEvent.id='icon-'+iconId;
+    iconEvent.snapshot.packages[0].inclusions=[{es:'Ida y vuelta sintética',summary:{es:'Resumen sintético'},iconId}];
+    controller.selectEvent(iconEvent,false);
+    for(const surface of ['desktop','mobile']){
+      if(surface==='mobile')await window.packageTestHooks.handleClick({getAttribute:()=> 'mobile',querySelector:()=>null},{target:{closest:()=>({getAttribute:key=>key==='data-package-browse'?iconEvent.snapshot.packages[0].id:null})}});
+      const rendered=window.packageTestHooks.configuration(controller.state,surface);
+      const cardIcon=highlightBlock(rendered);
+      assert.match(cardIcon,/<svg [^>]*aria-hidden="true"[^>]*focusable="false"/);
+      assert.ok(cardIcon.includes('Resumen sintético'));
+      const details=window.packageTestHooks.packageDetailsContent(iconEvent,iconEvent.snapshot.packages[0],surface==='mobile');
+      assert.ok(details.includes('Ida y vuelta sintética')&&!details.includes('Resumen sintético'));
+      assert.ok(details.includes('events-package-inclusion')&&details.includes('<svg '));
+      if(iconId==='round_trip')assert.ok(cardIcon.includes('M4 7h16l-4-4M20 7l-4 4M20 17H4l4-4M4 17l4 4'));
+    }
+  }
   const cleared=JSON.parse(sourceEditorial);cleared.id='empty-editorial';
   cleared.snapshot.packages[0].subtitle={es:'',en:''};
   cleared.snapshot.packages[0].inclusions=[{es:'Texto completo conservado',summary:{es:''}}];
@@ -685,7 +720,7 @@ async function assertOrdinaryPackageInputs() {
   hooks.changeField({getAttribute:()=> 'service:optional-block:additional',value:'',checked:true});assert.ok(hooks.configuration(controller.state).includes('service:optional-block:startLocal'));
   assert.ok(!hooks.configuration(controller.state).includes('value="none" selected'));
   const many=JSON.parse(JSON.stringify(fixed));many.id='many';many.snapshot.packages[0].options=Array.from({length:5},(_,i)=>({...JSON.parse(JSON.stringify(fixedOption)),id:'option-'+i}));
-  controller.selectEvent(many,false);controller.choose('welcome','');assert.ok(hooks.offer(controller.state).includes('<select data-package-field="option">'));assert.equal(controller.state.selection.optionId,'');
+  controller.selectEvent(many,false);controller.choose('welcome','');assert.ok(hooks.offer(controller.state).includes('<select data-package-field="option" data-package-option-package='));assert.equal(controller.state.selection.optionId,'');
   console.log(JSON.stringify({status:'PASS',suite:'event-packages-three-step',cases:['offer-without-premature-contact','single-option-direct','multiple-options-explicit','disabled-hidden','compatible-back','compatible-option-preserved','incompatible-option-confirmation','separate-custom-memory','custom-disabled','custom-event-resolution','free-place-edit-invalidates','quote-state-before-review','review-before-contact','navigation-never-submits','temporary-failure-no-custom-switch','airport-return-independent','explicit-lodging-reuse','direct-private-fixed','hourly-duration','chronological-days','operational-date-bounds','fixed-passenger-bands','fixed-values-not-editable','published-addons','baggage-not-preselected','many-options-selector'],externalCalls:0,visualAcceptance:false}));
   const css=fs.readFileSync(path.join(ROOT,'assets/css/events-packages.css'),'utf8');
   assert.ok(css.includes('.events-catalog-grid'));
@@ -699,6 +734,8 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(css.includes('.events-package-offer__highlights'));
   console.log(JSON.stringify({status:'PASS',suite:'event-packages-step-one-reference',cases:['one-native-disclosure','all-inclusions-and-both-condition-scopes','published-copy-and-duplicates-preserved','html-escaped','tailored-footer-copy','service-contact-custom-scope-isolation','mixed-services-not-transfers'],externalCalls:0,computedStylesVerified:false,visualAcceptance:false}));
   await assertAirportDesktop(runtime,event,hooks,root);
+  await assertLinkedAirportReturn(runtime,event,hooks,root);
+  await assertLinkedDirectReturn(runtime,event,hooks,root);
   await assertSharedPackageContact(runtime,event);
   const traditionalSource=fs.readFileSync(path.join(ROOT,'assets/js/services/events-special-panel.js'),'utf8');
   assert.ok(traditionalSource.includes('detail: { source: "special" }'));
@@ -721,12 +758,17 @@ async function assertSharedPackageContact(runtime, event) {
       matches(selector){const className=selector.match(/^\.([\w-]+)/)?.[1];if(className&&!this.className.split(/\s+/).includes(className))return false;const tag=selector.match(/^[a-z]+/)?.[0];if(tag&&this.tagName!==tag.toUpperCase())return false;for(const match of selector.matchAll(/\[([^=\]]+)(?:="([^"]*)")?\]/g)){const actual=this.getAttribute(match[1]);if(actual===null||(match[2]!==undefined&&actual!==match[2]))return false;}return Boolean(className||tag||selector.startsWith('['));},
       closest(selector){let current=this;while(current){if(current.matches?.(selector))return current;current=current.parentElement;}return null;},
       querySelectorAll(selector){return this.children.flatMap(child=>[...(child.matches?.(selector)?[child]:[]),...child.querySelectorAll(selector)]);},querySelector(selector){return this.querySelectorAll(selector)[0]||null;},
-      appendChild(child){child.parentElement=this;this.children.push(child);return child;},replaceChildren(...children){this.children=[];children.forEach(child=>this.appendChild(child));},contains(child){return this===child||this.children.some(node=>node.contains(child))}};
+      remove(){if(this.parentElement){const siblings=this.parentElement.children,index=siblings.indexOf(this);if(index>=0)siblings.splice(index,1);this.parentElement=null;}},
+      before(child){child.remove();const parent=this.parentElement;child.parentElement=parent;parent.children.splice(parent.children.indexOf(this),0,child);},
+      replaceWith(child){this.before(child);this.remove();},
+      prepend(child){child.remove();child.parentElement=this;this.children.unshift(child);},
+      appendChild(child){child.remove();child.parentElement=this;this.children.push(child);return child;},replaceChildren(...children){this.children=[];children.forEach(child=>this.appendChild(child));},contains(child){return this===child||this.children.some(node=>node.contains(child))}};
     item.classList={toggle(name,force){const names=new Set(item.className.split(/\s+/).filter(Boolean));const enabled=force===undefined?!names.has(name):force;if(enabled)names.add(name);else names.delete(name);item.className=Array.from(names).join(' ');},remove(name){this.toggle(name,false);},add(name){this.toggle(name,true);}};
     Object.defineProperty(item,'innerHTML',{get(){return html;},set(value){html=String(value);if(!value)item.children=[];if(html.includes('data-package-confirmation-title')){const heading=node('h3');heading.setAttribute('data-package-confirmation-title','');item.replaceChildren(heading);}}});
     return item;
   };
   const form=node(),legacy=node(),whatsapp=node(),fieldsByName=new Map(),ids=new Map();let navigations=0,v1Handoffs=0,genericSubmits=0;
+  const formGrid=node();formGrid.className='form-grid';form.appendChild(formGrid);formGrid.appendChild(legacy);
   const input=name=>{if(!fieldsByName.has(name)){const field=node();field.form=form;fieldsByName.set(name,field);}return fieldsByName.get(name);};
   for(const name of ['name','phone','email'])ids.set('contact-'+name,input(name));
   for(const id of ['contact-submit','contact-status','contact-form-error'])ids.set(id,node());
@@ -735,10 +777,12 @@ async function assertSharedPackageContact(runtime, event) {
     const wrapper=node();wrapper.className=name==='submit'?'form-actions':'form-field';wrapper.appendChild(ids.get('contact-'+name));return wrapper;
   });
   const footer=node('p');footer.setAttribute('data-i18n','contact.footer');
+  sharedWrappers.forEach(wrapper=>formGrid.appendChild(wrapper));
   const formContainer=node();formContainer.appendChild(form);formContainer.appendChild(footer);sharedWrappers.push(footer);
-  form.querySelector=selector=>selector==='[data-contact-event-special-editor]'?legacy:selector==='[data-contact-handoff="whatsapp"]'?whatsapp:selector.startsWith('#')?ids.get(selector.slice(1))||null:/\[name="([^"]+)"\]/.test(selector)?input(selector.match(/\[name="([^"]+)"\]/)[1]):null;
+  form.querySelector=selector=>selector==='.form-grid'?formGrid:selector==='[data-contact-event-special-editor]'?legacy:selector==='[data-contact-handoff="whatsapp"]'?whatsapp:selector.startsWith('#')?ids.get(selector.slice(1))||null:/\[name="([^"]+)"\]/.test(selector)?input(selector.match(/\[name="([^"]+)"\]/)[1]):null;
   const document=context.document,documentListeners=new Map();document.readyState='loading';document.querySelector=selector=>selector==='form[name="contact"]'?form:null;
   document.getElementById=id=>id==='contact'?{scrollIntoView(){navigations++;}}:ids.get(id)||null;
+  document.createComment=()=>node('comment');
   document.createElement=tagName=>node(tagName);document.addEventListener=(type,fn)=>{const listeners=documentListeners.get(type)||[];listeners.push(fn);documentListeners.set(type,listeners);};window.document=document;window.CustomEvent=context.CustomEvent;
   document.body={contains:()=>true};
   // The external phone library boundary is synthetic; the shared validator is exercised unchanged.
@@ -778,6 +822,9 @@ async function assertSharedPackageContact(runtime, event) {
   assert.equal(window.PixkuyEventPackagesConfig.contactHandoff(root),true);
   const contact=window.PixkuyEventPackagesContact;
   assert.equal(navigations,1);assert.equal(contact.isActive(),true);assert.equal(legacy.hidden,false);assert.equal(whatsapp.hidden,true);
+  assert.equal(form.getAttribute('data-package-review-desktop'),'');
+  const contactColumn=formGrid.querySelector('.events-package-contact__fields');
+  for(const wrapper of sharedWrappers)assert.equal(wrapper.parentElement,contactColumn,'review reuses actual shared field and consent nodes');
   assert.equal(window.PixkuyForms.getContactEventSelection().eventId,candidate.id);
   const picker=legacy.__contactEventPicker;
   assert.ok(picker&&picker.host.getAttribute('data-contact-event-picker')!==null,'one custom event selector is visible');
@@ -798,6 +845,8 @@ async function assertSharedPackageContact(runtime, event) {
   const beforeCategorySelection=JSON.stringify(controller.state.selection),beforeCategoryQuote=controller.state.quote;
   window.PixkuyForms.contactServiceState.setActiveServiceType('hourly_daily',{source:'synthetic-category-click'});
   assert.equal(contact.isActive(),false,'an inactive package never intercepts another category');
+  assert.equal(form.getAttribute('data-package-review-desktop'),null);
+  for(const wrapper of sharedWrappers)assert.equal(wrapper.parentElement,wrapper===footer?formContainer:formGrid,'leaving packages restores original field positions');
   window.PixkuyForms.contactServiceState.setActiveServiceType('event_special',{source:'synthetic-category-click'});
   assert.equal(contact.isActive(),true,'REGRESSION: package → private driver → Upcoming Events restores native package selection');
   assert.equal(JSON.stringify(controller.state.selection),beforeCategorySelection);
@@ -934,7 +983,7 @@ async function assertSharedPackageContact(runtime, event) {
   await Promise.all([window.PixkuyEventPackagesConfig.load(),window.PixkuyEventPackagesConfig.load()]);assert.equal(catalogRequests,1,'catalog loads are coalesced');
   selectByClick(directEntry.id);assert.equal(controller.state.selection.eventId,directEntry.id);assert.equal(controller.state.selection.services.length,0);assert.equal(controller.state.quote,null);
   assert.equal(picker.value.textContent,'QA LOCAL · Native package');assert.ok(markup(legacy.sibling).includes('data-package-configure="welcome"'));
-  const embeddedRoot=legacy.sibling.children[0].children[0];assert.equal(embeddedRoot.getAttribute('data-event-package-root'),'contact');
+  const embeddedRoot=legacy.sibling.children[1].children[0];assert.equal(embeddedRoot.getAttribute('data-event-package-root'),'contact');
   await window.packageTestHooks.handleClick(embeddedRoot,{target:{closest:()=>({disabled:false,getAttribute:name=>name==='data-package-configure'?'welcome':null})}});
   assert.equal(controller.state.step,'services');assert.ok(markup(legacy.sibling).includes('events-package-airport__form'));
   let automaticQuotes=0;
@@ -976,6 +1025,9 @@ async function assertSharedPackageContact(runtime, event) {
   const body=JSON.parse(posts[0].options.body);assert.equal(body.services.length,2);assert.equal(body.passengerBand,'van_3_4');assert.equal(body.passengerCount,undefined);assert.equal(body.contact.email,'synthetic@example.invalid');assert.equal(body.services[1].ordinaryInputs.flight,'SYN123');assert.equal(body.services[1].ordinaryInputs.baggageCount,3);assert.equal(body.services[0].ordinaryInputs.baggageCount,undefined);assert.equal(body.acceptedQuoteFingerprint,'e'.repeat(64));
   complete();await new Promise(resolve=>setTimeout(resolve,0));assert.equal(controller.state.requestStatus,'received');assert.equal(contact.canSubmit(),false);assert.ok(markup(legacy.sibling).includes(runtime.receipt.reference));submit();assert.equal(posts.length,1);
   assert.equal(runtime.request.hasFrozenBody(),false,'receipt notification sees the released retry body');
+  assert.equal(legacy.getAttribute('data-package-confirmed-field'),'','the event picker is hidden in the accepted receipt');
+  assert.equal(form.getAttribute('data-package-receipt-desktop'),'');
+  assert.equal(legacy.sibling.children[0].hidden,true,'receipt never offers mutable package selectors');
   for(const wrapper of sharedWrappers)assert.equal(wrapper.getAttribute('data-package-confirmed-field'),'','only this confirmation hides shared controls');
   assert.ok(!ids.get('contact-submit').textContent.includes('Reintentar'));
   const confirmation=markup(legacy.sibling);
@@ -1023,6 +1075,54 @@ async function assertSharedPackageContact(runtime, event) {
   assert.equal(controller.state.selection.services.length,0,'new request does not revive sent itinerary');
   for(const wrapper of sharedWrappers)assert.equal(wrapper.getAttribute('data-package-confirmed-field'),null);
   assert.equal(input('message').value,'Synthetic shared notes','new request preserves shared drafts');
+  // Exercise the new review controls through the actual adapter and state controller.
+  const originalPackages=candidate.snapshot.packages;
+  const another=JSON.parse(JSON.stringify(originalPackages[0]));another.id='other-package';another.title={es:'Other package'};
+  another.options=[{...JSON.parse(JSON.stringify(option)),id:'other-one'}, {...JSON.parse(JSON.stringify(option)),id:'other-two'}];
+  another.options.forEach((item,index)=>{item.title={es:'Mode '+index};item.services.forEach(service=>{service.id+='-other-'+index;});});
+  const single=JSON.parse(JSON.stringify(another));single.id='single-package';single.options=single.options.slice(0,1);
+  candidate.snapshot.packages=[...originalPackages,another,single,{...single,id:'inactive-package',active:false},{...single,id:'empty-package',options:[]}];
+  controller.choose('welcome','arrival');controller.go('services');
+  controller.change(s=>{s.services=[{serviceId:option.services[0].id,ordinaryInputs:{destination:{address:'Do not transfer',placeId:'old-place'}}}];});
+  window.PixkuyEventPackagesApi.quote=async()=>({source:'published',quoteFingerprint:'e'.repeat(64),calculation});
+  await controller.quote();controller.go('review');
+  const selectors=legacy.sibling.children[0];
+  assert.ok(selectors.innerHTML.includes('data-package-review-select="package"'));
+  assert.ok(!selectors.innerHTML.includes('inactive-package')&&!selectors.innerHTML.includes('empty-package'));
+  const chooseReview=(field,value)=>{const target=node('select');target.value=value;target.setAttribute('data-package-review-select',field);selectors.dispatchEvent({type:'change',target});return target;};
+  const previousConfirm=window.confirm;window.confirm=()=>false;
+  assert.equal(chooseReview('package',another.id).value,'welcome','cancel restores the native select value as well as state');assert.equal(controller.state.selection.packageId,'welcome');assert.ok(controller.state.quote,'cancel preserves the current valid review');
+  window.confirm=()=>true;
+  let finishPrevious;window.PixkuyEventPackagesApi.quote=()=>new Promise(resolve=>{finishPrevious=resolve;});
+  const inFlight=controller.quote();
+  chooseReview('package',another.id);
+  assert.equal(controller.state.selection.packageId,another.id);assert.equal(controller.state.selection.optionId,'');
+  assert.equal(controller.state.step,'package');assert.equal(controller.state.quote,null);assert.equal(contact.canSubmit(),false);
+  assert.equal(controller.state.selection.services.length,0,'matching field names never transfer incompatible inputs');
+  assert.equal(selectors.hidden,false);assert.equal(legacy.sibling.children[1].hidden,true,'choose a mode before its configuration opens');
+  assert.equal(legacy.sibling.children[2].innerHTML,'','old summary and amount disappear immediately');
+  finishPrevious({source:'published',quoteFingerprint:'e'.repeat(64),calculation});await inFlight;assert.equal(controller.state.quote,null);
+  chooseReview('option','other-two');assert.equal(controller.state.step,'services');assert.equal(controller.state.selection.optionId,'other-two');
+  controller.go('package');assert.equal(selectors.hidden,false);assert.equal(controller.state.quote,null,'back retains new selection without an old quote');
+  chooseReview('package',single.id);assert.equal(controller.state.step,'services');assert.equal(controller.state.selection.optionId,'other-one');
+  controller.go('package');assert.ok(!selectors.innerHTML.includes('data-package-review-select="option"'),'a sole mode is static text');
+  for(const [field,value] of [['name','Synthetic Person'],['phone','+525555555555'],['email','synthetic@example.invalid'],['message','Synthetic shared notes']])assert.equal(input(field).value,value,'contact survives package and mode changes');
+  const frozenCheck=runtime.request.hasFrozenBody;runtime.request.hasFrozenBody=()=>true;
+  chooseReview('package',another.id);assert.equal(controller.state.selection.packageId,single.id,'recovery forbids changes');
+  runtime.request.hasFrozenBody=frozenCheck;window.confirm=previousConfirm;
+  candidate.snapshot.packages=originalPackages;
+  const currentLanguage=window.__pixkuyI18nLang,loaders=[];
+  window.PixkuyEventPackagesApi.load=()=>new Promise(resolve=>loaders.push(resolve));
+  window.__pixkuyI18nLang='es';const olderCatalog=window.PixkuyEventPackagesConfig.load();await Promise.resolve();
+  window.__pixkuyI18nLang='en';const newerCatalog=window.PixkuyEventPackagesConfig.load();await Promise.resolve();
+  loaders[1]({events:[candidate,directEntry]});await newerCatalog;
+  loaders[0]({events:[]});await olderCatalog;assert.equal(controller.state.events.length,2,'late previous-language catalogs never replace current selections');
+  window.__pixkuyI18nLang=currentLanguage;
+  const noPackages=JSON.parse(JSON.stringify(candidate));noPackages.id='custom-only-event';noPackages.snapshot.packages=[];noPackages.snapshot.customInquiryEnabled=true;
+  window.PixkuyEventPackagesApi.load=async()=>({events:[candidate,directEntry,noPackages]});await window.PixkuyEventPackagesConfig.load();
+  selectNative(noPackages.id);assert.equal(controller.state.selection.requestKind,'custom');assert.equal(selectors.hidden,true,'custom-only events retain their own configuration');
+  assert.equal(input('message').value,'Synthetic shared notes');assert.equal(input('name').value,'Synthetic Person');
+  console.log(JSON.stringify({suite:'desktop-review-selectors',status:'PASS',cases:['explicit-mode','single-mode-direct','inactive-unselectable','cancel-loss','contact-notes-preserved','no-cross-service-inputs','stale-response-discarded','invalidated-total','back-no-old-summary','recovery-lock'],externalCalls:0}));
   // Run the real native Netlify preparation guard after leaving the package.
   window.nativeEventTest.selectGroup('synthetic-v1-group');
   for(const [name,value] of Object.entries(nativeRoutes.event_special))input(name).value=value;
@@ -1037,6 +1137,351 @@ async function assertSharedPackageContact(runtime, event) {
   assert.match(formHtml,/<form\s+class="form"\s+name="contact"\s+method="post"\s+data-netlify="true"[\s\S]*?action="\/\?lead=ok#contact"/);
   console.log(JSON.stringify({suite:'package-confirmation',status:'PASS',cases:['closed-success','released-frozen-body-before-notify','no-retry','snapshot-only','cdmx','optional-absence','copy-reference-success-and-denial','category-return','v1-return','new-deliberate-attempt'],externalCalls:0,visualAcceptance:false}));
   console.log(JSON.stringify({suite:'shared-package-contact',status:'PASS',cases:['canonical-handoff-once','shared-contact-validation','mobile-contact-real-fields','canonical-phone-parity','invalid-phone-no-submit','corrected-phone-recovers','all-services-and-places','human-cdmx-dates-airports','band-and-baggage-absence-zero-positive','edit-with-contact-preserved','stale-quote-blocked','real-package-api-route','concurrent-submit-once','receipt','economic-versus-optional','v1-route-and-validator-preserved'],externalCalls:0,databaseWrites:0,visualAcceptance:false}));
+}
+async function assertMobilePackageList(runtime,event,hooks) {
+  const {controller,window}=runtime,prior={...controller.state},copy=value=>JSON.parse(JSON.stringify(value));
+  const candidate=copy(event);candidate.id='mobile-list-event';
+  const first=candidate.snapshot.packages[0];first.subtitle={es:'Descripción breve <segura>'};
+  first.options.push({...copy(first.options[0]),id:'second-mode',title:{es:'Segunda modalidad'}});
+  const second=copy(first);second.id='other-package';second.title={es:'Otro paquete con nombre largo '.repeat(5)};second.options=second.options.slice(0,1);second.options[0].services[0].id='different-service';
+  candidate.snapshot.packages.push(second,{...copy(second),id:'disabled-package',active:false},{...copy(second),id:'empty-package',options:[]});
+  const route={scrollTop:120},focuses=[];
+  const root={getAttribute:()=> 'mobile',closest:()=>route,querySelector:selector=>({focus:()=>focuses.push(selector),isConnected:true})};
+  const click=attributes=>hooks.handleClick(root,{target:{closest:()=>({getAttribute:key=>attributes[key]??null,hasAttribute:key=>key in attributes,closest:()=>null})}});
+  controller.selectEvent(candidate,false);
+  let html=hooks.configuration(controller.state,'mobile');
+  const iconPaths=list=>Array.from(list.matchAll(/class="events-package-mobile-list__icon"[^>]*><path d="([^"]+)"/g),match=>match[1]);
+  const planePath=iconPaths(html)[0];assert.ok(planePath);assert.equal(iconPaths(html)[1],planePath);
+  assert.equal((html.match(/class="events-package-mobile-list__icon"[^>]*aria-hidden="true" focusable="false"/g)||[]).length,2);
+  assert.ok(html.includes('¿Necesita un servicio a medida?'));assert.ok(html.includes('events-package-button--secondary'));
+  // Semantics cover every active option, independently of names, IDs and inclusions.
+  const originalOptions=copy(second.options),originalTitle=second.title,originalInclusions=second.inclusions;
+  const direct=copy(second.options[0]),outbound=direct.services[0];
+  outbound.ordinary={baseService:'direct_transfer',inputs:{origin:{source:'customer'},destination:{source:'fixed',redacted:true}}};
+  const returning={id:'semantic-return',ordinary:{baseService:'direct_transfer',directReturn:{version:1,outboundServiceId:outbound.id,dateMode:'shared'},inputs:{time:{source:'customer'}}}};
+  direct.services.push(returning);second.options=[direct];second.title={es:'Airport <no es semántica>'};second.inclusions=[{iconId:'plane',es:'Una inclusión'}];
+  const roundTripPath=iconPaths(hooks.configuration(controller.state,'mobile'))[1];assert.equal(roundTripPath,'M4 7h16l-4-4M20 7l-4 4M20 17H4l4-4M4 17l4 4');
+  second.options.push({...copy(originalOptions[0]),id:'mixed-option'});
+  const neutralPath=iconPaths(hooks.configuration(controller.state,'mobile'))[1];assert.ok(neutralPath&&neutralPath!==planePath&&neutralPath!==roundTripPath,'mixed active options are neutral');
+  second.options[1].active=false;assert.equal(iconPaths(hooks.configuration(controller.state,'mobile'))[1],roundTripPath,'inactive options do not change semantics');
+  returning.ordinary.directReturn.outboundServiceId='unrelated-service';assert.equal(iconPaths(hooks.configuration(controller.state,'mobile'))[1],neutralPath,'an unresolvable reference is neutral');
+  returning.ordinary.directReturn.outboundServiceId=outbound.id;direct.services.push({...copy(outbound),id:'extra-leg'});assert.equal(iconPaths(hooks.configuration(controller.state,'mobile'))[1],neutralPath,'three legs are not inferred as a round trip');
+  second.options=originalOptions;second.title=originalTitle;second.inclusions=originalInclusions;
+  html=hooks.configuration(controller.state,'mobile');
+  assert.equal((html.match(/data-package-browse=/g)||[]).length,2);assert.ok(html.includes('Paquetes disponibles: 2'));
+  assert.ok(html.includes('Descripción breve &lt;segura&gt;'));assert.ok(!html.includes('Recepción identificada'));
+  for(const absent of ['data-package-configure','data-package-browse-option','disabled-package','empty-package','data-package-field="option"'])assert.ok(!html.includes(absent),absent);
+  const selectedBefore=JSON.stringify(controller.state.selection),desktopBefore=hooks.offer(controller.state,'desktop');
+  await click({'data-package-browse':first.id});
+  html=hooks.configuration(controller.state,'mobile');
+  assert.equal((html.match(/class="events-package-offer"/g)||[]).length,1);
+  assert.equal((html.match(/data-package-browse-option/g)||[]).length,2);assert.ok(html.includes('Ver todos los paquetes'));
+  assert.ok(html.includes('data-package-action="details"'));assert.equal(route.scrollTop,0);
+  assert.equal(focuses.at(-1),'[data-package-step-heading]');
+  hooks.changeRootField(root,{value:'second-mode',getAttribute:key=>key==='data-package-browse-option'?'':null});
+  assert.equal(JSON.stringify(controller.state.selection),selectedBefore,'exploration never commits a selection');
+  assert.equal(hooks.offer(controller.state,'desktop'),desktopBefore,'desktop does not inherit exploratory choices');
+  await click({'data-package-action':'package-list'});assert.equal(route.scrollTop,120);assert.equal(focuses.at(-1),'[data-package-browse="welcome"]');
+  await click({'data-package-browse':first.id});assert.ok(hooks.configuration(controller.state,'mobile').includes('value="second-mode" checked'));
+  await click({'data-package-configure':first.id});assert.equal(controller.state.step,'services');assert.equal(controller.state.selection.optionId,'second-mode','one continue activation commits and configures');
+  controller.change(selection=>{selection.services=[{serviceId:first.options[1].services[0].id,ordinaryInputs:{destination:{address:'Keep this address',placeId:'synthetic-place'}}}];});
+  const validQuote={source:'published',quoteFingerprint:'a'.repeat(64)};controller.state.quote=validQuote;controller.state.quoteStatus='ready';
+  await click({'data-package-action':'back'});html=hooks.configuration(controller.state,'mobile');
+  assert.ok(html.includes('events-package-mobile-detail'));assert.equal(controller.state.selection.services[0].ordinaryInputs.destination.address,'Keep this address');
+  await click({'data-package-action':'package-list'});await click({'data-package-browse':second.id});
+  assert.equal(controller.state.quote,validQuote,'browsing a different package preserves the active quote');
+  html=hooks.configuration(controller.state,'mobile');assert.ok(!html.includes('data-package-browse-option'),'a single option needs no selector');
+  const confirm=window.confirm;window.confirm=()=>true;
+  await click({'data-package-configure':second.id});window.confirm=confirm;
+  assert.equal(controller.state.step,'services');assert.equal(controller.state.selection.packageId,second.id);assert.equal(controller.state.quote,null);assert.equal(controller.state.selection.services.length,0);
+  const quoteApi=window.PixkuyEventPackagesApi.quote;let completeLate;
+  window.PixkuyEventPackagesApi.quote=()=>new Promise(resolve=>{completeLate=resolve;});
+  const late=controller.quote();await click({'data-package-action':'back'});
+  completeLate({source:'published',quoteFingerprint:'a'.repeat(64),calculation:{}});await late;
+  assert.equal(controller.state.quote,null,'a quote returning after leaving configuration is discarded');window.PixkuyEventPackagesApi.quote=quoteApi;
+  const frozen=window.PixkuyEventPackagesRequest.hasFrozenBody;window.PixkuyEventPackagesRequest.hasFrozenBody=()=>true;
+  const lockedDetail=hooks.configuration(controller.state,'mobile');await click({'data-package-action':'package-list'});
+  assert.equal(hooks.configuration(controller.state,'mobile'),lockedDetail,'recovery locks prevent navigation changes');window.PixkuyEventPackagesRequest.hasFrozenBody=frozen;
+  controller.go('package');const otherEvent=copy(candidate);otherEvent.id='another-mobile-event';controller.selectEvent(otherEvent,false);
+  assert.ok(hooks.configuration(controller.state,'mobile').includes('events-package-mobile-list'),'a new event cannot inherit another detail');
+  for(const count of [0,1]){otherEvent.snapshot.packages=candidate.snapshot.packages.slice(0,count);const list=hooks.configuration(controller.state,'mobile');assert.equal((list.match(/data-package-browse=/g)||[]).length,count);assert.ok(list.includes('Paquetes disponibles: '+count));assert.ok(list.includes('data-package-action="ordinary-custom"'));}
+  const dictionary=window.__pixkuyI18nDict.eventPackages;
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){const labels=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n',lang,'services-events.json'),'utf8')).eventPackages;window.__pixkuyI18nDict.eventPackages=labels;const list=hooks.configuration(controller.state,'mobile');assert.ok(list.includes(labels.packageCount.replace('{count}','1')));for(const key of ['customTitle','proposal','choosePackage'])assert.ok(list.includes(labels[key]),lang+': '+key);await click({'data-package-browse':first.id});assert.ok(hooks.configuration(controller.state,'mobile').includes(labels.allPackages));await click({'data-package-action':'package-list'});}
+  window.__pixkuyI18nDict.eventPackages=dictionary;
+  await click({'data-package-browse':first.id});await click({'data-package-action':'ordinary-custom'});assert.equal(controller.state.selection.requestKind,'custom');
+  await click({'data-package-action':'packages'});assert.ok(hooks.configuration(controller.state,'mobile').includes('events-package-mobile-list'),'custom returns to the list rather than an old detail');
+  Object.assign(controller.state,prior);
+  console.log(JSON.stringify({suite:'mobile-package-list-detail',status:'PASS',cases:['zero-one-many','eligible-count','short-editorial-only','all-active-options-semantic-icons','ambiguous-composition-neutral','decorative-icons','nine-language-custom-action','explicit-modes-first-render','explore-without-commit','desktop-unchanged','single-click-continue','back-keeps-data','row-focus-scroll-restored','new-event-reset','custom-entry'],externalCalls:0}));
+}
+async function assertLinkedDirectReturn(runtime,event,hooks,root) {
+  const {window,controller}=runtime,copy=value=>JSON.parse(JSON.stringify(value));
+  const originalMedia=window.matchMedia,originalQuery=root.querySelector,originalSurface=root.getAttribute,originalQuote=window.PixkuyEventPackagesApi.quote;
+  let mobile=false;window.matchMedia=()=>({matches:mobile});
+  const candidate=copy(event);candidate.id='linked-direct-event';
+  const option=candidate.snapshot.packages[0].options[0],outbound=option.services[0];
+  outbound.ordinary={baseService:'direct_transfer',inputs:{origin:{source:'customer'},destination:{source:'fixed',redacted:true},date:{source:'customer'},time:{source:'customer'},baggageCount:{source:'customer'}}};
+  outbound.from={kind:'airport',airportCode:'MEX'}; // Preserve inactive legacy fields; Direct must ignore them.
+  const returning=copy(outbound);returning.id='linked-direct-return';
+  returning.ordinary={baseService:'direct_transfer',directReturn:{version:1,outboundServiceId:outbound.id,dateMode:'shared'},inputs:{time:{source:'customer'},baggageStatus:{source:'deferred'}}};
+  option.services=[outbound,returning];option.baggagePolicy={allowUnknown:true};
+  outbound.ordinary.inputs.destination.displayLabel='Synthetic venue — Long official address';
+  controller.selectEvent(candidate,false);controller.choose('welcome','arrival');controller.go('services');
+  const longAddress='Hotel sintético, Avenida de la Constitución, Edificio principal, Colonia Centro, Ciudad de México <entrada>';
+  controller.change(selection=>{selection.passengerBand='van_3_4';selection.services=[{serviceId:outbound.id,ordinaryInputs:{origin:{address:longAddress,placeId:'synthetic-hotel'},date:'2026-10-29',time:'09:00'}},{serviceId:returning.id,ordinaryInputs:{time:'18:00'}}];});
+  assert.equal(controller.state.selection.directReturnVersion,1);
+  const view=()=>hooks.airportAutoQuoteView(controller.state,mobile?'mobile':'desktop');
+  assert.equal(view().sharedDate,true);assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,true);
+  assert.equal(hooks.resolvedOrdinaryValues(returning,controller.state).destination.placeId,'synthetic-hotel');
+  assert.equal(hooks.resolvedOrdinaryValues(returning,controller.state).date,'2026-10-29');
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
+    const labels=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n',lang,'services-events.json'),'utf8')).eventPackages;
+    window.__pixkuyI18nDict.eventPackages=labels;
+    for(const surface of ['desktop','mobile']){
+      mobile=surface==='mobile';const html=hooks.configuration(controller.state,surface);
+      for(const key of ['directSharedData','directSharedDate','directOutboundTime','directReturnTime','outboundHeading','returnHeading'])assert.ok(html.includes(labels[key]),lang+': '+key);
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-origin"/g)||[]).length,1);
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-date"/g)||[]).length,1);
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-time"/g)||[]).length,2);
+      assert.equal((html.match(/data-package-band="van_3_4"/g)||[]).length,1);
+      assert.ok(!html.includes('data-package-field="service:linked-direct-return:ordinary-origin"'));
+      assert.ok(!html.includes('data-package-field="service:linked-direct-return:ordinary-destination"'));
+      assert.ok(!html.includes('data-package-action="quote"')&&!html.includes('events-package-service-disclosure'));
+      assert.ok(!html.includes('ordinary-airportId')&&!html.includes('ordinary-flight'));
+      assert.ok(html.includes('&lt;entrada&gt;')&&!html.includes('<entrada>'),'long addresses remain escaped');
+      assert.ok(!html.includes(longAddress+' → '),'configuration does not duplicate routes');
+      assert.ok(html.includes(labels.directPickupAddress)&&html.includes(labels.directReturnToLodging));
+      assert.ok(html.includes('Synthetic venue — Long official address'),'canonical fixed display label');
+      assert.ok(!html.includes('<legend>'+labels.outboundHeading+'</legend>')&&!html.includes('<legend>'+labels.returnHeading+'</legend>'),'schedule labels do not repeat headings');
+      assert.ok(html.indexOf('events-package-airport__conditions')<html.indexOf('events-package-direct__quote'),'conditions before total and actions');
+      if(mobile)assert.ok(html.includes('data-package-mobile-address-input'),'Direct reuses the existing mobile search sheet');
+    }
+  }
+  window.__pixkuyI18nDict.eventPackages=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n/es/services-events.json'),'utf8')).eventPackages;
+  mobile=false;
+  const labels=window.__pixkuyI18nDict.eventPackages;
+  const empty=copy(controller.state);empty.selection.services.forEach(service=>{service.ordinaryInputs={};});
+  assert.deepEqual(Array.from(hooks.airportQuoteReadiness(empty,hooks.configuredDirectOption(empty)).missing).filter(label=>[labels.directSharedDate,labels.returnDate].includes(label)),[labels.directSharedDate],'one missing shared date');
+  const bagSource=outbound.ordinary.inputs.baggageCount;outbound.ordinary.inputs.baggageCount={source:'deferred'};
+  assert.equal((hooks.configuration(controller.state,'desktop').match(new RegExp(labels.ordinaryDeferred,'g'))||[]).length,1,'equal pending baggage is displayed once');
+  outbound.ordinary.inputs.baggageCount=bagSource;
+  const frozenBody=window.PixkuyEventPackagesRequest.hasFrozenBody;
+  window.PixkuyEventPackagesRequest.hasFrozenBody=()=>true;
+  const frozenHtml=hooks.configuration(controller.state,'mobile');
+  assert.ok(frozenHtml.includes('services-expand__field--date" disabled>'),'moving the shared date preserves its frozen request lock');
+  assert.ok(frozenHtml.includes('events-package-direct__baggage"><fieldset class="events-package-primary-form" disabled>'),'moving baggage preserves its frozen request lock');
+  window.PixkuyEventPackagesRequest.hasFrozenBody=frozenBody;
+  const offer=hooks.offer({...controller.state,step:'package'},'desktop');assert.ok(offer.includes(labels.completeTransfer));assert.ok(!offer.includes(' · '+labels.transferMany.replace('{count}','2')),'linked modality omits appended count');
+  const change=(id,key,value)=>hooks.changeField({getAttribute:()=>`service:${id}:ordinary-${key}`,value},true);
+  change(returning.id,'time','08:00');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  change(returning.id,'time','18:00');
+  returning.ordinary.directReturn.dateMode='independent';returning.ordinary.inputs.date={source:'customer'};
+  const independentEmpty=copy(controller.state);independentEmpty.selection.services.forEach(service=>{service.ordinaryInputs={};});
+  const ownMissing=hooks.airportQuoteReadiness(independentEmpty,hooks.configuredDirectOption(independentEmpty)).missing;
+  assert.ok(ownMissing.includes(labels.directOutboundDate)&&ownMissing.includes(labels.returnDate),'independent dates each remain pending');
+  assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  assert.ok(hooks.configuration(controller.state,'desktop').includes('data-package-field="service:linked-direct-return:ordinary-date"'));
+  change(returning.id,'date','2026-10-31');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,true);
+  change(returning.id,'date','2026-11-03');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  returning.ordinary.directReturn.dateMode='shared';delete returning.ordinary.inputs.date;delete controller.state.selection.services[1].ordinaryInputs.date;
+  option.baggagePolicy.allowUnknown=false;assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false,'required baggage is not invented');
+  controller.state.selection.services[0].ordinaryInputs.baggageCount=0;assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,true);
+  option.baggagePolicy.allowUnknown=true;
+  const price={innerHTML:''},actions={innerHTML:''},returnSection={outerHTML:'',contains:()=>false};
+  root.querySelector=selector=>selector==='[data-airport-price]'?price:selector==='[data-airport-actions]'?actions:selector==='[data-package-direct-return]'?returnSection:null;
+  root.getAttribute=name=>name==='data-event-package-root'?(mobile?'mobile':'desktop'):originalSurface.call(root,name);
+  hooks.roots.add(root);
+  const timeAttributes={};returnSection.contains=()=>true;returnSection.querySelector=()=>({setAttribute:(key,value)=>timeAttributes[key]=value,removeAttribute:key=>delete timeAttributes[key]});
+  change(outbound.id,'time','10:00');assert.equal(timeAttributes.min,'10:01','focused return keeps its input while its effective bound updates');
+  returnSection.contains=()=>false;hooks.cancelAirportAutoQuote();
+  const requests=[],resolvers=[],wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  window.PixkuyEventPackagesApi.quote=body=>{requests.push(copy(body));return new Promise(resolve=>resolvers.push(resolve));};
+  const result={source:'published',quoteFingerprint:'5'.repeat(64),calculation:{calculationModel:'ordinary_services',coverageStatus:'verified',serviceCount:2,pendingCodes:[],conditions:[],priceBreakdown:{priceStatus:'quoted',pricedSubtotal:'30000',currency:'MXN',automaticAddOns:[]},serviceLines:[{serviceId:outbound.id,baseService:'direct_transfer',directLeg:'outbound',resultMinorUnits:'12000'},{serviceId:returning.id,baseService:'direct_transfer',directLeg:'return',resultMinorUnits:'18000'}]}};
+  hooks.scheduleAirportAutoQuote(root);hooks.scheduleAirportAutoQuote(root);await wait(360);assert.equal(requests.length,1);
+  assert.deepEqual(Object.keys(requests[0].services[1].ordinaryInputs),['time']);
+  change(outbound.id,'date','2026-10-30');await wait(360);assert.equal(requests.length,2);
+  assert.equal(hooks.resolvedOrdinaryValues(returning,controller.state).date,'2026-10-30');
+  resolvers[1]({...result,quoteFingerprint:'6'.repeat(64)});await wait(0);resolvers[0](result);await wait(0);
+  assert.equal(controller.state.quote.quoteFingerprint,'6'.repeat(64),'late Direct response is rejected');
+  change(outbound.id,'origin','Edited hotel');assert.equal(controller.state.quote,null);await wait(360);assert.equal(requests.length,2,'unresolved address blocks both calculations');
+  controller.change(selection=>{selection.services[0].ordinaryInputs.origin={address:'Edited hotel',placeId:'synthetic-edited'};},{silent:true});
+  assert.equal(hooks.resolvedOrdinaryValues(returning,controller.state).destination.placeId,'synthetic-edited');
+  hooks.scheduleAirportAutoQuote(root);await wait(360);assert.equal(requests.length,3);
+  resolvers[2]({...result,quoteFingerprint:'7'.repeat(64)});await wait(0);
+  const review=window.PixkuyEventPackagesConfig.contactSummary(controller.state);
+  for(const text of ['Edited hotel','Total del paquete','300.00 MXN','30 de octubre de 2026'])assert.ok(review.includes(text),'review: '+text);
+  assert.equal((review.match(/Edited hotel/g)||[]).length,1);assert.ok(!review.includes('Aeropuerto'));
+  assert.ok(!review.includes('120.00 MXN')&&!review.includes('180.00 MXN')&&!review.includes('events-package-review__price'),'individual fares are never rendered, including disclosures');
+  assert.equal((review.match(/300.00 MXN/g)||[]).length,1);
+  assert.ok(!review.includes('Servicios: 2'));
+  assert.equal(controller.state.quote.calculation.serviceLines[0].resultMinorUnits,'12000','presentation preserves internal per-leg calculation');
+  const publicState=copy(controller.state),calculationBefore=JSON.stringify(controller.state.quote.calculation);
+  publicState.quote.calculation.conditions=[{title:{es:'Condición completa'},description:{es:'Texto repetido conservado'}},{title:{es:'Condición completa'},description:{es:'Texto repetido conservado'}}];
+  publicState.quote.calculation.priceBreakdown.automaticAddOns=[{totalMinorUnits:'98765'}];
+  publicState.quote.calculation.baggageAssessment='pending';
+  const originalLabels=window.__pixkuyI18nDict.eventPackages;
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
+    const translated=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n',lang,'services-events.json'),'utf8')).eventPackages;
+    window.__pixkuyI18nDict.eventPackages=translated;
+    for(const small of [false,true]){
+      mobile=small;
+      const publicHtml=window.PixkuyEventPackagesConfig.contactSummary(publicState);
+      assert.ok(publicHtml.includes(translated.packageTotal));
+      for(const internal of ['120.00 MXN','180.00 MXN','987.65 MXN','resultMinorUnits','effectiveMultiplierBasisPoints'])assert.ok(!publicHtml.includes(internal),'no public internal breakdown: '+lang);
+      assert.equal((publicHtml.match(/300.00 MXN/g)||[]).length,1);
+      assert.equal((publicHtml.match(/Texto repetido conservado/g)||[]).length,2,'all conditions survive, including duplicates');
+      assert.ok(publicHtml.includes(translated.baggageCount),'coordination identifies the pending field');
+    }
+  }
+  mobile=false;window.__pixkuyI18nDict.eventPackages=originalLabels;
+  publicState.quote.calculation.priceBreakdown.priceStatus='conditional';publicState.quote.calculation.priceBreakdown.pricedSubtotal='22222';
+  assert.ok(!window.PixkuyEventPackagesConfig.contactSummary(publicState).includes('222.22 MXN'),'a partial subtotal is not exposed as a package total');
+  const independent=copy(controller.state),independentOption=independent.selectedEvent.snapshot.packages[0].options[0];
+  independentOption.services[1].ordinary.directReturn.dateMode='independent';independentOption.services[1].ordinary.inputs.date={source:'customer'};
+  independent.selection.services[1].ordinaryInputs.date='2026-10-31';
+  const independentReview=window.PixkuyEventPackagesConfig.contactSummary(independent);
+  assert.ok(independentReview.includes('30 de octubre de 2026')&&independentReview.includes('31 de octubre de 2026'),'both independent dates are explicit');
+  independentOption.services.push({...copy(outbound),id:'third-independent-service'});
+  independent.selection.services.push({serviceId:'third-independent-service',ordinaryInputs:{origin:{address:'Third origin',placeId:'synthetic-third'},date:'2026-11-01',time:'12:00'}});
+  const multipleReview=window.PixkuyEventPackagesConfig.contactSummary(independent);
+  assert.ok(multipleReview.includes('Third origin')&&!multipleReview.includes('events-package-review__places'),'more services keep the general itinerary');
+  assert.equal(JSON.stringify(controller.state.quote.calculation),calculationBefore,'public rendering leaves the complete economic calculation untouched');
+  mobile=true;change(returning.id,'time','19:00');await wait(360);assert.equal(requests.length,4);
+  resolvers[3]({...result,quoteFingerprint:'8'.repeat(64)});await wait(0);
+  assert.ok(!hooks.configuration(controller.state,'mobile').includes('data-package-action="quote"'));
+  hooks.roots.delete(root); // This fixture tests navigation, not a DOM remount.
+  await hooks.handleClick(root,{target:{closest:()=>({disabled:false,getAttribute:key=>key==='data-package-action'?'airport-review':null})}});
+  assert.equal(controller.state.step,'review','Direct Continue uses the accepted review flow');
+  controller.go('services');
+  const previousSheet=window.PixkuyAirportMobileHotelSearchSheet,previousAdapter=window.PixkuyServicesEventsSpecialAddress;
+  let searchCallbacks,focused=false;const inputListeners={},clearListeners={};
+  const fieldName='service:'+outbound.id+':ordinary-origin';
+  const searchInput={value:'Edited hotel',hasAttribute:()=>true,getAttribute:()=>fieldName,setAttribute(){},addEventListener(name,listener){inputListeners[name]=listener;},focus(){focused=true;}};
+  const clearControl={hidden:false,addEventListener(name,listener){clearListeners[name]=listener;}};
+  const addressHost={getAttribute:()=>fieldName,querySelector:selector=>selector==='input'?searchInput:selector==='[data-package-mobile-address-clear]'?clearControl:null};
+  const addressRoot={getAttribute:()=> 'mobile',closest:()=>({}),querySelectorAll:()=>[addressHost]};
+  window.PixkuyServicesEventsSpecialAddress={mount(options){searchCallbacks=options;return {destroy(){}};}};
+  window.PixkuyAirportMobileHotelSearchSheet={openForField(options){options.mount({}, {parentElement:{}});},closeForField(){}};
+  hooks.mountAddresses(addressRoot);inputListeners.click();
+  searchCallbacks.onManualInput('Manual hotel edit');
+  assert.equal(controller.state.quote,null,'mobile search edits immediately invalidate the total');
+  assert.equal(controller.state.selection.services[0].ordinaryInputs.origin.placeId,undefined,'mobile search edits remove the previous geographic reference');
+  assert.equal(searchInput.value,'Manual hotel edit');assert.equal(clearControl.hidden,true);
+  searchCallbacks.onPlaceSelected({label:'Selected hotel, full real address',placeId:'synthetic-selected'});
+  assert.equal(controller.state.selection.services[0].ordinaryInputs.origin.address,'Selected hotel, full real address');
+  controller.state.quote={...result};
+  clearListeners.click({preventDefault(){},stopPropagation(){}});
+  assert.equal(controller.state.selection.services[0].ordinaryInputs.origin,undefined);assert.equal(controller.state.quote,null);assert.equal(focused,true,'mobile clear returns focus to the input');
+  window.PixkuyAirportMobileHotelSearchSheet=previousSheet;window.PixkuyServicesEventsSpecialAddress=previousAdapter;
+  hooks.cancelAirportAutoQuote();hooks.roots.delete(root);root.querySelector=originalQuery;root.getAttribute=originalSurface;window.matchMedia=originalMedia;window.PixkuyEventPackagesApi.quote=originalQuote;
+  controller.state.quote=null;controller.state.quoteStatus='idle';
+  const receiptState={...controller.state,receipt:{reference:'EVT-SYNTHETIC-DIRECT',priceStatus:'quoted',pricedSubtotal:'30000',currency:'MXN',confirmation:{eventTitle:{es:'Accepted event'},packageTitle:{es:'Accepted package'},optionTitle:{es:'Accepted option'},services:[{kind:'trip',baseService:'direct_transfer',directLeg:'outbound',startsAtUtc:'2026-10-30T16:00:00Z'},{kind:'trip',baseService:'direct_transfer',directLeg:'return',startsAtUtc:'2026-10-31T01:00:00Z'}],conditions:[]}}};
+  const receipt=window.PixkuyEventPackagesConfig.receiptContent(receiptState);
+  for(const text of ['<strong>Ida</strong>','<strong>Regreso</strong>','10:00','19:00','300.00 MXN','Hora solicitada (CDMX)'])assert.ok(receipt.includes(text),'accepted receipt '+text);
+  assert.ok(!receipt.includes('Direct Transfer'),'explicit direct legs need no internal service name');
+  const timedReceipt=copy(receiptState);timedReceipt.receipt.confirmation.services[0].endsAtUtc='2026-10-30T16:42:00Z';
+  assert.ok(!window.PixkuyEventPackagesConfig.receiptContent(timedReceipt).includes('10:42'),'route-estimated finish is not a second requested pickup');
+  timedReceipt.receipt.confirmation.services[0].kind='block';timedReceipt.receipt.confirmation.services[0].baseService='hourly_daily';
+  const blockReceipt=window.PixkuyEventPackagesConfig.receiptContent(timedReceipt);
+  assert.ok(blockReceipt.includes('Fin del servicio')&&blockReceipt.includes('10:42'),'blocks retain the service end with an explicit label');
+  const mediaBeforeReceipt=window.matchMedia;window.matchMedia=()=>({matches:true});
+  const mobileReceipt=window.PixkuyEventPackagesConfig.receiptContent(receiptState);
+  assert.ok(mobileReceipt.includes('Ida · Direct Transfer')&&!mobileReceipt.includes('events-package-receipt--desktop'),'mobile keeps its accepted receipt layout');
+  window.matchMedia=mediaBeforeReceipt;
+  const customReceipt=copy(receiptState);customReceipt.receipt.requestKind='custom';
+  assert.ok(!window.PixkuyEventPackagesConfig.receiptContent(customReceipt).includes('events-package-receipt--desktop'),'custom requests retain their own receipt presentation');
+  assert.ok(receipt.includes('Total del paquete'));assert.equal((receipt.match(/300.00 MXN/g)||[]).length,1);
+  const partialReceipt=copy(receiptState);partialReceipt.receipt.priceStatus='conditional';
+  assert.ok(!window.PixkuyEventPackagesConfig.receiptContent(partialReceipt).includes('300.00 MXN'),'confirmation does not label a partial subtotal as total');
+  assert.ok(!receipt.includes('Aeropuerto')&&!receipt.includes('Edited hotel'),'receipt uses only its accepted contract');
+  option.services=[outbound];assert.equal(hooks.configuredDirectOption(controller.state),null,'unlinked Direct retains its existing form');
+  console.log(JSON.stringify({suite:'linked-direct-return-landing',status:'PASS',externalCalls:0,formSubmissions:0,visualAcceptance:false,cases:['single-shared-inputs','nine-locales','desktop-mobile-specialized','explicit-date-modes','chronology-period','baggage-provenance','autoquote-dedup-late-response','canonical-address-invalidation','derived-date-and-time-bounds','separate-fares-review','unlinked-regression']}));
+}
+
+async function assertLinkedAirportReturn(runtime,event,hooks,root) {
+  const {window,controller}=runtime,copy=value=>JSON.parse(JSON.stringify(value));
+  const originalMedia=window.matchMedia,originalQuery=root.querySelector,originalSurface=root.getAttribute;
+  let mobile=false;window.matchMedia=()=>({matches:mobile});
+  const eventPair=copy(event);eventPair.id='linked-airport-event';
+  const option=eventPair.snapshot.packages[0].options[0],arrival=option.services[0];
+  arrival.ordinary.inputs.airportId={source:'customer'};
+  arrival.ordinary.inputs.direction={source:'fixed',value:'airport_to_destination'};
+  const returning=copy(arrival);returning.id='linked-airport-return';
+  returning.ordinary.airportReturn={version:1,arrivalServiceId:arrival.id};
+  returning.ordinary.inputs={direction:{source:'fixed',value:'destination_to_airport'},date:{source:'customer'},time:{source:'customer'},baggageStatus:{source:'deferred'}};
+  option.services.push(returning);
+  controller.selectEvent(eventPair,false);controller.choose('welcome','arrival');controller.go('services');
+  controller.change(selection=>{selection.passengerBand='van_3_4';selection.services=[{serviceId:arrival.id,ordinaryInputs:{airportId:'mex',destination:{address:'Hotel Alpha',placeId:'alpha'},date:'2026-10-29',time:'09:00'}},{serviceId:returning.id,ordinaryInputs:{date:'2026-10-31',time:'12:30'}}];});
+  assert.equal(controller.state.selection.airportReturnVersion,1);
+  const view=()=>hooks.airportAutoQuoteView(controller.state,mobile?'mobile':'desktop');
+  assert.equal(view().returning.id,returning.id);
+  assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,true);
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
+    const labels=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n',lang,'services-events.json'),'utf8')).eventPackages;
+    window.__pixkuyI18nDict.eventPackages=labels;
+    for(const surface of ['desktop','mobile']){
+      mobile=surface==='mobile';const html=hooks.configuration(controller.state,surface);
+      assert.ok(html.includes(labels.returnDate)&&html.includes(mobile?labels.returnPickupTime:labels.returnHotelPickup),lang+': return labels');
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-airportId"/g)||[]).length,1,'one airport selector');
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-destination"/g)||[]).length,1,'one hotel input');
+      assert.ok(html.includes('data-package-field="service:linked-airport-return:ordinary-date"'));
+      assert.ok(html.includes('data-package-field="service:linked-airport-return:ordinary-time"'));
+      assert.ok(!html.includes('data-package-action="quote"'),'paired Airport never falls back to manual quote');
+      assert.ok(!html.includes('events-package-service-disclosure'),'specialized experience');
+      assert.ok(!html.includes('Hotel Alpha → '),'configuration omits the duplicate return route on both surfaces');
+      assert.ok(html.includes('<legend>'+labels.returnHeading+'</legend>'),'the linked return keeps a brief localized heading');
+      if(surface==='mobile')assert.equal((html.match(/data-package-mobile-band/g)||[]).length,1,'one passenger selection');
+      if(surface==='desktop'){
+        assert.ok(html.includes('events-package-airport__shared-fields')&&html.includes('events-package-airport__legs'));
+        for(const key of ['sharedTripData','arrivalHeading','returnHeading','roundTripTotal'])assert.ok(html.includes(labels[key]),lang+': desktop presentation label '+key);
+        assert.equal((html.match(/data-package-airport-arrival-route/g)||[]).length,0);
+      }else assert.ok(!html.includes('events-package-airport__shared-fields'),'desktop grouping does not replace the accepted mobile form');
+
+    }
+  }
+  window.__pixkuyI18nDict.eventPackages=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n/es/services-events.json'),'utf8')).eventPackages;
+  mobile=false;
+  const change=(id,key,value)=>hooks.changeField({getAttribute:()=>`service:${id}:ordinary-${key}`,value},true);
+  change(returning.id,'date','2026-10-28');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  change(returning.id,'date','2026-11-03');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  change(returning.id,'date','2026-10-29');change(returning.id,'time','09:00');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  change(returning.id,'time','09:01');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,true);
+  const sameDay=hooks.configuration(controller.state,'desktop');
+  const timeTag=sameDay.match(/<input[^>]*data-package-field="service:linked-airport-return:ordinary-time"[^>]*>/)[0];assert.ok(timeTag.includes('min="09:01"'));
+  change(returning.id,'date','2026-10-31');change(returning.id,'time','12:30');
+  const price={innerHTML:''},actions={innerHTML:''},returnSection={outerHTML:'',contains:()=>false};
+  root.querySelector=selector=>selector==='[data-airport-price]'?price:selector==='[data-airport-actions]'?actions:selector==='[data-package-airport-return]'?returnSection:null;
+  root.getAttribute=name=>name==='data-event-package-root'?(mobile?'mobile':'desktop'):originalSurface.call(root,name);
+  hooks.roots.add(root);
+  const timeAttributes={};
+  returnSection.contains=()=>true;returnSection.querySelector=()=>({setAttribute:(key,value)=>timeAttributes[key]=value,removeAttribute:key=>delete timeAttributes[key]});
+  change(returning.id,'date','2026-10-29');assert.equal(timeAttributes.min,'09:01','focused date edit refreshes the sibling pickup time bound');
+  change(returning.id,'date','2026-10-31');assert.equal(timeAttributes.min,undefined,'later return date releases the arrival-day time bound');
+  returnSection.contains=()=>false;hooks.cancelAirportAutoQuote();
+  const requests=[],resolvers=[];
+  window.PixkuyEventPackagesApi.quote=body=>{requests.push(copy(body));return new Promise(resolve=>resolvers.push(resolve));};
+  const result={source:'published',quoteFingerprint:'1'.repeat(64),calculation:{calculationModel:'ordinary_services',coverageStatus:'verified',serviceCount:2,pendingCodes:[],conditions:[],priceBreakdown:{priceStatus:'quoted',pricedSubtotal:'24690',currency:'MXN',automaticAddOns:[]},serviceLines:[]}};
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  hooks.scheduleAirportAutoQuote(root);hooks.scheduleAirportAutoQuote(root);await wait(360);assert.equal(requests.length,1);
+  assert.equal(requests[0].services[1].ordinaryInputs.airportId,undefined);assert.equal(requests[0].services[1].ordinaryInputs.destination,undefined);
+  change(arrival.id,'airportId','nlu');await wait(360);assert.equal(requests.length,2);
+  assert.ok(returnSection.outerHTML.includes('data-package-field="service:linked-airport-return:ordinary-time"'),'silent airport edit preserves the return controls');
+  assert.ok(!returnSection.outerHTML.includes('Hotel Alpha → '),'desktop avoids a duplicate full route');
+  resolvers[1]({...result,quoteFingerprint:'2'.repeat(64)});await wait(0);resolvers[0](result);await wait(0);
+  assert.equal(controller.state.quote.quoteFingerprint,'2'.repeat(64),'old Airport quote is discarded');
+  change(arrival.id,'destination','Hotel Beta');assert.equal(controller.state.quote,null);await wait(360);assert.equal(requests.length,2,'unresolved hotel blocks both legs');
+  controller.change(selection=>{selection.services[0].ordinaryInputs.destination={address:'Hotel Beta',placeId:'beta'};},{silent:true});
+  hooks.scheduleAirportAutoQuote(root);await wait(360);assert.equal(requests.length,3);
+  resolvers[2]({...result,quoteFingerprint:'3'.repeat(64)});await wait(0);
+  const review=window.PixkuyEventPackagesConfig.contactSummary(controller.state);assert.ok(review.includes('Aeropuerto → Dirección'));assert.ok(review.includes('Dirección → Aeropuerto'));assert.equal((review.match(/Hotel Beta/g)||[]).length,1);
+  assert.ok(review.includes('31 de octubre de 2026'));assert.ok(review.includes('246.90 MXN'));
+  mobile=true;change(returning.id,'time','13:00');await wait(360);assert.equal(requests.length,4,'mobile return time starts one automatic quote');
+  resolvers[3]({...result,quoteFingerprint:'4'.repeat(64)});await wait(0);
+  const quotedMobile=hooks.configuration(controller.state,'mobile');assert.ok(quotedMobile.includes('events-package-vehicle-card'));assert.ok(!quotedMobile.includes('data-package-action="quote"'));
+  assert.equal(controller.state.step,'services');
+  hooks.cancelAirportAutoQuote();hooks.roots.delete(root);
+  root.querySelector=originalQuery;root.getAttribute=originalSurface;window.matchMedia=originalMedia;
+  controller.state.quote=null;controller.state.quoteStatus='idle';
+  console.log(JSON.stringify({suite:'linked-airport-return-landing',status:'PASS',externalCalls:0,formSubmissions:0,visualAcceptance:false,cases:['single-endpoint-capture','nine-locales','desktop-mobile-specialized','own-date-time','chronology-and-window','autoquote-debounce-dedup','late-response-rejected','hotel-edit-invalidates','no-inherited-overrides','review-both-directions','mobile-vehicle-total']}));
 }
 async function assertAirportDesktop(runtime,event,hooks,root) {
   const {window,controller}=runtime;
@@ -1058,7 +1503,7 @@ async function assertAirportDesktop(runtime,event,hooks,root) {
   const mobileStepOne=hooks.configuration(controller.state,'mobile');
   assert.ok(desktopStepOne.includes('events-package-offer__disclosure'),'desktop retains the approved disclosure');
   assert.ok(desktopStepOne.includes('data-package-action="ordinary-custom"'),'desktop retains the header custom entry');
-  assert.ok(mobileStepOne.includes('data-package-action="details"'),'mobile opens details in its auxiliary window');
+  assert.ok(mobileStepOne.includes('data-package-browse'),'mobile starts with compact rows before opening details');
   assert.ok(!mobileStepOne.includes('events-package-offer__disclosure'),'mobile does not expand offer details inline');
   assert.ok(!mobileStepOne.slice(0,mobileStepOne.indexOf('</header>')).includes('data-package-action="ordinary-custom"'),'mobile header has no duplicate custom entry');
   controller.go('services');
@@ -1068,7 +1513,7 @@ async function assertAirportDesktop(runtime,event,hooks,root) {
     const mobileHeader=mobileHtml.slice(0,headerEnd(mobileHtml));
     assert.ok(mobileHeader.includes('events-package-event-heading__meta'),'mobile keeps compact event context');
     for(const text of ['Evento sintético','Recinto sintético','30 oct – 1 nov 2026'])assert.ok(mobileHeader.includes(text),'mobile header preserves '+text);
-    assert.ok(!desktopHtml.slice(0,headerEnd(desktopHtml)).includes('events-package-event-heading__meta'),'generic desktop header remains unchanged');
+    assert.ok(desktopHtml.slice(0,headerEnd(desktopHtml)).includes('events-package-event-heading__meta'),'desktop keeps the same event data in compact presentation');
     // Mobile now has a different layout and a closed date choice, but consumes
     // the same business fields, constraints, values and calculation actions.
     const controls=html=>[...html.matchAll(/<(input|select|textarea)\b[^>]*data-package-field="[^"]+"[^>]*>(?:[^]*?<\/\1>)?/g)].map(match=>match[0]).filter(markup=>!markup.includes(':ordinary-date"')).map(markup=>markup.replace(/ class="[^"]*"/g,'').replace(/ data-package-mobile-(?:lodging|address)-input/g,'').replace(/ data-package-mobile-address-title="[^"]*"/g,'').replace(/ aria-describedby="[^"]*"/g,'').replace(/ data-package-description="[^"]*"/g,'')).sort();
@@ -1248,15 +1693,18 @@ async function assertAirportDesktop(runtime,event,hooks,root) {
   const result={source:'published',quoteFingerprint:'e'.repeat(64),calculation:{calculationModel:'ordinary_services',coverageStatus:'verified',serviceCount:1,pendingCodes:[],conditions:[],priceBreakdown:{priceStatus:'quoted',pricedSubtotal:'12345',currency:'MXN',automaticAddOns:[]},serviceLines:[]}};
   const click=action=>hooks.handleClick(root,{target:{closest:()=>({disabled:false,getAttribute:name=>name==='data-package-action'?action:null})}});
   const wait=delay=>new Promise(resolve=>setTimeout(resolve,delay));
-  const htmlBeforeAutoQuote=root.innerHTML;
+  let htmlBeforeAutoQuote=root.innerHTML;
   assert.equal(hooks.airportQuoteReadiness(controller.state,{option:candidate.snapshot.packages[0].options[0],service,arrival:true}).ready,true,'the complete Airport selection quotes without flight or baggage');
   assert.ok(priceNode.innerHTML.includes(labels('es').automaticQuotePending));
   assert.ok(actionNode.innerHTML.includes('data-package-action="airport-review"'));
   assert.ok(actionNode.innerHTML.includes('aria-disabled="true"'));
   assert.ok(!actionNode.innerHTML.includes('data-package-action="quote"'));
-  hooks.scheduleAirportAutoQuote(root);hooks.scheduleAirportAutoQuote(root);
+  const pendingMobileRoot={...root,attributes:{'data-event-package-root':'mobile'},getAttribute:name=>name==='data-event-package-root'?'mobile':null,closest:()=>null,querySelector:()=>null};
+  hooks.cancelAirportAutoQuote();mobile=true;hooks.scheduleAirportAutoQuote(pendingMobileRoot);
+  mobile=false;hooks.roots.add(pendingMobileRoot);window.packageViewportChange();hooks.roots.delete(pendingMobileRoot);
+  htmlBeforeAutoQuote=root.innerHTML;
   await wait(360);
-  assert.equal(requests.length,1,'debounced scheduling emits one automatic quote request');
+  assert.equal(requests.length,1,'a viewport change reassigns pending mobile work and still emits exactly one quote');
   assert.equal(controller.state.quoteStatus,'loading');assert.ok(priceNode.innerHTML.includes(labels('es').transferCalculating));
   assert.equal(requests[0].services[0].ordinaryInputs.destination.placeId,'synthetic-selected-place');
   assert.equal(requests[0].passengerBand,'van_3_4');assert.equal(requests[0].passengerCount,undefined);assert.equal(requests[0].services[0].ordinaryInputs.flight,undefined);
