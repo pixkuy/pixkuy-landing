@@ -19,10 +19,23 @@
   const confirmationFields = new Set();
   const boundForms = new WeakSet();
   let reviewLayout = null;
+  const configurationFields = new Set();
+
+  function syncConfigurationFields(configuring) {
+    configurationFields.forEach(node=>node.removeAttribute('data-package-configuration-contact'));
+    configurationFields.clear();
+    if (!configuring) return;
+    ['name','phone','email','message','submit'].forEach(name=>{
+      const node=form.querySelector('#contact-'+name)?.closest(name==='submit'?'.form-actions':'.form-field');
+      if(node){node.setAttribute('data-package-configuration-contact','');configurationFields.add(node);}
+    });
+  }
 
   function syncReviewLayout(enabled) {
     if (!enabled) {
       if (!reviewLayout) return;
+      const summary = reviewLayout.column.querySelector('.events-package-summary');
+      if(summary)summaryHost.appendChild(summary);
       reviewLayout.fields.forEach(({node, marker}) => marker.replaceWith(node));
       reviewLayout.heading.remove(); reviewLayout.column.remove();
       form.removeAttribute('data-package-review-desktop'); reviewLayout = null;
@@ -64,7 +77,7 @@
     const state = C.state;
     if (!isActive() || !matchesSelection() || state.receipt || state.requestStatus === 'submitting') return false;
     if (request().hasFrozenBody()) return state.requestStatus === 'unknown' || state.requestStatus === 'error';
-    return Boolean(state.configurationSurface === 'contact' && state.screen === 'contact' && state.selection && state.quoteStatus === 'ready' &&
+    return Boolean(state.configurationSurface === 'contact' && state.screen === 'contact' && state.step === 'review' && state.selection && view().quoteIsCurrent(state) && state.quoteStatus === 'ready' &&
       state.quote?.source === 'published' && /^[a-f0-9]{64}$/.test(state.quote.quoteFingerprint) &&
       state.selection.publicationVersion === state.selectedEvent?.publicationVersion &&
       state.quote.calculation.coverageStatus !== 'outside' &&
@@ -109,9 +122,15 @@
     if (selectionHost.innerHTML !== selectorMarkup) selectionHost.innerHTML = selectorMarkup;
     configurationHost.hidden = !!state.receipt || !matched || state.screen !== 'config' || desktopSelection;
     const nextMarkup = state.receipt ? config.receiptContent(state) : matched && state.selection && state.screen === 'contact' ? config.contactSummary(state, desktopSelection) : '';
-    if (summaryMarkup !== nextMarkup) { summaryHost.innerHTML = nextMarkup; summaryMarkup = nextMarkup; }
+    if (summaryMarkup !== nextMarkup) { reviewLayout?.column.querySelector('.events-package-summary')?.remove(); summaryHost.innerHTML = nextMarkup; summaryMarkup = nextMarkup; }
     syncConfirmationFields(!!state.receipt);
     syncReviewLayout(desktopSelection);
+    if(desktopSelection&&state.screen==='contact'){
+      const summary=summaryHost.querySelector('.events-package-summary');
+      const actions=reviewLayout?.column.querySelector('.form-actions');
+      if(summary&&actions)actions.before(summary);
+    }
+    syncConfigurationFields(!state.receipt && state.screen !== 'contact' && !window.matchMedia('(max-width:720px)').matches);
     if (state.receipt) form.setAttribute('data-package-receipt-desktop', '');
     else form.removeAttribute('data-package-receipt-desktop');
     // The accepted event is already projected by the receipt, never an editable picker.
@@ -150,6 +169,7 @@
     if (!active) return;
     syncContact(); active = false;
     syncReviewLayout(false);
+    syncConfigurationFields(false);
     form.removeAttribute('data-package-receipt-desktop');
     legacy?.removeAttribute('data-package-confirmed-field');
     syncConfirmationFields(false);
@@ -223,6 +243,14 @@
       form.addEventListener('input', syncContact);
       form.addEventListener('change', syncContact);
       form.addEventListener('pixkuy:contact-service-change', reconcile);
+      // Enter inside the embedded configurator must never validate the next step.
+      form.addEventListener('keydown', event => {
+        if(isActive() && C.state.screen !== 'contact' && event.key === 'Enter' &&
+          event.target.matches('input,select')) event.preventDefault();
+      });
+      form.addEventListener('submit', event => {
+        if(isActive() && !canSubmit()) {event.preventDefault();event.stopImmediatePropagation();}
+      }, true);
     }
     if (!configurationRoot) configurationRoot = view().mount(configurationHost, 'contact');
     if (entering && matchesSelection() && C.state.quoteStatus === 'ready' && !view().quoteIsCurrent(C.state) && C.state.screen === 'contact' && !request().hasFrozenBody()) C.change(()=>{});

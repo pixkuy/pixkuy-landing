@@ -50,7 +50,9 @@
     pendingField: "",
     pendingValue: ""
   };
-  let retainedSpecialDraft = null;
+  const specialDrafts = new Map();
+  const lastSpecialEvents = new Map();
+  const specialDraftFields = ['selectedVariant','selectedPassengerFareKey','originAddress','originPlaceId','originLat','originLng','originPlace','destinationAddress','destinationPlaceId','destinationLat','destinationLng','destinationPlace','originPickupTime','returnPickupTime','returnPickupDayOffset'];
 
   function isObject(value) {
     return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -266,10 +268,8 @@
       state.quoteStatus = "pending";
       state.quote = null;
     }
-    retainedSpecialDraft = {
-      groupId: state.selectedGroupId,
-      eventId: state.selectedEventId
-    };
+    lastSpecialEvents.set(state.selectedGroupId,state.selectedEventId);
+    specialDrafts.set(state.selectedGroupId+':'+state.selectedEventId, {eventId:state.selectedEventId, values:JSON.parse(JSON.stringify(Object.fromEntries(specialDraftFields.map(key=>[key,state[key]]))))});
   }
 
   function createEventPicker(root) {
@@ -1243,6 +1243,8 @@
     }
 
     addressRoots.forEach(function mountAddress(addressRoot) {
+      const groupId=state.selectedGroupId,eventId=state.selectedEventId;
+      const current=()=>state.selectedOfferKind==='special'&&state.selectedGroupId===groupId&&state.selectedEventId===eventId&&(typeof root.contains!=='function'||root.contains(addressRoot));
       const role = addressRoot.getAttribute("data-contact-event-special-address-role") || "origin";
       const fieldName = role === "destination"
         ? "contact_event_special_destination_address"
@@ -1253,15 +1255,16 @@
         fieldName: fieldName,
         language: getDocumentLanguage(),
         onManualInput: function onManualInput(value) {
-          setAddressValue(role, value);
+          if(current())setAddressValue(role, value);
         },
         onPlaceSelected: function onPlaceSelected(selectedPlace) {
-          setAddressPlace(role, selectedPlace);
+          if(current())setAddressPlace(role, selectedPlace);
         },
         onClearSelection: function onClearSelection() {
-          clearAddress(role);
+          if(current())clearAddress(role);
         },
         onError: function onError() {
+          if(!current())return;
           if (role === "destination") {
             state.destinationPlace = null;
             state.destinationPlaceId = "";
@@ -1735,30 +1738,31 @@
       state.quoteRequestId++;
       state.selectedGroupId = group.id; state.selectedEventId = group.id; state.selectedOfferKind = 'packages';
       C.state.configurationSurface = 'contact';
-      if (!C.state.receipt && (C.state.selectedEvent?.id !== event.id || C.state.selection?.publicationVersion !== event.publicationVersion)) {
+      if (!C.state.receipt) {
         if (!C.selectEvent(event, !event.snapshot.packages.some(pkg=>pkg.active!==false))) return false;
       }
       render();
       return true;
     }
 
+    retainSelectedSpecialDraft();
     state.quoteRequestId++;
-    const restoringDraft = state.selectedOfferKind === 'packages' && retainedSpecialDraft?.groupId === group.id;
-    if (!restoringDraft && state.selectedGroupId !== group.id) resetState();
+    const savedDraft = specialDrafts.get(group.id+':'+lastSpecialEvents.get(group.id));
+    const restoringDraft = savedDraft && group.events.some(event=>event.id===savedDraft.eventId);
+    if (restoringDraft) Object.assign(state, JSON.parse(JSON.stringify(savedDraft.values)));
+    else resetState();
     state.selectedOfferKind = 'special';
     window.PixkuyEventPackagesState?.suspendQuote();
 
     state.selectedGroupId = group.id;
-    state.selectedEventId = restoringDraft && group.events.some(event => event.id === retainedSpecialDraft.eventId)
-      ? retainedSpecialDraft.eventId
+    state.selectedEventId = restoringDraft
+      ? savedDraft.eventId
       : group.events[0] ? group.events[0].id : "";
-    if (!restoringDraft) {
-      state.quoteStatus = "pending";
-      state.quote = null;
-    }
-    retainedSpecialDraft = { groupId: state.selectedGroupId, eventId: state.selectedEventId };
+    state.quoteStatus = "pending";
+    state.quote = null;
+    lastSpecialEvents.set(state.selectedGroupId,state.selectedEventId);
     render();
-    if (!restoringDraft || state.quoteStatus !== "ready") requestQuoteIfReady();
+    requestQuoteIfReady();
 
     return true;
   }
@@ -1775,9 +1779,14 @@
       return false;
     }
 
+    if(state.selectedEventId===event.id)return true;
+    retainSelectedSpecialDraft();
+    const saved=specialDrafts.get(group.id+':'+event.id);
+    if(saved)Object.assign(state,JSON.parse(JSON.stringify(saved.values)));else resetState();
     state.quoteRequestId++;
+    state.selectedGroupId=group.id;
     state.selectedEventId = event.id;
-    retainedSpecialDraft = { groupId: state.selectedGroupId, eventId: state.selectedEventId };
+    lastSpecialEvents.set(group.id,event.id);
     state.quoteStatus = "pending";
     state.quote = null;
     render();

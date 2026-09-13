@@ -256,10 +256,13 @@ async function assertOrdinaryPackageInputs() {
   window.addEventListener=(name,listener)=>{const listeners=eventListeners.get(name)||[];listeners.push(listener);eventListeners.set(name,listeners);};
   window.dispatchEvent=event=>{for(const listener of eventListeners.get(event.type)||[])listener(event);return true;};
   window.__pixkuyI18nDict={eventPackages:{choose:'Seleccionar',viewPackages:'Ver paquetes'},airportMobileContactStep:{fields:{phone:'Teléfono/WhatsApp con prefijo internacional'},placeholders:{phone:'Ej. +525512345678'},validation:{phone:'Indica un teléfono válido con formato internacional.'}},services:{cards:{events:{types:{festival:'Festival',other:'Evento'},panel:{dateLabel:'Fecha y hora',venueLabel:'Recinto',priceFromLabel:'Desde',posterAlt:'Cartel del evento',configurationTitle:'Configura tu traslado',quotePending:'Completa los datos para calcular el precio.',quoteLoading:'Calculando precio…',quoteUnavailable:'No se pudo calcular.'}},airport:{panel:{fareLabel:'Tarifa'}}}}};
+  const fleet=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/js/data/fleet-gallery.json'),'utf8')).vehicles.byd_m9;
+  const galleryVehicle=()=>({id:'byd_m9',...fleet,images:fleet.images.filter(image=>image.active)});
+  window.PixkuyEventsMobileVehicleGallery={getVehicle:galleryVehicle};
   const bodyAttributes=new Map();let galleryFocus=0;
   context.document={documentElement:{lang:'es'},activeElement:null,addEventListener(){},querySelector(selector){return selector==='[data-events-mobile-vehicle-gallery-close]'?{focus(){galleryFocus++;}}:null;},body:{getAttribute(name){return bodyAttributes.has(name)?bodyAttributes.get(name):null;},setAttribute(name,value){bodyAttributes.set(name,value);},removeAttribute(name){bodyAttributes.delete(name);}},createElement(){return {attributes:{},setAttribute(name,value){this.attributes[name]=value;},remove(){this.removed=true;}};}};
   context.CustomEvent=class CustomEvent{constructor(type,init={}){this.type=type;this.detail=init.detail;}};
-  vm.runInNewContext(source.replace(anchor,'  window.packageTestHooks={catalog,configuration,changeField,renderRoot,offer,customStrip,handleClick,lodgingCandidate,serviceBounds,boundedDateChoices,dateChoiceLabel,mobileReviewContact,mobileContactValidationFields,validateMobilePackageContact,airportQuoteReadiness,airportCanReview,scheduleAirportAutoQuote,cancelAirportAutoQuote,mountAddresses,roots,mountAirportSelector,mountClearableAddress,packageDetailsContent,changeRootField,validateField,mobileOrdinaryInputs,mobileBaseRecognized,mobileCalculationContent,airportAutoQuoteView,configuredDirectOption,resolvedOrdinaryValues};\n'+anchor),context,{filename:file});
+  vm.runInNewContext(source.replace(anchor,'  window.packageTestHooks={catalog,configuration,changeField,renderRoot,offer,customStrip,handleClick,lodgingCandidate,serviceBounds,boundedDateChoices,dateChoiceLabel,mobileReviewContact,refreshMobileReview,scheduleMobileReviewExpiry,mobileContactValidationFields,validateMobilePackageContact,airportQuoteReadiness,airportCanReview,scheduleAirportAutoQuote,cancelAirportAutoQuote,mountAddresses,roots,mountAirportSelector,mountClearableAddress,packageDetailsContent,changeRootField,validateField,mobileOrdinaryInputs,mobileBaseRecognized,mobileCalculationContent,airportAutoQuoteView,configuredDirectOption,resolvedOrdinaryValues};\n'+anchor),context,{filename:file});
   const event={id:'synthetic-event',publicationVersion:1,snapshot:{schemaVersion:3,customInquiryEnabled:true,translations:{es:{title:'Evento sintético'}},type:'festival',media:{main:{url:'/synthetic-event.webp'},mobile:{url:'/synthetic-event-mobile.webp'}},publicEventDates:{startLocalDate:'2026-10-30',endLocalDateExclusive:'2026-11-02',timeZone:'America/Mexico_City'},servicePeriod:{from:'2026-10-23T06:00:00.000Z',until:'2026-11-03T06:00:00.000Z'},occurrences:[{sourceLocalDateTime:'2026-10-29T08:00',dateLabelOverrides:{}},{sourceLocalDateTime:'2026-11-02T08:00',dateLabelOverrides:{}}],venue:{baseName:'Recinto sintético',translations:{es:{name:'Recinto sintético'}}},addOns:[],packages:[{id:'welcome',title:{es:'Welcome'},description:{es:'Prueba'},inclusions:[{es:'Recepción identificada'},{es:'Seguimiento del vuelo'},{es:'Traslado privado'}],options:[{id:'arrival',title:{es:'Llegada'},calculationModel:'ordinary_services',services:[{id:'arrival-service',ordinary:{baseService:'airport_transfer',restrictions:{fromDate:'2026-10-24',untilDate:'2026-11-01'},inputs:{direction:{source:'fixed',value:'airport_to_destination'},airportId:{source:'fixed',value:'mex'},destination:{source:'customer'},date:{source:'customer'},time:{source:'customer'},flight:{source:'deferred'},baggageStatus:{source:'customer'}}}}]}]}]}};
   controller.selectEvent(event,false);
   const initialOffer=window.packageTestHooks.configuration(controller.state);
@@ -269,7 +272,7 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(!initialOffer.includes('data-package-action="quote"'));
   assert.ok(initialOffer.includes('events-package-config__header--package'));
   assert.ok(initialOffer.includes('Elija su paquete'));
-  assert.ok(initialOffer.includes('Modalidad disponible'));
+  assert.ok(!initialOffer.includes('Modalidad disponible'),'desktop avoids a redundant generated mode heading');
   assert.ok(initialOffer.includes('Llegada · 1 traslado'));
   assert.ok(initialOffer.includes('Completar mi traslado'));
   assert.ok(initialOffer.includes('Ver todas las inclusiones y condiciones'));
@@ -362,7 +365,7 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(!html.includes('ordinary-direction'));assert.ok(!html.includes('ordinary-flight'));
   assert.ok(html.includes('Pendiente para coordinación posterior'));assert.ok(html.includes('Pixkuy calcula el precio'));
   assert.ok(!html.includes('puede quedar pendiente'));assert.ok(html.includes('Número de maletas (opcional)'));assert.ok(html.includes('Puede indicarlo si desea facilitar la coordinación.'));
-  const requestOnlyQuote={calculation:{calculationModel:'ordinary_services',coverageStatus:'verified',availability:{status:'unavailable'},serviceCount:1,pendingCodes:[],conditions:[{title:{es:'Solicitudes y confirmación'},description:{es:'Todas las solicitudes conservan su texto completo.'}}],serviceLines:[],priceBreakdown:{priceStatus:'quoted',pricedSubtotal:'12345',currency:'MXN',automaticAddOns:[]}}};
+  const requestOnlyQuote={calculation:{passengerBand:'van_1_2',calculationModel:'ordinary_services',coverageStatus:'verified',availability:{status:'unavailable'},serviceCount:1,pendingCodes:[],conditions:[{title:{es:'Solicitudes y confirmación'},description:{es:'Todas las solicitudes conservan su texto completo.'}}],serviceLines:[],priceBreakdown:{priceStatus:'quoted',pricedSubtotal:'12345',currency:'MXN',automaticAddOns:[]}}};
   assert.equal(window.packageTestHooks.airportCanReview({quoteStatus:'ready',quote:requestOnlyQuote}),true,'the Events review gate does not consult vehicle availability');
   controller.state.quote=requestOnlyQuote;controller.state.quoteStatus='ready';
   const requestOnlyMobile=window.packageTestHooks.configuration(controller.state,'mobile');
@@ -377,6 +380,16 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(!requestOnlyMobile.includes('Disponibilidad pendiente'));
   const card=requestOnlyMobile.slice(requestOnlyMobile.indexOf('<section class="events-package-vehicle-card"'),requestOnlyMobile.indexOf('</section>',requestOnlyMobile.indexOf('<section class="events-package-vehicle-card"'))+'</section>'.length);
   assert.ok(card.endsWith('>Continuar</button></section>'),'the request card ends at the Events review CTA');
+  const noBand=structuredClone(controller.state);delete noBand.quote.calculation.passengerBand;delete noBand.selection.passengerBand;
+  assert.ok(!window.packageTestHooks.configuration(noBand,'mobile').includes('events-package-vehicle-card'),'unknown category cannot inherit the van image');
+  const expiredCard=structuredClone(controller.state);expiredCard.quote.calculation.serviceLines=[{included:{quoteExpiresAt:'2000-01-01T00:00:00Z'}}];
+  const expiredMarkup=window.packageTestHooks.configuration(expiredCard,'mobile');
+  assert.ok(!expiredMarkup.includes('events-package-vehicle-card')&&!expiredMarkup.includes('123.45'),'expired result cannot resurrect a vehicle fare');
+  const samePrice=structuredClone(controller.state);samePrice.quote.quoteFingerprint='new-valid-context';
+  assert.ok(window.packageTestHooks.configuration(samePrice,'mobile').includes('events-package-vehicle-card'),'new quote identity does not require a price change');
+  window.PixkuyEventsMobileVehicleGallery.getVehicle=()=>null;
+  assert.ok(!window.packageTestHooks.configuration(controller.state,'mobile').includes('events-package-vehicle-card'),'missing gallery configuration has no invented images');
+  window.PixkuyEventsMobileVehicleGallery.getVehicle=galleryVehicle;
   const stateBeforeReceiptScroll={requestStatus:controller.state.requestStatus,screen:controller.state.screen,receipt:controller.state.receipt,selection:controller.state.selection,contact:controller.state.contact,quote:controller.state.quote,quoteStatus:controller.state.quoteStatus,error:controller.state.error,recoveryNotice:controller.state.recoveryNotice};
   const receiptRoute={scrollTop:468};let receiptHeadingFocus=0,previousFieldBlur=0,receiptFrames=0;
   const previousField={selectionStart:0,selectionEnd:0,getAttribute(){return 'contact:name';},blur(){previousFieldBlur++;}};
@@ -408,7 +421,14 @@ async function assertOrdinaryPackageInputs() {
   window.packageTestHooks.renderRoot(desktopReceiptRoot);
   controller.state.receipt=receiptForScroll;controller.state.requestStatus='received';controller.state.screen='receipt';controller.state.selection=null;window.packageTestHooks.renderRoot(desktopReceiptRoot);
   assert.equal(desktopRoute.scrollTop,215,'desktop confirmation rendering does not use the mobile route scroll reset');
-  assert.equal(receiptFrames,1,'desktop confirmation rendering does not schedule a mobile frame');
+  assert.equal(receiptFrames,2,'desktop schedules its own heading focus without mobile scroll reset');
+  assert.equal(receiptHeadingFocus,2);
+  window.packageTestHooks.renderRoot(desktopReceiptRoot);
+  assert.equal(receiptFrames,2,'repeated rendering does not steal focus');
+  context.document.activeElement={hasAttribute:name=>name==='data-package-confirmation-title',getAttribute:()=>null};
+  desktopReceiptRoot.contains=node=>node===context.document.activeElement;
+  window.packageTestHooks.renderRoot(desktopReceiptRoot);
+  assert.equal(receiptHeadingFocus,3,'focused confirmation heading survives its rerender');
   controller.state.requestStatus='error';controller.state.screen='contact';controller.state.receipt=null;receiptRoute.scrollTop=333;window.packageTestHooks.renderRoot(receiptRoot);
   assert.equal(receiptRoute.scrollTop,333,'an error keeps the user beside the submitted form');
   Object.assign(controller.state,stateBeforeReceiptScroll);window.requestAnimationFrame=previousRaf;context.document.activeElement=previousActive;
@@ -464,7 +484,7 @@ async function assertOrdinaryPackageInputs() {
   controller.state.quote=requestOnlyQuote;controller.state.quoteStatus='ready';
   const galleryData=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/js/data/fleet-gallery.json'),'utf8')).vehicles.byd_m9;
   assert.equal(galleryData.images.filter(image=>image.active).length,8,'the Events gallery keeps the canonical BYD M9 image set');
-  const previousMatchMedia=window.matchMedia;let galleryOpens=0;window.matchMedia=()=>({matches:true});window.requestAnimationFrame=callback=>callback();window.PixkuyEventsMobileVehicleGallery={open(index){galleryOpens++;assert.equal(index,0);return true;}};
+  const previousMatchMedia=window.matchMedia;let galleryOpens=0;window.matchMedia=()=>({matches:true});window.requestAnimationFrame=callback=>callback();window.PixkuyEventsMobileVehicleGallery={getVehicle:galleryVehicle,open(index){galleryOpens++;assert.equal(index,0);return true;}};
   await window.packageTestHooks.handleClick(mobileRoot,{target:{closest:()=>({disabled:false,getAttribute:name=>name==='data-package-action'?'vehicle-gallery':null})}});
   assert.equal(galleryOpens,1);assert.equal(galleryFocus,1);assert.equal(bodyAttributes.get('data-events-mobile-config-screen'),'true');
   controller.state.quote={calculation:{...requestOnlyQuote.calculation,priceBreakdown:{...requestOnlyQuote.calculation.priceBreakdown,priceStatus:'personalized',pricedSubtotal:null}}};
@@ -607,16 +627,17 @@ async function assertOrdinaryPackageInputs() {
   }
   window.__pixkuyI18nLang='es';
   assert.equal(JSON.stringify(editorial),sourceEditorial,'rendering never edits or fills source data');
-  for(const iconId of ['plane','users','clock','round_trip']){
+  for(const iconId of ['plane','users','clock','round_trip','calendar']){
     const iconEvent=JSON.parse(sourceEditorial);iconEvent.id='icon-'+iconId;
     iconEvent.snapshot.packages[0].inclusions=[{es:'Ida y vuelta sintética',summary:{es:'Resumen sintético'},iconId}];
     controller.selectEvent(iconEvent,false);
     for(const surface of ['desktop','mobile']){
       if(surface==='mobile')await window.packageTestHooks.handleClick({getAttribute:()=> 'mobile',querySelector:()=>null},{target:{closest:()=>({getAttribute:key=>key==='data-package-browse'?iconEvent.snapshot.packages[0].id:null})}});
       const rendered=window.packageTestHooks.configuration(controller.state,surface);
-      const cardIcon=highlightBlock(rendered);
+      const cardIcon=surface==='mobile'?rendered.slice(rendered.indexOf('<details')):highlightBlock(rendered);
       assert.match(cardIcon,/<svg [^>]*aria-hidden="true"[^>]*focusable="false"/);
-      assert.ok(cardIcon.includes('Resumen sintético'));
+      assert.ok(cardIcon.includes(surface==='mobile'?'Ida y vuelta sintética':'Resumen sintético'));
+      if(surface==='mobile')assert.equal((cardIcon.match(/Ida y vuelta sintética/g)||[]).length,1,'full inclusion appears once in the native disclosure');
       const details=window.packageTestHooks.packageDetailsContent(iconEvent,iconEvent.snapshot.packages[0],surface==='mobile');
       assert.ok(details.includes('Ida y vuelta sintética')&&!details.includes('Resumen sintético'));
       assert.ok(details.includes('events-package-inclusion')&&details.includes('<svg '));
@@ -663,12 +684,14 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(twoServices.includes('Hora de recogida (CDMX)'));
   assert.ok(twoServices.includes('data-package-reuse="departure-service"'));
   controller.change(s=>s.services.push({serviceId:'departure-service',ordinaryInputs:{destination:{address:'Different synthetic hotel'}}}));
-  assert.equal(controller.choose('welcome','arrival',()=>false),false);
-  assert.equal(controller.state.selection.optionId,'return');
-  assert.equal(controller.choose('welcome','arrival',()=>true),true);
+  assert.equal(controller.choose('welcome','arrival',()=>{throw Error('navigation retains separate drafts')}),true);
+  assert.equal(controller.state.selection.optionId,'arrival');
+  assert.equal(controller.choose('welcome','arrival'),true);
   assert.equal(controller.state.selection.services.length,1);
+  controller.choose('welcome','return');assert.equal(controller.state.selection.services[1].ordinaryInputs.destination.address,'Different synthetic hotel');
+  controller.choose('welcome','arrival');
   controller.selectEvent(multi,true);controller.change(s=>{s.inquiry.notes='Synthetic custom schedule and route';});controller.state.contact.name='Custom contact';
-  controller.selectEvent(multi,false);assert.equal(controller.state.contact.name,'Synthetic contact');assert.equal(controller.state.selection.passengerBand,'van_5_6');
+  controller.selectEvent(multi,false);assert.equal(controller.state.contact.name,'Custom contact');assert.equal(controller.state.selection.passengerBand,'van_5_6');
   controller.selectEvent(multi,true);assert.equal(controller.state.selection.inquiry.notes,'Synthetic custom schedule and route');assert.equal(controller.state.contact.name,'Custom contact');
   const closed={...multi,id:'no-custom',snapshot:{...multi.snapshot,customInquiryEnabled:false}};
   assert.equal(controller.selectEvent(closed,true),false);assert.equal(hooks.customStrip({events:[closed]}),'');
@@ -721,7 +744,7 @@ async function assertOrdinaryPackageInputs() {
   assert.ok(!hooks.configuration(controller.state).includes('value="none" selected'));
   const many=JSON.parse(JSON.stringify(fixed));many.id='many';many.snapshot.packages[0].options=Array.from({length:5},(_,i)=>({...JSON.parse(JSON.stringify(fixedOption)),id:'option-'+i}));
   controller.selectEvent(many,false);controller.choose('welcome','');assert.ok(hooks.offer(controller.state).includes('<select data-package-field="option" data-package-option-package='));assert.equal(controller.state.selection.optionId,'');
-  console.log(JSON.stringify({status:'PASS',suite:'event-packages-three-step',cases:['offer-without-premature-contact','single-option-direct','multiple-options-explicit','disabled-hidden','compatible-back','compatible-option-preserved','incompatible-option-confirmation','separate-custom-memory','custom-disabled','custom-event-resolution','free-place-edit-invalidates','quote-state-before-review','review-before-contact','navigation-never-submits','temporary-failure-no-custom-switch','airport-return-independent','explicit-lodging-reuse','direct-private-fixed','hourly-duration','chronological-days','operational-date-bounds','fixed-passenger-bands','fixed-values-not-editable','published-addons','baggage-not-preselected','many-options-selector'],externalCalls:0,visualAcceptance:false}));
+  console.log(JSON.stringify({status:'PASS',suite:'event-packages-three-step',cases:['offer-without-premature-contact','single-option-direct','multiple-options-explicit','disabled-hidden','compatible-back','compatible-option-preserved','independent-option-memory','separate-custom-memory','custom-disabled','custom-event-resolution','free-place-edit-invalidates','quote-state-before-review','review-before-contact','navigation-never-submits','temporary-failure-no-custom-switch','airport-return-independent','explicit-lodging-reuse','direct-private-fixed','hourly-duration','chronological-days','operational-date-bounds','fixed-passenger-bands','fixed-values-not-editable','published-addons','baggage-not-preselected','many-options-selector'],externalCalls:0,visualAcceptance:false}));
   const css=fs.readFileSync(path.join(ROOT,'assets/css/events-packages.css'),'utf8');
   assert.ok(css.includes('.events-catalog-grid'));
   assert.ok(css.includes('.events-package-ordinary__route'));
@@ -736,6 +759,7 @@ async function assertOrdinaryPackageInputs() {
   await assertAirportDesktop(runtime,event,hooks,root);
   await assertLinkedAirportReturn(runtime,event,hooks,root);
   await assertLinkedDirectReturn(runtime,event,hooks,root);
+  await assertSharedDirectJourneys(runtime,event,hooks,root);
   await assertSharedPackageContact(runtime,event);
   const traditionalSource=fs.readFileSync(path.join(ROOT,'assets/js/services/events-special-panel.js'),'utf8');
   assert.ok(traditionalSource.includes('detail: { source: "special" }'));
@@ -754,7 +778,7 @@ async function assertSharedPackageContact(runtime, event) {
     const item={value:'',dataset:{},attributes:{},hidden:false,disabled:false,children:[],listeners:{},className:'',textContent:'',tagName:tagName.toUpperCase(),
       focus(options){this.focused=true;if(this.getAttribute('data-package-confirmation-title')!==null)confirmationFocus.push({kind:'focus',options});},scrollIntoView(options){if(this.getAttribute('data-package-confirmation-title')!==null)confirmationFocus.push({kind:'viewport',options});},after(child){this.sibling=child;child.parentElement=this.parentElement;},
       setAttribute(key,value){this.attributes[key]=String(value);if(key.startsWith('data-'))this.dataset[dataKey(key)]=String(value);},getAttribute(key){return key.startsWith('data-')?this.dataset[dataKey(key)]??this.attributes[key]??null:this.attributes[key]??null;},removeAttribute(key){delete this.attributes[key];if(key.startsWith('data-'))delete this.dataset[dataKey(key)];},
-      addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);},dispatchEvent(e){for(const fn of this.listeners[e.type]||[])fn(e);},
+      addEventListener(type,fn,capture){const list=this.listeners[type]??=[];if(capture===true)list.unshift(fn);else list.push(fn);},dispatchEvent(e){let stopped=false;e.stopImmediatePropagation=()=>{stopped=true;};for(const fn of this.listeners[e.type]||[]){fn(e);if(stopped)break;}},
       matches(selector){const className=selector.match(/^\.([\w-]+)/)?.[1];if(className&&!this.className.split(/\s+/).includes(className))return false;const tag=selector.match(/^[a-z]+/)?.[0];if(tag&&this.tagName!==tag.toUpperCase())return false;for(const match of selector.matchAll(/\[([^=\]]+)(?:="([^"]*)")?\]/g)){const actual=this.getAttribute(match[1]);if(actual===null||(match[2]!==undefined&&actual!==match[2]))return false;}return Boolean(className||tag||selector.startsWith('['));},
       closest(selector){let current=this;while(current){if(current.matches?.(selector))return current;current=current.parentElement;}return null;},
       querySelectorAll(selector){return this.children.flatMap(child=>[...(child.matches?.(selector)?[child]:[]),...child.querySelectorAll(selector)]);},querySelector(selector){return this.querySelectorAll(selector)[0]||null;},
@@ -1006,7 +1030,7 @@ async function assertSharedPackageContact(runtime, event) {
   selectNative(candidate.id);assert.equal(controller.state.selection.eventId,candidate.id);assert.equal(controller.state.selection.services.length,2);assert.equal(controller.state.quote,null);
   assert.equal(legacy.__contactEventPicker,picker,'the same selector surface persists when returning to packages');
   assert.equal(controller.state.selection.services[0].ordinaryInputs.destination.placeId,'synthetic-place-0');assert.equal(input('message').value,'Synthetic shared notes');
-  selectNative('synthetic-v1-group');assert.equal(window.nativeEventTest.state.originPlaceId,'retained-v1-place');assert.equal(window.nativeEventTest.state.originPickupTime,'08:45');assert.equal(window.nativeEventTest.state.quote.price,500);
+  selectNative('synthetic-v1-group');assert.equal(window.nativeEventTest.state.originPlaceId,'retained-v1-place');assert.equal(window.nativeEventTest.state.originPickupTime,'08:45');assert.equal(window.nativeEventTest.state.quote,null,'restored V1 edits do not revive an old quote');
   selectNative(candidate.id);assert.equal(controller.state.selection.services.length,2);assert.equal(documentListeners.get('pointerdown').length,1,'the persistent picker binds outside-click once');
   window.PixkuyEventPackagesApi.quote=async()=>({source:'published',quoteFingerprint:'e'.repeat(64),calculation});await controller.quote();
   console.log(JSON.stringify({suite:'native-upcoming-event-packages',status:'PASS',cases:['upper-entry-native-identity','one-persistent-custom-picker','keyboard-escape-tab-outside','pointer-selection','exact-reported-category-cycle','five-cycles-no-listener-growth','shared-contact-and-notes','other-service-draft-preserved','v1-draft-preserved','late-category-quote-rejected','single-source-load-coalesced','direct-selector-entry-reuses-config','native-one-service-autoquote','multi-service-draft-restored','zero-versus-absent-baggage','unavailable-event-no-silent-substitution','explicit-v1-v2-isolation'],externalCalls:0,databaseWrites:0,visualAcceptance:false}));
@@ -1090,9 +1114,9 @@ async function assertSharedPackageContact(runtime, event) {
   assert.ok(selectors.innerHTML.includes('data-package-review-select="package"'));
   assert.ok(!selectors.innerHTML.includes('inactive-package')&&!selectors.innerHTML.includes('empty-package'));
   const chooseReview=(field,value)=>{const target=node('select');target.value=value;target.setAttribute('data-package-review-select',field);selectors.dispatchEvent({type:'change',target});return target;};
-  const previousConfirm=window.confirm;window.confirm=()=>false;
-  assert.equal(chooseReview('package',another.id).value,'welcome','cancel restores the native select value as well as state');assert.equal(controller.state.selection.packageId,'welcome');assert.ok(controller.state.quote,'cancel preserves the current valid review');
-  window.confirm=()=>true;
+  const previousConfirm=window.confirm;window.confirm=()=>{throw Error('ordinary navigation must retain drafts without confirmation');};
+  assert.equal(chooseReview('package',another.id).value,another.id);assert.equal(controller.state.selection.packageId,another.id);assert.equal(controller.state.quote,null);
+  chooseReview('package','welcome');assert.equal(controller.state.selection.services[0].ordinaryInputs.destination.placeId,'old-place');
   let finishPrevious;window.PixkuyEventPackagesApi.quote=()=>new Promise(resolve=>{finishPrevious=resolve;});
   const inFlight=controller.quote();
   chooseReview('package',another.id);
@@ -1122,7 +1146,7 @@ async function assertSharedPackageContact(runtime, event) {
   window.PixkuyEventPackagesApi.load=async()=>({events:[candidate,directEntry,noPackages]});await window.PixkuyEventPackagesConfig.load();
   selectNative(noPackages.id);assert.equal(controller.state.selection.requestKind,'custom');assert.equal(selectors.hidden,true,'custom-only events retain their own configuration');
   assert.equal(input('message').value,'Synthetic shared notes');assert.equal(input('name').value,'Synthetic Person');
-  console.log(JSON.stringify({suite:'desktop-review-selectors',status:'PASS',cases:['explicit-mode','single-mode-direct','inactive-unselectable','cancel-loss','contact-notes-preserved','no-cross-service-inputs','stale-response-discarded','invalidated-total','back-no-old-summary','recovery-lock'],externalCalls:0}));
+  console.log(JSON.stringify({suite:'desktop-review-selectors',status:'PASS',cases:['explicit-mode','single-mode-direct','inactive-unselectable','preserved-option-drafts','contact-notes-preserved','no-cross-service-inputs','stale-response-discarded','invalidated-total','back-no-old-summary','recovery-lock'],externalCalls:0}));
   // Run the real native Netlify preparation guard after leaving the package.
   window.nativeEventTest.selectGroup('synthetic-v1-group');
   for(const [name,value] of Object.entries(nativeRoutes.event_special))input(name).value=value;
@@ -1176,7 +1200,12 @@ async function assertMobilePackageList(runtime,event,hooks) {
   html=hooks.configuration(controller.state,'mobile');
   assert.equal((html.match(/class="events-package-offer"/g)||[]).length,1);
   assert.equal((html.match(/data-package-browse-option/g)||[]).length,2);assert.ok(html.includes('Ver todos los paquetes'));
-  assert.ok(html.includes('data-package-action="details"'));assert.equal(route.scrollTop,0);
+  assert.ok(html.includes('<details class="events-package-offer__disclosure">'));
+  assert.equal((html.match(/<details/g)||[]).length,1,'one native disclosure, no nested panel');
+  assert.ok(!html.includes('data-package-action="details"')&&!html.includes('events-package-offer__highlights'));
+  assert.ok(!html.slice(0,html.indexOf('<details')).includes('events-package-offer__description'),'long description is not in the initial summary');
+  assert.ok(html.includes('Ver detalles, inclusiones y condiciones')&&html.includes('El precio se calcula al completar sus datos'));
+  assert.ok(!html.includes('Modalidad disponible'));assert.equal(route.scrollTop,0);
   assert.equal(focuses.at(-1),'[data-package-step-heading]');
   hooks.changeRootField(root,{value:'second-mode',getAttribute:key=>key==='data-package-browse-option'?'':null});
   assert.equal(JSON.stringify(controller.state.selection),selectedBefore,'exploration never commits a selection');
@@ -1191,6 +1220,11 @@ async function assertMobilePackageList(runtime,event,hooks) {
   await click({'data-package-action':'package-list'});await click({'data-package-browse':second.id});
   assert.equal(controller.state.quote,validQuote,'browsing a different package preserves the active quote');
   html=hooks.configuration(controller.state,'mobile');assert.ok(!html.includes('data-package-browse-option'),'a single option needs no selector');
+  assert.ok(!html.includes('Modalidad disponible'));
+  const beforeCommercial=JSON.stringify(second),ordinaryModel=second.options[0].calculationModel,ordinaryRates=second.options[0].rates;
+  second.options[0].calculationModel='fixed';second.options[0].rates={van_1_2:{status:'configured',minorUnits:'19000',currency:'MXN'}};
+  const fixedMobile=hooks.configuration(controller.state,'mobile');assert.ok(fixedMobile.includes('190.00 MXN')&&!fixedMobile.includes('El precio se calcula al completar sus datos'),'fixed models retain their published prices');
+  second.options[0].calculationModel=ordinaryModel;second.options[0].rates=ordinaryRates;assert.equal(JSON.stringify(second),beforeCommercial);
   const confirm=window.confirm;window.confirm=()=>true;
   await click({'data-package-configure':second.id});window.confirm=confirm;
   assert.equal(controller.state.step,'services');assert.equal(controller.state.selection.packageId,second.id);assert.equal(controller.state.quote,null);assert.equal(controller.state.selection.services.length,0);
@@ -1206,13 +1240,197 @@ async function assertMobilePackageList(runtime,event,hooks) {
   assert.ok(hooks.configuration(controller.state,'mobile').includes('events-package-mobile-list'),'a new event cannot inherit another detail');
   for(const count of [0,1]){otherEvent.snapshot.packages=candidate.snapshot.packages.slice(0,count);const list=hooks.configuration(controller.state,'mobile');assert.equal((list.match(/data-package-browse=/g)||[]).length,count);assert.ok(list.includes('Paquetes disponibles: '+count));assert.ok(list.includes('data-package-action="ordinary-custom"'));}
   const dictionary=window.__pixkuyI18nDict.eventPackages;
-  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){const labels=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n',lang,'services-events.json'),'utf8')).eventPackages;window.__pixkuyI18nDict.eventPackages=labels;const list=hooks.configuration(controller.state,'mobile');assert.ok(list.includes(labels.packageCount.replace('{count}','1')));for(const key of ['customTitle','proposal','choosePackage'])assert.ok(list.includes(labels[key]),lang+': '+key);await click({'data-package-browse':first.id});assert.ok(hooks.configuration(controller.state,'mobile').includes(labels.allPackages));await click({'data-package-action':'package-list'});}
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){const labels=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n',lang,'services-events.json'),'utf8')).eventPackages;window.__pixkuyI18nDict.eventPackages=labels;const list=hooks.configuration(controller.state,'mobile');assert.ok(list.includes(labels.packageCount.replace('{count}','1')));for(const key of ['customTitle','proposal','choosePackage'])assert.ok(list.includes(labels[key]),lang+': '+key);await click({'data-package-browse':first.id});const detail=hooks.configuration(controller.state,'mobile');for(const key of ['allPackages','mobileViewDetails','mobilePriceByDetails'])assert.ok(detail.includes(labels[key]),lang+': '+key);await click({'data-package-action':'package-list'});}
   window.__pixkuyI18nDict.eventPackages=dictionary;
   await click({'data-package-browse':first.id});await click({'data-package-action':'ordinary-custom'});assert.equal(controller.state.selection.requestKind,'custom');
   await click({'data-package-action':'packages'});assert.ok(hooks.configuration(controller.state,'mobile').includes('events-package-mobile-list'),'custom returns to the list rather than an old detail');
   Object.assign(controller.state,prior);
   console.log(JSON.stringify({suite:'mobile-package-list-detail',status:'PASS',cases:['zero-one-many','eligible-count','short-editorial-only','all-active-options-semantic-icons','ambiguous-composition-neutral','decorative-icons','nine-language-custom-action','explicit-modes-first-render','explore-without-commit','desktop-unchanged','single-click-continue','back-keeps-data','row-focus-scroll-restored','new-event-reset','custom-entry'],externalCalls:0}));
 }
+async function assertSharedDirectJourneys(runtime,event,hooks,root) {
+  const {window,controller}=runtime,copy=value=>JSON.parse(JSON.stringify(value)),wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const originalMedia=window.matchMedia,originalQuery=root.querySelector,originalSurface=root.getAttribute,originalQuote=window.PixkuyEventPackagesApi.quote;
+  let mobile=false;window.matchMedia=()=>({matches:mobile});
+  const candidate=copy(event);candidate.id='shared-journeys-synthetic';
+  const pkg=candidate.snapshot.packages[0],option=pkg.options[0],template=copy(option.services[0]);
+  option.services=[];candidate.snapshot.addOns=[];
+  for(const [index,date] of ['2026-10-30','2026-10-31','2026-11-01'].entries()){
+    const first=copy(template);first.id='day-'+index;
+    first.ordinary={baseService:'direct_transfer',...(index?{sharedOrigin:{version:1,serviceId:'day-0'}}:{}),inputs:{...(index?{}:{origin:{source:'customer'}}),destination:{source:'fixed',redacted:true,displayLabel:'Synthetic venue — Long official arrival address'},date:{source:'fixed',value:date},time:{source:'customer'},baggageCount:{source:'deferred'}}};
+    const back=copy(template);back.id='back-'+index;back.ordinary={baseService:'direct_transfer',directReturn:{version:1,outboundServiceId:first.id,dateMode:'shared'},inputs:{time:{source:'customer'},baggageCount:{source:'deferred'}}};
+    option.services.push(first,back);
+  }
+  controller.selectEvent(candidate,false);controller.choose(pkg.id,option.id);controller.go('services');
+  controller.change(selection=>{selection.passengerBand='van_3_4';selection.services=option.services.map((service,index)=>({serviceId:service.id,ordinaryInputs:{time:index%2?'18:00':'09:00',...(index===0?{origin:{address:'Synthetic accommodation with a very long establishment name and full street address <entrance>',placeId:'synthetic-shared'}}:{})}}));});
+  assert.equal(controller.state.selection.sharedOriginVersion,1);
+  const view=()=>hooks.configuredDirectOption(controller.state);
+  assert.equal(view().pairs.length,3);assert.equal(view().multiJourney,true);
+  assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,true);
+  for(const service of option.services){const inputs=hooks.resolvedOrdinaryValues(service,controller.state);assert.equal((service.ordinary.directReturn?inputs.destination:inputs.origin).placeId,'synthetic-shared');}
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
+    const labels=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n',lang,'services-events.json'),'utf8')).eventPackages;
+    window.__pixkuyI18nDict.eventPackages=labels;
+    for(const surface of ['desktop','mobile']){
+      mobile=surface==='mobile';const html=hooks.configuration(controller.state,surface);
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-origin"/g)||[]).length,1);
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-time"/g)||[]).length,6);
+      assert.equal((html.match(/data-package-field="[^"]+:ordinary-date"/g)||[]).length,0,'fixed dates are never client controls');
+      assert.equal((html.match(/data-package-band="van_3_4"/g)||[]).length,1);
+      assert.equal((html.match(surface==='desktop'?/class="events-package-desktop-journey"/g:/class="events-package-direct-journey"/g)||[]).length,3);
+      assert.ok(html.includes(labels.sharedLocalTime));
+      assert.ok(html.includes(labels.outboundHeading)&&html.includes(labels.returnHeading));
+      assert.equal(html.split(labels.ordinaryDeferred).length-1,0,'non-actionable baggage remains internal on both configuration surfaces');
+      if(surface==='mobile'){assert.ok(html.includes(labels.mobileTripStep)&&html.includes('data-package-config-conditions'));assert.ok(!html.includes(labels.directSharedData));assert.equal((html.match(/data-package-mobile-result/g)||[]).length,1);}
+      assert.ok(html.includes('Synthetic venue — Long official arrival address')&&html.includes('&lt;entrance&gt;'));
+      assert.ok(!html.includes('data-package-action="quote"'));
+    }
+  }
+  window.__pixkuyI18nDict.eventPackages=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/i18n/es/services-events.json'),'utf8')).eventPackages;
+  mobile=false;
+  const grouped=copy(controller.state),groupServices=grouped.selectedEvent.snapshot.packages[0].options[0].services;
+  groupServices.filter(s=>!s.ordinary.directReturn).forEach(s=>{s.ordinary.inputs.destination.destinationGroupId='day-0';});
+  const groupedHtml=hooks.configuration(grouped,'desktop');
+  assert.equal(groupedHtml.split('Synthetic venue — Long official arrival address').length-1,1,'public canonical group presents the complete address once');
+  mobile=true;
+  const groupedMobile=hooks.configuration(grouped,'mobile');
+  assert.equal(groupedMobile.split('Synthetic venue — Long official arrival address').length-1,1,'mobile reuses the public destination group');
+  assert.ok(!groupedMobile.includes('data-package-step="review"'),'disabled progress buttons are replaced by a step label');
+  assert.ok(groupedMobile.includes('data-package-action="back"')&&groupedMobile.includes('data-package-config-conditions'));
+  mobile=false;
+  assert.equal((groupedHtml.match(/data-airport-price/g)||[]).length,1,'one sidebar total');
+  assert.ok(groupedHtml.includes('<th scope="col">')&&groupedHtml.includes('<th scope="row">'),'semantic day and direction headers');
+  assert.ok(groupedHtml.includes('domingo, 1 de noviembre de 2026 · Regreso'),'full date and leg in accessible time label');
+  assert.ok(groupedHtml.indexOf('ordinary-origin')<groupedHtml.indexOf('Mismo lugar de recogida')&&groupedHtml.indexOf('Mismo lugar de recogida')<groupedHtml.indexOf('data-package-band'),'shared pickup help belongs below origin');
+  const unknown=copy(grouped);unknown.selectedEvent.snapshot.packages[0].options[0].services.filter(s=>!s.ordinary.directReturn).forEach(s=>{delete s.ordinary.inputs.destination.destinationGroupId;});
+  assert.equal(hooks.configuration(unknown,'desktop').split('Synthetic venue — Long official arrival address').length-1,3,'equal display labels never establish identity');
+  mobile=true;assert.equal(hooks.configuration(unknown,'mobile').split('Synthetic venue — Long official arrival address').length-1,3,'mobile also requires canonical identity');mobile=false;
+  groupServices[2].ordinary.inputs.destination.destinationGroupId='day-1';groupServices[2].ordinary.inputs.destination.displayLabel='Different canonical destination — Full exception address';
+  assert.ok(hooks.configuration(grouped,'desktop').includes('Different canonical destination — Full exception address'),'exception destination remains visible');
+  const initialShared=copy(controller.state);initialShared.selection.services=[];delete initialShared.selection.passengerBand;delete initialShared.selection.passengerCount;
+  assert.ok(hooks.configuration(initialShared,'desktop').includes(window.__pixkuyI18nDict.eventPackages.desktopCompleteShared),'initial guidance names the genuinely missing shared data and schedules');
+  const partial=copy(controller.state);partial.selection.services.filter(s=>['day-2','back-2'].includes(s.serviceId)).forEach(s=>{delete s.ordinaryInputs.time;});
+  const partialHtml=hooks.configuration(partial,'desktop');assert.ok(partialHtml.includes('Complete los horarios de domingo, 1 de noviembre de 2026')||partialHtml.includes('domingo, 1 de noviembre de 2026 para calcular'),'pending times identify their real date');
+  assert.ok(!partialHtml.includes('data-package-focus-field'),'no long pending links list on desktop');
+  assert.ok(!hooks.configuration(grouped,'mobile').includes('events-package-desktop-config'),'mobile keeps its renderer');
+  const calendarPath='M5 5h14a2 2 0 0 1 2 2v13H3V7a2 2 0 0 1 2-2Z';
+  const listState={...controller.state,step:'package'};
+  assert.ok(hooks.configuration(listState,'mobile').includes(calendarPath),'explicit shared composition supplies calendar');
+  const mixed=copy(listState);mixed.selectedEvent.snapshot.packages[0].options.push({...copy(option),id:'ambiguous',services:copy(option.services.slice(0,2))});
+  assert.ok(!hooks.configuration(mixed,'mobile').includes(calendarPath),'all active modes must agree');
+  mixed.selectedEvent.snapshot.packages[0].options[1].active=false;
+  assert.ok(hooks.configuration(mixed,'mobile').includes(calendarPath),'inactive modes do not override semantic composition');
+  const broken=copy(controller.state);delete broken.selectedEvent.snapshot.packages[0].options[0].services[2].ordinary.sharedOrigin;
+  assert.equal(hooks.configuredDirectOption(broken),null,'service count is not a relation');
+  const reordered=copy(controller.state);reordered.selectedEvent.snapshot.packages[0].options[0].services.reverse();assert.equal(hooks.configuredDirectOption(reordered).pairs.length,3);
+  const two=copy(controller.state);two.selectedEvent.snapshot.packages[0].options[0].services.splice(4);assert.equal(hooks.configuredDirectOption(two).pairs.length,2,'not specialized for three days');
+  mobile=false;
+  const price={innerHTML:''},actions={innerHTML:''},bounds={};
+  const focusedReturn={contains:()=>true,querySelector:()=>({getAttribute:key=>bounds[key]??null,hasAttribute:key=>key in bounds,setAttribute:(key,value)=>bounds[key]=value,removeAttribute:key=>delete bounds[key]})};
+  root.querySelector=selector=>selector==='[data-airport-price]'?price:selector==='[data-airport-actions]'?actions:selector==='[data-package-direct-return="back-1"]'?focusedReturn:null;
+  root.getAttribute=name=>name==='data-event-package-root'?(mobile?'mobile':'desktop'):originalSurface.call(root,name);hooks.roots.add(root);
+  const change=(id,key,value)=>hooks.changeField({getAttribute:()=>`service:${id}:ordinary-${key}`,value},true);
+  change('day-1','time','10:00');assert.equal(bounds.min,'10:01','later focused return has its own updated constraint');hooks.cancelAirportAutoQuote();
+  const requests=[],resolvers=[];window.PixkuyEventPackagesApi.quote=body=>{requests.push(copy(body));return new Promise(resolve=>resolvers.push(resolve));};
+  const result={source:'published',quoteFingerprint:'1'.repeat(64),calculation:{calculationModel:'ordinary_services',coverageStatus:'verified',serviceCount:6,pendingCodes:[],conditions:[],priceBreakdown:{priceStatus:'quoted',pricedSubtotal:'75000',currency:'MXN',automaticAddOns:[]},serviceLines:option.services.map((service,index)=>({serviceId:service.id,baseService:'direct_transfer',directLeg:service.ordinary.directReturn?'return':'outbound',resultMinorUnits:String(10000+index*1000)}))}};
+  hooks.scheduleAirportAutoQuote(root);hooks.scheduleAirportAutoQuote(root);await wait(360);assert.equal(requests.length,1);
+  assert.equal(requests[0].sharedOriginVersion,1);assert.equal(requests[0].services.filter(service=>service.ordinaryInputs.origin).length,1);
+  change('back-2','time','19:00');assert.equal(controller.state.quote,null);await wait(360);assert.equal(requests.length,2);
+  resolvers[1]({...result,quoteFingerprint:'2'.repeat(64)});await wait(0);resolvers[0](result);await wait(0);assert.equal(controller.state.quote.quoteFingerprint,'2'.repeat(64));
+  for(const surface of ['mobile','desktop']){
+    mobile=surface==='mobile';const html=hooks.configuration(controller.state,surface),review=window.PixkuyEventPackagesConfig.contactSummary(controller.state);
+    for(const output of [html,review]){const visible=output.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ');assert.equal((visible.match(/750.00 MXN/g)||[]).length,1);for(const amount of ['100.00','110.00','120.00','130.00','140.00','150.00'])assert.ok(!output.includes(amount+' MXN'));}
+    assert.ok(review.includes('30 de octubre de 2026')&&review.includes('1 de noviembre de 2026'));
+  }
+  const canonicalReview=copy(controller.state),canonicalOption=canonicalReview.selectedEvent.snapshot.packages[0].options[0];
+  canonicalOption.services.filter(s=>!s.ordinary.directReturn).forEach(s=>{s.ordinary.inputs.destination.destinationGroupId='day-0';});
+  canonicalReview.quote.calculation.baggageAssessment='pending';
+  canonicalReview.quote.calculation.coordinationPendingCodes=canonicalOption.services.map(s=>s.id+':BAGGAGECOUNT_PENDING');
+  canonicalReview.quote.calculation.conditions=[{title:{es:'Condición íntegra'},description:{es:'Texto versionado <sin recortes>'}},{title:{es:'Condición íntegra'},description:{es:'Texto versionado <sin recortes>'}}];
+  const canonicalBefore=JSON.stringify(canonicalReview);
+  mobile=false;
+  const canonicalHtml=window.PixkuyEventPackagesConfig.contactSummary(canonicalReview);
+  assert.ok(canonicalHtml.includes('events-package-review-table')&&canonicalHtml.includes('<th scope="col">Jornada</th>'));
+  assert.ok(canonicalHtml.includes('viernes, 30 de octubre de 2026')&&canonicalHtml.includes('domingo, 1 de noviembre de 2026'));
+  assert.equal((canonicalHtml.match(/events-package-review-table__time/g)||[]).length,6);
+  assert.equal(canonicalHtml.split('Synthetic venue — Long official arrival address').length-1,1,'common public identity presents one full address');
+  assert.equal(canonicalHtml.split('Texto versionado &lt;sin recortes&gt;').length-1,2,'all versioned conditions, including repeats, remain');
+  assert.ok(canonicalHtml.includes('</strong><p>Texto versionado'),'condition title and description are separate blocks');
+  assert.ok(canonicalHtml.indexOf('events-package-review-conditions')<canonicalHtml.indexOf(window.__pixkuyI18nDict.eventPackages.notBooking));
+  assert.ok(canonicalHtml.indexOf(window.__pixkuyI18nDict.eventPackages.notBooking)<canonicalHtml.indexOf('events-package-review-total'),'conditions and notice precede total next to existing submit');
+  assert.ok(!canonicalHtml.includes(window.__pixkuyI18nDict.eventPackages.ordinaryDeferred),'non-actionable baggage coordination does not occupy desktop review');
+  assert.equal((canonicalHtml.match(/750.00 MXN/g)||[]).length,1);
+  assert.equal(JSON.stringify(canonicalReview),canonicalBefore,'presentation does not mutate selected inputs or quote');
+  const optionalBags=copy(canonicalReview),optionalOption=optionalBags.selectedEvent.snapshot.packages[0].options[0];optionalOption.services.forEach(s=>{s.ordinary.inputs.baggageCount={source:'customer'};});optionalOption.baggagePolicy={allowUnknown:true};
+  assert.ok(!window.PixkuyEventPackagesConfig.contactSummary(optionalBags).includes(window.__pixkuyI18nDict.eventPackages.ordinaryDeferred),'optional customer baggage follows the existing allowUnknown contract');
+  optionalOption.baggagePolicy.allowUnknown=false;assert.ok(window.PixkuyEventPackagesConfig.contactSummary(optionalBags).includes(window.__pixkuyI18nDict.eventPackages.ordinaryDeferred),'required baggage information is preserved');
+  const unknownIdentity=copy(canonicalReview);unknownIdentity.selectedEvent.snapshot.packages[0].options[0].services.filter(s=>!s.ordinary.directReturn).forEach(s=>{delete s.ordinary.inputs.destination.destinationGroupId;});
+  assert.equal(window.PixkuyEventPackagesConfig.contactSummary(unknownIdentity).split('Synthetic venue — Long official arrival address').length-1,3,'equal labels alone cannot hide destinations');
+  mobile=true;const mobileCanonical=window.PixkuyEventPackagesConfig.contactSummary(canonicalReview);
+  assert.ok(!mobileCanonical.includes('events-package-review-table')&&!mobileCanonical.includes('events-package-summary--review'),'mobile renderers remain unchanged');
+  assert.ok(mobileCanonical.includes(window.__pixkuyI18nDict.eventPackages.ordinaryDeferred),'mobile coordination display retained');
+  const redesignedMobile=hooks.mobileReviewContact(canonicalReview);
+  assert.equal((redesignedMobile.match(/events-package-review-table__time/g)||[]).length,6,'mobile review retains all six service times');
+  assert.equal((redesignedMobile.match(/data-package-review-service=/g)||[]).length,6,'each grouped time retains its service identity');
+  assert.ok(redesignedMobile.includes('vie, 30 oct 2026')&&redesignedMobile.includes('dom, 1 nov 2026'),'mobile dates are localized and unambiguous');
+  assert.ok(!redesignedMobile.includes('events-package-steps'),'mobile review replaces the cramped three-step row');
+  assert.ok(redesignedMobile.includes('data-package-review-conditions')&&!redesignedMobile.includes('events-package-vehicle-card'));
+  assert.ok(redesignedMobile.indexOf('data-package-mobile-contact-form')<redesignedMobile.indexOf('data-package-review-conditions'));
+  assert.ok(redesignedMobile.indexOf('data-package-review-conditions')<redesignedMobile.indexOf('events-package-review-total'));
+  assert.ok(redesignedMobile.indexOf('events-package-review-total')<redesignedMobile.indexOf('data-package-action="submit"'));
+  assert.equal((redesignedMobile.match(/750.00 MXN/g)||[]).length,1);
+  assert.equal(redesignedMobile.split(window.__pixkuyI18nDict.eventPackages.notBooking).length-1,1,'one reservation warning');
+  assert.ok(!redesignedMobile.includes(window.__pixkuyI18nDict.eventPackages.ordinaryDeferred),'passive baggage is omitted only from presentation');
+  assert.equal(JSON.stringify(canonicalReview),canonicalBefore,'mobile rendering never changes request inputs or relationships');
+  const mobileUnknown=hooks.mobileReviewContact(unknownIdentity);
+  assert.equal(mobileUnknown.split('Synthetic venue — Long official arrival address').length-1,3,'unproven destinations remain complete once per journey');
+  assert.equal(redesignedMobile.split('Synthetic venue — Long official arrival address').length-1,1,'the common full destination appears only once');
+  assert.ok(!redesignedMobile.includes('Ver direcciones completas')&&!redesignedMobile.includes('events-package-route-detail'),'mobile review has no address disclosure');
+  const expiredReview=copy(canonicalReview);expiredReview.quote.calculation.serviceLines[0].included={quoteExpiresAt:'2020-01-01T00:00:00Z'};
+  const expiredMobile=hooks.mobileReviewContact(expiredReview);
+  assert.ok(!expiredMobile.includes('750.00 MXN')&&/data-package-action="submit" disabled/.test(expiredMobile),'expired context has no current total or enabled send');
+  const savedReviewState={...controller.state},savedReviewTimeout=window.setTimeout;
+  Object.assign(controller.state,copy(canonicalReview),{screen:'contact',step:'review'});
+  controller.state.quote.calculation.serviceLines[0].included={quoteExpiresAt:new Date(Date.now()+1000).toISOString()};
+  let expiryCallback;const expiryAmount={textContent:'750.00 MXN'},expirySubmit={disabled:false,setAttribute(){}};
+  const expiryRoot={getAttribute(){return 'mobile';},querySelector(selector){return selector.includes('summary__amount')?expiryAmount:selector.includes('submit')?expirySubmit:null;}};
+  window.setTimeout=(callback,delay)=>{assert.ok(delay>0&&delay<=1010);expiryCallback=callback;return 1;};
+  const callsBeforeExpiry=runtime.calls.length;
+  hooks.scheduleMobileReviewExpiry(expiryRoot);
+  assert.equal(expirySubmit.disabled,false);
+  controller.state.quote.calculation.serviceLines[0].included.quoteExpiresAt='2020-01-01T00:00:00Z';
+  expiryCallback();
+  assert.equal(expirySubmit.disabled,true);assert.notEqual(expiryAmount.textContent,'750.00 MXN');
+  assert.equal(runtime.calls.length,callsBeforeExpiry,'expiry only updates presentation, with no quote or submission');
+  window.setTimeout=savedReviewTimeout;Object.assign(controller.state,savedReviewState);
+  mobile=false;
+  const independent=copy(controller.state),independentOption=independent.selectedEvent.snapshot.packages[0].options[0];
+  const independentReturn=independentOption.services.find(service=>service.id==='back-1');
+  independentReturn.ordinary.directReturn.dateMode='independent';independentReturn.ordinary.inputs.date={source:'customer'};
+  independent.selection.services.find(service=>service.serviceId==='back-1').ordinaryInputs.date='2026-11-02';
+  independentOption.services.find(service=>service.id==='day-1').ordinary.inputs.destination={source:'fixed',redacted:true,displayLabel:'Different destination retained in full'};
+  independent.quote.calculation.serviceLines.find(line=>line.serviceId==='back-1').baggage={count:3,status:'declared'};
+  const exceptionalReview=window.PixkuyEventPackagesConfig.contactSummary(independent);
+  assert.ok(exceptionalReview.includes('2 de noviembre de 2026'),'independent return date remains visible in the grouped review');
+  assert.ok(exceptionalReview.includes('Different destination retained in full'),'a redacted destination label is preserved, never mistaken for a canonical shared identity');
+  assert.ok(exceptionalReview.includes('Número de maletas: 3'),'per-leg baggage differences survive grouping');
+  const mobileIndependent=hooks.mobileReviewContact(independent);
+  assert.ok(mobileIndependent.includes('lun, 2 nov 2026')&&mobileIndependent.includes('Different destination retained in full')&&mobileIndependent.includes('Número de maletas: 3'),'mobile preserves independent return dates, different destinations and declared baggage');
+  change('day-0','origin','Edited accommodation');assert.equal(controller.state.quote,null);assert.equal(controller.state.selection.services[0].ordinaryInputs.origin.placeId,undefined);await wait(360);assert.equal(requests.length,2);
+  change('day-0','origin','');assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  controller.change(selection=>{selection.services[0].ordinaryInputs.origin={address:'Replacement hotel',placeId:'replacement'};},{silent:true});
+  for(const service of option.services){const values=hooks.resolvedOrdinaryValues(service,controller.state);assert.equal((service.ordinary.directReturn?values.destination:values.origin).placeId,'replacement');}
+  hooks.scheduleAirportAutoQuote(root);mobile=false;window.packageViewportChange();await wait(360);assert.equal(requests.length,3,'viewport change reassigns pending debounce');
+  resolvers[2]({...result,quoteFingerprint:'3'.repeat(64)});await wait(0);
+  change('back-1','time','08:00');assert.equal(controller.state.quote,null);assert.equal(hooks.airportQuoteReadiness(controller.state,view()).ready,false);
+  change('back-1','time','18:00');hooks.cancelAirportAutoQuote();hooks.roots.delete(root);
+  const before=JSON.stringify(controller.state.selection);controller.state.contact={name:'Synthetic preserved contact'};controller.state.notes='Synthetic preserved notes';
+  controller.go('package');controller.go('services');assert.equal(JSON.stringify(controller.state.selection),before);assert.equal(controller.state.contact.name,'Synthetic preserved contact');assert.equal(controller.state.notes,'Synthetic preserved notes');
+  const frozen=window.PixkuyEventPackagesRequest.hasFrozenBody;window.PixkuyEventPackagesRequest.hasFrozenBody=()=>true;
+  assert.equal((hooks.configuration(controller.state,'desktop').match(/data-package-direct-return="[^"]+" disabled/g)||[]).length,3,'all returns remain recovery locked');window.PixkuyEventPackagesRequest.hasFrozenBody=frozen;
+  root.querySelector=originalQuery;root.getAttribute=originalSurface;window.matchMedia=originalMedia;window.PixkuyEventPackagesApi.quote=originalQuote;
+  console.log('PASS shared Direct journeys: six times, one canonical accommodation, nine locales, calendar semantics, one public total, stale/debounce/viewport, focused constraints, navigation and recovery locks');
+}
+
 async function assertLinkedDirectReturn(runtime,event,hooks,root) {
   const {window,controller}=runtime,copy=value=>JSON.parse(JSON.stringify(value));
   const originalMedia=window.matchMedia,originalQuery=root.querySelector,originalSurface=root.getAttribute,originalQuote=window.PixkuyEventPackagesApi.quote;
@@ -1238,7 +1456,7 @@ async function assertLinkedDirectReturn(runtime,event,hooks,root) {
     window.__pixkuyI18nDict.eventPackages=labels;
     for(const surface of ['desktop','mobile']){
       mobile=surface==='mobile';const html=hooks.configuration(controller.state,surface);
-      for(const key of ['directSharedData','directSharedDate','directOutboundTime','directReturnTime','outboundHeading','returnHeading'])assert.ok(html.includes(labels[key]),lang+': '+key);
+      for(const key of ['outboundHeading','returnHeading',...(mobile?['mobileTripStep','mobileJourneyDate']:['directSharedData','directSharedDate','desktopJourneys'])])assert.ok(html.includes(labels[key]),lang+': '+key);
       assert.equal((html.match(/data-package-field="[^"]+:ordinary-origin"/g)||[]).length,1);
       assert.equal((html.match(/data-package-field="[^"]+:ordinary-date"/g)||[]).length,1);
       assert.equal((html.match(/data-package-field="[^"]+:ordinary-time"/g)||[]).length,2);
@@ -1249,10 +1467,11 @@ async function assertLinkedDirectReturn(runtime,event,hooks,root) {
       assert.ok(!html.includes('ordinary-airportId')&&!html.includes('ordinary-flight'));
       assert.ok(html.includes('&lt;entrada&gt;')&&!html.includes('<entrada>'),'long addresses remain escaped');
       assert.ok(!html.includes(longAddress+' → '),'configuration does not duplicate routes');
-      assert.ok(html.includes(labels.directPickupAddress)&&html.includes(labels.directReturnToLodging));
+      assert.ok(html.includes(labels.directPickupAddress)&&html.includes(labels.directReturnToPickup));
       assert.ok(html.includes('Synthetic venue — Long official address'),'canonical fixed display label');
       assert.ok(!html.includes('<legend>'+labels.outboundHeading+'</legend>')&&!html.includes('<legend>'+labels.returnHeading+'</legend>'),'schedule labels do not repeat headings');
-      assert.ok(html.indexOf('events-package-airport__conditions')<html.indexOf('events-package-direct__quote'),'conditions before total and actions');
+      if(mobile)assert.ok(html.indexOf('data-package-config-conditions')<html.indexOf('data-package-mobile-result'),'mobile conditions window trigger before total and actions');
+      else assert.ok(html.indexOf('data-airport-price')<html.indexOf('events-package-option-copy'),'desktop conditions follow total and action');
       if(mobile)assert.ok(html.includes('data-package-mobile-address-input'),'Direct reuses the existing mobile search sheet');
     }
   }
@@ -1262,7 +1481,7 @@ async function assertLinkedDirectReturn(runtime,event,hooks,root) {
   const empty=copy(controller.state);empty.selection.services.forEach(service=>{service.ordinaryInputs={};});
   assert.deepEqual(Array.from(hooks.airportQuoteReadiness(empty,hooks.configuredDirectOption(empty)).missing).filter(label=>[labels.directSharedDate,labels.returnDate].includes(label)),[labels.directSharedDate],'one missing shared date');
   const bagSource=outbound.ordinary.inputs.baggageCount;outbound.ordinary.inputs.baggageCount={source:'deferred'};
-  assert.equal((hooks.configuration(controller.state,'desktop').match(new RegExp(labels.ordinaryDeferred,'g'))||[]).length,1,'equal pending baggage is displayed once');
+  assert.equal((hooks.configuration(controller.state,'desktop').match(new RegExp(labels.ordinaryDeferred,'g'))||[]).length,0,'passive pending baggage omitted on desktop');
   outbound.ordinary.inputs.baggageCount=bagSource;
   const frozenBody=window.PixkuyEventPackagesRequest.hasFrozenBody;
   window.PixkuyEventPackagesRequest.hasFrozenBody=()=>true;
@@ -1290,7 +1509,7 @@ async function assertLinkedDirectReturn(runtime,event,hooks,root) {
   root.querySelector=selector=>selector==='[data-airport-price]'?price:selector==='[data-airport-actions]'?actions:selector==='[data-package-direct-return]'?returnSection:null;
   root.getAttribute=name=>name==='data-event-package-root'?(mobile?'mobile':'desktop'):originalSurface.call(root,name);
   hooks.roots.add(root);
-  const timeAttributes={};returnSection.contains=()=>true;returnSection.querySelector=()=>({setAttribute:(key,value)=>timeAttributes[key]=value,removeAttribute:key=>delete timeAttributes[key]});
+  const timeAttributes={};returnSection.contains=()=>true;returnSection.querySelector=()=>({getAttribute:key=>timeAttributes[key]??null,hasAttribute:key=>key in timeAttributes,setAttribute:(key,value)=>timeAttributes[key]=value,removeAttribute:key=>delete timeAttributes[key]});
   change(outbound.id,'time','10:00');assert.equal(timeAttributes.min,'10:01','focused return keeps its input while its effective bound updates');
   returnSection.contains=()=>false;hooks.cancelAirportAutoQuote();
   const requests=[],resolvers=[],wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -1374,10 +1593,38 @@ async function assertLinkedDirectReturn(runtime,event,hooks,root) {
   window.PixkuyAirportMobileHotelSearchSheet=previousSheet;window.PixkuyServicesEventsSpecialAddress=previousAdapter;
   hooks.cancelAirportAutoQuote();hooks.roots.delete(root);root.querySelector=originalQuery;root.getAttribute=originalSurface;window.matchMedia=originalMedia;window.PixkuyEventPackagesApi.quote=originalQuote;
   controller.state.quote=null;controller.state.quoteStatus='idle';
-  const receiptState={...controller.state,receipt:{reference:'EVT-SYNTHETIC-DIRECT',priceStatus:'quoted',pricedSubtotal:'30000',currency:'MXN',confirmation:{eventTitle:{es:'Accepted event'},packageTitle:{es:'Accepted package'},optionTitle:{es:'Accepted option'},services:[{kind:'trip',baseService:'direct_transfer',directLeg:'outbound',startsAtUtc:'2026-10-30T16:00:00Z'},{kind:'trip',baseService:'direct_transfer',directLeg:'return',startsAtUtc:'2026-10-31T01:00:00Z'}],conditions:[]}}};
+  const receiptState={...controller.state,receipt:{requestKind:'package',reference:'EVT-SYNTHETIC-DIRECT',priceStatus:'quoted',pricedSubtotal:'30000',currency:'MXN',confirmation:{eventTitle:{es:'Accepted event'},packageTitle:{es:'Accepted package'},optionTitle:{es:'Accepted option'},services:[{kind:'trip',baseService:'direct_transfer',directLeg:'outbound',startsAtUtc:'2026-10-30T16:00:00Z'},{kind:'trip',baseService:'direct_transfer',directLeg:'return',startsAtUtc:'2026-10-31T01:00:00Z'}],conditions:[]}}};
   const receipt=window.PixkuyEventPackagesConfig.receiptContent(receiptState);
   for(const text of ['<strong>Ida</strong>','<strong>Regreso</strong>','10:00','19:00','300.00 MXN','Hora solicitada (CDMX)'])assert.ok(receipt.includes(text),'accepted receipt '+text);
   assert.ok(!receipt.includes('Direct Transfer'),'explicit direct legs need no internal service name');
+  const groupedReceipt=copy(receiptState);
+  groupedReceipt.receipt.confirmation.directJourneys={version:1,journeys:[{outboundStartsAtUtc:'2026-10-30T16:00:00Z',returnStartsAtUtc:'2026-10-31T01:00:00Z',independentReturnDate:false},{outboundStartsAtUtc:'2026-10-31T15:30:00Z',returnStartsAtUtc:'2026-11-01T01:30:00Z',independentReturnDate:false},{outboundStartsAtUtc:'2026-11-01T16:00:00Z',returnStartsAtUtc:'2026-11-02T02:30:00Z',independentReturnDate:false}]};
+  groupedReceipt.receipt.confirmation.conditions=[{title:{es:'Título intacto'},description:{es:'Párrafo intacto'}}];
+  const groupedBefore=JSON.stringify(groupedReceipt),groupedMarkup=window.PixkuyEventPackagesConfig.receiptContent(groupedReceipt);
+  assert.equal((groupedMarkup.match(/<tr>/g)||[]).length,4,'header plus three explicit pairs');
+  for(const text of ['viernes, 30 de octubre de 2026','20:30','events-package-receipt__columns','<strong>Título intacto</strong><p>Párrafo intacto</p>'])assert.ok(groupedMarkup.includes(text));
+  assert.equal((groupedMarkup.match(/300.00 MXN/g)||[]).length,1);
+  assert.ok(!groupedMarkup.includes('events-package-receipt__itinerary')&&!groupedMarkup.includes('data-package-action="submit"'));
+  assert.equal(JSON.stringify(groupedReceipt),groupedBefore,'rendering never updates the receipt or stale quote');
+  groupedReceipt.receipt.confirmation.directJourneys.journeys[0].independentReturnDate=true;
+  assert.ok(window.PixkuyEventPackagesConfig.receiptContent(groupedReceipt).includes('<p>viernes, 30 de octubre de 2026</p>'),'independent same-day return remains explicit');
+  groupedReceipt.receipt.confirmation.directJourneys.version=2;
+  assert.ok(window.PixkuyEventPackagesConfig.receiptContent(groupedReceipt).includes('events-package-receipt__itinerary'),'unknown projection retains legacy detail');
+  groupedReceipt.receipt.confirmation.directJourneys.version=1;
+  const groupedMedia=window.matchMedia;window.matchMedia=()=>({matches:true});
+  const mobileGrouped=window.PixkuyEventPackagesConfig.receiptContent(groupedReceipt);
+  assert.equal((mobileGrouped.match(/<tr>/g)||[]).length,4,'mobile uses three explicitly projected journeys');
+  assert.ok(mobileGrouped.includes('viernes, 30 de oct de 2026')&&mobileGrouped.includes('20:30'));
+  assert.ok(mobileGrouped.includes('data-package-action="receipt-conditions"')&&!mobileGrouped.includes('<details>'),'historical conditions open the existing dialog');
+  assert.equal((mobileGrouped.match(/300.00 MXN/g)||[]).length,1);
+  assert.ok(!mobileGrouped.includes('data-package-action="submit"')&&!mobileGrouped.includes('data-package-action="edit-services"'));
+  assert.ok(!mobileGrouped.includes('role="status" tabindex="-1" data-package-confirmation-title'),'the static receipt heading is not a repeated live announcement');
+  const noRelations=window.PixkuyEventPackagesConfig.receiptContent({...receiptState,receipt:{...groupedReceipt.receipt,confirmation:{...groupedReceipt.receipt.confirmation,directJourneys:undefined}}});
+  assert.ok(noRelations.includes('events-package-receipt__itinerary')&&!noRelations.includes('<table'),'historic receipts without relationships retain explicit legs');
+  const historicBefore=JSON.stringify(groupedReceipt);
+  window.PixkuyEventPackagesConfig.receiptContent({...groupedReceipt,selectedEvent:null,selection:null,quote:null,quoteStatus:'idle'});
+  assert.equal(JSON.stringify(groupedReceipt),historicBefore,'confirmation is independent of catalogue, quote and current selection');
+  window.matchMedia=groupedMedia;
   const timedReceipt=copy(receiptState);timedReceipt.receipt.confirmation.services[0].endsAtUtc='2026-10-30T16:42:00Z';
   assert.ok(!window.PixkuyEventPackagesConfig.receiptContent(timedReceipt).includes('10:42'),'route-estimated finish is not a second requested pickup');
   timedReceipt.receipt.confirmation.services[0].kind='block';timedReceipt.receipt.confirmation.services[0].baseService='hourly_daily';
@@ -1385,7 +1632,14 @@ async function assertLinkedDirectReturn(runtime,event,hooks,root) {
   assert.ok(blockReceipt.includes('Fin del servicio')&&blockReceipt.includes('10:42'),'blocks retain the service end with an explicit label');
   const mediaBeforeReceipt=window.matchMedia;window.matchMedia=()=>({matches:true});
   const mobileReceipt=window.PixkuyEventPackagesConfig.receiptContent(receiptState);
-  assert.ok(mobileReceipt.includes('Ida · Direct Transfer')&&!mobileReceipt.includes('events-package-receipt--desktop'),'mobile keeps its accepted receipt layout');
+  assert.ok(mobileReceipt.includes('Ida · Direct Transfer')&&mobileReceipt.includes('events-package-receipt--mobile')&&!mobileReceipt.includes('events-package-receipt--desktop'),'ungrouped mobile Direct retains explicit directions');
+  const mobileEnd=copy(receiptState);mobileEnd.receipt.confirmation.services[0].endsAtUtc='2026-10-30T16:42:00Z';
+  assert.ok(!window.PixkuyEventPackagesConfig.receiptContent(mobileEnd).includes('10:42'),'Direct route estimate is not a requested or guaranteed arrival');
+  mobileEnd.receipt.confirmation.services[0].kind='block';mobileEnd.receipt.confirmation.services[0].baseService='hourly_daily';
+  assert.ok(window.PixkuyEventPackagesConfig.receiptContent(mobileEnd).includes('Fin del servicio')&&window.PixkuyEventPackagesConfig.receiptContent(mobileEnd).includes('10:42'),'hourly finish remains labeled');
+  const airportReceipt=copy(receiptState);airportReceipt.receipt.confirmation.services.forEach((service,index)=>{service.baseService='airport_transfer';delete service.directLeg;service.direction=index?'destination_to_airport':'airport_to_destination';});
+  const airportReceiptHtml=window.PixkuyEventPackagesConfig.receiptContent(airportReceipt);
+  assert.ok(airportReceiptHtml.includes('Traslado de llegada')&&airportReceiptHtml.includes('Traslado de salida')&&!airportReceiptHtml.includes('<table'),'Airport retains its own directions and dates');
   window.matchMedia=mediaBeforeReceipt;
   const customReceipt=copy(receiptState);customReceipt.receipt.requestKind='custom';
   assert.ok(!window.PixkuyEventPackagesConfig.receiptContent(customReceipt).includes('events-package-receipt--desktop'),'custom requests retain their own receipt presentation');
@@ -1432,7 +1686,7 @@ async function assertLinkedAirportReturn(runtime,event,hooks,root) {
       if(surface==='mobile')assert.equal((html.match(/data-package-mobile-band/g)||[]).length,1,'one passenger selection');
       if(surface==='desktop'){
         assert.ok(html.includes('events-package-airport__shared-fields')&&html.includes('events-package-airport__legs'));
-        for(const key of ['sharedTripData','arrivalHeading','returnHeading','roundTripTotal'])assert.ok(html.includes(labels[key]),lang+': desktop presentation label '+key);
+        for(const key of ['sharedTripData','arrivalHeading','returnHeading','packageTotal'])assert.ok(html.includes(labels[key]),lang+': desktop presentation label '+key);
         assert.equal((html.match(/data-package-airport-arrival-route/g)||[]).length,0);
       }else assert.ok(!html.includes('events-package-airport__shared-fields'),'desktop grouping does not replace the accepted mobile form');
 
@@ -1453,8 +1707,10 @@ async function assertLinkedAirportReturn(runtime,event,hooks,root) {
   root.getAttribute=name=>name==='data-event-package-root'?(mobile?'mobile':'desktop'):originalSurface.call(root,name);
   hooks.roots.add(root);
   const timeAttributes={};
-  returnSection.contains=()=>true;returnSection.querySelector=()=>({setAttribute:(key,value)=>timeAttributes[key]=value,removeAttribute:key=>delete timeAttributes[key]});
+  let constraintWrites=0;
+  returnSection.contains=()=>true;returnSection.querySelector=()=>({getAttribute:key=>timeAttributes[key]??null,hasAttribute:key=>key in timeAttributes,setAttribute:(key,value)=>{constraintWrites++;timeAttributes[key]=value;},removeAttribute:key=>delete timeAttributes[key]});
   change(returning.id,'date','2026-10-29');assert.equal(timeAttributes.min,'09:01','focused date edit refreshes the sibling pickup time bound');
+  const writes=constraintWrites;change(returning.id,'time','12:03');assert.equal(constraintWrites,writes,'typing does not rewrite an unchanged min and reset the native segment');
   change(returning.id,'date','2026-10-31');assert.equal(timeAttributes.min,undefined,'later return date releases the arrival-day time bound');
   returnSection.contains=()=>false;hooks.cancelAirportAutoQuote();
   const requests=[],resolvers=[];
@@ -1511,8 +1767,8 @@ async function assertAirportDesktop(runtime,event,hooks,root) {
   function assertSameControls(desktopHtml,mobileHtml,message,compareActions=true){
     const headerEnd=html=>html.indexOf('</header>')+'</header>'.length;
     const mobileHeader=mobileHtml.slice(0,headerEnd(mobileHtml));
-    assert.ok(mobileHeader.includes('events-package-event-heading__meta'),'mobile keeps compact event context');
-    for(const text of ['Evento sintético','Recinto sintético','30 oct – 1 nov 2026'])assert.ok(mobileHeader.includes(text),'mobile header preserves '+text);
+    assert.ok(mobileHeader.includes(controller.state.step==='services'?'events-package-mobile-config__header':'events-package-event-heading__meta'),'mobile uses the scoped header only in configuration');
+    for(const text of ['Evento sintético','30 oct – 1 nov 2026'])assert.ok(mobileHeader.includes(text),'mobile header preserves '+text);
     assert.ok(desktopHtml.slice(0,headerEnd(desktopHtml)).includes('events-package-event-heading__meta'),'desktop keeps the same event data in compact presentation');
     // Mobile now has a different layout and a closed date choice, but consumes
     // the same business fields, constraints, values and calculation actions.
@@ -1530,7 +1786,10 @@ async function assertAirportDesktop(runtime,event,hooks,root) {
   assert.ok(!initial.includes('events-package-service-disclosure'));
   assert.ok(!initial.includes('Editorial day'));
   assert.ok(!initial.includes('events-package-ordinary__direction'));
-  assert.ok(initial.includes('Falta:'));
+  assert.ok(initial.includes(labels('es').desktopCompleteFields.split('{fields}')[0]));
+  assert.equal((initial.match(/data-airport-price/g)||[]).length,1,'single sidebar total');
+  assert.ok(initial.includes('events-package-desktop-summary'));
+  assert.ok(!initial.includes('events-package-airport__pending'));
   assert.equal(initial.split('Fecha y hora locales de Ciudad de México').length-1,1);
   assert.ok(initial.indexOf('events-package-airport__route')<initial.indexOf('events-package-airport__schedule'));
   assert.ok(initial.indexOf('events-package-airport__schedule')<initial.indexOf('events-package-airport__extras'));
@@ -1572,7 +1831,7 @@ async function assertAirportDesktop(runtime,event,hooks,root) {
   mobile=true;assertSameControls(render(),hooks.configuration(controller.state,'mobile'),'desktop and mobile keep the same Airport fields',false);mobile=false;
   const tripMobile=hooks.configuration(controller.state,'mobile');
   assert.ok(tripMobile.includes('Datos del viaje'));
-  assert.ok(tripMobile.includes('data-package-conditions-only aria-haspopup="dialog"'));
+  assert.match(tripMobile,/data-package-conditions-only[^>]*aria-haspopup="dialog"/);
   assert.ok(!tripMobile.includes('<details class="events-package-option-copy"'));
   assert.ok(tripMobile.includes('events-package-mobile-airport'));
   assert.ok(!tripMobile.includes('data-package-service-title'));
@@ -1663,13 +1922,13 @@ async function assertAirportDesktop(runtime,event,hooks,root) {
   assert.ok(fixedHtml.includes('29 de octubre de 2026'));
   assert.ok(!fixedHtml.includes('data-package-field="service:arrival-service:ordinary-date"'));
   assert.ok(!fixedHtml.includes('data-package-field="service:arrival-service:ordinary-flight"'));
-  assert.ok(fixedHtml.includes('Definido por el evento'));assert.ok(fixedHtml.includes('Pendiente para coordinación posterior'));
+  assert.ok(fixedHtml.includes('Definido por el evento'));assert.ok(!fixedHtml.includes('Pendiente para coordinación posterior'),'non-actionable baggage stays internal in desktop config');
   for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
     window.__pixkuyI18nLang=lang;window.__pixkuyI18nDict.eventPackages=labels(lang);
     const html=render();
     for(const key of ['eventUnavailable','continueContact','editTransfer','editTransfers','missingForQuote','invalidForQuote','automaticQuotePending','retryCalculation','optional','flightOptionalHelp','baggageOptionalHelp','vehicleCategoryLabel','vehicleGalleryOpen','vehicleFareLabel'])assert.equal(typeof labels(lang)[key],'string',lang+': '+key);
     for(const key of ['missingForQuote','invalidForQuote'])assert.ok(labels(lang)[key].includes('{fields}'),lang+': '+key+' placeholder');
-    for(const key of ['configureTransferTitle','arrivalAirport','arrivalAddress','transferDate','transferStartTime','transferLocalTime','transferFlight','transferPrice','missingForQuote','backToPackages','flightOptionalHelp','baggageOptionalHelp'])assert.ok(html.includes(labels(lang)[key].split('{fields}')[0]),lang+': '+key);
+    for(const key of ['configureTransferTitle','arrivalAirport','arrivalAddress','transferDate','transferStartTime','transferLocalTime','transferFlight','packageTotal','desktopCompleteFields','backToPackages','flightOptionalHelp','baggageOptionalHelp'])assert.ok(html.includes(labels(lang)[key].split('{fields}')[0]),lang+': '+key);
     assert.ok(html.includes('Welcome · Llegada'),'published names retain Spanish fallback');
   }
   window.__pixkuyI18nLang='es';window.__pixkuyI18nDict.eventPackages=labels('es');
@@ -1847,8 +2106,8 @@ async function assertAirportControls(runtime,candidate,hooks){
   const native=html.match(/<select[^>]*data-package-field="service:arrival-service:ordinary-airportId"[^>]*>/)[0];
   assert.ok(native.includes('hidden'));
   assert.ok(!html.includes('value="tlc"'),'published airport allowlist remains authoritative');
-  assert.ok(html.includes('services-hourly-panel__disclaimer-group'));
-  assert.ok(!html.includes('<summary>Condiciones'));
+  assert.ok(html.includes('events-package-option-copy'));
+  assert.ok(html.includes('<summary>Condiciones del servicio'));
   assert.equal(html.split('Full condition text').length-1,2);
   const control=node('button'),select=node('select'),host=node();
   select.options=[{value:'',textContent:'Select'},...['mex','nlu'].map(id=>({value:id,textContent:window.PixkuyAirportTariffCatalog.resolveDisplayLabel('airport',id)}))];
@@ -1950,6 +2209,31 @@ async function assertPackageBandRecovery() {
   assert.deepEqual(reloaded.controller.state.receipt,receipt);assert.equal(reloaded.controller.state.selection,null);
   assert.equal(reloaded.calls.filter(c=>c.kind==='submit').length,0,'Recovery is a closed receipt, never a new request');
   console.log(JSON.stringify({suite:'bands-baggage-frozen-request-recovery',status:'PASS',externalCalls:0,databaseWrites:0}));
+}
+async function assertSessionDraftNavigation() {
+  const runtime=packageRuntime(),C=runtime.controller;
+  const service=id=>({id,ordinary:{baseService:'direct_transfer',inputs:{origin:{source:'customer'},time:{source:'customer'}}}});
+  const option=id=>({id,active:true,calculationModel:'ordinary_services',services:[service(id+'-service')]});
+  const event={id:'session-event',publicationVersion:1,snapshot:{schemaVersion:3,packages:[{id:'p',active:true,options:[option('a'),option('b')]},{id:'q',active:true,options:[option('c')]}]}};
+  C.selectEvent(event,false);C.choose('p','a');C.go('services');
+  C.change(s=>{s.passengerBand='van_1_2';s.services=[{serviceId:'a-service',ordinaryInputs:{origin:{address:'Canonical test location',placeId:'test-place'},time:'09:30'}}];});
+  C.state.contact.name='Session contact';
+  const quoteA=C.quote();
+  C.choose('p','b');C.change(s=>{s.services=[{serviceId:'b-service',ordinaryInputs:{origin:{address:'Incomplete text'}}}];});
+  C.choose('p','a');assert.equal(C.state.selection.services[0].ordinaryInputs.origin.placeId,'test-place');assert.equal(C.state.quote,null);
+  const freshA=C.quote();runtime.quotes[1]({source:'published',quoteFingerprint:'b'.repeat(64)});await freshA;
+  runtime.quotes[0]({source:'published',quoteFingerprint:'a'.repeat(64)});await quoteA;assert.equal(C.state.quote.quoteFingerprint,'b'.repeat(64),'A→B→A rejects the first A response');
+  C.change(s=>{s.services[0].ordinaryInputs.time='09:30';},{onlyWhenChanged:true});assert.equal(C.state.quote.quoteFingerprint,'b'.repeat(64),'blur with the input value already stored retains the quote');
+  C.choose('p','b');assert.equal(C.state.selection.services[0].ordinaryInputs.origin.address,'Incomplete text');
+  C.choose('q','c');C.choose('p','');assert.equal(C.state.selection.optionId,'b','return to package restores its last explicit mode');
+  assert.equal(C.choose('p','missing'),false,'missing mode is never replaced by another');
+  C.selectEvent(event,true);C.change(s=>s.inquiry.notes='Context-specific inquiry');C.selectEvent(event,false);assert.equal(C.state.contact.name,'Session contact');assert.equal(C.state.selection.optionId,'b');
+  C.choose('p','a');
+  const next=JSON.parse(JSON.stringify(event));next.publicationVersion=2;next.snapshot.packages[0].options[0].services[0].ordinary.inputs.origin={source:'fixed',value:{address:'Fixed place',placeId:'fixed-place'}};
+  C.selectEvent(next,false);assert.equal(C.state.selection.services[0].ordinaryInputs.origin,undefined,'saved customer location cannot override a newly fixed input');assert.equal(C.state.selection.services[0].ordinaryInputs.time,'09:30');assert.equal(C.state.quote,null);assert.equal(C.state.error,'PUBLICATION_CHANGED');
+  const expired=C.quote();runtime.quotes[2]({source:'published',quoteFingerprint:'c'.repeat(64),calculation:{serviceLines:[{included:{quoteExpiresAt:'2000-01-01T00:00:00Z'}}]}});await expired;C.selectEvent(next,false);assert.equal(C.state.quote,null,'expired quote is not restored');
+  runtime.request.hasFrozenBody=()=>true;assert.equal(C.choose('p','b'),false,'memory drafts respect recovery locks');
+  console.log('PASS session drafts: package/mode/custom isolation, stable identities, incomplete fields, A-B-A responses, unchanged blur, publication compatibility, expiry and recovery');
 }
 async function assertPackageRecoveryAndState() {
   const event={id:'11111111-1111-4111-8111-111111111111',publicationVersion:1};
@@ -2078,6 +2362,7 @@ async function run() {
     /input\.snapshotVersion = selectedEvent\.snapshotVersion;/
   );
   await assertPackageRecoveryAndState();
+  await assertSessionDraftNavigation();
   await assertPackageBandRecovery();
   await assertOrdinaryPackageInputs();
 

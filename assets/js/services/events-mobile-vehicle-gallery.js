@@ -502,6 +502,7 @@
     try {
       await loadFleetGallery();
       bindDocumentEvents();
+      window.dispatchEvent(new CustomEvent("pixkuy:events-vehicle-gallery-ready"));
       syncActiveState();
 
       window.addEventListener("resize", syncActiveState);
@@ -526,6 +527,7 @@
   }
 
   window.PixkuyEventsMobileVehicleGallery = {
+    getVehicle: getVehicle,
     open: openGallery,
     close: closeGallery,
     next: function next() {
