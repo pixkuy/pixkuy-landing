@@ -1,0 +1,110 @@
+/* Catalogue only. The blurred copy is the explicitly approved poster treatment. */
+.events-catalog-poster-action { display: block; position: relative; border-radius: 8px; }
+.events-catalog-poster__label { display: none; }
+.events-catalog-poster {
+  display: block;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #151717;
+}
+.events-catalog-poster__backdrop {
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  filter: blur(10px) brightness(.4);
+}
+.events-catalog-poster img.services-events-panel__event-image,
+.events-catalog-poster img.events-mobile-stack-card__image { background: transparent; }
+.events-catalog-poster__open {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  border: 0;
+  border-radius: inherit;
+  color: #fff;
+  background: transparent;
+  cursor: zoom-in;
+}
+.events-catalog-poster__open svg {
+  box-sizing: content-box;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: 6px;
+  background: #151717;
+}
+.events-catalog-poster__open:disabled { visibility: hidden; }
+.events-catalog-poster__open:focus-visible,
+.events-catalog-poster-viewer__close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.events-catalog-poster__open:focus-visible { outline-offset: -3px; }
+.events-catalog-poster-viewer {
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 8px;
+  background: #151717;
+  color: #fff;
+}
+.events-catalog-poster-viewer::backdrop { background: rgba(0, 0, 0, .8); }
+.events-catalog-poster-viewer img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 116px);
+  object-fit: contain;
+  margin-inline: auto;
+}
+.events-catalog-poster-viewer__close {
+  display: block;
+  margin: 0 0 12px auto;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+@media (max-width: 720px) {
+  .events-mobile-route .events-catalog-poster-action { display: grid; width: 88px; }
+  .events-mobile-route .events-catalog-poster { width: 88px; height: 104px; }
+  .events-mobile-route .events-catalog-poster,
+  .events-mobile-route .events-catalog-poster__open { grid-area: 1 / 1; align-self: start; }
+  .events-mobile-route .events-catalog-poster__open {
+    position: static;
+    z-index: 1;
+    display: grid;
+    grid-template-rows: 104px auto;
+    justify-content: stretch;
+    gap: 6px;
+    height: auto;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+  }
+  .events-mobile-route .events-catalog-poster__open svg { display: none; }
+  .events-mobile-route .events-catalog-poster__label {
+    display: block;
+    grid-row: 2;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .events-mobile-route .events-catalog-poster__open:disabled .events-catalog-poster__label { display: none; }
+}

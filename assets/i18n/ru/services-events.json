@@ -316,6 +316,8 @@
           "eventCta": "Настроить трансфер",
           "continueCta": "Продолжить заявку",
           "posterAlt": "Афиша события",
+          "posterOpenLabel": "Увеличить афишу события",
+          "posterViewLabel": "Посмотреть афишу",
           "posterCloseLabel": "Закрыть афишу события",
           "addressOriginPickupLabel": "Введите точку отправления и время подачи для события",
           "addressReturnDestinationPickupLabel": "Введите пункт назначения и время подачи после события",

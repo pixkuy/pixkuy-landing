@@ -429,7 +429,7 @@
     const mobile=event.snapshot.media?.mobile?.url;
     if(!main)return '<div class="services-events-panel__event-media"><div class="services-events-panel__event-image events-package-card__media-fallback" aria-hidden="true"><span>'+esc(eventType(event))+'</span></div></div>';
     const alt=sharedEventText(['services','cards','events','panel','posterAlt'],'Cartel del evento')+': '+eventTitle(event);
-    return '<div class="services-events-panel__event-media"><picture>'+(mobile?'<source media="(max-width: 720px)" srcset="'+esc(mobile)+'">':'')+'<img class="services-events-panel__event-image" src="'+esc(main)+'" alt="'+esc(alt)+'" loading="lazy" decoding="async"></picture></div>';
+    return '<div class="services-events-panel__event-media"><picture>'+(mobile?'<source media="(max-width: 720px)" srcset="'+esc(mobile)+'">':'')+'<img class="services-events-panel__event-image" src="'+esc(main)+'" width="'+esc(event.snapshot.media.main.width)+'" height="'+esc(event.snapshot.media.main.height)+'" alt="'+esc(alt)+'" loading="lazy" decoding="async"></picture></div>';
   }
   function eventMetadata(event,compact){
     const dates=eventDates(event);
@@ -440,10 +440,15 @@
     if(venue)rows.push('<div><dt>'+esc(sharedEventText(['services','cards','events','panel','venueLabel'],'Recinto'))+'</dt><dd>'+esc(venue)+'</dd></div>');
     return rows.length?'<dl class="services-events-panel__event-meta">'+rows.join('')+'</dl>':'';
   }
-  function packageCard(event){
+  function packageCard(event,mobile=false){
     const hasPackages=activePackages(event).length>0;
     const fromPrice=event.fromPrice;
     const selected=C.state.screen!=='catalog'&&C.state.selectedEvent?.id===event.id;
+    const actionClass='events-package-button events-package-button--primary'+(mobile?'':' services-events-panel__event-cta');
+    const actions='<div class="events-package-card__actions">'
+      +(hasPackages?'<button type="button" class="'+actionClass+'" data-package-event="'+esc(event.id)+'">'+esc(t('viewPackages'))+'</button>':'')
+      +(!hasPackages&&event.snapshot.customInquiryEnabled?'<button type="button" class="'+actionClass+'" data-package-custom="'+esc(event.id)+'">'+esc(t('proposal'))+'</button>':'')
+      +'</div>';
     return '<article class="services-events-panel__event events-package-card'+(selected?' is-selected':'')+'" data-package-card="'+esc(event.id)+'" role="listitem">'
       +eventMedia(event)
       +'<div class="services-events-panel__event-body">'
@@ -452,16 +457,13 @@
       +eventMetadata(event)
       +'<div class="services-events-panel__event-footer">'
       +(fromPrice?'<div class="services-events-panel__event-price"><span>'+esc(sharedEventText(['services','cards','events','panel','priceFromLabel'],'Desde'))+'</span><strong>'+esc(money(fromPrice.minorUnits,fromPrice.currency))+'</strong></div>':'<span aria-hidden="true"></span>')
-      +'<div class="events-package-card__actions">'
-      +(hasPackages?'<button type="button" class="services-events-panel__event-cta events-package-card__primary" data-package-event="'+esc(event.id)+'">'+esc(t('viewPackages'))+'</button>':'')
-      +(!hasPackages&&event.snapshot.customInquiryEnabled?'<button type="button" class="services-events-panel__event-cta" data-package-custom="'+esc(event.id)+'">'+esc(t('proposal'))+'</button>':'')
-      +'</div></div></div></article>';
+      +(mobile?'':actions)+'</div></div>'+(mobile?actions:'')+'</article>';
   }
-  function catalog(state){
+  function catalog(state,mobile=false){
     if(state.catalogStatus==='loading')return '<p class="events-package-catalog__status" role="status">'+esc(t("loading"))+'</p>';
     if(state.catalogStatus==='error')return '<div class="events-package-catalog__status"><p role="alert">'+esc(t("error"))+'</p>'+button('reload',t('retry'),false,'secondary')+'</div>';
     if(state.events.length===0)return '<p class="events-package-catalog__status">'+esc(t("empty"))+'</p>';
-    return '<div class="events-package-offers" role="list" aria-label="'+esc(t('title'))+'">'+state.events.map(packageCard).join('')+'</div>';
+    return '<div class="events-package-offers" role="list" aria-label="'+esc(t('title'))+'">'+state.events.map(event=>packageCard(event,mobile)).join('')+'</div>';
   }
   function customStrip(state){
     const events=state.events.filter(e=>e.snapshot.customInquiryEnabled);
@@ -1637,7 +1639,7 @@
     if(!sharedContact&&state.recoveryNotice&&!state.receipt)detail+='<div class="events-package-status"><p role="status">'+esc(t('recoveryNotice'))+'</p>'+button('recover',t('recover'),false,'secondary')+'</div>';
     if(!sharedContact&&!state.storageAvailable)detail+='<p class="events-package-status" role="status">'+esc(t('storageWarning'))+'</p>';
     if(!sharedContact&&state.requestStatus==='unknown')detail+='<div class="events-package-status"><p role="alert">'+esc(t('unknownReception'))+'</p>'+button('recover',t('recover'),false,'secondary')+button('retry',t('retry'),false,'primary')+'</div>';
-    const html=desktop?customStrip(state)+catalog(state)+(detail?'<section class="events-package-detail">'+detail+'</section>':''):state.screen==='catalog'?catalog(state)+customStrip(state)+(state.recoveryNotice?detail:''):detail;
+    const html=desktop?customStrip(state)+catalog(state)+(detail?'<section class="events-package-detail">'+detail+'</section>':''):state.screen==='catalog'?catalog(state,root.getAttribute('data-event-package-root')==='mobile')+customStrip(state)+(state.recoveryNotice?detail:''):detail;
     const mobileReceiptMarkup=root.getAttribute('data-event-package-root')==='mobile'&&state.receipt?.requestKind==='package'&&receipt;
     if(mobileReceiptMarkup&&root.packageReceiptMarkup===html){settleMobileReceipt(root,false);return;}
     root.packageReceiptMarkup=mobileReceiptMarkup?html:null;

@@ -366,7 +366,7 @@
     const poster = group.posterMobileSrc || group.posterSrc || "";
 
     return [
-      '<button type="button"',
+      '<article',
       ' class="events-mobile-stack-card"',
       ' data-events-mobile-event-group="' + escapeHtml(group.id) + '">',
       '<span class="events-mobile-stack-card__media">',
@@ -387,9 +387,9 @@
       '<strong class="events-mobile-stack-card__price-value">' + escapeHtml(formatCurrency(fromPrice, pricing.currency || "MXN")) + '</strong>',
       '</span>',
       '<span class="events-mobile-stack-card__venue">' + escapeHtml(venueName) + '</span>',
-      '<span class="cta events-mobile-stack-card__action" data-events-mobile-continue="' + escapeHtml(group.id) + '">' + escapeHtml(ctaLabel) + '</span>',
       '</span>',
-      '</button>'
+      '<button type="button" class="events-package-button events-package-button--primary events-mobile-stack-card__action" data-events-mobile-continue="' + escapeHtml(group.id) + '">' + escapeHtml(ctaLabel) + '</button>',
+      '</article>'
     ].join("");
   }
 

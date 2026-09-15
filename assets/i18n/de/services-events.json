@@ -316,6 +316,8 @@
           "eventCta": "Transfer konfigurieren",
           "continueCta": "Anfrage fortsetzen",
           "posterAlt": "Eventposter",
+          "posterOpenLabel": "Eventposter vergrößern",
+          "posterViewLabel": "Plakat ansehen",
           "posterCloseLabel": "Eventposter schließen",
           "addressOriginPickupLabel": "Gib deinen Abholort und die Abholzeit für das Event ein",
           "addressReturnDestinationPickupLabel": "Gib dein Ziel und die Abholzeit nach dem Event ein",

@@ -1279,6 +1279,16 @@
     padding: 12px;
   }
 
+  .events-mobile-route .events-package-card > .events-package-card__actions {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .events-mobile-route .events-package-card > .events-package-card__actions .events-package-button {
+    width: 100%;
+    height: auto;
+  }
+
   .events-mobile-route .services-events-panel__event-media,
   .events-mobile-route .services-events-panel__event-body {
     padding: 0;

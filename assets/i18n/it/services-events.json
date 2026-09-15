@@ -316,6 +316,8 @@
           "eventCta": "Configura transfer",
           "continueCta": "Continua richiesta",
           "posterAlt": "Poster dell’evento",
+          "posterOpenLabel": "Ingrandisci il poster dell’evento",
+          "posterViewLabel": "Vedi locandina",
           "posterCloseLabel": "Chiudi poster dell’evento",
           "addressOriginPickupLabel": "Inserisci origine e ora di prelievo per l’evento",
           "addressReturnDestinationPickupLabel": "Inserisci destinazione e ora di prelievo dopo l’evento",

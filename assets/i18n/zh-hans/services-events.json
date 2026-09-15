@@ -316,6 +316,8 @@
           "eventCta": "配置接送",
           "continueCta": "继续申请",
           "posterAlt": "活动海报",
+          "posterOpenLabel": "放大活动海报",
+          "posterViewLabel": "查看海报",
           "posterCloseLabel": "关闭活动海报",
           "addressOriginPickupLabel": "请输入活动出发地和接送时间",
           "addressReturnDestinationPickupLabel": "请输入活动后目的地和接送时间",

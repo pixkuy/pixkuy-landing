@@ -316,6 +316,8 @@
           "eventCta": "Configurar traslado",
           "continueCta": "Continuar solicitud",
           "posterAlt": "Cartel del evento",
+          "posterOpenLabel": "Ampliar cartel del evento",
+          "posterViewLabel": "Ver cartel",
           "posterCloseLabel": "Cerrar cartel del evento",
           "addressOriginPickupLabel": "Introduce tu origen y hora de recogida para el evento",
           "addressReturnDestinationPickupLabel": "Introduce tu destino y hora de recogida tras el evento",

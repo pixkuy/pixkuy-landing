@@ -316,6 +316,8 @@
           "eventCta": "Configurer le transfert",
           "continueCta": "Continuer la demande",
           "posterAlt": "Affiche de l’événement",
+          "posterOpenLabel": "Agrandir l’affiche de l’événement",
+          "posterViewLabel": "Voir l’affiche",
           "posterCloseLabel": "Fermer l’affiche de l’événement",
           "addressOriginPickupLabel": "Saisissez votre origine et l’heure de prise en charge pour l’événement",
           "addressReturnDestinationPickupLabel": "Saisissez votre destination et l’heure de prise en charge après l’événement",

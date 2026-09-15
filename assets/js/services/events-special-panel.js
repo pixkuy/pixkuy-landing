@@ -414,9 +414,7 @@
       <article
         class="services-events-panel__event${isSelected ? " is-selected" : ""}"
         data-services-events-group="${escapeHtml(group.id)}"
-        role="button"
-        tabindex="0"
-        aria-pressed="${isSelected ? "true" : "false"}"
+        tabindex="-1"
       >
         <div class="services-events-panel__event-media">
           <picture>
@@ -455,9 +453,9 @@
               <strong>${escapeHtml(formatCurrency(fromPrice, state.pricing.currency || "MXN"))}</strong>
             </div>
 
-            <span class="services-events-panel__event-cta" aria-hidden="true">
+            <button type="button" class="services-events-panel__event-cta events-package-button events-package-button--primary" aria-pressed="${isSelected ? "true" : "false"}">
               ${escapeHtml(ctaLabel)}
-            </span>
+            </button>
           </div>
         </div>
       </article>

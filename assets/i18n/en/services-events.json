@@ -316,6 +316,8 @@
           "eventCta": "Configure transfer",
           "continueCta": "Continue request",
           "posterAlt": "Event poster",
+          "posterOpenLabel": "Enlarge event poster",
+          "posterViewLabel": "View poster",
           "posterCloseLabel": "Close event poster",
           "addressOriginPickupLabel": "Enter your origin and pickup time for the event",
           "addressReturnDestinationPickupLabel": "Enter your destination and pickup time after the event",

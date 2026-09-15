@@ -316,6 +316,8 @@
           "eventCta": "이동 설정",
           "continueCta": "요청 계속하기",
           "posterAlt": "이벤트 포스터",
+          "posterOpenLabel": "이벤트 포스터 확대",
+          "posterViewLabel": "포스터 보기",
           "posterCloseLabel": "이벤트 포스터 닫기",
           "addressOriginPickupLabel": "이벤트를 위한 출발지와 픽업 시간을 입력하세요",
           "addressReturnDestinationPickupLabel": "이벤트 후 목적지와 픽업 시간을 입력하세요",
