@@ -1,9 +1,10 @@
 (function(window,document){
   "use strict";
-  const C=window.PixkuyEventPackagesState;const roots=new Set();let catalogSequence=0;let catalogLoad=null;let packageDetailsDialog=null;let packageDetailsPreviousFocus=null;
+  const C=window.PixkuyEventPackagesState;const roots=new Set();let catalogSequence=0;let catalogLoad=null;let packageDetailsDialog=null;let packageDetailsPreviousFocus=null;let recoveryInitialization=null;
   const AUTO_QUOTE_DELAY_MS=320;let airportQuoteTimer=null;let airportQuoteTimerRoot=null;let airportQuoteTimerSignature='';let airportQuoteAttemptedSignature='';
   const fallback={"ordinaryArrival":"Llegada: aeropuerto → dirección","ordinaryDeparture":"Salida: dirección → aeropuerto","ordinaryHourly":"Por horas","ordinaryFullDay":"Día completo","ordinaryDirection":"Sentido","ordinaryDate":"Fecha (CDMX)","ordinaryTime":"Hora (CDMX)","ordinaryMode":"Modalidad","ordinaryDuration":"Duración en horas","ordinaryPricing":"Pixkuy calcula el precio según los datos del servicio.","ordinaryDeferred":"Pendiente para coordinación posterior","ordinaryFixed":"Definido por el evento","ordinaryOutside":"El servicio seleccionado no cubre este trayecto. Puedes solicitar una valoración personalizada si está disponible.",title:"Paquetes para eventos",publicDatesLabel:"Fechas",choose:"Seleccionar",viewPackages:"Ver paquetes",custom:"Empresas y grupos · solicitud personalizada",empty:"No hay paquetes publicados en este momento.",error:"No se pudo completar la operación. Revisa los datos y vuelve a intentarlo.",loading:"Cargando…",back:"Volver",package:"Paquete",option:"Opción",passengers:"Pasajeros",services:"Servicios",date:"Fecha y hora local (CDMX)",origin:"Origen",destination:"Destino",airport:"Aeropuerto",address:"Dirección",baggage:"Equipaje",unknown:"Pendiente",none:"Sin equipaje",declared:"Declarado",specialNeeds:"Necesidades especiales por valorar",quote:"Revisar cálculo",continue:"Continuar con los datos de contacto",name:"Nombre",phone:"Teléfono",email:"Correo electrónico",submit:"Enviar solicitud",retry:"Reintentar el mismo envío",recover:"Recuperar recibo",received:"Solicitud recibida",notBooking:"La solicitud no confirma una reserva ni disponibilidad.",pending:"Hay datos o condiciones pendientes de valoración.",conditional:"Subtotal condicionado",personalized:"Valoración personalizada",quoted:"Subtotal cotizado",description:"Describe lo que necesitas",reason:"Motivo",knownPassengers:"Número de personas conocido",additional:"Servicio adicional",conditions:"Condiciones",recoveryNotice:"No se ha podido recuperar la recepción. Conservamos el mismo intento; reintroduce los datos si recargaste la página.",storageWarning:"El navegador no puede conservar el intento al recargar. Mantén esta página abierta para reintentar.",sending:"Enviando…",unknownReception:"La recepción es desconocida. Recupera el recibo o reintenta con la misma clave.",newRequest:"Nueva consulta",whatsapp:"Continuar voluntariamente en WhatsApp",flight:"Vuelo",notes:"Notas operativas (opcional)",notOffered:"Combinación no ofrecida",reviewChanged:"Revisa de nuevo la oferta antes de enviar.",close:"Cerrar",inclusions:"Qué incluye",base:"Base",multiplier:"Multiplicador",result:"Resultado",calculationStatus:"Estado del cálculo",selectPackageOption:"Selecciona paquete y opción para continuar."};
   Object.assign(fallback,{mobileConfigureTrip:'Configurar mi viaje',mobileTripData:'Datos del viaje',vehicleCategoryLabel:'Van Premium · BYD M9 o similar',vehicleGalleryOpen:'Ver galería',vehicleFareLabel:'Tarifa',"confirmationTitle":"Solicitud recibida correctamente","confirmationNext":"Gracias por contactar con Pixkuy. Su solicitud ha quedado registrada. Nos pondremos en contacto con usted para revisar los detalles.","receiptReference":"Referencia de la solicitud","copyReference":"Copiar referencia","referenceCopied":"Referencia copiada.","referenceCopyUnavailable":"No se pudo copiar. Seleccione la referencia y cópiela manualmente.","confirmationWhatsapp":"Contactar por WhatsApp","confirmationNew":"Nueva solicitud","confirmationNoRepeat":"No necesita enviarla de nuevo.","confirmationReservation":"Esta solicitud no constituye una reserva confirmada.","receiptEvent":"Evento","confirmationArrival":"Traslado de llegada","confirmationDeparture":"Traslado de salida"});
+  Object.assign(fallback,{"hourlyReviewIntro":"Revise su servicio y complete sus datos","hourlyReviewChangePackage":"Cambiar paquete","hourlyReviewNotes":"Notas adicionales","hourlyReviewNotesHelp":"Indique detalles que debamos tener en cuenta para su servicio."});
   const journeyFallback={"eventUnavailable":"El evento seleccionado ya no está disponible o su publicación ha cambiado. Seleccione un evento para continuar.","continueContact":"Continuar","editTransfer":"Editar traslado","editTransfers":"Editar traslados","customTitle": "¿Necesita un servicio a medida?", "customIntro": "También organizamos traslados con otros horarios, recorridos o necesidades, para particulares, empresas y grupos.", "proposal": "Solicitar propuesta", "customLink": "Servicio a medida", "noPackage": "¿Ningún paquete se ajusta a lo que necesita?", "configure": "Configurar", "goServices": "Continuar a servicios", "reviewContact": "Revisión y contacto", "priceByDetails": "El precio depende de la opción y de los datos del servicio.", "groupTotal": "Total del grupo", "breakdown": "Desglose", "customNotesHelp": "Indique fechas, horarios, recorrido y necesidades. Si representa a una empresa, puede indicarlo aquí.", "changeLoss": "Este cambio descarta datos de servicios que no son compatibles. ¿Desea continuar?", "invalidData": "Revise los datos del servicio, su periodo operativo y las restricciones publicadas.", "reuseLodging": "Usar el alojamiento de otro servicio", "selectEvent": "Seleccione el evento de su solicitud", "calculatePrice": "Calcular precio", "arrivalTime": "Hora de inicio del servicio (CDMX)", "pickupTime": "Hora de recogida (CDMX)", "transferFlight": "Número de vuelo", "editServices": "Editar servicios", "backToEvents": "← Volver a eventos", "choosePackage": "Elija su paquete", "modeAvailable": "Modalidad disponible", "transferOne": "1 traslado", "transferMany": "{count} traslados", "viewInclusions": "Ver las {count} inclusiones", "viewAllDetails": "Ver todas las inclusiones y condiciones", "customStepIntro": "Para particulares, empresas y grupos con otros horarios o recorridos.", "configureTransfer": "Configurar traslado", "configureServices": "Configurar servicios", "missingForQuote": "Falta: {fields}.", "invalidForQuote": "Revisa: {fields}.", "placeDetailsError": "No hemos podido confirmar la dirección seleccionada. Vuelve a elegirla de la lista.", "automaticQuotePending": "El precio se calculará automáticamente.", "retryCalculation": "Reintentar cálculo"};
   const bandsFallback={"baggageCount":"Número de maletas","baggageQuantityUnknown":"Cantidad no indicada","baggageMayBePending":"Puede dejar la cantidad pendiente para coordinación.","baggageConfigurationRequired":"Falta configurar quién indica el número de maletas.","optional":"opcional","flightOptionalHelp":"Si lo conoce, lo usaremos para coordinar la recogida.","baggageOptionalHelp":"Puede indicarlo si desea facilitar la coordinación.","noCompatibleBand":"No hay bandas de pasajeros compatibles con esta opción.","historicalExact":"cantidad exacta histórica"};
   Object.assign(journeyFallback,{journeyHeading:'Day · {date}',mobileViewDetails:'Ver detalles, inclusiones y condiciones',mobilePriceByDetails:'El precio se calcula al completar sus datos'});
@@ -45,13 +46,19 @@
     names.forEach(name=>{if(!forms.refreshReservationRequestValidationUX(fields,name))valid=false;});
     const data=forms.getReservationRequestData(fields);
     if(valid&&data?.phone&&names.includes('phone')){fields.phone.value=data.phone;C.state.contact.phone=data.phone;}
-    if(!valid){const invalid=root.querySelector?.('[aria-invalid="true"]');invalid?.focus?.({preventScroll:true});}
+    if(!valid&&!fieldName){const invalid=root.querySelector?.('[aria-invalid="true"]');invalid?.focus?.({preventScroll:true});}
     return valid;
   }
   Object.assign(fallback,{sharedTripData:"Datos compartidos",arrivalHeading:"Llegada",returnHeading:"Regreso",roundTripTotal:"Total de ida y vuelta",arrivalRoute:"Aeropuerto → Alojamiento",returnRoute:"Alojamiento → Aeropuerto",roundTripRoute:"Aeropuerto → Alojamiento → Mismo aeropuerto",returnDate:'Fecha de regreso',returnPickupTime:'Hora de recogida en el hotel (CDMX)'});
   Object.assign(fallback,{"outboundHeading": "Ida", "directTransferLabel": "Direct Transfer", "directSharedData": "Datos compartidos", "directDestination": "Destino / dirección de llegada", "directSharedDate": "Fecha de ida y regreso (CDMX)", "directOutboundDate": "Fecha de ida", "directOutboundTime": "Hora de ida (CDMX)", "directReturnTime": "Hora de regreso (CDMX)", "directEndpointsHelp": "El regreso utiliza los mismos extremos en sentido inverso."});
   const ordinaryChoices={airportId:[['mex','MEX'],['nlu','NLU'],['tlc','TLC'],['pbc','PBC'],['qro','QRO']],direction:[['airport_to_destination','ordinaryArrival'],['destination_to_airport','ordinaryDeparture']],mode:[['hourly','ordinaryHourly'],['full_day','ordinaryFullDay']],baggageStatus:[['unknown','unknown'],['none','none'],['declared','declared']]};
   const ordinaryFieldLabels={airportId:'airport',direction:'ordinaryDirection',origin:'origin',destination:'address',date:'ordinaryDate',time:'ordinaryTime',mode:'ordinaryMode',durationHours:'ordinaryDuration',flight:'flight',baggageStatus:'baggage'};
+  Object.assign(fallback,{"hourlyReviewAllDays":"Todas las jornadas","hourlyReviewDate":"Fecha","hourlyReviewDuration":"{hours} h por jornada · Horario de Ciudad de México","hourlyReviewHours":"{hours} h"});
+  Object.assign(fallback,{"hourlyMobileStart":"Inicio","hourlyMobileEnd":"Fin","hourlyMobileCommonStart":"Hora habitual","hourlyMobileDuration":"12 h por jornada · Horario de Ciudad de México"});
+  Object.assign(fallback,{"hourlyPickup":"Recogida","hourlyStart":"Inicio (CDMX)","hourlyEnd":"Fin del servicio (CDMX)","hourlyHabits":"Datos habituales","hourlyHabitsHelp":"Aplique una recogida y hora habituales; puede cambiarlas por jornada. Los cambios habituales conservan sus excepciones.","hourlyCommonPickup":"Recogida habitual","hourlyCommonStart":"Hora habitual (CDMX)","hourlyWeekStart":"Fecha inicial de la semana","hourlyDay":"Jornada {number}","hourlyDuration":"12 horas consecutivas por jornada","hourlyCount":"{count} jornadas · 12 horas por jornada"});
+  Object.assign(fallback,{"hourlyEnterTime":"Indique la hora","hourlyChooseDate":"Seleccione una fecha para organizar sus jornadas.","hourlyDateRange":"Elija una fecha entre {from} y {until}.","hourlyLatestStart":"Comience como máximo a las {time} para completar las 12 horas.","hourlyInvalidTime":"Revise el horario: debe respetar el periodo y no solaparse con otra jornada.","hourlySelectPlace":"Seleccione una dirección de las sugerencias.","hourlyNextDay":"día siguiente","hourlyDifferentPickup":"Recogida diferente","hourlyDifferentTime":"Horario diferente","hourlyCheckDay":"Revise los datos de esta jornada","hourlyEditDay":"Editar {date}","hourlyEdit":"Editar","hourlyDone":"Listo","hourlyUseHabits":"Usar recogida y hora habituales","hourlyAdjustDay":"Puede ajustar la recogida y el horario de cada jornada","hourlyComplete":"Complete fecha, pasajeros, recogida y hora para obtener el total.","hourlyCheckData":"Revisar datos"});
+  Object.assign(fallback,{"hourlyDesktopSingle":"1 jornada · {hours} h","hourlyDesktopComposition":"{count} jornadas · {hours} h por jornada","hourlyDesktopHabitual":"Recogida habitual","hourlyDesktopPickupPending":"Indique la recogida","hourlyDesktopChangeDay":"Cambiar {date}","hourlyDesktopChange":"Cambiar","hourlyDesktopFixedDates":"Fechas fijadas","hourlyDesktopSchedule":"Horario","hourlyDesktopAction":"Acción"});
+  const H=window.PixkuyEventPackagesHourly({C,t,esc,ordinaryInput,addressField,field,passengerField,baggageField,serviceBounds,desktopDate,receiptServiceTime,locale});
   function serviceBounds(service,state=C.state){
     const period=state.selectedEvent?.snapshot.servicePeriod;
     const localMinute=value=>value?new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(value)).replace(' ','T'):'';
@@ -59,7 +66,8 @@
     const selection=state.selection;
     const option=state.selectedEvent?.snapshot.packages.find(p=>p.id===selection?.packageId)?.options.find(o=>o.id===selection?.optionId);
     const r=option?.calculationModel==='ordinary_services'?service.ordinary?.restrictions:null;
-    if(option?.services.some(item=>item.ordinary?.airportReturn||item.ordinary?.directReturn)){
+    if(service.ordinary?.baseService==='hourly_daily'&&service.ordinary.inputs.mode?.source==='fixed'&&service.ordinary.inputs.mode.value==='hourly'&&service.ordinary.inputs.durationHours?.source==='fixed'&&period?.until)bounds.max=localMinute(new Date(Date.parse(period.until)-Number(service.ordinary.inputs.durationHours.value)*3600000-60000).toISOString());
+    if(service.ordinary?.baseService==='hourly_daily'||option?.services.some(item=>item.ordinary?.airportReturn||item.ordinary?.directReturn)){
       const earliest=Math.ceil((Date.now()+(state.selectedEvent.snapshot.minimumLeadMinutes||0)*60000)/60000)*60000;
       bounds.min=[bounds.min,localMinute(new Date(earliest).toISOString())].sort().pop();
     }
@@ -76,6 +84,7 @@
   }
   function airportQuoteReadiness(state,view){
     if(!view)return {ready:false,missing:[],invalid:[]};
+    if(view.hourly)return H.readiness(state,view);
     if(view.service.ordinary?.baseService==='direct_transfer')return directQuoteReadiness(state,view);
     const {option,service,arrival}=view;const data=state.selection.services.find(item=>item.serviceId===service.id)||{};const inputs=service.ordinary.inputs;const values=data.ordinaryInputs||{};const missing=[];const invalid=[];
     const requireValue=(key,label,validate)=>{
@@ -296,12 +305,12 @@
     const view=option&&optionAirportView(state,pkg,option);
     return view?.returning&&serviceId===view.returning.id?t('returnHeading'):view?.returning&&serviceId===view.service.id?t('arrivalHeading'):t('serviceLabel');
   }
-  function summary(state,surface){
+  function summary(state,surface,hourlyDesktop){
     if(!state.quote)return '';
     const calculation=state.quote.calculation;
     const price=calculation.priceBreakdown;
     const complete=price.priceStatus==='quoted'&&price.pricedSubtotal!==null;
-    const amount=complete?money(price.pricedSubtotal,price.currency):t('pending');
+    const amount=complete?(hourlyDesktop?receiptMoney:money)(price.pricedSubtotal,price.currency):t('pending');
     const packageOption=state.selection?.requestKind==='package';
     const coordinationFields=[...new Set((calculation.serviceLines||[]).flatMap(line=>Object.entries(line.inputStatus||{}).filter(([,input])=>input.pending).map(([key])=>t(ordinaryFieldLabels[key]||'pending'))).concat(calculation.baggageAssessment==='pending'?[t('baggageCount')]:[]))];
     const conditions=surface==='mobile-config'?'':surface==='mobile-review'
@@ -313,7 +322,7 @@
       const pendingFields=[...new Set((calculation.serviceLines||[]).flatMap(line=>Object.entries(line.inputStatus||{}).filter(([key,input])=>input.pending&&(!passiveBaggage||!['baggageCount','baggageStatus'].includes(key))).map(([key])=>t(ordinaryFieldLabels[key]||'pending'))).concat(calculation.baggageAssessment==='pending'&&!passiveBaggage?[t('baggageCount')]:[]))];
       const remainingCodes=(calculation.coordinationPendingCodes||[]).filter(code=>!passiveBaggage||!/:BAGGAGE(?:COUNT|STATUS)_PENDING$/.test(code));
       const detail=surface==='mobile-review'?conditions:'<details class="events-package-review-conditions"><summary>'+esc(t('desktopConditions'))+'</summary><ul>'+(calculation.conditions||[]).map(condition=>'<li><strong>'+esc(local(condition.title))+'</strong><p>'+esc(local(condition.description))+'</p></li>').join('')+'</ul></details>';
-      return '<section class="events-package-summary events-package-summary--review">'+detail+(calculation.pendingCodes.length?'<p class="events-package-help">'+esc(t('pending'))+'</p>':'')+(pendingFields.length?'<p class="events-package-help">'+esc(pendingFields.join(', '))+': '+esc(t('ordinaryDeferred'))+'</p>':remainingCodes.length?'<p class="events-package-help">'+esc(t('pending'))+': '+esc(t('ordinaryDeferred'))+'</p>':'')+'<p class="events-package-help">'+esc(t('notBooking'))+'</p><div class="events-package-review-total" aria-live="polite"><h4>'+esc(t('packageTotal'))+'</h4><p class="events-package-summary__amount">'+esc(surface==='mobile-review'&&!airportCanReview(state)?t('reviewChanged'):amount)+'</p></div></section>';
+      return '<section class="events-package-summary events-package-summary--review">'+detail+(calculation.pendingCodes.length?'<p class="events-package-help">'+esc(t('pending'))+'</p>':'')+(pendingFields.length?'<p class="events-package-help">'+esc(pendingFields.join(', '))+': '+esc(t('ordinaryDeferred'))+'</p>':remainingCodes.length?'<p class="events-package-help">'+esc(t('pending'))+': '+esc(t('ordinaryDeferred'))+'</p>':'')+'<p class="events-package-help">'+esc(t('notBooking'))+'</p><div class="events-package-review-total" aria-live="polite"><h4>'+esc(t('packageTotal'))+'</h4><p class="events-package-summary__amount">'+esc((surface==='mobile-review'||hourlyDesktop)&&!airportCanReview(state)?t('reviewChanged'):amount)+'</p></div></section>';
     }
     return '<section class="events-package-summary" aria-live="polite">'
       +'<h4>'+esc(t(packageOption?'packageTotal':complete?'groupTotal':'pending'))+'</h4>'
@@ -335,7 +344,7 @@
     // The existing van fare bands describe a category, never an assigned vehicle.
     const band=calculation?.passengerBand||state.selection?.passengerBand;
     const vehicle=window.PixkuyEventsMobileVehicleGallery?.getVehicle?.();
-    if(!mobileAirportOption(option)||!['van_1_2','van_3_4','van_5_6'].includes(band)||vehicle?.id!=='byd_m9'||!vehicle.images?.length||!airportCanReview(state)||price?.priceStatus!=='quoted'||price.pricedSubtotal===null||price.pricedSubtotal===undefined)return '';
+    if((!mobileAirportOption(option)&&!H.configured(state))||!['van_1_2','van_3_4','van_5_6'].includes(band)||vehicle?.id!=='byd_m9'||!vehicle.images?.length||!airportCanReview(state)||price?.priceStatus!=='quoted'||price.pricedSubtotal===null||price.pricedSubtotal===undefined)return '';
     const formatted=money(price.pricedSubtotal,price.currency);
     const currency=String(price.currency||'MXN');
     const suffix=' '+currency;
@@ -347,7 +356,7 @@
       +'<span class="events-package-vehicle-card__gallery-label">'+esc(t('vehicleGalleryOpen'))+'</span></button>'
       +'<p class="events-package-vehicle-card__vehicle">'+esc(t('vehicleCategoryLabel'))+'</p>'
       +'<div class="events-package-vehicle-card__fare"><span>'+esc(t('packageTotal'))+'</span><strong><span>'+esc(amount)+'</span><span class="events-package-vehicle-card__currency">'+esc(currency)+'</span></strong></div>'
-      +button(configuredDirectOption(state)?'airport-review':'contact',t('continueContact'),locked,'primary')+'</section>';
+      +button(configuredDirectOption(state)||H.configured(state)?'airport-review':'contact',t('continueContact'),locked,'primary')+'</section>';
   }
   Object.assign(fallback,{"mobileBackToPackage":"Volver al paquete","mobileTripStep":"Paso 2 de 3 · Datos del viaje","mobileJourneyDate":"Fecha de ida y regreso","mobileMissingJourneyField":"Complete el horario de {field} de {date}."});
   function mobileQuoteMessage(state,view){
@@ -369,16 +378,18 @@
     return t('desktopCompleteFields',{fields:ready.missing.slice(0,3).join(', ')});
   }
   function mobileCalculationContent(state,option,locked){
-    const automaticView=configuredAirportOption(state)||configuredDirectOption(state);
+    const automaticView=configuredAirportOption(state)||configuredDirectOption(state)||H.configured(state);
     if(!automaticView||automaticView.option!==option)return summary(state,'mobile-config')+calculationControls(state,locked);
     const card=mobileAirportQuoteCard(state,option,locked);
     if(card)return card;
+    const hourlyProblem=automaticView.hourly&&H.firstProblem(state);
+    if(hourlyProblem&&state.quoteStatus!=='error')return '<p class="events-package-status">'+esc(t(H.readiness(state,automaticView).invalid.length?'hourlyCheckDay':'hourlyComplete'))+'</p>'+(automaticView.services.length>1&&/ordinary-(origin|time|baggageCount)$/.test(hourlyProblem)?button('hourly-fix',t('hourlyCheckData'),locked,'quiet'):'')+button('airport-review',t('continueContact'),true,'primary');
     const calculation=state.quoteStatus==='ready'?state.quote?.calculation:null;
     if(calculation?.coverageStatus==='outside'){let content='<p class="events-package-alert" role="alert">'+esc(t('ordinaryOutside'))+'</p>';if(state.selectedEvent.snapshot.customInquiryEnabled)content+=button('ordinary-custom',t('custom'),locked,'secondary');return content;}
     const current=airportCanReview(state),price=current?calculation?.priceBreakdown:null;
     const amount=price?.pricedSubtotal!==null&&price?.pricedSubtotal!==undefined?'<p class="events-package-summary__amount"><span>'+esc(t('packageTotal'))+'</span> '+esc(money(price.pricedSubtotal,price.currency))+'</p>':'';
     const message=current?(price?.priceStatus==='quoted'?'':t('pending')):mobileQuoteMessage(state,automaticView);
-    return amount+(message?'<p class="events-package-status" role="status">'+esc(message)+'</p>':'')+(state.quoteStatus==='error'?button('retry-quote',t('retryCalculation'),locked,'secondary'):'')+(!current||price?.priceStatus==='quoted'||configuredDirectOption(state)?button(configuredDirectOption(state)?'airport-review':'contact',t('continueContact'),locked||!current,'primary'):'');
+    return amount+(message?'<p class="events-package-status" role="status">'+esc(message)+'</p>':'')+(state.quoteStatus==='error'?button('retry-quote',t('retryCalculation'),locked,'secondary'):'')+(!current||price?.priceStatus==='quoted'||configuredDirectOption(state)?button(configuredDirectOption(state)||H.configured(state)?'airport-review':'contact',t('continueContact'),locked||!current,'primary'):'');
   }
   function sharedEventText(path,fallbackValue){
     let value=window.__pixkuyI18nDict;
@@ -628,6 +639,7 @@
     return new Intl.DateTimeFormat(locale(),{dateStyle:'long',...(value.length>10?{timeStyle:'short'}:{}),timeZone:'UTC'}).format(date)+(withZone?' · CDMX':'');
   }
   function resolvedOrdinaryValues(service,state){
+    if(service.ordinary?.baseService==='hourly_daily'&&H.view(state))return H.values(service,state);
     const data=state.selection.services.find(item=>item.serviceId===service.id)?.ordinaryInputs||{};
     const values=Object.fromEntries(Object.entries(service.ordinary?.inputs||{}).map(([key,input])=>[key,input.source==='fixed'?(input.redacted?(input.displayLabel||t('ordinaryFixed')):input.value):input.source==='customer'?data[key]:undefined]));
     if(service.ordinary?.sharedOrigin){
@@ -656,6 +668,10 @@
     return '<fieldset class="events-package-primary-form'+(mobile?'':' events-package-airport__leg')+'" data-package-airport-return="'+esc(service.id)+'"'+(window.PixkuyEventPackagesRequest.hasFrozenBody()?' disabled':'')+'><legend>'+esc(t('returnHeading'))+'</legend><div class="'+(mobile?'services-expand__form events-package-airport-return__schedule':'events-package-airport__extras')+'">'+control('date','returnDate')+control('time',mobile?'returnPickupTime':'returnHotelPickup')+'</div></fieldset>';
   }
   Object.assign(fallback,{"reviewIntro":"Revise su traslado y complete sus datos","contactDetails":"Datos de contacto","packageTotal":"Total del paquete","reviewPickup":"Recogida","reviewDestination":"Destino","reviewMode":"Modalidad","receiptRequestedTime":"Hora solicitada (CDMX)","receiptEnd":"Fin del servicio"});
+  function hourlyDesktopReview(state){
+    const current=H.view(state);if(!current)return '';
+    return '<section class="events-package-review events-package-review--hourly-desktop"><header><p class="events-package-review__event">'+esc(eventTitle(state.selectedEvent))+'</p><div class="events-package-review__heading"><h4>'+esc(local(current.pkg.title))+'</h4>'+button('edit-services',t('editServices'),false,'quiet')+'</div><p class="events-package-review__mode">'+esc(local(current.option.title))+' · '+esc(passengerDescription(state.selection))+' '+esc(t('passengers'))+'</p>'+button('change-package',t('hourlyReviewChangePackage'),false,'quiet')+'</header>'+H.review(state,false)+'</section>';
+  }
   function reviewSelectors(state,locked){
     const selection=state.selection,packages=activePackages(state.selectedEvent).filter(pkg=>activeOptions(pkg).length);
     const pkg=packages.find(item=>item.id===selection.packageId);
@@ -664,6 +680,7 @@
     return '<div class="events-package-review__selectors">'+control('package',packages,selection.packageId)+(options.length===1?'<div class="events-package-field"><span>'+esc(t('reviewMode'))+'</span><p>'+esc(local(options[0].title))+'</p></div>':options.length?control('option',options,selection.optionId):'')+'</div>';
   }
   function reviewItinerary(state,compact,omitTitle,mobile){
+    const hourly=H.review(state,mobile);if(hourly){const view=H.view(state);return '<section class="events-package-review events-package-review--compact">'+(omitTitle?'':'<h4>'+esc(local(view.pkg.title))+'</h4><p class="events-package-review__mode">'+esc(local(view.option.title))+(mobile?' · '+esc(t('passengers'))+': '+esc(passengerDescription(state.selection)):'')+'</p>')+(mobile?'':'<p>'+esc(t('passengers'))+': '+esc(passengerDescription(state.selection))+'</p>')+hourly+button('edit-services',t('editServices'),false,'quiet')+'</section>';}
     const selection=state.selection,event=state.selectedEvent;
     if(selection.requestKind==='custom')return '<p>'+esc(selection.inquiry.notes)+'</p><p>'+esc(t('passengers'))+': '+esc(selection.inquiry.passengers.count??t('unknown'))+'</p>'+button('edit-services',t('editServices'),false,'quiet');
     const pkg=activePackages(event).find(p=>p.id===selection.packageId),option=pkg?.options.find(o=>o.id===selection.optionId);
@@ -747,11 +764,11 @@
   }
   function mobileReviewContact(state){
     const locked=window.PixkuyEventPackagesRequest.hasFrozenBody()||state.requestStatus==='submitting';
-    const contact=state.contact||{};
+    const contact=state.contact||{},hourly=!!H.view(state);
     const phoneLabel=i18nText('airportMobileContactStep.fields.phone',t('phone'));
     const phonePlaceholder=i18nText('airportMobileContactStep.placeholders.phone','');
-    return '<section class="events-package-mobile-contact" data-package-mobile-contact>'
-      +'<header class="events-package-config__header events-package-mobile-contact__header">'+button('back',t('mobileReviewBack'),locked,'secondary')+'<h3 tabindex="-1" data-package-heading>'+esc(eventTitle(state.selectedEvent))+'</h3><p>'+esc(t('mobileReviewStep'))+'</p></header>'
+    return '<section class="events-package-mobile-contact'+(hourly?' events-package-mobile-contact--hourly':'')+'" data-package-mobile-contact>'
+      +'<header class="events-package-config__header events-package-mobile-contact__header">'+button('back',t('mobileReviewBack'),locked,hourly?'quiet':'secondary')+'<h3 tabindex="-1" data-package-heading>'+esc(eventTitle(state.selectedEvent))+'</h3><p>'+esc(t('mobileReviewStep'))+'</p></header>'
       +mobileReviewItinerary(state)+'<form data-package-mobile-contact-form novalidate>'
       +'<fieldset class="events-package-mobile-contact__fields"'+(locked?' disabled':'')+'><legend>'+esc(t('contactDetails'))+'</legend>'
       +contactField('name',i18nText('airportMobileContactStep.fields.name',t('name')),contact.name,'text','required minlength="2" maxlength="180" autocomplete="name"')
@@ -857,10 +874,42 @@
     // Relocate the existing presentation fragments only; their controls and contracts stay intact.
     body=body.replace(/<h3[^>]*data-package-step-heading[^>]*>[\s\S]*?<\/h3><p[^>]*>[\s\S]*?<\/p>/,'').replace(airportConditions(state.selectedEvent,view.pkg),'').replace(/<div[^>]*data-airport-price[^>]*>[\s\S]*?<\/div>/g,'').replace(/<div[^>]*data-airport-actions[^>]*>[\s\S]*?<\/div>/g,'');
     for(const service of view.option.services){const input=service.ordinary?.inputs.baggageCount||service.ordinary?.inputs.baggageStatus;if(!input||input.source==='deferred')body=body.replace(baggageField(service,state.selection.services.find(s=>s.serviceId===service.id)||{},'service:'+service.id+':'),'');}
-    const count=pairs.length&&dates.size===pairs.length?t(dates.size===1?'desktopSingleDayCount':'desktopJourneyCount',{days:dates.size,transfers:view.option.services.length}):t(view.option.services.length===1?'desktopSingleTransfer':'desktopTransferCount',{count:view.option.services.length});
+    const count=view.hourly?t('hourlyCount',{count:view.option.services.length}):pairs.length&&dates.size===pairs.length?t(dates.size===1?'desktopSingleDayCount':'desktopJourneyCount',{days:dates.size,transfers:view.option.services.length}):t(view.option.services.length===1?'desktopSingleTransfer':'desktopTransferCount',{count:view.option.services.length});
     const daily=pairs.length&&pairs.every(pair=>pair.sharedDate);
     const conditions=conditionsHtml(state.selectedEvent,view.pkg).replace(esc(t('conditions')),esc(t('desktopConditions')));
     return '<section class="events-package-desktop-config"><h3 tabindex="-1" data-package-step-heading>'+esc(t('configureTransferTitle'))+'</h3><div class="events-package-desktop-selection"><p>'+esc(local(view.pkg.title))+' · '+esc(local(view.option.title))+'</p>'+(common?desktopDestination(common):'')+'</div><div class="events-package-desktop-columns"><div class="events-package-desktop-main">'+body+'</div><aside class="events-package-desktop-summary" aria-label="'+esc(t('desktopYourPackage'))+'"><h4>'+esc(t('desktopYourPackage'))+'</h4><p>'+esc(count)+'</p>'+(daily?'<p class="events-package-desktop-roundtrip">'+'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="'+inclusionIconPaths.round_trip+'"/></svg>'+esc(t('desktopDailyReturn'))+'</p>':'')+'<div data-airport-price role="status" aria-live="polite" aria-atomic="true">'+desktopPrice(state,view)+'</div><div data-airport-actions>'+desktopActions(state)+'</div>'+conditions+'<p class="events-package-desktop-notice">'+esc(t('notBooking'))+'</p></aside></div></section>';
+  }
+  function hourlyDesktopVehicle(state){
+    const vehicle=window.PixkuyEventsMobileVehicleGallery?.getVehicle?.();
+    if(!H.configured(state)||!airportCanReview(state)||state.quote?.calculation?.priceBreakdown?.priceStatus!=='quoted'||!['van_1_2','van_3_4','van_5_6'].includes(state.selection.passengerBand)||vehicle?.id!=='byd_m9'||!vehicle.images?.length||!window.PixkuyHourlyDesktopVehicleGallery)return '';
+    return '<button type="button" class="events-package-hourly-desktop__gallery" data-package-action="hourly-desktop-gallery" aria-haspopup="dialog"><img src="'+esc(vehicle.images[0].src)+'" alt="" loading="lazy"><span>'+esc(t('vehicleGalleryOpen'))+'</span></button><p>'+esc(t('vehicleCategoryLabel'))+'</p>';
+  }
+  function hourlyDesktopActions(state){
+    const problem=H.firstProblem(state),locked=window.PixkuyEventPackagesRequest.hasFrozenBody()||['unknown','submitting','received'].includes(state.requestStatus);
+    const view=H.configured(state),repair=problem&&(H.readiness(state,view).invalid.length||view.services.length>1&&/ordinary-(origin|time|baggageCount)$/.test(problem));
+    return (repair?button('hourly-fix',t('hourlyCheckData'),locked,'quiet'):'')+desktopActions(state);
+  }
+  function hourlyDesktopConfig(state,view,body,surface,locked){
+    return '<div class="events-package-hourly-config"><header class="events-package-hourly-desktop__header"><div class="events-package-desktop-nav">'+button('packages',t('backToPackages'),locked,'secondary')+(state.selectedEvent.snapshot.customInquiryEnabled?button('ordinary-custom',t('customLink'),locked,'quiet'):'')+'</div><p>'+esc(eventTitle(state.selectedEvent))+'</p>'+navigation(state,surface)+'</header><section class="events-package-desktop-config"><h3 tabindex="-1" data-package-step-heading>'+esc(local(view.pkg.title))+'</h3><p class="events-package-hourly-desktop__mode">'+esc(local(view.option.title))+' · '+esc(H.composition(view))+'</p><div class="events-package-desktop-columns"><div class="events-package-desktop-main">'+body+'</div><aside class="events-package-desktop-summary" aria-label="'+esc(t('desktopYourPackage'))+'"><h4>'+esc(t('desktopYourPackage'))+'</h4><p>'+esc(H.composition(view))+'</p><div data-airport-price role="status" aria-live="polite" aria-atomic="true">'+desktopPrice(state,view)+'</div><div data-airport-actions>'+hourlyDesktopActions(state)+'</div>'+conditionsHtml(state.selectedEvent,view.pkg).replace(esc(t('conditions')),esc(t('desktopConditions')))+'<p class="events-package-desktop-notice">'+esc(t('notBooking'))+'</p><div data-hourly-desktop-vehicle>'+hourlyDesktopVehicle(state)+'</div></aside></div></section></div>';
+  }
+  function syncHourlyDesktopSummary(root){
+    const summary=root.querySelector?.('.events-package-hourly-config .events-package-desktop-summary');
+    if(root.hourlySummaryTarget!==summary){root.hourlySummaryObserver?.disconnect();root.hourlySummaryTarget=summary;if(summary&&window.ResizeObserver){root.hourlySummaryObserver=new window.ResizeObserver(()=>syncHourlyDesktopSummary(root));root.hourlySummaryObserver.observe(summary);}}
+    if(!summary)return;
+    const fits=window.innerWidth>=1200&&summary.getBoundingClientRect().height<=window.innerHeight-112;
+    summary.classList.toggle('is-sticky',fits);
+  }
+  function openHourlyDesktopGallery(root,target){
+    if(!H.configured(C.state)||window.matchMedia('(max-width:720px)').matches||!hourlyDesktopVehicle(C.state))return;
+    target.focus({preventScroll:true});const scroll=window.scrollY;
+    if(!window.PixkuyHourlyDesktopVehicleGallery.open(0))return;
+    const gallery=document.querySelector('[data-hourly-desktop-vehicle-gallery]');if(!gallery)return;
+    const label=gallery.querySelector('[data-hourly-desktop-vehicle-gallery-label]');
+    const sync=()=>{if(label&&label.textContent!==t('vehicleCategoryLabel'))label.textContent=t('vehicleCategoryLabel');};sync();
+    const trap=event=>{if(event.key!=='Tab')return;const buttons=Array.from(gallery.querySelectorAll('button')).filter(b=>!b.hidden&&b.offsetParent!==null&&!b.hasAttribute('data-hourly-desktop-vehicle-gallery-backdrop')),first=buttons[0],last=buttons[buttons.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}};
+    gallery.addEventListener('keydown',trap);
+    const observer=new MutationObserver(()=>{if(gallery.getAttribute('aria-hidden')==='true'){observer.disconnect();gallery.removeEventListener('keydown',trap);window.scrollTo(0,scroll);(root.querySelector('[data-package-action="hourly-desktop-gallery"]')||target)?.focus({preventScroll:true});}else sync();});observer.observe(gallery,{attributes:true,subtree:true,childList:true});
+    gallery.querySelector('[data-hourly-desktop-vehicle-gallery-close]')?.focus({preventScroll:true});
   }
   function desktopDirect(state,view,locked,endpoint){
     const common=desktopCommonDestination(view,state);
@@ -942,7 +991,7 @@
     return configuredAirportOption(state);
   }
   function airportDesktop(state,surface){return airportConfiguredView(state,surface,false);}
-  function airportAutoQuoteView(state,surface){const mobile=window.matchMedia?.('(max-width:720px)').matches;if(surface==='mobile'?!mobile:!['desktop','contact'].includes(surface)||mobile)return null;return configuredAirportOption(state)||configuredDirectOption(state);}
+  function airportAutoQuoteView(state,surface){const mobile=window.matchMedia?.('(max-width:720px)').matches;if(surface==='mobile'?!mobile:!['desktop','contact'].includes(surface)||mobile)return null;return configuredAirportOption(state)||configuredDirectOption(state)||H.configured(state);}
   function airportCanReview(state){return state.quoteStatus==='ready'&&!!state.quote&&state.quote.calculation.coverageStatus!=='outside'&&!(state.quote.calculation.serviceLines||[]).some(line=>line.included?.quoteExpiresAt&&Date.parse(line.included.quoteExpiresAt)<=Date.now());}
   function airportSelector(service,data,prefix,label,mobile){
     const binding=service.ordinary;
@@ -1103,7 +1152,7 @@
         const option=pkg?.options.find(item=>item.id===C.state.selection?.optionId);
         updateQuoteMarkup(area,mobileCalculationContent(C.state,option,window.PixkuyEventPackagesRequest.hasFrozenBody()));
       }
-      const configured=configuredAirportOption(C.state)||configuredDirectOption(C.state);
+      const configured=configuredAirportOption(C.state)||configuredDirectOption(C.state)||H.configured(C.state);
       if(!configured&&root.getAttribute('data-event-package-root')!=='mobile'&&C.state.step==='services'){
         const area=root.querySelector('.events-package-layout__actions');
         updateQuoteMarkup(area,calculationControls(C.state,window.PixkuyEventPackagesRequest.hasFrozenBody()));
@@ -1126,14 +1175,17 @@
       }
       });
       const price=root.querySelector('[data-airport-price]'),actions=root.querySelector('[data-airport-actions]');
-      const view=airportDesktop(C.state,root.getAttribute('data-event-package-root'))||configuredDirectOption(C.state);
+      H.refresh(root,C.state);
+      const view=airportDesktop(C.state,root.getAttribute('data-event-package-root'))||configuredDirectOption(C.state)||H.configured(C.state);
       const desktop=!!root.querySelector('.events-package-desktop-config');
       if(desktop&&configured?.pairs)configured.pairs.forEach(pair=>[pair.service,pair.returning].forEach(service=>{
         const input=root.querySelector('[data-package-field="service:'+service.id+':ordinary-time"]'),label=input?.closest('label')?.querySelector('span');
         if(label)label.textContent=desktopDate(resolvedOrdinaryValues(service,C.state).date)+' · '+t(service===pair.returning?'returnHeading':'outboundHeading');
       }));
       if(price&&view)updateQuoteMarkup(price,desktop?desktopPrice(C.state,view):airportPrice(C.state,view));
-      updateQuoteMarkup(actions,desktop?desktopActions(C.state):airportActions(C.state));
+      updateQuoteMarkup(actions,desktop?(view?.hourly?hourlyDesktopActions(C.state):desktopActions(C.state)):airportActions(C.state));
+      const hourlyVehicle=root.querySelector('[data-hourly-desktop-vehicle]');if(hourlyVehicle)updateQuoteMarkup(hourlyVehicle,hourlyDesktopVehicle(C.state));
+      syncHourlyDesktopSummary(root);
       if(desktop)root.querySelectorAll('input[type=date],input[type=time]').forEach(input=>{
         const invalid=!!input.value&&!input.validity.valid;
         let error=input.parentElement.querySelector('.events-package-desktop-field-error');
@@ -1146,6 +1198,7 @@
   }
   function mobileConfigurationHeader(state,locked){
     const pkg=state.selectedEvent.snapshot.packages.find(item=>item.id===state.selection.packageId),option=pkg?.options.find(item=>item.id===state.selection.optionId);
+    if(H.configured(state))return '<header class="events-package-hourly-mobile__header">'+button('back',t('mobileBackToPackage'),locked,'quiet')+'<p class="events-package-hourly-mobile__event">'+esc(eventTitle(state.selectedEvent))+'</p><p class="events-package-hourly-mobile__step">'+esc(t('mobileTripStep'))+'</p><h3 tabindex="-1" data-package-step-heading>'+esc(local(pkg?.title))+'</h3><p>'+esc(local(option?.title))+'</p></header>';
     return '<header class="events-package-mobile-config__header">'+button('back',t('mobileBackToPackage'),locked,'secondary')+'<h3>'+esc(eventTitle(state.selectedEvent))+'</h3><p>'+esc(eventDates(state.selectedEvent))+'</p></header><h3 class="events-package-mobile-config__step" tabindex="-1" data-package-step-heading>'+esc(t('mobileTripStep'))+'</h3><p class="events-package-mobile-config__selection"><strong>'+esc(local(pkg?.title))+'</strong><span>'+esc(local(option?.title))+'</span></p>';
   }
   function configuration(state,surface){
@@ -1165,6 +1218,8 @@
     const wrap=html=>mobileConfig?'<div class="events-package-mobile-config">'+html+'</div>':html;
     const header=mobileConfig?mobileConfigurationHeader(state,locked):surface==='contact'?'<header class="events-package-config__header"><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3></header>'+navigation(state,surface):(isPackageStep||surface==='mobile')?'<header class="events-package-config__header events-package-config__header--package">'+button('back',t(isPackageStep?'backToEvents':'back'),locked,'quiet')+'<div class="events-package-event-heading"><div><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3>'+eventMetadata(event,true)+'</div>'+((surface!=='mobile'&&event.snapshot.customInquiryEnabled)?button('ordinary-custom',t('customLink'),locked,'quiet'):'')+'</div></header>'+navigation(state,surface):'<header class="events-package-config__header">'+button('back',t('back'),locked,'quiet')+'<div><h3 tabindex="-1" data-package-heading>'+esc(title)+'</h3>'+eventMetadata(event,true)+'</div>'+((surface!=='mobile'&&event.snapshot.customInquiryEnabled&&selection.requestKind==='package')?button('ordinary-custom',t('customLink'),locked,'quiet'):'')+'</header>'+navigation(state,surface);
     if(isPackageStep)return '<div class="events-package-step-one">'+header+'<h3 class="events-package-offer-heading" tabindex="-1" data-package-step-heading>'+esc(t('choosePackage'))+'</h3>'+offer(state,surface)+'</div>';
+    const hourlyView=H.configured(state);
+    if(hourlyView){const body=H.render(state,hourlyView,locked,surface);return desktopPackageConfig(state,surface)?hourlyDesktopConfig(state,hourlyView,body,surface,locked):'<div class="events-package-mobile-config events-package-hourly-mobile-config">'+header+body+mobileConditions(state,hourlyView.pkg)+'<div class="events-package-layout__actions">'+mobileCalculationContent(state,hourlyView.option,locked)+'</div></div>';}
     const directView=configuredDirectOption(state);
     const desktopView=desktopPackageConfig(state,surface)&&(directView||airportDesktop(state,surface));
     if(desktopView)return desktopHeader(state,surface,locked)+desktopFrame(state,desktopView,directView?directConfiguration(state,directView,locked,'desktop-table'):airportConfiguration(state,desktopView,locked));
@@ -1336,7 +1391,8 @@
         const address=place?.label||place?.formattedAddress||'';const placeId=place?.placeId||place?.id;
         if(!address||!placeId){window.PixkuyAirportMobileHotelSearchSheet?.closeForField(root.closest('.events-mobile-route'));showError(t('placeDetailsError'));return;}
         showError('');window.PixkuyAirportMobileHotelSearchSheet?.closeForField(root.closest('.events-mobile-route'));
-        const [,id,fieldName]=name.split(':');
+        if(name==='hourly-common:origin'){H.changeHabit(C.state,'origin',{address,placeId});input.value=address;refreshAirportQuote();return;}
+        const [,id,fieldName]=name.split(':');H.markException(C.state,id,fieldName.slice(9));
         C.change(selection=>{let data=selection.services.find(s=>s.serviceId===id);if(!data){data={serviceId:id};selection.services.push(data);}const value={address,placeId};if(fieldName.startsWith('ordinary-')){data.ordinaryInputs=data.ordinaryInputs||{};data.ordinaryInputs[fieldName.slice(9)]=value;}else data[fieldName==='fromAddress'?'from':'to']=value;});
       };
       const sheet=window.PixkuyAirportMobileHotelSearchSheet;
@@ -1420,6 +1476,7 @@
     const state=C.state;
     if(root.getAttribute('data-event-package-root')!=='contact')state.configurationSurface='upper';
     const locked=window.PixkuyEventPackagesRequest.hasFrozenBody()||['submitting','unknown','received'].includes(state.requestStatus);
+    if(!locked&&H.action(root,target,state))return;
     const focusField=target.getAttribute('data-package-focus-field');
     if(focusField&&!locked){
       const field=focusField==='passengerBand'?root.querySelector('[data-package-band]'):Array.from(root.querySelectorAll('[data-package-field]')).find(node=>node.getAttribute('data-package-field')===focusField);
@@ -1440,6 +1497,7 @@
       window.requestAnimationFrame(()=>{const route=root.closest?.('.events-mobile-route');if(route)route.scrollTop=view.scrollTop;root.querySelector('[data-package-browse="'+id+'"]')?.focus({preventScroll:true});});return;
     }
     if(action==='details'){openPackageDetailsDialog(root,target.getAttribute('data-package-details'),target);return;}
+    if(action==='hourly-desktop-gallery'){openHourlyDesktopGallery(root,target);return;}
     if(action==='vehicle-gallery'){
       if(root.getAttribute('data-event-package-root')!=='mobile'||!window.matchMedia('(max-width:720px)').matches)return;
       closePackageDetailsDialog();
@@ -1513,7 +1571,7 @@
       }else{focusDetail(root);}
       if(state.error)root.querySelector('[role="alert"]')?.focus();
     }
-    else if(action==='airport-review'&&!locked&&(airportDesktop(state,root.getAttribute('data-event-package-root'))||configuredDirectOption(state))&&validFields(root)){
+    else if(action==='airport-review'&&!locked&&(airportDesktop(state,root.getAttribute('data-event-package-root'))||configuredDirectOption(state)||H.configured(state))&&validFields(root)){
       if(state.quoteStatus==='ready'&&!airportCanReview(state)){C.change(()=>{});return;}
       if(airportCanReview(state))contactHandoff(root);
     }
@@ -1579,7 +1637,7 @@
     if(!sharedContact&&state.recoveryNotice&&!state.receipt)detail+='<div class="events-package-status"><p role="status">'+esc(t('recoveryNotice'))+'</p>'+button('recover',t('recover'),false,'secondary')+'</div>';
     if(!sharedContact&&!state.storageAvailable)detail+='<p class="events-package-status" role="status">'+esc(t('storageWarning'))+'</p>';
     if(!sharedContact&&state.requestStatus==='unknown')detail+='<div class="events-package-status"><p role="alert">'+esc(t('unknownReception'))+'</p>'+button('recover',t('recover'),false,'secondary')+button('retry',t('retry'),false,'primary')+'</div>';
-    const html=desktop?customStrip(state)+catalog(state)+(detail?'<section class="events-package-detail">'+detail+'</section>':''):state.screen==='catalog'?catalog(state)+customStrip(state):detail;
+    const html=desktop?customStrip(state)+catalog(state)+(detail?'<section class="events-package-detail">'+detail+'</section>':''):state.screen==='catalog'?catalog(state)+customStrip(state)+(state.recoveryNotice?detail:''):detail;
     const mobileReceiptMarkup=root.getAttribute('data-event-package-root')==='mobile'&&state.receipt?.requestKind==='package'&&receipt;
     if(mobileReceiptMarkup&&root.packageReceiptMarkup===html){settleMobileReceipt(root,false);return;}
     root.packageReceiptMarkup=mobileReceiptMarkup?html:null;
@@ -1597,6 +1655,7 @@
     if(root.getAttribute('data-event-package-root')!=='mobile')restoreTemporalControls(root,state);
     mountAddresses(root);
     mountAirportSelector(root);
+    syncHourlyDesktopSummary(root);
     root.querySelectorAll('[data-package-service]').forEach(node=>node.addEventListener('toggle',()=>{C.state.expandedServiceIds=Array.from(root.querySelectorAll('[data-package-service][open]')).map(item=>item.getAttribute('data-package-service'));}));
     if(focused){const target=Array.from(root.querySelectorAll('[data-package-field]')).find(node=>node.getAttribute('data-package-field')===focused&&(node.type!=='radio'||node.value===focusedValue));if(target){target.focus({preventScroll:true});if(caret&&typeof caret[0]==="number"){try{target.setSelectionRange(caret[0],caret[1]);}catch{}}}}
     const legacy=root.parentElement&&root.parentElement.querySelector('[data-events-mobile-flow]');if(legacy)legacy.hidden=state.screen!=='catalog';
@@ -1612,11 +1671,14 @@
     if(root.getAttribute?.('data-event-package-root')==='contact')return C.state.configurationSurface==='contact'&&C.state.screen==='config'&&window.PixkuyEventPackagesContact?.isActive()&&window.PixkuyEventPackagesContact.matchesSelection();
     return C.state.configurationSurface!=='contact';
   }
-  function changeField(target,silent){const name=target.getAttribute('data-package-field');if(!name)return;const value=target.value;const checked=target.checked;if(name.startsWith('contact:')){C.state.contact[name.slice(8)]=value;return;}if(name==='package'||name==='option'){if(!C.choose(name==='package'?value:(target.getAttribute('data-package-option-package')||C.state.selection.packageId),name==='option'?value:'',()=>window.confirm(t('changeLoss'))))C.notify();return;}
-    C.change(selection=>{if(name.startsWith('need:')){const flag=name.slice(5);selection.inquiry.needsFlags=checked?[...new Set([...selection.inquiry.needsFlags,flag])]:selection.inquiry.needsFlags.filter(v=>v!==flag);}else if(name==='reason')selection.inquiry.reasonCode=value;else if(name==='inquiryNotes')selection.inquiry.notes=value;else if(name==='passengersKnown')selection.inquiry.passengers=checked?{status:'known',count:1}:{status:'pending',count:null};else if(name==='customPassengers')selection.inquiry.passengers={status:'known',count:Number(value)};else if(name.startsWith('service:')){const [,id,fieldName]=name.split(':');if(fieldName==='additional'){selection.additionalServiceIds=checked?[...selection.additionalServiceIds,id]:selection.additionalServiceIds.filter(v=>v!==id);if(!checked)selection.services=selection.services.filter(s=>s.serviceId!==id);return;}let data=selection.services.find(s=>s.serviceId===id);if(!data){data={serviceId:id};selection.services.push(data);}if(fieldName.startsWith('ordinary-')){const key=fieldName.slice(9);const option=C.state.selectedEvent.snapshot.packages.find(p=>p.id===selection.packageId)?.options.find(o=>o.id===selection.optionId);const input=option?.services.find(s=>s.id===id)?.ordinary?.inputs[key];if(option?.calculationModel!=='ordinary_services'||(input?.source!=='customer'&&!(key==='baggageCount'&&!input&&option.services.find(s=>s.id===id)?.ordinary?.inputs.baggageStatus?.source==='customer')))return;data.ordinaryInputs=data.ordinaryInputs||{};if(!value)delete data.ordinaryInputs[key];else data.ordinaryInputs[key]=key==='origin'||key==='destination'?{address:value}:key==='durationHours'||key==='baggageCount'?Number(value):value;if(key==='baggageCount')delete data.ordinaryInputs.baggageStatus;}else if(fieldName==='fromAddress'||fieldName==='toAddress')data[fieldName==='fromAddress'?'from':'to']={address:value};else if(fieldName==='baggage'){if(!value){delete data.baggage;return;}data.baggage={status:value,items:[],specialRequirementsPresent:false};}else if(fieldName.startsWith('bag-')){if(!data.baggage)return;const categoryId=fieldName.slice(4);data.baggage.items=data.baggage.items.filter(v=>v.categoryId!==categoryId);data.baggage.items.push({categoryId,count:Number(value)});}else if(fieldName==='specialNeeds'){if(!data.baggage)data.baggage={status:'unknown',items:[],specialRequirementsPresent:checked};else data.baggage.specialRequirementsPresent=checked;}else if(fieldName==='startLocal')data.startLocal=value||null;else if(value)data[fieldName]=value;else delete data[fieldName];}},{silent,onlyWhenChanged:true});
+  function changeField(target,silent){const name=target.getAttribute('data-package-field');if(!name)return;const value=target.value;const checked=target.checked;if(name.startsWith('hourly-common:')){const key=name.split(':')[1];H.changeHabit(C.state,key,key==='origin'?(value?{address:value}:null):value);refreshAirportQuote();return;}if(name.startsWith('contact:')){C.state.contact[name.slice(8)]=value;return;}if(name==='package'||name==='option'){if(!C.choose(name==='package'?value:(target.getAttribute('data-package-option-package')||C.state.selection.packageId),name==='option'?value:'',()=>window.confirm(t('changeLoss'))))C.notify();return;}
+    C.change(selection=>{if(name.startsWith('need:')){const flag=name.slice(5);selection.inquiry.needsFlags=checked?[...new Set([...selection.inquiry.needsFlags,flag])]:selection.inquiry.needsFlags.filter(v=>v!==flag);}else if(name==='reason')selection.inquiry.reasonCode=value;else if(name==='inquiryNotes')selection.inquiry.notes=value;else if(name==='passengersKnown')selection.inquiry.passengers=checked?{status:'known',count:1}:{status:'pending',count:null};else if(name==='customPassengers')selection.inquiry.passengers={status:'known',count:Number(value)};else if(name.startsWith('service:')){const [,id,fieldName]=name.split(':');H.markException(C.state,id,fieldName.slice(9));if(fieldName==='additional'){selection.additionalServiceIds=checked?[...selection.additionalServiceIds,id]:selection.additionalServiceIds.filter(v=>v!==id);if(!checked)selection.services=selection.services.filter(s=>s.serviceId!==id);return;}let data=selection.services.find(s=>s.serviceId===id);if(!data){data={serviceId:id};selection.services.push(data);}if(fieldName.startsWith('ordinary-')){const key=fieldName.slice(9);const option=C.state.selectedEvent.snapshot.packages.find(p=>p.id===selection.packageId)?.options.find(o=>o.id===selection.optionId);const input=option?.services.find(s=>s.id===id)?.ordinary?.inputs[key];if(option?.calculationModel!=='ordinary_services'||(input?.source!=='customer'&&!(key==='baggageCount'&&!input&&option.services.find(s=>s.id===id)?.ordinary?.inputs.baggageStatus?.source==='customer')))return;data.ordinaryInputs=data.ordinaryInputs||{};if(!value)delete data.ordinaryInputs[key];else data.ordinaryInputs[key]=key==='origin'||key==='destination'?{address:value}:key==='durationHours'||key==='baggageCount'?Number(value):value;if(key==='baggageCount')delete data.ordinaryInputs.baggageStatus;}else if(fieldName==='fromAddress'||fieldName==='toAddress')data[fieldName==='fromAddress'?'from':'to']={address:value};else if(fieldName==='baggage'){if(!value){delete data.baggage;return;}data.baggage={status:value,items:[],specialRequirementsPresent:false};}else if(fieldName.startsWith('bag-')){if(!data.baggage)return;const categoryId=fieldName.slice(4);data.baggage.items=data.baggage.items.filter(v=>v.categoryId!==categoryId);data.baggage.items.push({categoryId,count:Number(value)});}else if(fieldName==='specialNeeds'){if(!data.baggage)data.baggage={status:'unknown',items:[],specialRequirementsPresent:checked};else data.baggage.specialRequirementsPresent=checked;}else if(fieldName==='startLocal')data.startLocal=value||null;else if(value)data[fieldName]=value;else delete data[fieldName];}},{silent,onlyWhenChanged:true});
     if(silent)refreshAirportQuote();
   }
   function changeRootField(root,target){
+    // Places can leave a native change pending until blur. Actual typing already
+    // invalidates the reference on input; an unchanged committed address must survive.
+    if(root.querySelector?.('[data-hourly-desktop]')&&H.unchangedAddress(C.state,target.getAttribute('data-package-field'),target.value))return;
     if(root.getAttribute('data-event-package-root')==='mobile'&&target.getAttribute('data-package-browse-option')===''){
       if(window.PixkuyEventPackagesRequest.hasFrozenBody()||['submitting','unknown','received'].includes(C.state.requestStatus))return;
       const view=mobilePackageView(C.state),pkg=activePackages(C.state.selectedEvent).find(item=>item.id===view.packageId);
@@ -1630,7 +1692,7 @@
     }
     // A blur/change between pointerdown and click must not replace the mobile
     // conditions trigger. Input already updates state; keep the same control.
-    const preserve=(root.getAttribute('data-event-package-root')==='mobile'||configuredDirectOption(C.state)||configuredAirportOption(C.state)||target.type==='time'||target.type==='datetime-local')&&target.getAttribute('data-package-field')?.startsWith('service:')&&['text','date','time','datetime-local','number','select-one'].includes(target.type);
+    const preserve=(root.getAttribute('data-event-package-root')==='mobile'||configuredDirectOption(C.state)||configuredAirportOption(C.state)||H.configured(C.state)||target.type==='time'||target.type==='datetime-local')&&target.getAttribute('data-package-field')?.startsWith('service:')&&['text','date','time','datetime-local','number','select-one'].includes(target.type);
     changeField(target,preserve);
     const overlay=target.parentElement?.querySelector('.services-expand__date-overlay');if(overlay)overlay.hidden=Boolean(target.value);
     if(root.getAttribute('data-event-package-root')==='mobile'){
@@ -1659,12 +1721,32 @@
     if(!airportCanReview(C.state)||!validFields(root)||!validateMobilePackageContact(root))return false;
     await window.PixkuyEventPackagesRequest.submit();return true;
   }
-  function mount(parent,surface){if(!parent)return null;let root=parent.querySelector('[data-event-package-root="'+surface+'"]');if(root)return root;root=document.createElement('section');root.setAttribute('data-events-offer','packages');root.setAttribute('data-event-package-root',surface);let host=parent;if(surface==='desktop'){const legacyCatalog=parent.querySelector('[data-services-events-catalog]');let unified=parent.querySelector('[data-events-unified-catalog]');if(legacyCatalog&&!unified){unified=document.createElement('div');unified.className='events-catalog-grid';unified.setAttribute('data-events-unified-catalog','');legacyCatalog.before(unified);unified.appendChild(legacyCatalog);}if(unified)host=unified;}host.appendChild(root);roots.add(root);root.addEventListener('change',event=>changeRootField(root,event.target));root.addEventListener('input',event=>{const key=event.target.getAttribute('data-package-field');if(key&&key.startsWith('contact:')){C.state.contact[key.slice(8)]=event.target.value;clearMobileContactValidation(event.target);}else if(key&&['text','textarea','tel','email','date','time','datetime-local','number'].includes(event.target.type)){changeField(event.target,true);if(surface==='mobile'){const fields=Array.from(root.querySelectorAll('[data-package-field]'));validateField(root,event.target,Math.max(0,fields.indexOf(event.target)));}}});root.addEventListener('focusout',event=>{const key=event.target?.getAttribute?.('data-package-field');if(key?.startsWith('contact:'))validateMobilePackageContact(root,key.slice(8));});root.addEventListener('submit',event=>{if(!event.target?.matches?.('[data-package-mobile-contact-form]'))return;event.preventDefault();void submitMobilePackageContact(root);});root.addEventListener('click',event=>{void handleClick(root,event);});renderRoot(root);if(surface!=='contact'&&roots.size===1){void load();void window.PixkuyEventPackagesRequest.initialize();}return root;}
+  async function initializeRecoverySurface(){
+    await window.PixkuyEventPackagesRequest.initialize();
+    if(!C.state.receipt&&!C.state.recoveryNotice)return;
+    // Surface controllers boot after this module. Recovery must not depend on
+    // the catalogue finishing or on a service parameter surviving in the URL.
+    if(document.readyState==='loading')await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
+    if(!C.state.receipt&&!C.state.recoveryNotice)return;
+    C.state.configurationSurface='upper';
+    const mobile=window.matchMedia('(max-width:720px)').matches;
+    if(mobile)await window.PixkuyEventsMobileBookingFlow?.open();
+    else window.PixkuyServicesExpand?.open('events',{scroll:false});
+    C.notify();
+    const root=Array.from(roots).find(node=>node.getAttribute('data-event-package-root')===(mobile?'mobile':'desktop'));
+    const target=root?.querySelector(C.state.receipt?'[data-package-confirmation-title]':'[data-package-action="recover"]');
+    if(mobile){if(!C.state.receipt){const route=root?.closest('.events-mobile-route');if(route)route.scrollTop=0;}}
+    else target?.scrollIntoView?.({block:'start',behavior:'instant'});
+    target?.focus?.({preventScroll:true});
+  }
+  function mount(parent,surface){if(!parent)return null;let root=parent.querySelector('[data-event-package-root="'+surface+'"]');if(root)return root;root=document.createElement('section');root.setAttribute('data-events-offer','packages');root.setAttribute('data-event-package-root',surface);let host=parent;if(surface==='desktop'){const legacyCatalog=parent.querySelector('[data-services-events-catalog]');let unified=parent.querySelector('[data-events-unified-catalog]');if(legacyCatalog&&!unified){unified=document.createElement('div');unified.className='events-catalog-grid';unified.setAttribute('data-events-unified-catalog','');legacyCatalog.before(unified);unified.appendChild(legacyCatalog);}if(unified)host=unified;}host.appendChild(root);roots.add(root);root.addEventListener('change',event=>changeRootField(root,event.target));root.addEventListener('input',event=>{const key=event.target.getAttribute('data-package-field');if(key&&key.startsWith('contact:')){C.state.contact[key.slice(8)]=event.target.value;clearMobileContactValidation(event.target);}else if(key&&['text','textarea','tel','email','date','time','datetime-local','number'].includes(event.target.type)){changeField(event.target,true);if(surface==='mobile'){const fields=Array.from(root.querySelectorAll('[data-package-field]'));validateField(root,event.target,Math.max(0,fields.indexOf(event.target)));}}});root.addEventListener('focusout',event=>{const key=event.target?.getAttribute?.('data-package-field');if(key?.startsWith('contact:'))validateMobilePackageContact(root,key.slice(8));});root.addEventListener('submit',event=>{if(!event.target?.matches?.('[data-package-mobile-contact-form]'))return;event.preventDefault();void submitMobilePackageContact(root);});root.addEventListener('click',event=>{void handleClick(root,event);});renderRoot(root);if(surface!=='contact'&&!recoveryInitialization){void load();recoveryInitialization=initializeRecoverySurface();}return root;}
   async function open(eventId){C.state.configurationSurface='upper';if(window.matchMedia('(max-width:720px)').matches&&window.PixkuyEventsMobileBookingFlow){window.PixkuyEventsMobileConfigStep?.close();await window.PixkuyEventsMobileBookingFlow.open();}else{const toggle=document.querySelector('[data-service-expand-trigger="events"]');const panel=document.getElementById('services-expand-events');if(panel&&panel.hidden&&toggle)toggle.click();}if(C.state.catalogStatus!=='ready')await load();const item=C.state.events.find(e=>e.id===eventId);if(item&&C.selectEvent(item,!item.snapshot.packages.length))window.dispatchEvent(new CustomEvent('pixkuy:events-detail-activated',{detail:{source:'packages'}}));const root=Array.from(roots).find(r=>r.offsetParent!==null);if(root)root.scrollIntoView({block:'start',behavior:'smooth'});}
   C.subscribe(()=>roots.forEach(renderRoot));window.addEventListener('pixkuy:events-detail-activated',event=>{if(event.detail?.source!=='special'||C.state.screen==='catalog')return;closePackageDetailsDialog();C.state.screen='catalog';C.notify();});window.addEventListener('pixkuy:i18n-applied',()=>{closePackageDetailsDialog();roots.forEach(renderRoot);void load();});
-  window.addEventListener('pixkuy:events-vehicle-gallery-ready',()=>{if(window.matchMedia('(max-width:720px)').matches&&C.state.step==='services')refreshAirportQuote();});
+  window.addEventListener('resize',()=>roots.forEach(syncHourlyDesktopSummary));
+  window.addEventListener('pixkuy:events-vehicle-gallery-ready',()=>{if(C.state.step==='services'&&(window.matchMedia('(max-width:720px)').matches||H.configured(C.state)))refreshAirportQuote();});
   window.matchMedia?.('(max-width:720px)').addEventListener?.('change',()=>{
     // Reassign queued work to the newly active surface before hidden roots render.
+    if(window.matchMedia('(max-width:720px)').matches&&C.state.configurationSurface==='contact'&&H.configured(C.state))C.state.configurationSurface='upper';
     cancelAirportAutoQuote();roots.forEach(renderRoot);
   });
   document.addEventListener('click',event=>roots.forEach(root=>root.closePackageAirport?.(event.target)));
@@ -1695,20 +1777,41 @@
     return '<table class="events-package-receipt__table"><thead><tr><th scope="col">'+esc(t('desktopJourney'))+'</th><th scope="col">'+esc(t('outboundHeading'))+'</th><th scope="col">'+esc(t('returnHeading'))+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
   Object.assign(fallback,{mobileReceiptTitle:'Solicitud recibida',mobileReceiptNext:'Su solicitud ha quedado registrada. Nos pondremos en contacto con usted para revisar los detalles.',receiptRequestedSchedules:'Horarios solicitados',receiptRecordedEnd:'Fin registrado'});
+  function receiptMoney(minor,currency){
+    if(!/^(0|[1-9][0-9]*)$/.test(String(minor))||!(/^[A-Z]{3}$/).test(currency||''))return t('pending');
+    // Format recorded minor units exactly, including values beyond Number's precision.
+    const amount=BigInt(minor),fraction=new Intl.NumberFormat(locale(),{minimumIntegerDigits:2,useGrouping:false}).format(Number(amount%100n));
+    return new Intl.NumberFormat(locale(),{style:'currency',currency,currencyDisplay:'code',minimumFractionDigits:2,maximumFractionDigits:2}).formatToParts(amount/100n).map(part=>part.type==='fraction'?fraction:part.value).join('');
+  }
   function mobileReceipt(receipt,services){
     const detail=receipt.confirmation,title=local(detail?.eventTitle)||receipt.eventTitle,packageTitle=local(detail?.packageTitle)||receipt.packageTitle,optionTitle=local(detail?.optionTitle)||receipt.optionTitle;
-    const itinerary=receiptJourneys(detail,true)||(services?'<ol class="events-package-receipt__itinerary">'+services+'</ol>':'');
+    const hourly=H.receipt(detail),itinerary=hourly?.table||receiptJourneys(detail,true)||(services?'<ol class="events-package-receipt__itinerary">'+services+'</ol>':'');
     const passengers=receipt.passengerBand||receipt.passengerCount!==undefined?passengerDescription(receipt):'';
-    return '<section class="events-package-receipt events-package-receipt--mobile" data-package-confirmation aria-label="'+esc(t('mobileReceiptTitle'))+'">'+
+    return '<section class="events-package-receipt events-package-receipt--mobile'+(hourly?' events-package-receipt--hourly':'')+'" data-package-confirmation aria-label="'+esc(t('mobileReceiptTitle'))+'">'+
       '<header><h3 tabindex="-1" data-package-confirmation-title><span class="events-package-receipt__check" aria-hidden="true">✓</span>'+esc(t('mobileReceiptTitle'))+'</h3><p>'+esc(t('mobileReceiptNext'))+'</p><p class="events-package-receipt__notice">'+esc(t('confirmationReservation'))+'</p><p>'+esc(t('confirmationNoRepeat'))+'</p></header>'+
       '<div class="events-package-receipt__reference"><div><span>'+esc(t('receiptReference'))+'</span><span class="events-package-receipt__reference-value">'+esc(receipt.reference)+'</span></div>'+button('copy-reference',t('copyReference'),false,'secondary')+'<span role="status" data-reference-status></span></div>'+
+      (hourly?'<section class="events-package-receipt__summary"><p class="events-package-receipt__event">'+esc(title)+'</p><h4>'+esc(packageTitle||t('custom'))+'</h4>'+(optionTitle||passengers?'<p class="events-package-receipt__mode">'+esc([optionTitle,passengers?t('passengers')+': '+passengers:''].filter(Boolean).join(' · '))+'</p>':'')+'</section>':
       '<dl class="events-package-receipt__summary"><div><dt>'+esc(t('receiptEvent'))+'</dt><dd class="events-package-receipt__event">'+esc(title)+'</dd></div><div><dt>'+esc(t('package'))+'</dt><dd>'+esc(packageTitle||t('custom'))+'</dd>'+
-      (optionTitle||passengers?'<dd class="events-package-receipt__mode">'+esc([optionTitle,passengers?t('passengers')+': '+passengers:''].filter(Boolean).join(' · '))+'</dd>':'')+'</div></dl>'+
-      (itinerary?'<section class="events-package-receipt__journeys"><h4>'+esc(t('receiptRequestedSchedules'))+'</h4><p class="events-package-help">'+esc(t('sharedLocalTime'))+'</p>'+itinerary+'</section>':'')+
+      (optionTitle||passengers?'<dd class="events-package-receipt__mode">'+esc([optionTitle,passengers?t('passengers')+': '+passengers:''].filter(Boolean).join(' · '))+'</dd>':'')+'</div></dl>')+
+      (itinerary?'<section class="events-package-receipt__journeys'+(hourly?' events-package-hourly-review--mobile':'')+'"><'+(hourly?'h5':'h4')+'>'+esc(t(hourly?'desktopJourneys':'receiptRequestedSchedules'))+(hourly?.years?' · '+esc(hourly.years):'')+'</'+(hourly?'h5':'h4')+'><p class="events-package-help">'+esc(t('sharedLocalTime'))+'</p>'+itinerary+'</section>':'')+
       (receipt.baggage?.some(item=>Number.isSafeInteger(item.count)&&item.count>=0)?'<p>'+esc(t('baggage'))+': '+baggageSummary(receipt.baggage.map(item=>Number.isSafeInteger(item.count)&&item.count>=0?{baggage:item}:{}))+'</p>':'')+
-      '<div class="events-package-receipt__total"><strong>'+esc(t('packageTotal'))+'</strong><p class="events-package-receipt__amount">'+esc(receipt.priceStatus==='quoted'&&receipt.pricedSubtotal!==null&&receipt.pricedSubtotal!==undefined?money(receipt.pricedSubtotal,receipt.currency):t('pending'))+'</p>'+(receipt.priceStatus!=='quoted'?'<p>'+esc(t(receipt.priceStatus==='conditional'?'conditional':'personalized'))+'</p>':'')+'</div>'+
+      '<div class="events-package-receipt__total"><strong>'+esc(t('packageTotal'))+'</strong><p class="events-package-receipt__amount">'+esc(receipt.priceStatus==='quoted'&&receipt.pricedSubtotal!==null&&receipt.pricedSubtotal!==undefined?(hourly?receiptMoney:money)(receipt.pricedSubtotal,receipt.currency):t('pending'))+'</p>'+(receipt.priceStatus!=='quoted'?'<p>'+esc(t(receipt.priceStatus==='conditional'?'conditional':'personalized'))+'</p>':'')+'</div>'+
       (detail?.conditions?.length?'<button type="button" class="events-package-button events-package-button--secondary" data-package-action="receipt-conditions" aria-haspopup="dialog">'+esc(t('desktopConditions'))+'</button>':'')+
       '<div class="events-package-receipt__actions">'+button('whatsapp',t('confirmationWhatsapp'),false,'secondary')+button('new',t('confirmationNew'),false,'quiet')+'</div></section>';
+  }
+  function desktopHourlyReceipt(receipt,hourly){
+    // Only the recorded receipt and its pure historical Hourly projection.
+    const detail=receipt.confirmation,title=local(detail?.eventTitle)||receipt.eventTitle,packageTitle=local(detail?.packageTitle)||receipt.packageTitle,optionTitle=local(detail?.optionTitle)||receipt.optionTitle;
+    const passengers=receipt.passengerBand||receipt.passengerCount!==undefined?passengerDescription(receipt):'',conditions=detail?.conditions||[];
+    return '<section class="events-package-receipt events-package-receipt--desktop events-package-receipt--hourly-desktop" data-package-confirmation aria-label="'+esc(t('mobileReceiptTitle'))+'">'+
+      '<header><h3 role="status" tabindex="-1" data-package-confirmation-title><span class="events-package-receipt__check" aria-hidden="true">✓</span>'+esc(t('mobileReceiptTitle'))+'</h3><p>'+esc(t('mobileReceiptNext'))+'</p><p class="events-package-receipt__notice">'+esc(t('confirmationReservation'))+'</p><p>'+esc(t('confirmationNoRepeat'))+'</p></header>'+
+      '<div class="events-package-receipt__reference"><div><span>'+esc(t('receiptReference'))+'</span><span class="events-package-receipt__reference-value">'+esc(receipt.reference)+'</span></div>'+button('copy-reference',t('copyReference'),false,'secondary')+'<span role="status" data-reference-status></span></div>'+
+      '<div class="events-package-receipt__columns"><div class="events-package-receipt__journeys"><section class="events-package-receipt__summary"><p class="events-package-receipt__event">'+esc(title)+'</p><h4>'+esc(packageTitle||t('custom'))+'</h4>'+(optionTitle||passengers?'<p class="events-package-receipt__mode">'+esc([optionTitle,passengers?t('passengers')+': '+passengers:''].filter(Boolean).join(' · '))+'</p>':'')+
+      (receipt.baggage?.some(item=>Number.isSafeInteger(item.count)&&item.count>=0)?'<p>'+esc(t('baggage'))+': '+baggageSummary(receipt.baggage.map(item=>Number.isSafeInteger(item.count)&&item.count>=0?{baggage:item}:{}))+'</p>':'')+'</section>'+
+      '<section class="events-package-receipt__hourly-schedule"><h5>'+esc(t('desktopJourneys'))+(hourly.years?' · '+esc(hourly.years):'')+'</h5><p class="events-package-help">'+esc(t('sharedLocalTime'))+'</p>'+hourly.table+'</section></div><aside class="events-package-receipt__side">'+
+      '<div class="events-package-receipt__total"><strong>'+esc(t('packageTotal'))+'</strong><p class="events-package-receipt__amount">'+esc(receipt.priceStatus==='quoted'&&receipt.pricedSubtotal!==null&&receipt.pricedSubtotal!==undefined?receiptMoney(receipt.pricedSubtotal,receipt.currency):t('pending'))+'</p>'+(receipt.priceStatus!=='quoted'?'<p>'+esc(t(receipt.priceStatus==='conditional'?'conditional':'personalized'))+'</p>':'')+'</div>'+
+      (conditions.length?'<details class="events-package-receipt__conditions"><summary>'+esc(t('desktopConditions'))+'</summary><ul>'+conditions.map(condition=>'<li><strong>'+esc(local(condition.title))+'</strong><p>'+esc(local(condition.description))+'</p></li>').join('')+'</ul></details>':'')+
+      '<div class="events-package-receipt__actions">'+button('whatsapp',t('confirmationWhatsapp'),false,'secondary')+button('new',t('confirmationNew'),false,'quiet')+'</div></aside></div></section>';
   }
   function receiptContent(state){
     if(!state.receipt)return '';
@@ -1738,6 +1841,8 @@
     }).join('');
     const conditions=detail?.conditions||[];
     if(mobilePackage)return mobileReceipt(receipt,services);
+    const hourly=desktop&&H.receipt(detail);
+    if(hourly)return desktopHourlyReceipt(receipt,hourly);
     if(desktop)return '<section class="events-package-receipt events-package-receipt--desktop" data-package-confirmation aria-label="'+esc(t('confirmationTitle'))+'">'+
       '<header><h3 role="status" tabindex="-1" data-package-confirmation-title><span class="events-package-receipt__check" aria-hidden="true">✓</span>'+esc(t('confirmationTitle'))+'</h3><p>'+esc(t('confirmationNext'))+'</p><p>'+esc(t('confirmationNoRepeat'))+'</p></header>'+
       '<div class="events-package-receipt__reference"><div><span>'+esc(t('receiptReference'))+'</span><span class="events-package-receipt__reference-value">'+esc(receipt.reference)+'</span></div>'+button('copy-reference',t('copyReference'),false,'secondary')+'<span role="status" data-reference-status></span></div>'+
@@ -1764,5 +1869,5 @@
       '<div class="events-package-receipt__actions">'+button('whatsapp',t('confirmationWhatsapp'),false,'secondary')+button('new',t('confirmationNew'),false,'quiet')+'</div></section>';
   }
   window.PixkuyEventPackagesConfig={mount,open,t,money,load,closePackageDetailsDialog};
-  Object.assign(window.PixkuyEventPackagesConfig,{copyReference,reviewSelectors,quoteIsCurrent:airportCanReview,renderContact:renderRoot,contactHandoff,receiptContent,contactSummary:(state,omitTitle)=>reviewItinerary(state,!window.matchMedia('(max-width:720px)').matches,omitTitle)+summary(state,!window.matchMedia('(max-width:720px)').matches?'desktop-review':undefined),editServices:()=>{if(!C.go('services'))return false;if(window.matchMedia('(max-width:720px)').matches&&window.PixkuyEventsMobileBookingFlow){void open(C.state.selectedEvent.id);return true;}const root=Array.from(roots).find(r=>r.offsetParent!==null);if(root){root.scrollIntoView({block:'start',behavior:'smooth'});focusDetail(root);}return true;}});
+  Object.assign(window.PixkuyEventPackagesConfig,{copyReference,reviewSelectors,quoteIsCurrent:airportCanReview,renderContact:renderRoot,contactHandoff,receiptContent,isHourlyReview:state=>!!H.view(state),contactSummary:(state,omitTitle,hourlyDesktop)=> (hourlyDesktop?hourlyDesktopReview(state):reviewItinerary(state,!window.matchMedia('(max-width:720px)').matches,omitTitle))+summary(state,!window.matchMedia('(max-width:720px)').matches?'desktop-review':undefined,hourlyDesktop),editServices:()=>{if(!C.go('services'))return false;if(window.matchMedia('(max-width:720px)').matches&&window.PixkuyEventsMobileBookingFlow){void open(C.state.selectedEvent.id);return true;}const root=Array.from(roots).find(r=>r.offsetParent!==null);if(root){root.scrollIntoView({block:'start',behavior:'smooth'});focusDetail(root);}return true;}});
 })(window,document);

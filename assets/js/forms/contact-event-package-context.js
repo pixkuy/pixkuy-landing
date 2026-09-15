@@ -31,7 +31,30 @@
     });
   }
 
-  function syncReviewLayout(enabled) {
+  let hourlyNotes = null;
+  function syncHourlyNotes(enabled) {
+    const input=form.querySelector('#contact-message'),label=form.querySelector('label[for="contact-message"]');
+    if(!input||!label)return;
+    if(enabled){
+      if(!hourlyNotes){
+        const help=document.createElement('p');help.id='events-package-hourly-notes-help';help.className='events-package-help';
+        hourlyNotes={input,label,help,key:label.getAttribute('data-i18n'),text:label.textContent,placeholder:input.getAttribute('placeholder'),describedby:input.getAttribute('aria-describedby')};
+        input.after(help);label.setAttribute('data-i18n','eventPackages.hourlyReviewNotes');
+        input.setAttribute('aria-describedby',[hourlyNotes.describedby,help.id].filter(Boolean).join(' '));
+      }
+      label.textContent=view().t('hourlyReviewNotes');input.setAttribute('placeholder','');hourlyNotes.help.textContent=view().t('hourlyReviewNotesHelp');
+    }else if(hourlyNotes){
+      const saved=hourlyNotes,translated=saved.key?.split('.').reduce((value,key)=>value?.[key],window.__pixkuyI18nDict);
+      saved.key?label.setAttribute('data-i18n',saved.key):label.removeAttribute('data-i18n');label.textContent=translated||saved.text;
+      saved.placeholder===null?input.removeAttribute('placeholder'):input.setAttribute('placeholder',translated||saved.placeholder);
+      saved.describedby===null?input.removeAttribute('aria-describedby'):input.setAttribute('aria-describedby',saved.describedby);
+      saved.help.remove();hourlyNotes=null;
+    }
+  }
+  function syncReviewLayout(enabled,hourlyDesktop=false) {
+    if(hourlyDesktop){form.setAttribute('data-package-hourly-review','');legacy?.setAttribute('data-package-hourly-review-picker','');}
+    else{form.removeAttribute('data-package-hourly-review');legacy?.removeAttribute('data-package-hourly-review-picker');}
+    syncHourlyNotes(hourlyDesktop);
     if (!enabled) {
       if (!reviewLayout) return;
       const summary = reviewLayout.column.querySelector('.events-package-summary');
@@ -59,7 +82,7 @@
       reviewLayout = {heading,column,title,fields:positions};
       form.setAttribute('data-package-review-desktop', '');
     }
-    reviewLayout.heading.textContent = view().t('reviewIntro');
+    reviewLayout.heading.textContent = view().t(hourlyDesktop?'hourlyReviewIntro':'reviewIntro');
     reviewLayout.title.textContent = view().t('contactDetails');
   }
 
@@ -117,14 +140,15 @@
     // remount Places, the selector or the shared contact fields.
     const desktopSelection = matched && state.selection?.requestKind === 'package' && !state.receipt &&
       !window.matchMedia('(max-width:720px)').matches && (state.screen === 'contact' || state.step === 'package');
-    selectionHost.hidden = !desktopSelection;
-    const selectorMarkup = desktopSelection ? config.reviewSelectors(state, locked) : '';
+    const hourlyDesktop=desktopSelection&&state.screen==='contact'&&config.isHourlyReview(state);
+    selectionHost.hidden = !desktopSelection||hourlyDesktop;
+    const selectorMarkup = desktopSelection&&!hourlyDesktop ? config.reviewSelectors(state, locked)+(state.step==='package'&&config.isHourlyReview(state)&&state.selection.optionId?'<button type="button" class="events-package-button events-package-button--secondary" data-package-action="edit-services"'+(locked?' disabled':'')+'>'+t('configureServices')+'</button>':'') : '';
     if (selectionHost.innerHTML !== selectorMarkup) selectionHost.innerHTML = selectorMarkup;
     configurationHost.hidden = !!state.receipt || !matched || state.screen !== 'config' || desktopSelection;
-    const nextMarkup = state.receipt ? config.receiptContent(state) : matched && state.selection && state.screen === 'contact' ? config.contactSummary(state, desktopSelection) : '';
+    const nextMarkup = state.receipt ? config.receiptContent(state) : matched && state.selection && state.screen === 'contact' ? config.contactSummary(state, desktopSelection, hourlyDesktop) : '';
     if (summaryMarkup !== nextMarkup) { reviewLayout?.column.querySelector('.events-package-summary')?.remove(); summaryHost.innerHTML = nextMarkup; summaryMarkup = nextMarkup; }
     syncConfirmationFields(!!state.receipt);
-    syncReviewLayout(desktopSelection);
+    syncReviewLayout(desktopSelection,hourlyDesktop);
     if(desktopSelection&&state.screen==='contact'){
       const summary=summaryHost.querySelector('.events-package-summary');
       const actions=reviewLayout?.column.querySelector('.form-actions');
@@ -142,7 +166,7 @@
       heading?.focus({preventScroll:true});
       heading?.scrollIntoView({block:'start',behavior:'auto'});
     }
-    root.querySelectorAll('[data-package-action="edit-services"]').forEach(button => { button.disabled = locked; });
+    root.querySelectorAll('[data-package-action="edit-services"],[data-package-action="change-package"]').forEach(button => { button.disabled = locked; });
     contactFields().forEach(([, input]) => { if (input) input.readOnly = locked; });
     const message = document.createElement('p');
     message.className = 'events-package-help';
@@ -217,7 +241,16 @@
         const button = event.target.closest('[data-package-action]');
         if (!button || button.disabled) return;
         const action = button.getAttribute('data-package-action');
-        if (action === 'edit-services') { syncContact(); C.state.configurationSurface = 'contact'; C.go('services'); configurationRoot?.scrollIntoView({block:'nearest'}); }
+        if (action === 'edit-services') {
+          syncContact(); C.state.configurationSurface = 'contact'; C.go('services');
+          if(view().isHourlyReview(C.state))configurationRoot?.querySelector('[data-package-step-heading]')?.focus({preventScroll:true});
+          configurationRoot?.scrollIntoView({block:'nearest'});
+        }
+        else if(action === 'change-package'){
+          if(request().hasFrozenBody()||C.state.receipt||['submitting','unknown'].includes(C.state.requestStatus))return;
+          syncContact();C.state.configurationSurface='contact';C.go('package');
+          const picker=legacy?.querySelector('[data-contact-event-picker-control]');picker?.focus({preventScroll:true});legacy?.scrollIntoView({block:'start'});
+        }
         else if (action === 'recover') void request().recover();
         else if (action === 'new') {
           if (!C.state.receipt) return;
