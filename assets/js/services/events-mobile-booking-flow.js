@@ -42,6 +42,7 @@
   let isLoading = false;
   let hasLoaded = false;
   let loadError = false;
+  let catalogSequence = 0;
   let previousFocus = null;
   let pageScrollY = 0;
 
@@ -304,7 +305,7 @@
     return Math.ceil((minimum * factor) / step) * step;
   }
 
-  async function loadEventsData() {
+  async function loadEventsData(sequence) {
     const source = window.PixkuyServicesEventsCatalogSource;
 
     if (!source || typeof source.loadCatalog !== "function") {
@@ -312,6 +313,7 @@
     }
 
     const catalog = await source.loadCatalog();
+    if (sequence !== catalogSequence) return false;
     const venues = Array.isArray(catalog.venues) ? catalog.venues : [];
     const events = Array.isArray(catalog.events) ? catalog.events : [];
     const loadedPricing = catalog.pricing && typeof catalog.pricing === "object" ? catalog.pricing : {};
@@ -394,7 +396,9 @@
   }
 
   function buildStackMarkup() {
+    const packages = window.PixkuyEventPackagesState?.state;
     if (isLoading) {
+      if (packages?.catalogStatus === "loading") return "";
       return [
         '<div class="events-mobile-flow__state">',
         escapeHtml(getI18nValue("services.cards.events.mobileFlow.loading", "")),
@@ -417,6 +421,7 @@
         ].join("");
       }
 
+      if (!hasLoaded || (packages && (packages.catalogStatus !== "ready" || packages.events.length))) return "";
       return [
         '<div class="events-mobile-flow__state">',
         escapeHtml(getI18nValue("services.cards.events.mobileFlow.empty", "")),
@@ -620,12 +625,15 @@
     }
 
     isLoading = true;
+    const sequence = ++catalogSequence;
     renderStack();
 
     try {
-      await loadEventsData();
+      await loadEventsData(sequence);
+      if (sequence !== catalogSequence) return false;
       loadError = false;
     } catch (error) {
+      if (sequence !== catalogSequence) return false;
       groups = [];
       selectedGroupId = "";
       loadError = true;
@@ -928,6 +936,7 @@
     });
 
     window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
+      catalogSequence += 1;
       hasLoaded = false;
       isLoading = false;
       loadError = false;
@@ -955,6 +964,10 @@
       return isRouteOpen;
     }
   };
+
+  window.PixkuyEventPackagesState?.subscribe(() => {
+    if (routeNode && !groups.length) renderStack();
+  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });

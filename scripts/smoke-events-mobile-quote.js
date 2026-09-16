@@ -565,6 +565,9 @@ async function assertOrdinaryPackageInputs() {
   controller.selectEvent({...event,id:'fixed-event',snapshot:{...event.snapshot,schemaVersion:2}},false);assert.equal(controller.state.selection.contractVersion,undefined);
   const catalogEvent=event;
   const catalogHtml=window.packageTestHooks.catalog({catalogStatus:'ready',events:[{...catalogEvent,fromPrice:null}]});
+  assert.equal(window.packageTestHooks.catalog({catalogStatus:'ready',events:[]}), '', 'the ordinary surface owns the single global empty message');
+  assert.ok(window.packageTestHooks.catalog({catalogStatus:'loading',events:[]}).includes('role="status"'));
+  assert.ok(window.packageTestHooks.catalog({catalogStatus:'error',events:[]}).includes('data-package-action="reload"'), 'package error keeps its own retry');
   assert.ok(catalogHtml.includes('services-events-panel__event'));
   assert.ok(catalogHtml.includes('<article class="services-events-panel__event events-package-card'));
   assert.ok(catalogHtml.includes('<div class="services-events-panel__event-media"><picture>'));
@@ -2498,7 +2501,9 @@ async function assertMobileRouteLifecycle() {
   const window={scrollY:240,scrollTo(options){scrolls.push(options.top);},matchMedia:()=>media,location:{href:'http://localhost:8888/?service=event_special'},history:{replaceState(){}},
     PixkuyEventsMobileConfigStep:{open(root,payload){assert.equal(root,route);opened.push(payload.group.id);return true;},close(){closed++;}},
     __pixkuyI18nDict:{eventPackages:{configureTransfer:'Configurar traslado',error:'No se pueden cargar eventos'},services:{cards:{events:{mobileFlow:{back:'Volver',title:'Próximos eventos',loading:'Cargando eventos',empty:'Sin eventos'},panel:{intro:'Contexto breve'}}}}}};
-  const hook='  window.mobileRouteHooks={buildEventGroups,buildEventCardMarkup,buildStackMarkup,bindBack,bindStack,setStatus:function(loading,error){isLoading=loading;loadError=error;},setFixture:function(r,g){routeNode=r;routeContent={};groups=g;hasLoaded=true;venuesById={venue:{id:"venue",active:true,name:"Recinto"}};}};\n';
+  const packageState={catalogStatus:'ready',events:[]},catalogSubscribers=[];
+  window.PixkuyEventPackagesState={state:packageState,subscribe:fn=>catalogSubscribers.push(fn)};
+  const hook='  window.mobileRouteHooks={buildEventGroups,buildEventCardMarkup,buildStackMarkup,bindBack,bindStack,reload:function(){hasLoaded=false;isLoading=false;catalogSequence++;return ensureDataLoaded();},setStatus:function(loading,error){isLoading=loading;loadError=error;},setFixture:function(r,g){routeNode=r;routeContent={};groups=g;hasLoaded=true;venuesById={venue:{id:"venue",active:true,name:"Recinto"}};}};\n';
   vm.runInNewContext(fs.readFileSync(path.join(ROOT,'assets/js/services/events-package-hourly.js'),'utf8'),{window});
   vm.runInNewContext(source.replace(anchor,hook+anchor),{window,document,Intl,Date,URL,URLSearchParams,Number,Array},{filename:file});
   const hooks=window.mobileRouteHooks;
@@ -2526,12 +2531,79 @@ async function assertMobileRouteLifecycle() {
   hooks.setStatus(false,true);assert.ok(hooks.buildStackMarkup().includes('role="alert"'));
   assert.ok(hooks.buildStackMarkup().includes('No se pueden cargar eventos'));
   assert.ok(hooks.buildStackMarkup().includes('data-events-mobile-catalog-retry'));
+  packageState.catalogStatus='loading';
+  hooks.setStatus(false,false);
+  assert.equal(hooks.buildStackMarkup(),'','ordinary empty waits for packages');
+  packageState.catalogStatus='ready';packageState.events=[{id:'package-event'}];
+  catalogSubscribers.forEach(fn=>fn());
+  assert.equal(nodes.get('[data-events-mobile-stack]').innerHTML,'','package completion refreshes the ordinary status');
+  assert.equal(hooks.buildStackMarkup(),'','a package offer prevents a global empty');
+  await window.PixkuyEventsMobileBookingFlow.open();
+  assert.equal(nodes.get('[data-events-mobile-stack]').innerHTML,'','return to catalog preserves combined availability');
+  window.PixkuyEventsMobileBookingFlow.close();
+  packageState.events=[];assert.ok(hooks.buildStackMarkup().includes('Sin eventos'));
+  packageState.catalogStatus='error';assert.equal(hooks.buildStackMarkup(),'','package failure is not an empty catalog');
+  hooks.setStatus(false,true);assert.ok(hooks.buildStackMarkup().includes('data-events-mobile-catalog-retry'),'ordinary failure stays retryable');
+  const pending=[];window.PixkuyServicesEventsCatalogSource={loadCatalog:()=>new Promise((resolve,reject)=>pending.push({resolve,reject}))};
+  const oldLanguage=hooks.reload(),newLanguage=hooks.reload();
+  pending[1].resolve({events:[],venues:[],pricing:{}});await newLanguage;
+  pending[0].reject(Error('obsolete language'));await oldLanguage;
+  packageState.catalogStatus='ready';catalogSubscribers.forEach(fn=>fn());
+  assert.ok(nodes.get('[data-events-mobile-stack]').innerHTML.includes('Sin eventos'));
+  assert.ok(!nodes.get('[data-events-mobile-stack]').innerHTML.includes('role="alert"'),'late locale failure does not replace current mobile catalog');
   media.matches=false;assert.equal(await window.PixkuyEventsMobileBookingFlow.open(),false,'desktop does not open or lock the mobile shell');
-  assert.equal(closed,6);
+  assert.equal(closed,7);
   console.log(JSON.stringify({suite:'events-mobile-route-lifecycle',status:'PASS',cases:['all-eligible-events','one-activation','five-reopen-cycles','listener-count-stable','scroll-restoration','inactive-close-noop','loading-empty-error-retry','desktop-gate'],externalCalls:0,formSubmissions:0}));
 }
 
+async function assertCombinedCatalogStatus() {
+  const source=fs.readFileSync(path.join(ROOT,'assets/js/services/events-special-panel.js'),'utf8');
+  const listeners=new Map(),pending=[];
+  const node=()=>({hidden:true,innerHTML:'',attributes:{},setAttribute(k,v){this.attributes[k]=v;},removeAttribute(k){delete this.attributes[k];},querySelector(){return null;},querySelectorAll(){return [];},addEventListener(type,fn){this[type]=fn;}});
+  const panel=node(),catalog=node(),empty=node(),config=node(),message=node();let retry=null;
+  empty.querySelector=selector=>selector==='p'?message:retry;
+  empty.insertAdjacentHTML=()=>{retry={disabled:false,remove(){retry=null;}};};
+  panel.appendChild=()=>{};config.parentElement=panel;
+  const nodes={'[data-services-events-panel]':panel,'[data-services-events-catalog]':catalog,'[data-services-events-empty]':empty,'[data-services-events-config]':config};
+  const subscribers=[];
+  const packages={catalogStatus:'loading',events:[]};
+  const window={innerWidth:1280,location:{search:''},
+    __pixkuyI18nDict:{services:{cards:{events:{panel:{empty:'No events',quoteUnavailable:'Load error'}}}},eventPackages:{loading:'Loading'}},
+    PixkuyEventPackagesState:{state:packages,subscribe:fn=>subscribers.push(fn)},
+    PixkuyServicesEventsCatalogSource:{invalidate(){},loadCatalog:()=>new Promise((resolve,reject)=>pending.push({resolve,reject}))},
+    addEventListener(type,fn){listeners.set(type,fn);}};
+  const document={getElementById(){return null;},querySelector:selector=>nodes[selector]};
+  vm.runInNewContext(source,{window,document,Intl,Date,URLSearchParams,CustomEvent:class {constructor(type,options){this.type=type;this.detail=options?.detail;}}});
+  const flush=async()=>{for(let n=0;n<6;n++)await Promise.resolve();};
+  const respond=async(events=[])=>{pending.shift().resolve({events,venues:[{id:'venue',active:true}],pricing:{}});await flush();};
+  const publish=(status,events=[])=>{packages.catalogStatus=status;packages.events=events;subscribers.forEach(fn=>fn());};
+  const available=[{id:'available-package'}];
+  const reload=()=>listeners.get('pixkuy:i18n-applied')();
+  const fail=async()=>{pending.shift().reject(Error('synthetic'));await flush();};
+  assert.equal(empty.hidden,true,'no empty during initial concurrent loading');
+  await respond();assert.equal(empty.hidden,true,'ordinary empty arrives first');
+  publish('ready',available);assert.equal(empty.hidden,true,'late package offer suppresses empty');
+  publish('loading');reload();publish('ready',available);await respond();
+  assert.equal(empty.hidden,true,'package response arrives first');
+  publish('loading');reload();await respond();assert.equal(empty.hidden,true);
+  publish('ready');assert.equal(empty.hidden,false);assert.equal(message.textContent,'No events');assert.equal(retry,null);
+  publish('error');assert.equal(empty.hidden,true,'package error does not imply global empty');
+  reload();await fail();assert.equal(empty.hidden,false);assert.equal(message.attributes.role,'alert');assert.ok(retry);
+  publish('ready',available);assert.equal(empty.hidden,false,'available packages do not hide ordinary load failure');
+  empty.click({target:{closest:()=>retry}});assert.equal(empty.hidden,false);assert.equal(message.attributes.role,'status');assert.equal(retry,null);
+  await respond();assert.equal(empty.hidden,true,'successful retry removes the error without showing a contradictory empty');
+  publish('ready');reload();const obsolete=pending.shift();reload();await respond();
+  obsolete.reject(Error('aborted old language'));await flush();
+  assert.equal(empty.hidden,false);assert.equal(message.textContent,'No events');assert.equal(retry,null,'obsolete error cannot replace latest-language empty');
+  reload();const oldSuccess=pending.shift();reload();await fail();oldSuccess.resolve({events:[],venues:[],pricing:{}});await flush();
+  assert.equal(message.attributes.role,'alert','obsolete success cannot erase current error');
+  reload();await respond([{id:'ordinary',active:true,posterSrc:'/synthetic.webp',venueId:'venue',startsAtUtc:'2099-01-01T12:00:00Z',title:'Ordinary',startsAt:'2099-01-01T06:00'}]);
+  assert.equal(empty.hidden,true);assert.equal(catalog.hidden,false,'normal-only offer remains visible');
+  console.log(JSON.stringify({suite:'combined-events-catalog',status:'PASS',cases:['both-response-orders','normal-only','packages-only','both-empty-single-owner','partial-errors-and-retries','loading-not-empty','language-races'],externalCalls:0}));
+}
+
 async function run() {
+  await assertCombinedCatalogStatus();
   await assertMobileRouteLifecycle();
   await assertCompleteVariant("arrival");
   await assertCompleteVariant("departure");

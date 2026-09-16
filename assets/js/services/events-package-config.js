@@ -462,7 +462,9 @@
   function catalog(state,mobile=false){
     if(state.catalogStatus==='loading')return '<p class="events-package-catalog__status" role="status">'+esc(t("loading"))+'</p>';
     if(state.catalogStatus==='error')return '<div class="events-package-catalog__status"><p role="alert">'+esc(t("error"))+'</p>'+button('reload',t('retry'),false,'secondary')+'</div>';
-    if(state.events.length===0)return '<p class="events-package-catalog__status">'+esc(t("empty"))+'</p>';
+    // The ordinary Events surface owns the single empty message for both catalogs.
+    // Loading and errors remain local to each source, including their retry actions.
+    if(state.events.length===0)return '';
     return '<div class="events-package-offers" role="list" aria-label="'+esc(t('title'))+'">'+state.events.map(event=>packageCard(event,mobile)).join('')+'</div>';
   }
   function customStrip(state){

@@ -12,6 +12,7 @@
   const MAX_VISIBLE_GROUPS = 10;
   const MIN_LEAD_HOURS = 6;
   const RETURN_PICKUP_NEXT_DAY_CUTOFF_MINUTES = 120;
+  let catalogSequence = 0;
 
   const state = {
     groups: [],
@@ -1613,6 +1614,15 @@
     `;
   }
 
+  function syncEmptyVisibility() {
+    const packages = window.PixkuyEventPackagesState?.state;
+    const packagesLoading = packages?.catalogStatus === "loading";
+    const allEmpty = state.catalogStatus === "ready" && (!packages ||
+      (packages.catalogStatus === "ready" && packages.events.length === 0));
+    emptyMount.hidden = Boolean(state.groups.length) || !(state.catalogStatus === "error" ||
+      (state.catalogStatus === "loading" && !packagesLoading) || allEmpty);
+  }
+
   function renderEmpty() {
     const message = emptyMount.querySelector("p");
     const retry = emptyMount.querySelector("[data-services-events-catalog-retry]");
@@ -1633,6 +1643,13 @@
           `<button type="button" class="cta" data-services-events-catalog-retry aria-label="${escapeHtml(errorLabel)}">↻</button>`
         );
       }
+    } else if (state.catalogStatus === "loading") {
+      if (message) {
+        message.setAttribute("data-i18n", "eventPackages.loading");
+        message.setAttribute("role", "status");
+        message.textContent = getI18nValue("eventPackages.loading") || "";
+      }
+      if (retry) retry.remove();
     } else {
       if (message) {
         message.setAttribute("data-i18n", "services.cards.events.panel.empty");
@@ -1644,7 +1661,7 @@
 
     catalogMount.hidden = true;
     catalogMount.innerHTML = "";
-    emptyMount.hidden = false;
+    syncEmptyVisibility();
     configMount.hidden = true;
     configMount.innerHTML = "";
   }
@@ -2144,8 +2161,12 @@
   }
 
   async function init() {
+    const sequence = ++catalogSequence;
+    state.catalogStatus = "loading";
+    if (!state.groups.length) renderEmpty();
     try {
       const data = await loadData();
+      if (sequence !== catalogSequence) return;
 
       state.venuesById = buildVenuesById(data.venues);
       state.pricing = data.pricing || {};
@@ -2160,6 +2181,7 @@
       renderAll();
       handleEventDeeplinkFocus();
     } catch (error) {
+      if (sequence !== catalogSequence) return;
       state.groups = [];
       state.selectedGroupId = "";
       state.selectedEventId = "";
@@ -2169,6 +2191,7 @@
   }
 
   bindEvents();
+  window.PixkuyEventPackagesState?.subscribe(syncEmptyVisibility);
   if (window.PixkuyEventPackagesConfig) window.PixkuyEventPackagesConfig.mount(panelRoot, "desktop");
   bindExpandedPanelObserver();
   init();
