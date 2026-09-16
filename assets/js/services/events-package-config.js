@@ -1872,6 +1872,6 @@
       '<p class="events-package-receipt__notice">'+esc(t('confirmationReservation'))+'</p>'+
       '<div class="events-package-receipt__actions">'+button('whatsapp',t('confirmationWhatsapp'),false,'secondary')+button('new',t('confirmationNew'),false,'quiet')+'</div></section>';
   }
-  window.PixkuyEventPackagesConfig={mount,open,t,money,load,closePackageDetailsDialog};
+  window.PixkuyEventPackagesConfig={mount,open,t,money,load,closePackageDetailsDialog,eventTitle,eventDates,eventVenue};
   Object.assign(window.PixkuyEventPackagesConfig,{copyReference,reviewSelectors,quoteIsCurrent:airportCanReview,renderContact:renderRoot,contactHandoff,receiptContent,isHourlyReview:state=>!!H.view(state),contactSummary:(state,omitTitle,hourlyDesktop)=> (hourlyDesktop?hourlyDesktopReview(state):reviewItinerary(state,!window.matchMedia('(max-width:720px)').matches,omitTitle))+summary(state,!window.matchMedia('(max-width:720px)').matches?'desktop-review':undefined,hourlyDesktop),editServices:()=>{if(!C.go('services'))return false;if(window.matchMedia('(max-width:720px)').matches&&window.PixkuyEventsMobileBookingFlow){void open(C.state.selectedEvent.id);return true;}const root=Array.from(roots).find(r=>r.offsetParent!==null);if(root){root.scrollIntoView({block:'start',behavior:'smooth'});focusDetail(root);}return true;}});
 })(window,document);

@@ -246,10 +246,51 @@ function packageRuntime(settings={}) {
   for(const name of ['state','request']){const file=path.join(ROOT,`assets/js/services/events-package-${name}.js`);vm.runInNewContext(fs.readFileSync(file,'utf8'),context,{filename:file});}
   return {window,context,controller:window.PixkuyEventPackagesState,request:window.PixkuyEventPackagesRequest,storage,calls,quotes,receipt};
 }
+async function assertPackageFirstOpen(runtime,event) {
+  // Exercise the actual entry point and catalogue loader with independently
+  // completed dependencies. The real route/CSS are checked in the local product.
+  const {window,controller}=runtime;
+  const before={state:{...controller.state},media:window.matchMedia,mobile:window.PixkuyEventsMobileBookingFlow,step:window.PixkuyEventsMobileConfigStep,load:window.PixkuyEventPackagesApi.load};
+  const deferred=()=>{let resolve;const promise=new Promise(done=>{resolve=done;});return {promise,resolve};};
+  const flush=async()=>{for(let n=0;n<8;n++)await Promise.resolve();};
+  const callsBefore=runtime.calls.length;
+  try {
+    window.matchMedia=()=>({matches:true});
+    for(const order of ['catalog-first','route-first']) {
+      Object.assign(controller.state,before.state);
+      const route=deferred(),catalog=deferred();let opens=0,closes=0,finished=false;
+      window.PixkuyEventsMobileBookingFlow={open(){opens++;return route.promise;}};
+      window.PixkuyEventsMobileConfigStep={close(){closes++;}};
+      window.PixkuyEventPackagesApi.load=()=>catalog.promise;
+      const loading=window.PixkuyEventPackagesConfig.load();
+      const opening=window.PixkuyEventPackagesConfig.open(event.id).then(()=>{finished=true;});
+      await flush();assert.equal(opens,1);assert.equal(closes,1);
+      assert.equal(controller.state.selectedEvent,null,'a cold entry has not selected an event prematurely');
+      if(order==='catalog-first'){catalog.resolve({events:[event]});await loading;}
+      else {route.resolve(true);await flush();}
+      assert.equal(finished,false,'selection waits for both dependencies');
+      assert.equal(controller.state.screen,'catalog');
+      route.resolve(true);catalog.resolve({events:[event]});await Promise.all([opening,loading]);
+      assert.equal(controller.state.selectedEvent.id,event.id);
+      assert.equal(controller.state.screen,'config');
+      await window.PixkuyEventPackagesConfig.open(event.id);
+      assert.equal(opens,2,'reopening uses the same canonical mobile entry');
+      assert.equal(controller.state.selectedEvent.id,event.id);
+    }
+    assert.equal(runtime.calls.length,callsBefore,'opening never submits or recovers a request');
+    assert.equal(runtime.quotes.length,0,'opening never quotes');
+  } finally {
+    Object.assign(controller.state,before.state);
+    window.matchMedia=before.media;window.PixkuyEventsMobileBookingFlow=before.mobile;
+    window.PixkuyEventsMobileConfigStep=before.step;window.PixkuyEventPackagesApi.load=before.load;
+  }
+  console.log(JSON.stringify({suite:'package-first-open',status:'PASS',cases:['cold-catalog-first','cold-route-first','wait-before-selection','reopen','no-business-effects'],externalCalls:0,physicalSafari:false}));
+}
+
 async function assertOrdinaryPackageInputs() {
   const runtime=packageRuntime();const {controller,window,context}=runtime;
   const file=path.join(ROOT,'assets/js/services/events-package-config.js');
-  const source=fs.readFileSync(file,'utf8');const anchor='  window.PixkuyEventPackagesConfig={mount,open,t,money,load,closePackageDetailsDialog};';
+  const source=fs.readFileSync(file,'utf8');const anchor='  window.PixkuyEventPackagesConfig={mount,open,t,money,load,closePackageDetailsDialog,eventTitle,eventDates,eventVenue};';
   assert.equal(source.split(anchor).length-1,1);
   const eventListeners=new Map();
   window.matchMedia=query=>({matches:false,addEventListener(type,listener){if(query==='(max-width:720px)'&&!window.packageViewportChange)window.packageViewportChange=listener;}});
@@ -265,6 +306,7 @@ async function assertOrdinaryPackageInputs() {
   vm.runInNewContext(fs.readFileSync(path.join(ROOT,'assets/js/services/events-package-hourly.js'),'utf8'),context);
   vm.runInNewContext(source.replace(anchor,'  window.packageTestHooks={initializeRecoverySurface,hourly:H,catalog,configuration,changeField,renderRoot,offer,customStrip,handleClick,lodgingCandidate,serviceBounds,boundedDateChoices,dateChoiceLabel,mobileReviewContact,refreshMobileReview,scheduleMobileReviewExpiry,mobileContactValidationFields,validateMobilePackageContact,airportQuoteReadiness,airportCanReview,scheduleAirportAutoQuote,cancelAirportAutoQuote,mountAddresses,roots,mountAirportSelector,mountClearableAddress,packageDetailsContent,changeRootField,validateField,mobileOrdinaryInputs,mobileBaseRecognized,mobileCalculationContent,airportAutoQuoteView,configuredDirectOption,resolvedOrdinaryValues};\n'+anchor),context,{filename:file});
   const event={id:'synthetic-event',publicationVersion:1,snapshot:{schemaVersion:3,customInquiryEnabled:true,translations:{es:{title:'Evento sintético'}},type:'festival',media:{main:{url:'/synthetic-event.webp'},mobile:{url:'/synthetic-event-mobile.webp'}},publicEventDates:{startLocalDate:'2026-10-30',endLocalDateExclusive:'2026-11-02',timeZone:'America/Mexico_City'},servicePeriod:{from:'2026-10-23T06:00:00.000Z',until:'2026-11-03T06:00:00.000Z'},occurrences:[{sourceLocalDateTime:'2026-10-29T08:00',dateLabelOverrides:{}},{sourceLocalDateTime:'2026-11-02T08:00',dateLabelOverrides:{}}],venue:{baseName:'Recinto sintético',translations:{es:{name:'Recinto sintético'}}},addOns:[],packages:[{id:'welcome',title:{es:'Welcome'},description:{es:'Prueba'},inclusions:[{es:'Recepción identificada'},{es:'Seguimiento del vuelo'},{es:'Traslado privado'}],options:[{id:'arrival',title:{es:'Llegada'},calculationModel:'ordinary_services',services:[{id:'arrival-service',ordinary:{baseService:'airport_transfer',restrictions:{fromDate:'2026-10-24',untilDate:'2026-11-01'},inputs:{direction:{source:'fixed',value:'airport_to_destination'},airportId:{source:'fixed',value:'mex'},destination:{source:'customer'},date:{source:'customer'},time:{source:'customer'},flight:{source:'deferred'},baggageStatus:{source:'customer'}}}}]}]}]}};
+  await assertPackageFirstOpen(runtime,event);
   controller.selectEvent(event,false);
   const initialOffer=window.packageTestHooks.configuration(controller.state);
   assert.ok(initialOffer.includes('data-package-configure="welcome"'));
@@ -564,6 +606,7 @@ async function assertOrdinaryPackageInputs() {
   const pending=window.PixkuyEventPackagesConfig.contactSummary(controller.state);assert.ok(!pending.includes('6789'));assert.ok(pending.includes('Hay datos o condiciones pendientes'));assert.ok(!pending.includes('data-package-contact'));assert.ok(!pending.includes('events-package-ordinary__route'));
   controller.selectEvent({...event,id:'fixed-event',snapshot:{...event.snapshot,schemaVersion:2}},false);assert.equal(controller.state.selection.contractVersion,undefined);
   const catalogEvent=event;
+  assertPackageSpotlight(window, catalogEvent);
   const catalogHtml=window.packageTestHooks.catalog({catalogStatus:'ready',events:[{...catalogEvent,fromPrice:null}]});
   assert.equal(window.packageTestHooks.catalog({catalogStatus:'ready',events:[]}), '', 'the ordinary surface owns the single global empty message');
   assert.ok(window.packageTestHooks.catalog({catalogStatus:'loading',events:[]}).includes('role="status"'));
@@ -2554,6 +2597,45 @@ async function assertMobileRouteLifecycle() {
   media.matches=false;assert.equal(await window.PixkuyEventsMobileBookingFlow.open(),false,'desktop does not open or lock the mobile shell');
   assert.equal(closed,7);
   console.log(JSON.stringify({suite:'events-mobile-route-lifecycle',status:'PASS',cases:['all-eligible-events','one-activation','five-reopen-cycles','listener-count-stable','scroll-restoration','inactive-close-noop','loading-empty-error-retry','desktop-gate'],externalCalls:0,formSubmissions:0}));
+}
+
+function assertPackageSpotlight(configWindow, event) {
+  const source=fs.readFileSync(path.join(ROOT,'assets/js/services/events-special-spotlight.js'),'utf8');
+  const handlers={},imageHandlers={};let removed=0,opened=null;
+  const root={querySelector:()=>({addEventListener:(type,fn)=>{imageHandlers[type]=fn;}}),addEventListener:(type,fn)=>{handlers[type]=fn;},remove(){removed++;}};
+  const window={PixkuyEventPackagesConfig:{...configWindow.PixkuyEventPackagesConfig,open:id=>{opened=id;}},addEventListener(){},matchMedia:()=>({matches:false}),setTimeout(){}};
+  const document={querySelector:()=>null,createElement:()=>({firstElementChild:root}),body:{appendChild(){}}};
+  const anchor='  window.PixkuyServicesEventsSpotlight = {';
+  assert.equal(source.split(anchor).length,2);
+  vm.runInNewContext(source.replace(anchor,'  window.spotlightHooks={buildSpotlightMarkup,mountSpotlight};\n'+anchor),{window,document,Intl,Date});
+  window.__pixkuyI18nDict={services:{cards:{events:{spotlight:{label:'Eventos',cta:'Ver traslado',close:'Cerrar',metaFallback:'Consulta las fechas'}}}}};
+  const build=item=>window.spotlightHooks.buildSpotlightMarkup(item,{},[item]);
+  const published={...event,offerKind:'packages'};
+  const markup=build(published);
+  assert.ok(markup.includes('events-special-spotlight__media'));
+  assert.ok(markup.includes('src="/synthetic-event.webp"'));
+  assert.ok(markup.includes('events-special-spotlight__top'));
+  assert.ok(markup.includes('class="events-special-spotlight__meta">30 oct – 1 nov 2026'));
+  assert.ok(markup.includes('data-events-special-spotlight-event-id="'+event.id+'"'));
+  assert.equal(build({...published,snapshot:{...event.snapshot,media:{main:null,mobile:{url:'/draft-only.webp'}}}}),'','no published main poster means no spotlight');
+  const noDates={...published,snapshot:{...event.snapshot,publicEventDates:undefined}};
+  assert.ok(build(noDates).includes('Consulta las fechas'),'legacy snapshots use the existing fallback, never service/publication dates');
+  const language=configWindow.__pixkuyI18nLang;
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
+    configWindow.__pixkuyI18nLang=lang;
+    assert.ok(build(published).includes(configWindow.PixkuyEventPackagesConfig.eventDates(published)));
+  }
+  configWindow.__pixkuyI18nLang=language;
+  window.spotlightHooks.mountSpotlight(published,{},[]);
+  imageHandlers.error();assert.equal(removed,1,'failed poster is not shown as featured');
+  handlers.click({target:{closest:selector=>selector.includes('-cta')?{}:null}});
+  assert.equal(opened,event.id,'package CTA preserves selected event');assert.equal(removed,2);
+  handlers.click({target:{closest:selector=>selector.includes('-close')?{}:null}});assert.equal(removed,3);
+  const ordinary={id:'ordinary',title:'Normal',posterSrc:'/ordinary.webp',posterMobileSrc:'/ordinary-mobile.webp',dateLabel:'Fecha normal'};
+  assert.ok(build(ordinary).includes('src="/ordinary.webp"'));assert.ok(build(ordinary).includes('Fecha normal'));assert.ok(build(ordinary).includes('Ver traslado'));
+  window.matchMedia=()=>({matches:true});assert.ok(build(ordinary).includes('/ordinary-mobile.webp'),'ordinary responsive resolver preserved');
+  assert.ok(build(published).includes('src="/synthetic-event.webp"'),'package Spotlight keeps published main poster; CSS hides media on mobile');
+  console.log(JSON.stringify({suite:'package-spotlight',status:'PASS',cases:['shared-markup','published-main','exclusive-public-dates','legacy-date-fallback','nine-locales','missing-and-failed-image','close-and-open-selected-event','ordinary-unchanged'],externalCalls:0}));
 }
 
 async function assertCombinedCatalogStatus() {

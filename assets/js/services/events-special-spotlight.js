@@ -438,20 +438,16 @@
   }
 
   function buildSpotlightMarkup(event, venuesById, events) {
-    if (event && event.offerKind === "packages") {
-      const api=window.PixkuyEventPackagesConfig;
-      const lang=window.__pixkuyI18nLang||"es";
-      const title=event.snapshot.translations[lang]?.title||event.snapshot.translations.es.title;
-      return '<aside class="events-special-spotlight" data-events-special-spotlight hidden><div class="events-special-spotlight__inner"><div class="events-special-spotlight__body"><button type="button" class="events-special-spotlight__close" data-events-special-spotlight-close aria-label="'+escapeHtml(api.t("close"))+'">×</button><h3 class="events-special-spotlight__title">'+escapeHtml(title)+'</h3><p>'+escapeHtml(api.t("title"))+'</p><button type="button" class="events-special-spotlight__cta" data-events-special-spotlight-cta data-events-special-spotlight-event-id="'+escapeHtml(event.id)+'">'+escapeHtml(api.t("choose"))+'</button></div></div></aside>';
-    }
-    const label = getI18nValue("services.cards.events.spotlight.label");
-    const cta = getI18nValue("services.cards.events.spotlight.cta");
-    const close = getI18nValue("services.cards.events.spotlight.close");
+    const packages = event?.offerKind === "packages" ? window.PixkuyEventPackagesConfig : null;
+    const label = packages ? packages.t("title") : getI18nValue("services.cards.events.spotlight.label");
+    const cta = packages ? packages.t("choose") : getI18nValue("services.cards.events.spotlight.cta");
+    const close = packages ? packages.t("close") : getI18nValue("services.cards.events.spotlight.close");
     const metaFallback = getI18nValue("services.cards.events.spotlight.metaFallback");
-    const title = getEventTitle(event);
-    const dateLabel = getEventGroupDateSummary(event, events);
-    const venueName = getVenueName(event, venuesById);
-    const image = getEventImage(event);
+    const title = packages ? packages.eventTitle(event) : getEventTitle(event);
+    const dateLabel = packages ? packages.eventDates(event) : getEventGroupDateSummary(event, events);
+    const venueName = packages ? packages.eventVenue(event) : getVenueName(event, venuesById);
+    // Package catalog snapshots contain published media, never Admin draft previews.
+    const image = getEventImage(packages ? { posterSrc: event.snapshot.media?.main?.url } : event);
     const meta = dateLabel || metaFallback;
 
     if (!event || !event.id || !title || !image || !label || !cta || !close) {
@@ -513,6 +509,10 @@
 
     if (!root) {
       return false;
+    }
+
+    if (event.offerKind === "packages") {
+      root.querySelector("img").addEventListener("error", () => root.remove(), { once: true });
     }
 
     root.addEventListener("click", function handleSpotlightClick(clickEvent) {
