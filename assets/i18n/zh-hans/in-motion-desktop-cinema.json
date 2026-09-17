@@ -66,17 +66,8 @@
         "primary": "查看私人游览",
         "secondary": "查看服务"
       },
-      "wc2026": {
-        "index": "07",
-        "time": "00:33",
-        "label": "2026 世界杯",
-        "title": "2026 世界杯",
-        "text": "为墨西哥城的比赛和活动提供私人接送。",
-        "primary": "查看 2026 世界杯",
-        "secondary": "查看服务"
-      },
       "returnHome": {
-        "index": "08",
+        "index": "07",
         "time": "00:37",
         "label": "返程",
         "title": "返回酒店或前往机场",
@@ -85,7 +76,7 @@
         "secondary": "查看服务"
       },
       "final": {
-        "index": "09",
+        "index": "08",
         "time": "00:45",
         "label": "旅程结束",
         "title": "你的旅程从这里开始",

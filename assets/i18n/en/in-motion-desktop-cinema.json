@@ -66,17 +66,8 @@
         "primary": "View private tours",
         "secondary": "View service"
       },
-      "wc2026": {
-        "index": "07",
-        "time": "00:33",
-        "label": "World Cup 2026",
-        "title": "World Cup 2026",
-        "text": "Private transfers for matches and events in Mexico City.",
-        "primary": "View World Cup 2026",
-        "secondary": "View service"
-      },
       "returnHome": {
-        "index": "08",
+        "index": "07",
         "time": "00:37",
         "label": "Back home",
         "title": "Back home",
@@ -85,7 +76,7 @@
         "secondary": "View service"
       },
       "final": {
-        "index": "09",
+        "index": "08",
         "time": "00:45",
         "label": "End of the journey",
         "title": "Your journey starts here",

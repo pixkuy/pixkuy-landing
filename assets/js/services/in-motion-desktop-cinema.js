@@ -51,11 +51,6 @@
       href: "?service=tour_private&tour=xochimilco_coyoacan#services"
     },
     {
-      id: "wc2026",
-      time: 33.5,
-      href: "#wc2026"
-    },
-    {
       id: "returnHome",
       time: 37,
       href: "?service=airport_hotel&airport_id=mex&airport_direction=hotel_to_airport#services"

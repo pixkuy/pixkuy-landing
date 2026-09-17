@@ -353,26 +353,5 @@
   "body2": "Diese Technologien können Cookies, Kennungen oder lokalen Browserspeicher verwenden. Wenn erforderlich, wird vor der Aktivierung nicht notwendiger Werbe- oder Messzwecke eine Einwilligung eingeholt.",
   "body3": "Die bevorzugte Sprache kann lokal im Browser gespeichert werden, um die Nutzungserfahrung zu verbessern.",
   "back": "Zurück zur Landing"
-},
-  "event": {
-    "wc2026": {
-      "ariaLabel": "Eventmodus Fußball-Weltmeisterschaft 2026",
-      "eyebrow": "MEXIKO\nJUNI–JULI 2026",
-      "headline": "Die Weltmeisterschaft ⚽\nwird nicht improvisiert.",
-      "headlinePrimary": "Die Weltmeisterschaft",
-      "headlineSecondary": "wird nicht improvisiert.",
-      "subline": "Ihr Transport auch nicht.",
-      "support": "Vorausschauende Planung · Dedizierte Flotte · Koordination mehrerer Fahrzeuge",
-      "disclaimer": "Vorläufige Informationen vorbehaltlich der Verfügbarkeit. Operative Details und Umfang werden bestätigt.",
-      "cta": "Planung Weltmeisterschaft 2026",
-      "prefill": {
-        "separator": ":",
-        "line1": "Interesse an der Planung der Weltmeisterschaft 2026.",
-        "line2": "",
-        "line3": "",
-        "line4": "",
-        "line5": ""
-      }
-    }
-  }
+}
 }

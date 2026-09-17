@@ -353,26 +353,5 @@
     "body2": "Ces technologies peuvent utiliser des cookies, des identifiants ou le stockage local du navigateur. Lorsque cela est nécessaire, le consentement sera demandé avant d’activer des finalités publicitaires ou de mesure non essentielles.",
     "body3": "La préférence de langue peut être enregistrée localement dans le navigateur afin d’améliorer l’expérience de navigation.",
     "back": "Retour à la landing"
-  },
-  "event": {
-    "wc2026": {
-      "ariaLabel": "Mode événement Coupe du monde 2026",
-      "eyebrow": "MEXIQUE\nJUIN–JUILLET 2026",
-      "headline": "La Coupe du monde ⚽\nne s’improvise pas.",
-      "headlinePrimary": "La Coupe du monde",
-      "headlineSecondary": "ne s’improvise pas.",
-      "subline": "Votre transport non plus.",
-      "support": "Planification anticipée · Flotte dédiée · Coordination multi-véhicules",
-      "disclaimer": "Informations préliminaires soumises à disponibilité. Les détails opérationnels et le périmètre seront confirmés.",
-      "cta": "Planification Coupe du monde 2026",
-      "prefill": {
-        "separator": ":",
-        "line1": "Intérêt pour la planification Coupe du monde 2026.",
-        "line2": "",
-        "line3": "",
-        "line4": "",
-        "line5": ""
-      }
-    }
   }
 }

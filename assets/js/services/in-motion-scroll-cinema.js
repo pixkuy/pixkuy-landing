@@ -51,11 +51,6 @@
       time: 28,
       href: "?service=tour_private&tour=xochimilco_coyoacan&return_to=in_motion_scroll_cinema&return_chapter=xochimilco&return_time=28#services"
     },
-    {
-      id: "wc2026",
-      time: 33.5,
-      href: "#wc2026"
-    },
 {
   id: "returnHome",
   time: 37,

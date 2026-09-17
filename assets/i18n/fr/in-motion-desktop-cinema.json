@@ -66,17 +66,8 @@
         "primary": "Voir les tours privés",
         "secondary": "Voir le service"
       },
-      "wc2026": {
-        "index": "07",
-        "time": "00:33",
-        "label": "Coupe du monde 2026",
-        "title": "Coupe du monde 2026",
-        "text": "Transferts privés pour les matchs et événements à Mexico.",
-        "primary": "Voir Coupe du monde 2026",
-        "secondary": "Voir le service"
-      },
       "returnHome": {
-        "index": "08",
+        "index": "07",
         "time": "00:37",
         "label": "Retour",
         "title": "Retour à l’hôtel ou à l’aéroport",
@@ -85,7 +76,7 @@
         "secondary": "Voir le service"
       },
       "final": {
-        "index": "09",
+        "index": "08",
         "time": "00:45",
         "label": "Fin du voyage",
         "title": "Votre voyage commence ici",

@@ -66,17 +66,8 @@
         "primary": "Vedi tour privati",
         "secondary": "Vedi servizio"
       },
-      "wc2026": {
-        "index": "07",
-        "time": "00:33",
-        "label": "Mondiali 2026",
-        "title": "Mondiali 2026",
-        "text": "Trasferimenti privati per partite ed eventi a Città del Messico.",
-        "primary": "Vedi Mondiali 2026",
-        "secondary": "Vedi servizio"
-      },
       "returnHome": {
-        "index": "08",
+        "index": "07",
         "time": "00:37",
         "label": "Ritorno",
         "title": "Ritorno in hotel o aeroporto",
@@ -85,7 +76,7 @@
         "secondary": "Vedi servizio"
       },
       "final": {
-        "index": "09",
+        "index": "08",
         "time": "00:45",
         "label": "Fine del viaggio",
         "title": "Il tuo viaggio inizia qui",

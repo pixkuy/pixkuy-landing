@@ -66,17 +66,8 @@
         "primary": "Ver tours privados",
         "secondary": "Ver servicio"
       },
-      "wc2026": {
-        "index": "07",
-        "time": "00:33",
-        "label": "Mundial 2026",
-        "title": "Mundial 2026",
-        "text": "Traslados privados para partidos y eventos en Ciudad de México.",
-        "primary": "Ver Mundial 2026",
-        "secondary": "Ver servicio"
-      },
       "returnHome": {
-        "index": "08",
+        "index": "07",
         "time": "00:37",
         "label": "Vuelta a casa",
         "title": "Vuelta a casa",
@@ -85,7 +76,7 @@
         "secondary": "Ver servicio"
       },
       "final": {
-        "index": "09",
+        "index": "08",
         "time": "00:45",
         "label": "Final del viaje",
         "title": "Tu viaje empieza aquí",

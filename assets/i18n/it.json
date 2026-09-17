@@ -353,26 +353,5 @@
     "body2": "Queste tecnologie possono utilizzare cookie, identificatori o archiviazione locale del browser. Quando necessario, verrà richiesto il consenso prima di attivare finalità pubblicitarie o di misurazione non essenziali.",
     "body3": "La preferenza di lingua può essere memorizzata localmente nel browser per migliorare l’esperienza di navigazione.",
     "back": "Torna alla landing"
-  },
-  "event": {
-    "wc2026": {
-      "ariaLabel": "Modalità evento Coppa del Mondo 2026",
-      "eyebrow": "MESSICO\nGIUGNO–LUGLIO 2026",
-      "headline": "La Coppa del Mondo ⚽\nnon si improvvisa.",
-      "headlinePrimary": "La Coppa del Mondo",
-      "headlineSecondary": "non si improvvisa.",
-      "subline": "Nemmeno il tuo trasporto.",
-      "support": "Pianificazione anticipata · Flotta dedicata · Coordinamento multi-veicolo",
-      "disclaimer": "Informazioni preliminari soggette a disponibilità. I dettagli operativi e l’ambito saranno confermati.",
-      "cta": "Pianificazione Coppa del Mondo 2026",
-      "prefill": {
-        "separator": ":",
-        "line1": "Interesse per la pianificazione Coppa del Mondo 2026.",
-        "line2": "",
-        "line3": "",
-        "line4": "",
-        "line5": ""
-      }
-    }
   }
 }
