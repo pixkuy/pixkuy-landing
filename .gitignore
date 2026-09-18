@@ -4,6 +4,26 @@ ficheros_pixkuy.txt
 PLAN_DESARROLLO_formulario_reserva_pixkuy_v0.1.txt 
 PLAN_DESARROLLO_formulario_reserva_pixkuy_v0_1_actualizado_v4_2.txt 
 PLAN_DESARROLLO_formulario_reserva_pixkuy_v0_1_actualizado_v4_9.txt
+PLAN_DESARROLLO_formulario_reserva_pixkuy_v0_1_actualizado_v5_0.txt
+PLAN_DESARROLLO_formulario_reserva_pixkuy_v5_8_actualizado.txt
+PLAN_DESARROLLO_formulario_reserva_pixkuy_v6_0_actualizado
 Uncodixfy.md 
 old/ 
 skill.md
+
+# Local Netlify folder
+.netlify
+
+# Node / local tooling
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+.cache/
+
+# Local environment secrets
+.env
+.env.*
+!.env.example
