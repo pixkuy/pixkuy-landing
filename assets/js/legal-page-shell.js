@@ -200,10 +200,12 @@
   const main = document.querySelector("main.screen.legal");
   const shell = createShell();
   document.body.insertBefore(shell, main || document.body.firstChild);
-  if (main) {
-    main.insertAdjacentElement("afterend", createFooter());
-  } else {
-    document.body.appendChild(createFooter());
+  if (!document.body.hasAttribute("data-public-shell-header-only")) {
+    if (main) {
+      main.insertAdjacentElement("afterend", createFooter());
+    } else {
+      document.body.appendChild(createFooter());
+    }
   }
   syncLinks(getCurrentLang());
 

@@ -364,6 +364,19 @@
     return finalDict;
   }
 
+  // Strict fragments are opt-in. Existing optional fragments/fallback are unchanged.
+  async function loadRequiredFragment(lang, fragment) {
+    if (!(root.SUPPORTED_LANGS || []).some(function (item) { return item.code === lang; }) || fragment !== "service-feedback") {
+      throw new Error("I18N_REQUIRED_FRAGMENT_INVALID");
+    }
+    var response = await fetch(I18N_JSON_BASE + "/" + encodeURIComponent(lang) + "/" + fragment + ".json", { cache: "no-store", credentials: "same-origin" });
+    if (!response.ok) throw new Error("I18N_REQUIRED_FRAGMENT_UNAVAILABLE");
+    var value = await response.json();
+    if (!value || !value.feedback || Object.values(value.feedback).some(function (text) { return typeof text !== "string" || !text.trim(); })) throw new Error("I18N_REQUIRED_FRAGMENT_INVALID");
+    return value;
+  }
+  root.loadRequiredFragment = loadRequiredFragment;
+
   // Exposición pública
   root.I18N_JSON_BASE = I18N_JSON_BASE;
   root.I18N_OPTIONAL_FRAGMENTS = I18N_OPTIONAL_FRAGMENTS;

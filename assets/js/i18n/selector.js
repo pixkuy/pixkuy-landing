@@ -265,4 +265,15 @@
   root.setMenuOpen = setMenuOpen;
   root.updateLangUI = updateLangUI;
   root.initLangSelector = initLangSelector;
+  // Publication-scoped native selector; never mutates the global language catalogue.
+  root.populateAllowedLanguageSelect = function (select, locales) {
+    select.replaceChildren();
+    locales.forEach(function (locale) {
+      if (!(root.SUPPORTED_LANGS || []).some(function (item) { return item.code === locale.code; })) return;
+      var option = document.createElement("option");
+      option.value = locale.code;
+      option.textContent = locale.nativeName || root.LANGUAGE_CATALOG[locale.code].label;
+      select.appendChild(option);
+    });
+  };
 })();
