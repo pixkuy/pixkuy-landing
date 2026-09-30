@@ -1,5 +1,6 @@
 {
   "contactSuccess": {
+    "receiptError": "无法确认是否已收到请求。您填写的信息仍然保留。请求未被重新发送。",
     "title": "请求已收到",
     "lead": "感谢您信任 Pixkuy Mobility。我们已成功收到您的出行服务信息。",
     "nextTitle": "接下来会发生什么",

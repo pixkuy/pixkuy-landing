@@ -1,5 +1,6 @@
 {
   "contactSuccess": {
+    "receiptError": "Non è stato possibile confermare la ricezione. I tuoi dati sono ancora qui. La richiesta non è stata inviata di nuovo.",
     "title": "Richiesta ricevuta",
     "lead": "Grazie per aver scelto Pixkuy Mobility. Abbiamo ricevuto correttamente i dati del tuo trasferimento.",
     "nextTitle": "Cosa succede ora",

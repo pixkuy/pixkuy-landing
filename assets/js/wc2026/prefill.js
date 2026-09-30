@@ -5,18 +5,8 @@
 (function (window, document) {
   "use strict";
 
-  var LEAD_SUCCESS_SIGNAL_KEY = "pixkuy_lead_success";
-
   function getReservationRequestForm() {
     return document.querySelector('form[name="contact"]');
-  }
-
-  function storeLeadSuccessSignal() {
-    try {
-      window.sessionStorage.setItem(LEAD_SUCCESS_SIGNAL_KEY, "1");
-    } catch (e) {
-      // no-op
-    }
   }
 
   function lockReservationRequestForm(options) {
@@ -46,8 +36,12 @@
   try {
     var params = new window.URLSearchParams(window.location.search || "");
     if (params.get("lead") === "ok") {
-      storeLeadSuccessSignal();
-      lockReservationRequestForm({ showStatus: true });
+      // The URL is navigation only. A receipt must come from the Netlify POST.
+      var receipts = window.PixkuyNetlifyLeadSubmission;
+      var receiptId = receipts && receipts.getConfirmedReceiptId();
+      if (receiptId && window.sessionStorage.getItem("pixkuy_contact_success_pending") === receiptId) {
+        lockReservationRequestForm({ showStatus: true });
+      }
 
       params.delete("lead");
       var cleanQuery = params.toString();

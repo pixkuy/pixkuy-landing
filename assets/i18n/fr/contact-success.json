@@ -1,5 +1,6 @@
 {
   "contactSuccess": {
+    "receiptError": "Nous n’avons pas pu confirmer la réception. Vos informations sont conservées. La demande n’a pas été renvoyée.",
     "title": "Demande reçue",
     "lead": "Merci de faire confiance à Pixkuy Mobility. Nous avons bien reçu les informations de votre trajet.",
     "nextTitle": "Ce qui se passe maintenant",

@@ -2,7 +2,7 @@
    Submission guard.
    Responsabilidad:
    - generar idempotencia de envío para form[name="contact"]
-   - preparar metadatos de submit antes del POST nativo Netlify
+   - preparar metadatos de submit antes del POST Netlify
    - limpiar payload semántico de servicios no activos
    - neutralizar names duplicados conocidos antes del submit
    - aplicar lock final de envío
@@ -607,7 +607,31 @@
     return true;
   }
 
+  function releaseFailedSubmit(form) {
+    if (!form) return;
+    const submissionId = getFieldValue(form, "submission_id");
+    try {
+      window.sessionStorage.removeItem(getStorageKey(submissionId));
+      window.sessionStorage.removeItem(ENHANCED_CONVERSION_DATA_STORAGE_KEY);
+      window.sessionStorage.removeItem(LEAD_SUCCESS_CONTEXT_STORAGE_KEY);
+    } catch (error) {
+      // Do not infer reception from a failed/unknown HTTP result.
+    }
+    delete form.dataset.submitted;
+    form.removeAttribute("aria-busy");
+    restoreGuardDisabledFields(form);
+    Array.from(form.querySelectorAll('button[type="submit"]')).forEach(function (button) {
+      button.disabled = false;
+      button.removeAttribute("aria-disabled");
+    });
+    const api = window.PixkuyForms;
+    if (api && api.getReservationRequestFields && api.syncReservationRequestState) {
+      api.syncReservationRequestState(api.getReservationRequestFields(form));
+    }
+  }
+
   window.PixkuySubmissionGuard = {
+    releaseFailedSubmit: releaseFailedSubmit,
     prepareSubmit: prepareSubmit,
     isFormLocked: isFormLocked,
     lockForm: lockForm,

@@ -1,5 +1,6 @@
 {
   "contactSuccess": {
+    "receiptError": "We couldn't confirm receipt. Your details are still here. The request has not been resent.",
     "title": "Request received",
     "lead": "Thank you for trusting Pixkuy Mobility. We have successfully received the details of your transfer.",
     "nextTitle": "What happens next",

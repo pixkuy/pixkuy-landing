@@ -17,21 +17,23 @@
   }
   
   var lastConfirmedResult = null;
+  var queuedAnalytics = Object.create(null);
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
   }
 
   function normalizeAmount(value) {
-    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+    if (!Number.isSafeInteger(value) || value <= 0) {
       return null;
     }
 
-    return Math.round(value) / 100;
+    return value / 100;
   }
 
   function normalizeCurrency(value) {
-    return normalizeText(value).toUpperCase() || "MXN";
+    var currency = normalizeText(value).toUpperCase();
+    return /^[A-Z]{3}$/.test(currency) ? currency : "";
   }
 
   function getAnalytics() {
@@ -65,7 +67,10 @@
     return Boolean(
       result &&
         result.view === "confirmed" &&
-        result.reservationStatus === "confirmed"
+        result.reservationStatus === "confirmed" &&
+        result.paymentStatus === "paid" &&
+        normalizeAmount(result.paymentAmountPaid) !== null &&
+        normalizeCurrency(result.paymentCurrency)
     );
   }
 
@@ -113,6 +118,7 @@
     var didTrack = false;
 
     if (!isConfirmedReservation(result) || !publicCode) {
+      lastConfirmedResult = null;
       return false;
     }
 
@@ -120,13 +126,13 @@
     payload = buildPayload(result);
 
     if (analytics) {
-      didTrack = analytics.trackOnce(
+      didTrack = queueAnalyticsOnce(analytics,
         "purchase",
         payload,
         publicCode
       ) || didTrack;
 
-      didTrack = analytics.trackOnce(
+      didTrack = queueAnalyticsOnce(analytics,
         "pixkuy_booking_confirmed",
         payload,
         publicCode
@@ -136,6 +142,24 @@
     didTrack = trackPaidReservationGoogleAdsConversion(payload, publicCode) || didTrack;
 
     return didTrack;
+  }
+
+  function queueAnalyticsOnce(analytics, eventName, payload, publicCode) {
+    var key = "pixkuy_booking_analytics_queued:" + eventName + ":" + publicCode;
+    if (queuedAnalytics[key]) return false;
+    try {
+      if (window.sessionStorage.getItem(key) === "queued") return false;
+    } catch (error) {
+      // In-memory deduplication still covers this page.
+    }
+    if (!analytics.trackOnce(eventName, payload, publicCode)) return false;
+    queuedAnalytics[key] = true;
+    try {
+      window.sessionStorage.setItem(key, "queued");
+    } catch (error) {
+      // Queued is not an acknowledgement from Google.
+    }
+    return true;
   }
 
   function onBookingStatusReady(event) {

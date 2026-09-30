@@ -1,7 +1,7 @@
 /* assets/js/forms/contact-success-modal.js
    Confirmación post-submit.
    Responsabilidad:
-   - detectar ?lead=ok tras redirección Netlify
+   - mostrar únicamente recepciones confirmadas por el transporte Netlify
    - abrir confirmación transaccional
    - gestionar cierre, foco y bloqueo de scroll
    No modifica:
@@ -16,39 +16,25 @@
 
   var LOCK_CLASS = "contact-success-modal-lock";
   var MODAL_SUCCESS_SIGNAL_KEY = "pixkuy_contact_success_pending";
-  var LEAD_SUCCESS_SIGNAL_KEY = "pixkuy_lead_success";
   var LEAD_SUCCESS_CONTEXT_STORAGE_KEY = "pixkuy_lead_success_context";
   var LEAD_SUCCESS_TRACKED_STORAGE_KEY = "pixkuy_lead_success_tracked";
   var MOBILE_QUERY = "(max-width: 720px)";
   var previousFocus = null;
+  var queuedLeadSuccess = Object.create(null);
 
-  function hasLeadSuccessParam() {
-    var params;
-
-    try {
-      params = new URLSearchParams(window.location.search);
-      return params.get("lead") === "ok";
-    } catch (error) {
-      return false;
-    }
+  function getReceiptId() {
+    var receipts = window.PixkuyNetlifyLeadSubmission;
+    return receipts ? receipts.getConfirmedReceiptId() : "";
   }
   
     
     
   function hasModalSuccessSignal() {
     try {
-      return window.sessionStorage.getItem(MODAL_SUCCESS_SIGNAL_KEY) === "1";
+      var receiptId = getReceiptId();
+      return !!receiptId && window.sessionStorage.getItem(MODAL_SUCCESS_SIGNAL_KEY) === receiptId;
     } catch (error) {
       return false;
-    }
-  }
-
-  function setSuccessSignals() {
-    try {
-      window.sessionStorage.setItem(MODAL_SUCCESS_SIGNAL_KEY, "1");
-      window.sessionStorage.setItem(LEAD_SUCCESS_SIGNAL_KEY, "1");
-    } catch (error) {
-      // no-op
     }
   }
 
@@ -61,7 +47,7 @@
   }
 
   function shouldOpenModal() {
-    return hasLeadSuccessParam() || hasModalSuccessSignal();
+    return hasModalSuccessSignal();
   }
 
   function getModal() {
@@ -296,22 +282,23 @@
   function getLeadSuccessTrackedKey() {
     return [
       LEAD_SUCCESS_TRACKED_STORAGE_KEY,
-      window.location ? window.location.pathname : "",
-      window.location ? window.location.search : ""
+      getReceiptId()
     ].join(":");
   }
 
   function hasTrackedLeadSuccess() {
+    if (queuedLeadSuccess[getLeadSuccessTrackedKey()]) return true;
     try {
-      return window.sessionStorage.getItem(getLeadSuccessTrackedKey()) === "1";
+      return window.sessionStorage.getItem(getLeadSuccessTrackedKey()) === "queued";
     } catch (error) {
       return false;
     }
   }
 
   function markLeadSuccessTracked() {
+    queuedLeadSuccess[getLeadSuccessTrackedKey()] = true;
     try {
-      window.sessionStorage.setItem(getLeadSuccessTrackedKey(), "1");
+      window.sessionStorage.setItem(getLeadSuccessTrackedKey(), "queued");
       return true;
     } catch (error) {
       return false;
@@ -363,7 +350,7 @@
     var analytics = window.PixkuyAnalytics;
     var payload;
 
-    if (hasTrackedLeadSuccess()) {
+    if (!getReceiptId() || hasTrackedLeadSuccess()) {
       return false;
     }
 
@@ -403,23 +390,11 @@
     return true;
   }
 
-  function bindSubmitSuccessSignal() {
-    var form = document.querySelector('form[name="contact"]');
-
-    if (!form || form.dataset.contactSuccessSubmitBound === "1") {
-      return false;
-    }
-
-    form.addEventListener("submit", function (event) {
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      setSuccessSignals();
-    });
-
-    form.dataset.contactSuccessSubmitBound = "1";
-    return true;
+  function showConfirmedReceipt() {
+    if (!getReceiptId()) return;
+    clearModalSuccessSignal();
+    setOpen(getModal(), true);
+    scheduleLeadSuccessTracking();
   }
      
   function initContactSuccessModal() {
@@ -430,7 +405,7 @@
     }
 
     bindModal(modal);
-    bindSubmitSuccessSignal();
+    window.addEventListener("pixkuy:lead-received", showConfirmedReceipt);
     applyAriaLabels(modal);
 
     window.addEventListener("pixkuy:i18n-applied", function () {
@@ -438,9 +413,7 @@
     });
 
     if (shouldOpenModal()) {
-      clearModalSuccessSignal();
-      setOpen(modal, true);
-      scheduleLeadSuccessTracking();
+      showConfirmedReceipt();
     }
 
     return true;

@@ -1,5 +1,6 @@
 {
   "contactSuccess": {
+    "receiptError": "Wir konnten den Eingang nicht bestätigen. Ihre Angaben sind noch vorhanden. Die Anfrage wurde nicht erneut gesendet.",
     "title": "Anfrage erhalten",
     "lead": "Vielen Dank für Ihr Vertrauen in Pixkuy Mobility. Wir haben die Daten Ihrer Fahrt erfolgreich erhalten.",
     "nextTitle": "Was jetzt passiert",

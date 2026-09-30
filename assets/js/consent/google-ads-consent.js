@@ -7,13 +7,14 @@
   var GOOGLE_ADS_WHATSAPP_CONVERSION_SEND_TO = 'AW-18114199280/yfbjCPOSl6scEPD9wr1D';
   var GOOGLE_ADS_PAID_RESERVATION_CONVERSION_SEND_TO = 'AW-18114199280/jWSbCK7p1b4cEPD9wr1D';
   var STORAGE_KEY = 'pixkuy_google_ads_consent';
-  var LEAD_SUCCESS_SIGNAL_KEY = 'pixkuy_lead_success';
   var LEAD_CONVERSION_STORAGE_KEY = 'pixkuy_google_ads_lead_conversion';
   var PAID_RESERVATION_CONVERSION_STORAGE_KEY = 'pixkuy_google_ads_paid_reservation_conversion';
   var ENHANCED_CONVERSION_DATA_STORAGE_KEY = 'pixkuy_google_ads_enhanced_conversion_data';
   var BANNER_ID = 'pixkuy-google-ads-consent';
   var ACCEPTED = 'accepted';
   var REJECTED = 'rejected';
+  // Deduplication records enqueueing only, never delivery/attribution in Ads.
+  var queuedConversions = Object.create(null);
 
   function normalizeText(value) {
     return typeof value === 'string' ? value.trim() : '';
@@ -59,58 +60,38 @@
     }
   }
 
-  function hasLeadSuccessParam() {
-    var params;
-
-    try {
-      params = new URLSearchParams(window.location.search);
-      return params.get('lead') === 'ok';
-    } catch (error) {
-      return false;
-    }
-  }
-
-  function hasLeadSuccessSignal() {
-    try {
-      return window.sessionStorage.getItem(LEAD_SUCCESS_SIGNAL_KEY) === '1';
-    } catch (error) {
-      return false;
-    }
-  }
-
-  function clearLeadSuccessSignal() {
-    try {
-      window.sessionStorage.removeItem(LEAD_SUCCESS_SIGNAL_KEY);
-    } catch (error) {
-      // no-op
-    }
-  }
-
-  function hasLeadSuccess() {
-    return hasLeadSuccessParam() || hasLeadSuccessSignal();
+  function getLeadReceiptId() {
+    var receipts = window.PixkuyNetlifyLeadSubmission;
+    return receipts ? receipts.getConfirmedReceiptId() : '';
   }
 
   function getLeadConversionKey() {
     return [
       LEAD_CONVERSION_STORAGE_KEY,
-      window.location.pathname,
-      window.location.search
+      getLeadReceiptId()
     ].join(':');
   }
 
-  function hasTrackedLeadConversion() {
+  function hasQueuedLeadConversion() {
+    return hasQueuedConversion(getLeadConversionKey());
+  }
+
+  function hasQueuedConversion(key) {
+    if (queuedConversions[key]) return true;
     try {
-      return window.sessionStorage.getItem(getLeadConversionKey()) === '1';
+      var state = window.sessionStorage.getItem(key);
+      return state === 'queued' || state === '1';
     } catch (error) {
       return false;
     }
   }
 
-  function markLeadConversionTracked() {
+  function markConversionQueued(key) {
+    queuedConversions[key] = true;
     try {
-      window.sessionStorage.setItem(getLeadConversionKey(), '1');
+      window.sessionStorage.setItem(key, 'queued');
     } catch (error) {
-      // no-op
+      // The in-memory mark still prevents repeats on this page.
     }
   }
   
@@ -202,13 +183,12 @@
   }
 
   function trackLeadConversionIfNeeded() {
-    if (!hasLeadSuccess()) {
+    var receiptId = getLeadReceiptId();
+    if (getStoredConsent() !== ACCEPTED || !receiptId) {
       return;
     }
 
-    if (hasTrackedLeadConversion()) {
-      clearLeadSuccessSignal();
-      clearEnhancedConversionData();
+    if (hasQueuedLeadConversion()) {
       return;
     }
 
@@ -216,11 +196,11 @@
     applyEnhancedConversionData();
 
     window.gtag('event', 'conversion', {
-      send_to: GOOGLE_ADS_LEAD_CONVERSION_SEND_TO
+      send_to: GOOGLE_ADS_LEAD_CONVERSION_SEND_TO,
+      transaction_id: receiptId
     });
 
-    markLeadConversionTracked();
-    clearLeadSuccessSignal();
+    markConversionQueued(getLeadConversionKey());
     clearEnhancedConversionData();
   }
   
@@ -272,29 +252,21 @@
     ].join(':');
   }
 
-  function hasTrackedPaidReservationConversion(transactionId) {
+  function hasQueuedPaidReservationConversion(transactionId) {
     if (!transactionId) {
       return false;
     }
 
-    try {
-      return window.sessionStorage.getItem(getPaidReservationConversionKey(transactionId)) === '1';
-    } catch (error) {
-      return false;
-    }
+    return hasQueuedConversion(getPaidReservationConversionKey(transactionId));
   }
 
-  function markPaidReservationConversionTracked(transactionId) {
+  function markPaidReservationConversionQueued(transactionId) {
     if (!transactionId) {
       return false;
     }
 
-    try {
-      window.sessionStorage.setItem(getPaidReservationConversionKey(transactionId), '1');
-      return true;
-    } catch (error) {
-      return false;
-    }
+    markConversionQueued(getPaidReservationConversionKey(transactionId));
+    return true;
   }
 
   function trackPaidReservationConversion(input) {
@@ -308,7 +280,7 @@
       !transactionId ||
       value === null ||
       !currency ||
-      hasTrackedPaidReservationConversion(transactionId)
+      hasQueuedPaidReservationConversion(transactionId)
     ) {
       return false;
     }
@@ -322,7 +294,7 @@
       transaction_id: transactionId
     });
 
-    markPaidReservationConversionTracked(transactionId);
+    markPaidReservationConversionQueued(transactionId);
     return true;
   }
 
@@ -568,6 +540,8 @@
       trackPaidReservationConversion: trackPaidReservationConversion
     }
   );
+
+  window.addEventListener('pixkuy:lead-received', trackLeadConversionIfNeeded);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
