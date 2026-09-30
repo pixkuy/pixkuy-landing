@@ -184,8 +184,15 @@
     );
   }
 
+  function getSelectedVehicleModel() {
+    const fleet = window.PixkuyFleetSelection;
+    return fleet && typeof fleet.model === "function" ? fleet.model(SERVICE_TYPE) : null;
+  }
+
   function getVehicleLabel() {
-    return getI18nValue("directTransferMobileFlow.vehicle.title", "BYD M9");
+    const model = getSelectedVehicleModel();
+    return normalizeText(model && model.name) ||
+      getI18nValue("directTransferMobileFlow.vehicle.title", "BYD M9");
   }
 
   function getPassengerBucketLabel(bucket) {
@@ -473,6 +480,7 @@
   }
 
   function getSharedReservationMinimumDateValue() {
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
     const formsApi = window.PixkuyForms || {};
     const getMinimumDateTime = typeof formsApi.getReservationMinimumDateTime === "function"
       ? formsApi.getReservationMinimumDateTime
@@ -690,6 +698,9 @@
 
     return {
       root: root,
+      vehicleLabel: root.querySelector(".contact-direct-transfer-editor__vehicle-label"),
+      vehicleImage: root.querySelector("[data-contact-direct-transfer-vehicle-image]"),
+      vehicleMedia: root.querySelector("[data-contact-direct-transfer-vehicle-media]"),
 
       originInput: root.querySelector("[data-contact-direct-transfer-origin-input]"),
       originMount: root.querySelector("[data-contact-direct-transfer-origin-mount]"),
@@ -1037,6 +1048,35 @@
     return true;
   }
 
+  function syncVehiclePresentation(nodes) {
+    const model = getSelectedVehicleModel();
+    const fleet = window.PixkuyFleetSelection;
+    const label = getVehicleLabel();
+    const photo = model
+      ? (fleet && typeof fleet.photo === "function" ? fleet.photo(model) : "")
+      : "assets/img/fleet/bydm9_xhoras001d.jpeg";
+
+    if (nodes.vehicleLabel) {
+      nodes.vehicleLabel.removeAttribute("data-i18n");
+      nodes.vehicleLabel.textContent = label;
+    }
+    if (nodes.vehicleImage) {
+      nodes.vehicleImage.hidden = !photo;
+      if (photo) {
+        nodes.vehicleImage.setAttribute("src", photo);
+        nodes.vehicleImage.setAttribute("alt", model ? label : getI18nValue(
+          "directTransferMobileFlow.vehicle.alt", "BYD M9 — van ejecutiva eléctrica"
+        ));
+      } else {
+        nodes.vehicleImage.removeAttribute("src");
+        nodes.vehicleImage.removeAttribute("alt");
+      }
+    }
+    if (nodes.vehicleMedia) {
+      nodes.vehicleMedia.hidden = !photo;
+    }
+  }
+
   function syncView(nodes, options) {
     const safeOptions = options && typeof options === "object" ? options : {};
     const priceLabel = getPriceLabelValue();
@@ -1072,11 +1112,14 @@
       button.classList.toggle("is-active", isSelected);
     });
 
+    nodes.distanceValue.previousElementSibling.textContent = getI18nValue("directTransferMobileFlow.estimate.distanceLabel", "Distancia");
+    nodes.durationValue.previousElementSibling.textContent = getI18nValue("directTransferMobileFlow.estimate.durationLongLabel", "Tiempo estimado");
     nodes.distanceValue.textContent = distanceLabel || "—";
     nodes.durationValue.textContent = durationLabel || "—";
     nodes.priceValue.textContent = priceLabel || "—";
     nodes.priceBlock.hidden = !priceLabel;
 
+    syncVehiclePresentation(nodes);
     syncStatus(nodes);
     syncHiddenFields(nodes);
 
@@ -1239,6 +1282,13 @@
     }
 
     nodes.root.dataset.contactDirectTransferEditorBound = "1";
+
+    document.addEventListener("pixkuy:fleet-model-selected", function (event) {
+      if (event.detail && event.detail.service === SERVICE_TYPE &&
+          document.body.contains(nodes.root) && isDirectTransferServiceActive()) {
+        syncView(nodes);
+      }
+    });
 	
     nodes.originClear.addEventListener("click", function (event) {
       event.preventDefault();
@@ -1428,8 +1478,12 @@
     const form = getReservationForm();
     const nodes = getEditorNodes(form);
     const safePayload = payload && typeof payload === "object" ? payload : {};
-    const originAddress = safePayload.originAddress;
-    const destinationAddress = safePayload.destinationAddress;
+    const restored = !safePayload.originAddress && !safePayload.destinationAddress &&
+      window.PixkuyDirectTransferTransactionalState
+      ? window.PixkuyDirectTransferTransactionalState.buildPrecheckPayload(safePayload, { compareCanonicalQuote: false })
+      : null;
+    const originAddress = safePayload.originAddress || (restored && restored.originAddress);
+    const destinationAddress = safePayload.destinationAddress || (restored && restored.destinationAddress);
 
     if (!hasCriticalNodes(nodes)) {
       return false;

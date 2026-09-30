@@ -134,7 +134,7 @@
       "expired": {
         "state": "Reserva temporária expirada",
         "title": "A reserva temporária expirou",
-        "lead": "A janela de pagamento já não está ativa. Para reservar, inicie um novo pedido.",
+        "lead": "O prazo terminou sem pagamento. Pode iniciar outra reserva e verificar novamente a disponibilidade.",
         "notice": "Não reativamos reservas expiradas a partir deste ecrã."
       },
       "cancelled": {
@@ -172,6 +172,7 @@
       },
       "actions": {
         "retry": "Tentar pagamento novamente",
+        "modify": "Alterar dados",
         "newBooking": "Nova reserva",
         "home": "Voltar ao início"
       },
@@ -204,7 +205,7 @@
         "expired": {
           "state": "Reserva expirada",
           "title": "A reserva temporária expirou",
-          "lead": "A janela de pagamento já não está ativa. Inicie um novo pedido.",
+          "lead": "O prazo terminou sem pagamento. Pode iniciar outra reserva e verificar novamente a disponibilidade.",
           "notice": "Não foi feita nenhuma cobrança nem confirmada nenhuma reserva."
         },
         "cancelled": {

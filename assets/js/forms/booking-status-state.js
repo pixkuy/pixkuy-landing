@@ -23,6 +23,11 @@
 
   var readyCallbacks = [];
   var currentState = null;
+  var statusRequest = null;
+  var POLL_INTERVAL_MS = 2000;
+  var POLL_WINDOW_MS = 30000;
+  var MAX_STATUS_REQUESTS = 16;
+  var REQUEST_TIMEOUT_MS = 8000;
 
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -176,9 +181,12 @@
       encodeURIComponent(token);
   }
 
-  function requestStatus(config, token) {
-    return window.fetch(buildStatusUrl(config, token), {
+  function requestStatus(config, token, signal) {
+    if (statusRequest) return statusRequest;
+    statusRequest = window.fetch(buildStatusUrl(config, token), {
       method: "GET",
+      cache: "no-store",
+      signal: signal,
       headers: {
         "X-Pixkuy-Site-Key": config.publicSiteKey
       }
@@ -192,7 +200,8 @@
           body: body
         };
       });
-    });
+    }).finally(function () { statusRequest = null; });
+    return statusRequest;
   }
   
     function waitForPublicConfigReady() {
@@ -452,12 +461,15 @@
       serviceStartLocalTime: getServiceStartLocalTime(body),
       pickupAddress: getPickupAddress(body),
       destinationAddress: getDestinationAddress(body),
+      pickupAddressDetail: body.reservation && body.reservation.pickupAddressDetail || "",
+      destinationAddressDetail: body.reservation && body.reservation.destinationAddressDetail || "",
       durationHours: getDurationHours(body),
       passengerCount: getPassengerCount(body),
       passengerLabel: getPassengerLabel(body),
       luggageCount: getLuggageCount(body),
       customerNotes: getCustomerNotes(body),
       vehicleDisplayName: getVehicleDisplayName(body),
+      vehiclePhotoUrl: body.reservation && typeof body.reservation.vehiclePhotoUrl === "string" ? body.reservation.vehiclePhotoUrl : "",
       customerFullName: getCustomerFullName(body),
       customerEmail: getCustomerEmail(body),
       customerPhone: getCustomerPhone(body),
@@ -544,6 +556,67 @@
     };
   }
 
+  function watchPendingStatus(baseState, config, token) {
+    var deadline = Date.now() + POLL_WINDOW_MS;
+    var attempts = 0;
+    var stopped = false;
+    var timer;
+    var controller;
+    var timeout;
+    var cancelledReturn = /\/booking-cancelled(?:\.html)?\/?$/.test(window.location.pathname);
+
+    function stop() {
+      stopped = true;
+      window.clearTimeout(timer);
+      window.clearTimeout(timeout);
+      if (controller) controller.abort();
+      window.removeEventListener("pagehide", stop);
+    }
+
+    function query() {
+      if (stopped || attempts >= MAX_STATUS_REQUESTS || Date.now() >= deadline) {
+        stop();
+        return;
+      }
+      attempts += 1;
+      controller = new AbortController();
+      timeout = window.setTimeout(function () { controller.abort(); },
+        Math.min(REQUEST_TIMEOUT_MS, deadline - Date.now()));
+
+      requestStatus(config, token, controller.signal)
+        .then(function (response) {
+          window.clearTimeout(timeout);
+          if (stopped) return;
+          var result = normalizeResult(response);
+          if (result.view === "requestError" && currentState && currentState.result.view === "pending") {
+            stop();
+            return;
+          }
+          // Do not reopen/repaint the same pending screen on every poll.
+          if (!currentState || JSON.stringify(currentState.result) !== JSON.stringify(result)) {
+            notifyReady(Object.assign({}, baseState, { result: result }));
+          }
+          if (result.view !== "pending" || cancelledReturn ||
+              attempts >= MAX_STATUS_REQUESTS || Date.now() + POLL_INTERVAL_MS >= deadline) {
+            stop();
+            return;
+          }
+          timer = window.setTimeout(query, POLL_INTERVAL_MS);
+        })
+        .catch(function () {
+          if (stopped) return;
+          // A failed recheck cannot change a previously pending payment to failed.
+          if (!currentState) {
+            notifyReady(Object.assign({}, baseState, { result: buildRequestErrorResult() }));
+          }
+          stop();
+        });
+    }
+
+    window.addEventListener("pagehide", stop);
+    query();
+  }
+
   function init() {
     var preferredLang = getActiveLang();
     var token = getToken();
@@ -573,12 +646,7 @@
 
         waitForPublicConfigReady()
           .then(function requestStatusAfterPublicConfig() {
-            return requestStatus(getConfig(), token);
-          })
-          .then(function (result) {
-            notifyReady(Object.assign({}, baseState, {
-              result: normalizeResult(result)
-            }));
+            watchPendingStatus(baseState, getConfig(), token);
           })
           .catch(function () {
             notifyReady(Object.assign({}, baseState, {
@@ -592,7 +660,17 @@
   }
 
   window.PixkuyBookingStatusState = {
-    onReady: onReady
+    onReady: onReady,
+    refresh: function () {
+      if (!currentState || !currentState.token) return Promise.reject(new Error("BOOKING_STATUS_CONTEXT_REQUIRED"));
+      var controller = new AbortController();
+      var timeout = window.setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS);
+      return requestStatus(getConfig(), currentState.token, controller.signal).then(function (response) {
+        var result = normalizeResult(response);
+        if (result.view === "requestError") throw new Error("BOOKING_STATUS_REQUEST_FAILED");
+        notifyReady(Object.assign({}, currentState, {result:result}));
+      }).finally(function () { window.clearTimeout(timeout); });
+    }
   };
 
   if (document.readyState === "loading") {

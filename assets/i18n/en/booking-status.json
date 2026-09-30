@@ -134,7 +134,7 @@
       "expired": {
         "state": "Temporary booking expired",
         "title": "The temporary booking has expired",
-        "lead": "The payment window is no longer active. To book, start a new request.",
+        "lead": "The deadline passed without payment. You can start another booking and check availability again.",
         "notice": "We do not reactivate expired reservations from this screen."
       },
       "cancelled": {
@@ -172,6 +172,7 @@
       },
       "actions": {
         "retry": "Retry payment",
+        "modify": "Edit details",
         "newBooking": "New booking",
         "home": "Back to home"
       },
@@ -204,7 +205,7 @@
         "expired": {
           "state": "Reservation expired",
           "title": "The temporary booking expired",
-          "lead": "The payment window is no longer active. Start a new request.",
+          "lead": "The deadline passed without payment. You can start another booking and check availability again.",
           "notice": "No charge has been made and no reservation has been confirmed."
         },
         "cancelled": {

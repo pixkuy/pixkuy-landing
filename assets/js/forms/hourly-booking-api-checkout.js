@@ -312,7 +312,7 @@ var availabilityPrecheckSequence = 0;
       hourly_daily_date: data.hourlyDailyDate,
       hourly_daily_start_time: data.hourlyDailyStartTime,
       hourly_daily_duration_hours: durationHours,
-      hourly_daily_passengers: DEFAULT_HOURLY_PASSENGERS,
+      hourly_daily_passengers: window.PixkuyFleetSelection.hourlyPassengers(data.hourlyDailyPassengers),
       hourly_daily_price: amountMinor,
       hourly_daily_currency: "MXN",
       request_summary: getFieldValue(form, "request_summary") || buildRequestSummary(data),
@@ -334,7 +334,7 @@ var availabilityPrecheckSequence = 0;
       payload.recaptchaToken = normalizeText(recaptchaToken);
     }
 
-    return payload;
+    return window.PixkuyFleetSelection.snapshot("hourly_daily", payload);
   }
   
   function buildAvailabilityPrecheckDetail(data) {
@@ -342,6 +342,7 @@ var availabilityPrecheckSequence = 0;
       serviceType: "hourly_daily",
       hourly_daily_mode: data.hourlyDailyMode,
       hourly_daily_vehicle_type: data.hourlyDailyVehicleType,
+      hourly_daily_passengers: window.PixkuyFleetSelection.hourlyPassengers(data.hourlyDailyPassengers),
       hourly_daily_pickup: data.hourlyDailyPickup,
       hourly_daily_pickup_place_id: data.hourlyDailyPickupPlaceId,
       hourly_daily_pickup_lat: data.hourlyDailyPickupLat,
@@ -362,6 +363,7 @@ var availabilityPrecheckSequence = 0;
     snapshot.phone = data.phone;
     snapshot.service_type = "hourly_daily";
     snapshot.hourly_daily_mode = data.hourlyDailyMode;
+    snapshot.hourly_daily_passengers = window.PixkuyFleetSelection.hourlyPassengers(data.hourlyDailyPassengers);
     snapshot.hourly_daily_pickup = data.hourlyDailyPickup;
     snapshot.hourly_daily_date = data.hourlyDailyDate;
     snapshot.hourly_daily_start_time = data.hourlyDailyStartTime;
@@ -381,7 +383,7 @@ var availabilityPrecheckSequence = 0;
 
     addLegalAcceptanceFields(snapshot, form);
 
-    return snapshot;
+    return window.PixkuyFleetSelection.snapshot("hourly_daily", snapshot);
   }
 
   function redirectToCheckoutReview(form, data) {
@@ -1131,7 +1133,7 @@ var availabilityPrecheckSequence = 0;
   }
 
   function requestCheckout(input) {
-    return window.fetch(buildCheckoutUrl(input.config), {
+    return window.PixkuyFleetSelection.fetchCheckout("hourly_daily", buildCheckoutUrl(input.config), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1380,6 +1382,13 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
 
     window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
       scheduleLegalAcceptanceVisibilitySync(getForm());
+    });
+
+    document.addEventListener("pixkuy:contact-service-change", function clearPreviousHourlyMessage() {
+      var activeForm = getForm();
+      if (activeForm && activeForm.hasAttribute("data-hourly-checkout-error-category")) {
+        hideCheckoutError(activeForm);
+      }
     });
 
     scheduleLegalAcceptanceVisibilitySync(form);

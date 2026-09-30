@@ -130,7 +130,7 @@
       hourly_daily_date: safeDetail.hourly_daily_date,
       hourly_daily_start_time: safeDetail.hourly_daily_start_time,
       hourly_daily_duration_hours: durationHours,
-      hourly_daily_passengers: DEFAULT_HOURLY_PASSENGERS,
+      hourly_daily_passengers: window.PixkuyFleetSelection.hourlyPassengers(safeDetail.hourly_daily_passengers),
       hourly_daily_price: amountMinor,
       hourly_daily_currency: normalizeText(safeDetail.hourly_daily_currency) || "MXN"
     };
@@ -221,7 +221,7 @@
       });
     }
 
-    return window.fetch(buildPrecheckUrl(config), {
+    return window.PixkuyFleetSelection.fetchPrecheck("hourly_daily", buildPrecheckUrl(config), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

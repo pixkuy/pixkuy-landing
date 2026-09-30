@@ -325,7 +325,7 @@
     const hotel = lodgingSide === "origin" ? origin : destination;
     const airport = lodgingSide === "origin" ? destination : origin;
 
-    return {
+    const snapshot = {
       state: state,
       payload: payload,
       direction: direction,
@@ -350,6 +350,7 @@
         ? String(state.lodgingEndpointLng)
         : ""
     };
+    return window.PixkuyFleetSelection ? window.PixkuyFleetSelection.snapshot("airport_transfer", snapshot, {refreshSelection:true}) : snapshot;
   }
 
   function hasCompleteAirportSnapshot(snapshot) {
@@ -506,6 +507,7 @@
       "time",
       "passengers",
       "luggage",
+      "vehicle",
       "fare"
     ].forEach(function appendRow(key) {
       summaryList.appendChild(buildSummaryRow(key));
@@ -613,6 +615,7 @@
       time: safeSnapshot.serviceTime || "",
       passengers: safeSnapshot.passengerBucketLabel || "",
       luggage: safeSnapshot.luggage || "0",
+      vehicle: safeSnapshot.fleet_model ? safeSnapshot.fleet_model.name : "",
       fare: safeSnapshot.fare || ""
     };
 
@@ -664,6 +667,7 @@
       getI18nValue("airportMobileContactStep.validation.formIncomplete", "")
     );
 
+    setText(getSummaryLabelNode("vehicle"), getI18nValue("fleetSelection.model", ""));
     ["airport", "hotel", "zone", "date", "time", "passengers", "luggage", "fare"]
       .forEach(function syncSummaryLabel(key) {
         setText(

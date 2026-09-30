@@ -323,7 +323,7 @@
     );
     const currency = normalizeText(safePayload.hourly_daily_currency);
 
-    return {
+    const snapshot = {
       serviceType: "hourly_daily",
       hourly_daily_mode:
         mode === MODE_HOURLY || mode === MODE_FULL_DAY || mode === MODE_LONG_TERM
@@ -345,6 +345,12 @@
       hourly_daily_extra_km_price: normalizeText(safePayload.hourly_daily_extra_km_price),
       hourly_daily_out_of_zone_supplement: normalizeText(safePayload.hourly_daily_out_of_zone_supplement)
     };
+    const fleet = window.PixkuyFleetSelection;
+    if (fleet && mode !== MODE_LONG_TERM) {
+      snapshot.hourly_daily_passengers = String(fleet.passengers());
+      return fleet.snapshot("hourly_daily", snapshot, {refreshSelection:true});
+    }
+    return snapshot;
   }
 
   function hasCompleteHourlySnapshot(snapshot) {
@@ -584,6 +590,7 @@
       "date",
       "time",
       "duration",
+      "passengers",
       "vehicle",
       "price",
       "notes"
@@ -727,11 +734,14 @@
       date: safeSnapshot.hourly_daily_date || "",
       time: safeSnapshot.hourly_daily_start_time || "",
       duration: getDurationLabel(safeSnapshot),
-      vehicle: "ByD M9",
+      passengers: safeSnapshot.hourly_daily_passengers || "",
+      vehicle: safeSnapshot.fleet_model ? safeSnapshot.fleet_model.name : safeSnapshot.hourly_daily_mode === MODE_LONG_TERM ? "ByD M9" : "",
       price: getPriceLabel(safeSnapshot),
       notes: safeSnapshot.hourly_daily_notes || ""
     };
 
+    const passengersRow = contactStepNode.querySelector('[data-hourly-mobile-contact-summary-row="passengers"]');
+    passengersRow.hidden = !values.passengers;
     Object.keys(values).forEach(function syncValue(key) {
       if (key === "price") {
         setPriceText(getSummaryValueNode(key), values[key]);
@@ -851,6 +861,7 @@
       )
     );
 
+    setText(getSummaryLabelNode("passengers"), getI18nValue("fleetSelection.passengers", ""));
     ["mode", "pickup", "date", "time", "duration", "vehicle", "price", "notes"]
       .forEach(function syncSummaryLabel(key) {
         setText(

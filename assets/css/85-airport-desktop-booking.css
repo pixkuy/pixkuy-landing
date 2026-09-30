@@ -1,0 +1,96 @@
+@media (min-width: 721px) {
+  body.airport-booking-active { background: var(--bg); overflow: auto; }
+  body.airport-booking-active > :not(.airport-booking):not(#pixkuy-legal-overlay):not(script):not(style):not(link):not(.consent-banner):not(.consent-preferences) { display: none !important; }
+  .airport-booking { color: var(--fg); max-width: 1280px; margin: 0 auto; padding: 24px 32px 48px; font-size: 1rem; line-height: 1.5; }
+  .airport-booking [hidden] { display: none !important; }
+  .airport-booking__header { display: flex; align-items: center; min-height: 56px; margin: 0 0 22px; }
+  .airport-booking__identity { display: flex; align-items: center; gap: 32px; min-width: 0; }
+  .airport-booking__logo { width: 168px; height: auto; }
+  .airport-booking__step-caption { margin: 0 auto 12px; max-width: 760px; color: var(--muted); font-size: .875rem !important; }
+  .airport-booking__progress { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 760px; list-style: none; padding: 0; margin: 0 auto 32px; color: var(--muted); }
+  .airport-booking__progress li { position: relative; min-width: 0; }
+  .airport-booking__progress li:not(:last-child)::after { content: ""; position: absolute; z-index: 0; top: 12px; left: calc(50% + 20px); width: calc(100% - 40px); height: 1px; background: #515859; }
+  .airport-booking__progress li.is-complete:not(:last-child)::after { background: var(--accent); }
+  .airport-booking__step-content, .airport-booking__step-action { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 28px; color: inherit; font: inherit; white-space: nowrap; }
+  .airport-booking__step-action { border: 0; background: var(--bg); padding: 0 8px 0 0; cursor: pointer; }
+  .airport-booking__step-content { background: var(--bg); padding-right: 8px; }
+  .airport-booking__step-marker { display: inline-grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; box-sizing: border-box; border: 1px solid #6e7677; border-radius: 50%; color: #c4c8c8; font-size: .78rem; line-height: 1; }
+  .airport-booking__progress .is-complete, .airport-booking__progress .is-current { color: var(--fg); }
+  .airport-booking__progress .is-complete .airport-booking__step-marker { border-color: var(--accent); color: var(--accent); }
+  .airport-booking__progress .is-current .airport-booking__step-marker { border-color: var(--accent); background: var(--accent); color: #0f1113; font-weight: 700; }
+  .airport-booking__progress .is-current .airport-booking__step-label { font-weight: 600; }
+  .airport-booking__layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 24px; align-items: start; }
+  .airport-booking h1 { font-size: 1.8rem; line-height: 1.2; margin: 0 0 12px; }
+  .airport-booking h2 { font-size: 1.25rem; margin: 0 0 16px; }
+  .airport-booking h3 { font-size: 1.1rem; margin: 12px 0; }
+  .airport-booking p { font-size: 1rem; }
+  .airport-booking img { opacity: 1; visibility: visible; }
+  body.airport-booking-active > .lang { display: none !important; }
+  .airport-booking__lead { color: var(--muted); margin: 0 0 18px; }
+  .airport-booking__reference { color: var(--muted); margin: -8px 0 16px; font-variant-numeric: tabular-nums; }
+  .airport-booking__summary, .airport-booking__block { background: #171b1c; border: 1px solid #343a3b; border-radius: 8px; padding: 20px; min-width: 0; }
+  .airport-booking__block + .airport-booking__block { margin-top: 14px; }
+  .airport-booking__block-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .airport-booking__link { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; border: 0; border-radius: 0; background: transparent; color: #66c7bc; padding: 7px 2px; font: inherit; text-align: left; cursor: pointer; text-decoration: none; }
+  .airport-booking__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .airport-booking__link:focus-visible, .airport-booking :focus-visible { outline: 2px solid #66c7bc; outline-offset: 3px; }
+  .airport-booking h1[tabindex="-1"]:focus { outline: 0; box-shadow: inset 3px 0 0 var(--accent); padding-left: 12px; }
+  .airport-booking__icon { display: inline-flex; flex: 0 0 18px; width: 18px; height: 18px; }
+  .airport-booking__icon svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .airport-booking__photo { display: block; width: 100%; max-height: 190px; aspect-ratio: 16 / 9; object-fit: cover; object-position: center 75%; border-radius: 4px; }
+  .airport-booking__detail { padding: 8px 0; border-bottom: 1px solid #343a3b; overflow-wrap: anywhere; }
+  .airport-booking__detail dt { color: var(--muted); font-size: .875rem; }
+  .airport-booking__detail dd { margin: 4px 0 0; }
+  .airport-booking__location-name,
+  .airport-booking__location-address { display: block; }
+  .airport-booking__location-name { font-weight: 650; }
+  .airport-booking__location-address { margin-top: 2px; color: var(--muted); font-size: .875rem; line-height: 1.35; }
+  .airport-booking__details { margin: 0; }
+  .airport-booking__summary > .airport-booking__details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
+  .airport-booking__summary > .airport-booking__details .airport-booking__location-detail { grid-column: 1 / -1; }
+  .airport-booking__block .airport-booking__details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; }
+  .airport-booking__block:first-of-type .airport-booking__detail:nth-child(-n+2) { grid-column: 1 / -1; }
+  .airport-booking__block:last-of-type .airport-booking__detail { grid-column: 1 / -1; }
+  .airport-booking__block:first-of-type:not(:last-of-type) .airport-booking__detail:last-child { display: none; }
+  .airport-booking p.airport-booking__total { font-size: 1.75rem; color: #e9c982; font-weight: 600; margin: 20px 0; overflow-wrap: anywhere; }
+  .airport-booking__primary { width: 100%; margin-top: 16px; background: var(--accent); color: var(--fg); border-radius: 8px; box-shadow: none; transform: none; padding: 14px 20px; font-size: 1rem; }
+  .airport-booking__notice { border-left: 3px solid #e9c982; padding: 12px 16px; margin: 20px 0; }
+  .airport-booking__notice:empty { display: none; }
+  .airport-booking__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: 20px 0; }
+  .airport-booking__payment-actions { display: grid; gap: 12px; }
+  .airport-booking__payment-actions > button { min-height: 44px; margin: 0; justify-content: center; text-align: center; }
+  .airport-booking__secondary { border: 1px solid #636968; border-radius: 8px; padding: 10px 16px; }
+  .airport-booking__payment-actions > button:disabled { opacity: .65; cursor: wait; }
+  .airport-booking--result .airport-booking__block .airport-booking__details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .airport-booking--result .airport-booking__block .airport-booking__detail--half { grid-column: auto; }
+  .airport-booking__actions .airport-booking__link { min-height: 44px; padding: 9px 12px; border: 1px solid #505758; border-radius: 7px; }
+  .airport-booking__back-action { margin-top: 16px; }
+  .airport-booking__form { margin-top: 18px; width: 100%; max-width: none; }
+  .airport-booking__form .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .airport-booking__form .form-grid > :not([data-airport-desktop-field]):not([data-airport-transfer-checkout-legal-acceptance]):not(.form-actions) { display: none !important; }
+  .airport-booking__form [data-airport-desktop-field="name"], .airport-booking__form [data-airport-desktop-field="message"], .airport-booking__form [data-airport-desktop-field="luggage"], .airport-booking__form [data-airport-transfer-checkout-legal-acceptance], .airport-booking__form .form-actions { grid-column: 1 / -1; }
+  .airport-booking__form [data-airport-desktop-field="luggage"] > :not(.airport-booking__luggage) { display: none !important; }
+  .airport-booking__form [data-airport-desktop-field] { min-width: 0; }
+  .airport-booking__form [data-airport-desktop-field] label.visually-hidden { position: static !important; width: auto !important; height: auto !important; clip: auto !important; clip-path: none !important; overflow: visible !important; display: block; margin: 0 0 6px; white-space: normal; }
+  .airport-booking__form input, .airport-booking__form textarea { background: #171b1c; color: var(--fg); border: 1px solid #636968; border-radius: 6px; min-height: 46px; font: inherit; width: 100%; box-sizing: border-box; }
+  .airport-booking__form textarea { min-height: 88px; resize: vertical; }
+  .airport-booking__field-help { margin: 6px 0 0; color: var(--muted); font-size: .875rem !important; }
+  .airport-booking__form .form-actions .cta { width: 100%; min-height: 48px; padding: 12px 20px; background: var(--accent); border-radius: 8px; box-shadow: none; transform: none; font-size: 1rem; font-weight: 600; }
+  .airport-booking__form .legal-acceptance { margin: 0; }
+  .airport-booking__form [data-airport-transfer-checkout-legal-acceptance] { display: block !important; }
+  .airport-booking__form .form-error { color: #f59d9d; }
+  .airport-booking__form #contact-form-error { margin-bottom: 16px; }
+  .airport-booking__conditions { display: grid; gap: 8px; margin-top: 20px; padding: 14px 0; border-top: 1px solid #343a3b; border-bottom: 1px solid #343a3b; }
+  .airport-booking__conditions-status { display: flex; align-items: center; gap: 9px; margin: 0; font-weight: 600; }
+  .airport-booking__conditions .legal-acceptance__links { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+  .airport-booking__conditions a { display: inline-flex; align-items: center; gap: 5px; min-height: 32px; color: #66c7bc; }
+  .airport-booking__conditions a .airport-booking__icon { width: 15px; height: 15px; }
+  @media (max-width: 1050px) {
+    .airport-booking { padding: 20px 24px 40px; }
+    .airport-booking__identity { gap: 22px; }
+    .airport-booking__logo { width: 154px; }
+    .airport-booking__progress, .airport-booking__step-caption { max-width: 680px; }
+    .airport-booking__layout { grid-template-columns: minmax(0, 1.4fr) minmax(270px, 1fr); gap: 20px; }
+    .airport-booking__summary, .airport-booking__block { padding: 20px; }
+  }
+}

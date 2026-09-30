@@ -72,6 +72,7 @@
   }
 
   function getVehicleFromPayload(payload) {
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.gallery("direct_transfer");
     var vehicles = payload && payload.vehicles ? payload.vehicles : {};
     var vehicle = vehicles[VEHICLE_ID] || null;
     var images = normalizeImages(vehicle ? vehicle.images : []);

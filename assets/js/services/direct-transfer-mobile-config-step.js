@@ -1119,6 +1119,8 @@
   }
 
   function getFareText() {
+    if (state.quoteStatus === "choice") return getI18nValue("fleetSelection.choose", "Elige un modelo");
+
     if (state.quoteStatus === "loading") {
       return getI18nValue(
         "directTransferMobileFlow.fare.loading",
@@ -1865,6 +1867,10 @@
     syncStateFromFields();
     syncDateTimeConstraints();
     syncAllAddressClearState();
+    if (window.PixkuyFleetSelection) {
+      window.PixkuyFleetSelection.render("direct_transfer");
+      window.PixkuyFleetSelection.syncPresentation("direct_transfer");
+    }
     syncCta();
     requestQuoteIfReady();
 
@@ -1901,6 +1907,10 @@
     step.hidden = !isVisible;
     step.setAttribute("aria-hidden", isVisible ? "false" : "true");
     document.body.setAttribute(BODY_CONFIG_ATTR, isVisible ? "true" : "false");
+    if (window.PixkuyFleetSelection) {
+      window.PixkuyFleetSelection.render("direct_transfer");
+      window.PixkuyFleetSelection.syncPresentation("direct_transfer");
+    }
 
     return true;
   }
@@ -2137,6 +2147,14 @@
     canReacceptCanonicalPriceState,
     hasCanonicalMobileQuote
   };
+
+  document.addEventListener("pixkuy:fleet-choice-required", function (event) {
+    if (event.detail.service !== "direct_transfer" || event.detail.surface !== "panel" || !isOpen()) return;
+    state.quoteStatus = "choice";
+    state.precheckAllowed = false;
+    state.quoteReviewRequired = false;
+    syncCta();
+  });
 
   window.addEventListener("pixkuy:direct-transfer-canonical-price", function onCanonicalPrice(event) {
     const detail = event && event.detail && typeof event.detail === "object"

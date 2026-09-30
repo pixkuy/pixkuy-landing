@@ -1032,3 +1032,15 @@
     background-size:18px 18px !important;
   }
 }
+
+/* Airport-only: two readable rows, preserving the native date/time controls. */
+@media (max-width:720px){
+  .airport-mobile-route #services-expand-airport .services-expand__form > .airport-mobile-passengers,
+  .airport-mobile-route #services-expand-airport .services-expand__form > .airport-mobile-luggage{
+    flex:0 0 calc(50% - 5px); margin-right:0 !important;
+  }
+  .airport-mobile-route #services-expand-airport .airport-mobile-passengers__select,
+  .airport-mobile-route #services-expand-airport .airport-mobile-luggage__select{ width:100%; max-width:none; }
+  .airport-mobile-route #services-expand-airport .services-expand__form > .services-expand__field--date{ flex:1 1 calc(60% - 5px); }
+  .airport-mobile-route #services-expand-airport .services-expand__form > .services-expand__field--time{ flex:0 0 calc(40% - 5px); min-width:0; }
+}

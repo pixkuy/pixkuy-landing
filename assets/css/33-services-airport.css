@@ -109,6 +109,19 @@
     appearance:none;
   }
 
+  #services-expand-airport .services-expand__field--time .services-expand__control::-webkit-calendar-picker-indicator{
+    position:absolute;
+    top:50%;
+    right:0;
+    transform:translateY(-50%);
+    width:34px;
+    height:48px;
+    margin:0;
+    opacity:0;
+    cursor:pointer;
+    pointer-events:auto;
+  }
+
   .services-expand__field--date .services-expand__control::-webkit-calendar-picker-indicator{
     position:absolute;
     top:50%;
@@ -671,6 +684,21 @@
    ------------------------------------------------- */
 
 @media (min-width: 721px){
+  #services-expand-airport .services-expand__field:has(.services-expand__control[aria-expanded="true"]),
+  #services-expand-airport .services-expand__field:has(> .place-autocomplete__panel:not([hidden])){
+    isolation:isolate;
+    z-index:60;
+  }
+
+  #services-expand-airport .services-expand__field:has(> .place-autocomplete__panel[data-airport-tariff-dropdown="origin"]:not([hidden])){
+    z-index:80;
+  }
+
+  #services-expand-airport .services-expand__field > .place-autocomplete__panel{
+    background-color:#14181b;
+    opacity:1;
+  }
+
   .services-expand__form{
     display:flex;
     flex-wrap:wrap;
@@ -1222,4 +1250,478 @@
   #services-expand-airport .services-expand__actions .services-hourly-panel__availability[hidden]{
     display:none !important;
   }
+}
+/* Contractual model presentation when the offer has one choice. */
+.airport-single-model { grid-column:1 / -1; order:7; flex:0 0 100%; display:flex; align-items:center; gap:16px; margin:8px 0; min-width:0; }
+.airport-single-model p { margin:0; color:inherit; font-weight:600; overflow-wrap:anywhere; }
+.airport-single-model__image { display:block; width:auto; max-width:240px; height:144px; object-fit:contain; border-radius:8px; }
+
+/* Airport desktop: the existing trip controls and offer share two columns. */
+@media (min-width:721px){
+  #services-expand-airport{
+    padding:clamp(24px,3vw,42px);
+    border-radius:18px;
+    border-color:rgba(236,220,189,.18);
+    background:rgba(20,23,22,.94);
+    box-shadow:0 12px 28px rgba(0,0,0,.16);
+    backdrop-filter:none;
+  }
+
+  #services-expand-airport .airport-desktop-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);
+    gap:clamp(24px,3vw,46px);
+    align-items:stretch;
+  }
+
+  #services-expand-airport .airport-desktop-trip,
+  #services-expand-airport .airport-desktop-vehicle{ min-width:0; }
+
+  #services-expand-airport .services-expand__eyebrow{
+    margin-bottom:14px;
+    color:rgba(184,229,214,.9);
+  }
+
+  #services-expand-airport .services-expand__title{
+    font-size:32px;
+    line-height:1.08;
+  }
+
+  #services-expand-airport .services-expand__text{
+    margin:8px 0 24px;
+    max-width:620px;
+    font-size:15px;
+    line-height:1.6;
+  }
+
+  #services-expand-airport .services-expand__form{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr)) 52px;
+    gap:22px 14px;
+    align-items:start;
+    margin:0;
+  }
+
+  #services-expand-airport .services-expand__form > .airport-mobile-fare-footer{ display:none; }
+  #services-expand-airport .services-expand__form > .services-expand__field{
+    min-width:0;
+    max-width:none;
+    width:100%;
+    gap:9px;
+  }
+  #services-expand-airport [data-airport-tariff-role="destination"] > .services-expand__destination{
+    width:100%;
+    max-width:none;
+  }
+  #services-expand-airport [data-airport-tariff-role="origin"]{ grid-column:1 / 3; grid-row:1; }
+  #services-expand-airport [data-airport-tariff-role="destination"]{ grid-column:1 / 3; grid-row:2; }
+  #services-expand-airport .services-expand__field--date{ grid-column:1; grid-row:3; }
+  #services-expand-airport .services-expand__field--time{ grid-column:2; grid-row:3; align-self:start; }
+  #services-expand-airport .services-expand__field--passengers{ grid-column:1 / 3; grid-row:4; }
+
+  #services-expand-airport .services-expand__swap{
+    position:relative;
+    grid-column:3;
+    grid-row:1 / 3;
+    align-self:stretch;
+    justify-self:stretch;
+    padding:0;
+    margin:0;
+  }
+
+  #services-expand-airport .services-expand__swap::before{
+    content:"";
+    position:absolute;
+    top:var(--airport-origin-center,20%);
+    left:50%;
+    height:calc(var(--airport-swap-center,50%) - var(--airport-origin-center,20%) - 25px);
+    border-left:1px solid rgba(236,220,189,.30);
+  }
+
+  #services-expand-airport .services-expand__swap::after{
+    content:"";
+    position:absolute;
+    top:calc(var(--airport-swap-center,50%) + 25px);
+    left:50%;
+    height:calc(var(--airport-destination-center,80%) - var(--airport-swap-center,50%) - 25px);
+    border-left:1px solid rgba(236,220,189,.30);
+  }
+
+  #services-expand-airport .services-expand__swap-button{
+    position:absolute;
+    z-index:1;
+    top:var(--airport-swap-center,50%);
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    border-color:rgba(31,174,150,.78);
+    background:rgba(20,23,22,.98);
+    box-shadow:none;
+  }
+
+  #services-expand-airport .services-expand__label{
+    font-size:13px;
+    color:rgba(255,248,236,.96);
+  }
+
+  #services-expand-airport :is(.services-expand__control,.services-expand__destination-resolved,.services-expand__destination-search .place-autocomplete input){
+    min-height:64px;
+    border-radius:10px;
+    border-color:rgba(236,220,189,.3);
+    background:rgba(19,21,20,.7);
+    box-shadow:none;
+  }
+
+  #services-expand-airport .services-expand__airport-shell .services-expand__control--select{
+    width:100%;
+    gap:13px;
+    padding:9px 42px 9px 15px;
+    font-family:inherit;
+    font-size:14px;
+    text-align:left;
+  }
+
+  #services-expand-airport .airport-endpoint__icon{
+    display:inline-flex;
+    flex:0 0 21px;
+    align-items:center;
+    justify-content:center;
+    width:21px;
+    height:21px;
+    color:rgba(255,248,236,.88);
+    pointer-events:none;
+  }
+
+  #services-expand-airport .airport-endpoint__icon svg{ width:21px; height:21px; }
+  #services-expand-airport .airport-endpoint__copy,
+  #services-expand-airport .services-expand__destination-resolved-label{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    min-width:0;
+    gap:2px;
+  }
+
+  #services-expand-airport .airport-endpoint__primary{
+    display:block;
+    font-size:15px;
+    line-height:1.2;
+    font-weight:600;
+    color:rgba(255,248,236,.98);
+  }
+
+  #services-expand-airport .airport-endpoint__secondary{
+    display:block;
+    font-size:12.5px;
+    line-height:1.3;
+    font-weight:400;
+    color:rgba(255,248,236,.7);
+  }
+
+  #services-expand-airport .services-expand__destination-resolved{
+    justify-content:flex-start;
+    padding:9px 42px 9px 15px;
+    overflow:visible;
+  }
+
+  #services-expand-airport .services-expand__destination-resolved-main{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    width:100%;
+    min-width:0;
+  }
+
+  #services-expand-airport .services-expand__destination-resolved-label{
+    flex:1 1 auto;
+    max-width:none;
+    overflow:visible;
+    text-align:left;
+    font-size:14px;
+    line-height:1.35;
+    -webkit-line-clamp:unset;
+    line-clamp:unset;
+  }
+
+  #services-expand-airport .services-expand__destination-search > .airport-endpoint__icon{
+    position:absolute;
+    z-index:2;
+    top:32px;
+    left:16px;
+    transform:translateY(-50%);
+  }
+
+  #services-expand-airport .services-expand__destination-search [data-airport-lodging-input]{
+    padding-left:48px;
+    font-family:inherit;
+    font-size:14px;
+  }
+
+  #services-expand-airport :is(.services-expand__date-wrap,.services-expand__time-wrap,.services-expand__field--time input,.services-expand__field--date input){
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+
+  #services-expand-airport :is(.services-expand__field--date,.services-expand__field--time) .services-expand__control{
+    min-height:56px;
+    height:56px;
+    padding-left:48px;
+    padding-right:10px;
+    font-size:14px;
+  }
+
+  #services-expand-airport :is(.services-expand__field--date,.services-expand__field--time) .services-expand__date-icon{
+    left:16px;
+    right:auto;
+  }
+
+  #services-expand-airport :is(.services-expand__field--date,.services-expand__field--time) .services-expand__control::-webkit-calendar-picker-indicator{
+    left:0;
+    right:auto;
+    width:42px;
+    height:100%;
+    opacity:0;
+  }
+
+  #services-expand-airport .services-expand__passengers-segmented{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    width:100%;
+    gap:0;
+  }
+
+  #services-expand-airport .services-expand__passenger-chip{
+    min-width:0;
+    width:100%;
+    min-height:58px;
+    padding:0 8px;
+    border-radius:0;
+    background:rgba(19,21,20,.7);
+    box-shadow:none;
+  }
+
+  #services-expand-airport .services-expand__passenger-chip:first-child{ border-radius:10px 0 0 10px; }
+  #services-expand-airport .services-expand__passenger-chip:last-child{ border-radius:0 10px 10px 0; }
+  #services-expand-airport .services-expand__passenger-chip + .services-expand__passenger-chip{ border-left:0; }
+  #services-expand-airport .services-expand__passenger-chip.is-active,
+  #services-expand-airport .services-expand__passenger-chip[aria-pressed="true"]{
+    border-color:rgba(31,174,150,.78);
+    background:rgba(20,112,101,.38);
+  }
+
+  #services-expand-airport .airport-desktop-vehicle{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    align-self:start;
+    gap:16px;
+    padding:clamp(18px,2vw,28px);
+    border:1px solid rgba(236,220,189,.24);
+    border-radius:18px;
+    background:rgba(255,255,255,.025);
+  }
+
+  #services-expand-airport .airport-desktop-vehicle__heading{
+    order:1;
+    margin:0;
+    font-size:16px;
+    line-height:1.3;
+    font-weight:700;
+    color:rgba(255,248,236,.98);
+  }
+
+  #services-expand-airport .airport-desktop-vehicle > .fleet-selection{
+    order:2;
+    margin:0;
+    min-width:0;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle > .fleet-selection legend{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .fleet-selection__choices{
+    border:1px solid rgba(236,220,189,.3);
+    border-radius:10px;
+    overflow:hidden;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .fleet-selection__choice:last-child{ border-bottom:0; }
+
+  #services-expand-airport .airport-single-model{
+    order:3;
+    display:flex;
+    flex-direction:column;
+    flex:0 1 auto;
+    align-items:stretch;
+    gap:12px;
+    margin:0;
+    min-width:0;
+  }
+
+  #services-expand-airport .airport-single-model p{
+    order:0;
+    margin:0;
+    padding:14px 16px;
+    border:1px solid rgba(236,220,189,.32);
+    border-radius:10px;
+    font-size:16px;
+    line-height:1.3;
+    font-weight:600;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle:has(> .fleet-selection) .airport-single-model p{ display:none; }
+  #services-expand-airport .airport-single-model > span{ order:1; position:relative; display:block; min-width:0; }
+  #services-expand-airport .airport-single-model > span[hidden]{ display:none; }
+  #services-expand-airport .airport-single-model__image{
+    display:block;
+    width:100%;
+    max-width:none;
+    height:auto;
+    aspect-ratio:1.65;
+    object-fit:cover;
+    object-position:center 80%;
+    border-radius:10px;
+  }
+
+  #services-expand-airport [data-airport-desktop-vehicle-gallery-trigger]{ cursor:pointer; }
+  #services-expand-airport [data-airport-desktop-vehicle-gallery-trigger]:focus-visible{
+    outline:2px solid rgba(31,174,150,.95);
+    outline-offset:4px;
+  }
+
+  #services-expand-airport .airport-single-model__gallery-label{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    padding:9px 13px;
+    border-radius:8px;
+    background:rgba(20,23,22,.9);
+    color:rgba(255,248,236,.98);
+    font-size:14px;
+    line-height:1.2;
+    font-weight:600;
+    pointer-events:none;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle > .services-expand__actions{ display:contents; }
+  #services-expand-airport .airport-desktop-vehicle .services-hourly-panel__availability{
+    order:4;
+    margin:0;
+    max-width:none;
+    font-size:14px;
+    line-height:1.4;
+    font-weight:600;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .services-hourly-panel__availability[hidden]{ display:none !important; }
+
+  #services-expand-airport .airport-desktop-vehicle__empty{
+    order:3;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    aspect-ratio:1.65;
+    min-height:140px;
+    margin:0;
+    padding:20px;
+    border:1px solid rgba(236,220,189,.2);
+    border-radius:10px;
+    color:rgba(255,248,236,.65);
+    font-size:14px;
+    line-height:1.5;
+    text-align:center;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle__empty[hidden]{ display:none; }
+
+  #services-expand-airport .airport-desktop-vehicle > .services-expand__field--fare{
+    order:5;
+    display:grid;
+    flex:0 1 auto;
+    grid-template-columns:max-content minmax(0,1fr);
+    grid-template-areas:"label zone" "price zone";
+    gap:3px 12px;
+    align-items:center;
+    padding-top:18px;
+    border-top:1px solid rgba(236,220,189,.26);
+    min-width:0;
+    width:100%;
+    margin:0;
+    transform:none;
+  }
+
+  #services-expand-airport .services-expand__field--fare > .services-expand__label{
+    grid-area:label;
+    align-self:end;
+    color:rgba(255,248,236,.7);
+    font-size:12px;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .services-expand__fare{
+    grid-area:price;
+    min-height:0;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:none;
+    box-shadow:none;
+    font-size:24px;
+    line-height:1.08;
+    white-space:nowrap;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .services-expand__destination-zone{
+    grid-area:zone;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    gap:4px;
+    min-width:0;
+    margin:0;
+    padding-left:12px;
+    border-left:1px solid rgba(236,220,189,.32);
+    text-align:left;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .services-expand__destination-zone[hidden]{ display:none !important; }
+  #services-expand-airport .airport-desktop-vehicle .services-expand__destination-zone-value{
+    font-size:13px;
+    line-height:1.25;
+    overflow-wrap:break-word;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .services-expand__cta{
+    order:6;
+    width:100%;
+    min-height:56px;
+    border-radius:10px;
+    background:rgba(18,142,125,.96);
+    box-shadow:none;
+    font-size:16px;
+  }
+
+  #services-expand-airport .airport-desktop-vehicle .services-expand__cta:hover{ background:rgba(22,161,142,.96); }
+  #services-expand-airport .airport-desktop-vehicle .services-expand__cta:disabled,
+  #services-expand-airport .airport-desktop-vehicle .services-expand__cta[aria-disabled="true"]{ background:rgba(255,255,255,.06); }
+  body[data-airport-desktop-vehicle-gallery-active="true"]{ overflow:hidden; }
+}
+
+@media (min-width:721px) and (max-width:1050px){
+  #services-expand-airport .airport-desktop-layout{ gap:22px; }
+  #services-expand-airport .airport-desktop-vehicle{ padding:18px; }
+  #services-expand-airport .services-expand__form{ gap:18px 10px; grid-template-columns:repeat(2,minmax(0,1fr)) 46px; }
 }

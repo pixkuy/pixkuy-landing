@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "availabilityUnavailable": "No vehicles are available at this time.",
+    "availabilityTechnical": "We could not check availability. Please try again.",
     "emptyTitle": "No direct transfer to review",
     "emptyText": "Go back to the form and configure your transfer again.",
     "emptyCta": "Back to direct transfers",

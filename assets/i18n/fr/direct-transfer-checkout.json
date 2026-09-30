@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "availabilityUnavailable": "Aucun véhicule disponible à cet horaire.",
+    "availabilityTechnical": "Impossible de vérifier la disponibilité. Réessayez.",
     "emptyTitle": "Aucun transfert direct a verifier",
     "emptyText": "Revenez au formulaire et configurez a nouveau votre transfert.",
     "emptyCta": "Retour aux transferts directs",

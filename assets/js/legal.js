@@ -15,6 +15,35 @@
   var BODY_LOCK_CLASS = "pixkuy-legal-lock";
   var LEGAL_JSON_URL = "/assets/i18n/es/legal.json";
   var lastLegalTrigger = null;
+  var inertedBackground = [];
+
+  function setBackgroundInert(overlay, inert) {
+    if (!inert) {
+      inertedBackground.forEach(function restoreBackground(entry) {
+        entry.node.inert = entry.wasInert;
+      });
+      inertedBackground = [];
+      return;
+    }
+
+    inertedBackground = Array.prototype.slice.call(document.body.children)
+      .filter(function isBackground(node) {
+        return node !== overlay && !/^(SCRIPT|STYLE|LINK)$/.test(node.tagName);
+      })
+      .map(function inertBackground(node) {
+        var entry = { node: node, wasInert: Boolean(node.inert) };
+        node.inert = true;
+        return entry;
+      });
+  }
+
+  function getFocusableElements(overlay) {
+    return Array.prototype.slice.call(overlay.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(function isVisible(node) {
+      return !node.hidden && node.getClientRects().length > 0;
+    });
+  }
 
   function getModeFromHref(href) {
     if (typeof href !== "string") return null;
@@ -390,6 +419,7 @@
 
   function setOpen(overlay, open) {
     if (open) {
+      if (overlay.getAttribute("data-open") !== "1") setBackgroundInert(overlay, true);
       overlay.setAttribute("data-open", "1");
       overlay.setAttribute("aria-hidden", "false");
       document.body.classList.add(BODY_LOCK_CLASS);
@@ -399,24 +429,14 @@
       var closeBtn = overlay.querySelector("button[data-legal-close='1']");
       if (closeBtn) closeBtn.focus();
     } else {
-      if (
-        document.activeElement &&
-        overlay.contains(document.activeElement) &&
-        lastLegalTrigger &&
-        typeof lastLegalTrigger.focus === "function"
-      ) {
-        lastLegalTrigger.focus();
-      } else if (
-        document.activeElement &&
-        overlay.contains(document.activeElement) &&
-        typeof document.activeElement.blur === "function"
-      ) {
-        document.activeElement.blur();
-      }
-
       overlay.removeAttribute("data-open");
       overlay.setAttribute("aria-hidden", "true");
       document.body.classList.remove(BODY_LOCK_CLASS);
+      setBackgroundInert(overlay, false);
+      if (lastLegalTrigger && lastLegalTrigger.isConnected && typeof lastLegalTrigger.focus === "function") {
+        lastLegalTrigger.focus({ preventScroll: true });
+      }
+      document.dispatchEvent(new CustomEvent("pixkuy:legal-overlay-closed"));
     }
   }
 
@@ -466,11 +486,33 @@
   }
 
   function handleKeydown(e) {
+    var overlay = document.getElementById(OVERLAY_ID);
+
     if (e.key === "Escape") {
-      var overlay = document.getElementById(OVERLAY_ID);
       if (overlay && overlay.getAttribute("data-open") === "1") {
         e.preventDefault();
         closeOverlay();
+      }
+      return;
+    }
+
+    if (e.key === "Tab" && overlay && overlay.getAttribute("data-open") === "1") {
+      var focusable = getFocusableElements(overlay);
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (!first) {
+        e.preventDefault();
+        return;
+      }
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!overlay.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
       }
     }
   }

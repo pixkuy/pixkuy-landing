@@ -74,7 +74,7 @@
   }
 
   function t(dictionary, path) {
-    return getPathValue(dictionary, path);
+    return getPathValue(window.__pixkuyI18nDict, path) || getPathValue(dictionary, path);
   }
 
   function loadDictionary() {
@@ -208,7 +208,7 @@
     ].join("");
   }
 
-  function buildVehicleRow(label, value) {
+  function buildVehicleRow(label, value, selectedModel) {
     var safeLabel = normalizeText(label);
     var safeValue = normalizeText(value);
 
@@ -226,7 +226,7 @@
       escapeHtml(safeValue),
       "</span>",
       '<span class="booking-status__vehicle-media" aria-hidden="true">',
-      '<img src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="" loading="lazy" decoding="async">',
+      selectedModel ? (window.PixkuyFleetSelection.photo(selectedModel) ? '<img src="' + escapeHtml(window.PixkuyFleetSelection.photo(selectedModel)) + '" alt="" loading="lazy" decoding="async">' : '') : '<img src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="" loading="lazy" decoding="async">',
       "</span>",
       "</dd>",
       "</div>"
@@ -300,6 +300,8 @@
     var details = getNode("[data-hourly-checkout-review-details]");
     var base = "services.cards.hourly.panel.reviewPage.";
     var notes = getReviewNotes(snapshot);
+    var modeKey = snapshot.hourly_daily_mode === "full_day" ? "fullDay" : snapshot.hourly_daily_mode === "hourly" ? "hourly" : "";
+    var modeLabel = modeKey ? t(dictionary, "services.cards.hourly.panel.tabs." + modeKey) : snapshot.hourly_daily_mode_label || snapshot.hourly_daily_mode;
 
     if (!details) {
       return false;
@@ -307,13 +309,13 @@
 
     details.innerHTML = [
       buildRow(t(dictionary, base + "details.service"), t(dictionary, base + "serviceValue"), "service"),
-      buildRow(t(dictionary, base + "details.mode"), snapshot.hourly_daily_mode_label || snapshot.hourly_daily_mode, "mode"),
+      buildRow(t(dictionary, base + "details.mode"), modeLabel, "mode"),
       buildRow(t(dictionary, base + "details.pickup"), snapshot.hourly_daily_pickup_label || snapshot.hourly_daily_pickup, "pickup"),
       buildRow(t(dictionary, base + "details.date"), snapshot.hourly_daily_date, "date"),
       buildRow(t(dictionary, base + "details.time"), snapshot.hourly_daily_start_time, "time"),
-      buildRow(t(dictionary, base + "details.duration"), formatDuration(snapshot), "duration"),
-      buildVehicleRow(t(dictionary, base + "details.vehicle"), t(dictionary, base + "vehicleValue")),
-      buildRow(t(dictionary, base + "details.passengers"), t(dictionary, base + "passengersValue"), "passengers"),
+      buildRow(t(dictionary, base + "details.duration"), snapshot.hourly_daily_mode === "full_day" ? modeLabel : formatDuration(snapshot), "duration"),
+      buildVehicleRow(t(dictionary, base + "details.vehicle"), (snapshot.fleet_model ? snapshot.fleet_model.name : t(dictionary, base + "vehicleValue")), snapshot.fleet_model),
+      buildRow(t(dictionary, base + "details.passengers"), String(snapshot.hourly_daily_passengers || ""), "passengers"),
       buildRow(t(dictionary, base + "details.price"), formatPrice(snapshot), "price"),
       buildRow(t(dictionary, "services.cards.hourly.mobileFlow.contactStep.fields.name"), snapshot.name, "customer-name"),
       buildRow(t(dictionary, "services.cards.hourly.mobileFlow.contactStep.fields.phone"), snapshot.phone, "customer-phone"),
@@ -420,7 +422,7 @@
       hourly_daily_date: snapshot.hourly_daily_date,
       hourly_daily_start_time: snapshot.hourly_daily_start_time,
       hourly_daily_duration_hours: durationHours,
-      hourly_daily_passengers: 6,
+      hourly_daily_passengers: window.PixkuyFleetSelection.hourlyPassengers(snapshot.hourly_daily_passengers),
       hourly_daily_price: amountMinor,
       hourly_daily_currency: "MXN",
       request_summary: snapshot.request_summary || "",
@@ -461,7 +463,7 @@
       }
     });
 
-    return payload;
+    return window.PixkuyFleetSelection.snapshot("hourly_daily", payload);
   }
 
   function setBusy(isBusy) {
@@ -548,7 +550,7 @@
           payload.recaptchaToken = normalizeText(recaptchaToken);
         }
 
-        return window.fetch(
+        return window.PixkuyFleetSelection.fetchCheckout("hourly_daily",
           checkoutUrl,
           {
             method: "POST",
@@ -627,6 +629,9 @@
 
     loadDictionary().then(function onDictionaryLoaded(dictionary) {
       renderSnapshot(snapshot, dictionary);
+      window.addEventListener("pixkuy:i18n-applied", function refreshReviewLanguage() {
+        renderSnapshot(snapshot, dictionary);
+      });
 
       if (snapshot) {
         bindActions(snapshot, dictionary);

@@ -20,6 +20,8 @@
   var STORAGE_KEY = "pixkuy_airport_transfer_checkout_review_snapshot";
   var RETURN_KEY = "pixkuy_airport_transfer_checkout_review_return";
   var CHECKOUT_ENDPOINT = "/v1/public/reservations/checkout";
+  var REPLACE_CHECKOUT_ENDPOINT = "/v1/public/reservations/replace-checkout";
+  var EDIT_KEY = "pixkuy_airport_pending_edit_v1";
   var BOOKING_CHECKOUT_HANDOFF_PATH = "/booking-checkout.html";
   var BOOKING_CHECKOUT_STORAGE_PREFIX = "pixkuy_booking_checkout:";
 
@@ -229,7 +231,7 @@
     ].join("");
   }
 
-  function buildVehicleRow(label, value) {
+  function buildVehicleRow(label, value, selectedModel) {
     var safeLabel = normalizeText(label);
     var safeValue = normalizeText(value);
 
@@ -247,7 +249,7 @@
       escapeHtml(safeValue),
       "</span>",
       '<span class="booking-status__vehicle-media" aria-hidden="true">',
-      '<img src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="" loading="lazy" decoding="async">',
+      selectedModel ? (window.PixkuyFleetSelection.photo(selectedModel) ? '<img src="' + escapeHtml(window.PixkuyFleetSelection.photo(selectedModel)) + '" alt="" loading="lazy" decoding="async">' : '') : '<img src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="" loading="lazy" decoding="async">',
       "</span>",
       "</dd>",
       "</div>"
@@ -452,29 +454,17 @@
 
   function getAirportTransferPassengers(snapshot) {
     var explicitPassengers = parsePositiveInteger(
-      snapshot.airport_transfer_passengers ||
-        snapshot.passengers ||
-        snapshot.passenger_count ||
-        snapshot.passengerCount
+      Object.prototype.hasOwnProperty.call(snapshot, "airport_transfer_passengers")
+        ? snapshot.airport_transfer_passengers
+        : Object.prototype.hasOwnProperty.call(snapshot, "passengers")
+          ? snapshot.passengers
+          : Object.prototype.hasOwnProperty.call(snapshot, "passenger_count")
+            ? snapshot.passenger_count
+            : snapshot.passengerCount
     );
-    var fareKey;
 
     if (explicitPassengers && explicitPassengers <= 6) {
       return explicitPassengers;
-    }
-
-    fareKey = getAirportTransferPassengerFareKey(snapshot);
-
-    if (fareKey === "van_1_2") {
-      return 2;
-    }
-
-    if (fareKey === "van_3_4") {
-      return 4;
-    }
-
-    if (fareKey === "van_5_6") {
-      return 6;
     }
 
     return null;
@@ -615,7 +605,6 @@
     if (
       !amountMinor ||
       !nonAirportLocation ||
-      !passengerCount ||
       !passengerFareKey ||
       !requestSummary ||
       !zoneId ||
@@ -653,7 +642,6 @@
           snapshot.airport_hotel_time ||
           snapshot.serviceTime
       ),
-      airport_transfer_passengers: passengerCount,
       airport_transfer_price: amountMinor,
       airport_transfer_currency: "MXN",
       airport_transfer_pricing_version: pricingVersion,
@@ -667,9 +655,20 @@
       },
       form_payload_raw:
         snapshot.form_payload_raw && typeof snapshot.form_payload_raw === "object"
-          ? snapshot.form_payload_raw
+          ? Object.assign({}, snapshot.form_payload_raw)
           : {}
     };
+
+    if (passengerCount !== null) payload.airport_transfer_passengers = passengerCount;
+    else delete payload.form_payload_raw.airport_transfer_passengers;
+
+    if (Object.prototype.hasOwnProperty.call(snapshot, "message")) {
+      payload.airport_transfer_notes = normalizeText(snapshot.message);
+      payload.form_payload_raw.airport_transfer_notes = normalizeText(snapshot.message);
+    } else if (Object.prototype.hasOwnProperty.call(snapshot, "airport_transfer_notes")) {
+      payload.airport_transfer_notes = normalizeText(snapshot.airport_transfer_notes);
+      payload.form_payload_raw.airport_transfer_notes = normalizeText(snapshot.airport_transfer_notes);
+    }
 
     addOptionalString(
       payload,
@@ -754,14 +753,9 @@
       snapshot.airport_transfer_passenger_bucket_label ||
         snapshot.airport_hotel_passenger_bucket_label
     );
-    addOptionalString(
-      payload,
-      "airport_transfer_notes",
-      snapshot.message || snapshot.notes
-    );
     addLegalAcceptanceFields(payload, snapshot);
 
-    return payload;
+    return window.PixkuyFleetSelection.snapshot("airport_transfer", payload);
   }
 
   function validateSnapshot(snapshot) {
@@ -776,7 +770,7 @@
       getAirportTransferZoneId(snapshot) &&
       getAirportTransferPassengerFareKey(snapshot) &&
       getNonAirportLocation(snapshot) &&
-      getAirportTransferPassengers(snapshot) &&
+      (!Object.prototype.hasOwnProperty.call(snapshot, "airport_transfer_passengers") || getAirportTransferPassengers(snapshot)) &&
       getRequestSummary(snapshot) &&
       getAmountMinor(snapshot) &&
       normalizeText(snapshot.airport_transfer_pricing_version) &&
@@ -834,7 +828,7 @@
       snapshot.airport_transfer_luggage || snapshot.luggage
         ? buildRow(t("contact.luggage", "Equipaje"), normalizeText(snapshot.airport_transfer_luggage || snapshot.luggage), "luggage")
         : "",
-      buildVehicleRow(t("fleet.intro.title", "Vehículo"), t("fleet.m9.title", "BYD M9")),
+      buildVehicleRow(t("fleetSelection.model", "Vehículo"), (snapshot.fleet_model ? snapshot.fleet_model.name : t("fleet.m9.title", "BYD M9")), snapshot.fleet_model),
       buildRow(t("contact.services.airportHotelSummaryFare", "Precio"), getPriceLabel(snapshot), "price"),
       buildRow(t("contact.name", "Nombre"), snapshot.name, "customer-name"),
       buildRow(t("contact.phone", "Teléfono"), snapshot.phone, "customer-phone"),
@@ -862,7 +856,7 @@
       "</strong>",
       "<p>",
       acceptedAt
-        ? t("legalAcceptance.accepted", "Condiciones aceptadas.")
+        ? t("legalAcceptance.accepted", t("services.cards.hourly.panel.reviewPage.legalText", "Condiciones aceptadas."))
         : t("legalAcceptance.required", "Acepta las condiciones antes de continuar."),
       "</p>",
       "</div>"
@@ -976,7 +970,7 @@
           payload.recaptchaToken = normalizeText(recaptchaToken);
         }
 
-        return window.fetch(
+        return window.PixkuyFleetSelection.fetchCheckout("airport_transfer",
           checkoutUrl,
           {
             method: "POST",
@@ -998,6 +992,62 @@
             statusCode: response.status,
             body: body
           };
+        });
+      });
+  }
+
+  function requestReplacement(snapshot, context) {
+    var config = getConfig();
+    var savedAttempt = context && context.attempt;
+    var payload = savedAttempt ? JSON.parse(JSON.stringify(savedAttempt.payload)) : buildPayload(snapshot);
+    var apiBaseUrl;
+    var checkoutUrl;
+    if (
+      !payload ||
+      (!savedAttempt && !validateSnapshot(snapshot)) ||
+      !context ||
+      context.version !== 1 ||
+      !normalizeText(context.token) ||
+      !normalizeText(context.editRevision) ||
+      !normalizeText(context.idempotencyKey)
+    ) {
+      return Promise.reject(new Error("INVALID_AIRPORT_TRANSFER_REPLACEMENT_PAYLOAD"));
+    }
+    apiBaseUrl = normalizeText(config.apiBaseUrl);
+    checkoutUrl = apiBaseUrl
+      ? apiBaseUrl.replace(/\/+$/, "") + REPLACE_CHECKOUT_ENDPOINT
+      : REPLACE_CHECKOUT_ENDPOINT;
+    if (savedAttempt) checkoutUrl = savedAttempt.url;
+    return getRecaptchaToken()
+      .then(function addRecaptchaToken(recaptchaToken) {
+        // Freeze the reviewed request before sending. A lost response must replay
+        // this exact draft and key, without a precheck against an obsolete revision.
+        if (!savedAttempt) {
+          context.attempt = { payload: payload, url: checkoutUrl };
+          window.sessionStorage.setItem(EDIT_KEY, JSON.stringify(context));
+        }
+        if (normalizeText(recaptchaToken)) payload.recaptchaToken = normalizeText(recaptchaToken);
+        return window.fetch(checkoutUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Pixkuy-Site-Key": config.publicSiteKey,
+            "X-Pixkuy-Booking-Token": context.token,
+            "X-Pixkuy-Edit-Revision": context.editRevision,
+            "Idempotency-Key": context.idempotencyKey
+          },
+          body: JSON.stringify(payload)
+        });
+      })
+      .then(function parseReplacementResponse(response) {
+        return response.json().catch(function () { return {}; }).then(function (body) {
+          if (!response.ok && body.code &&
+              (body.recovery && body.recovery.state === "not_committed" ||
+                response.status >= 400 && response.status < 500 && !body.recovery)) {
+            delete context.attempt;
+            window.sessionStorage.setItem(EDIT_KEY, JSON.stringify(context));
+          }
+          return { ok: response.ok, statusCode: response.status, body: body };
         });
       });
   }
@@ -1047,10 +1097,29 @@
     return true;
   }
 
+    window.PixkuyAirportReview = {
+      requestStatus: function (token) {
+        return waitForPublicConfigReady().then(function () {
+          var config = getConfig();
+          return window.fetch(config.apiBaseUrl.replace(/\/+$/, "") + "/v1/public/reservations/status?token=" + encodeURIComponent(token), {
+            headers:{"X-Pixkuy-Site-Key":config.publicSiteKey}
+          }).then(function (response) { if(!response.ok) throw new Error("STATUS_UNAVAILABLE"); return response.json(); });
+        });
+      },
+    requestCheckout: requestCheckout,
+    requestReplacement: requestReplacement,
+    redirectToCheckout: redirectToCheckout,
+    validateSnapshot: validateSnapshot
+  };
+
   function init() {
+    if (!getNode("[data-airport-transfer-checkout-review-page]")) return false;
     var snapshot = readSnapshot();
 
     renderSnapshot(snapshot);
+    window.addEventListener("pixkuy:i18n-applied", function refreshReviewLanguage() {
+      renderSnapshot(snapshot);
+    });
 
     if (snapshot) {
       bindActions(snapshot);

@@ -393,6 +393,28 @@ function getAutocompleteApi() {
 }
 
 let lastRenderedActiveRootId = "";
+let desktopPlacePresentation = null;
+
+function renderDesktopPlaceLabel(node, label) {
+  node.textContent = label;
+  node.removeAttribute("aria-label");
+  if (!isDesktopViewport() || !desktopPlacePresentation || desktopPlacePresentation.label !== label) {
+    return;
+  }
+
+  const name = desktopPlacePresentation.name;
+  const address = desktopPlacePresentation.address;
+  if (!name || !address || name === address) return;
+
+  const primary = document.createElement("span");
+  primary.className = "airport-endpoint__primary";
+  primary.textContent = name;
+  const secondary = document.createElement("span");
+  secondary.className = "airport-endpoint__secondary";
+  secondary.textContent = address;
+  node.replaceChildren(primary, secondary);
+  node.setAttribute("aria-label", label);
+}
 
 function blurActiveElementInside(node) {
   const activeElement = document.activeElement;
@@ -457,6 +479,31 @@ function getAirportShellNodes(rootId) {
 
 function getRealAirportControl() {
   return document.querySelector("#airport-tariff-origin");
+}
+
+function placeAirportDropdown(rootId) {
+  const airportNodes = getAirportShellNodes(rootId);
+  const dropdown = document.querySelector('[data-airport-tariff-dropdown="origin"]');
+  const field = airportNodes && airportNodes.shell
+    ? airportNodes.shell.closest('[data-airport-tariff-role]')
+    : null;
+
+  if (dropdown && field && dropdown.parentElement !== field) {
+    field.appendChild(dropdown);
+  }
+}
+
+function syncAirportMirrorAria(mirrorButton, realControl) {
+  if (!mirrorButton || !realControl) {
+    return;
+  }
+
+  ["aria-expanded", "aria-controls", "aria-activedescendant"].forEach(function (name) {
+    const value = realControl.getAttribute(name);
+    if (value === null) mirrorButton.removeAttribute(name);
+    else mirrorButton.setAttribute(name, value);
+  });
+  mirrorButton.setAttribute("aria-haspopup", "listbox");
 }
 
 function getFixedFareZoneNodes() {
@@ -638,24 +685,38 @@ function bindAirportMirrorProxy(rootId) {
 
   mirrorButton.dataset.airportMirrorProxyBound = "1";
 
+  const realControl = getRealAirportControl();
+  syncAirportMirrorAria(mirrorButton, realControl);
+  if (realControl && window.MutationObserver) {
+    new MutationObserver(function () {
+      syncAirportMirrorAria(mirrorButton, realControl);
+    }).observe(realControl, {
+      attributes: true,
+      attributeFilter: ["aria-expanded", "aria-controls", "aria-activedescendant"]
+    });
+  }
+
   mirrorButton.addEventListener("click", function (event) {
-    const realControl = getRealAirportControl();
-    if (!realControl) {
+    const control = getRealAirportControl();
+    if (!control) {
       return;
     }
 
     event.preventDefault();
-    realControl.focus();
-    realControl.click();
+    placeAirportDropdown(rootId);
+    control.click();
+    syncAirportMirrorAria(mirrorButton, control);
   });
 
   mirrorButton.addEventListener("keydown", function (event) {
-    const realControl = getRealAirportControl();
-    if (!realControl) {
+    const control = getRealAirportControl();
+    if (!control) {
       return;
     }
 
-    forwardAirportMirrorKeydown(event, realControl);
+    placeAirportDropdown(rootId);
+    forwardAirportMirrorKeydown(event, control);
+    syncAirportMirrorAria(mirrorButton, control);
   });
 }
 
@@ -669,6 +730,8 @@ function renderAirportShells(state, activeRootId) {
     activeAirportRootId === "0" ? rightAirport : leftAirport;
 
   const airportLabel = getVisibleAirportLabel(state);
+
+  placeAirportDropdown(activeAirportRootId);
 
   if (activeAirportNodes) {
     activeAirportNodes.shell.hidden = false;
@@ -759,7 +822,7 @@ function renderDestinationUi() {
     activeNodes.manualControl.setAttribute("disabled", "disabled");
   }
 
-  activeNodes.label.textContent = placeLabel;
+  renderDesktopPlaceLabel(activeNodes.label, placeLabel);
 
   if (fixedFareZoneNodes) {
     setHidden(fixedFareZoneNodes.zone, !zoneLabel);
@@ -1138,6 +1201,12 @@ function bindClearAction() {
     };
   }
 
+  desktopPlacePresentation = {
+    label: placeLabel,
+    name: normalizeText(input && input.displayName),
+    address: normalizeText(input && input.formattedAddress)
+  };
+
   const successResult = {
     ok: true,
     reason: "",
@@ -1160,6 +1229,7 @@ function bindClearAction() {
     return false;
   }
 
+  desktopPlacePresentation = null;
   renderDestinationUi();
   return true;
 }

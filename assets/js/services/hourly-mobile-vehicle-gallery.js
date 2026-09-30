@@ -75,6 +75,7 @@
   }
 
   function getVehicleFromPayload(payload) {
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.gallery("hourly_daily");
     const vehicles = payload && payload.vehicles ? payload.vehicles : {};
     const vehicle = vehicles[VEHICLE_ID] || null;
     const images = normalizeImages(vehicle ? vehicle.images : []);
@@ -335,8 +336,9 @@
     }
 
     image.src = slide.src;
-    image.alt = getI18nText(slide.altKey);
-    caption.textContent = getI18nText(slide.captionKey);
+    var selectedModel = window.PixkuyFleetSelection.model("hourly_daily");
+    image.alt = selectedModel ? selectedModel.name : getI18nText(slide.altKey);
+    caption.textContent = selectedModel ? selectedModel.name : getI18nText(slide.captionKey);
     counter.textContent = `${currentIndex + 1} / ${slides.length}`;
 
     prev.hidden = slides.length <= 1;

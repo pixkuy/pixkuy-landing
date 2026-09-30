@@ -135,7 +135,7 @@
       "expired": {
         "state": "Reserva temporal caducada",
         "title": "La reserva temporal ha caducado",
-        "lead": "La ventana de pago ya no está activa. Para reservar, inicia una nueva solicitud.",
+        "lead": "El plazo ha terminado sin pago. Puede comenzar otra reserva y comprobar de nuevo la disponibilidad.",
         "notice": "No reactivamos reservas caducadas desde esta pantalla."
       },
 	  "cancelled": {
@@ -173,6 +173,7 @@
       },
       "actions": {
         "retry": "Reintentar pago",
+        "modify": "Modificar datos",
         "newBooking": "Nueva reserva",
         "home": "Volver al inicio"
       },
@@ -205,7 +206,7 @@
         "expired": {
           "state": "Reserva caducada",
           "title": "La reserva temporal caducó",
-          "lead": "La ventana de pago ya no está activa. Inicia una nueva solicitud.",
+          "lead": "El plazo ha terminado sin pago. Puede comenzar otra reserva y comprobar de nuevo la disponibilidad.",
           "notice": "No se ha realizado ningún cargo ni confirmado ninguna reserva."
         },
         "cancelled": {

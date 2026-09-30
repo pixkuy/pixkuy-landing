@@ -619,6 +619,9 @@
 
   const requestedService = getRequestedServiceFromUrl();
   if (requestedService && services[requestedService]) {
+    if (!mobileQuery.matches && requestedService === 'airport' && window.location.hash === '#contact') {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search + '#services');
+    }
     setExpandedState(requestedService);
 
     scrollDesktopEventsDeepLinkPanelIntoView(requestedService);

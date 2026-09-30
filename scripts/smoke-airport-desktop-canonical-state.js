@@ -226,3 +226,76 @@ assert.match(
 );
 
 process.stdout.write("AIRPORT_DESKTOP_CANONICAL_STATE_SMOKE=PASS\n");
+
+async function verifyAirportPresentationCertificate() {
+  const storage = new Map(); let tripKey = "trip-1", clock = 1000, expiry;
+  const context = {
+    document:{documentElement:{lang:"en"},querySelector(){return null;},querySelectorAll(){return [];},addEventListener(){},dispatchEvent(){}},
+    location:{origin:"http://localhost:8888"},Response,URL,Date:{now(){return clock;},parse:Date.parse},
+    sessionStorage:{getItem(key){return storage.get(key)||null;},setItem(key,value){storage.set(key,value);}},
+    matchMedia(){return {matches:true};},addEventListener(){},setTimeout(fn){expiry=fn;},
+    CustomEvent:class { constructor(type,options){this.type=type;this.detail=options?.detail;} },
+    PixkuyAirportZoneTariff:{fleetContextKey(){return tripKey;}},
+    fetch:async()=>new Response(JSON.stringify({fleetSelection:{model:"Vehicle"}})),
+  };
+  context.window=context;
+  vm.runInNewContext(fs.readFileSync(path.join(root,"assets/js/services/fleet-selection-state.js"),"utf8"),context);
+  const fleet=context.PixkuyFleetSelection;
+  const chosen={modelId:"00000000-0000-4000-8000-000000000001",modelRevision:1,name:"Selected QA",photoUrl:null,passengersSupported:2};
+  await fleet.acceptOffer("airport_transfer",{fleet:{version:1,status:"available",requestKey:"offer-1",models:[chosen]}},{},{fleetContextKey:tripKey});
+  assert.equal(fleet.model("airport_transfer")?.name,"Selected QA");
+  tripKey="trip-2"; assert.equal(fleet.model("airport_transfer"),null);
+  tripKey="trip-1"; clock+=5*60*1000+1; assert.equal(fleet.model("airport_transfer"),null);
+  expiry(); assert.equal(fleet.read("airport_transfer").offer,null);
+  assert.equal(fleet.read("airport_transfer").selected.name,"Selected QA");
+  await fleet.acceptOffer("airport_transfer",{fleet:{version:1,status:"available",requestKey:"offer-2",models:[chosen]},
+    price:{quoteExpiresAt:new Date(clock+1000).toISOString()}},{},{fleetContextKey:tripKey});
+  assert.equal(fleet.model("airport_transfer")?.name,"Selected QA");
+  clock+=1001; assert.equal(fleet.model("airport_transfer"),null);
+  process.stdout.write("AIRPORT_PRESENTATION_CERTIFICATE_SMOKE=PASS\n");
+}
+
+// B state tests reuse the existing VM fixture; no server, network or browser.
+async function verifyFleetBAttemptState() {
+  const storage = new Map(), sent = [];
+  let failSend = true, responseBody = {bookingStatusToken:"synthetic-token",checkoutUrl:"https://stripe.invalid/synthetic"};
+  const fleetContext = {
+    document:{documentElement:{lang:"en"},querySelector(){return null;},querySelectorAll(){return [];},addEventListener(){},dispatchEvent(){}},
+    location:{origin:"http://localhost:8888"},Response,URL,crypto:require("node:crypto").webcrypto,
+    matchMedia(){return {matches:false};},addEventListener(){},CustomEvent:class { constructor(type,options){this.type=type;this.detail=options?.detail;} },
+    sessionStorage:{getItem(key){return storage.get(key)||null;},setItem(key,value){storage.set(key,value);}},
+    fetch:async function(url,init){
+      if (!init) return new Response(JSON.stringify({fleetSelection:{model:"Vehicle",choose:"Choose"}}));
+      sent.push({url,headers:JSON.parse(JSON.stringify(init.headers)),payload:JSON.parse(init.body)});
+      if (failSend) {failSend=false;throw new Error("SIMULATED_LOST_RESPONSE");}
+      return new Response(JSON.stringify(responseBody),{status:responseBody.recovery?409:200});
+    }
+  };
+  fleetContext.window=fleetContext;
+  vm.runInNewContext(fs.readFileSync(path.join(root,"assets/js/services/fleet-selection-state.js"),"utf8"),fleetContext);
+  const fleet=fleetContext.PixkuyFleetSelection;
+  const chosen={modelId:"00000000-0000-4000-8000-000000000001",modelRevision:1,name:"Selected QA",photoUrl:null,passengersSupported:4};
+  for(const service of ["airport_transfer","direct_transfer","hourly_daily"]){
+    await fleet.acceptOffer(service,{fleet:{version:1,status:"available",requestKey:"synthetic",models:[chosen]}},{passengers:4});
+    const original={service_type:service,customer:{full_name:"Synthetic",email:"synthetic@example.invalid"},passengers:4,notes:"Keep notes",recaptchaToken:"first"};
+    failSend=true;
+    await assert.rejects(fleet.fetchCheckout(service,"/checkout",{headers:{"X-Pixkuy-Site-Key":"synthetic"},body:JSON.stringify(original)}),/SIMULATED_LOST_RESPONSE/);
+    const first=sent.at(-1),snapshot=fleet.snapshot(service,original);
+    await fleet.fetchCheckout(service,"/checkout",{headers:{"X-Pixkuy-Site-Key":"synthetic"},body:JSON.stringify({...original,passengers:2,notes:"New draft",recaptchaToken:"renewed"})});
+    const second=sent.at(-1);assert.equal(first.headers["Idempotency-Key"],second.headers["Idempotency-Key"]);
+    assert.equal(second.payload.passengers,4);assert.equal(second.payload.notes,"Keep notes");assert.equal(second.payload.recaptchaToken,"renewed");
+    assert.equal(fleet.read(service).draft.notes,"New draft");assert.equal(snapshot.fleet_model.name,chosen.name);
+    assert.equal(fleet.snapshot(service,{...snapshot,fleet_model:{...chosen,name:"Frozen"}}).fleet_model.name,"Frozen");
+  }
+  storage.clear();responseBody={code:"FLEET_SELECTION_REQUIRED",recovery:{state:"not_committed",action:"refresh_form"}};
+  await fleet.fetchCheckout("hourly_daily","/checkout",{headers:{},body:JSON.stringify({service_type:"hourly_daily",notes:"Legacy draft"})});
+  const migrated=await fleet.acceptOffer("hourly_daily",{fleet:{version:1,status:"available",requestKey:"synthetic",models:[chosen]}},{passengers:4});
+  assert.equal(migrated.checkoutAllowed,false);assert.equal(fleet.selection("hourly_daily"),null);
+  assert.equal(fleet.read("hourly_daily").draft.notes,"Legacy draft");
+  assert.throws(()=>fleet.hourlyPassengers(7),/FLEET_INVALID_PASSENGERS/);assert.throws(()=>fleet.hourlyPassengers(0),/FLEET_INVALID_PASSENGERS/);
+  assert.equal(fleet.hourlyPassengers(4),4);
+  fleetContext.sessionStorage.setItem=function(){throw new Error("STORAGE_BLOCKED");};
+  assert.throws(()=>fleet.fetchCheckout("airport_transfer","/checkout",{headers:{},body:"{}"}),/STORAGE_BLOCKED/);
+  process.stdout.write("FLEET_B_ATTEMPT_STATE_SMOKE=PASS\n");
+}
+verifyAirportPresentationCertificate().then(verifyFleetBAttemptState).catch(error=>{console.error(error);process.exitCode=1;});

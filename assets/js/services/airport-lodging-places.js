@@ -419,6 +419,8 @@ const GOOGLE_PLACES_READY_RETRY_MS = 120;
 
     return {
       label: label,
+      displayName: displayName,
+      formattedAddress: formattedAddress,
       placeId: placeId,
       primaryType: primaryType,
       lat: coordinates.lat,

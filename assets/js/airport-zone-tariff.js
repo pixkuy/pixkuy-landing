@@ -20,6 +20,7 @@
     availabilityChecking: "services.cards.airport.panel.availability.checking",
     availabilityAvailable: "services.cards.airport.panel.availability.available",
     availabilityUnavailable: "services.cards.airport.panel.availability.unavailable",
+    availabilityMinimumLeadTime: "services.cards.airport.panel.availability.minimumLeadTime",
     availabilityNextAvailableSlot: "services.cards.airport.panel.availability.nextAvailableSlot",
     availabilityPriceMismatch: "services.cards.airport.panel.availability.priceMismatch",
     availabilityOperationalConfirmation: "fleet.operational",
@@ -65,6 +66,8 @@
 
   let airportMobilePrecheckRequestId = 0;
   let airportDesktopPrecheckContextKey = "";
+  let airportAutoTimer = null;
+  let airportAutoKey = "";
   
   const utils = window.PixkuyAirportTariffUtils || null;
 
@@ -301,6 +304,10 @@
       normalizedResult,
       requestedLocalDate
     );
+
+    if (code === "AIRPORT_TRANSFER_MINIMUM_LEAD_TIME_NOT_MET") {
+      return [getAirportAvailabilityCopy("availabilityMinimumLeadTime", "Reserve con al menos 24 horas de antelación. Seleccione una fecha y hora posteriores."), nextAvailableMessage].filter(Boolean).join(" ");
+    }
 
     if (code === "AIRPORT_TRANSFER_PRICE_MISMATCH") {
       return getAirportAvailabilityCopy(
@@ -557,7 +564,7 @@
     const nonAirportLocation = getAirportTransferNonAirportLocation(state);
     const passengers = getPassengerCountForFareKey(passengerFareKey);
 
-    return {
+    const detail = {
       serviceType: "airport_transfer",
       airportId: getSelectedAirportId(state),
       direction: getAirportTransferDirection(state),
@@ -577,6 +584,22 @@
       currency: "MXN",
       locale: getDocumentLocale()
     };
+    const fleetState = window.PixkuyFleetSelection && window.PixkuyFleetSelection.read("airport_transfer");
+    const prior = fleetState && fleetState.precheck;
+    const priorPayload = prior && prior.payload;
+    const priorPrice = prior && prior.body && prior.body.result && prior.body.result.price;
+    const priorLocation = priorPayload && priorPayload.nonAirportLocation;
+    if (priorPayload && priorPrice && Number.isSafeInteger(priorPrice.amountMinor) && priorPrice.amountMinor > 0 &&
+        priorPayload.airportId === detail.airportId && priorPayload.direction === detail.direction &&
+        priorPayload.zoneId === detail.zoneId && priorPayload.passengerFareKey === detail.passengerFareKey &&
+        priorPayload.passengers === detail.passengers && priorPayload.date === detail.date &&
+        priorPayload.time === detail.time && priorLocation && detail.nonAirportLocation &&
+        priorLocation.address === detail.nonAirportLocation.address &&
+        priorLocation.place_id === detail.nonAirportLocation.place_id &&
+        priorLocation.lat === detail.nonAirportLocation.lat && priorLocation.lng === detail.nonAirportLocation.lng) {
+      detail.expectedAmountMinor = priorPrice.amountMinor;
+    }
+    return detail;
   }
 
   function setAirportCtaPrecheckBusy(nodes, isBusy) {
@@ -591,7 +614,8 @@
     return true;
   }
 
-  function runAirportTransferPrecheck(state) {
+  function runAirportTransferPrecheck(state, options) {
+    window.PixkuyFleetSelection.enterPanel("airport_transfer");
     const api = getAirportTransferAvailabilityPrecheckApi();
     const detail = buildAirportTransferPrecheckDetail(state);
 
@@ -611,7 +635,10 @@
       });
     }
 
-    return api.precheck(detail);
+    const precheckOptions = !isAirportMobileViewport()
+      ? Object.assign({}, options, { fleetContextKey: buildAirportMobilePrecheckKey(detail) })
+      : options;
+    return api.precheck(detail, precheckOptions);
   }
 
   function buildAirportMobilePrecheckKey(detail) {
@@ -666,12 +693,26 @@
     return true;
   }
 
-  function applyAirportNextAvailableSuggestion(
+  async function applyAirportNextAvailableSuggestion(
     nodes,
     state,
     nextAvailableStartLocal
   ) {
     const suggestion = window.PixkuySharedAvailabilitySuggestion;
+
+    if (state.mobileAvailabilityStatus === "loading") return false;
+    if (normalizeAirportPrecheckResult(state.mobileAvailabilityResult).code === "AIRPORT_TRANSFER_MINIMUM_LEAD_TIME_NOT_MET") {
+      const key = buildAirportMobilePrecheckKey(buildAirportTransferPrecheckDetail(state));
+      invalidateAirportMobileAvailability(nodes, state);
+      const refresh = syncAirportMobileAvailability(nodes, state, true);
+      const requestId = airportMobilePrecheckRequestId;
+      await refresh;
+      if (requestId !== airportMobilePrecheckRequestId ||
+          key !== buildAirportMobilePrecheckKey(buildAirportTransferPrecheckDetail(state)) ||
+          state.mobileAvailabilityStatus !== "unavailable") return false;
+      nextAvailableStartLocal = normalizeAirportPrecheckResult(state.mobileAvailabilityResult).nextAvailableStartLocal;
+      if (!nextAvailableStartLocal) return false;
+    }
 
     return suggestion && typeof suggestion.apply === "function"
       ? suggestion.apply({
@@ -696,7 +737,7 @@
             renderPanel(nodes, state);
           },
           recheck: function recheckAirportSuggestion() {
-            return syncAirportMobileAvailability(nodes, state);
+            return syncAirportMobileAvailability(nodes, state, true);
           }
         })
       : Promise.resolve(false);
@@ -745,8 +786,18 @@
   }
 
   function invalidateAirportMobileAvailability(nodes, state) {
+    window.clearTimeout(airportAutoTimer); airportAutoTimer = null; airportAutoKey = "";
+    window.PixkuyFleetSelection.invalidateOffer("airport_transfer");
     airportMobilePrecheckRequestId += 1;
     return setAirportMobileAvailabilityState(nodes, state, "idle", "", null);
+  }
+
+  function cancelScheduledAirportAvailability(nodes, state) {
+    window.clearTimeout(airportAutoTimer); airportAutoTimer = null; airportAutoKey = "";
+    if (state.mobileAvailabilityStatus === "scheduled") {
+      setAirportMobileAvailabilityState(nodes, state, "idle", "", null);
+      clearAirportAvailabilityStatus(nodes);
+    }
   }
 
   function isCurrentAirportMobileAvailability(state, detail) {
@@ -757,16 +808,62 @@
         state &&
         state.mobileAvailabilityStatus === "available" &&
         state.mobileAvailabilityKey === key &&
-        isAirportMobilePrecheckAllowed(state.mobileAvailabilityResult)
+        isAirportMobilePrecheckAllowed(state.mobileAvailabilityResult) &&
+        (isAirportMobileViewport() || !state.mobileAvailabilityResult.raw?.result?.price?.quoteExpiresAt ||
+          Date.parse(state.mobileAvailabilityResult.raw.result.price.quoteExpiresAt) > Date.now())
     );
   }
 
-  function syncAirportMobileAvailability(nodes, state) {
+  function airportDetailReady(nodes, state) {
+    const api = getAirportTransferAvailabilityPrecheckApi();
+    const detail = buildAirportTransferPrecheckDetail(state);
+    return Boolean(api && api.buildPayload(detail) &&
+      requireCtaApi().getCtaEligibility(state, getCtaDeps()).canNavigate &&
+      !isNonAirportLocationSelectedAirport(state) &&
+      nodes.dateInput && nodes.dateInput.value && nodes.dateInput.checkValidity() &&
+      nodes.timeInput && nodes.timeInput.value && nodes.timeInput.checkValidity());
+  }
+
+  function scheduleAirportAvailability(nodes, state) {
+    const fleet = window.PixkuyFleetSelection.read("airport_transfer");
+    if (fleet.attempt && fleet.attempt.state !== "not_committed") return;
+    const key = airportDetailReady(nodes, state)
+      ? buildAirportMobilePrecheckKey(buildAirportTransferPrecheckDetail(state)) : "";
+    if (state.mobileAvailabilityKey && state.mobileAvailabilityKey !== key) {
+      invalidateAirportMobileAvailability(nodes, state);
+      clearAirportAvailabilityStatus(nodes);
+    }
+    if (!key || isAirportMobileViewport() || !nodes.panel.getClientRects().length) {
+      cancelScheduledAirportAvailability(nodes, state);
+      return;
+    }
+    if (state.mobileAvailabilityKey === key && state.mobileAvailabilityStatus === "scheduled" &&
+        (!airportAutoTimer || airportAutoKey !== key)) cancelScheduledAirportAvailability(nodes, state);
+    if (state.mobileAvailabilityKey === key && state.mobileAvailabilityStatus !== "idle") return;
+    if (airportAutoTimer && airportAutoKey === key) return;
+    window.clearTimeout(airportAutoTimer);
+    setAirportMobileAvailabilityState(nodes, state, "scheduled", key, null);
+    setAirportAvailabilityStatus(nodes, getAirportAvailabilityCopy(
+      "availabilityChecking", "Comprobando disponibilidad..."
+    ), "checking");
+    airportAutoKey = key;
+    airportAutoTimer = window.setTimeout(function () {
+      airportAutoTimer = null; airportAutoKey = "";
+      if (isAirportMobileViewport() || !nodes.panel.getClientRects().length || !airportDetailReady(nodes, state) ||
+          key !== buildAirportMobilePrecheckKey(buildAirportTransferPrecheckDetail(state))) {
+        cancelScheduledAirportAvailability(nodes, state);
+        return;
+      }
+      syncAirportMobileAvailability(nodes, state, true, true);
+    }, 350);
+  }
+
+  function syncAirportMobileAvailability(nodes, state, allowDesktopSuggestion, background) {
     const detail = buildAirportTransferPrecheckDetail(state);
     const key = buildAirportMobilePrecheckKey(detail);
     let requestId;
 
-    if (!isAirportMobileViewport()) {
+    if (!isAirportMobileViewport() && allowDesktopSuggestion !== true) {
       return false;
     }
 
@@ -807,7 +904,8 @@
 
     if (
       state.mobileAvailabilityKey === key &&
-      state.mobileAvailabilityStatus !== "idle"
+      state.mobileAvailabilityStatus !== "idle" &&
+      state.mobileAvailabilityStatus !== "scheduled"
     ) {
       return true;
     }
@@ -824,7 +922,7 @@
       "checking"
     );
 
-    runAirportTransferPrecheck(state)
+    return runAirportTransferPrecheck(state, background ? { interactive: false } : undefined)
       .then(function handleAirportMobilePrecheckResult(result) {
         const suggestion = window.PixkuySharedAvailabilitySuggestion;
         const isCurrent = Boolean(
@@ -849,7 +947,7 @@
         setAirportMobileAvailabilityState(
           nodes,
           state,
-          isAllowed ? "available" : "unavailable",
+          isAllowed ? "available" : result && result.code === "PRECHECK_REQUEST_FAILED" ? "error" : "unavailable",
           key,
           result
         );
@@ -900,7 +998,6 @@
         return false;
       });
 
-    return true;
   }
 
   function getStateDeps() {
@@ -1378,6 +1475,7 @@ function shouldUsePassengerChipUi(nodes) {
   }
   
     function getReservationMinimumDateLiteral() {
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
     const formsApi = window.PixkuyForms || {};
     const getMinimumDateTime =
       typeof formsApi.getReservationMinimumDateTime === "function"
@@ -1409,9 +1507,9 @@ function shouldUsePassengerChipUi(nodes) {
       return false;
     }
 
-    if (minimumDateLiteral) {
+    if (minimumDateLiteral && nodes.dateInput.getAttribute("min") !== minimumDateLiteral) {
       nodes.dateInput.setAttribute("min", minimumDateLiteral);
-    } else {
+    } else if (!minimumDateLiteral && nodes.dateInput.hasAttribute("min")) {
       nodes.dateInput.removeAttribute("min");
     }
 
@@ -1419,7 +1517,10 @@ function shouldUsePassengerChipUi(nodes) {
       state.serviceDate = "";
     }
 
-    if (nodes.dateInput.value !== (state.serviceDate || "")) {
+    if (
+      nodes.dateInput.value !== (state.serviceDate || "") &&
+      (isAirportMobileViewport() || document.activeElement !== nodes.dateInput)
+    ) {
       nodes.dateInput.value = state.serviceDate || "";
     }
 
@@ -1512,10 +1613,7 @@ function shouldUsePassengerChipUi(nodes) {
         ? normalizeText(state.serviceDate)
         : "";
 
-    const availabilityPriceVisible = isAirportMobileViewport()
-      ? state.mobileAvailabilityStatus === "available"
-      : state.mobileAvailabilityStatus !== "loading" &&
-        state.mobileAvailabilityStatus !== "unavailable";
+    const availabilityPriceVisible = state.mobileAvailabilityStatus === "available";
     let shouldShowPrice = availabilityPriceVisible;
 
     if (suggestion && typeof suggestion.syncUiState === "function") {
@@ -1557,6 +1655,18 @@ function shouldUsePassengerChipUi(nodes) {
       return;
     }
 
+    const verifiedPrice = state.mobileAvailabilityResult && state.mobileAvailabilityResult.raw &&
+      state.mobileAvailabilityResult.raw.result && state.mobileAvailabilityResult.raw.result.price;
+    if (state.mobileAvailabilityStatus === "available" && verifiedPrice &&
+        Number.isSafeInteger(verifiedPrice.amountMinor) && verifiedPrice.amountMinor > 0) {
+      nodes.fareValue.textContent = formatPrice(
+        verifiedPrice.amountMinor / 100,
+        verifiedPrice.currency || fare.currency
+      );
+      nodes.fareValue.removeAttribute("data-i18n");
+      return;
+    }
+
     const finalPrice =
       temporalPricing &&
       typeof temporalPricing.applyTemporalPricing === "function"
@@ -1583,10 +1693,8 @@ function shouldUsePassengerChipUi(nodes) {
     requireCtaApi().applyCtaState(nodes.cta, eligibility);
     const suggestion = window.PixkuySharedAvailabilitySuggestion;
     const baseCtaEnabled = !nodes.cta.disabled;
-    const availabilityCtaEnabled = isAirportMobileViewport()
-      ? state.mobileAvailabilityStatus === "available"
-      : state.mobileAvailabilityStatus !== "loading" &&
-        state.mobileAvailabilityStatus !== "unavailable";
+    const availabilityCtaEnabled = state.mobileAvailabilityStatus === "available" &&
+      (isAirportMobileViewport() || Boolean(window.PixkuyFleetSelection.model("airport_transfer")));
 
     if (suggestion && typeof suggestion.syncUiState === "function") {
       suggestion.syncUiState({
@@ -1749,7 +1857,8 @@ function shouldUsePassengerChipUi(nodes) {
     renderFare(nodes, state);
     renderCtaState(nodes, state);
     renderAccessibility(nodes);
-    syncAirportMobileAvailability(nodes, state);
+    if (isAirportMobileViewport()) syncAirportMobileAvailability(nodes, state);
+    else scheduleAirportAvailability(nodes, state);
   }
 
   function getEndpointsStateApi() {
@@ -2579,6 +2688,15 @@ function shouldUsePassengerChipUi(nodes) {
       return;
     }
 
+    if (!isAirportMobileViewport() && !airportDetailReady(nodes, state)) return;
+    window.clearTimeout(airportAutoTimer); airportAutoTimer = null;
+    const fleetSelection = window.PixkuyFleetSelection.selection("airport_transfer");
+    if (!isAirportMobileViewport() && isCurrentAirportMobileAvailability(state, buildAirportTransferPrecheckDetail(state)) &&
+        window.PixkuyFleetSelection.canContinue("airport_transfer", fleetSelection)) {
+      completeAirportTransferPanelSubmit(nodes, state, state.mobileAvailabilityResult);
+      return;
+    }
+
     if (isAirportMobileViewport()) {
       const currentDetail = buildAirportTransferPrecheckDetail(state);
 
@@ -2607,6 +2725,7 @@ function shouldUsePassengerChipUi(nodes) {
     setAirportCtaPrecheckBusy(nodes, true);
     airportMobilePrecheckRequestId += 1;
     const desktopRequestId = airportMobilePrecheckRequestId;
+    const selectionBeforePrecheck = window.PixkuyFleetSelection.selection("airport_transfer");
     const desktopContextKey = buildAirportMobilePrecheckKey(
       buildAirportTransferPrecheckDetail(state)
     );
@@ -2644,7 +2763,7 @@ function shouldUsePassengerChipUi(nodes) {
         setAirportMobileAvailabilityState(
           nodes,
           state,
-          isAllowed ? "available" : "unavailable",
+          isAllowed ? "available" : result && result.code === "PRECHECK_REQUEST_FAILED" ? "error" : "unavailable",
           desktopContextKey,
           result
         );
@@ -2655,6 +2774,14 @@ function shouldUsePassengerChipUi(nodes) {
           return false;
         }
 
+        const fleetAfter = window.PixkuyFleetSelection.read("airport_transfer");
+        const automaticSingleton = !selectionBeforePrecheck && fleetAfter.selectedByUser === false &&
+          fleetAfter.offer && fleetAfter.offer.models.length === 1;
+        if (!window.PixkuyFleetSelection.canContinue("airport_transfer", automaticSingleton ? window.PixkuyFleetSelection.selection("airport_transfer") : selectionBeforePrecheck)) {
+          setAirportAvailabilityStatus(nodes, getAirportAvailabilityCopy("availabilityAvailable", "Disponibilidad confirmada. Puedes continuar."), "success");
+          renderCtaState(nodes, state);
+          return false;
+        }
         return completeAirportTransferPanelSubmit(nodes, state, result);
       })
       .catch(function handleAirportPrecheckError() {
@@ -2738,8 +2865,12 @@ function shouldUsePassengerChipUi(nodes) {
   }
 
   if (nodes.dateInput) {
+    nodes.dateInput.addEventListener("blur", function () {
+      if (!isAirportMobileViewport()) syncTemporalDateInput(nodes, state);
+    });
+
     nodes.dateInput.addEventListener("input", function () {
-      invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() || state.serviceDate !== normalizeText(nodes.dateInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceDate = normalizeText(nodes.dateInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
@@ -2747,7 +2878,7 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     nodes.dateInput.addEventListener("change", function () {
-      invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() || state.serviceDate !== normalizeText(nodes.dateInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceDate = normalizeText(nodes.dateInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
@@ -2757,7 +2888,7 @@ function shouldUsePassengerChipUi(nodes) {
 
   if (nodes.timeInput) {
     nodes.timeInput.addEventListener("input", function () {
-      invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() || state.serviceTime !== normalizeText(nodes.timeInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceTime = normalizeText(nodes.timeInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
@@ -2765,7 +2896,7 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     nodes.timeInput.addEventListener("change", function () {
-      invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() || state.serviceTime !== normalizeText(nodes.timeInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceTime = normalizeText(nodes.timeInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
@@ -2815,8 +2946,52 @@ function shouldUsePassengerChipUi(nodes) {
 
     renderPanel(nodes, state);
     bindEvents(nodes, state);
+    function reconcileAirportPanelVisibility() {
+      if (isAirportMobileViewport()) {
+        cancelScheduledAirportAvailability(nodes, state);
+        if (nodes.panel.getClientRects().length) syncAirportMobileAvailability(nodes, state);
+      } else {
+        if (state.mobileAvailabilityStatus === "available" &&
+            !window.PixkuyFleetSelection.model("airport_transfer")) {
+          invalidateAirportMobileAvailability(nodes, state);
+        }
+        scheduleAirportAvailability(nodes, state);
+      }
+    }
+    if (typeof MutationObserver === "function") {
+      const observer = new MutationObserver(reconcileAirportPanelVisibility);
+      observer.observe(nodes.panel, { attributes: true, attributeFilter: ["hidden"] });
+      const expand = nodes.panel.closest("#services-expand");
+      if (expand) observer.observe(expand, { attributes: true, attributeFilter: ["hidden"] });
+    }
+    window.addEventListener("resize", reconcileAirportPanelVisibility);
+    document.addEventListener("pixkuy:fleet-choice-required", function (event) {
+      if (event.detail.service !== "airport_transfer" || event.detail.surface !== "panel") return;
+      setAirportMobileAvailabilityState(nodes, state, "choice", state.mobileAvailabilityKey, null);
+      clearAirportAvailabilityStatus(nodes);
+      nodes.cta.setAttribute("aria-busy", "false");
+    });
     scheduleI18nLabelHydration(nodes, state);
     preloadZoneResolver();
+    document.addEventListener("pixkuy:fleet-offer-expired", function (event) {
+      if (!event.detail || event.detail.service !== "airport_transfer" || isAirportMobileViewport()) return;
+      if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active()) {
+        window.clearTimeout(airportAutoTimer); airportAutoTimer = null; airportAutoKey = "";
+        airportMobilePrecheckRequestId += 1;
+        setAirportMobileAvailabilityState(nodes, state, "idle", "", null);
+        return;
+      }
+      invalidateAirportMobileAvailability(nodes, state);
+      scheduleAirportAvailability(nodes, state);
+    });
+    document.addEventListener("pixkuy:fleet-offer-accepted", function (event) {
+      if (!event.detail || event.detail.service !== "airport_transfer" || isAirportMobileViewport()) return;
+      window.queueMicrotask(function () {
+        if (window.PixkuyAirportZoneTariff && window.PixkuyAirportZoneTariff.reconcileAvailability) {
+          window.PixkuyAirportZoneTariff.reconcileAvailability();
+        }
+      });
+    });
 
     window.PixkuyAirportZoneTariff = {
       panel: nodes.panel,
@@ -2826,6 +3001,26 @@ function shouldUsePassengerChipUi(nodes) {
       swapButton: nodes.swapButton,
       fareValue: nodes.fareValue,
       cta: nodes.cta,
+      fleetContextKey: function () {
+        const api = getAirportTransferAvailabilityPrecheckApi();
+        const detail = buildAirportTransferPrecheckDetail(state);
+        return api && api.buildPayload(detail) ? buildAirportMobilePrecheckKey(detail) : "";
+      },
+      reconcileAvailability: function () {
+        const offerStatus = window.PixkuyFleetSelection.airportOfferStatus &&
+          window.PixkuyFleetSelection.airportOfferStatus();
+        if (offerStatus && offerStatus.valid && window.PixkuyFleetSelection.model("airport_transfer")) {
+          const fleetState = window.PixkuyFleetSelection.read("airport_transfer");
+          setAirportMobileAvailabilityState(nodes, state, "available", offerStatus.contextKey, {
+            available: true,
+            checkoutAllowed: true,
+            raw: fleetState.precheck && fleetState.precheck.body || {}
+          });
+        }
+        renderPanel(nodes, state);
+        reconcileAirportPanelVisibility();
+        return state.mobileAvailabilityStatus;
+      },
       originDropdown: nodes.originDropdown,
       destinationDropdown: nodes.destinationDropdown,
       passengersDropdown: nodes.passengersDropdown,

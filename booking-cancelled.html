@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="assets/css/82-booking-status-mobile.css">
 <link rel="stylesheet" href="assets/css/50-mobile-topbar.css">
 <link rel="stylesheet" href="assets/css/90-a11y.css">
+<link rel="stylesheet" href="assets/css/85-airport-desktop-booking.css">
 </head>
 
 <body class="booking-status-shell">
@@ -193,6 +194,13 @@
             type="button"
             class="cta booking-status__primary"
             data-booking-cancelled-retry
+            hidden
+          ></button>
+
+          <button
+            type="button"
+            class="booking-status__secondary"
+            data-booking-cancelled-modify
             hidden
           ></button>
 
@@ -418,8 +426,12 @@
   <script src="assets/js/analytics/pixkuy-analytics.js"></script>
   <script src="assets/js/forms/booking-status-state.js"></script>
   <script src="assets/js/forms/booking-cancelled-retry.js"></script>
+  <script src="assets/js/forms/booking-cancelled-edit.js"></script>
   <script src="assets/js/analytics/booking-cancelled-analytics.js"></script>
   <script src="assets/js/forms/booking-cancelled-desktop.js"></script>
   <script src="assets/js/forms/booking-cancelled-mobile.js"></script>
+<script src="assets/js/services/fleet-selection-state.js"></script>
+<script src="assets/js/forms/airport-desktop-view.js"></script>
+<script src="assets/js/forms/airport-desktop-result.js"></script>
 </body>
 </html>

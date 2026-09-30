@@ -40,7 +40,11 @@
       return false;
     }
 
-    name.textContent = "Van Premium - ByD M9";
+    const model = window.PixkuyFleetSelection && window.PixkuyFleetSelection.model("hourly_daily");
+    if (window.PixkuyFleetSelection) {
+      window.PixkuyFleetSelection.syncPresentation("hourly_daily");
+      if (model) name.textContent = model.name;
+    }
 
     return true;
   }

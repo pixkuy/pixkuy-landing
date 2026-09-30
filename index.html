@@ -156,6 +156,7 @@
       ]
     }
   </script>
+<link rel="stylesheet" href="assets/css/85-airport-desktop-booking.css" />
 </head>
 
 <body>
@@ -1701,6 +1702,7 @@
 		<!-- Payload semántico hourly_daily -->
         <input type="hidden" name="hourly_daily_mode" value="" />
         <input type="hidden" name="hourly_daily_vehicle_type" value="" />
+        <input type="hidden" name="hourly_daily_passengers" value="1" />
         <input type="hidden" name="hourly_daily_pickup" value="" />
         <input type="hidden" name="hourly_daily_date" value="" />
         <input type="hidden" name="hourly_daily_start_time" value="" />
@@ -1854,16 +1856,6 @@
             <button
               type="button"
               class="contact-service-switcher__button"
-              data-contact-service-trigger="airport_hotel"
-              aria-pressed="false"
-              data-i18n="contact.services.airportHotel"
-              >
-              Transfer Aeropuerto
-            </button>
-
-            <button
-              type="button"
-              class="contact-service-switcher__button"
               data-contact-service-trigger="tour_private"
               aria-pressed="false"
               data-i18n="contact.services.tourPrivate"
@@ -1906,9 +1898,9 @@
             </button>
           </div>
 
-           <div
-            class="contact-service-panel"
-            data-contact-service-panel="airport_hotel"
+          <!-- Shared canonical controls for the Airport desktop/mobile adapters. -->
+          <div
+            data-airport-canonical-controls
             aria-hidden="true"
             hidden
           >
@@ -1916,14 +1908,6 @@
               class="contact-airport-hotel-editor"
               data-contact-airport-hotel-editor
             >
-            <div class="contact-airport-hotel-editor__header">
-              <p
-                class="muted small"
-                data-contact-airport-hotel-helper
-                data-i18n="contact.services.airportHotelHelper"
-              ></p>
-            </div>
-
               <div
                 class="contact-airport-hotel-editor__grid"
                 data-contact-airport-hotel-layout="side-aware"
@@ -4271,6 +4255,7 @@
 <script src="assets/js/forms/google-places.js"></script>
 <script src="assets/js/airport-tariff/airport-extended-rings-policy.js"></script>
 <script src="https://unpkg.com/libphonenumber-js@1.12.15/bundle/libphonenumber-max.js"></script>
+<script src="assets/js/services/fleet-selection-state.js"></script>
 <script src="assets/js/forms/reservation-request.js"></script>
 <script src="assets/js/forms/submission-guard.js"></script>
 <script>
@@ -4349,6 +4334,7 @@
 <script src="assets/js/services/direct-transfer-quote.js"></script>
 <script src="assets/js/services/direct-transfer-panel.js"></script>
 <script src="assets/js/services/direct-transfer-desktop-vehicle-gallery.js"></script>
+<script src="assets/js/services/airport-desktop-vehicle-gallery.js"></script>
 <script src="assets/js/services/direct-transfer-mobile-config-step.js"></script>
 <script src="assets/js/services/direct-transfer-mobile-address-search-sheet.js"></script>
 <script src="assets/js/services/direct-transfer-mobile-vehicle-gallery.js"></script>
@@ -4374,6 +4360,7 @@
 <script src="assets/js/geo/zone-resolver.js"></script>
 <script src="assets/js/services/airport-endpoints-state.js"></script>
 <script src="assets/js/airport-zone-tariff.js"></script>
+<script src="assets/js/services/airport-desktop-layout.js"></script>
 <script src="assets/js/services/airport-lodging-types.js"></script>
 <script src="assets/js/services/airport-destination.js"></script>
 <script src="assets/js/services/airport-lodging-autocomplete.js"></script>
@@ -4414,5 +4401,8 @@
 <script src="assets/js/analytics/pixkuy-analytics.js"></script>
 <script src="assets/js/consent/google-ads-consent.js"></script>
 
+<script src="assets/js/forms/airport-transfer-checkout-review-page.js"></script>
+<script src="assets/js/forms/airport-desktop-view.js"></script>
+<script src="assets/js/forms/airport-desktop-booking.js"></script>
 </body>
 </html>

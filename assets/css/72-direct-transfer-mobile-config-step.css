@@ -459,6 +459,7 @@
     grid-template-columns:136px minmax(0, 1fr);
     grid-template-areas:
       "vehicle fare"
+      "model fare"
       "cta cta";
     gap:8px 10px;
     align-items:start;
@@ -699,3 +700,4 @@
     filter:none;
   }
 }
+.direct-transfer-mobile-config-step__model-name { grid-area:model; margin:0; font-size:13px; font-weight:600; }

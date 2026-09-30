@@ -134,7 +134,7 @@
       "expired": {
         "state": "Temporäre Reservierung abgelaufen",
         "title": "Die temporäre Reservierung ist abgelaufen",
-        "lead": "Das Zahlungsfenster ist nicht mehr aktiv. Um zu reservieren, starte eine neue Anfrage.",
+        "lead": "Die Frist ist ohne Zahlung abgelaufen. Sie können neu buchen und die Verfügbarkeit erneut prüfen.",
         "notice": "Abgelaufene Reservierungen werden von dieser Seite aus nicht reaktiviert."
       },
       "cancelled": {
@@ -172,6 +172,7 @@
       },
       "actions": {
         "retry": "Zahlung erneut versuchen",
+        "modify": "Daten ändern",
         "newBooking": "Neue Reservierung",
         "home": "Zur Startseite"
       },
@@ -204,7 +205,7 @@
         "expired": {
           "state": "Reservierung abgelaufen",
           "title": "Die temporäre Reservierung ist abgelaufen",
-          "lead": "Das Zahlungsfenster ist nicht mehr aktiv. Starte eine neue Anfrage.",
+          "lead": "Die Frist ist ohne Zahlung abgelaufen. Sie können neu buchen und die Verfügbarkeit erneut prüfen.",
           "notice": "Es wurde keine Zahlung belastet und keine Reservierung bestätigt."
         },
         "cancelled": {

@@ -368,7 +368,9 @@
       hasSummaryPayload: !!summaryPayload
     });
 
-    scrollToContactForm(fields);
+    if (!window.PixkuyAirportDesktopBooking || !window.PixkuyAirportDesktopBooking.open()) {
+      scrollToContactForm(fields);
+    }
 
     return true;
   }

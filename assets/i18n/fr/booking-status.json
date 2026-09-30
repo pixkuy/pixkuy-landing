@@ -134,7 +134,7 @@
       "expired": {
         "state": "Réservation temporaire expirée",
         "title": "La réservation temporaire a expiré",
-        "lead": "La fenêtre de paiement n’est plus active. Pour réserver, lancez une nouvelle demande.",
+        "lead": "Le délai est écoulé sans paiement. Vous pouvez commencer une autre réservation et vérifier les disponibilités.",
         "notice": "Nous ne réactivons pas les réservations expirées depuis cet écran."
       },
       "cancelled": {
@@ -172,6 +172,7 @@
       },
       "actions": {
         "retry": "Réessayer le paiement",
+        "modify": "Modifier les données",
         "newBooking": "Nouvelle réservation",
         "home": "Retour à l’accueil"
       },
@@ -204,7 +205,7 @@
         "expired": {
           "state": "Réservation expirée",
           "title": "La réservation temporaire a expiré",
-          "lead": "La fenêtre de paiement n’est plus active. Lancez une nouvelle demande.",
+          "lead": "Le délai est écoulé sans paiement. Vous pouvez commencer une autre réservation et vérifier les disponibilités.",
           "notice": "Aucun débit n’a été effectué et aucune réservation n’a été confirmée."
         },
         "cancelled": {

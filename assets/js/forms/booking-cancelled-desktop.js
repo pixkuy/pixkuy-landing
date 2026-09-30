@@ -527,7 +527,7 @@ function syncActions(root, dictionary, result) {
   setText(root, "[data-booking-status-whatsapp]", t(dictionary, "actions.whatsapp"));
 
   setActionVisible(retry, canRetry);
-  setActionVisible(newBooking, !canRetry);
+  setActionVisible(newBooking, result.serviceType === "airport_transfer" ? !!(result.raw.actions && result.raw.actions.canCreateNewReservation) : !canRetry);
   setActionVisible(home, true);
 
   if (retry) {

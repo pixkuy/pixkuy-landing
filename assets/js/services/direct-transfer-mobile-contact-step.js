@@ -307,7 +307,7 @@
       "distance"
     ]);
 
-    return {
+    const snapshot = {
       serviceType: "direct_transfer",
 
       direct_transfer_origin_address: normalizeText(originAddress.label),
@@ -339,9 +339,13 @@
       direct_transfer_quote_fingerprint: normalizeText(quote.quoteFingerprint),
       direct_transfer_quote_expires_at: normalizeText(quote.quoteExpiresAt),
       direct_transfer_quote_accepted_at: normalizeText(quote.quoteAcceptedAt),
-      direct_transfer_vehicle_label: normalizeText(safePayload.vehicleLabel) || "BYD M9",
+      direct_transfer_vehicle_label: normalizeText(safePayload.vehicleLabel),
       direct_transfer_notes: normalizeText(safePayload.notes)
     };
+    const fleet = window.PixkuyFleetSelection;
+    const result = fleet ? fleet.snapshot("direct_transfer", snapshot, {refreshSelection:true}) : snapshot;
+    result.direct_transfer_vehicle_label = result.fleet_model ? result.fleet_model.name : "";
+    return result;
   }
 
   function hasCompleteDirectTransferSnapshot(snapshot) {

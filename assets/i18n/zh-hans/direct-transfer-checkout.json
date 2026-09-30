@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "availabilityUnavailable": "所选时间没有可用车辆。",
+    "availabilityTechnical": "无法查询可用车辆，请重试。",
     "emptyTitle": "没有可确认的直达接送",
     "emptyText": "返回表单并重新配置接送。",
     "emptyCta": "返回直达接送",

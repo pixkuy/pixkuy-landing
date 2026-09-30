@@ -333,7 +333,7 @@
     ].join("");
   }
 
-  function buildVehicleRow(label, value) {
+  function buildVehicleRow(label, value, selectedModel) {
     var safeLabel = normalizeText(label);
     var safeValue = normalizeText(value);
 
@@ -351,7 +351,7 @@
       escapeHtml(safeValue),
       "</span>",
       '<span class="booking-status__vehicle-media" aria-hidden="true">',
-      '<img src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="" loading="lazy" decoding="async">',
+      selectedModel ? (window.PixkuyFleetSelection.photo(selectedModel) ? '<img src="' + escapeHtml(window.PixkuyFleetSelection.photo(selectedModel)) + '" alt="" loading="lazy" decoding="async">' : '') : '<img src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="" loading="lazy" decoding="async">',
       "</span>",
       "</dd>",
       "</div>"
@@ -433,7 +433,7 @@
       buildRow(t(dictionary, "details.date", "Fecha"), snapshot.direct_transfer_date, "date"),
       buildRow(t(dictionary, "details.time", "Hora"), snapshot.direct_transfer_time, "time"),
       buildRow(t(dictionary, "details.passengers", "Pasajeros"), getPassengerLabel(snapshot, dictionary), "passengers"),
-      buildVehicleRow(t(dictionary, "details.vehicle", "Vehiculo"), normalizeText(snapshot.direct_transfer_vehicle_label) || t(dictionary, "vehicleValue", "BYD M9")),
+      buildVehicleRow(t(dictionary, "details.vehicle", "Vehiculo"), (snapshot.fleet_model ? snapshot.fleet_model.name : normalizeText(snapshot.direct_transfer_vehicle_label) || t(dictionary, "vehicleValue", "BYD M9")), snapshot.fleet_model),
       estimate ? buildRow(t(dictionary, "details.estimate", "Ruta"), estimate, "estimate") : "",
       buildRow(t(dictionary, "details.price", "Precio"), formatPrice(snapshot), "price"),
       buildRow(t(dictionary, "details.name", "Nombre"), snapshot.name, "customer-name"),
@@ -540,8 +540,11 @@
     var code = normalizeText(error && (error.code || error.message));
     var message;
 
+    var precheck = error && error.result && error.result.body && error.result.body.result;
     if (isApiConfigurationError(error)) {
       message = getApiConfigurationErrorMessage(dictionary);
+    } else if (error && error.httpStatus >= 500) {
+      message = t(dictionary, "availabilityTechnical", "");
     } else if (code === "DIRECT_TRANSFER_PRICE_MISMATCH") {
       message = t(dictionary, "quote.priceUpdated", "");
     } else if (code === "DIRECT_TRANSFER_QUOTE_STALE") {
@@ -555,6 +558,9 @@
       message = t(dictionary, "quote.requoteRequired", "");
     } else if (code === "DIRECT_TRANSFER_QUOTE_FINGERPRINT_MISMATCH") {
       message = t(dictionary, "quote.tampered", "");
+    } else if (precheck && ((precheck.fleet && precheck.fleet.status === "unavailable") ||
+      (precheck.availability && precheck.availability.available === false))) {
+      message = t(dictionary, "availabilityUnavailable", "");
     } else {
       message = t(dictionary, "error", "Review the transfer details before continuing.");
     }
@@ -648,7 +654,7 @@
       return Promise.reject(new Error("DIRECT_TRANSFER_REQUOTE_REQUIRED"));
     }
 
-    return window.fetch(buildPrecheckUrl(config), {
+    return window.PixkuyFleetSelection.fetchPrecheck("direct_transfer", buildPrecheckUrl(config), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -694,7 +700,7 @@
           throw new Error("INVALID_DIRECT_TRANSFER_CHECKOUT_REVIEW_PAYLOAD");
         }
 
-        return window.fetch(checkoutUrl, {
+        return window.PixkuyFleetSelection.fetchCheckout("direct_transfer", checkoutUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -726,7 +732,7 @@
     var stateApi = getStateApi();
 
     if (edit) {
-      edit.setAttribute("href", "/?service=direct_transfer#contact");
+      edit.setAttribute("href", "/#contact");
 
       edit.addEventListener("click", function onEditClick() {
         if (!stateApi) {
@@ -764,9 +770,14 @@
           ) {
             var missingQuoteError = new Error(getPrecheckCode(result));
             missingQuoteError.code = getPrecheckCode(result);
+            missingQuoteError.result = result;
             throw missingQuoteError;
           }
 
+          var fleetState = window.PixkuyFleetSelection.read("direct_transfer");
+          if (accepted && (!fleetState.attempt || fleetState.attempt.state === "not_committed")) {
+            snapshot = window.PixkuyFleetSelection.snapshot("direct_transfer", snapshot, {refreshSelection:true});
+          }
           snapshot.direct_transfer_price_label = "";
           snapshot.direct_transfer_price_label = formatPrice(snapshot);
           stateApi.writeReviewSnapshot(snapshot);
@@ -775,6 +786,7 @@
           if (!accepted) {
             var precheckError = new Error(getPrecheckCode(result));
             precheckError.code = getPrecheckCode(result);
+            precheckError.result = result;
             throw precheckError;
           }
 
@@ -804,6 +816,13 @@
 
   function init() {
     var snapshot = readSnapshot();
+
+    window.addEventListener("pixkuy:i18n-applied", function refreshReviewLanguage() {
+      var lang = getPreferredLang();
+      loadDictionary().then(function renderCurrentLanguage(dictionary) {
+        if (lang === getPreferredLang()) renderSnapshot(snapshot, dictionary);
+      });
+    });
 
     loadDictionary().then(function onDictionaryLoaded(dictionary) {
       renderSnapshot(snapshot, dictionary);

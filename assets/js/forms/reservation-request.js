@@ -54,6 +54,7 @@
       hourlyDailyVisibleDate: form.querySelector('[data-contact-hourly-daily-date]'),
       hourlyDailyVisibleTime: form.querySelector('[data-contact-hourly-daily-time]'),
 
+      hourlyDailyPassengers: form.querySelector('input[name="hourly_daily_passengers"]'),
       hourlyDailyMode: form.querySelector('input[name="hourly_daily_mode"]'),
       hourlyDailyVehicleType: form.querySelector('input[name="hourly_daily_vehicle_type"]'),
       hourlyDailyPickup: form.querySelector('input[name="hourly_daily_pickup"]'),
@@ -519,6 +520,7 @@
       tourPrivatePrice: fields.tourPrivatePrice ? getTrimmedValue(fields.tourPrivatePrice) : '',
       tourPrivateCurrency: fields.tourPrivateCurrency ? getTrimmedValue(fields.tourPrivateCurrency) : '',
 
+      hourlyDailyPassengers: fields.hourlyDailyPassengers ? getTrimmedValue(fields.hourlyDailyPassengers) : '',
       hourlyDailyMode: fields.hourlyDailyMode ? getTrimmedValue(fields.hourlyDailyMode) : '',
       hourlyDailyVehicleType: fields.hourlyDailyVehicleType ? getTrimmedValue(fields.hourlyDailyVehicleType) : '',
       hourlyDailyPickup: fields.hourlyDailyPickup ? getTrimmedValue(fields.hourlyDailyPickup) : '',

@@ -793,6 +793,7 @@
   }
 
   function getSharedReservationMinimumDateValue() {
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
     const formsApi = window.PixkuyForms || {};
     const getMinimumDateTime = typeof formsApi.getReservationMinimumDateTime === "function"
       ? formsApi.getReservationMinimumDateTime
@@ -1602,6 +1603,8 @@
   function render() {
     configMount.hidden = false;
     configMount.innerHTML = buildMarkup();
+    window.PixkuyFleetSelection.render("direct_transfer");
+    window.PixkuyFleetSelection.syncPresentation("direct_transfer");
     ensureSafariDesktopTimeFallback();
     mountAddressControllers();
     syncView();

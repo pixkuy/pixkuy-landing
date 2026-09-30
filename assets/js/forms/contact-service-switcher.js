@@ -716,6 +716,24 @@
       return false;
     }
 
+    // Airport keeps its canonical fields but no longer has a desktop contact panel.
+    // Defer until a synchronous handoff has entered the new Airport route.
+    function restoreDesktopContactService() {
+      window.queueMicrotask(function () {
+        if (!isMobileServiceSelectViewport() &&
+            !/^#airport\//.test(window.location.hash) &&
+            serviceStateApi.getActiveServiceType() === "airport_hotel") {
+          serviceStateApi.setActiveServiceType("hourly_daily", {
+            source: "contact-desktop-default", skipConfirm: true
+          });
+        }
+      });
+    }
+    window.addEventListener("hashchange", restoreDesktopContactService);
+    window.addEventListener("resize", restoreDesktopContactService);
+    form.addEventListener("pixkuy:contact-service-change", restoreDesktopContactService);
+    restoreDesktopContactService();
+
     nodes.buttons.forEach(function (button) {
       if (button.dataset.contactServiceSwitcherBound === "1") {
         return;

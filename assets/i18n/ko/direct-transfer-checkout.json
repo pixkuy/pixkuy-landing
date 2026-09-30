@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "availabilityUnavailable": "요청하신 시간에 이용 가능한 차량이 없습니다.",
+    "availabilityTechnical": "예약 가능 여부를 확인하지 못했습니다. 다시 시도해 주세요.",
     "emptyTitle": "검토할 직행 이동이 없습니다",
     "emptyText": "양식으로 돌아가 이동 정보를 다시 설정하세요.",
     "emptyCta": "직행 이동으로 돌아가기",

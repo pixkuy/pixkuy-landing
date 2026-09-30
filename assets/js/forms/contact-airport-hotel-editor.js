@@ -496,6 +496,7 @@
   }
 
   function getAirportHotelMinimumDateLiteral() {
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
     const formsApi = NAMESPACE && typeof NAMESPACE === "object"
       ? NAMESPACE
       : null;
@@ -2159,9 +2160,11 @@
     const safeSnapshot =
       snapshot && typeof snapshot === "object" ? snapshot : {};
     const notes = normalizeText(
-      safeSnapshot.message ||
-        safeSnapshot.notes ||
-        safeSnapshot.airport_transfer_notes
+      Object.prototype.hasOwnProperty.call(safeSnapshot, "message")
+        ? safeSnapshot.message
+        : Object.prototype.hasOwnProperty.call(safeSnapshot, "notes")
+          ? safeSnapshot.notes
+          : safeSnapshot.airport_transfer_notes
     );
 
     if (!form) {
@@ -2174,7 +2177,12 @@
     writeCheckoutReviewReturnField(
       form,
       "luggage",
-      safeSnapshot.airport_transfer_luggage || safeSnapshot.luggage
+      safeSnapshot.luggage || (
+        safeSnapshot.airport_transfer_luggage === null ||
+        typeof safeSnapshot.airport_transfer_luggage === "undefined"
+          ? ""
+          : String(safeSnapshot.airport_transfer_luggage)
+      )
     );
     writeCheckoutReviewReturnField(form, "message", notes);
     writeCheckoutReviewReturnField(form, "notes", notes);
@@ -2342,6 +2350,7 @@
     syncPanelSummaryFromTariffBridge(editorState, nodes);
     restoreCheckoutReviewCommonFields(safePayload);
     syncReservationRequestUiState({ skipValidation: true });
+    form.dispatchEvent(new window.CustomEvent("pixkuy:airport-draft-restored", { bubbles: true }));
 
     return true;
   }
@@ -2353,22 +2362,34 @@
       return false;
     }
 
+    const form = getReservationForm();
+    let edited = false;
+    const preserveUserInput = function (event) { if (event.isTrusted) edited = true; };
+    form.addEventListener("input", preserveUserInput, true);
+    form.addEventListener("change", preserveUserInput, true);
+
     activateAirportHotelServiceForCheckoutReturn();
 
     if (!applyHandoff(snapshot)) {
       return false;
     }
+    window.PixkuyFleetSelection.editFromReview("airport_transfer");
 
     window.setTimeout(function reapplyCheckoutReviewSnapshot() {
+      if (edited) return;
       activateAirportHotelServiceForCheckoutReturn();
       applyHandoff(snapshot);
       scrollCheckoutReviewReturnToForm();
     }, 0);
 
     window.setTimeout(function finalReapplyCheckoutReviewSnapshot() {
-      activateAirportHotelServiceForCheckoutReturn();
-      applyHandoff(snapshot);
-      scrollCheckoutReviewReturnToForm();
+      if (!edited) {
+        activateAirportHotelServiceForCheckoutReturn();
+        applyHandoff(snapshot);
+        scrollCheckoutReviewReturnToForm();
+      }
+      form.removeEventListener("input", preserveUserInput, true);
+      form.removeEventListener("change", preserveUserInput, true);
 
       try {
         window.sessionStorage.removeItem(CHECKOUT_REVIEW_RETURN_KEY);

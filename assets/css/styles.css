@@ -238,8 +238,6 @@ html,body{
 
 .content{ max-width:920px; }
 
-
-
 h1{
   font-size:clamp(40px,6vw,72px);
   line-height:1.05;
@@ -676,117 +674,6 @@ ul{
   gap:12px;
 }
 
-.contact-airport-hotel-editor{
-  display:grid;
-  gap:14px;
-  padding:16px;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:18px;
-  background:rgba(255,255,255,.02);
-}
-
-.contact-airport-hotel-editor__header{
-  display:grid;
-  gap:6px;
-}
-
-.contact-airport-hotel-editor__header .muted.small{
-  margin:0;
-}
-
-.contact-airport-hotel-editor__grid{
-  display:grid;
-  grid-template-columns:minmax(0, 1fr) 56px minmax(0, 1fr);
-  gap:12px;
-  align-items:end;
-}
-
-.contact-airport-hotel-editor__field{
-  display:grid;
-  gap:8px;
-  min-width:0;
-}
-
-.contact-airport-hotel-editor__airport-shell{
-  width:100%;
-  min-width:0;
-}
-
-.contact-airport-hotel-editor__airport-shell .services-expand__control{
-  width:100%;
-}
-
-.contact-airport-hotel-editor__swap{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding-bottom:2px;
-}
-
-.contact-airport-hotel-editor__passengers{
-  display:grid;
-  gap:12px;
-}
-
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-root]{
-  position:relative;
-  min-width:0;
-  z-index:1;
-}
-
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-root].is-open{
-  z-index:40;
-}
-
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-input]{
-  width:100%;
-  min-height:56px;
-  padding:0 48px 0 16px;
-  border-radius:16px;
-  border:1px solid rgba(236,220,189,.30);
-  background:rgba(22,18,17,.62);
-  color:rgba(255,249,238,.98);
-  box-shadow:inset 0 1px 0 rgba(255,248,236,.08);
-}
-
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-input]::placeholder{
-  color:rgba(255,249,238,.64);
-  opacity:1;
-}
-
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-mount]{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  pointer-events:none;
-}
-
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-root].is-open [data-contact-airport-hotel-hotel-mount]{
-  z-index:41;
-}
-
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-root].is-ready [data-contact-airport-hotel-hotel-mount],
-.contact-airport-hotel-editor [data-contact-airport-hotel-hotel-root].is-open [data-contact-airport-hotel-hotel-mount]{
-  pointer-events:auto;
-}
-
-@media (max-width: 720px){
-  .contact-airport-hotel-editor{
-    padding:14px;
-    border-radius:16px;
-  }
-
-  .contact-airport-hotel-editor__grid{
-    grid-template-columns:1fr;
-    gap:12px;
-  }
-
-  .contact-airport-hotel-editor__swap{
-    justify-content:center;
-    padding-bottom:0;
-  }
-}
-
 .contact-panel-summary{
   margin-top:10px;
   padding:10px 0 0;
@@ -973,17 +860,7 @@ ul{
     opacity:0;
   }
 
-  .contact-airport-hotel-editor__date input:valid + .form-field-overlay--date{
-    opacity:1;
-  }
-
-  .contact-airport-hotel-editor__date input[data-has-value="true"] + .form-field-overlay--date,
-  .contact-airport-hotel-editor__date input:focus + .form-field-overlay--date,
-  .contact-airport-hotel-editor__date.is-invalid .form-field-overlay--date{
-    opacity:0;
-  }
-
-  .form-field--date input::-webkit-calendar-picker-indicator,
+.form-field--date input::-webkit-calendar-picker-indicator,
   .form-field--time input::-webkit-calendar-picker-indicator{
     opacity:0;
     position:absolute;
@@ -1147,10 +1024,6 @@ ul{
   transform:translateY(0);
   box-shadow:none;
 }
-
-
-
-
 
 /* -------------------------------------------------
    FRANJA 6 — CIERRE LEGAL Y FIRMA

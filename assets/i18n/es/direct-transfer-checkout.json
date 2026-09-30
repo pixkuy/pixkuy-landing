@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "availabilityUnavailable": "No hay vehículos disponibles en este horario.",
+    "availabilityTechnical": "No pudimos comprobar disponibilidad. Inténtalo de nuevo.",
     "emptyTitle": "No hay un traslado directo para revisar",
     "emptyText": "Vuelve al formulario y configura de nuevo tu traslado.",
     "emptyCta": "Volver a traslados directos",

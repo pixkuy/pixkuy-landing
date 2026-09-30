@@ -248,7 +248,7 @@
     };
   }
 
-  function precheck(detail) {
+  function precheck(detail, options) {
     var config = getConfig();
     var payload = buildPayload(detail);
 
@@ -272,14 +272,17 @@
       });
     }
 
-    return window.fetch(buildPrecheckUrl(config), {
+    var desktop = window.PixkuyAirportDesktopBooking;
+    var editing = desktop && desktop.pendingEdit && desktop.pendingEdit();
+    if (editing) payload.pending_edit = editing;
+    return window.PixkuyFleetSelection.fetchPrecheck("airport_transfer", buildPrecheckUrl(config), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Pixkuy-Site-Key": config.publicSiteKey
       },
       body: JSON.stringify(payload)
-    }).then(function handleResponse(response) {
+    }, options).then(function handleResponse(response) {
       return response.json().catch(function () {
         return {};
       }).then(function handleBody(body) {

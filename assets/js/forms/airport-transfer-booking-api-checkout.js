@@ -667,7 +667,7 @@
       payload.recaptchaToken = normalizeText(recaptchaToken);
     }
 
-    return payload;
+    return window.PixkuyFleetSelection.snapshot("airport_transfer", payload);
   }
   
     function buildAvailabilityPrecheckDetail(form, data) {
@@ -698,8 +698,9 @@
     };
   }
 
-  function buildCheckoutReviewSnapshot(form, data) {
+  function buildCheckoutReviewSnapshot(form, data, draft) {
     var snapshot = getFormPayloadRaw(form);
+    var previousSnapshot = null;
     var quoteBinding = getCurrentAirportTransferQuoteBinding(form, data);
     var airportSnapshot =
       window.PixkuyForms &&
@@ -707,9 +708,11 @@
         ? window.PixkuyForms.getContactAirportHotelSnapshot()
         : null;
 
-    if (!quoteBinding) {
+    if (!quoteBinding && !draft) {
       return null;
     }
+
+    quoteBinding = quoteBinding || {};
 
     snapshot.name = data.name;
     snapshot.email = data.email;
@@ -728,6 +731,23 @@
     snapshot.airport_transfer_zone_id =
       airportSnapshot && airportSnapshot.zoneId ? airportSnapshot.zoneId : data.zone;
     snapshot.airport_transfer_passenger_fare_key = data.passengerFareKey;
+    try {
+      previousSnapshot = JSON.parse(
+        window.sessionStorage.getItem("pixkuy_airport_transfer_checkout_review_snapshot") || "null"
+      );
+    } catch (_) {
+      previousSnapshot = null;
+    }
+    if (
+      previousSnapshot &&
+      previousSnapshot.airport_transfer_passenger_fare_key === data.passengerFareKey &&
+      Object.prototype.hasOwnProperty.call(previousSnapshot, "airport_transfer_passengers")
+    ) {
+      var preservedPassengers = parsePositiveInteger(previousSnapshot.airport_transfer_passengers);
+      if (preservedPassengers && preservedPassengers <= 6) {
+        snapshot.airport_transfer_passengers = preservedPassengers;
+      }
+    }
     snapshot.airport_transfer_luggage = data.luggage;
     snapshot.airport_transfer_price = data.fare;
     snapshot.airport_transfer_currency = "MXN";
@@ -771,7 +791,7 @@
 
     addLegalAcceptanceFields(snapshot, form);
 
-    return snapshot;
+    return window.PixkuyFleetSelection.snapshot("airport_transfer", snapshot);
   }
 
   function redirectToCheckoutReview(form, data) {
@@ -790,6 +810,10 @@
       return false;
     }
 
+    if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.review(snapshot)) {
+      setFormBusy(form, false);
+      return true;
+    }
     window.location.assign(AIRPORT_TRANSFER_CHECKOUT_REVIEW_PATH);
     return true;
   }
@@ -1095,7 +1119,7 @@
     return true;
   }
 
-  function verifyAvailabilityBeforeCheckout(form, data) {
+  function verifyAvailabilityBeforeCheckout(form, data, requestOptions) {
     var precheckApi = getAvailabilityPrecheckApi();
     var detail = buildAvailabilityPrecheckDetail(form, data);
 
@@ -1107,7 +1131,13 @@
       });
     }
 
-    return precheckApi.precheck(detail);
+    var desktop = window.PixkuyAirportDesktopBooking;
+    var airport = window.PixkuyAirportZoneTariff;
+    var options = requestOptions ? Object.assign({}, requestOptions) : {};
+    if (desktop && desktop.active() && airport && airport.fleetContextKey) {
+      options.fleetContextKey = airport.fleetContextKey();
+    }
+    return precheckApi.precheck(detail, options);
   }
 
   function setFormBusy(form, isBusy) {
@@ -1427,7 +1457,7 @@
   }
 
   function requestCheckout(input) {
-    return window.fetch(buildCheckoutUrl(input.config), {
+    return window.PixkuyFleetSelection.fetchCheckout("airport_transfer", buildCheckoutUrl(input.config), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1507,6 +1537,8 @@
     var data;
     var config;
     var idempotencyKey;
+    var desktopFlowRevision = window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active()
+      ? window.PixkuyAirportDesktopBooking.revision() : null;
 
     if (
       !form ||
@@ -1542,6 +1574,12 @@
 
     syncLegalAcceptanceVisibility(form);
 
+    if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active() &&
+        !api.refreshReservationRequestValidationUX(fields)) {
+      window.PixkuyAirportDesktopBooking.focusError();
+      return;
+    }
+
     if (!hasRequiredAirportTransferCheckoutData(data, form)) {
       showCheckoutError(form);
       return;
@@ -1563,6 +1601,11 @@
 
       verifyAvailabilityBeforeCheckout(form, data)
         .then(function onAvailabilityPrecheckResult(result) {
+          if (desktopFlowRevision !== null &&
+              (!window.PixkuyAirportDesktopBooking.active() || window.PixkuyAirportDesktopBooking.revision() !== desktopFlowRevision)) {
+            setFormBusy(form, false);
+            return;
+          }
           var isAllowed = Boolean(
             result &&
               result.available === true &&
@@ -1571,6 +1614,7 @@
 
           if (!isAllowed) {
             setFormBusy(form, false);
+            if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.availabilityError(result)) return;
             showAvailabilityError(form, result, data);
             return;
           }
@@ -1591,6 +1635,7 @@
         })
         .catch(function onAvailabilityPrecheckError() {
           setFormBusy(form, false);
+          if (desktopFlowRevision !== null && !window.PixkuyAirportDesktopBooking.active()) return;
           showCheckoutError(form);
         });
 
@@ -1647,6 +1692,54 @@
         showCheckoutError(form);
       });
   }
+
+  window.PixkuyAirportCheckout = {
+    acceptPrice: function (amountMinor) {
+      if (!Number.isSafeInteger(amountMinor) || amountMinor <= 0) return false;
+      var form = getForm();
+      var fare = getField(form, "fare");
+      if (!fare) return false;
+      fare.value = String(amountMinor / 100);
+      var label = getField(form, "airport_hotel_fare_label");
+      if (label) label.value = String(amountMinor / 100) + " MXN";
+      invalidateAirportTransferQuoteBinding();
+      return true;
+    },
+    prepare: function (options) {
+      var form = getForm();
+      var api = getReservationApi();
+      var data = api.getReservationRequestData(api.getReservationRequestFields(form));
+      return verifyAvailabilityBeforeCheckout(form, data, options).then(function (result) {
+        if (!result.available || !result.checkoutAllowed ||
+            !rememberAirportTransferQuoteBinding(result, buildAvailabilityPrecheckDetail(form, data))) {
+          var error = new Error(result.code || "PRECHECK_UNAVAILABLE");
+          error.result = result;
+          throw error;
+        }
+        var liveData = api.getReservationRequestData(api.getReservationRequestFields(form));
+        var snapshot = buildCheckoutReviewSnapshot(form, liveData);
+        var price = result.raw && result.raw.result && result.raw.result.price;
+        if (snapshot && price && Number.isSafeInteger(price.amountMinor) && price.amountMinor > 0) {
+          snapshot.airport_transfer_price = String(price.amountMinor / 100);
+          snapshot.airport_transfer_price_label = String(price.amountMinor / 100) + " MXN";
+          snapshot.fare = snapshot.airport_transfer_price;
+          snapshot.airport_desktop_amount_minor = price.amountMinor;
+        }
+        return snapshot;
+      });
+    },
+    draft: function () {
+      var form = getForm();
+      var api = getReservationApi();
+      var fields = form && api && api.getReservationRequestFields(form);
+      return fields ? buildCheckoutReviewSnapshot(form, api.getReservationRequestData(fields), true) : null;
+    },
+    validate: function () {
+      var form = getForm();
+      var api = getReservationApi();
+      return !!(form && api && api.refreshReservationRequestValidationUX(api.getReservationRequestFields(form)) && validateLegalAcceptance(form));
+    }
+  };
 
   function init() {
     var form = getForm();
@@ -1709,6 +1802,10 @@
     }, true);
 
     window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
+      scheduleLegalAcceptanceVisibilitySync(getForm());
+    });
+
+    document.addEventListener("pixkuy:airport-draft-restored", function () {
       scheduleLegalAcceptanceVisibilitySync(getForm());
     });
 

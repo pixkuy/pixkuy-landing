@@ -409,7 +409,7 @@
 
     addLegalAcceptanceFields(snapshot, snapshot.form_payload_raw);
 
-    return snapshot;
+    return window.PixkuyFleetSelection.snapshot("direct_transfer", snapshot);
   }
 
   function getSnapshotLocation(snapshot, role) {
@@ -576,7 +576,7 @@
       payload.recaptchaToken = normalizeText(safeOptions.recaptchaToken);
     }
 
-    return payload;
+    return window.PixkuyFleetSelection.snapshot("direct_transfer", payload);
   }
 
   function hasLegalAcceptance(snapshot) {

@@ -22,6 +22,10 @@ body.booking-status-mobile-lock{
 }
 
 @media (max-width:720px){
+  body.booking-status-mobile-lock .consent-banner{
+    z-index:150;
+  }
+
   .mobile-topbar{
     z-index:140;
   }

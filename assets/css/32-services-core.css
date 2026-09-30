@@ -669,3 +669,59 @@
     background:rgba(31,122,109,.18);
   }
 }
+
+/* Contractual fleet choices shared by the three service panels. */
+.fleet-selection{ grid-column:1 / -1; flex:0 0 auto; min-width:0; margin:12px 0; padding:0; border:0; }
+.fleet-selection legend{ padding:0; margin-bottom:8px; font-size:14px; font-weight:600; }
+.fleet-selection__choices{ display:grid; gap:0; }
+.fleet-selection__choice{ display:flex; align-items:center; gap:12px; min-height:48px; padding:10px 12px; border-bottom:1px solid rgba(236,220,189,.24); color:var(--fg); cursor:pointer; overflow-wrap:anywhere; }
+.fleet-selection__choice:has(input:checked){ background:rgba(31,122,109,.24); }
+.fleet-selection__choice:focus-within{ outline:2px solid rgba(31,122,109,.95); outline-offset:2px; }
+.fleet-selection__choice input{ flex:0 0 18px; width:18px; height:18px; margin:0; accent-color:#1f7a6d; }
+.fleet-selection__choice span{ min-width:0; }
+.fleet-selection > p{ margin:8px 0; }
+[data-fleet-choice-required] [data-fleet-was-disabled]{ opacity:.45; cursor:not-allowed; }
+[data-fleet-presentation="empty"] :is(.services-hourly-panel__field--vehicle, .services-direct-transfer-panel__vehicle, .airport-mobile-vehicle-gallery-trigger, .direct-transfer-mobile-config-step__vehicle, .direct-transfer-mobile-config-step__model-name){ display:none !important; }
+[data-fleet-photo="false"] :is(.services-hourly-panel__vehicle-media, .direct-transfer-mobile-config-step__vehicle){ display:none !important; }
+[data-fleet-photo="false"] .services-direct-transfer-panel__vehicle{ min-height:0; cursor:default; }
+[data-fleet-photo="false"] .services-direct-transfer-panel__vehicle::after{ display:none; }
+@media (min-width:721px){
+  [data-fleet-presentation="empty"] .services-hourly-panel__row--top{ grid-template-columns:170px 120px minmax(0,1fr) 178px; grid-template-areas:"pickup pickup pickup price" "date time . ."; }
+}
+
+.services-direct-transfer-panel__fare[hidden]{ display:none !important; }
+[data-fleet-presentation="empty"] .services-direct-transfer-panel__summary{ grid-template-columns:minmax(0,1fr); }
+[data-fleet-presentation="empty"] [data-hourly-mobile-vehicle-in-footer="true"]{ display:none !important; }
+[data-fleet-photo="false"] .services-direct-transfer-panel__vehicle span{ min-height:0; overflow-wrap:anywhere; }
+@media (max-width:720px){
+  .airport-mobile-route #services-expand-airport[data-fleet-photo="false"] .airport-mobile-fare-footer[data-airport-mobile-fare-footer-ready="true"]{ grid-template-columns:minmax(0,1fr); grid-template-areas:"fare" "model" "cta"; }
+  .airport-mobile-route #services-expand-airport[data-fleet-photo="false"] .airport-mobile-vehicle-gallery-trigger{ display:none !important; }
+  [data-fleet-airport-model-name]{ grid-area:model; margin:0; overflow-wrap:anywhere; }
+  .hourly-mobile-route [data-fleet-presentation="empty"] .services-hourly-panel__row--mobile-footer-spacer{ grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"price" !important; }
+  .hourly-mobile-route [data-fleet-presentation="empty"] [data-hourly-mobile-vehicle-in-footer="true"]{ display:none !important; }
+  [data-direct-transfer-mobile-config-step][data-fleet-presentation="empty"] .direct-transfer-mobile-config-step__footer{ grid-template-columns:minmax(0,1fr); grid-template-areas:"fare" "cta"; }
+  [data-direct-transfer-mobile-config-step][data-fleet-presentation="empty"] .direct-transfer-mobile-config-step__fare{ width:100%; }
+}
+
+#services-expand-airport .services-expand__form > .fleet-selection{ order:7; flex:0 0 100%; }
+@media(max-width:720px){ .airport-mobile-route #services-expand-airport .services-expand__form > .fleet-selection{ order:5 !important; } }
+
+@media(max-width:720px){
+  .hourly-mobile-route:has(.fleet-selection) .hourly-mobile-route__content{ overflow-y:auto; }
+  .hourly-mobile-route:has(.fleet-selection) #services-expand-hourly,
+  .hourly-mobile-route:has(.fleet-selection) [data-services-hourly-config],
+  .hourly-mobile-route:has(.fleet-selection) .services-hourly-panel__layout{ height:auto !important; max-height:none !important; overflow:visible !important; }
+}
+
+@media(max-width:720px){
+  [data-direct-transfer-mobile-config-step][data-fleet-photo="false"][data-fleet-presentation="selected"] .direct-transfer-mobile-config-step__footer{ grid-template-columns:minmax(0,1fr); grid-template-areas:"model" "fare" "cta"; }
+  .airport-mobile-route [data-airport-mobile-contact-summary-row="vehicle"] [data-airport-mobile-contact-summary-value],
+  .hourly-mobile-route [data-hourly-mobile-contact-summary-row="vehicle"] [data-hourly-mobile-contact-summary-value],
+  .direct-transfer-mobile-route [data-direct-transfer-mobile-contact-summary-row="vehicle"] [data-direct-transfer-mobile-contact-summary-value]{ white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }
+}
+
+@media(max-width:720px){
+  .airport-mobile-route [data-airport-mobile-contact-summary-row="vehicle"]{ grid-column:1 / -1; }
+}
+
+[data-direct-transfer-mobile-fare-state="choice"]{ display:none !important; }

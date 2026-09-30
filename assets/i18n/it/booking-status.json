@@ -134,7 +134,7 @@
       "expired": {
         "state": "Prenotazione temporanea scaduta",
         "title": "La prenotazione temporanea è scaduta",
-        "lead": "La finestra di pagamento non è più attiva. Per prenotare, avvia una nuova richiesta.",
+        "lead": "Il termine è scaduto senza pagamento. Può iniziare una nuova prenotazione e verificare la disponibilità.",
         "notice": "Non riattiviamo prenotazioni scadute da questa schermata."
       },
       "cancelled": {
@@ -172,6 +172,7 @@
       },
       "actions": {
         "retry": "Riprovare il pagamento",
+        "modify": "Modifica dati",
         "newBooking": "Nuova prenotazione",
         "home": "Torna all'inizio"
       },
@@ -204,7 +205,7 @@
         "expired": {
           "state": "Prenotazione scaduta",
           "title": "La prenotazione temporanea è scaduta",
-          "lead": "La finestra di pagamento non è più attiva. Avvia una nuova richiesta.",
+          "lead": "Il termine è scaduto senza pagamento. Può iniziare una nuova prenotazione e verificare la disponibilità.",
           "notice": "Non è stato effettuato alcun addebito né confermata alcuna prenotazione."
         },
         "cancelled": {

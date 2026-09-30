@@ -663,7 +663,7 @@
       return Promise.reject(error);
     }
 
-    return window.fetch(url, {
+    return window.PixkuyFleetSelection.fetchCheckout("direct_transfer", url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -693,7 +693,7 @@
       return Promise.reject(error);
     }
 
-    return window.fetch(url, {
+    return window.PixkuyFleetSelection.fetchPrecheck("direct_transfer", url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1129,9 +1129,11 @@
       ? body.result
       : {};
     var nextAvailableMessage = getNextAvailableMessage(result);
+    var commercialUnavailable = !!(precheck.fleet && precheck.fleet.status === "unavailable") ||
+      !!(precheck.availability && precheck.availability.available === false);
     var baseMessage = getI18nValue(
-      "directTransferMobileFlow.fare.unavailable",
-      "No pudimos confirmar disponibilidad para este traslado."
+      commercialUnavailable ? "fleetSelection.none" : "fleetSelection.technical",
+      commercialUnavailable ? "No hay vehículos disponibles en este horario." : "No pudimos comprobar disponibilidad. Inténtalo de nuevo."
     );
     var code = getPrecheckCode(result);
 
@@ -1219,6 +1221,7 @@
   }
 
   function redirectToCheckoutReview(snapshot) {
+    snapshot = window.PixkuyFleetSelection.snapshot("direct_transfer", snapshot, {refreshSelection:true});
     var stateApi = getStateApi();
 
     if (!stateApi || typeof stateApi.writeReviewSnapshot !== "function") {
@@ -1469,6 +1472,8 @@
 
     if (fare && state) {
       fare.setAttribute("data-direct-transfer-panel-fare-state", state);
+      // Keep one explanation beside the action, including the valid suggestion.
+      fare.hidden = (state === "error" || state === "choice") && !!statusNode;
     }
 
     if (statusNode) {
@@ -1561,6 +1566,11 @@
     return Boolean(value);
   }
 
+  document.addEventListener("pixkuy:fleet-choice-required", function (event) {
+    if (event.detail.service !== "direct_transfer" || event.detail.surface !== "panel") return;
+    setPanelPrecheckMessage("", "choice");
+  });
+
   function handlePanelSubmit(event) {
     var detail = event && event.detail && typeof event.detail === "object"
       ? event.detail
@@ -1586,7 +1596,9 @@
       return;
     }
 
+    window.PixkuyFleetSelection.enterPanel("direct_transfer");
     snapshot = buildPanelSnapshot(detail);
+    var selectionBeforePrecheck = window.PixkuyFleetSelection.selection("direct_transfer");
 
     payload = stateApi.buildPrecheckPayload(snapshot);
 
@@ -1614,6 +1626,7 @@
             getAvailabilityConfirmedMessage(),
             "success"
           );
+          if (!window.PixkuyFleetSelection.canContinue("direct_transfer", selectionBeforePrecheck)) return;
           applyPanelSnapshotToContact(snapshot);
           return;
         }
@@ -1681,6 +1694,7 @@
       source: "direct-transfer-checkout-review-return"
     });
     forms.applyContactDirectTransferHandoff(snapshot);
+    window.PixkuyFleetSelection.editFromReview("direct_transfer");
 
     ["name", "phone", "email"].forEach(function restoreField(name) {
       var field = form.querySelector('[name="' + name + '"]');

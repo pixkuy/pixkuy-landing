@@ -1,4 +1,22 @@
 {
+  "fleetSelection": {
+    "model": "Vehículo",
+    "choose": "Elige un modelo",
+    "changed": "El modelo elegido ya no está disponible. Confirma otro modelo para continuar.",
+    "confirmModel": "Confirmar modelo",
+    "technical": "No pudimos comprobar disponibilidad. Inténtalo de nuevo.",
+    "capacity": "Plazas",
+    "none": "No hay vehículos disponibles en este horario.",
+    "recover": "Recupera el intento anterior antes de continuar.",
+    "retry": "Recuperar reserva",
+    "uncertain": "No se ha confirmado el resultado. Conserva el intento y contacta con atención al cliente si no puedes recuperarlo.",
+    "refresh": "Los datos se conservan. Vuelve al formulario para actualizar la disponibilidad y elegir el modelo.",
+    "edit": "Volver al formulario",
+    "passengers": "Pasajeros",
+    "close": "Cerrar",
+    "previous": "Anterior",
+    "next": "Siguiente"
+  },
   "ui": {
     "language": "Idioma",
     "yes": "Sí",
@@ -81,12 +99,14 @@
   "fareValuePendingPassengers": "Selecciona pasajeros",
   "fareLabel": "Tarifa",
   "fareValue": "—",
-"cta": "Solicitar",
+"cta": "Continuar",
 "back": "Volver",
 "availability": {
+  "initial": "Complete los datos del viaje para consultar los vehículos disponibles",
   "checking": "Comprobando disponibilidad...",
   "available": "Disponibilidad confirmada. Puedes continuar.",
   "unavailable": "No hay disponibilidad para esa fecha y hora. Elige otra opción.",
+      "minimumLeadTime": "Reserve con al menos 24 horas de antelación. Seleccione una fecha y hora posteriores.",
   "nonAirportLocationIsSelectedAirport": "Elige una dirección de recogida o destino diferente del aeropuerto seleccionado.",
   "nextAvailableSlot": "Siguiente hora disponible: {time}",
   "priceMismatch": "La tarifa ha cambiado. Actualiza la configuración antes de continuar.",
@@ -94,7 +114,7 @@
 },
 "catalog": {
   "airports": {
-    "mex": "AICM · Aeropuerto Internacional Ciudad de México",
+            "mex": "MEX — Aeropuerto Internacional Ciudad de México",
     "nlu": "NLU — Aeropuerto Internacional Felipe Ángeles",
     "tlc": "TLC — Aeropuerto Internacional de Toluca",
     "pbc": "PBC — Aeropuerto Internacional Hermanos Serdán",
@@ -286,7 +306,6 @@
       "confirmChangeSpecificData": "Si cambias de servicio, se perderán los datos específicos del servicio actual. ¿Quieres continuar?",
       "confirmAccept": "Continuar",
       "confirmCancel": "Cancelar",
-      "airportHotelHelper": "Selecciona aeropuerto y dirección para preparar el trayecto.",
       "airportHotelAirportLabel": "Aeropuerto",
       "airportHotelAirportPlaceholder": "Selecciona aeropuerto",
       "airportHotelHotelLabel": "Dirección o lugar",

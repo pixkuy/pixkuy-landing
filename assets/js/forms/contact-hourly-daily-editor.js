@@ -238,6 +238,7 @@
   }
 
   function getHourlyDailyMinimumDate() {
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
     const formsApi = NAMESPACE && typeof NAMESPACE === "object" ? NAMESPACE : {};
     const getMinimumDateTime =
       typeof formsApi.getReservationMinimumDateTime === "function"
@@ -400,6 +401,7 @@
       priceValue: root.querySelector("[data-contact-hourly-daily-price-value]"),
 
       hiddenMode: form.querySelector('input[name="hourly_daily_mode"]'),
+      hiddenPassengers: form.querySelector('input[name="hourly_daily_passengers"]'),
       hiddenVehicleType: form.querySelector('input[name="hourly_daily_vehicle_type"]'),
       hiddenPickup: form.querySelector('input[name="hourly_daily_pickup"]'),
       hiddenPickupPlaceId: form.querySelector('input[name="hourly_daily_pickup_place_id"]'),
@@ -802,6 +804,7 @@
     }
 
     writeHiddenValue(nodes.hiddenMode, state.mode);
+    writeHiddenValue(nodes.hiddenPassengers, String(window.PixkuyFleetSelection.passengers()));
     writeHiddenValue(nodes.hiddenVehicleType, state.vehicleType);
     writeHiddenValue(nodes.hiddenPickup, state.pickup);
     writeHiddenValue(nodes.hiddenPickupPlaceId, state.pickupPlaceId);
@@ -891,6 +894,7 @@
   syncPrice(nodes);
   syncDisclaimers(nodes);
   syncHiddenFields(nodes);
+  window.PixkuyFleetSelection.syncFormPresentation("hourly_daily");
 
   if (shouldSyncReservationState) {
     syncReservationRequestUiState({
@@ -947,6 +951,7 @@
       serviceType: "hourly_daily",
       mode: state.mode,
       vehicleType: state.vehicleType,
+      passengers: window.PixkuyFleetSelection.passengers(),
       pickup: state.pickup,
       pickupPlaceId: state.pickupPlaceId,
       pickupLat: state.pickupLat,
@@ -1056,6 +1061,7 @@
     if (!applyHandoff(snapshot)) {
       return false;
     }
+    window.PixkuyFleetSelection.editFromReview("hourly_daily");
 
     window.setTimeout(function reapplyCheckoutReviewSnapshot() {
       activateHourlyDailyServiceForCheckoutReturn();
@@ -1097,6 +1103,9 @@
         ? nextMode
         : DEFAULT_MODE;
 
+    if (safePayload.hourly_daily_passengers != null && safePayload.hourly_daily_passengers !== "") {
+      window.PixkuyFleetSelection.setPassengers(safePayload.hourly_daily_passengers);
+    }
     state.vehicleType = normalizeText(safePayload.hourly_daily_vehicle_type) || DEFAULT_VEHICLE_TYPE;
     state.pickup = normalizeText(safePayload.hourly_daily_pickup);
     state.pickupPlaceId = normalizeText(safePayload.hourly_daily_pickup_place_id);
