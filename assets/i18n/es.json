@@ -104,7 +104,7 @@
 "availability": {
   "initial": "Complete los datos del viaje para consultar los vehículos disponibles",
   "checking": "Comprobando disponibilidad...",
-  "available": "Disponibilidad confirmada. Puedes continuar.",
+  "available": "Disponibilidad confirmada. Puede continuar.",
   "unavailable": "No hay disponibilidad para esa fecha y hora. Elige otra opción.",
       "minimumLeadTime": "Reserve con al menos 24 horas de antelación. Seleccione una fecha y hora posteriores.",
   "nonAirportLocationIsSelectedAirport": "Elige una dirección de recogida o destino diferente del aeropuerto seleccionado.",

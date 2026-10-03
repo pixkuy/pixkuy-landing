@@ -22,7 +22,7 @@
   const NOTES_EDITOR_ACTIVE_ATTR = "data-airport-mobile-notes-editor-active";
 
   const COMPACT_NOTES_SELECTOR =
-    '.airport-mobile-route .airport-mobile-contact-step [data-airport-mobile-contact-field="notes"]';
+    '.airport-mobile-route .airport-mobile-contact-step [data-airport-mobile-contact-field="notes"], body.airport-booking-active .airport-booking__form #contact-message';
 
   const EDITOR_SELECTOR = "[data-airport-mobile-notes-editor]";
   const EDITOR_INPUT_SELECTOR = "[data-airport-mobile-notes-editor-input]";
@@ -33,6 +33,21 @@
 
   let editorNode = null;
   let activeCompactInput = null;
+  let viewportFrame = 0;
+  let returnScroll = null;
+  let returnFocusCleanup = null;
+  const selections = new WeakMap();
+
+  function positionEditorInViewport() {
+    if (!isEditorOpen()) return;
+    const viewport = window.visualViewport;
+    editorNode.style.top = (viewport ? viewport.offsetTop : 0) + "px";
+    editorNode.style.height = (viewport ? viewport.height : window.innerHeight) + "px";
+  }
+  function syncVisibleViewport() {
+    window.cancelAnimationFrame(viewportFrame);
+    viewportFrame = window.requestAnimationFrame(positionEditorInViewport);
+  }
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -183,6 +198,8 @@
     editor.className = "airport-mobile-notes-editor";
     editor.setAttribute("data-airport-mobile-notes-editor", "1");
     editor.setAttribute("aria-hidden", "true");
+    editor.setAttribute("role", "dialog");
+    editor.setAttribute("aria-labelledby", "airport-notes-editor-title");
     editor.hidden = true;
 
     panel.className = "airport-mobile-notes-editor__panel";
@@ -190,6 +207,7 @@
     header.className = "airport-mobile-notes-editor__header";
 
     title.className = "airport-mobile-notes-editor__title";
+    title.id = "airport-notes-editor-title";
     title.setAttribute("data-airport-mobile-notes-editor-title", "1");
 
     close.type = "button";
@@ -274,18 +292,28 @@
     if (!isAirportMobileContactStepActive() || !compactInput || !editor || !editorInput) {
       return false;
     }
+    if (isEditorOpen() && activeCompactInput === compactInput) return true;
+    if (returnFocusCleanup) returnFocusCleanup();
 
     activeCompactInput = compactInput;
+    const scroller = compactInput.closest('.airport-mobile-route__content');
+    returnScroll = scroller ? { node: scroller, top: scroller.scrollTop } : null;
     syncCompactToEditor();
 
     editor.hidden = false;
     editor.setAttribute("aria-hidden", "false");
     document.body.setAttribute(NOTES_EDITOR_ACTIVE_ATTR, "true");
-
-    window.requestAnimationFrame(function focusEditorInput() {
-      editorInput.focus({ preventScroll: true });
+    positionEditorInViewport();
+    // Focus within the activation event so the native iPhone keyboard can open.
+    editorInput.focus({ preventScroll: true });
+    const saved = selections.get(compactInput);
+    if (saved && saved.value === editorInput.value) {
+      editorInput.setSelectionRange(saved.start, saved.end);
+      editorInput.scrollTop = saved.scroll;
+    } else {
       editorInput.setSelectionRange(editorInput.value.length, editorInput.value.length);
-    });
+      editorInput.scrollTop = editorInput.value ? editorInput.scrollHeight : 0;
+    }
 
     return true;
   }
@@ -297,15 +325,31 @@
       return false;
     }
 
+    const input = getEditorInput();
+    if (activeCompactInput && input) selections.set(activeCompactInput, {value:input.value,start:input.selectionStart,end:input.selectionEnd,scroll:input.scrollTop});
     syncEditorToCompact();
+    if (input) input.blur();
 
     editor.hidden = true;
     editor.setAttribute("aria-hidden", "true");
     document.body.setAttribute(NOTES_EDITOR_ACTIVE_ATTR, "false");
 
     if (activeCompactInput && typeof activeCompactInput.focus === "function") {
-      activeCompactInput.focus({ preventScroll: true });
+      const compact = activeCompactInput;
+      const wasReadOnly = compact.readOnly;
+      if (!wasReadOnly) {
+        compact.readOnly = true;
+        returnFocusCleanup = function () {
+          compact.readOnly = false;
+          compact.removeEventListener('blur', returnFocusCleanup);
+          returnFocusCleanup = null;
+        };
+        compact.addEventListener('blur', returnFocusCleanup, {once:true});
+      }
+      compact.focus({ preventScroll: true });
     }
+    if (returnScroll && returnScroll.node.isConnected) returnScroll.node.scrollTop = returnScroll.top;
+    returnScroll = null;
 
     activeCompactInput = null;
 
@@ -365,20 +409,6 @@
   }
 
   function bindCompactDelegates() {
-    document.addEventListener("focusin", function onCompactFocus(event) {
-      const target = event.target;
-
-      if (!target || !target.matches || !target.matches(COMPACT_NOTES_SELECTOR)) {
-        return;
-      }
-
-      if (!isAirportMobileContactStepActive()) {
-        return;
-      }
-
-      openEditor(target);
-    });
-
     document.addEventListener("click", function onCompactClick(event) {
       const target = event.target;
 
@@ -395,6 +425,12 @@
     });
 
     document.addEventListener("keydown", function onKeydown(event) {
+      if ((event.key === "Enter" || event.key === " ") &&
+          event.target.matches(COMPACT_NOTES_SELECTOR) && isAirportMobileContactStepActive()) {
+        event.preventDefault();
+        openEditor(event.target);
+        return;
+      }
       if (event.key !== "Escape" || !isEditorOpen()) {
         return;
       }
@@ -420,6 +456,11 @@
     syncActiveState();
 
     window.addEventListener("resize", syncActiveState);
+    window.addEventListener("resize", syncVisibleViewport);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", syncVisibleViewport);
+      window.visualViewport.addEventListener("scroll", syncVisibleViewport);
+    }
     window.addEventListener("pageshow", syncActiveState);
     window.addEventListener("pixkuy:i18n-applied", syncCopy);
 

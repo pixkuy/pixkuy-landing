@@ -62,8 +62,8 @@
     min-width:0 !important;
     max-width:none !important;
     min-height:112px !important;
-    height:112px !important;
-    max-height:112px !important;
+    height:auto !important;
+    max-height:none !important;
     margin:0 !important;
     padding:16px 12px !important;
     border:0 !important;
@@ -114,6 +114,7 @@
     box-shadow:none !important;
     display:flex !important;
     align-items:baseline !important;
+    flex-wrap:wrap;
     gap:6px !important;
     color:rgba(255,249,238,.98) !important;
     line-height:.96 !important;
@@ -122,8 +123,8 @@
 
   .airport-mobile-route #services-expand-airport .airport-mobile-fare-footer[data-airport-mobile-fare-footer-ready="true"] > .services-expand__field--fare[data-airport-mobile-fare-state="pending"]{
     min-height:112px !important;
-    height:112px !important;
-    max-height:112px !important;
+    height:auto !important;
+    max-height:none !important;
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
@@ -156,6 +157,10 @@
     display:none !important;
   }
 
+  .airport-mobile-route #services-expand-airport .airport-mobile-fare-footer[data-airport-mobile-fare-footer-ready="true"] > .services-expand__field--fare[data-airport-mobile-fare-state="pending"]:has(> .airport-mobile-fare-pending[hidden]){
+    display:none !important;
+  }
+
   .airport-mobile-vehicle-gallery-trigger{
     position:relative;
     align-self:start;
@@ -175,7 +180,8 @@
     text-align:left;
   }
 
-  .airport-mobile-vehicle-gallery-trigger__image{
+  .airport-mobile-vehicle-gallery-trigger__image,
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__vehicle-thumb{
     display:block;
     width:136px;
     height:108px;
@@ -188,7 +194,7 @@
     display:block;
     width:136px;
     max-width:136px;
-    overflow:hidden;
+    overflow-wrap:anywhere;
     color:rgba(255,249,238,.86);
     font-size:10.5px;
     line-height:1.18;

@@ -1316,12 +1316,20 @@
       return existing;
     }
 
+    // create() clears hidden fields; preserve acceptance belonging to this draft.
+    var acceptedFields = hasSyncedLegalAcceptance(form)
+      ? Array.from(form.querySelectorAll('[name^="legal_acceptance_"]')).map(function (field) { return [field, field.value]; })
+      : null;
     host.__pixkuyLegalAcceptanceInstance = api.create({
       container: host,
       form: form,
       channel: "web_airport_checkout",
       checkboxId: "pixkuy-airport-transfer-legal-acceptance"
     });
+    if (acceptedFields && host.__pixkuyLegalAcceptanceInstance) {
+      acceptedFields.forEach(function (entry) { entry[0].value = entry[1]; });
+      host.__pixkuyLegalAcceptanceInstance.checkbox.checked = true;
+    }
 
     bindLegalAcceptanceSubmitState(form, host.__pixkuyLegalAcceptanceInstance);
 
@@ -1392,7 +1400,8 @@
     isRequired = isAirportTransferTransactionalData(data) &&
       (
         isDesktopViewport() ||
-        isAirportMobileContactStepVisible()
+        isAirportMobileContactStepVisible() ||
+        window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active()
       );
 
     if (!isRequired) {
@@ -1407,7 +1416,9 @@
     }
 
     if (hasSyncedLegalAcceptance(form)) {
+      instance = getLegalAcceptanceInstance(form);
       host = getExistingLegalAcceptanceHost(form);
+      if (instance && instance.checkbox) instance.checkbox.checked = true;
 
       if (host) {
         host.hidden = false;
@@ -1596,7 +1607,14 @@
       return;
     }
 
-    if (isDesktopViewport()) {
+    // Mobile booking and authorized pending editing share the canonical review gate.
+    // Fail closed if its controller is unavailable or inactive.
+    if (!isDesktopViewport() && (!window.PixkuyAirportDesktopBooking || !window.PixkuyAirportDesktopBooking.active())) {
+      if (window.PixkuyAirportDesktopBooking) window.PixkuyAirportDesktopBooking.open();
+      return;
+    }
+
+    if (isDesktopViewport() || window.PixkuyAirportDesktopBooking.active()) {
       setFormBusy(form, true);
 
       verifyAvailabilityBeforeCheckout(form, data)
@@ -1635,7 +1653,7 @@
         })
         .catch(function onAvailabilityPrecheckError() {
           setFormBusy(form, false);
-          if (desktopFlowRevision !== null && !window.PixkuyAirportDesktopBooking.active()) return;
+          if (desktopFlowRevision !== null && (!window.PixkuyAirportDesktopBooking.active() || window.PixkuyAirportDesktopBooking.revision() !== desktopFlowRevision)) return;
           showCheckoutError(form);
         });
 
@@ -1702,6 +1720,13 @@
       fare.value = String(amountMinor / 100);
       var label = getField(form, "airport_hotel_fare_label");
       if (label) label.value = String(amountMinor / 100) + " MXN";
+      var api = getReservationApi();
+      var data = api.getReservationRequestData(api.getReservationRequestFields(form));
+      var summary = buildRequestSummary(data, form);
+      ["request_summary", "airport_hotel_trip_summary"].forEach(function (name) {
+        var field = getField(form, name);
+        if (field) field.value = summary;
+      });
       invalidateAirportTransferQuoteBinding();
       return true;
     },

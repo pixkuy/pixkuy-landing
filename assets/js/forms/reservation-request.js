@@ -960,6 +960,10 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   }
 
   function getSubmitLabelForData(data) {
+    if (data && data.serviceType === 'airport_hotel' && !isDesktopViewport() &&
+        window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active()) {
+      return window.PixkuyAirportDesktopView.t('mobileReviewCta');
+    }
     if (
       data &&
       data.serviceType === 'hourly_daily' &&
@@ -997,7 +1001,10 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       return false;
     }
 
-    fields.submit.textContent = getSubmitLabelForData(data);
+    const label = getSubmitLabelForData(data);
+    // A native blur can run between pointerdown and click. Keep the existing
+    // button text node when its label has not changed (notably on WebKit).
+    if (fields.submit.textContent !== label) fields.submit.textContent = label;
     return true;
   }
 

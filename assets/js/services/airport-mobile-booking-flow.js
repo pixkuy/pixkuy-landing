@@ -281,7 +281,7 @@
     const title = panel.querySelector("[data-airport-mobile-flow-title]");
     const helper = panel.querySelector("[data-airport-mobile-flow-helper]");
     const note = panel.querySelector("[data-airport-mobile-flow-note]");
-    const cta = panel.querySelector(".services-expand__cta");
+    const cta = panel.querySelector(".services-expand__actions .services-expand__cta");
     const direction = panel.querySelector(".airport-mobile-flow__direction");
     const airportToHotel = panel.querySelector('[data-airport-mobile-direction-option="airport_to_hotel"]');
     const hotelToAirport = panel.querySelector('[data-airport-mobile-direction-option="hotel_to_airport"]');
@@ -1144,7 +1144,7 @@
   }
 
   function setMobileContinueAvailability(panel, isReady) {
-    const cta = panel ? panel.querySelector(".services-expand__cta") : null;
+    const cta = panel ? panel.querySelector(".services-expand__actions .services-expand__cta") : null;
 
     if (!cta) {
       return false;
@@ -1937,6 +1937,8 @@
 
 
   function openAirportMobileContactStepFromPanel(panel) {
+    // The canonical handoff opens the shared Datos/Revisión form after this event.
+    if (window.PixkuyAirportDesktopBooking) return false;
     const contactStep = getAirportMobileContactStepApi();
 
     if (!panel || !contactStep || !isMobileViewport() || !isRouteOpen) {
@@ -2299,6 +2301,10 @@
     window.addEventListener("pageshow", syncActiveState);
     window.addEventListener("hashchange", syncActiveState);
     window.addEventListener("popstate", function onPopState() {
+      if (/^#airport\/(datos|revision|traslado)/.test(window.location.hash)) {
+        syncActiveState();
+        return;
+      }
       if (isRouteOpen && shouldReturnToInMotionScrollCinema()) {
         inMotionReturnContext = getResolvedInMotionReturnContext();
 
@@ -2338,6 +2344,11 @@
   }
 
   window.PixkuyAirportMobileBookingFlow = {
+    setLuggage: function (value) {
+      mobileLuggageValue = /^[0-6]$/.test(String(value)) ? String(value) : "0";
+      const panel = getPanel();
+      if (panel) ensureMobileLuggage(panel);
+    },
     open: openAirportRoute,
     close: closeAirportRoute,
     openAirportPicker: openAirportPickerForConsumer,

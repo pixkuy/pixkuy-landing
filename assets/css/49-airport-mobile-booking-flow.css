@@ -33,6 +33,7 @@
     overflow:hidden;
     overscroll-behavior:none;
   }
+  body[data-airport-mobile-screen="true"] .whatsapp-floating{display:none;}
 
   .airport-mobile-route{
     position:fixed;
@@ -68,11 +69,18 @@
     width:100%;
     height:100svh;
     min-height:0;
-    overflow:hidden;
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
     padding:
       calc(60px + env(safe-area-inset-top))
       18px
       calc(18px + env(safe-area-inset-bottom));
+  }
+
+  body[data-airport-mobile-vehicle-gallery-active="true"] .airport-mobile-route__content,
+  .airport-mobile-route:has([data-airport-mobile-airport-picker]:not([hidden])) .airport-mobile-route__content{
+    overflow-y:hidden;
   }
 
   :is(.airport-mobile-route #services-expand-airport, .events-package-mobile-airport){
@@ -1043,4 +1051,74 @@
   .airport-mobile-route #services-expand-airport .airport-mobile-luggage__select{ width:100%; max-width:none; }
   .airport-mobile-route #services-expand-airport .services-expand__form > .services-expand__field--date{ flex:1 1 calc(60% - 5px); }
   .airport-mobile-route #services-expand-airport .services-expand__form > .services-expand__field--time{ flex:0 0 calc(40% - 5px); min-width:0; }
+
+  /* Resolved trip text grows in this route; Events keeps its own composition. */
+  .airport-mobile-route #services-expand-airport .services-expand__field[data-airport-tariff-role="origin"],
+  .airport-mobile-route #services-expand-airport .services-expand__field[data-airport-tariff-role="destination"],
+  .airport-mobile-route #services-expand-airport .services-expand__field[data-airport-tariff-role] > .services-expand__destination,
+  .airport-mobile-route #services-expand-airport .services-expand__field[data-airport-tariff-role] .services-expand__airport-shell,
+  .airport-mobile-route #services-expand-airport .services-expand__field[data-airport-tariff-role] .services-expand__airport-shell > .services-expand__control,
+  .airport-mobile-route #services-expand-airport .services-expand__destination-resolved{
+    height:auto;
+    max-height:none;
+  }
+  .airport-mobile-route #services-expand-airport .services-expand__airport-shell > .services-expand__control,
+  .airport-mobile-route #services-expand-airport .services-expand__destination-resolved{
+    padding-top:12px;
+    padding-bottom:12px;
+  }
+  .airport-mobile-route #services-expand-airport .services-expand__airport-shell > .services-expand__control,
+  .airport-mobile-route #services-expand-airport .services-expand__destination-resolved-label{
+    white-space:normal;
+    overflow:visible;
+    overflow-wrap:anywhere;
+    line-height:1.4;
+    text-overflow:clip;
+  }
+  .airport-mobile-route #services-expand-airport .services-expand__cta{
+    height:auto;
+    min-height:50px;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+
+  .airport-mobile-route #services-expand-airport :is(#airport-tariff-date, #airport-tariff-time, .airport-mobile-passengers__select, .airport-mobile-luggage__select){
+    font-family:inherit;
+    font-size:16px;
+    font-weight:600;
+    line-height:normal;
+  }
+  .airport-mobile-route #services-expand-airport :is(#airport-tariff-date, #airport-tariff-time)::-webkit-datetime-edit{
+    font:inherit;
+    padding:0;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:1;
+  }
+  .airport-mobile-route #services-expand-airport :is(#airport-tariff-date, #airport-tariff-time){
+    display:flex;
+    align-items:center;
+    line-height:1.25;
+    padding-block:0;
+    padding-inline:28px;
+    text-align:center;
+    justify-content:center;
+  }
+  .airport-mobile-route #services-expand-airport :is(.services-expand__date-overlay, .services-expand__time-overlay){display:none !important;}
+  .airport-mobile-route #services-expand-airport :is(#airport-tariff-date, #airport-tariff-time)::-webkit-datetime-edit-fields-wrapper{
+    padding:0;
+  }
+  /* WebKit's single date/time value uses the available control height. */
+  .airport-mobile-route #services-expand-airport :is(#airport-tariff-date, #airport-tariff-time)::-webkit-date-and-time-value{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    min-height:100%;
+    margin:0;
+  }
+  .airport-mobile-route #services-expand-airport [data-airport-tariff-availability][data-availability-tone="success"]{
+    color:#79d4a3;
+  }
 }

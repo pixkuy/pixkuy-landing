@@ -8,19 +8,15 @@
 */
 
 @media (max-width:720px){
-  body[data-airport-mobile-notes-editor-active="true"]{
-    overflow:hidden;
-  }
-
   .airport-mobile-notes-editor[hidden]{
     display:none !important;
   }
 
   .airport-mobile-notes-editor{
     position:fixed;
-    top:calc(64px + env(safe-area-inset-top));
+    top:0;
     right:0;
-    bottom:0;
+    height:100dvh;
     left:0;
     z-index:121;
     display:block;
@@ -84,7 +80,7 @@
 
   .airport-mobile-notes-editor__close{
     min-width:44px;
-    min-height:34px;
+    min-height:44px;
     padding:0 8px;
     border:0;
     border-radius:8px;
@@ -103,9 +99,11 @@
 
   .airport-mobile-notes-editor__body{
     position:relative;
-    display:block;
+    display:flex;
     min-height:0;
     flex:1 1 auto;
+    box-sizing:border-box;
+    overflow:hidden;
     padding:8px 16px calc(16px + env(safe-area-inset-bottom));
     background:#0f1113;
   }
@@ -113,7 +111,7 @@
   .airport-mobile-notes-editor__input{
     width:100%;
     height:100%;
-    min-height:220px;
+    min-height:0;
     padding:14px 42px 14px 14px;
     border:1px solid rgba(236,220,189,.38);
     border-radius:9px;
@@ -122,10 +120,11 @@
     box-shadow:none;
     box-sizing:border-box;
     font:inherit;
-    font-size:14px;
+    font-size:16px;
     line-height:1.45;
     font-weight:650;
     resize:none;
+    overflow-y:auto;
     color-scheme:dark;
     -webkit-appearance:none;
     appearance:none;

@@ -17,6 +17,91 @@
   display:none !important;
 }
 
+/* Airport return uses the compact mobile review hierarchy; other services and
+   desktop retain their existing composition. Content remains naturally scrollable. */
+@media (max-width:720px){
+  body.booking-status-shell:has([data-airport-return]) .mobile-topbar{background:#0f1113;backdrop-filter:none;-webkit-backdrop-filter:none;}
+  body.booking-status-shell .mobile-topbar-menu{z-index:330;}
+  body.booking-status-shell[data-mobile-topbar-menu-open="true"] .booking-status-mobile__panel{overflow:hidden;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__panel{
+    display:block;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior-y:contain;
+    background-image:linear-gradient(180deg,rgba(15,17,19,.78),rgba(15,17,19,.88)),url("../img/cdmx-angel-night.webp");
+    font-size:14px;
+    line-height:1.35;
+  }
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__title{font-size:20px;line-height:1.2;letter-spacing:normal;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__lead{font-size:13px;line-height:1.35;}
+  .booking-status-mobile[data-airport-return] .airport-return__reference{display:flex;gap:6px;margin:8px 0;padding:0;background:transparent;}
+  .booking-status-mobile[data-airport-return] .airport-return__reference :is(dt,dd){font-size:12px;line-height:1.3;margin:0;color:rgba(255,245,228,.72);}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__details,
+  .booking-status-mobile[data-airport-return] .airport-return__contact{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;
+    margin:8px 0;padding:10px;border:1px solid rgba(236,220,189,.22);border-radius:12px;
+    background:transparent;overflow:visible;
+  }
+  .booking-status-mobile[data-airport-return] :is(.booking-status-mobile__detail,.airport-booking__detail){padding:0;background:transparent;min-width:0;grid-row:auto;}
+  .booking-status-mobile[data-airport-return] :is(dt,dd){margin:0;overflow-wrap:anywhere;}
+  .booking-status-mobile[data-airport-return] dt{font-size:12px;line-height:1.35;color:rgba(255,245,228,.70);}
+  .booking-status-mobile[data-airport-return] dd{font-size:14px;line-height:1.35;font-weight:650;white-space:pre-wrap;color:var(--fg);}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__detail:has([data-booking-status-label="service"], [data-booking-status-label="duration"]){display:none;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__detail:has([data-booking-status-pickup],[data-booking-status-destination],[data-booking-status-vehicle]){grid-column:1 / -1;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__vehicle-value{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__vehicle-thumb{width:64px;height:40px;flex:0 0 64px;}
+  .booking-status-mobile[data-airport-return] .airport-return__contact>*{grid-column:1 / -1;}
+  .booking-status-mobile[data-airport-return] .airport-return__disclosure{margin:8px 0;}
+  .booking-status-mobile[data-airport-return] .airport-return__disclosure summary{padding:12px 0;min-height:44px;box-sizing:border-box;cursor:pointer;font-weight:650;}
+  .booking-status-mobile[data-airport-return] .airport-return__disclosure summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .booking-status-mobile[data-airport-return] .airport-return__contact{margin-top:0;}
+  .booking-status-mobile[data-airport-return] .airport-return__resume{margin:10px 0 14px;}
+  .booking-status-mobile[data-airport-return] .airport-return__payment-actions{display:grid;gap:8px;}
+  .booking-status-mobile[data-airport-return] .airport-return__payment-actions>*{min-height:44px;height:auto;white-space:normal;font-size:14px;line-height:1.35;padding:10px;}
+  .booking-status-mobile[data-airport-return] :is([data-airport-return-phone],[data-airport-return-email]) dt{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);}
+  .booking-status-mobile[data-airport-return] [data-booking-status-notes-row]{cursor:auto;}
+  .booking-status-mobile[data-airport-return] [data-booking-status-notes]{white-space:pre-wrap;overflow:visible;text-overflow:clip;text-decoration:none;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__notice{margin:8px 0;font-size:13px;line-height:1.35;}
+  .booking-status-mobile[data-airport-return] .airport-return__payment{margin:12px 0 4px;}
+  .booking-status-mobile[data-airport-return] .airport-return__payment>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+  .booking-status-mobile[data-airport-return] .airport-return__payment dd{font-size:18px;color:rgba(61,158,122,.98);font-weight:750;}
+  .booking-status-mobile[data-airport-return] .airport-return__deadline{margin:4px 0 10px;font-size:13px;line-height:1.35;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__actions{gap:8px;}
+  .booking-status-mobile[data-airport-return] .booking-status-mobile__actions>*{min-height:44px;height:auto;white-space:normal;font-size:14px;line-height:1.35;padding:10px;}
+  .booking-status-mobile[data-airport-return] :is([data-booking-cancelled-retry],[data-booking-cancelled-modify],[data-booking-cancelled-new]){grid-column:1 / -1;}
+  .booking-status-mobile[data-airport-return] :is([data-booking-status-whatsapp],[data-booking-cancelled-home],[data-booking-status-primary]){grid-column:auto;background:transparent;border:0;font-weight:500;font-size:13px;color:rgba(255,245,228,.80);}
+  .booking-status-mobile[data-airport-return] [hidden]{display:none !important;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__title::before{content:"✓";color:#3d9e7a;margin-right:8px;font-size:18px;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__reference{margin:6px 0;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__resume{margin:6px 0 10px;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__payment{margin:0;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__details{grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;border:0;padding:0;margin:16px 0;}
+  .booking-status-mobile[data-airport-confirmed] :is(dt,dd){font-weight:400;}
+  .booking-status-mobile[data-airport-confirmed] :is([data-booking-status-date],[data-booking-status-time]){font-weight:650;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__detail:has([data-booking-status-date],[data-booking-status-time],[data-booking-status-vehicle],[data-booking-status-luggage])>dt{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary{display:grid;grid-template-columns:minmax(0,1fr);gap:3px 12px;margin:12px 0 16px;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary:has(img){grid-template-columns:136px minmax(0,1fr);}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary>div:has([data-booking-status-vehicle]),
+  .booking-status-mobile[data-airport-confirmed] [data-booking-status-vehicle]{display:contents;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary>*{grid-column:1;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-name{grid-row:1;font-size:16px;font-weight:650;overflow-wrap:anywhere;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary:has(img)>div:not(:has([data-booking-status-vehicle])),
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary:has(img) .airport-return__vehicle-name{grid-column:2;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__vehicle-thumb{grid-column:1;grid-row:1 / span 4;border:0;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary>div:has([data-booking-status-passengers],[data-booking-status-luggage]){display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__vehicle-summary>div:has([data-booking-status-amount]){margin-top:5px;}
+  .booking-status-mobile[data-airport-confirmed] [data-booking-status-amount]{font-size:18px;font-weight:700;color:rgba(61,158,122,.98);}
+  .booking-status-mobile[data-airport-confirmed] :is([data-booking-status-date],[data-booking-status-time]){font-size:16px;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__timezone{grid-column:1 / -1;margin-top:-4px;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__address{display:block;font-weight:400;margin-top:2px;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__vehicle-value{justify-content:flex-start;flex-wrap:wrap;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__vehicle-thumb{order:-1;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__actions{display:flex;flex-direction:column;gap:2px;}
+  .booking-status-mobile[data-airport-confirmed] [data-booking-status-whatsapp]{border:1px solid rgba(236,220,189,.3);background:rgba(255,255,255,.03);font-size:14px;font-weight:650;}
+  .booking-status-mobile[data-airport-confirmed] :is([data-booking-status-primary],[data-booking-cancelled-home]){text-decoration:underline;text-underline-offset:3px;}
+
+}
+
 body.booking-status-mobile-lock{
   overflow:hidden !important;
 }

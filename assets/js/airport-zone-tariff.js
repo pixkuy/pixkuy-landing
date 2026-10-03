@@ -334,7 +334,7 @@
       return "No hay una tarifa reservable para este traslado.";
     }
 
-    if (code === "PRECHECK_REQUEST_FAILED" || code === "INVALID_PRECHECK_PAYLOAD") {
+    if (!isAirportConfirmedUnavailable(result)) {
       return getAirportAvailabilityCopy(
         "availabilityError",
         "No pudimos confirmar disponibilidad. Revisa fecha, hora y dirección."
@@ -635,9 +635,7 @@
       });
     }
 
-    const precheckOptions = !isAirportMobileViewport()
-      ? Object.assign({}, options, { fleetContextKey: buildAirportMobilePrecheckKey(detail) })
-      : options;
+    const precheckOptions = Object.assign({}, options, { fleetContextKey: buildAirportMobilePrecheckKey(detail) });
     return api.precheck(detail, precheckOptions);
   }
 
@@ -669,6 +667,15 @@
         result.available === true &&
         result.checkoutAllowed === true
     );
+  }
+
+  function isAirportConfirmedUnavailable(result) {
+    const raw = result && result.raw && result.raw.result;
+    const availability = raw && raw.availability;
+    const code = String(result && result.code || "") + " " + String(availability && availability.code || "");
+    if (/FAILED|UNDETERMINED|TECHNICAL|PENDING/.test(code)) return false;
+    return /NO_AVAILABILITY|FLEET_UNAVAILABLE|TRANSFER_UNAVAILABLE/.test(code) ||
+      Boolean(availability && availability.available === false && availability.status === "unavailable");
   }
 
   function setAirportMobileAvailabilityState(nodes, state, status, key, result) {
@@ -809,8 +816,7 @@
         state.mobileAvailabilityStatus === "available" &&
         state.mobileAvailabilityKey === key &&
         isAirportMobilePrecheckAllowed(state.mobileAvailabilityResult) &&
-        (isAirportMobileViewport() || !state.mobileAvailabilityResult.raw?.result?.price?.quoteExpiresAt ||
-          Date.parse(state.mobileAvailabilityResult.raw.result.price.quoteExpiresAt) > Date.now())
+        window.PixkuyFleetSelection.airportOfferStatus().valid
     );
   }
 
@@ -861,9 +867,20 @@
   function syncAirportMobileAvailability(nodes, state, allowDesktopSuggestion, background) {
     const detail = buildAirportTransferPrecheckDetail(state);
     const key = buildAirportMobilePrecheckKey(detail);
+    const precheckApi = getAirportTransferAvailabilityPrecheckApi();
     let requestId;
 
     if (!isAirportMobileViewport() && allowDesktopSuggestion !== true) {
+      return false;
+    }
+
+    // A context key is not a complete request. Missing inputs are a neutral
+    // form state, including when a previous request settles after a field clears.
+    if (!detail || !nodes.dateInput.value || !nodes.timeInput.value ||
+        !nodes.dateInput.checkValidity() || !nodes.timeInput.checkValidity() ||
+        precheckApi && !precheckApi.buildPayload(detail)) {
+      invalidateAirportMobileAvailability(nodes, state);
+      clearAirportAvailabilityStatus(nodes);
       return false;
     }
 
@@ -947,7 +964,7 @@
         setAirportMobileAvailabilityState(
           nodes,
           state,
-          isAllowed ? "available" : result && result.code === "PRECHECK_REQUEST_FAILED" ? "error" : "unavailable",
+          isAllowed ? "available" : isAirportConfirmedUnavailable(result) ? "unavailable" : "error",
           key,
           result
         );
@@ -956,7 +973,7 @@
             nodes,
             getAirportAvailabilityCopy(
               "availabilityAvailable",
-              "Disponibilidad confirmada. Puedes continuar."
+              "Disponibilidad confirmada. Puede continuar."
             ),
             "success"
           );
@@ -1859,6 +1876,7 @@ function shouldUsePassengerChipUi(nodes) {
     renderAccessibility(nodes);
     if (isAirportMobileViewport()) syncAirportMobileAvailability(nodes, state);
     else scheduleAirportAvailability(nodes, state);
+    document.dispatchEvent(new window.CustomEvent("pixkuy:airport-trip-changed"));
   }
 
   function getEndpointsStateApi() {
@@ -1946,7 +1964,7 @@ function shouldUsePassengerChipUi(nodes) {
       nodes,
       getAirportAvailabilityCopy(
         "availabilityAvailable",
-        "Disponibilidad confirmada. Puedes continuar."
+        "Disponibilidad confirmada. Puede continuar."
       ),
       "success"
     );
@@ -2755,15 +2773,12 @@ function shouldUsePassengerChipUi(nodes) {
           return false;
         }
 
-        const isAllowed = Boolean(
-          result &&
-            (result.available === true || result.checkoutAllowed === true)
-        );
+        const isAllowed = isAirportMobilePrecheckAllowed(result);
 
         setAirportMobileAvailabilityState(
           nodes,
           state,
-          isAllowed ? "available" : result && result.code === "PRECHECK_REQUEST_FAILED" ? "error" : "unavailable",
+          isAllowed ? "available" : isAirportConfirmedUnavailable(result) ? "unavailable" : "error",
           desktopContextKey,
           result
         );
@@ -2778,7 +2793,7 @@ function shouldUsePassengerChipUi(nodes) {
         const automaticSingleton = !selectionBeforePrecheck && fleetAfter.selectedByUser === false &&
           fleetAfter.offer && fleetAfter.offer.models.length === 1;
         if (!window.PixkuyFleetSelection.canContinue("airport_transfer", automaticSingleton ? window.PixkuyFleetSelection.selection("airport_transfer") : selectionBeforePrecheck)) {
-          setAirportAvailabilityStatus(nodes, getAirportAvailabilityCopy("availabilityAvailable", "Disponibilidad confirmada. Puedes continuar."), "success");
+          setAirportAvailabilityStatus(nodes, getAirportAvailabilityCopy("availabilityAvailable", "Disponibilidad confirmada. Puede continuar."), "success");
           renderCtaState(nodes, state);
           return false;
         }
@@ -2870,7 +2885,8 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     nodes.dateInput.addEventListener("input", function () {
-      if (isAirportMobileViewport() || state.serviceDate !== normalizeText(nodes.dateInput.value)) invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() && state.serviceDate === normalizeText(nodes.dateInput.value)) return;
+      if (state.serviceDate !== normalizeText(nodes.dateInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceDate = normalizeText(nodes.dateInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
@@ -2878,7 +2894,8 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     nodes.dateInput.addEventListener("change", function () {
-      if (isAirportMobileViewport() || state.serviceDate !== normalizeText(nodes.dateInput.value)) invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() && state.serviceDate === normalizeText(nodes.dateInput.value)) return;
+      if (state.serviceDate !== normalizeText(nodes.dateInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceDate = normalizeText(nodes.dateInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalDateInput(nodes, state);
@@ -2888,7 +2905,8 @@ function shouldUsePassengerChipUi(nodes) {
 
   if (nodes.timeInput) {
     nodes.timeInput.addEventListener("input", function () {
-      if (isAirportMobileViewport() || state.serviceTime !== normalizeText(nodes.timeInput.value)) invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() && state.serviceTime === normalizeText(nodes.timeInput.value)) return;
+      if (state.serviceTime !== normalizeText(nodes.timeInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceTime = normalizeText(nodes.timeInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
@@ -2896,7 +2914,8 @@ function shouldUsePassengerChipUi(nodes) {
     });
 
     nodes.timeInput.addEventListener("change", function () {
-      if (isAirportMobileViewport() || state.serviceTime !== normalizeText(nodes.timeInput.value)) invalidateAirportMobileAvailability(nodes, state);
+      if (isAirportMobileViewport() && state.serviceTime === normalizeText(nodes.timeInput.value)) return;
+      if (state.serviceTime !== normalizeText(nodes.timeInput.value)) invalidateAirportMobileAvailability(nodes, state);
       state.serviceTime = normalizeText(nodes.timeInput.value);
       clearAirportAvailabilityStatus(nodes);
       syncTemporalTimeInput(nodes, state);
@@ -2974,7 +2993,7 @@ function shouldUsePassengerChipUi(nodes) {
     scheduleI18nLabelHydration(nodes, state);
     preloadZoneResolver();
     document.addEventListener("pixkuy:fleet-offer-expired", function (event) {
-      if (!event.detail || event.detail.service !== "airport_transfer" || isAirportMobileViewport()) return;
+      if (!event.detail || event.detail.service !== "airport_transfer") return;
       if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active()) {
         window.clearTimeout(airportAutoTimer); airportAutoTimer = null; airportAutoKey = "";
         airportMobilePrecheckRequestId += 1;
@@ -2982,15 +3001,26 @@ function shouldUsePassengerChipUi(nodes) {
         return;
       }
       invalidateAirportMobileAvailability(nodes, state);
-      scheduleAirportAvailability(nodes, state);
+      if (isAirportMobileViewport()) renderPanel(nodes, state);
+      else scheduleAirportAvailability(nodes, state);
     });
     document.addEventListener("pixkuy:fleet-offer-accepted", function (event) {
-      if (!event.detail || event.detail.service !== "airport_transfer" || isAirportMobileViewport()) return;
+      if (!event.detail || event.detail.service !== "airport_transfer") return;
       window.queueMicrotask(function () {
+        // A current accepted offer can finish through a compatible shared
+        // request. Reconcile mobile too, but never bypass explicit model choice.
+        if (isAirportMobileViewport() && (!window.PixkuyFleetSelection.airportOfferStatus().valid ||
+            !window.PixkuyFleetSelection.model("airport_transfer"))) return;
         if (window.PixkuyAirportZoneTariff && window.PixkuyAirportZoneTariff.reconcileAvailability) {
           window.PixkuyAirportZoneTariff.reconcileAvailability();
         }
       });
+    });
+    document.addEventListener("pixkuy:fleet-model-selected", function (event) {
+      if (!event.detail || event.detail.service !== "airport_transfer") return;
+      // A choice requested by Datos is completed on Trayecto, outside its old request.
+      if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active()) return;
+      window.queueMicrotask(function () { window.PixkuyAirportZoneTariff.reconcileAvailability(); });
     });
 
     window.PixkuyAirportZoneTariff = {
@@ -3016,6 +3046,11 @@ function shouldUsePassengerChipUi(nodes) {
             checkoutAllowed: true,
             raw: fleetState.precheck && fleetState.precheck.body || {}
           });
+        } else if (offerStatus && offerStatus.valid) {
+          setAirportMobileAvailabilityState(nodes, state, "choice", offerStatus.contextKey, null);
+        } else if (state.mobileAvailabilityStatus === "available") {
+          // A failed check in Datos supersedes the old positive panel result.
+          invalidateAirportMobileAvailability(nodes, state);
         }
         renderPanel(nodes, state);
         reconcileAirportPanelVisibility();

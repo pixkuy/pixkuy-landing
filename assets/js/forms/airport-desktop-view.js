@@ -84,9 +84,12 @@
     if (model && Number.isFinite(model.amountMinor)) return money(model.amountMinor, model.currency || snapshot.airport_transfer_currency);
     return snapshot.airport_transfer_price_label || snapshot.airport_transfer_price || snapshot.fareLabel || "—";
   }
-  function date(value) {
+  function date(value, compact) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return value || "—";
-    return new Intl.DateTimeFormat(document.documentElement.lang || "es", {dateStyle:"long", timeZone:"UTC"}).format(new Date(value + "T12:00:00Z"));
+    var parts = value.split("-").map(Number);
+    var civil = new Date(parts[0], parts[1] - 1, parts[2], 12);
+    if (civil.getFullYear() !== parts[0] || civil.getMonth() !== parts[1] - 1 || civil.getDate() !== parts[2]) return value;
+    return new Intl.DateTimeFormat(document.documentElement.lang || "es", compact ? {day:"numeric",month:"short",year:"numeric"} : {dateStyle:"long"}).format(civil);
   }
   function shell(step, back, editData, options) {
     options = options || {};

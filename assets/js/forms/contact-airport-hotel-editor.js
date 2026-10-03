@@ -2371,6 +2371,10 @@
     activateAirportHotelServiceForCheckoutReturn();
 
     if (!applyHandoff(snapshot)) {
+      form.removeEventListener("input", preserveUserInput, true);
+      form.removeEventListener("change", preserveUserInput, true);
+      window.sessionStorage.removeItem(CHECKOUT_REVIEW_RETURN_KEY);
+      form.dispatchEvent(new window.CustomEvent("pixkuy:airport-draft-restored", { bubbles: true, detail: { reviewReturnCompleted: true, restored: false } }));
       return false;
     }
     window.PixkuyFleetSelection.editFromReview("airport_transfer");
@@ -2383,9 +2387,10 @@
     }, 0);
 
     window.setTimeout(function finalReapplyCheckoutReviewSnapshot() {
+      let restored = true;
       if (!edited) {
         activateAirportHotelServiceForCheckoutReturn();
-        applyHandoff(snapshot);
+        restored = applyHandoff(snapshot);
         scrollCheckoutReviewReturnToForm();
       }
       form.removeEventListener("input", preserveUserInput, true);
@@ -2394,6 +2399,7 @@
       try {
         window.sessionStorage.removeItem(CHECKOUT_REVIEW_RETURN_KEY);
       } catch (error) {}
+      form.dispatchEvent(new window.CustomEvent("pixkuy:airport-draft-restored", { bubbles: true, detail: { reviewReturnCompleted: true, restored: restored } }));
     }, 250);
 
     return true;
@@ -2495,4 +2501,5 @@
     return nodes ? getAirportHotelTripSnapshot(editorState, nodes) : null;
   };
   NAMESPACE.applyContactAirportHotelHandoff = applyHandoff;
+  NAMESPACE.restoreContactAirportHotelDraftFields = restoreCheckoutReviewCommonFields;
 })(window, document);

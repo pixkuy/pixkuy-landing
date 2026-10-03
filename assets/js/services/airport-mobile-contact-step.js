@@ -1275,7 +1275,83 @@
     return hasCompleteAirportSnapshot(buildAirportSnapshot(panel));
   }
 
+  // Presentation only for the shared booking controller: reuse the original
+  // mobile route, summary rows and styles, without creating another form.
+  function createReviewSummary(value) {
+    const view = window.PixkuyAirportDesktopView;
+    const section = view.node("section", "airport-mobile-contact-step__summary airport-mobile-review__trip");
+    section.appendChild(view.node("h1", "airport-mobile-contact-step__summary-title", view.t("mobileReviewTitle")));
+    const places = view.node("dl", "airport-mobile-review__places");
+    const toAirport = value.airport_transfer_direction === "destination_to_airport";
+    const airport = value.airport_transfer_airport_label;
+    const destination = value.airport_transfer_destination_label || "";
+    const location = value.airport_transfer_non_airport_location || {};
+    let address = location.address || "";
+    const name = destination.split(" — ")[0];
+    if (address.startsWith(name + " — ")) address = address.slice(name.length + 3);
+    const placeOptions = address && address !== destination ? {address:address} : {};
+    const airportOptions = {airportId:value.airport_transfer_airport_id};
+    places.append(
+      view.locationField(view.t("origin"), toAirport ? destination : airport, toAirport ? placeOptions : airportOptions),
+      view.locationField(view.t("destination"), toAirport ? airport : destination, toAirport ? airportOptions : placeOptions)
+    );
+    const details = view.node("dl", "airport-mobile-review__facts");
+    details.append(
+      view.field(view.t("date"), view.date(value.airport_transfer_date, true)),
+      view.field(view.t("time"), value.airport_transfer_time),
+      view.field(view.t("passengers"), getPassengerBucketLabel(value.airport_transfer_passenger_fare_key)),
+      view.field(view.t("luggage"), String(value.luggage ?? value.airport_transfer_luggage ?? "0"))
+    );
+    const vehicle = view.node("dl", "airport-mobile-review__vehicle");
+    vehicle.appendChild(view.field(getI18nValue("fleetSelection.model", ""), value.fleet_model && value.fleet_model.name));
+    section.append(places, details, vehicle);
+    return section;
+  }
+  function createBookingView(value, onBack, review) {
+    const view = window.PixkuyAirportDesktopView;
+    const root = document.createElement("section");
+    root.className = "airport-booking airport-mobile-contact-step";
+    const backRow = document.createElement("div");
+    backRow.className = "airport-mobile-flow__back-row";
+    const back = document.createElement("button");
+    back.type = "button";
+    back.className = "airport-mobile-flow__back";
+    back.textContent = getI18nValue("airportMobileFlow.back", "Volver");
+    back.addEventListener("click", onBack);
+    backRow.appendChild(back);
+    if (review) { root.append(backRow, createReviewSummary(value)); return root; }
+    const summary = document.createElement("section");
+    summary.className = "airport-mobile-contact-step__summary";
+    const title = document.createElement("p");
+    title.className = "airport-mobile-contact-step__summary-title";
+    title.textContent = getI18nValue("airportMobileContactStep.summary.title", "") + " " +
+      getDirectionLabel(value.airport_transfer_direction === "destination_to_airport" ? "hotel_to_airport" : "airport_to_hotel");
+    const list = document.createElement("dl");
+    list.className = "airport-mobile-contact-step__summary-list";
+    const values = {
+      airport: value.airport_transfer_airport_label,
+      hotel: value.airport_transfer_destination_label,
+      zone: value.airport_transfer_zone_label,
+      date: view.date(value.airport_transfer_date, true),
+      time: value.airport_transfer_time,
+      passengers: getPassengerBucketLabel(value.airport_transfer_passenger_fare_key),
+      luggage: value.luggage ?? value.airport_transfer_luggage ?? "0",
+      vehicle: value.fleet_model && value.fleet_model.name,
+      fare: view.price(value)
+    };
+    Object.keys(values).forEach(function (key) {
+      const row = buildSummaryRow(key);
+      row.querySelector("dt").textContent = getI18nValue("airportMobileContactStep.summary." + key, key === "vehicle" ? getI18nValue("fleetSelection.model", "") : "");
+      row.querySelector("dd").textContent = values[key] || "";
+      list.appendChild(row);
+    });
+    summary.append(title, list);
+    root.append(backRow, summary);
+    return root;
+  }
+
   window.PixkuyAirportMobileContactStep = {
+    createBookingView: createBookingView,
     open: open,
     close: close,
     isOpen: isOpen,

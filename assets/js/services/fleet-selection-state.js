@@ -10,6 +10,16 @@
   var airportCertificate = null;
   var AIRPORT_OFFER_MAX_AGE_MS = 5 * 60 * 1000;
   function copy(value) { return JSON.parse(JSON.stringify(value)); }
+  function createAttemptKey() {
+    var secure = window.crypto;
+    if (secure && typeof secure.randomUUID === "function") return secure.randomUUID();
+    if (!secure || typeof secure.getRandomValues !== "function") throw new Error("FLEET_SECURE_RANDOM_UNAVAILABLE");
+    var bytes = secure.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 15) | 64;
+    bytes[8] = (bytes[8] & 63) | 128;
+    var hex = Array.from(bytes, function (value) { return value.toString(16).padStart(2, "0"); }).join("");
+    return hex.slice(0, 8) + "-" + hex.slice(8, 12) + "-" + hex.slice(12, 16) + "-" + hex.slice(16, 20) + "-" + hex.slice(20);
+  }
   function read(service) {
     var raw = window.sessionStorage.getItem(PREFIX + service);
     return raw ? JSON.parse(raw) : { version: 1, selected: null, offer: null, attempt: null, explicit: false };
@@ -43,7 +53,7 @@
     return state.selected ? { version: 1, model_id: state.selected.modelId, model_revision: state.selected.modelRevision } : null;
   }
   function airportOfferCertified(state) {
-    if (editingService === "airport_transfer" || !window.matchMedia("(min-width: 721px)").matches) return true;
+    if (editingService === "airport_transfer") return true;
     var airport = window.PixkuyAirportZoneTariff;
     var key = airport && airport.fleetContextKey && airport.fleetContextKey();
     return !!(key && airportCertificate && airportCertificate.key === key &&
@@ -54,7 +64,9 @@
     var state = read("airport_transfer");
     var airport = window.PixkuyAirportZoneTariff;
     var key = airport && airport.fleetContextKey && airport.fleetContextKey();
-    var valid = Boolean(key && state.offer && airportCertificate &&
+    var result = state.precheck && state.precheck.body && state.precheck.body.result;
+    var valid = Boolean(key && state.offer && state.offer.models.length &&
+      result && result.checkoutAllowed === true && result.availability && result.availability.available === true && airportCertificate &&
       airportCertificate.key === key && airportCertificate.requestKey === state.offer.requestKey &&
       Date.now() < airportCertificate.validUntil);
     return {
@@ -73,7 +85,7 @@
   }
   function model(service) {
     var state = read(service);
-    return service === "airport_transfer" && !airportOfferCertified(state) ? null : state.selected;
+    return service === "airport_transfer" && !validSelection(state, service) ? null : state.selected;
   }
   function snapshot(service, value, options) {
     var state = read(service);
@@ -163,6 +175,15 @@
   }
   function editFromReview(service) {
     if (services.indexOf(service) < 0 || !document.querySelector('form[name="contact"]')) return false;
+    // Continuing from Airport's vehicle step confirms even its sole offered model.
+    // A later replacement must use the existing explicit-choice contract.
+    if (service === "airport_transfer") {
+      var confirmed = read(service);
+      if (confirmed.selected) {
+        confirmed.selectedByUser = true;
+        write(service, confirmed);
+      }
+    }
     editingService = service;
     services.forEach(function (item) { render(item); syncFormPresentation(item); });
     var hourlyHost = host("hourly_daily");
@@ -342,7 +363,8 @@
       }, Math.max(1, validUntil - Date.now() + 1));
     }
     if (prior) {
-      state.selected = offer.models.find(function (item) { return item.modelId === prior.modelId && item.modelRevision === prior.modelRevision; }) || null;
+      state.selected = offer.models.find(function (item) { return item.modelId === prior.modelId && item.modelRevision === prior.modelRevision; }) ||
+        (service === "airport_transfer" && !offer.models.length ? prior : null);
       if (!state.selected && state.selectedByUser !== false) state.explicit = true;
     }
     if (!state.selected && !state.explicit && offer.models.length === 1) {
@@ -399,7 +421,7 @@
     if (selected) payload.fleet_selection = selected;
     var requestKey = url + "|" + JSON.stringify(payload);
     var inflight = inflightPrechecks[service];
-    if (inflight && inflight.key === requestKey) {
+    if (inflight && inflight.key === requestKey && inflight.sequence === sequences[service]) {
       return inflight.promise.then(function (response) { return response.clone(); });
     }
     invalidateOffer(service);
@@ -419,7 +441,7 @@
         });
       });
     });
-    inflightPrechecks[service] = { key: requestKey, promise: request };
+    inflightPrechecks[service] = { key: requestKey, sequence: sequence, promise: request };
     return request.then(function (response) { return response.clone(); }).finally(function () {
       if (inflightPrechecks[service] && inflightPrechecks[service].promise === request) delete inflightPrechecks[service];
     });
@@ -433,7 +455,7 @@
       if ((!selected || state.explicit) && state.offer) return Promise.reject(new Error("FLEET_MODEL_SELECTION_REQUIRED"));
       if (selected) payload.fleet_selection = payload.fleet_selection || selected;
       if (selected && (payload.fleet_selection.model_id !== selected.model_id || payload.fleet_selection.model_revision !== selected.model_revision)) return Promise.reject(new Error("FLEET_REVIEW_SELECTION_CHANGED"));
-      state.attempt = { state: "pending", key: window.crypto.randomUUID(), payload: copy(payload), url: url, headers: copy(init.headers || {}) };
+      state.attempt = { state: "pending", key: createAttemptKey(), payload: copy(payload), url: url, headers: copy(init.headers || {}) };
     }
     var attempt = state.attempt;
     var sent = copy(attempt.payload);
@@ -476,7 +498,7 @@
         if (token && body.checkoutUrl) {
           window.sessionStorage.setItem("pixkuy_booking_checkout:" + token, JSON.stringify({token:token, checkoutUrl:body.checkoutUrl, redirected:false, createdAt:new Date().toISOString()}));
           window.location.assign("/booking-checkout.html?token=" + encodeURIComponent(token));
-        } else if (token && body.recovery && body.recovery.action === "reservation_status") (onReservationStatus || function (value) { window.location.assign("/booking-status.html?token=" + encodeURIComponent(value)); })(token);
+        } else if (token && body.recovery && body.recovery.action === "reservation_status") (onReservationStatus || function (value) { window.location.assign("/booking-success.html?token=" + encodeURIComponent(value)); })(token);
         else if (!body.recovery || body.recovery.state !== "not_committed") throw new Error("FLEET_ASSISTED_RECOVERY_REQUIRED");
         return body;
       });
@@ -684,7 +706,7 @@
     if (event.type === "click") {
       if (!target.closest('[data-airport-tariff-passenger-option], [data-airport-tariff-swap], [data-airport-destination-clear], [data-direct-transfer-panel-passenger-option], [data-direct-transfer-panel-address-clear], [data-direct-transfer-mobile-address-clear], [data-contact-airport-hotel-passenger-option], [data-contact-airport-hotel-swap], [data-contact-airport-hotel-hotel-clear], [data-contact-hourly-daily-mode-option], [data-contact-hourly-daily-duration-option], [data-contact-direct-transfer-passenger-option], [data-contact-direct-transfer-origin-clear], [data-contact-direct-transfer-destination-clear]')) return;
     } else if (!target.matches('input:not([type="hidden"]):not([type="checkbox"]), select')) return;
-    if (target.closest("#services-expand-airport") && window.matchMedia("(min-width: 721px)").matches) {
+    if (target.closest("#services-expand-airport")) {
       if (event.type !== "click") {
         if (airportEditValues.get(target) === target.value) return;
         airportEditValues.set(target, target.value);
@@ -740,7 +762,7 @@
     control.addEventListener("change", sync); label.appendChild(control); placeControl(parent, label); setPassengers(control.value);
   }
   window.PixkuyFleetSelection = { read: read, selection: selection, model: model, snapshot: snapshot, gallery: gallery, photo: modelPhoto,
-    fetchPrecheck: fetchPrecheck, fetchCheckout: fetchCheckout, recoverAttempt: recoverAttempt, completeAttempt: completeAttempt,
+    fetchPrecheck: fetchPrecheck, fetchCheckout: fetchCheckout, recoverAttempt: recoverAttempt, completeAttempt: completeAttempt, createAttemptKey: createAttemptKey,
     bindReservation: bindReservation, completeReservation: completeReservation,
     airportOfferStatus: airportOfferStatus, expireAirportOfferIfNeeded: expireAirportOfferIfNeeded,
     syncPresentation: syncPresentation, acceptOffer: acceptOffer, render: render,

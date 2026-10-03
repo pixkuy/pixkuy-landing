@@ -14,16 +14,19 @@
   var changed = false;
   var pendingPrice = null;
   var busy = false;
-  var checkedAt = 0;
   var revision = 0;
   var revalidation = null;
   var revalidationSequence = 0;
+  var mobileReviewAttempt = "";
+  var mobileReviewHydrated = document.readyState === "complete";
   var deferredRender = false;
+  var mobileUiFrame = 0;
+  var mobileEntryPending = false;
   var originalSubmitKey = document.getElementById("contact-submit").getAttribute("data-i18n");
   form.before(placeholder);
 
   function route() { return /^#airport\/(datos|revision|traslado)(?:\/(name|phone|email|luggage|message|legal))?$/.exec(window.location.hash); }
-  function active() { return !!(view.media.matches && route() && route()[1] !== "traslado"); }
+  function active() { return !!(route() && route()[1] !== "traslado"); }
   function editContext() {
     try {
       var value = JSON.parse(window.sessionStorage.getItem(EDIT_KEY) || "null");
@@ -34,7 +37,8 @@
     var editing = editContext();
     if (!editing) return;
     rememberUnsaved(editing);
-    [KEY, RETURN, EDIT_KEY, "pixkuy_fleet_b:airport_transfer"].forEach(function (key) {
+    // An unresolved replacement keeps its frozen request and identity on exit.
+    if (!editing.attempt) [KEY, RETURN, EDIT_KEY, "pixkuy_fleet_b:airport_transfer"].forEach(function (key) {
       window.sessionStorage.removeItem(key);
     });
     window.location.assign("/booking-cancelled.html?token=" + encodeURIComponent(editing.token));
@@ -87,7 +91,7 @@
   function read() { try { return JSON.parse(window.sessionStorage.getItem(KEY)); } catch (_) { return null; } }
   function restoreTripContext(value) {
     var airport = window.PixkuyAirportZoneTariff;
-    var location = value && value.airport_transfer_non_airport_location || {};
+    var location = window.PixkuyAirportMobileDraft.locationOf(value) || {};
     if (!airport || !value || !value.airport_transfer_airport_id) return false;
     var direction = value.airport_transfer_direction === "destination_to_airport"
       ? "hotel_to_airport"
@@ -114,14 +118,16 @@
     return true;
   }
   function persist(value) {
+    if (!view.media.matches && !editContext() && !pending()) {
+      value.airport_mobile_draft = true;
+      value.airport_draft_stage = route() ? route()[1] : "datos";
+    }
     snapshot = value;
     try { window.sessionStorage.setItem(KEY, JSON.stringify(value)); return true; } catch (_) { return false; }
   }
   function offerFresh() {
     var state = window.PixkuyFleetSelection.airportOfferStatus && window.PixkuyFleetSelection.airportOfferStatus();
-    return !!(state && state.valid) || !!(
-      checkedAt && Date.now() - checkedAt < 5 * 60 * 1000
-    );
+    return !!(state && state.valid);
   }
   function save() {
     var draft = window.PixkuyAirportCheckout.draft();
@@ -131,31 +137,70 @@
       var summary = mount.querySelector(".airport-booking__summary");
       if (summary) {
         var freshSummary = view.summary(snapshot, !!notice || !offerFresh());
-        summary.replaceChildren.apply(summary, Array.from(freshSummary.childNodes));
+        if (summary.innerHTML !== freshSummary.innerHTML) summary.replaceChildren.apply(summary, Array.from(freshSummary.childNodes));
       }
     }
     return persist(draft);
   }
   // Reuse the authorized review-return mechanism for reload and browser history.
-  if (route() && read()) window.sessionStorage.setItem(RETURN, "1");
+  if (route() && route()[1] !== "traslado" && read()) window.sessionStorage.setItem(RETURN, "1");
 
   function navigate(step, focus) {
+    if (!view.media.matches) {
+      mobileReviewAttempt = "";
+      revalidationSequence += 1;
+      revalidation = null;
+      if (notice === "checking" || notice === "unverified") notice = "";
+    }
     revision += 1;
     window.history.pushState(null, "", "#airport/" + step + (focus ? "/" + focus : ""));
     render();
   }
+  var mobileAppearance = [];
+  function mobileStyle(node, attributes, text) {
+    if (!node) return;
+    mobileAppearance.push({node:node, attributes:Object.keys(attributes).map(function (key) { return [key,node.getAttribute(key)]; }), text:text === undefined ? undefined : node.textContent});
+    Object.keys(attributes).forEach(function (key) { if (attributes[key] === null) node.removeAttribute(key); else node.setAttribute(key,attributes[key]); });
+    if (text !== undefined) node.textContent = text;
+  }
+  function mobileScroller() { return document.querySelector('.airport-mobile-route__content'); }
+  function focusMobileScreen(preserved) {
+    var currentMount = mount;
+    if (!preserved) mobileEntryPending = true;
+    window.cancelAnimationFrame(mobileUiFrame);
+    mobileUiFrame = window.requestAnimationFrame(function () {
+      mobileUiFrame = 0;
+      if (!mount || mount !== currentMount || view.media.matches) return;
+      if (mobileEntryPending) {
+        mobileEntryPending = false;
+        mount.querySelector('.airport-mobile-flow__back').focus({preventScroll:true});
+        mobileScroller().scrollTop = 0;
+      } else if (preserved) restoreUiPosition(preserved);
+    });
+  }
   function restoreForm() {
+    form.inert = false;
+    mobileAppearance.reverse().forEach(function (entry) {
+      entry.attributes.forEach(function (attribute) { if (attribute[1] === null) entry.node.removeAttribute(attribute[0]); else entry.node.setAttribute(attribute[0],attribute[1]); });
+      if (entry.text !== undefined) entry.node.textContent = entry.text;
+    });
+    mobileAppearance = [];
     placeholder.after(form);
     form.classList.remove("airport-booking__form");
     document.getElementById("contact-submit").setAttribute("data-i18n", originalSubmitKey);
     if (mount) mount.remove();
     mount = null;
     document.body.classList.remove("airport-booking-active");
+    document.body.setAttribute("data-airport-mobile-contact-step-active", "false");
+    document.getElementById("services-expand-airport").removeAttribute("data-airport-mobile-primary-step-hidden");
     var api = window.PixkuyForms;
     if (api && api.syncReservationRequestState) api.syncReservationRequestState(api.getReservationRequestFields(form));
   }
   function goTrip() {
-    save(); reviewed = null; notice = ""; pendingPrice = null; checkedAt = 0;
+    save(); reviewed = null; notice = ""; pendingPrice = null;
+    if (!view.media.matches && window.PixkuyAirportMobileBookingFlow) {
+      window.PixkuyAirportMobileBookingFlow.setLuggage(form.elements.namedItem("luggage").value);
+    }
     revalidationSequence += 1;
     revalidation = null;
     navigate("traslado");
@@ -167,9 +212,23 @@
   }
   function mountShell(step) {
     restoreForm();
+    if (!view.media.matches) {
+      if (!window.PixkuyAirportMobileBookingFlow.isOpen()) window.PixkuyAirportMobileBookingFlow.open();
+      mount = window.PixkuyAirportMobileContactStep.createBookingView(snapshot || {}, step === 2 ? function () { navigate("datos"); } : goTrip, step === 2);
+      mobileScroller().appendChild(mount);
+      document.getElementById("services-expand-airport").setAttribute("data-airport-mobile-primary-step-hidden", "true");
+      document.body.classList.add("airport-booking-active");
+      document.body.setAttribute("data-airport-mobile-contact-step-active", "true");
+      mount.setAttribute("data-airport-mobile-booking-step", step === 1 ? "datos" : "revision");
+      return mount;
+    }
     mount = view.shell(step, goTrip, step === 2 ? function () { navigate("datos"); } : null, { showBack: false });
     document.body.appendChild(mount);
     document.body.classList.add("airport-booking-active");
+    if (!view.media.matches) {
+      document.body.setAttribute("data-airport-mobile-contact-step-active", step === 1 ? "true" : "false");
+      mount.setAttribute("data-airport-mobile-booking-step", step === 1 ? "datos" : "revision");
+    }
     return mount;
   }
   function fields() {
@@ -209,7 +268,7 @@
     parent.appendChild(message);
     if (notice === "technical" && route() && route()[1] === "datos") {
       parent.appendChild(button("checkAgain", revalidateOffer, true));
-    } else if (notice === "incomplete") {
+    } else if (notice === "incomplete" && view.media.matches) {
       parent.appendChild(button("editTrip", goTrip, false));
     }
     if (pendingPrice) {
@@ -225,7 +284,7 @@
     var activeElement = document.activeElement;
     return {
       x: window.scrollX,
-      y: window.scrollY,
+      y: !view.media.matches && mount ? mobileScroller().scrollTop : window.scrollY,
       element: activeElement,
       id: activeElement && activeElement.id || "",
       name: activeElement && activeElement.getAttribute && activeElement.getAttribute("name") || "",
@@ -234,8 +293,14 @@
     };
   }
   function restoreUiState(state) {
+    if (!view.media.matches) { focusMobileScreen(state); return; }
     window.requestAnimationFrame(function () {
-      window.scrollTo({ left: state.x, top: state.y, behavior: "instant" });
+      restoreUiPosition(state);
+    });
+  }
+  function restoreUiPosition(state) {
+      if (!view.media.matches && mount) mobileScroller().scrollTop = state.y;
+      else window.scrollTo({ left: state.x, top: state.y, behavior: "instant" });
       var target = state.element && state.element.isConnected ? state.element : null;
       if (!target && state.id) target = document.getElementById(state.id);
       if (!target && state.name && form.elements) target = form.elements.namedItem(state.name);
@@ -246,7 +311,6 @@
         target = Array.from(mount.querySelectorAll("[aria-label]")).find(function (node) { return node.getAttribute("aria-label") === state.ariaLabel; });
       }
       if (target && target.focus) target.focus({ preventScroll: true });
-    });
   }
   function finishScreenFocus(main, preserved) {
     if (preserved) restoreUiState(preserved);
@@ -254,6 +318,7 @@
   }
   function dataScreen(preserved) {
     mountShell(1);
+    if (!view.media.matches) { mobileDataScreen(preserved); return; }
     var layout = view.node("div", "airport-booking__layout");
     var main = view.node("section", "");
     var editing = editContext();
@@ -276,13 +341,46 @@
     if (focus) view.focus(focus === "legal" ? form.querySelector('[type="checkbox"]') : form.elements.namedItem(focus));
     else finishScreenFocus(main, preserved);
   }
+  function mobileDataScreen(preserved) {
+    fields();
+    form.inert = !mobileReviewHydrated;
+    form.classList.add("airport-booking__form");
+    mobileStyle(form, {class:form.className + " airport-mobile-contact-step__form"});
+    ["name","phone","email","message"].forEach(function (name) {
+      var input = form.elements.namedItem(name), wrapper = input.closest('.form-field');
+      var key = name === "message" ? "notes" : name;
+      mobileStyle(wrapper, {class:wrapper.className + " airport-mobile-contact-step__field"});
+      mobileStyle(input, {class:input.className + " airport-mobile-contact-step__control" + (name === "message" ? " airport-mobile-contact-step__control--notes" : ""), placeholder:pageCopy("airportMobileContactStep.placeholders." + key,input.placeholder)});
+      if (name === "message") mobileStyle(input, {readonly:"",role:"button","aria-haspopup":"dialog"});
+      var label = wrapper.querySelector('label');
+      mobileStyle(label, {class:"airport-mobile-contact-step__label", "data-i18n":null},pageCopy("airportMobileContactStep.fields." + key,label.textContent));
+      mobileStyle(wrapper.querySelector('.field-error'), {class:"field-error airport-mobile-contact-step__error"});
+    });
+    var actions = form.querySelector('.form-actions');
+    mobileStyle(actions,{class:actions.className + " airport-mobile-contact-step__actions"});
+    var submit = form.querySelector('#contact-submit');
+    mobileStyle(submit,{class:"airport-mobile-contact-step__submit", "data-i18n":null},view.t('mobileReviewCta'));
+    mount.appendChild(form);
+    var editing = editContext();
+    if (editing && editing.expiresAt && editing.serverNow) mount.appendChild(editDeadline(editing));
+    if (editing) mount.appendChild(button("exitEdit", returnToPaymentStatus, false));
+    renderNotice(mount);
+    mount.querySelectorAll('.airport-booking__primary').forEach(function (node) { node.classList.add('airport-mobile-contact-step__submit'); node.classList.remove('cta'); });
+    var focus = route()[2];
+    if (focus === 'luggage') { goTrip(); return; }
+    if (focus) view.focus(focus === 'legal' ? form.querySelector('[type="checkbox"]') : form.elements.namedItem(focus));
+    else focusMobileScreen(preserved);
+  }
   function reviewBlock(title, focus, content) {
     var section = view.node("section", "airport-booking__block");
     var heading = view.node("div", "airport-booking__block-heading");
-    var edit = button("edit", function () { focus === "trip" ? goTrip() : navigate("datos", focus); });
-    edit.replaceChildren(view.icon("edit"), view.node("span", "", view.t("edit")));
-    edit.setAttribute("aria-label", view.t("edit") + ": " + view.t(title));
-    heading.append(view.node("h2", "", view.t(title)), edit);
+    heading.appendChild(view.node(view.media.matches ? "h2" : "p", view.media.matches ? "" : "airport-mobile-contact-step__summary-title", view.t(title)));
+    if (view.media.matches) {
+      var edit = button("edit", function () { focus === "trip" ? goTrip() : navigate("datos", focus); });
+      edit.replaceChildren(view.icon("edit"), view.node("span", "", view.t("edit")));
+      edit.setAttribute("aria-label", view.t("edit") + ": " + view.t(title));
+      heading.appendChild(edit);
+    }
     section.append(heading, content);
     return section;
   }
@@ -305,15 +403,29 @@
     });
     return copy;
   }
+  function mobileLegalCurrent() {
+    var host = form.querySelector('[data-airport-transfer-checkout-legal-acceptance]');
+    var instance = host && host.__pixkuyLegalAcceptanceInstance;
+    var api = window.PixkuyForms && window.PixkuyForms.LegalAcceptance;
+    if (!snapshot || !instance || !instance.isAccepted() || !api || snapshot.legal_acceptance_accepted !== "true" || !snapshot.legal_acceptance_accepted_at) return false;
+    // Inspect current document versions; never create or sync an acceptance here.
+    var policy = api.buildSnapshot(snapshot.legal_acceptance_channel);
+    return ["termsVersion","cancellationsVersion","privacyVersion","channel"].every(function (key) { return snapshot[api.fieldNames[key]] === policy[key]; });
+  }
   function conditions() {
-    var accepted = snapshot.legal_acceptance_accepted === "true";
+    var accepted = view.media.matches ? snapshot.legal_acceptance_accepted === "true" : mobileLegalCurrent();
     var legal = view.node("section", "airport-booking__conditions");
     var status = view.node("p", "airport-booking__conditions-status");
     status.append(view.icon(accepted ? "check" : "document"), view.node("span", "", view.t(accepted ? "accepted" : "conditions")));
+    if (!view.media.matches) status.textContent = view.t(accepted ? "accepted" : "conditions");
     legal.appendChild(status);
     var links = form.querySelector("[data-airport-transfer-checkout-legal-acceptance] .legal-acceptance__links");
     var copy = links ? links.cloneNode(true) : legalLinks();
-    Array.from(copy.querySelectorAll("a")).forEach(function (link) { link.prepend(view.icon("document")); });
+    if (!view.media.matches) {
+      Array.from(copy.querySelectorAll("a")).forEach(function (link, index) { link.textContent = view.t(["mobileTerms","mobileCancellations","mobilePrivacy"][index]); });
+      Array.from(copy.childNodes).forEach(function (node) { if (node.nodeType === 3 || node.nodeType === 1 && node.tagName !== "A") node.remove(); });
+    }
+    if (view.media.matches) Array.from(copy.querySelectorAll("a")).forEach(function (link) { link.prepend(view.icon("document")); });
     legal.appendChild(copy);
     return legal;
   }
@@ -321,21 +433,40 @@
     mountShell(2);
     var layout = view.node("div", "airport-booking__layout");
     var main = view.node("section", "");
-    main.append(view.node("h1", "", view.t("reviewTitle")), view.node("p", "airport-booking__lead", view.t("reviewText")));
+    if (view.media.matches) main.append(view.node("h1", "", view.t("reviewTitle")), view.node("p", "airport-booking__lead", view.t("reviewText")));
     var contact = view.node("dl", "airport-booking__details");
     contact.append(view.field(view.t("name"), snapshot.name), view.field(view.t("phone"), snapshot.phone), view.field(view.t("email"), snapshot.email));
     var notes = view.node("dl", "airport-booking__details");
-    notes.append(view.field(view.t("luggage"), snapshot.luggage), view.field(view.t("transferNotes"),
-      Object.prototype.hasOwnProperty.call(snapshot, "message") ? snapshot.message : snapshot.notes));
-    main.append(reviewBlock("trip", "trip", view.trip(snapshot)), reviewBlock("contact", "name", contact), reviewBlock("transferNotes", "luggage", notes), conditions());
+    if (view.media.matches) notes.append(view.field(view.t("luggage"), snapshot.luggage));
+    var noteText = Object.prototype.hasOwnProperty.call(snapshot, "message") ? snapshot.message : snapshot.notes;
+    if (noteText && view.media.matches) notes.append(view.field(view.t("transferNotes"), noteText));
+    if (view.media.matches) main.appendChild(reviewBlock("trip", "trip", view.trip(snapshot)));
+    var contactBlock = reviewBlock("contact", "name", contact);
+    main.appendChild(contactBlock);
+    if (view.media.matches) main.appendChild(reviewBlock("transferNotes", "luggage", notes));
+    else if (String(noteText || "").trim()) {
+      var mobileNotes = view.node("div", "airport-mobile-review__notes");
+      mobileNotes.append(view.node("p", "airport-mobile-contact-step__summary-label", view.t("mobileNotes")), view.node("p", "airport-mobile-contact-step__summary-value", noteText));
+      contactBlock.appendChild(mobileNotes);
+    }
+    main.appendChild(conditions());
     var aside = view.node("aside", "airport-booking__summary");
-    aside.append(view.node("h2", "", view.t("amountTitle")), view.vehicle(snapshot));
-    if (notice) aside.appendChild(view.node("p", "", view.t("lastReviewedAmount")));
-    aside.appendChild(view.node("p", "airport-booking__total", view.price(snapshot)));
-    renderNotice(aside);
+    if (view.media.matches) aside.append(view.node("h2", "", view.t("amountTitle")), view.vehicle(snapshot));
+    if (notice && view.media.matches) aside.appendChild(view.node("p", "", view.t("lastReviewedAmount")));
+    if (view.media.matches) aside.appendChild(view.node("p", "airport-booking__total", view.price(snapshot)));
+    else {
+      var total = view.node("p", "airport-booking__total");
+      total.append(view.node("span", "", view.t("mobileTotal")), view.node("strong", "", notice && !changed || revalidation || !offerFresh() ? "—" : view.price(snapshot)));
+      aside.appendChild(total);
+    }
+    if (view.media.matches || notice !== "checking" && notice !== "unverified") renderNotice(aside);
+    else {
+      var progress = view.node("p", "airport-booking__notice airport-mobile-review__status", view.t("mobileChecking"));
+      progress.setAttribute("role", "status"); aside.appendChild(progress);
+    }
     var editing = editContext();
     if(editing && editing.expiresAt && editing.serverNow) aside.appendChild(editDeadline(editing));
-    else if(!editing) aside.appendChild(view.node("p", "airport-booking__lead", view.t("paymentPolicy")));
+    else if(!editing && view.media.matches) aside.appendChild(view.node("p", "airport-booking__lead", view.t("paymentPolicy")));
     if (editing && notice === "paymentWindowClosed") aside.appendChild(button("recover", function () {
       window.location.assign("/booking-cancelled.html?token=" + encodeURIComponent(editing.token));
     }, true));
@@ -346,13 +477,24 @@
     else if (pending()) aside.appendChild(button("recover", recover, true));
     else if (changed) aside.appendChild(button("acceptOffer", function () { changed = false; reviewed = snapshot; notice = ""; render(); }, true));
     else {
-      var checkoutButton = button(notice ? "checkAgain" : editContext() ? "replacePayCta" : "payCta", checkout, true);
+      var mobileRetry = !view.media.matches && notice === "technical";
+      var mobileWaiting = !view.media.matches && (revalidation || notice === "checking" || notice === "unverified");
+      var checkoutButton = button(notice === "localError" ? "retryCheckout" : !view.media.matches ? mobileWaiting ? "mobileChecking" : mobileRetry ? "checkAgain" : editContext() ? "replacePayCta" : "payCta" : notice ? "checkAgain" : editContext() ? "replacePayCta" : "payCta", mobileRetry ? revalidateOffer : checkout, true);
       checkoutButton.setAttribute('data-airport-pay','');
-      if (revalidation || editExpired()) checkoutButton.disabled = true;
+      if (revalidation || editExpired() || !view.media.matches && !mobileRetry && (notice && notice !== "localError" || !offerFresh() || !mobileLegalCurrent())) checkoutButton.disabled = true;
       aside.appendChild(checkoutButton);
     }
-    aside.appendChild(view.node("p", "airport-booking__lead", view.t("confirmAfterPayment")));
+    if (view.media.matches) aside.appendChild(view.node("p", "airport-booking__lead", view.t("confirmAfterPayment")));
     layout.append(main, aside); mount.append(layout);
+    if (!view.media.matches) {
+      mount.querySelectorAll('.airport-booking__block, .airport-booking__conditions').forEach(function (node) { node.classList.add('airport-mobile-contact-step__summary'); });
+      mount.querySelectorAll('.airport-booking__detail dt').forEach(function (node) { node.classList.add('airport-mobile-contact-step__summary-label'); });
+      mount.querySelectorAll('.airport-booking__detail dd').forEach(function (node) { node.classList.add('airport-mobile-contact-step__summary-value'); });
+      mount.querySelectorAll('.airport-booking__link').forEach(function (node) { node.classList.add('airport-mobile-flow__back'); });
+      mount.querySelectorAll('.airport-booking__primary').forEach(function (node) { node.classList.add('airport-mobile-contact-step__submit'); node.classList.remove('cta'); });
+      focusMobileScreen(preserved);
+      return;
+    }
     finishScreenFocus(main, preserved);
   }
   function commercialKey(value) {
@@ -433,13 +575,13 @@
       return;
     }
     var before = snapshot;
-    var checkingOnly = !!notice || !reviewed;
+    var checkingOnly = notice !== "localError" && (!!notice || !reviewed);
+    var operation = "availability";
     var current = revision;
     busy = true; render();
-    window.PixkuyAirportCheckout.prepare().then(function (fresh) {
+    Promise.resolve().then(function () { return window.PixkuyAirportCheckout.prepare(); }).then(function (fresh) {
       if (current !== revision || !active() || route()[1] !== "revision") return;
       snapshot = fresh;
-      checkedAt = Date.now();
       if (checkingOnly || commercialKey(before) !== commercialKey(fresh)) {
         changed = commercialKey(before) !== commercialKey(fresh);
         notice = changed ? "offerChanged" : "";
@@ -452,6 +594,7 @@
         return;
       }
       var editing = editContext();
+      operation = "checkout";
       var request = editing
         ? window.PixkuyAirportReview.requestReplacement(fresh, editing)
         : window.PixkuyAirportReview.requestCheckout(fresh);
@@ -461,7 +604,9 @@
     }).catch(function (error) {
       if (current !== revision) return;
       var failedEdit = editContext();
-      notice = requestErrorKind(error, failedEdit ? failedEdit.attempt ? "saveUncertain" : "technical" : "uncertain");
+      // The transport persists its attempt before dispatch. Availability,
+      // validation or storage failures without that evidence are not a lost payment.
+      notice = failedEdit && failedEdit.attempt ? "saveUncertain" : pending() ? "uncertain" : operation === "checkout" ? "localError" : requestErrorKind(error, "technical");
       reviewed = null;
     }).finally(function () { busy = false; if (active()) render(); });
   }
@@ -474,21 +619,18 @@
   }
   function errorKind(result) {
     pendingPrice = null;
-    var storedState = window.PixkuyFleetSelection.read("airport_transfer");
-    var storedResult = storedState && storedState.precheck && storedState.precheck.body && storedState.precheck.body.result;
-    var price = result && result.raw && result.raw.result && result.raw.result.price || storedResult && storedResult.price;
-    var availabilityCode = result && result.raw && result.raw.result &&
-      result.raw.result.availability && result.raw.result.availability.code ||
-      storedResult && storedResult.availability && storedResult.availability.code;
+    var currentResult = result && result.raw && result.raw.result;
+    var price = currentResult && currentResult.price;
+    var availability = currentResult && currentResult.availability;
+    var codes = (result && result.code || "") + " " + (availability && availability.code || "");
     if (price && price.reason === "AIRPORT_TRANSFER_PRICE_MISMATCH" && Number.isSafeInteger(price.actualAmountMinor) && price.actualAmountMinor > 0) {
       pendingPrice = price.actualAmountMinor;
       return "offerChanged";
     }
-    if (result && result.ok === true && result.available === false) return "unavailable";
-    if (/NO_AVAILABILITY|FLEET_UNAVAILABLE|TRANSFER_UNAVAILABLE/.test((result && result.code || "") + " " + (availabilityCode || ""))) return "unavailable";
-    if (!result || /FAILED|UNDETERMINED|TECHNICAL/.test(result.code || "")) return "technical";
-    if (!result.ok && !result.code) return "technical";
-    return "unavailable";
+    if (/FAILED|UNDETERMINED|TECHNICAL|PENDING/.test(codes)) return "technical";
+    if (/NO_AVAILABILITY|FLEET_UNAVAILABLE|TRANSFER_UNAVAILABLE/.test(codes) ||
+        availability && availability.available === false && availability.status === "unavailable") return "unavailable";
+    return "technical";
   }
   function requestErrorKind(error, fallback) {
     if (error && /^INVALID_AIRPORT_TRANSFER_/.test(error.message || "")) return "incomplete";
@@ -506,9 +648,11 @@
   function revalidateOffer() {
     if(editExpired()) { notice = "editDeadlinePassed"; renderPreservingUi(); return Promise.resolve(false); }
     if (!active() || pending()) return Promise.resolve(false);
-    if (offerFresh()) {
-      if (notice === "checking" || notice === "unverified") {
+    if (offerFresh() && (!mobileReviewActive() || mobileReviewFresh())) {
+      if (mobileReviewActive()) mobileReviewAttempt = "";
+      if (notice === "checking" || notice === "unverified" || mobileReviewActive() && notice === "technical") {
         notice = "";
+        if (mobileReviewActive()) reviewed = snapshot;
         renderPreservingUi();
       }
       return Promise.resolve(true);
@@ -516,6 +660,7 @@
     if (revalidation) return revalidation;
     var before = snapshot;
     var current = ++revalidationSequence;
+    var routeRevision = revision;
     pendingPrice = null;
     changed = false;
     reviewed = null;
@@ -524,15 +669,16 @@
     revalidation = request;
     renderPreservingUi();
     request.then(function (fresh) {
-      if (current !== revalidationSequence || !active()) return false;
+      if (current !== revalidationSequence || !active() || !view.media.matches && routeRevision !== revision) return false;
       changed = commercialKey(before) !== commercialKey(fresh);
       notice = changed ? "offerChanged" : "";
-      checkedAt = Date.now();
       persist(fresh);
+      if (mobileReviewActive() && !changed && !mobileReviewFresh()) throw new Error("FLEET_REVIEW_CONTEXT_CHANGED");
       reviewed = route()[1] === "revision" && !changed ? fresh : null;
+      mobileReviewAttempt = "";
       return true;
     }).catch(function (error) {
-      if (current !== revalidationSequence || !active()) return false;
+      if (current !== revalidationSequence || !active() || !view.media.matches && routeRevision !== revision) return false;
       var fleet = window.PixkuyFleetSelection.read("airport_transfer");
       if (fleet && fleet.explicit && !fleet.selected && fleet.offer && fleet.offer.models && fleet.offer.models.length) {
         goTrip();
@@ -545,14 +691,40 @@
     }).finally(function () {
       if (current !== revalidationSequence) return;
       if (revalidation === request) revalidation = null;
+      if (!view.media.matches && routeRevision !== revision) {
+        mobileReviewAttempt = "";
+        if (notice === "checking") notice = "unverified";
+      }
       if (active()) renderPreservingUi();
     });
     return request;
+  }
+  function mobileReviewActive() {
+    var editing = editContext();
+    return !view.media.matches && active() && route()[1] === "revision" && !(editing && editing.attempt) && !pending();
+  }
+  function mobileReviewFresh() {
+    return offerFresh() && snapshot && commercialKey(snapshot) === commercialKey(window.PixkuyAirportCheckout.draft() || {});
+  }
+  function syncMobileReviewOffer() {
+    if (!mobileReviewHydrated || !mobileReviewActive() || busy || revalidation || changed || pendingPrice) return;
+    if (notice && notice !== "unverified" && notice !== "checking") return;
+    if (mobileReviewFresh()) {
+      mobileReviewAttempt = "";
+      reviewed = snapshot;
+      if (notice) { notice = ""; renderPreservingUi(); }
+      return;
+    }
+    var key = window.PixkuyFleetSelection.airportOfferStatus().contextKey + "|" + commercialKey(snapshot);
+    if (mobileReviewAttempt === key) return;
+    mobileReviewAttempt = key;
+    revalidateOffer();
   }
   function render(options) {
     if (!active()) {
       restoreForm();
       if (route() && route()[1] === "traslado") {
+        if (!view.media.matches && window.PixkuyAirportMobileBookingFlow) window.PixkuyAirportMobileBookingFlow.open();
         window.PixkuyFleetSelection.enterPanel("airport_transfer");
         var panel = document.getElementById("services-expand-airport");
         if (panel) {
@@ -574,11 +746,13 @@
       window.PixkuyFleetSelection.editFromReview("airport_transfer");
     }
     var preserved = options && options.preserve ? captureUiState() : null;
+    if (route()[1] === "revision" && pending() && !notice) notice = "uncertain";
     if (route()[1] === "revision" && !pending() && !offerFresh() && !notice) {
       notice = "unverified";
     }
     if (route()[1] === "revision" && editContext() && editContext().attempt) notice = "saveUncertain";
     if (route()[1] === "revision") reviewScreen(preserved); else dataScreen(preserved);
+    syncMobileReviewOffer();
   }
   function focusError() {
     var invalid = form.querySelector('[aria-invalid="true"]');
@@ -586,22 +760,20 @@
   }
   window.PixkuyAirportDesktopBooking = {
     pendingEdit: function () {
-      var editing = view.media.matches && route() && editContext();
+      var editing = route() && editContext();
       return editing ? { token: editing.token, revision: editing.editRevision } : null;
     },
     active: active,
     revision: function () { return revision; },
     focusError: focusError,
     open: function () {
-      if (!view.media.matches) return false;
-      save(); notice = ""; reviewed = null; pendingPrice = null; checkedAt = Date.now();
+      save(); notice = ""; reviewed = null; pendingPrice = null;
       window.PixkuyFleetSelection.editFromReview("airport_transfer");
       navigate("datos"); return true;
     },
     review: function (value) {
       if (!active()) return false;
       persist(value); reviewed = value; notice = ""; changed = false; pendingPrice = null;
-      checkedAt = Date.now();
       navigate("revision");
       return true;
     },
@@ -609,7 +781,7 @@
       if (!active()) return false;
       var fleet = window.PixkuyFleetSelection.read("airport_transfer");
       var selectedModel = snapshot && snapshot.fleet_selection && snapshot.fleet_selection.model_id;
-      if (selectedModel && fleet && fleet.explicit && !fleet.selected) {
+      if (selectedModel && fleet && fleet.explicit && !fleet.selected && fleet.offer && fleet.offer.models.length) {
         goTrip();
         return true;
       }
@@ -621,11 +793,18 @@
     revision += 1;
     save(); reviewed = null;
     var submit = document.getElementById("contact-submit");
-    window.queueMicrotask(function () { submit.textContent = view.t("reviewCta"); });
+    window.queueMicrotask(function () {
+      var label = view.t(view.media.matches ? "reviewCta" : "mobileReviewCta");
+      if (submit.textContent !== label) submit.textContent = label;
+    });
   });
   form.addEventListener("change", function () { if (active()) save(); });
   form.addEventListener("blur", function () {
-    if (active()) window.queueMicrotask(function () { form.querySelector("#contact-submit").textContent = view.t("reviewCta"); });
+    if (active()) window.queueMicrotask(function () {
+      var submit = form.querySelector("#contact-submit");
+      var label = view.t(view.media.matches ? "reviewCta" : "mobileReviewCta");
+      if (submit.textContent !== label) submit.textContent = label;
+    });
   }, true);
   document.addEventListener("pixkuy:fleet-choice-required", function (event) {
     if (active() && event.detail.service === "airport_transfer") {
@@ -637,19 +816,36 @@
   window.addEventListener("popstate", function () { revision += 1; render(); });
   window.addEventListener("hashchange", render);
   window.addEventListener("pageshow", function () {
+    // The draft adapter is registered first and restores the trip on pageshow.
+    // Contact restoration also owns deferred reapplications. Wait for its
+    // terminal event before preparing with the canonical hidden quote fields.
+    if (!view.media.matches && editContext()) restoreTripContext(snapshot || read());
+    mobileReviewHydrated = window.sessionStorage.getItem(RETURN) !== "1";
     refreshEditDeadline();
     busy = false;
     if (!active()) return;
     if (window.PixkuyFleetSelection.expireAirportOfferIfNeeded) window.PixkuyFleetSelection.expireAirportOfferIfNeeded();
     render();
   });
+  document.addEventListener("pixkuy:airport-draft-restored", function (event) {
+    if (!event.detail || !event.detail.reviewReturnCompleted) return;
+    // Restoration can finish before load/pageshow; the mobile draft adapter
+    // still has to restore its panel context in that case.
+    mobileReviewHydrated = document.readyState === "complete";
+    if (!view.media.matches && active()) {
+      if (!event.detail.restored) notice = "incomplete";
+      renderPreservingUi();
+    }
+  });
   document.addEventListener("pixkuy:fleet-offer-expired", function (event) {
     if (event.detail && event.detail.service === "airport_transfer" && active()) {
-      checkedAt = 0;
       reviewed = null;
       if (!pending()) notice = "unverified";
       renderPreservingUi();
     }
+  });
+  document.addEventListener("pixkuy:fleet-offer-accepted", function (event) {
+    if (event.detail && event.detail.service === "airport_transfer" && mobileReviewActive()) window.queueMicrotask(syncMobileReviewOffer);
   });
   document.addEventListener("visibilitychange", function () {
     if (document.visibilityState !== "visible" || !active()) return;
@@ -669,13 +865,8 @@
   window.addEventListener("pixkuy:airport-desktop-copy", function () { if (active()) renderPreservingUi(); });
   view.media.addEventListener("change", function () {
     revision += 1;
-    if (!view.media.matches && mount) {
-      save(); restoreForm();
-      document.getElementById("contact").scrollIntoView({block:"start"});
-    } else {
-      if (form.elements.namedItem("service_type").value !== "airport_hotel") window.history.replaceState(null, "", "#contact");
-      render();
-    }
+    if (form.elements.namedItem("service_type").value !== "airport_hotel") window.history.replaceState(null, "", "#contact");
+    render();
   });
   window.addEventListener("beforeunload", function (event) {
     if (active() && !save()) { event.preventDefault(); event.returnValue = ""; }
@@ -685,7 +876,7 @@
       if (route()) {
         if(!mount) {
           snapshot = read();
-          if (editContext() || snapshot && snapshot.airport_new_continuation) restoreTripContext(snapshot);
+          if (editContext() || snapshot && (snapshot.airport_new_continuation || snapshot.airport_mobile_draft)) restoreTripContext(snapshot);
           render();
         }
         refreshEditDeadline();

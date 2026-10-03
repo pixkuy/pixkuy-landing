@@ -6,6 +6,7 @@
   var RETURN_KEY = "pixkuy_airport_transfer_checkout_review_return";
   var EDIT_KEY = "pixkuy_airport_pending_edit_v1";
   var FLEET_KEY = "pixkuy_fleet_b:airport_transfer";
+  var currentState = null;
 
   function t(dictionary, path, fallback) {
     var value = String(path || "").split(".").reduce(function (cursor, key) {
@@ -108,13 +109,20 @@
     var prior;
     try { prior = JSON.parse(window.sessionStorage.getItem(EDIT_KEY) || "null"); }
     catch (_) { prior = null; }
+    if (prior && prior.token === state.token && prior.attempt) {
+      // Recover the original replacement even if the public revision advanced.
+      if (!window.sessionStorage.getItem(SNAPSHOT_KEY)) window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(buildSnapshot(draft)));
+      window.sessionStorage.setItem(RETURN_KEY, "1");
+      window.location.assign("/?service=airport_hotel#airport/revision");
+      return true;
+    }
     var context = {
       version: 1,
       token: state.token,
       editRevision: edit.revision,
       idempotencyKey: prior && prior.token === state.token && prior.editRevision === edit.revision
         ? prior.idempotencyKey
-        : window.crypto.randomUUID(),
+        : window.PixkuyFleetSelection.createAttemptKey(),
       publicCode: state.result.publicCode,
       expiresAt: state.result.raw.hold.expiresAt,
       serverNow: state.result.raw.serverNow,
@@ -176,9 +184,9 @@
   };
 
   window.PixkuyBookingStatusState.onReady(function renderEdit(state) {
-    var button = document.querySelector("[data-booking-cancelled-modify]");
+    currentState = state;
     var allowed = canEdit(state);
-    if (!button) return;
+    document.querySelectorAll("[data-booking-cancelled-modify]").forEach(function (button) {
     button.textContent = t(
       state.dictionary,
       "cancelled.actions.modify",
@@ -190,7 +198,8 @@
     if (button.dataset.bookingCancelledModifyBound === "1") return;
     button.dataset.bookingCancelledModifyBound = "1";
     button.addEventListener("click", function () {
-      if (!button.disabled) beginEdit(state);
+      if (!button.disabled && canEdit(currentState)) beginEdit(currentState);
+    });
     });
   });
 })(window, document);

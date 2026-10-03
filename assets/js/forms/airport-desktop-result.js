@@ -5,22 +5,168 @@
   var mount = null;
   var ready = false;
   var receivedAt = 0;
+  var mobileDeadline = null;
+  var mobileDeadlineKey = "";
   function serverNow(raw) { return new Date(Date.parse(raw.serverNow) + window.performance.now() - receivedAt).toISOString(); }
   function home() { window.location.assign("/"); }
   function trip() { window.location.assign("/?service=airport_hotel#services"); }
-  function render() {
-    document.querySelectorAll('[data-airport-mobile-deadline]').forEach(function (node) { node.remove(); });
-    if(ready && !view.media.matches && state && state.result.serviceType === "airport_transfer" && state.result.view !== "confirmed") {
-      var nativePanel=document.querySelector('[data-booking-cancelled-mobile-panel]');
-      var raw=state.result.raw;
-      if(nativePanel && raw.hold && raw.serverNow && !raw.actions.canCreateNewReservation) {
-        var timing=view.deadline(raw.hold.expiresAt,serverNow(raw),raw.actions.canCreateNewReservation ? 'paymentDeadlineResolved' : 'paymentDeadlinePassed');
-        timing.className='booking-status-mobile__lead';
-        timing.setAttribute('data-airport-mobile-deadline','');
-        var nativeLead=nativePanel.querySelector('[data-booking-status-lead]');
-        if(nativeLead) nativeLead.after(timing); else nativePanel.appendChild(timing);
+  function mobileLocation(label, address) {
+    label=String(label || '').trim();address=String(address || '').trim();
+    if (!label) return address || '—';
+    if (!address) return label;
+    function comparable(value) { return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim(); }
+    var display=comparable(label), detail=comparable(address);
+    // The display contract can already include the POI and formatted address.
+    // Compare the street component too: country spelling can differ. Never
+    // split or truncate the displayed label to infer a place name.
+    var street=comparable(address.split(',')[0]);
+    if (display === detail || display.indexOf(detail) >= 0 ||
+        street.length >= 12 && street.split(' ').length >= 2 && display.indexOf(street) >= 0) return label;
+    return label + '\n' + address;
+  }
+  function renderMobileResult() {
+    var root = document.querySelector('[data-booking-cancelled-mobile], [data-booking-status-mobile]');
+    if (!root || !state) return;
+    // A superseded initial translation load can resolve before the current one.
+    // The copy-ready event will render; never seed a persistent clock with keys.
+    if (view.t('paymentRemaining') === 'paymentRemaining') return;
+    var result = state.result, raw = result.raw, actions = raw.actions || {};
+    var panel = root.querySelector('[data-booking-cancelled-mobile-panel], [data-booking-status-mobile-panel]');
+    var details = root.querySelector('[data-booking-status-details]');
+    if (!panel || !details || details.hidden || result.serviceType !== "airport_transfer") {
+      root.querySelectorAll('.airport-return__reference,.airport-return__disclosure,.airport-return__resume').forEach(function(node){node.hidden=true;});
+      if(mobileDeadline)mobileDeadline.remove();mobileDeadline=null;mobileDeadlineKey="";
+      return;
+    }
+    root.setAttribute('data-airport-return', 'true');
+    var processing = result.paymentStatus === 'processing';
+    var confirmed = result.view === 'confirmed' && result.paymentStatus === 'paid';
+    root.toggleAttribute('data-airport-confirmed', confirmed);
+    root.querySelector('[data-booking-status-lead]').hidden=confirmed;
+    var kind = confirmed ? 'confirmed' : result.view === 'expired' ? 'expired' : result.view === 'pending' ? (processing ? 'pending' : 'returnPending') : '';
+    if (kind) {
+      root.querySelector('[data-booking-status-title]').textContent = view.t(confirmed ? 'mobileConfirmedTitle' : kind + 'Title');
+      root.querySelector('[data-booking-status-lead]').textContent = actions.paymentWindowClosed ? view.t('paymentWindowClosed') : view.t(kind === 'returnPending' ? 'confirmAfterPayment' : kind + 'Text');
+      var notice = root.querySelector('[data-booking-status-notice]');
+      notice.textContent = '';
+      notice.hidden = true;
+    }
+    root.querySelector('[data-booking-status-payment]').parentNode.hidden=!!kind;
+    if (processing) root.querySelector('[data-booking-status-payment]').textContent=view.t('paymentChecking');
+    var reference = root.querySelector('[data-booking-status-public-code]').parentNode;
+    if (reference.tagName !== 'DL') {
+      var referenceList=view.node('dl','');
+      while(reference.firstChild)referenceList.appendChild(reference.firstChild);
+      reference.remove();reference=referenceList;
+    }
+    reference.classList.add('airport-return__reference');
+    reference.hidden=false;
+    root.querySelector('[data-booking-status-lead]').after(reference);
+    ['pickup','destination'].forEach(function (key) {
+      var value = root.querySelector('[data-booking-status-' + key + ']');
+      var label = key === 'pickup' ? result.pickupAddress : result.destinationAddress;
+      var address = key === 'pickup' ? result.pickupAddressDetail : result.destinationAddressDetail;
+      var location=mobileLocation(label,address);
+      value.textContent=location;
+      if(confirmed) {
+        // Split only our separator between contract fields, never a display label.
+        if(label && address && location===label+'\n'+address) {
+          value.replaceChildren(view.node('strong','',label),view.node('span','airport-return__address',address));
+        } else if(key==='pickup' && !address) {
+          value.replaceChildren(view.node('strong','',location));
+        }
+        // A compound destination stays complete and normal-weight. Do not guess
+        // a place name by splitting user/server text on punctuation.
+      }
+      value.parentNode.hidden=!label && !address;
+    });
+    root.querySelector('[data-booking-status-date]').textContent = view.date(result.serviceStartLocalDate, true);
+    details.appendChild(root.querySelector('[data-booking-status-vehicle]').parentNode);
+    var contact = root.querySelector('[data-airport-return-contact]');
+    var disclosure = root.querySelector('.airport-return__disclosure');
+    if (!contact) {
+      disclosure=view.node('details','airport-return__disclosure');
+      disclosure.appendChild(view.node('summary',''));
+      contact = view.node('dl', 'airport-return__contact');
+      contact.setAttribute('data-airport-return-contact', '');
+      ['name','phone','email'].forEach(function (key) { var row=view.field(view.t(key),'');row.setAttribute('data-airport-return-'+key,'');contact.appendChild(row); });
+      disclosure.appendChild(contact);details.after(disclosure);
+    }
+    disclosure.querySelector('summary').textContent=view.t(result.customerNotes ? 'contactNotes' : 'contact');
+    ['name','phone','email'].forEach(function (key) {
+      var row=contact.querySelector('[data-airport-return-'+key+']');
+      var value=result[key==='name'?'customerFullName':key==='phone'?'customerPhone':'customerEmail'];
+      row.hidden=!value;row.querySelector('dt').textContent=view.t(key==='name'?'contact':key);row.querySelector('dd').textContent=value || '';
+    });
+    var notes=root.querySelector('[data-booking-status-notes-row]');
+    if (notes) { contact.appendChild(notes);notes.removeAttribute('tabindex');notes.removeAttribute('role'); }
+    disclosure.hidden=!result.customerFullName && !result.customerPhone && !result.customerEmail && !result.customerNotes;
+    var resume=root.querySelector('.airport-return__resume');
+    if (!resume) {
+      resume=view.node('section','airport-return__resume');
+      resume.appendChild(view.node('div','airport-return__payment-actions'));
+      details.before(resume);
+    }
+    resume.hidden=false;
+    var paymentActions=resume.querySelector('.airport-return__payment-actions');
+    ['retry','modify','new'].forEach(function(key){var action=root.querySelector('[data-booking-cancelled-'+key+']');if(action && action.parentNode!==paymentActions)paymentActions.appendChild(action);});
+    var amount=root.querySelector('[data-booking-status-amount]');
+    var payment=root.querySelector('[data-airport-return-payment]');
+    if (!payment) {
+      payment=view.node('dl','airport-return__payment');payment.setAttribute('data-airport-return-payment','');
+      resume.prepend(payment);
+    }
+    var amountRow=amount && amount.parentNode;
+    payment.hidden=false;
+    if (!amountRow) { amountRow=view.field('','');amount=amountRow.querySelector('dd');amount.setAttribute('data-booking-status-amount',''); }
+    amountRow.querySelector('dt').textContent=view.t(confirmed?'paidAmount':result.view==='pending'?'pendingAmount':'amount');
+    amount.textContent=view.money(confirmed?result.paymentAmountPaid:result.paymentAmountExpected,result.paymentCurrency);
+    payment.prepend(amountRow);
+    var key=!confirmed && raw.hold && raw.serverNow && !actions.canCreateNewReservation ? state.token+'|'+raw.hold.expiresAt : '';
+    if (key !== mobileDeadlineKey) {
+      if (mobileDeadline) mobileDeadline.remove();
+      mobileDeadline=null;mobileDeadlineKey=key;
+      if (key) {
+        mobileDeadline=view.deadline(raw.hold.expiresAt,serverNow(raw),'paymentDeadlinePassed');
+        mobileDeadline.setAttribute('data-airport-mobile-deadline','');
+        // The existing clock keeps its performance-time anchor across redraws.
+        mobileDeadline.className='airport-return__deadline';
       }
     }
+    if (mobileDeadline) payment.after(mobileDeadline);
+    var retry=root.querySelector('[data-booking-cancelled-retry]');
+    if (retry && !retry.disabled) retry.textContent=view.t('resumePayment');
+    var timezone=root.querySelector('[data-airport-confirmed-timezone]');
+    if(confirmed) {
+      if(!timezone) {timezone=view.node('div','airport-return__timezone');timezone.setAttribute('data-airport-confirmed-timezone','');}
+      timezone.replaceChildren(view.node('dt','',view.t('confirmedTimezone')));
+      ['date','time'].forEach(function(key){details.appendChild(root.querySelector('[data-booking-status-'+key+']').parentNode);});
+      details.appendChild(timezone);
+      ['pickup','destination'].forEach(function(key){var value=root.querySelector('[data-booking-status-'+key+']');if(value)details.appendChild(value.parentNode);});
+      var vehicleSummary=root.querySelector('.airport-return__vehicle-summary');
+      if(!vehicleSummary) {vehicleSummary=view.node('dl','airport-return__vehicle-summary');resume.before(vehicleSummary);}
+      vehicleSummary.hidden=false;resume.hidden=true;
+      var vehicle=root.querySelector('[data-booking-status-vehicle]');
+      var thumbnail=vehicle.querySelector('[data-booking-status-vehicle-thumb]');
+      var vehicleName=view.node('span','airport-return__vehicle-name',result.vehicleDisplayName || '—');
+      vehicle.replaceChildren(vehicleName);if(thumbnail)vehicle.appendChild(thumbnail);
+      ['vehicle','passengers','luggage'].forEach(function(key){var value=root.querySelector('[data-booking-status-'+key+']');if(value)vehicleSummary.appendChild(value.parentNode);});
+      vehicleSummary.appendChild(amountRow);
+      var whatsapp=root.querySelector('[data-booking-status-whatsapp]');
+      var another=root.querySelector('[data-booking-status-primary],[data-booking-cancelled-home]');
+      if(whatsapp) {whatsapp.textContent=view.t('talkWhatsApp');whatsapp.parentNode.prepend(whatsapp);}
+      if(another)another.textContent=view.t('bookAnother');
+    } else {
+      if(timezone)timezone.remove();
+      var vehicleSummary=root.querySelector('.airport-return__vehicle-summary');
+      if(vehicleSummary) {
+        ['vehicle','passengers','luggage'].forEach(function(key){var value=root.querySelector('[data-booking-status-'+key+']');if(value)details.appendChild(value.parentNode);});
+        vehicleSummary.hidden=true;
+      }
+    }
+  }
+  function render() {
+    if (ready && !view.media.matches) renderMobileResult();
     if (mount) mount.remove();
     mount = null;
     document.body.classList.remove("airport-booking-active");

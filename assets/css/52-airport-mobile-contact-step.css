@@ -201,7 +201,7 @@
     display:none !important;
   }
   
-  .airport-mobile-route .airport-mobile-contact-step__legal{
+  .airport-mobile-route :is(.airport-mobile-contact-step__legal,[data-airport-transfer-checkout-legal-acceptance]){
     grid-row:5;
     min-height:0;
     align-self:start;
@@ -210,11 +210,11 @@
     transform:translateY(var(--airport-mobile-contact-bottom-shift));
   }
 
-  .airport-mobile-route .airport-mobile-contact-step__legal[hidden]{
+  .airport-mobile-route :is(.airport-mobile-contact-step__legal,[data-airport-transfer-checkout-legal-acceptance])[hidden]{
     display:none !important;
   }
 
-  .airport-mobile-route .airport-mobile-contact-step__legal .legal-acceptance{
+  .airport-mobile-route :is(.airport-mobile-contact-step__legal,[data-airport-transfer-checkout-legal-acceptance]) .legal-acceptance{
     grid-template-columns:15px minmax(0, 1fr);
     gap:4px 7px;
     margin:0;
@@ -224,7 +224,7 @@
     background:rgba(255,255,255,.018);
   }
 
-  .airport-mobile-route .airport-mobile-contact-step__legal .legal-acceptance__checkbox{
+  .airport-mobile-route :is(.airport-mobile-contact-step__legal,[data-airport-transfer-checkout-legal-acceptance]) .legal-acceptance__checkbox{
     width:15px;
     height:15px;
     min-width:15px;
@@ -233,20 +233,20 @@
     border-radius:4px;
   }
 
-  .airport-mobile-route .airport-mobile-contact-step__legal .legal-acceptance__label{
+  .airport-mobile-route :is(.airport-mobile-contact-step__legal,[data-airport-transfer-checkout-legal-acceptance]) .legal-acceptance__label{
     font-size:10.75px;
     line-height:1.22;
     color:rgba(255,249,238,.82);
   }
 
-  .airport-mobile-route .airport-mobile-contact-step__legal .legal-acceptance__links{
+  .airport-mobile-route :is(.airport-mobile-contact-step__legal,[data-airport-transfer-checkout-legal-acceptance]) .legal-acceptance__links{
     grid-column:2;
     gap:2px 6px;
     font-size:10.75px;
     line-height:1.2;
   }
 
-  .airport-mobile-route .airport-mobile-contact-step__legal .legal-acceptance__error{
+  .airport-mobile-route :is(.airport-mobile-contact-step__legal,[data-airport-transfer-checkout-legal-acceptance]) .legal-acceptance__error{
     grid-column:2;
     font-size:10.75px;
     line-height:1.2;
@@ -288,4 +288,106 @@
     outline:2px solid rgba(255,249,238,.88);
     outline-offset:2px;
   }
+
+  /* Shared canonical form, original mobile presentation. Flow sizing replaces
+     the old fixed grid rows so notes, errors and consent cannot overlap. */
+  .airport-mobile-route .airport-mobile-contact-step[data-airport-mobile-booking-step]{
+    height:auto;
+    overflow:visible;
+    grid-template-rows:none;
+  }
+  .airport-mobile-route .airport-booking__form{margin:0; width:100%; max-width:none;}
+  .airport-mobile-route .airport-booking__form .form-grid{
+    display:grid; grid-template-columns:minmax(0,1fr); gap:5px; height:auto;
+  }
+  .airport-mobile-route .airport-booking__form .form-grid > :not([data-airport-desktop-field]):not([data-airport-transfer-checkout-legal-acceptance]):not(.form-actions),
+  .airport-mobile-route .airport-booking__form [data-airport-desktop-field="luggage"],
+  .airport-mobile-route .airport-booking__field-help{display:none !important;}
+  .airport-mobile-route .airport-booking__form [data-airport-desktop-field]{
+    position:static; transform:none; margin:0; min-width:0; height:auto;
+  }
+  .airport-mobile-route .airport-booking__form .airport-mobile-contact-step__label{
+    position:static; width:auto; height:auto; clip:auto; overflow:visible;
+  }
+  .airport-mobile-route .airport-booking__form [data-airport-transfer-checkout-legal-acceptance],
+  .airport-mobile-route .airport-booking__form .airport-mobile-contact-step__actions{
+    grid-row:auto; transform:none;
+  }
+  .airport-mobile-route .airport-booking__form .airport-mobile-contact-step__actions{margin:0;}
+  .airport-mobile-route .airport-booking__form .airport-mobile-contact-step__submit{height:auto; min-height:44px;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-mobile-contact-step__summary-value{
+    white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__layout{display:grid; gap:6px;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__block,
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__conditions{margin-top:6px;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__block-heading{display:flex; align-items:center; justify-content:space-between; gap:6px;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__details{margin:0; display:grid; gap:5px;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-mobile-contact-step__summary{
+    gap:6px; padding:10px;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-mobile-contact-step__summary-list{
+    grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr) minmax(0,1fr) minmax(0,.8fr);
+    gap:5px 6px;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step] [data-airport-mobile-contact-summary-row]{align-content:start;}
+  .airport-mobile-route [data-airport-mobile-booking-step] [data-airport-mobile-contact-summary-row="vehicle"]{grid-column:1 / 3;}
+  .airport-mobile-route [data-airport-mobile-booking-step] [data-airport-mobile-contact-summary-row="fare"]{grid-column:3 / -1;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__detail dd{margin:0;}
+  .airport-mobile-route .airport-booking__form input:is(:autofill, :-webkit-autofill){
+    -webkit-text-fill-color:rgba(255,249,238,.96);
+    caret-color:rgba(255,249,238,.96);
+    box-shadow:0 0 0 1000px #0f1113 inset;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__detail{min-width:0;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__lead{font-size:11px; line-height:1.3; margin:6px 0;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-booking__conditions-status{margin:0; font-size:12.5px;}
+  .airport-mobile-route [data-airport-mobile-booking-step] .legal-acceptance__links{flex-wrap:wrap;}
+  .airport-mobile-route [data-airport-mobile-booking-step] [hidden]{display:none !important;}
+  body[data-airport-mobile-notes-editor-active="true"] .airport-mobile-route__content,
+  body:has(#pixkuy-legal-overlay[data-open="1"]) .airport-mobile-route__content{overflow-y:hidden;}
+  body.airport-booking-active .whatsapp-floating{display:none;}
+  /* Review has its own compact composition; Data keeps the restored form. */
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__places,
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__facts,
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__vehicle{
+    margin:0; display:grid; gap:6px;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__places dt,
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__status,
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__vehicle dt,
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__block .airport-booking__details dt{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip-path:inset(50%); white-space:nowrap;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__location-name,
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__location-address{display:block;}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__location-address{font-weight:500;}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__facts{grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 12px;}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__facts .airport-booking__detail{
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:3px 6px;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__details{gap:3px;}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-mobile-review__notes{display:grid; gap:3px;}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__conditions{
+    display:block; padding:8px 10px;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .legal-acceptance__links{
+    display:flex; flex-wrap:wrap; align-items:center; gap:0 12px; margin:2px 0 0; font-size:12.5px; line-height:1.4;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .legal-acceptance__links a{display:inline-flex; align-items:center; min-height:44px;}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__summary{display:grid; gap:6px; padding:2px 0 0;}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__total{
+    display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:4px 12px; margin:0;
+    font-size:14px; line-height:1.4;
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__total strong{font-size:18px; color:rgba(61,158,122,.98);}
+  .airport-mobile-route [data-airport-mobile-booking-step="revision"] .airport-booking__notice{margin:0; font-size:13px; line-height:1.4;}
+}
+@media (max-width:360px){
+  .airport-mobile-route [data-airport-mobile-booking-step] .airport-mobile-contact-step__summary-list{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .airport-mobile-route [data-airport-mobile-booking-step] [data-airport-mobile-contact-summary-row="vehicle"]{grid-column:1;}
+  .airport-mobile-route [data-airport-mobile-booking-step] [data-airport-mobile-contact-summary-row="fare"]{grid-column:2;}
 }

@@ -5,6 +5,7 @@ const fs = require("node:fs/promises");
 const os = require("node:os");
 const { pathToFileURL } = require("node:url");
 const { execFileSync } = require("node:child_process");
+const controlledFixtures = require('./airport-controlled-fixtures.cjs');
 // Explicit test configuration only: never inherit the runner DATABASE_URL.
 // Supply PIXKUY_AIRPORT_TEST_DATABASE_URL through the authorized test environment.
 // It must match airportPendingEditIntegration.mjs; no database is provisioned here.
@@ -22,9 +23,38 @@ function readTestDatabaseUrl() {
   }
   return value;
 }
-const testDatabaseUrl = readTestDatabaseUrl();
-const origin = process.env.PIXKUY_TEST_ORIGIN || "http://localhost:8888";
-assert(["localhost", "127.0.0.1"].includes(new URL(origin).hostname), "Local runner only");
+const mobilePhase1 = process.argv.includes("--mobile-phase1");
+const mobilePhase2 = process.argv.includes("--mobile-phase2");
+const manualAcceptance = mobilePhase2 && process.argv.includes('--manual-acceptance');
+const manualWebkit = manualAcceptance && process.argv.includes('--manual-webkit');
+const mobileIntegrated = mobilePhase2 && process.argv.includes('--mobile-integrated');
+const iphoneFourFixes = mobileIntegrated && process.argv.includes('--iphone-four-fixes');
+const confirmedCopy = mobileIntegrated && process.argv.includes('--confirmed-copy');
+const returnHierarchy = mobileIntegrated && process.argv.includes('--return-mobile-hierarchy');
+const integratedBefore = mobileIntegrated && process.argv.includes('--integrated-before');
+const integratedWebkit = mobileIntegrated && process.argv.includes('--integrated-webkit');
+const integratedLan = mobileIntegrated && process.argv.includes('--integrated-lan');
+const integratedMatrix = mobileIntegrated && process.argv.includes('--integrated-matrix');
+const integratedFleet = mobileIntegrated && process.argv.includes('--integrated-fleet');
+const mobileSharedOnly = mobilePhase2 && process.argv.includes("--shared-only");
+const desktopSelectionOnly = mobilePhase2 && process.argv.includes("--desktop-selection-only");
+const visualRestore = mobilePhase2 && process.argv.includes("--visual-restore");
+const mobileRefinement = mobilePhase2 && process.argv.includes("--mobile-refinement");
+const reviewCompact = mobileRefinement && process.argv.includes("--review-compact");
+const reviewUncertainty = reviewCompact && process.argv.includes("--review-uncertainty");
+const refinementBefore = mobileRefinement && process.argv.includes("--refinement-before");
+const refinementWebkit = mobileRefinement && process.argv.includes("--refinement-webkit");
+const mobileFixtures = mobilePhase1 || mobilePhase2;
+const mobileBaseline = process.argv.includes("--mobile-baseline");
+if (mobilePhase2) assert(process.argv.slice(2).every(value=>['--mobile-phase2','--manual-acceptance','--manual-webkit','--shared-only','--desktop-selection-only','--visual-restore','--mobile-refinement','--refinement-before','--refinement-webkit','--review-compact','--review-state-only','--review-uncertainty','--mobile-integrated','--integrated-before','--integrated-webkit','--integrated-lan','--integrated-matrix','--integrated-fleet','--iphone-four-fixes','--four-fixes-desktop-only','--return-mobile-hierarchy','--confirmed-copy'].includes(value)) && [mobileSharedOnly,desktopSelectionOnly,visualRestore,mobileRefinement,mobileIntegrated].filter(Boolean).length<=1 && (!process.argv.includes('--refinement-before') || mobileRefinement) && (!process.argv.includes('--refinement-webkit') || mobileRefinement) && (!process.argv.includes('--review-compact') || mobileRefinement) && (!process.argv.includes('--review-state-only') || reviewCompact) && (!process.argv.includes('--review-uncertainty') || reviewUncertainty && !refinementWebkit && !process.argv.includes('--review-state-only')) && (!process.argv.some(v=>v.startsWith('--integrated-')) || mobileIntegrated), 'Phase 2 cannot combine with other modes');
+if (manualAcceptance) assert(process.argv.slice(2).every(value=>['--mobile-phase2','--manual-acceptance','--manual-webkit','--return-mobile-hierarchy','--confirmed-copy'].includes(value)), 'Manual acceptance cannot combine with other modes');
+if (process.argv.includes('--manual-webkit')) assert(manualAcceptance, 'Manual WebKit requires manual acceptance');
+if (mobilePhase1 || mobileBaseline) {
+  assert(mobilePhase1 && process.argv.slice(2).every(value => ["--mobile-phase1", "--mobile-baseline"].includes(value)), "Mobile fixtures cannot combine with transactional modes");
+}
+const testDatabaseUrl = mobileFixtures ? null : readTestDatabaseUrl();
+const origin = integratedLan || manualAcceptance ? 'http://192.168.0.14:8888' : process.env.PIXKUY_TEST_ORIGIN || "http://localhost:8888";
+assert(["localhost", "127.0.0.1",...(integratedLan || manualAcceptance?['192.168.0.14']:[])].includes(new URL(origin).hostname), "Existing local/LAN runner only");
 const refinementOnly = process.argv.includes("--refinement");
 const leadSuggestionOnly = process.argv.includes("--lead-time-suggestion");
 const continuationOnly = process.argv.includes("--continuation");
@@ -36,12 +66,13 @@ const httpEditOnly=sequenceOnly || resultDeltaOnly || process.argv.some(value=>[
 const isolatedApi='http://127.0.0.1:35434';
 const holdEditOnly = httpEditOnly || process.argv.some(value=>['--hold-edit','--hold-edit-baseline','--hold-edit-conflict'].includes(value));
 function airportSql(command) {
+  assert(!mobileFixtures, "Mobile fixtures forbid database access");
   return JSON.parse(execFileSync(process.execPath,['--import','tsx','scripts/internal/airportPendingEditIntegration.mjs'],{
     cwd:path.resolve(__dirname,'../../../pixkuy-booking-api'),input:JSON.stringify(command),encoding:'utf8',
     env:{...process.env,NODE_ENV:'test',DATABASE_URL:testDatabaseUrl,DOTENV_CONFIG_PATH:path.resolve(__dirname,'../../../nonexistent-test-env')}
   }));
 }
-const output = leadSuggestionOnly ? path.resolve(__dirname, "../../../.tmp/airport-suggestion") : sequenceOnly ? path.resolve(__dirname, "../../../evidence/airport-new-booking-20260928") : resultDeltaOnly ? path.resolve(__dirname, "../../../evidence/airport-result-delta-20260928") : stripeEditOnly
+const output = reviewCompact ? path.resolve(__dirname, "../../../evidence/airport-mobile-review-compact-20261002/browser", refinementWebkit ? "webkit" : ".", process.argv.includes("--review-state-only") ? "state-only" : refinementBefore ? "before" : "after") : mobileRefinement ? path.resolve(__dirname, "../../../evidence/airport-mobile-refinement-20261002/browser", refinementWebkit ? "webkit" : ".", refinementBefore ? "before" : "after") : visualRestore ? path.resolve(__dirname, "../../../evidence/airport-mobile-visual-restore-20260930/browser") : mobilePhase2 ? path.resolve(__dirname, "../../../evidence/airport-mobile-phase2-20260930/browser") : mobilePhase1 ? path.resolve(__dirname, "../../../evidence/airport-mobile-phase1-20260930", mobileBaseline ? "before" : "after") : leadSuggestionOnly ? path.resolve(__dirname, "../../../.tmp/airport-suggestion") : sequenceOnly ? path.resolve(__dirname, "../../../evidence/airport-new-booking-20260928") : resultDeltaOnly ? path.resolve(__dirname, "../../../evidence/airport-result-delta-20260928") : stripeEditOnly
   ? path.resolve(__dirname, "../../../evidence/airport-desktop-stripe-edit-20260928/landing")
   : continuationOnly
   ? path.resolve(__dirname, "../../../evidence/airport-desktop-continuation-20260928/landing")
@@ -51,6 +82,7 @@ const output = leadSuggestionOnly ? path.resolve(__dirname, "../../../.tmp/airpo
 
 // Exercise the live Booking contract, with no sockets or external providers.
 function airportBackendContract(operation, payload, fleet, clock) {
+  assert(!mobileFixtures, "Mobile fixtures forbid backend operations");
   const script = `
     import net from 'node:net';
     import {readFileSync} from 'node:fs';
@@ -99,10 +131,16 @@ function airportBackendContract(operation, payload, fleet, clock) {
 }
 
 async function run() {
-  const { chromium } = require(process.env.PIXKUY_PLAYWRIGHT_MODULE || "../../../pixkuy_frontend/node_modules/playwright");
-  await fs.mkdir(output, {recursive:true});
-  const browser = await chromium.launch({headless:true,...(httpEditOnly?{args:['--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1','--no-proxy-server']}: {})});
-  const context = await browser.newContext({viewport:{width:1440,height:1000}, locale:"es-ES", serviceWorkers:"block"});
+  const { chromium, webkit, devices } = require(process.env.PIXKUY_PLAYWRIGHT_MODULE || "../../../pixkuy_frontend/node_modules/playwright");
+  const runOutput = confirmedCopy ? path.resolve(__dirname,'../../../evidence/airport-confirmed-photo-20261003/browser',integratedWebkit?'webkit':'chromium',integratedBefore?'before':'after') : returnHierarchy ? path.resolve(__dirname,'../../../evidence/airport-return-hierarchy-20261003/browser',integratedWebkit?'webkit':'chromium',integratedBefore?'before':'after') : iphoneFourFixes ? path.resolve(__dirname,'../../../evidence/airport-iphone-four-fixes-20261003/browser',integratedWebkit?'webkit':'chromium',integratedBefore?'before':'after') : mobileIntegrated ? path.resolve(__dirname,'../../../evidence/airport-mobile-lan-integrated-20261002/browser',integratedWebkit?'webkit':'chromium',integratedLan?'lan':'localhost',integratedFleet?'fleet':integratedMatrix?'matrix':integratedBefore?'before':'after') : reviewUncertainty ? path.resolve(__dirname,'../../../evidence/airport-mobile-review-recovery-20261002/browser',refinementBefore?'before':'after') : output;
+  await fs.mkdir(runOutput, {recursive:true});
+  const browser = await (refinementWebkit || integratedWebkit || manualWebkit ? webkit : chromium).launch({headless:true,...(!refinementWebkit && !integratedWebkit && !manualWebkit && (httpEditOnly || mobileFixtures)?{args:['--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE 192.168.0.14','--no-proxy-server']}: {})});
+  const context = await browser.newContext({...refinementWebkit || integratedWebkit || manualWebkit?devices['iPhone 13']:{},viewport:{width:1440,height:1000}, locale:"es-ES", serviceWorkers:"block"});
+  if (manualAcceptance) {
+    try { await (process.argv.includes('--confirmed-copy') ? require('./airport-confirmed-copy-regression').manualConfirmed : process.argv.includes('--return-mobile-hierarchy') ? require('./airport-return-hierarchy-regression').manualPending : require('./airport-manual-acceptance-regression.cjs'))({browser,context,origin,webkit:manualWebkit}); }
+    finally { await browser.close(); }
+    return;
+  }
   let writes = 0;
   let prechecks = 0;
   let suggestionClock = {now:'2026-09-30T08:54:59.900Z',occupied:false};
@@ -125,6 +163,15 @@ async function run() {
   const sent = [];
   const model = {modelId:"00000000-0000-4000-8000-000000000001",modelRevision:1,name:"BYD M9",photoUrl:origin+"/assets/img/fleet/bydm9_xhoras001d.jpeg",passengersSupported:2};
   let models = [model];
+  let mobileDelay = () => 0;
+  const mobileRequests = [];
+  const mobileCheckouts = [];
+  const mobileReplacements = [];
+  let mobileStatuses = 0;
+  let mobilePrice = null;
+  let mobileNext = null;
+  let mobileCode = 'NO_AVAILABILITY';
+  let mobileCheckoutMode = 'not_committed';
   let recoverStatus = false;
   const errors = [];
   await context.addInitScript(()=>{
@@ -141,6 +188,35 @@ async function run() {
     const request = route.request();
     const url = new URL(request.url());
     const json = (body, code=200) => route.fulfill({status:code,contentType:"application/json",body:JSON.stringify(body)});
+    if (mobilePhase2 && url.pathname === '/v1/public/reservations/checkout' && request.method() === 'POST') {
+      mobileCheckouts.push({key:request.headers()['idempotency-key'],body:request.postDataJSON()});
+      // Transport boundary only: no backend, reservation, hold or payment created.
+      await new Promise(resolve=>setTimeout(resolve,200));
+      if((reviewUncertainty || mobileIntegrated) && mobileCheckoutMode === 'lost') return route.abort('failed');
+      if(mobileIntegrated && mobileCheckoutMode === 'timeout') return route.abort('timedout');
+      if((reviewUncertainty || mobileIntegrated) && mobileCheckoutMode === 'unknown') return json({code:'CHECKOUT_STATE_UNCERTAIN',recovery:{state:'unknown',preserveData:true}},503);
+      if((reviewUncertainty || mobileIntegrated) && mobileCheckoutMode === 'status') return json({bookingStatusToken:'synthetic-recovery-only',recovery:{state:'authoritative_status',action:'reservation_status'}});
+      if(mobileIntegrated && mobileCheckoutMode === 'success') return json(controlledFixtures.checkout());
+      return json({code:'CONTROLLED_CHECKOUT_NOT_COMMITTED',recovery:{state:'not_committed',preserveData:true}},409);
+    }
+    if(mobileIntegrated && url.pathname.endsWith('/replace-checkout') && request.method()==='POST') {
+      mobileReplacements.push({key:request.headers()['idempotency-key'],body:request.postDataJSON()});
+      if(mobileCheckoutMode==='lost')return route.abort('failed');
+      if(mobileCheckoutMode==='unknown')return json({code:'CHECKOUT_STATE_UNCERTAIN',recovery:{state:'unknown',preserveData:true}},503);
+      return json({replacement:true,bookingStatusToken:'synthetic-integrated-only',checkoutUrl:'https://checkout.stripe.com/c/pay/synthetic-replacement'});
+    }
+    if(mobileIntegrated && url.pathname.endsWith('/retry-checkout') && request.method()==='POST') {
+      retries++;return json({paymentAttempt:{checkoutUrl:'https://checkout.stripe.com/c/pay/synthetic-retry'}});
+    }
+    if (mobileFixtures && !['GET','HEAD'].includes(request.method()) && url.pathname !== '/v1/public/reservations/airport-transfer-availability-precheck') { writes++; return route.abort(); }
+    if (mobileFixtures && url.hostname === 'checkout.stripe.com') {
+      // Intercept provider navigation locally: never continue to Stripe.
+      if (mobileIntegrated && request.method()==='GET' && /^\/c\/pay\/synthetic(?:-integrated-only|-replacement|-retry)$/.test(url.pathname) && !url.search) {
+        return route.fulfill({contentType:'text/html',body:'<!doctype html><title>Controlled payment boundary</title>'});
+      }
+      return route.abort();
+    }
+    if (mobileFixtures && url.pathname === '/.netlify/functions/booking-public-config') return json({ok:true,bookingApi:{apiBaseUrl:origin},publicSite:{siteKey:'local_pixkuy_site_key'}});
     if(leadSuggestionOnly && !['GET','HEAD'].includes(request.method()) && !url.pathname.endsWith('/airport-transfer-availability-precheck')) { writes++; return route.abort(); }
     if (url.protocol === "file:") return route.continue();
     if (url.hostname === 'checkout.stripe.com') return route.fulfill({contentType:'text/html',body:'<!doctype html><title>Controlled payment boundary</title>'});
@@ -151,6 +227,24 @@ async function run() {
     if(httpEditOnly && url.pathname.startsWith('/v1/')) return route.abort();
     if (url.pathname === "/v1/public/reservations/airport-transfer-availability-precheck") {
       prechecks++;
+      if (mobileFixtures) {
+        // Capture the response at dispatch so late A cannot inherit B's fixture.
+        const payload = request.postDataJSON();
+        const record = {id:prechecks,time:payload.time,date:payload.date,airport:payload.airportId,direction:payload.direction,zone:payload.zoneId,band:payload.passengerFareKey,capacity:payload.passengers,mode,models:models.map(item=>item.modelId),settled:false};
+        mobileRequests.push(record);
+        lastPrecheckPayload = payload;
+        const available = mode === 'available' && models.length > 0;
+        const body = controlledFixtures.precheck(payload,{models,requestNumber:prechecks,available});
+        if (mobilePrice && mobilePrice !== payload.expectedAmountMinor) body.result={checkoutAllowed:false,price:{available:false,reason:'AIRPORT_TRANSFER_PRICE_MISMATCH',actualAmountMinor:mobilePrice,expectedAmountMinor:payload.expectedAmountMinor}};
+        if (mobileNext) body.result.availability={available:false,status:'unavailable',code:mobileCode,nextAvailableStartLocal:mobileNext};
+        const wait = mobileDelay(payload, record.id);
+        if (wait) await new Promise(resolve=>setTimeout(resolve,wait));
+        record.settled = true;
+        if(mobileIntegrated && record.mode === 'invalid') return json({});
+        if(mobileIntegrated && record.mode === 'pending') return json({result:{checkoutAllowed:false,availability:{status:'pending',available:false,code:'AVAILABILITY_PENDING'}}});
+        if(mobileIntegrated && record.mode === 'network') return route.abort('internetdisconnected');
+        return record.mode === 'technical' ? json({code:'FLEET_AVAILABILITY_UNDETERMINED'},503) : json(body);
+      }
       if (delayPrecheck) await new Promise(resolve=>setTimeout(resolve,delayPrecheck));
       if (mode === "technical") return json({code:"FLEET_AVAILABILITY_UNDETERMINED"},503);
       const payload=request.postDataJSON();
@@ -214,6 +308,13 @@ async function run() {
       return json({bookingStatusToken:"synthetic-airport-token",checkoutUrl:"https://checkout.stripe.com/c/pay/synthetic"});
     }
     if (url.pathname.includes("/status")) {
+      if(mobileIntegrated) {
+        mobileStatuses++;
+        const source=mobileCheckouts.findLast(entry=>entry.body.airport_transfer_airport_id)?.body || {};
+        const selected=models[0] || model;
+        const amount=source.airport_transfer_price || 80000;
+        return json(controlledFixtures.status({source,selected,amount,service,state:status,canModify,canRetry}));
+      }
       if(holdEditOnly) return json(airportSql({operation:'status'}));
       if (statusFailure) return route.abort();
       const statusBody = {reservation:{serviceType:service,status,publicCode:"PKY-TEST",pickupAddress:"MEX — Aeropuerto Internacional Ciudad de México",destinationAddress:"Hotel MX Condesa — Salamanca 35, Roma Norte",serviceStartLocalDate:"2026-10-05",serviceStartLocalTime:"22:03",passengerCount:2,passengerLabel:"1–2",luggageCount:2,vehicleDisplayName:"BYD M9",customerNotes:"Vuelo AM123. Dos maletas."},customer:{fullName:"Ana García",email:"ana@example.com",phone:"+34612345678"},payment:{status:status==="confirmed"?"paid":"pending",amountExpected:price,amountPaid:status==="confirmed"?price:null,currency:"MXN"},actions:{canRetryCheckout:canRetry,canModify:canModify},edit:{allowed:canModify,revision:"2026-09-28T10:00:00.000Z",draft:canModify?{service_type:"airport_transfer",airport_transfer_airport_id:"mex",airport_transfer_direction:"airport_to_destination",airport_transfer_zone_id:"roma_condesa",airport_transfer_passenger_fare_key:"van_1_2",airport_transfer_destination_label:"Hotel MX Condesa — Salamanca 35, Roma Norte",airport_transfer_airport_label:"MEX — Aeropuerto Internacional Ciudad de México",airport_transfer_passenger_bucket_label:"1–2 pasajeros",airport_transfer_non_airport_location:{address:"Salamanca 35, Roma Norte, Ciudad de México",place_id:"synthetic-place",lat:19.418,lng:-99.169},airport_transfer_date:"2026-10-05",airport_transfer_time:"22:03",airport_transfer_passengers:2,airport_transfer_luggage:2,airport_transfer_price:price,airport_transfer_currency:"MXN",airport_transfer_pricing_version:"test-v1",airport_transfer_quote_fingerprint:"a".repeat(64),airport_transfer_notes:"Vuelo AM123. Dos maletas.",request_summary:"MEX a Hotel MX Condesa",locale:"es",customer:{full_name:"Ana García",email:"ana@example.com",phone:"+34612345678"},fleet_selection:{version:1,model_id:model.modelId,model_revision:model.modelRevision},fleet_model:{id:model.modelId,name:model.name,revision:model.modelRevision,photoUrl:model.photoUrl,amountMinor:price,currency:"MXN"},legal_acceptance_accepted:"true",legal_acceptance_terms_version:"test",legal_acceptance_cancellation_policy_version:"test",legal_acceptance_privacy_version:"test",legal_acceptance_accepted_at:"2026-09-28T09:00:00.000Z",legal_acceptance_channel:"web_airport_checkout"}:null}}; if (stripeEditOnly && statusBody.edit.draft) { statusBody.reservation.passengerCount=null; delete statusBody.edit.draft.airport_transfer_passengers; } if (checkoutRegressionOnly && statusBody.edit.draft && sent.length) { const source=sent[0].body; for(const key of [...Object.keys(statusBody.edit.draft),...Object.keys(source).filter(key=>key.startsWith("legal_acceptance_"))]) { if(Object.hasOwn(source,key)) statusBody.edit.draft[key]=source[key]; } delete statusBody.edit.draft.airport_transfer_passengers; statusBody.edit.draft.airport_transfer_passenger_bucket_label="3–4 pasajeros"; statusBody.reservation.passengerCount=null; statusBody.reservation.passengerLabel="3–4"; } return json(statusBody);
@@ -670,6 +771,22 @@ async function run() {
   }
   page.on("pageerror", error => errors.push(error.stack || error.message));
   try {
+    if (mobilePhase2) {
+      const phase2Output=mobileIntegrated || reviewUncertainty?runOutput:visualRestore?path.resolve(output,'../../airport-mobile-visual-restore-20260930/browser'):mobileSharedOnly?path.join(output,'shared-regressions'):desktopSelectionOnly?path.join(output,'desktop-selection'):output;
+      await fs.mkdir(phase2Output,{recursive:true});
+      await require(mobileSharedOnly || integratedFleet?'./airport-mobile-phase1-regression':'./airport-mobile-phase2-regression')({page,context,origin,output:phase2Output,baseline:false,desktopSelectionOnly,visualRestore,mobileRefinement,refinementBefore,refinementWebkit,reviewCompact,mobileIntegrated:mobileIntegrated && !integratedMatrix,integratedBefore,integratedWebkit,model,errors,
+        fixture(value) { mode=value.mode || 'available'; models=value.models || [model]; mobileDelay=value.delay || (()=>0); mobilePrice=value.price || null; mobileNext=value.next || null; mobileCode=value.code || 'NO_AVAILABILITY'; mobileCheckoutMode=value.checkout || 'not_committed'; if(value.status)status=value.status; if(value.service)service=value.service; if(value.canModify!==undefined)canModify=value.canModify; if(value.canRetry!==undefined)canRetry=value.canRetry; },
+        stats() { return {prechecks,writes,requests:mobileRequests,checkouts:mobileCheckouts,replacements:mobileReplacements,statuses:mobileStatuses,retries}; }
+      });
+      return;
+    }
+    if (mobilePhase1) {
+      await require('./airport-mobile-phase1-regression')({page,context,origin,output,baseline:mobileBaseline,model,errors,
+        fixture(value) { mode=value.mode || 'available'; models=value.models || [model]; mobileDelay=value.delay || (()=>0); },
+        stats() { return {prechecks,writes,requests:mobileRequests}; }
+      });
+      return;
+    }
     if(leadSuggestionOnly) {
       const results=[];
       for(const scenario of [
@@ -1364,6 +1481,7 @@ async function run() {
   } catch(error) {
     if (checkoutRegressionOnly || leadSuggestionOnly) throw error;
     await page.screenshot({path:path.join(output,"diagnostico.png"),fullPage:false}).catch(()=>{});
+    if (reviewUncertainty || mobileIntegrated) { console.error(JSON.stringify({prechecks,controlledCheckouts:mobileCheckouts.length,writes,errors:errors.length})); throw error; }
     console.error(JSON.stringify(await page.evaluate(()=>({runtime:window.__qaErrors,service:document.querySelector('[name="service_type"]')?.value}))));
     console.error(JSON.stringify({url:page.url(),errors,prechecks,controlledCheckouts:writes,lastPrecheckPayload,offerStatus:await page.evaluate(()=>window.PixkuyFleetSelection&&window.PixkuyFleetSelection.airportOfferStatus()).catch(()=>null),panelState:await page.locator('#services-expand-airport').getAttribute('data-airport-mobile-availability-state').catch(()=>null),fleet:await page.evaluate(()=>window.PixkuyFleetSelection&&window.PixkuyFleetSelection.read('airport_transfer')).catch(()=>null),diagnostic:await page.locator('.airport-booking, #services-expand-airport').allTextContents().then(x=>x.join('\n').slice(0,2500)).catch(()=>"")}));
     throw error;

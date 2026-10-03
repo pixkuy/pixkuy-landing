@@ -224,8 +224,13 @@
     return String(result.luggageCount) + " " + (t(dictionary, "details.luggageMany") || "maletas");
   }
 
-  function getVehicleThumbnailSrc(vehicleDisplayName) {
-    var normalized = String(vehicleDisplayName || "").toLowerCase();
+  function getVehicleThumbnailSrc(result) {
+    if (result && result.serviceType === "airport_transfer") {
+      try {
+        return window.PixkuyFleetSelection.photo({ photoUrl: result.vehiclePhotoUrl });
+      } catch (_) { return ""; }
+    }
+    var normalized = String(result && result.vehicleDisplayName || "").toLowerCase();
 
     if (normalized.indexOf("byd m9") > -1 || normalized.indexOf("m9") > -1) {
       return "assets/img/fleet/bydm9_xhoras001d.jpeg";
@@ -252,7 +257,7 @@
 
     vehicleNode.classList.remove("booking-status-mobile__vehicle-value");
 
-    src = getVehicleThumbnailSrc(result && result.vehicleDisplayName);
+    src = getVehicleThumbnailSrc(result);
 
     if (!src) {
       return false;
@@ -266,6 +271,14 @@
     image.setAttribute("aria-hidden", "true");
     image.setAttribute("loading", "lazy");
     image.setAttribute("decoding", "async");
+    if (result && result.serviceType === "airport_transfer") {
+      image.addEventListener("error", function () {
+        if (image.parentNode === vehicleNode) {
+          image.remove();
+          vehicleNode.classList.remove("booking-status-mobile__vehicle-value");
+        }
+      }, { once: true });
+    }
 
     vehicleNode.classList.add("booking-status-mobile__vehicle-value");
     vehicleNode.appendChild(image);
@@ -620,6 +633,9 @@
     document.addEventListener("keydown", function onKeydown(event) {
       if (
         event.key === "Escape" &&
+        !event.defaultPrevented &&
+        !event.target.closest('.lang') &&
+        !(window.PixkuyMobileTopbarMenu && window.PixkuyMobileTopbarMenu.isOpen()) &&
         isMobileViewport() &&
         isOpen()
       ) {
@@ -798,7 +814,9 @@ function syncActions(root, dictionary, result) {
       retryApi.retry(state.token).catch(function onRetryError() {
         retry.disabled = false;
         retry.setAttribute("aria-disabled", "false");
-        setNodeText(retry, t(state.dictionary, "cancelled.actions.retry"));
+        setNodeText(retry, root.getAttribute('data-airport-return') === 'true'
+          ? window.PixkuyAirportDesktopView.t('resumePayment')
+          : t(state.dictionary, "cancelled.actions.retry"));
         showNotice(
           root,
           t(state.dictionary, "cancelled.retry.error"),
@@ -911,7 +929,9 @@ function syncActions(root, dictionary, result) {
     syncActions(root, dictionary, result);
     bindRetry(root, state);
     showNotice(root, getNotice(dictionary, result), getTone(result.view));
-    open();
+    // An already open Airport confirmation must retain disclosure focus on refresh.
+    if (!(result.serviceType === "airport_transfer" && result.view === "confirmed" &&
+          result.paymentStatus === "paid" && isOpen())) open();
 
     return true;
   }

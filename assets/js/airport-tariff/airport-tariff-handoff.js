@@ -279,10 +279,6 @@
   function handoffPanelSelectionToContact(state, deps) {
     requireDeps(deps);
 
-    if (isMobileViewport()) {
-      return false;
-    }
-
     const fields = getContactFields();
     const prefill = buildPanelToContactPrefill(state, deps);
     const panelSummaryApi = getPanelHandoffSummaryApi();
@@ -319,6 +315,10 @@
 
     setInputValueAndDispatch(fields.origin, prefill.origin, deps);
     setInputValueAndDispatch(fields.destination, prefill.destination, deps);
+    if (isMobileViewport()) {
+      const luggage = document.querySelector('[data-airport-mobile-luggage-select]');
+      if (luggage && fields.luggage) setInputValueAndDispatch(fields.luggage, luggage.value, deps);
+    }
 
     clearPlaceHiddenFieldsForHandoff(fields);
     syncContactFormAfterPanelPrefill(fields);
