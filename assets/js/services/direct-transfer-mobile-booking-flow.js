@@ -319,6 +319,12 @@ let inMotionReturnContext = null;
     syncCopy();
     setRouteVisibility(true);
     openConfigStep();
+    const contact=getContactStepApi();
+    const config=routeNode.querySelector('[data-direct-transfer-mobile-config-step]');
+    if(contact && config) {
+      if(window.history.state && window.history.state.directTransferStep==='config') contact.close();
+      else contact.restoreDraft(config);
+    }
 
     if (window.PixkuyAnalytics && typeof window.PixkuyAnalytics.track === "function") {
       window.PixkuyAnalytics.track("pixkuy_mobile_route_open", {
@@ -444,6 +450,8 @@ let inMotionReturnContext = null;
 
     if (isRouteOpen) {
       syncCopy();
+    } else if (shouldOpenFromUrl()) {
+      openDirectTransferRoute();
     }
 
     return true;
@@ -466,6 +474,7 @@ let inMotionReturnContext = null;
     window.addEventListener("hashchange", syncActiveState);
 
     window.addEventListener("popstate", function onPopState() {
+      if (shouldOpenFromUrl()) {openDirectTransferRoute();return;}
       if (isRouteOpen) {
         const shouldReturnToInMotion = Boolean(inMotionReturnContext);
 

@@ -1921,7 +1921,14 @@
     }
 
     parentRoute = route;
-
+    const contact=window.PixkuyDirectTransferMobileContactStep;
+    const saved=contact && contact.readDraft();
+    if (saved && saved.config) {
+      ['origin','originPlace','originCoverage','destination','destinationPlace','destinationCoverage','date','time','passengerFareKey'].forEach(key=>{
+        if(Object.prototype.hasOwnProperty.call(saved.config,key))state[key]=saved.config[key];
+      });
+      state=resetCanonicalPriceState(state);
+    }
     renderStep();
     setStepVisibility(true);
 
@@ -2119,14 +2126,13 @@
         event.target.getAttribute("data-direct-transfer-mobile-config-field")
       );
 
-      if (fieldName === "date" || fieldName === "time") {
-        resetQuote();
-      }
-
+      const previousCriteria = JSON.stringify(buildQuoteInput());
       normalizeDateTimeField(event.target);
       syncDateTimeOverlayState(event.target);
       syncStateFromFields();
       syncDateTimeConstraints();
+      if (previousCriteria === JSON.stringify(buildQuoteInput())) return;
+      if (fieldName === "date" || fieldName === "time") resetQuote();
       requestQuoteIfReady();
       syncCta();
     });
@@ -2137,7 +2143,8 @@
   window.PixkuyDirectTransferMobileConfigStep = {
     open,
     close,
-    isOpen
+    isOpen,
+    draft: function(){const result={};['origin','originPlace','originCoverage','destination','destinationPlace','destinationCoverage','date','time','passengerFareKey'].forEach(key=>result[key]=state[key]);return result;}
   };
 
   window.PixkuyDirectTransferMobileQuoteContract = {

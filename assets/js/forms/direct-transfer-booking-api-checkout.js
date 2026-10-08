@@ -1716,6 +1716,12 @@
   }
 
   function runMobileCheckout(form, stateApi, snapshot, config) {
+    var owner=window.PixkuyDirectTransferMobileContactStep;
+    var revision=owner && owner.revision();
+    function stillOwnsOperation(){
+      return owner && owner.isOpen() && owner.revision()===revision &&
+        getFieldValue(form,"service_type")==="direct_transfer";
+    }
     var precheckPayload = stateApi.buildPrecheckPayload(snapshot);
     var idempotencyKey = createIdempotencyKey();
 
@@ -1736,6 +1742,7 @@
       payload: precheckPayload
     })
       .then(function onPrecheckResult(result) {
+        if (!stillOwnsOperation()) {setButtonsBusy(form,false);return null;}
         if (!isPrecheckAllowed(result)) {
           applyPrecheckPriceToSnapshot(snapshot, result, false);
           setButtonsBusy(form, false);
@@ -1748,6 +1755,7 @@
         }
 
         return getRecaptchaToken().then(function requestMobileCheckout(recaptchaToken) {
+          if (!stillOwnsOperation()) {setButtonsBusy(form,false);return null;}
           var checkoutPayload = stateApi.buildCheckoutPayload(snapshot, {
             recaptchaToken: recaptchaToken
           });

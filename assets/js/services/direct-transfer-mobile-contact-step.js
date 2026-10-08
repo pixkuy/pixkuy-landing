@@ -33,6 +33,50 @@
   let contactStepNode = null;
   let currentConfigStep = null;
   let currentSnapshot = null;
+  let currentPayload = null;
+  let operationRevision = 0;
+  let restoringDraft = false;
+  let restoredLegalProof = null;
+  function readMobileDraft() {
+    const store = window.PixkuyDirectTransferTransactionalState;
+    const value = store && store.readReviewSnapshot();
+    return value && value.mobileDraft && value.mobileDraft.version === 1 ? value.mobileDraft : null;
+  }
+  function saveMobileDraft(stage) {
+    if (restoringDraft || !currentSnapshot || !contactStepNode) return;
+    const store = window.PixkuyDirectTransferTransactionalState;
+    const config = window.PixkuyDirectTransferMobileConfigStep;
+    if (!store || !config || !currentPayload) return;
+    const host = contactStepNode.querySelector('[data-direct-transfer-mobile-checkout-legal-acceptance]');
+    const instance = host && host.__pixkuyLegalAcceptanceInstance;
+    const contact = {};
+    [FIELD_NAME,FIELD_PHONE,FIELD_EMAIL,FIELD_NOTES].forEach(name => { const node=getContactField(name); if(node)contact[name]=node.value; });
+    store.writeReviewSnapshot(Object.assign({}, currentSnapshot, {mobileDraft:{version:1,stage:stage || 'datos',
+      config:config.draft(),payload:currentPayload,contact:contact,
+      legal:instance && instance.isAccepted() ? (instance.getSnapshot() || restoredLegalProof) : null}}));
+  }
+  function restoreMobileDraft(configStep) {
+    const saved=readMobileDraft(), fleet=window.PixkuyFleetSelection.read('direct_transfer');
+    if (!saved || saved.stage!=='datos' || fleet.attempt && fleet.attempt.state!=='not_committed') return false;
+    restoringDraft=true;
+    try {
+      if (!open(configStep,saved.payload)) return false;
+      Object.keys(saved.contact || {}).forEach(name=>{const field=getContactField(name);if(field)field.value=saved.contact[name];});
+      const bridge=window.PixkuyDirectTransferMobileTransactionalBridge;if(bridge)bridge.sync();
+      const legal=window.PixkuyForms.LegalAcceptance, proof=saved.legal;
+      const current=legal.buildSnapshot('web_direct_transfer_mobile_checkout');
+      const host=contactStepNode.querySelector('[data-direct-transfer-mobile-checkout-legal-acceptance]');
+      const instance=host && host.__pixkuyLegalAcceptanceInstance;
+      if(instance && proof && proof.accepted==='true' && proof.acceptedAt && proof.channel===current.channel &&
+          proof.termsVersion===current.termsVersion && proof.cancellationsVersion===current.cancellationsVersion && proof.privacyVersion===current.privacyVersion){
+        restoredLegalProof=proof;
+        instance.checkbox.checked=true;
+        legal.syncAcceptedFields(getReservationFormsApi().getReservationForm(),proof);
+      }
+      syncSubmitAvailability();
+      return true;
+    } finally {restoringDraft=false;}
+  }
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -1431,13 +1475,17 @@
         }
 
         field.addEventListener("input", function onInput() {
+          operationRevision += 1;
           clearValidationForField(name);
           syncSubmitAvailability();
+          saveMobileDraft();
         });
 
         field.addEventListener("change", function onChange() {
+          operationRevision += 1;
           clearValidationForField(name);
           syncSubmitAvailability();
+          saveMobileDraft();
         });
 
         if (name === FIELD_PHONE) {
@@ -1501,6 +1549,8 @@
         }
 
         close();
+        saveMobileDraft('config');
+        window.history.replaceState(Object.assign({},window.history.state,{directTransferStep:'config'}),document.title,window.location.href);
         return;
       }
 
@@ -1526,6 +1576,8 @@
       notesEditorInput.addEventListener("input", function onNotesEditorInput() {
         syncNotesEditorToCompact();
         syncNotesEditorClear();
+        operationRevision += 1;
+        saveMobileDraft();
       });
     }
 
@@ -1540,8 +1592,10 @@
       return false;
     }
 
+    operationRevision += 1;
     currentConfigStep = configStep;
     currentSnapshot = snapshot;
+    currentPayload = payload;
 
     syncCopy();
     syncSummary(snapshot);
@@ -1552,7 +1606,15 @@
     node.setAttribute("aria-hidden", "false");
     document.body.setAttribute(CONTACT_STEP_ACTIVE_ATTR, "true");
 
+    saveMobileDraft();
+    if (!restoringDraft) {
+      const state=Object.assign({},window.history.state,{directTransferMobileRoute:true});
+      window.history.replaceState(Object.assign({},state,{directTransferStep:'config'}),document.title,window.location.href);
+      window.history.pushState(Object.assign({},state,{directTransferStep:'datos'}),document.title,window.location.href);
+    }
+    const openingRevision=operationRevision, openedByRestore=restoringDraft;
     window.requestAnimationFrame(function focusFirstContactField() {
+      if(openedByRestore || !isOpen() || openingRevision!==operationRevision) return;
       const first = getContactField(FIELD_NAME);
 
       if (first && typeof first.focus === "function") {
@@ -1564,6 +1626,8 @@
   }
 
   function close() {
+    if (isOpen()) saveMobileDraft();
+    operationRevision += 1;
     if (!contactStepNode) {
       return false;
     }
@@ -1607,7 +1671,10 @@
     canOpen,
     syncCopy,
     submit: submitContactStep,
-    applyCanonicalQuote: applyCanonicalQuoteToCurrentSnapshot
+    applyCanonicalQuote: applyCanonicalQuoteToCurrentSnapshot,
+    revision: function(){return operationRevision;},
+    readDraft: readMobileDraft,
+    restoreDraft: restoreMobileDraft
   };
 
   window.PixkuyDirectTransferMobileContactContract = {
@@ -1620,6 +1687,9 @@
     applyCanonicalQuoteToSnapshot
   };
 
+  document.addEventListener('change',function(event){
+    if(isOpen() && event.target.matches('[data-direct-transfer-mobile-checkout-legal-acceptance] input')) window.queueMicrotask(function(){saveMobileDraft();});
+  });
   window.addEventListener("pixkuy:direct-transfer-canonical-price", function onCanonicalPrice(event) {
     applyCanonicalQuoteToCurrentSnapshot(event && event.detail);
   });
