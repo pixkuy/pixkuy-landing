@@ -1,5 +1,37 @@
 # Regresiones Hourly conservadas — 08/10/2026
 
+## Reparación posterior autorizada — 08/10/2026
+
+`node scripts/hourly-correction-regression.cjs`: **24 PASS, 0 FAIL, 0 omitidos**.
+Se mantienen los 24 escenarios, ejecutando los módulos/declaraciones reales.
+No se han cambiado producto, contratos de pago ni diseño.
+
+Los dobles representan ahora `hourlyEdit`, atributos de campos, etiquetas del
+formulario, `CSSStyleDeclaration`, foco, almacenamiento, propiedad Hourly y la
+forma actual del recurso de traducción. El caso sin historial reutiliza el DOM
+del fixture integrado, sin una segunda implementación de navegación.
+Tras volver a Configuración, se entra por `openData()` antes de `review()`;
+también se afirma que la llamada directa desde Configuración es rechazada.
+Es la guarda instalada por HOURLY-EXPIRY-GUARD-20261006, no una expectativa
+suavizada para pasar el test.
+
+La aserción CSS se vincula al diseño aprobado: Datos/Revisión usan el scroll del
+documento, altura automática y overflow visible, con cabecera conservada;
+Configuración conserva su scroll limitado y safe areas. Se comprueba también la
+ausencia del contenedor fijo anterior. El control único Volver conserva su
+presentación común y se prueba su destino; no se exige la antigua clave de texto.
+Referencias de implementación/aceptación en el workspace:
+
+- `.pixkuy-agents/work/sdd-local-dashboard/specs/SPEC-20261003-213150-3DE84785/candidate-revisions/mobile-composition-20261004/iphone-acceptance-r1/RESULTADO.md`.
+- El mismo expediente, `candidate-revisions/mobile-data-menu-20261005/RESULTADO.md`, y la continuación humana que acepta Datos/navegación y exige conservar el scroll del documento.
+- `.pixkuy-agents/work/microphases/HOURLY-EXPIRY-TRANSPORT-20261006/ACEPTACION-USUARIO.md`: declaración de diez secuencias físicas aceptadas, distinta de estas comprobaciones.
+
+Evidencia de reparación: `evidence/local-commits-20261008/repairs/hourly-final.tap`.
+Los dobles DOM y la aserción CSS estática no acreditan layout de navegador ni una
+nueva aceptación iPhone. No se ejecutó SQL ni se repitió la batería física.
+
+## Registro anterior conservado
+
 `hourly-correction-regression.cjs` y `hourly-integrated-regression.js` proceden
 de SPEC-20261003-213150-3DE84785. Se conservan como soporte versionado, sin alterar
 aserciones ni equiparar sus versiones históricas con los recorridos aceptados.
