@@ -96,9 +96,10 @@
   .booking-status-mobile[data-airport-confirmed] .airport-return__address{display:block;font-weight:400;margin-top:2px;}
   .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__vehicle-value{justify-content:flex-start;flex-wrap:wrap;}
   .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__vehicle-thumb{order:-1;}
-  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__actions{display:flex;flex-direction:column;gap:2px;}
-  .booking-status-mobile[data-airport-confirmed] [data-booking-status-whatsapp]{border:1px solid rgba(236,220,189,.3);background:rgba(255,255,255,.03);font-size:14px;font-weight:650;}
-  .booking-status-mobile[data-airport-confirmed] :is([data-booking-status-primary],[data-booking-cancelled-home]){text-decoration:underline;text-underline-offset:3px;}
+  body:not([data-hourly-result]) .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__actions{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;margin:6px 0 0;}
+  body:not([data-hourly-result]) .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__actions > a{width:auto;min-width:0;max-width:100%;min-height:44px;height:auto;display:inline-flex;align-items:center;justify-content:flex-start;gap:6px;padding:8px 0;border:0;background:transparent;color:rgba(255,245,228,.80);font:inherit;font-size:13px;line-height:1.4;font-weight:500;text-decoration:underline;text-underline-offset:3px;white-space:normal;overflow-wrap:anywhere;}
+  body:not([data-hourly-result]) .booking-status-mobile[data-airport-confirmed] [data-booking-status-whatsapp]::before{content:"";display:inline-block;flex:0 0 18px;width:18px;height:18px;background:url("../img/icons/mobile-menu/phosphor/menu-whatsapp.svg") center/contain no-repeat;}
+  body:not([data-hourly-result]) .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__actions > :is([data-booking-status-primary],[data-booking-cancelled-home]){margin-left:auto;text-align:right;justify-content:flex-end;}
 
 }
 
@@ -521,4 +522,43 @@ body.booking-status-mobile-lock{
     outline:2px solid rgba(31,122,109,.95);
     outline-offset:2px;
   }
+}
+
+/* Airport pending: the accepted Hourly return hierarchy, without its domain
+   fields. Keep the existing scroll panel, authorized photo and action nodes. */
+@media (max-width:720px){
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__panel { font:inherit;line-height:1.4;padding:12px 18px calc(16px + env(safe-area-inset-bottom)); }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__title { margin:0 0 6px;font-size:20px;line-height:1.2; }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__lead { margin:0;font-size:13px;line-height:1.35; }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__details,
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__disclosure { padding:10px;border:1px solid rgba(236,220,189,.22);border-radius:10px;background:rgba(15,17,19,.42); }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__details { gap:4px 12px;margin:0; }
+  body .booking-status-mobile[data-airport-pending-return] :is(dt,dd) { margin:0; }
+  body .booking-status-mobile[data-airport-pending-return] dt { color:rgba(255,245,228,.56);font-size:14px;line-height:1.35;font-weight:700; }
+  body .booking-status-mobile[data-airport-pending-return] dd { font-size:12.5px;line-height:1.25;font-weight:750;color:rgba(255,249,238,.92);white-space:pre-wrap;overflow-wrap:anywhere; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__reference dt { color:rgba(255,245,228,.56);font-size:14px;line-height:1.35;font-weight:700; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__reference dd { color:rgba(255,249,238,.92);font-size:12.5px;line-height:1.25;font-weight:750; }
+  body .booking-status-mobile[data-airport-pending-return] :is([data-booking-status-pickup],[data-booking-status-destination]) { font-weight:400; }
+  body .booking-status-mobile[data-airport-pending-return] :is([data-booking-status-pickup],[data-booking-status-destination]) strong { display:block;font-weight:750; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__address { display:block;font-weight:400; }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__detail:has([data-booking-status-date],[data-booking-status-time],[data-booking-status-passengers],[data-booking-status-luggage]) { display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 6px; }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__detail:has([data-booking-status-date],[data-booking-status-time]) { grid-column:1 / -1; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__disclosure { margin:6px 0 0;padding:0 10px; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__disclosure summary { padding:12px 0;min-height:44px;font-size:13px;line-height:1.4;font-weight:800; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__contact { display:grid;gap:3px;margin:0;padding:0 0 10px;border:0;background:transparent; }
+  body .booking-status-mobile[data-airport-pending-return] [data-airport-return-name] dt { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%); }
+  body .booking-status-mobile[data-airport-pending-return] [data-booking-status-notes-row] { display:grid;gap:3px;margin-top:3px; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__resume { margin:12px 0 6px; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__payment { margin:0; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__payment dt { font-size:14px;line-height:1.4;font-weight:400; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__payment dd { color:rgba(61,158,122,.98);font-size:18px;line-height:1.4;font-weight:750; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__deadline { margin:4px 0 10px;font-size:12px;line-height:1.35;color:rgba(255,245,228,.70); }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__payment-actions { gap:8px; }
+  body .booking-status-mobile[data-airport-pending-return] .airport-return__payment-actions > * { min-height:44px;height:auto;padding:12px 16px;border-radius:9px;font:inherit;font-size:14px;line-height:1.2;font-weight:800; }
+  body .booking-status-mobile[data-airport-pending-return] [data-booking-cancelled-retry] { background:rgba(31,122,109,.86);color:rgba(255,249,238,.98); }
+  body .booking-status-mobile[data-airport-pending-return] [data-booking-cancelled-modify] { border:1px solid rgba(236,220,189,.38);background:transparent;font-weight:650; }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__actions { display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;margin:0; }
+  body .booking-status-mobile[data-airport-pending-return] .booking-status-mobile__actions > a { width:auto;min-width:0;max-width:100%;min-height:44px;height:auto;display:inline-flex;align-items:center;justify-content:flex-start;gap:6px;padding:8px 0;border:0;background:transparent;color:rgba(255,245,228,.80);font:inherit;font-size:13px;line-height:1.4;font-weight:500;text-decoration:underline;text-underline-offset:3px;white-space:normal;overflow-wrap:anywhere; }
+  body .booking-status-mobile[data-airport-pending-return] [data-booking-cancelled-home] { margin-left:auto; }
+  body .booking-status-mobile[data-airport-pending-return] [data-booking-status-whatsapp]::before { content:"";display:inline-block;flex:0 0 18px;width:18px;height:18px;background:url("../img/icons/mobile-menu/phosphor/menu-whatsapp.svg") center/contain no-repeat; }
 }

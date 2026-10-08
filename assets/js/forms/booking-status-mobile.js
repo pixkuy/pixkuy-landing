@@ -304,6 +304,12 @@
 
   function passengerLabel(dictionary, result) {
     if (result && result.passengerLabel) {
+      if (result.serviceType === "airport_transfer" && result.view === "confirmed" && result.paymentStatus === "paid") {
+        // The public Airport label is a localized passenger band. Keep its
+        // exact range beside the translated dt; leave non-band labels intact.
+        var band = result.passengerLabel.match(/^[^\d]*?(\d+\s*[–-]\s*\d+)[^\d]*$/u);
+        if (band) return band[1];
+      }
       return result.passengerLabel;
     }
 
@@ -339,7 +345,7 @@
   }
 
   function getVehicleThumbnailSrc(result) {
-    if (result && result.serviceType === "airport_transfer") {
+    if (result && (result.serviceType === "airport_transfer" || result.serviceType === "hourly_daily" || result.serviceType === "direct_transfer")) {
       try {
         return window.PixkuyFleetSelection.photo({ photoUrl: result.vehiclePhotoUrl });
       } catch (_) { return ""; }
@@ -385,7 +391,7 @@
     image.setAttribute("aria-hidden", "true");
     image.setAttribute("loading", "lazy");
     image.setAttribute("decoding", "async");
-    if (result && result.serviceType === "airport_transfer") {
+    if (result && (result.serviceType === "airport_transfer" || result.serviceType === "hourly_daily" || result.serviceType === "direct_transfer")) {
       image.addEventListener("error", function () {
         if (image.parentNode === vehicleNode) {
           image.remove();
