@@ -26,7 +26,7 @@
   "editDataTitle": "Reservierungsdaten bearbeiten",
   "editDataText": "Wenn Sie Ihre Angaben ändern, bleibt dieselbe Buchung bestehen.",
   "originalAmount": "Ursprünglicher Betrag",
-  "exitEdit": "Ohne Änderungen zum Zahlungsstatus zurückkehren",
+  "exitEdit": "Bearbeitung abbrechen",
   "reviewTitle": "Prüfen Sie Ihre Buchung",
   "reviewText": "Prüfen Sie Strecke, Uhrzeit und Kontaktdaten vor der Zahlung.",
   "reviewCta": "Meine Buchung prüfen",

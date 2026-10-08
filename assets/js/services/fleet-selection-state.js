@@ -8,6 +8,8 @@
   var inflightPrechecks = {};
   var editingService = "";
   var airportCertificate = null;
+  var hourlyCertificate = null;
+  var HOURLY_EDIT_KEY = "pixkuy_hourly_pending_edit_v1";
   var AIRPORT_OFFER_MAX_AGE_MS = 5 * 60 * 1000;
   function copy(value) { return JSON.parse(JSON.stringify(value)); }
   function createAttemptKey() {
@@ -47,7 +49,22 @@
       return false;
     }
   }
-  function pending(state) { return state.attempt && state.attempt.state !== "not_committed" && !replacementEditing(); }
+  function pending(state) {
+    var attempt=state.attempt;
+    return attempt && attempt.state !== "not_committed" &&
+      !(attempt.payload && attempt.payload.service_type==="airport_transfer" && replacementEditing());
+  }
+  function hourlyEdit() {
+    try { var edit=JSON.parse(window.sessionStorage.getItem(HOURLY_EDIT_KEY)||"null");
+      return edit && edit.version===1 && edit.token && edit.editRevision && edit.idempotencyKey ? edit : null;
+    } catch(_){return null;}
+  }
+  function hourlyOfferStatus() {
+    var state=read("hourly_daily");
+    return {valid:!!(hourlyCertificate && state.offer && state.offer.models.length &&
+      hourlyCertificate.requestKey===state.offer.requestKey && Date.now()<hourlyCertificate.validUntil),
+      validUntil:hourlyCertificate?hourlyCertificate.validUntil:0};
+  }
   function selection(service) {
     var state = read(service);
     return state.selected ? { version: 1, model_id: state.selected.modelId, model_revision: state.selected.modelRevision } : null;
@@ -85,7 +102,7 @@
   }
   function model(service) {
     var state = read(service);
-    return service === "airport_transfer" && !validSelection(state, service) ? null : state.selected;
+    return (service === "airport_transfer" || service === "hourly_daily" && !pending(state)) && !validSelection(state, service) ? null : state.selected;
   }
   function snapshot(service, value, options) {
     var state = read(service);
@@ -169,7 +186,7 @@
     else parent.appendChild(control);
   }
   function validSelection(state, service) {
-    return !!((service !== "airport_transfer" || airportOfferCertified(state)) && state.selected && state.offer && state.offer.models.some(function (item) {
+    return !!((service !== "airport_transfer" || airportOfferCertified(state)) && (service !== "hourly_daily" || hourlyOfferStatus().valid) && state.selected && state.offer && state.offer.models.some(function (item) {
       return item.modelId === state.selected.modelId && item.modelRevision === state.selected.modelRevision;
     }));
   }
@@ -228,7 +245,8 @@
   }
   function render(service) {
     var state = read(service);
-    if (service === "airport_transfer" && !airportOfferCertified(state)) state = Object.assign({}, state, { offer: null });
+    if ((service === "airport_transfer" && !airportOfferCertified(state)) ||
+        (service === "hourly_daily" && !hourlyOfferStatus().valid && !pending(state))) state = Object.assign({}, state, { offer: null });
     var parent = host(service);
     var field = null;
     document.querySelectorAll('[data-fleet-selection="' + service + '"]').forEach(function (node) {
@@ -362,6 +380,15 @@
         expireAirportOfferIfNeeded();
       }, Math.max(1, validUntil - Date.now() + 1));
     }
+    if(service==="hourly_daily"){
+      hourlyCertificate={requestKey:offer.requestKey,validUntil:Date.now()+5*60*1000};
+      var hourlyProof=hourlyCertificate;
+      window.setTimeout(function(){
+        if(hourlyCertificate!==hourlyProof || pending(read(service)))return;
+        invalidateOffer(service);
+        document.dispatchEvent(new window.CustomEvent("pixkuy:fleet-offer-expired",{detail:{service:service}}));
+      },5*60*1000+1);
+    }
     if (prior) {
       state.selected = offer.models.find(function (item) { return item.modelId === prior.modelId && item.modelRevision === prior.modelRevision; }) ||
         (service === "airport_transfer" && !offer.models.length ? prior : null);
@@ -377,7 +404,7 @@
       if (sequences[service] !== sequence) throw new Error("FLEET_STALE_OFFER");
       var select = render(service);
       syncPresentation(service);
-      if (state.selected || !offer.models.length || pending(state)) return body;
+      if (state.selected || !offer.models.length || pending(state) || options && options.interactive === false) return body;
       if (!select) { result.checkoutAllowed = false; result.code = "FLEET_MODEL_SELECTION_REQUIRED"; return body; }
       // Resume the same precheck when the explicit choice arrives. Leaving this
       // control settles the pending flow safely and preserves the draft.
@@ -417,6 +444,10 @@
     var state = read(service);
     if (pending(state) && state.precheck) return Promise.resolve(new window.Response(JSON.stringify(state.precheck.body), { status: 200, headers: { "Content-Type": "application/json" } }));
     payload.fleet_contract_version = 1;
+    if(service==="hourly_daily" && hourlyEdit()){
+      var editing=hourlyEdit();
+      payload.pending_edit={bookingStatusToken:editing.token,editRevision:editing.editRevision};
+    }
     var selected = selection(service);
     if (selected) payload.fleet_selection = selected;
     var requestKey = url + "|" + JSON.stringify(payload);
@@ -426,8 +457,22 @@
     }
     invalidateOffer(service);
     var sequence = sequences[service];
-    var request = window.fetch(url, Object.assign({}, init, { body: JSON.stringify(payload) })).then(function (response) {
-      return response.clone().json().then(function (body) {
+    // Bound only network + body delivery, never the user's model selection.
+    var timeoutMs = options && options.transportTimeoutMs;
+    var abort = timeoutMs ? new window.AbortController() : null;
+    var timer;
+    var transport = new Promise(function (resolve, reject) {
+      if (timeoutMs) timer = window.setTimeout(function () {
+        abort.abort();
+        reject(new Error("FLEET_PRECHECK_TIMEOUT"));
+      }, timeoutMs);
+      window.fetch(url, Object.assign({}, init, { body: JSON.stringify(payload) }, abort ? { signal: abort.signal } : {}))
+        .then(function (response) {
+          return response.clone().json().then(function (body) { return { response: response, body: body }; });
+        }).then(resolve, reject);
+    }).finally(function () { if (timer) window.clearTimeout(timer); });
+    var request = transport.then(function (result) {
+      var response = result.response, body = result.body;
         if (sequences[service] !== sequence) throw new Error("FLEET_STALE_OFFER");
         if (response.status >= 500) {
           var error = new Error(body && body.code || "FLEET_PRECHECK_FAILED");
@@ -439,7 +484,6 @@
           if (sequences[service] !== sequence) throw new Error("FLEET_STALE_OFFER");
           return new window.Response(JSON.stringify(accepted), { status: response.status, headers: { "Content-Type": "application/json" } });
         });
-      });
     });
     inflightPrechecks[service] = { key: requestKey, sequence: sequence, promise: request };
     return request.then(function (response) { return response.clone(); }).finally(function () {
@@ -450,19 +494,26 @@
     var state = read(service);
     var payload = JSON.parse(init.body);
     state.draft = copy(payload);
+    if(service==="hourly_daily" && !pending(state) && hourlyEdit()){
+      var edit=hourlyEdit();
+      url=url.replace(/\/checkout$/, "/replace-checkout");
+      init=Object.assign({},init,{headers:Object.assign({},init.headers,{
+        "X-Pixkuy-Booking-Token":edit.token,"X-Pixkuy-Edit-Revision":edit.editRevision})});
+    }
     if (!pending(state)) {
       var selected = selection(service);
       if ((!selected || state.explicit) && state.offer) return Promise.reject(new Error("FLEET_MODEL_SELECTION_REQUIRED"));
       if (selected) payload.fleet_selection = payload.fleet_selection || selected;
       if (selected && (payload.fleet_selection.model_id !== selected.model_id || payload.fleet_selection.model_revision !== selected.model_revision)) return Promise.reject(new Error("FLEET_REVIEW_SELECTION_CHANGED"));
-      state.attempt = { state: "pending", key: createAttemptKey(), payload: copy(payload), url: url, headers: copy(init.headers || {}) };
+      state.attempt = { state: "pending", key: service==="hourly_daily" && hourlyEdit() ? hourlyEdit().idempotencyKey : createAttemptKey(), payload: copy(payload), url: url, headers: copy(init.headers || {}) };
     }
     var attempt = state.attempt;
     var sent = copy(attempt.payload);
     // Only transport evidence is renewable; commercial fields/key stay exactly frozen.
     if (sent.fleet_selection && payload.recaptchaToken) sent.recaptchaToken = payload.recaptchaToken;
     write(service, state); // Refuse the send when recoverable storage cannot be proved.
-    var headers = Object.assign({}, init.headers, { "Idempotency-Key": attempt.key });
+    var headers = Object.assign({}, service==="hourly_daily"?attempt.headers:init.headers, { "Idempotency-Key": attempt.key });
+    if(service==="hourly_daily")url=attempt.url;
     return window.fetch(url, Object.assign({}, init, { headers: headers, body: JSON.stringify(sent) })).then(function (response) {
       return response.clone().json().then(function (body) {
         var current = read(service);
@@ -473,7 +524,7 @@
           current.explicit = true; current.selected = null;
         } else if (body.bookingStatusToken) {
           current.attempt.state = "committed";
-          if (service === "airport_transfer") current.reservationToken = body.bookingStatusToken;
+          if (service === "airport_transfer" || service === "hourly_daily") current.reservationToken = body.bookingStatusToken;
         }
         write(service, current);
         render(service);
@@ -515,7 +566,7 @@
     return true;
   }
   function bindReservation(service, token) {
-    if (service !== "airport_transfer" || !token) return false;
+    if (["airport_transfer","hourly_daily"].indexOf(service)<0 || !token) return false;
     var state = read(service);
     state.reservationToken = token;
     write(service, state);
@@ -524,23 +575,25 @@
   // Called only after the public status confirms payment. A superseded checkout
   // attempt is not a paid reservation; pending edit/recovery keeps its context.
   function completeReservation(service, token, resolvedExpired) {
-    if (service !== "airport_transfer" || !token) return false;
+    if (["airport_transfer","hourly_daily"].indexOf(service)<0 || !token) return false;
     var state = read(service);
     var attempt = state.attempt;
     var owner = state.reservationToken || attempt && attempt.response && attempt.response.bookingStatusToken;
     if (owner !== token) return false;
     var edit;
-    try { edit = JSON.parse(window.sessionStorage.getItem(AIRPORT_REPLACEMENT_EDIT_KEY) || "null"); }
+    try { edit = JSON.parse(window.sessionStorage.getItem(service==="hourly_daily"?HOURLY_EDIT_KEY:AIRPORT_REPLACEMENT_EDIT_KEY) || "null"); }
     catch (_) { return false; }
     if (edit && edit.token !== token) return false;
     if (!resolvedExpired && attempt && (attempt.state !== "committed" || !attempt.response || attempt.response.bookingStatusToken !== token)) return false;
     sequences[service] = (sequences[service] || 0) + 1;
     delete inflightPrechecks[service];
-    airportCertificate = null;
+    if(service==="hourly_daily")hourlyCertificate=null;
+    else airportCertificate = null;
     editingService = "";
     write(service, {version:1, selected:null, offer:null, attempt:null, explicit:false});
-    ["pixkuy_airport_transfer_checkout_review_snapshot", "pixkuy_airport_transfer_checkout_review_return",
-      AIRPORT_REPLACEMENT_EDIT_KEY, "pixkuy_booking_checkout:" + token].forEach(function (key) {
+    (service==="hourly_daily" ? ["pixkuy_hourly_checkout_review_snapshot","pixkuy_hourly_checkout_review_return",
+      HOURLY_EDIT_KEY,"pixkuy_booking_checkout:"+token] : ["pixkuy_airport_transfer_checkout_review_snapshot", "pixkuy_airport_transfer_checkout_review_return",
+      AIRPORT_REPLACEMENT_EDIT_KEY, "pixkuy_booking_checkout:" + token]).forEach(function (key) {
       window.sessionStorage.removeItem(key);
     });
     document.dispatchEvent(new window.CustomEvent("pixkuy:fleet-offer-invalidated", {detail:{service:service}}));
@@ -594,7 +647,7 @@
       root.insertBefore(row, root.firstChild);
     }
     row.textContent = text("model") + ": " + selected.name;
-    if (service === "hourly_daily") row.textContent += " · " + text("passengers") + ": " + passengers();
+    if (service === "hourly_daily") row.textContent += " · " + text("passengers") + ": " + passengerLabel(passengers());
   }
   function syncPresentation(service) {
     var galleries = {airport_transfer:["PixkuyAirportMobileVehicleGallery"],direct_transfer:["PixkuyDirectTransferDesktopVehicleGallery","PixkuyDirectTransferMobileVehicleGallery"],hourly_daily:["PixkuyHourlyDesktopVehicleGallery","PixkuyHourlyMobileVehicleGallery"]};
@@ -691,6 +744,7 @@
     var state = read(service);
     if (pending(state)) return;
     if (service === "airport_transfer") airportCertificate = null;
+    if (service === "hourly_daily") hourlyCertificate = null;
     sequences[service] = (sequences[service] || 0) + 1;
     state.offer = null;
     write(service, state);
@@ -706,6 +760,13 @@
     if (event.type === "click") {
       if (!target.closest('[data-airport-tariff-passenger-option], [data-airport-tariff-swap], [data-airport-destination-clear], [data-direct-transfer-panel-passenger-option], [data-direct-transfer-panel-address-clear], [data-direct-transfer-mobile-address-clear], [data-contact-airport-hotel-passenger-option], [data-contact-airport-hotel-swap], [data-contact-airport-hotel-hotel-clear], [data-contact-hourly-daily-mode-option], [data-contact-hourly-daily-duration-option], [data-contact-direct-transfer-passenger-option], [data-contact-direct-transfer-origin-clear], [data-contact-direct-transfer-destination-clear]')) return;
     } else if (!target.matches('input:not([type="hidden"]):not([type="checkbox"]), select')) return;
+    if (target.closest("[data-services-hourly-config]")) return;
+    // The Direct input event already invalidated the quote for this value.
+    // Its later change/blur must not discard the resulting fleet offer.
+    if (event.type !== "click" && target.matches("[data-direct-transfer-mobile-config-field]")) {
+      if (airportEditValues.get(target) === target.value) return;
+      airportEditValues.set(target, target.value);
+    }
     if (target.closest("#services-expand-airport")) {
       if (event.type !== "click") {
         if (airportEditValues.get(target) === target.value) return;
@@ -731,9 +792,16 @@
     var parts = new Intl.DateTimeFormat("en-CA", {timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date(Date.now() + 24 * 60 * 60 * 1000));
     return ["year","month","day"].map(function (key) { return parts.find(function (part) { return part.type === key; }).value; }).join("-");
   }
-  function passengers() { return read("hourly_daily").passengers || 1; }
+  // Same capacity upper bounds as Airport getPassengerCountForFareKey (2/4/6).
+  // Labels are ranges; Hourly pricing never consumes a fare key.
+  function passengerBand(value) {
+    var count=hourlyPassengers(value);
+    return [{label:"1–2",maxPassengers:2},{label:"3–4",maxPassengers:4},{label:"5–6",maxPassengers:6}].find(function(band){return count<=band.maxPassengers;});
+  }
+  function passengerLabel(value) { return passengerBand(value).label; }
+  function passengers() { return passengerBand(read("hourly_daily").passengers || 2).maxPassengers; }
   function setPassengers(value) {
-    var number = hourlyPassengers(value), state = read("hourly_daily");
+    var number = passengerBand(value).maxPassengers, state = read("hourly_daily");
     state.passengers = number; write("hourly_daily", state);
     document.querySelectorAll('[name="hourly_daily_passengers"], [data-fleet-hourly-passengers]').forEach(function (field) { field.value = String(number); });
     syncFormPresentation("hourly_daily");
@@ -747,26 +815,32 @@
     });
     if (parent.querySelector("[data-fleet-hourly-passengers]")) return;
     var label = document.createElement("label");
-    label.className = "services-hourly-panel__row";
+    label.className = "services-hourly-panel__field services-hourly-panel__field--passengers";
     var title = document.createElement("span"); title.setAttribute("data-fleet-passengers-label", ""); title.textContent = text("passengers"); label.appendChild(title);
     loadLabels().then(function () { title.textContent = text("passengers"); });
     var control = document.createElement("select"); control.className = "services-hourly-panel__control";
     control.setAttribute("data-fleet-hourly-passengers", "");
     var state = read("hourly_daily");
-    for (var n = 1; n <= 6; n += 1) { var option = document.createElement("option"); option.value = String(n); option.textContent = String(n); control.appendChild(option); }
-    control.value = String(state.passengers || 1);
+    [2,4,6].forEach(function(n) { var option = document.createElement("option"); option.value = String(n); option.textContent = passengerLabel(n); control.appendChild(option); });
+    control.value = String(passengerBand(state.passengers || 2).maxPassengers);
     function sync() {
       setPassengers(control.value);
       document.dispatchEvent(new window.CustomEvent("pixkuy:fleet-passengers-changed", {detail:{service:"hourly_daily"}}));
     }
-    control.addEventListener("change", sync); label.appendChild(control); placeControl(parent, label); setPassengers(control.value);
+    control.addEventListener("change", sync); label.appendChild(control);
+    var top=parent.querySelector('.services-hourly-panel__row--top');
+    var notes=parent.querySelector('.services-hourly-panel__row--mobile-notes');
+    if(top)top.appendChild(label);else if(notes)notes.before(label);else placeControl(parent,label);
+    setPassengers(control.value);
   }
   window.PixkuyFleetSelection = { read: read, selection: selection, model: model, snapshot: snapshot, gallery: gallery, photo: modelPhoto,
     fetchPrecheck: fetchPrecheck, fetchCheckout: fetchCheckout, recoverAttempt: recoverAttempt, completeAttempt: completeAttempt, createAttemptKey: createAttemptKey,
     bindReservation: bindReservation, completeReservation: completeReservation,
-    airportOfferStatus: airportOfferStatus, expireAirportOfferIfNeeded: expireAirportOfferIfNeeded,
+    airportOfferStatus: airportOfferStatus,
+    hourlyOfferStatus: hourlyOfferStatus,
+    hourlyEdit: hourlyEdit, expireAirportOfferIfNeeded: expireAirportOfferIfNeeded,
     syncPresentation: syncPresentation, acceptOffer: acceptOffer, render: render,
-    minimumDate: minimumDate, hourlyPassengers: hourlyPassengers, passengers: passengers, setPassengers: setPassengers, invalidateOffer: invalidateOffer, canContinue: canContinue, syncFormPresentation: syncFormPresentation,
+    minimumDate: minimumDate, hourlyPassengers: hourlyPassengers, passengerLabel: passengerLabel, passengers: passengers, setPassengers: setPassengers, invalidateOffer: invalidateOffer, canContinue: canContinue, syncFormPresentation: syncFormPresentation,
     mountHourlyPassengers: mountHourlyPassengers, editFromReview: editFromReview, enterPanel: enterPanel };
   document.addEventListener("pixkuy:contact-service-change", function (event) {
     if (editingService && event.detail) {

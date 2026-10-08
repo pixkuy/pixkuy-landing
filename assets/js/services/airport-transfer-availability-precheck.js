@@ -282,7 +282,7 @@
         "X-Pixkuy-Site-Key": config.publicSiteKey
       },
       body: JSON.stringify(payload)
-    }, options).then(function handleResponse(response) {
+    }, Object.assign({}, options, { transportTimeoutMs: 20000 })).then(function handleResponse(response) {
       return response.json().catch(function () {
         return {};
       }).then(function handleBody(body) {

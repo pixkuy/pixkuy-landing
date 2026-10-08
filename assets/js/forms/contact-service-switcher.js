@@ -265,6 +265,13 @@
         ? normalizeText(serviceStateApi.getActiveServiceType())
         : "";
 
+    // The dedicated Hourly route owns this form while entering/reviewing data.
+    // Keyboard height changes must not invoke the generic contact fallback.
+    if (form && form.elements.service_type && form.elements.service_type.value === "hourly_daily" &&
+        window.PixkuyHourlyBookingFlow && window.PixkuyHourlyBookingFlow.isActive()) {
+      return "hourly_daily";
+    }
+
     if (!isMobileBlockedServiceType(activeServiceType)) {
       return activeServiceType;
     }
@@ -346,7 +353,9 @@
       activeServiceType === "direct_transfer";
     const shouldHideSharedMessage =
       activeServiceType === "hourly_daily" &&
-      !isMobileServiceSelectViewport();
+      !isMobileServiceSelectViewport() &&
+      !form.classList.contains("hourly-booking__form") &&
+      !(window.PixkuyHourlyBookingFlow && window.PixkuyHourlyBookingFlow.isActive());
 
     if (originField) {
       originField.hidden = shouldHideSharedPlacesAndPassengers;

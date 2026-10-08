@@ -198,5 +198,28 @@
         }
       }
     }
+  },
+  "hourlyBooking": {
+    "start": "Beginn des Services",
+    "serviceDetails": "Servicedetails",
+    "notesOptional": "Hinweise / Reiseplan (optional)",
+    "notesHelp": "Geben Sie Ihren Reiseplan oder hilfreiche Informationen zum Service an.",
+    "checkingAvailability": "Verfügbarkeit wird geprüft…",
+    "availabilityError": "Die Verfügbarkeit konnte nicht geprüft werden. Versuchen Sie es erneut; Ihre Angaben sind gespeichert.",
+    "availabilityUnavailable": "Das gewählte Fahrzeug ist nicht verfügbar. Prüfen Sie die Konfiguration auf aktuelle Optionen.",
+    "retryAvailability": "Erneut prüfen",
+    "confirmedText": "Zahlung bestätigt. Hier finden Sie die Details Ihres Services.",
+    "tripTitle": "Privater Chauffeurservice",
+    "hourly": "Stundenweise",
+    "fullDay": "Ganzer Tag",
+    "duration": "Dauer",
+    "end": "Serviceende",
+    "timezone": "Ortszeit Mexiko-Stadt",
+    "editTrip": "Service konfigurieren",
+    "reviewTitle": "Prüfen Sie Ihre Buchung",
+    "mobileReviewTitle": "Prüfen Sie Ihren Service",
+    "pendingServiceTitle": "Ihr Service",
+    "reviewCta": "Reservierung prüfen",
+    "expiredAccess": "Zugriff abgelaufen. Prüfen Sie Ihre Bestätigung oder kontaktieren Sie uns."
   }
 }

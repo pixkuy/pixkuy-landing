@@ -25,7 +25,7 @@
   "dataText": "We have kept the transfer you selected.",
   "editDataTitle": "Edit your reservation details",
   "editDataText": "Editing your details keeps the same booking.",
-  "exitEdit": "Return to payment status without applying changes",
+  "exitEdit": "Cancel editing",
   "reviewTitle": "Review your booking",
   "reviewText": "Check the route, time and contact details before paying.",
   "reviewCta": "Review my booking",

@@ -26,7 +26,7 @@
   "editDataTitle": "Modifiez les données de votre réservation",
   "editDataText": "La modification de vos informations conserve la même réservation.",
   "originalAmount": "Montant initial",
-  "exitEdit": "Revenir au statut du paiement sans appliquer les modifications",
+  "exitEdit": "Annuler la modification",
   "reviewTitle": "Vérifiez votre réservation",
   "reviewText": "Vérifiez le trajet, l’heure et vos coordonnées avant de payer.",
   "reviewCta": "Vérifier ma réservation",

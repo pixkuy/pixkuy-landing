@@ -102,7 +102,67 @@
     window.sessionStorage.setItem(FLEET_KEY, JSON.stringify(current));
   }
 
+  function beginHourly(state,startNew){
+    var raw=state.result.raw,edit=raw.edit;
+    var source=startNew?raw.continuation&&raw.continuation.draft:edit&&edit.allowed&&edit.draft;
+    if(!source || startNew&&!raw.actions.canCreateNewReservation)return false;
+    var store=window.PixkuyHourlyBookingDraft,fleet=window.PixkuyFleetSelection;
+    if(!store||!fleet)return false;
+    var current=fleet.read("hourly_daily"),prior=fleet.hourlyEdit();
+    if(current.reservationToken&&current.reservationToken!==state.token)return false;
+    if(!startNew && prior && prior.token===state.token && current.attempt &&
+      current.attempt.state!=="not_committed" &&
+      !(current.attempt.state==="committed" && current.attempt.response?.bookingStatusToken===state.token) &&
+      current.attempt.headers&&current.attempt.headers["X-Pixkuy-Booking-Token"]===state.token){
+      // Older edit contexts can lack presentation metadata. Reacquire it from
+      // this authorized status without changing the frozen attempt or its clock.
+      prior.reservationAmount={amountMinor:raw.payment.amountExpected,currency:raw.payment.currency};
+      prior.contact={name:source.customer?.full_name,phone:source.customer?.phone,email:source.customer?.email};
+      window.sessionStorage.setItem("pixkuy_hourly_pending_edit_v1",JSON.stringify(prior));
+      // Restore a missing presentation draft from the frozen request, without
+      // changing that request or releasing its recovery guard.
+      if(!store.read()){
+        var frozen=current.attempt.payload||{},rawFields=frozen.form_payload_raw||{};
+        var recoverySource=Object.assign({},source,{customer:frozen.customer||source.customer});
+        Object.keys(source).forEach(function(key){if(/^(hourly_daily_|fleet_)/.test(key)&&key in frozen)recoverySource[key]=frozen[key];});
+        if(rawFields.hourly_daily_notes!=null)recoverySource.hourly_daily_notes=rawFields.hourly_daily_notes;
+        var recovered=store.fromPublic(recoverySource,frozen);recovered.hourlyPendingToken=state.token;store.save(recovered);
+      }
+      window.location.assign("/?service=hourly_daily#hourly/revision");return true;
+    }
+    var consent=null,attempt=current.attempt;
+    if(!startNew&&current.reservationToken===state.token){
+      if(attempt&&attempt.state==="committed"&&attempt.response&&attempt.response.bookingStatusToken===state.token)consent=attempt.payload;
+      else if(prior&&prior.token===state.token&&prior.contactOnly){
+        var saved=store.read();if(saved?.hourlyPendingToken===state.token)consent=saved;
+      }
+    }
+    var snapshot=store.fromPublic(source,consent);
+    if(startNew){
+      fleet.completeReservation("hourly_daily",state.token,true);
+      var unsaved;try{unsaved=JSON.parse(window.sessionStorage.getItem("pixkuy_hourly_unsaved:"+state.token));}catch(_){}
+      if(unsaved)["name","email","phone","message","hourly_daily_notes"].forEach(function(key){if(key in unsaved)snapshot[key]=unsaved[key];});
+      delete snapshot.fleet_selection;delete snapshot.fleet_model;snapshot.legal_acceptance_accepted=false;
+    }else{
+      var context={version:1,token:state.token,editRevision:edit.revision,idempotencyKey:prior && prior.token===state.token && prior.editRevision===edit.revision && !attempt ? prior.idempotencyKey : fleet.createAttemptKey(),contactOnly:true,
+        publicCode:state.result.publicCode,expiresAt:raw.hold.expiresAt,serverNow:raw.serverNow,receivedAt:Date.now(),
+        reservationAmount:{amountMinor:raw.payment.amountExpected,currency:raw.payment.currency},
+        contact:{name:snapshot.name,phone:snapshot.phone,email:snapshot.email}};
+      window.sessionStorage.setItem("pixkuy_hourly_pending_edit_v1",JSON.stringify(context));
+      // Public authorization permits replacing the old attempt. The new replacement
+      // is owned by the same shared fleet state, never by a parallel attempt store.
+      var model=source.fleet_model||{},selection=source.fleet_selection||{};
+      current.attempt=null;current.offer=null;current.explicit=false;current.reservationToken=state.token;
+      current.selected={modelId:selection.model_id,modelRevision:selection.model_revision,name:model.name,
+        photoUrl:model.photoUrl,photoUrls:model.photoUrl?[model.photoUrl]:[]};
+      window.sessionStorage.setItem("pixkuy_fleet_b:hourly_daily",JSON.stringify(current));
+    }
+    if(!startNew)snapshot.hourlyPendingToken=state.token;
+    store.save(snapshot);window.sessionStorage.setItem(store.returnKey,"1");
+    window.location.assign("/?service=hourly_daily#hourly/"+(startNew?"servicio":"datos"));return true;
+  }
   function beginEdit(state) {
+    if(state.result.serviceType==="hourly_daily")return beginHourly(state,false);
     var edit = state.result.raw && state.result.raw.edit;
     var draft = edit && edit.draft;
     if (!edit || !edit.allowed || !draft) return false;
@@ -129,7 +189,10 @@
       receivedAt: Date.now(),
       createdAt: new Date().toISOString()
     };
-    window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(buildSnapshot(draft)));
+    var snapshot = buildSnapshot(draft);
+    snapshot.airport_pending_token = state.token;
+    snapshot.airport_draft_stage = "datos";
+    window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
     window.sessionStorage.setItem(RETURN_KEY, "1");
     window.sessionStorage.setItem(EDIT_KEY, JSON.stringify(context));
     persistFleetDraft(draft, state.token);
@@ -142,7 +205,7 @@
       state &&
       state.result &&
       state.result.view === "pending" &&
-      state.result.serviceType === "airport_transfer" &&
+      ["airport_transfer","hourly_daily"].indexOf(state.result.serviceType)>=0 &&
       state.result.raw &&
       state.result.raw.actions &&
       state.result.raw.actions.canModify === true &&
@@ -155,6 +218,7 @@
     allowed: canEdit,
     begin: beginEdit,
     beginNew: function (state) {
+      if(state.result.serviceType==="hourly_daily")return beginHourly(state,true);
       var raw = state.result.raw;
       if (!raw.actions.canCreateNewReservation || !raw.continuation || !raw.continuation.draft) return false;
       var fleet = window.PixkuyFleetSelection.read("airport_transfer");

@@ -801,6 +801,13 @@
       return false;
     }
 
+    // The active flow validates and persists its own edit provenance. Do not
+    // overwrite that draft with the raw snapshot before its recovery guard.
+    if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.review(snapshot)) {
+      setFormBusy(form, false);
+      return true;
+    }
+
     try {
       window.sessionStorage.setItem(
         AIRPORT_TRANSFER_CHECKOUT_REVIEW_STORAGE_KEY,
@@ -810,10 +817,6 @@
       return false;
     }
 
-    if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.review(snapshot)) {
-      setFormBusy(form, false);
-      return true;
-    }
     window.location.assign(AIRPORT_TRANSFER_CHECKOUT_REVIEW_PATH);
     return true;
   }
@@ -1615,6 +1618,7 @@
     }
 
     if (isDesktopViewport() || window.PixkuyAirportDesktopBooking.active()) {
+      if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.guardReviewExpiry()) return;
       setFormBusy(form, true);
 
       verifyAvailabilityBeforeCheckout(form, data)
@@ -1623,6 +1627,9 @@
               (!window.PixkuyAirportDesktopBooking.active() || window.PixkuyAirportDesktopBooking.revision() !== desktopFlowRevision)) {
             setFormBusy(form, false);
             return;
+          }
+          if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.guardReviewExpiry()) {
+            setFormBusy(form, false); return;
           }
           var isAllowed = Boolean(
             result &&
@@ -1654,6 +1661,7 @@
         .catch(function onAvailabilityPrecheckError() {
           setFormBusy(form, false);
           if (desktopFlowRevision !== null && (!window.PixkuyAirportDesktopBooking.active() || window.PixkuyAirportDesktopBooking.revision() !== desktopFlowRevision)) return;
+          if (window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.guardReviewExpiry()) return;
           showCheckoutError(form);
         });
 

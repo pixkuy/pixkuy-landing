@@ -11,9 +11,10 @@
   .airport-booking__progress li { position: relative; min-width: 0; }
   .airport-booking__progress li:not(:last-child)::after { content: ""; position: absolute; z-index: 0; top: 12px; left: calc(50% + 20px); width: calc(100% - 40px); height: 1px; background: #515859; }
   .airport-booking__progress li.is-complete:not(:last-child)::after { background: var(--accent); }
-  .airport-booking__step-content, .airport-booking__step-action { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 28px; color: inherit; font: inherit; white-space: nowrap; }
+  .airport-booking__step-content, .airport-booking__step-action { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 28px; color: inherit; font: inherit; white-space: normal; max-width: 100%; box-sizing: border-box; }
   .airport-booking__step-action { border: 0; background: var(--bg); padding: 0 8px 0 0; cursor: pointer; }
   .airport-booking__step-content { background: var(--bg); padding-right: 8px; }
+  .airport-booking__step-label { min-width:0; overflow-wrap:anywhere; }
   .airport-booking__step-marker { display: inline-grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; box-sizing: border-box; border: 1px solid #6e7677; border-radius: 50%; color: #c4c8c8; font-size: .78rem; line-height: 1; }
   .airport-booking__progress .is-complete, .airport-booking__progress .is-current { color: var(--fg); }
   .airport-booking__progress .is-complete .airport-booking__step-marker { border-color: var(--accent); color: var(--accent); }

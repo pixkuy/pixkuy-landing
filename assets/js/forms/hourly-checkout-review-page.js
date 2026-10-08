@@ -626,6 +626,11 @@
 
   function init() {
     var snapshot = readSnapshot();
+    if(snapshot){
+      window.sessionStorage.setItem("pixkuy_hourly_checkout_review_return","1");
+      window.location.replace("/?service=hourly_daily#hourly/revision");
+      return true;
+    }
 
     loadDictionary().then(function onDictionaryLoaded(dictionary) {
       renderSnapshot(snapshot, dictionary);

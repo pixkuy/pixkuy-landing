@@ -1028,6 +1028,7 @@
   }
 
   function openHourlyRoute() {
+    if(window.PixkuyHourlyBookingFlow?.resumeEntry())return true;
     const panel = getPanel();
 
     if (!isMobileViewport() || !panel) {
@@ -1326,7 +1327,7 @@
         url.searchParams.delete("service");
       }
 
-      if (url.hash === "#services") {
+      if (url.hash === "#services" || /^#hourly\/(datos|revision|servicio)$/.test(url.hash)) {
         url.hash = "";
       }
 
@@ -1372,6 +1373,20 @@
 
     return true;
   }
+
+  // visualViewport includes the usable height after Safari's keyboard/browser UI.
+  function syncViewportHeight() {
+    const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if (isMobileViewport() && height > 0) document.documentElement.style.setProperty('--hourly-viewport-height', height + 'px');
+    else document.documentElement.style.removeProperty('--hourly-viewport-height');
+  }
+  // Data/Review scroll naturally in the document, including native keyboard
+  // focus/Next and zoom. Only Configuration uses the bounded viewport height.
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncViewportHeight);
+  }
+  window.addEventListener('resize', syncViewportHeight);
+  syncViewportHeight();
 
   function syncActiveState() {
     const panel = getPanel();
@@ -1437,10 +1452,14 @@
     return true;
   }
 
+  function isHourlyBookingDestination() {
+    return /^#hourly\/(datos|revision|servicio)$/.test(window.location.hash);
+  }
+
   function shouldOpenFromUrl() {
     try {
       const params = new URLSearchParams(window.location.search || "");
-      return normalizeText(params.get("service")).toLowerCase() === "hourly_daily";
+      return isHourlyBookingDestination() || ((!window.location.hash || window.location.hash==="#services") && normalizeText(params.get("service")).toLowerCase() === "hourly_daily");
     } catch (error) {
       return false;
     }
@@ -1468,8 +1487,15 @@
     window.addEventListener("pageshow", syncActiveState);
     window.addEventListener("hashchange", syncActiveState);
     window.addEventListener("popstate", function onPopState() {
+      // Internal history belongs to the booking flow, regardless of listener order.
+      // The legacy configuration URL also needs to reopen on browser Forward.
+      if (shouldOpenFromUrl()) {
+        if (isMobileViewport() && !isRouteOpen) openHourlyRoute();
+        syncActiveState();
+        return;
+      }
       if (isRouteOpen) {
-        const shouldReturnToInMotion = Boolean(inMotionReturnContext || getInMotionReturnContextFromUrl());
+        const shouldReturnToInMotion = window.location.hash === "#pixkuy-in-motion" && Boolean(inMotionReturnContext || getInMotionReturnContextFromUrl());
 
         closeHourlyRoute({ collapsePanel: true, updateUrl: false });
 

@@ -2379,14 +2379,15 @@
     }
     window.PixkuyFleetSelection.editFromReview("airport_transfer");
 
-    window.setTimeout(function reapplyCheckoutReviewSnapshot() {
+    const canonicalRoute = window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active();
+    if (!canonicalRoute) window.setTimeout(function reapplyCheckoutReviewSnapshot() {
       if (edited) return;
       activateAirportHotelServiceForCheckoutReturn();
       applyHandoff(snapshot);
       scrollCheckoutReviewReturnToForm();
     }, 0);
 
-    window.setTimeout(function finalReapplyCheckoutReviewSnapshot() {
+    function finalReapplyCheckoutReviewSnapshot() {
       let restored = true;
       if (!edited) {
         activateAirportHotelServiceForCheckoutReturn();
@@ -2400,7 +2401,16 @@
         window.sessionStorage.removeItem(CHECKOUT_REVIEW_RETURN_KEY);
       } catch (error) {}
       form.dispatchEvent(new window.CustomEvent("pixkuy:airport-draft-restored", { bubbles: true, detail: { reviewReturnCompleted: true, restored: restored } }));
-    }, 250);
+    }
+    if (canonicalRoute) {
+      // The first frame drains the handoff/consent synchronizers queued by boot.
+      // Finish on the next frame instead of reapplying at both 0 and 250 ms.
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(finalReapplyCheckoutReviewSnapshot);
+      });
+    } else {
+      window.setTimeout(finalReapplyCheckoutReviewSnapshot, 250);
+    }
 
     return true;
   }

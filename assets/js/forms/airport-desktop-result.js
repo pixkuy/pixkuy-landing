@@ -31,6 +31,8 @@
     // The copy-ready event will render; never seed a persistent clock with keys.
     if (view.t('paymentRemaining') === 'paymentRemaining') return;
     var result = state.result, raw = result.raw, actions = raw.actions || {};
+    var pending = result.serviceType === 'airport_transfer' && result.view === 'pending' && result.paymentStatus !== 'processing';
+    root.toggleAttribute('data-airport-pending-return', pending);
     var panel = root.querySelector('[data-booking-cancelled-mobile-panel], [data-booking-status-mobile-panel]');
     var details = root.querySelector('[data-booking-status-details]');
     if (!panel || !details || details.hidden || result.serviceType !== "airport_transfer") {
@@ -68,11 +70,11 @@
       var address = key === 'pickup' ? result.pickupAddressDetail : result.destinationAddressDetail;
       var location=mobileLocation(label,address);
       value.textContent=location;
-      if(confirmed) {
+      if(confirmed || pending) {
         // Split only our separator between contract fields, never a display label.
         if(label && address && location===label+'\n'+address) {
           value.replaceChildren(view.node('strong','',label),view.node('span','airport-return__address',address));
-        } else if(key==='pickup' && !address) {
+        } else if(confirmed && key==='pickup' && !address) {
           value.replaceChildren(view.node('strong','',location));
         }
         // A compound destination stays complete and normal-weight. Do not guess
@@ -136,6 +138,14 @@
     if (mobileDeadline) payment.after(mobileDeadline);
     var retry=root.querySelector('[data-booking-cancelled-retry]');
     if (retry && !retry.disabled) retry.textContent=view.t('resumePayment');
+    if (pending) {
+      // Match the installed Hourly hierarchy, retaining action nodes and clock.
+      details.after(disclosure);
+      disclosure.after(resume);
+    } else {
+      // A live status refresh must restore the other states' existing order.
+      details.before(resume);
+    }
     var timezone=root.querySelector('[data-airport-confirmed-timezone]');
     if(confirmed) {
       if(!timezone) {timezone=view.node('div','airport-return__timezone');timezone.setAttribute('data-airport-confirmed-timezone','');}
@@ -158,7 +168,7 @@
       if(another)another.textContent=view.t('bookAnother');
     } else {
       if(timezone)timezone.remove();
-      var vehicleSummary=root.querySelector('.airport-return__vehicle-summary');
+      vehicleSummary=root.querySelector('.airport-return__vehicle-summary');
       if(vehicleSummary) {
         ['vehicle','passengers','luggage'].forEach(function(key){var value=root.querySelector('[data-booking-status-'+key+']');if(value)details.appendChild(value.parentNode);});
         vehicleSummary.hidden=true;

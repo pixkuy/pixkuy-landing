@@ -198,5 +198,28 @@
         }
       }
     }
+  },
+  "hourlyBooking": {
+    "start": "服务开始",
+    "serviceDetails": "服务详情",
+    "notesOptional": "备注 / 行程（选填）",
+    "notesHelp": "请填写您的行程或与服务有关的信息。",
+    "checkingAvailability": "正在查询可用车辆…",
+    "availabilityError": "无法查询可用车辆。请重试，您的信息已保存。",
+    "availabilityUnavailable": "所选车辆暂不可用。请在设置中查看当前可用选项。",
+    "retryAvailability": "重新查询",
+    "confirmedText": "付款已确认。您可以在此查看服务详情。",
+    "tripTitle": "专属司机服务",
+    "hourly": "按小时",
+    "fullDay": "全天",
+    "duration": "时长",
+    "end": "服务结束",
+    "timezone": "墨西哥城时间",
+    "editTrip": "设置服务",
+    "reviewTitle": "请核对您的预订",
+    "mobileReviewTitle": "请核对您的服务",
+    "pendingServiceTitle": "您的服务",
+    "reviewCta": "检查预订",
+    "expiredAccess": "访问已过期。请查看确认邮件或联系我们寻求帮助。"
   }
 }

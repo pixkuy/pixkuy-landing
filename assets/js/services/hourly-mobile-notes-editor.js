@@ -33,6 +33,7 @@
 
   let editorNode = null;
   let activeCompactInput = null;
+  let configurationScroll = 0;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -75,7 +76,7 @@
   function isHourlyMobileRouteActive() {
     return (
       isMobileViewport() &&
-      document.body.getAttribute(BODY_SCREEN_ATTR) === "true"
+      (document.body.getAttribute(BODY_SCREEN_ATTR) === "true" || document.body.classList.contains("hourly-booking-active"))
     );
   }
 
@@ -275,6 +276,9 @@
       return false;
     }
 
+    if (isEditorOpen()) return true;
+    const content = compactInput.closest("[data-hourly-mobile-route-content]");
+    configurationScroll = content ? content.scrollTop : 0;
     activeCompactInput = compactInput;
     syncCompactToEditor();
 
@@ -282,14 +286,27 @@
     editor.setAttribute("aria-hidden", "false");
     document.body.setAttribute(NOTES_EDITOR_ACTIVE_ATTR, "true");
 
-    window.requestAnimationFrame(function focusEditorInput() {
-      editorInput.focus({ preventScroll: true });
-      editorInput.setSelectionRange(editorInput.value.length, editorInput.value.length);
-    });
+    // Keep focus inside the opening gesture so iOS may present the keyboard.
+    editorInput.focus({ preventScroll: true });
+    editorInput.setSelectionRange(compactInput.selectionStart??editorInput.value.length,
+      compactInput.selectionEnd??editorInput.value.length);
+    syncVisualViewport();
 
     return true;
   }
 
+  function syncVisualViewport(){
+    if(!editorNode)return;
+    const viewport=window.visualViewport;
+    const header=document.querySelector(".mobile-topbar");
+    const headerHeight=header?header.getBoundingClientRect().height:60;
+    editorNode.style.height=Math.max(0,(viewport?viewport.height:window.innerHeight)-headerHeight)+"px";
+    editorNode.style.top=((viewport?viewport.offsetTop:0)+headerHeight)+"px";
+  }
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize",syncVisualViewport);
+    window.visualViewport.addEventListener("scroll",syncVisualViewport);
+  }
   function closeEditor() {
     const editor = ensureEditorNode();
 
@@ -298,14 +315,27 @@
     }
 
     syncEditorToCompact();
+    // End the editable focus before hiding; focusing the source textarea would
+    // keep iOS's keyboard alive and may open this editor again.
+    const input = getEditorInput();
+    if (input) input.blur();
 
     editor.hidden = true;
     editor.setAttribute("aria-hidden", "true");
     document.body.setAttribute(NOTES_EDITOR_ACTIVE_ATTR, "false");
 
-    if (activeCompactInput && typeof activeCompactInput.focus === "function") {
-      activeCompactInput.focus({ preventScroll: true });
+    const content = activeCompactInput && activeCompactInput.closest("[data-hourly-mobile-route-content]");
+    const label = activeCompactInput && activeCompactInput.closest(".services-hourly-panel__field--notes")?.querySelector("label");
+    if (label) {
+      const previousTabIndex = label.getAttribute("tabindex");
+      label.setAttribute("tabindex", "-1");
+      label.focus({ preventScroll: true });
+      label.addEventListener("blur", function restoreTabIndex() {
+        if (previousTabIndex === null) label.removeAttribute("tabindex");
+        else label.setAttribute("tabindex", previousTabIndex);
+      }, { once: true });
     }
+    if (content) content.scrollTop = configurationScroll;
 
     activeCompactInput = null;
 
@@ -395,7 +425,7 @@
     });
 
     document.addEventListener("keydown", function onKeydown(event) {
-      if (event.key !== "Escape" || !isEditorOpen()) {
+      if (event.key !== "Escape" || event.defaultPrevented || !isEditorOpen() || !editorNode.contains(event.target)) {
         return;
       }
 

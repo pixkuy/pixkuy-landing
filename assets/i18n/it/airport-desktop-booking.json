@@ -26,7 +26,7 @@
   "editDataTitle": "Modifica i dati della prenotazione",
   "editDataText": "La modifica dei dati mantiene la stessa prenotazione.",
   "originalAmount": "Importo originale",
-  "exitEdit": "Torna allo stato del pagamento senza applicare modifiche",
+  "exitEdit": "Annulla modifica",
   "reviewTitle": "Verifichi la prenotazione",
   "reviewText": "Controlli il tragitto, l’orario e i contatti prima di pagare.",
   "reviewCta": "Verifica la mia prenotazione",

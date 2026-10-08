@@ -415,6 +415,8 @@
       }
 
       formsNamespace.applyContactHourlyDailyHandoff(detail);
+      // The ordinary Hourly route owns stage focus and scroll, as Airport does.
+      if (window.PixkuyHourlyBookingFlow && ['hourly','full_day'].includes(detail.hourly_daily_mode)) return;
       scrollToContactSection(form);
       focusHourlyDailyPrimaryField(form);
     });

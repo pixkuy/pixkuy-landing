@@ -1035,6 +1035,8 @@
   }
 
   function scrollCheckoutReviewReturnToForm() {
+    // The canonical pending-contact entry owns its one post-mount scroll.
+    if(window.PixkuyFleetSelection.hourlyEdit()?.contactOnly&&/^#hourly\/(datos|revision)$/.test(window.location.hash))return false;
     const form = getReservationForm();
 
     if (!form || typeof form.scrollIntoView !== "function") {
@@ -1050,12 +1052,14 @@
   }
 
   function restoreCheckoutReviewHourlyState() {
+    if(/^#hourly\/(datos|revision)$/.test(window.location.hash))return false;
     const snapshot = readCheckoutReviewReturnSnapshot();
 
     if (!snapshot) {
       return false;
     }
 
+    const returnHref=window.location.href;
     activateHourlyDailyServiceForCheckoutReturn();
 
     if (!applyHandoff(snapshot)) {
@@ -1064,12 +1068,14 @@
     window.PixkuyFleetSelection.editFromReview("hourly_daily");
 
     window.setTimeout(function reapplyCheckoutReviewSnapshot() {
+      if(window.location.href!==returnHref || window.PixkuyHourlyBookingFlow?.isActive())return;
       activateHourlyDailyServiceForCheckoutReturn();
       applyHandoff(snapshot);
       scrollCheckoutReviewReturnToForm();
     }, 0);
 
     window.setTimeout(function finalReapplyCheckoutReviewSnapshot() {
+      if(window.location.href!==returnHref || window.PixkuyHourlyBookingFlow?.isActive())return;
       activateHourlyDailyServiceForCheckoutReturn();
       applyHandoff(snapshot);
       scrollCheckoutReviewReturnToForm();

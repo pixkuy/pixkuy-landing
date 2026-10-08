@@ -552,10 +552,19 @@ onClearSelection: function () {
     return true;
   }
 
+  let automaticHourlyCheck;
   function invalidateAvailabilityState() {
     window.PixkuyFleetSelection.invalidateOffer('hourly_daily');
     availabilityRequestSequence += 1;
     activeAvailabilityContextKey = '';
+    window.clearTimeout(automaticHourlyCheck);
+    automaticHourlyCheck=window.setTimeout(()=>{
+      // Pending contact editing is owned by the Data/Review precheck. The
+      // restored configuration must not race it with a background request.
+      if(window.PixkuyFleetSelection.hourlyEdit()?.contactOnly)return;
+      if(isTransactionalHourlyMode() && isConfigComplete())
+        runHourlyAvailabilityPrecheck(buildHourlySubmitDetail(),{dispatchOnAvailable:false,interactive:false});
+    },350);
     availabilityBlockReason = '';
     lastAvailabilityResult = null;
     clearAvailabilityStatus();
@@ -1353,7 +1362,15 @@ function applyContactHourlyDailySync(snapshot) {
     return false;
   }
 
-  invalidateAvailabilityState();
+  const unchangedPendingTrip = window.PixkuyFleetSelection.hourlyEdit()?.contactOnly &&
+    state.mode === nextMode && state.durationHours === nextDuration &&
+    state.vehicleType === (normalizeText(safeSnapshot.vehicleType) || 'executive_van') &&
+    ['pickup', 'pickupPlaceId', 'pickupLat', 'pickupLng', 'tripDate', 'startTime'].every(
+      key => state[key] === normalizeText(safeSnapshot[key])) &&
+    state.currency === (normalizeText(safeSnapshot.currency) || 'MXN');
+  // Rehydrating labels/contact for the same pending trip changes no availability
+  // input. Retain the in-flight certificate; actual trip changes still invalidate.
+  if (!unchangedPendingTrip) invalidateAvailabilityState();
   state.mode = nextMode;
   state.vehicleType = normalizeText(safeSnapshot.vehicleType) || 'executive_van';
 state.pickup = normalizeText(safeSnapshot.pickup);
@@ -1822,7 +1839,7 @@ function runHourlyAvailabilityPrecheck(detail, options) {
   setAvailabilityStatus(labels.availability.checking, 'checking');
   setHourlyContinueBusy(true);
 
-  return precheckApi.precheck(detail)
+  return precheckApi.precheck(detail,{interactive:safeOptions.interactive!==false})
     .then(function (result) {
       if (!isCurrentHourlyAvailabilityRequest(requestId, contextKey)) {
         return false;
@@ -1882,12 +1899,25 @@ function handleHourlyContinue() {
   });
 }
 
-function applyNextAvailableSuggestion(nextAvailableStartLocal) {
+async function applyNextAvailableSuggestion(nextAvailableStartLocal) {
+  const original=buildHourlySubmitDetail();
+  const originalKey=getHourlyAvailabilityContextKey(original);
+  let fresh;
+  try { fresh=await getHourlyAvailabilityPrecheckApi().precheck(original,{interactive:false}); }
+  catch (_) { if(originalKey===getHourlyAvailabilityContextKey(buildHourlySubmitDetail()))setAvailabilityStatus(getLabels().availability.error,'error');return false; }
+  if(originalKey!==getHourlyAvailabilityContextKey(buildHourlySubmitDetail()))return false;
+  if(!fresh || isAvailabilityRequestFailure(fresh)){
+    setAvailabilityStatus(getLabels().availability.error,'error');return false;
+  }
+  if(fresh.available){clearAvailabilityBlock();setAvailabilityStatus(getLabels().availability.available,'success');return true;}
+  if(!fresh.nextAvailableStartLocal){
+    setAvailabilityBlock(fresh.code,fresh);setUnavailableAvailabilityStatus(fresh);return false;
+  }
   const suggestion = window.PixkuySharedAvailabilitySuggestion;
 
   return suggestion && typeof suggestion.apply === 'function'
     ? suggestion.apply({
-        nextAvailableStartLocal: nextAvailableStartLocal,
+        nextAvailableStartLocal: fresh.nextAvailableStartLocal,
         invalidate: invalidateAvailabilityState,
         applyDateTime: ({ date, time }) => {
           state.tripDate = date;
@@ -2000,6 +2030,7 @@ if (ctaButton && !ctaButton.disabled) {
       const target = event.target;
 
       if (target.matches('[data-services-hourly-date]')) {
+        if(state.tripDate === (target.value || ''))return;
         invalidateAvailabilityState();
         state.tripDate = target.value || '';
 
@@ -2015,6 +2046,7 @@ if (ctaButton && !ctaButton.disabled) {
       }
 
       if (target.matches('[data-services-hourly-time]')) {
+        if(state.startTime === (target.value || ''))return;
         invalidateAvailabilityState();
         state.startTime = target.value || '';
         syncDerivedState();
@@ -2031,8 +2063,14 @@ if (ctaButton && !ctaButton.disabled) {
 
     configMount.addEventListener('change', (event) => {
       const target = event.target;
+      if (target.matches('[data-services-hourly-time]')) {
+        if(state.startTime === (target.value || ''))return;
+        invalidateAvailabilityState();state.startTime=target.value || '';
+        syncDerivedState();syncLiveFieldValues();return;
+      }
 
       if (target.matches('[data-services-hourly-date]')) {
+        if(state.tripDate === (target.value || ''))return;
         invalidateAvailabilityState();
         state.tripDate = target.value || '';
 

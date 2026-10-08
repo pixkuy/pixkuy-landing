@@ -199,7 +199,7 @@
     };
   }
 
-  function precheck(detail) {
+  function precheck(detail, options) {
     var config = getConfig();
     var payload = buildPayload(detail);
 
@@ -228,7 +228,7 @@
         "X-Pixkuy-Site-Key": config.publicSiteKey
       },
       body: JSON.stringify(payload)
-    }).then(function handleResponse(response) {
+    }, options).then(function handleResponse(response) {
       return response.json().catch(function () {
         return {};
       }).then(function handleBody(body) {

@@ -26,7 +26,7 @@
   "editDataTitle": "修改预订信息",
   "editDataText": "修改信息时将保留同一预订。",
   "originalAmount": "原金额",
-  "exitEdit": "不应用修改并返回付款状态",
+  "exitEdit": "取消修改",
   "reviewTitle": "核对您的预订",
   "reviewText": "付款前请核对路线、时间和联系方式。",
   "reviewCta": "核对我的预订",

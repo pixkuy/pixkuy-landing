@@ -225,7 +225,7 @@
   }
 
   function getVehicleThumbnailSrc(result) {
-    if (result && result.serviceType === "airport_transfer") {
+    if (result && (result.serviceType === "airport_transfer" || result.serviceType === "direct_transfer")) {
       try {
         return window.PixkuyFleetSelection.photo({ photoUrl: result.vehiclePhotoUrl });
       } catch (_) { return ""; }
@@ -271,6 +271,9 @@
     image.setAttribute("aria-hidden", "true");
     image.setAttribute("loading", "lazy");
     image.setAttribute("decoding", "async");
+    if (result && result.serviceType === "direct_transfer") image.addEventListener("error", function () {
+      image.remove(); vehicleNode.classList.remove("booking-status-mobile__vehicle-value");
+    }, {once:true});
     if (result && result.serviceType === "airport_transfer") {
       image.addEventListener("error", function () {
         if (image.parentNode === vehicleNode) {
@@ -721,11 +724,18 @@
       "[data-booking-status-payment]",
       cancelledPaymentLabel(dictionary, result)
     );
-    setText(
-      root,
-      "[data-booking-status-amount]",
-      amountLabel(dictionary, result)
-    );
+    if (result.serviceType === "direct_transfer" && !root.querySelector("[data-booking-status-amount]")) {
+      var amountRow = document.createElement("div"), amountTitle = document.createElement("dt"), amountValue = document.createElement("dd");
+      amountRow.className = "booking-status-mobile__detail";
+      amountRow.setAttribute("data-direct-pending-amount", "");
+      amountTitle.setAttribute("data-booking-status-label", "amount");
+      amountTitle.textContent = tFallback(dictionary, "cancelled.details.amount", "details.amount");
+      amountValue.setAttribute("data-booking-status-amount", "");
+      amountRow.append(amountTitle, amountValue);
+      root.querySelector("[data-booking-status-details]").appendChild(amountRow);
+    }
+    setText(root, "[data-booking-status-amount]", result.serviceType === "direct_transfer" && result.view === "pending"
+      ? formatMoney(dictionary, result.paymentAmountExpected, result.paymentCurrency) : amountLabel(dictionary, result));
 	    setText(
       root,
       "[data-booking-status-notes]",

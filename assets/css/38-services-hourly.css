@@ -930,3 +930,15 @@ button.shared-availability-suggestion__link[data-direct-transfer-mobile-next-ava
     justify-content:center;
   }
 }
+
+/* Ordinary Hourly keeps the same form/vehicle columns throughout availability. */
+@media (min-width:721px){
+  [data-services-hourly-mode-active]:not([data-services-hourly-mode-active="custom_long_term"]) .services-hourly-panel__row--top{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(240px,320px);
+    grid-template-areas:"pickup pickup vehicle" "date time vehicle" "passengers passengers price";
+  }
+  [data-services-hourly-mode-active]:not([data-services-hourly-mode-active="custom_long_term"]) .services-hourly-panel__field--date,
+  [data-services-hourly-mode-active]:not([data-services-hourly-mode-active="custom_long_term"]) .services-hourly-panel__field--time{transform:none;}
+  [data-services-hourly-mode-active]:not([data-services-hourly-mode-active="custom_long_term"])[data-fleet-presentation="empty"] .services-hourly-panel__field--vehicle{display:grid !important;visibility:hidden;}
+  .services-hourly-panel__field--passengers{grid-area:passengers;max-width:220px;}
+}

@@ -198,5 +198,28 @@
         }
       }
     }
+  },
+  "hourlyBooking": {
+    "start": "Inicio del servicio",
+    "serviceDetails": "Detalles del servicio",
+    "notesOptional": "Notas / itinerario (opcional)",
+    "notesHelp": "Indique su itinerario o información útil para el servicio.",
+    "checkingAvailability": "Comprobando disponibilidad…",
+    "availabilityError": "No hemos podido comprobar la disponibilidad. Inténtelo de nuevo; sus datos están guardados.",
+    "availabilityUnavailable": "El vehículo seleccionado no está disponible. Revise la configuración para ver las opciones actuales.",
+    "retryAvailability": "Volver a comprobar",
+    "confirmedText": "Pago verificado. Puede consultar aquí los detalles de su servicio.",
+    "tripTitle": "Vehículo con conductor privado",
+    "hourly": "Por horas",
+    "fullDay": "Día completo",
+    "duration": "Duración",
+    "end": "Fin del servicio",
+    "timezone": "Horario de Ciudad de México",
+    "editTrip": "Configurar servicio",
+    "reviewTitle": "Revise su reserva",
+    "mobileReviewTitle": "Revise su servicio",
+    "pendingServiceTitle": "Su servicio",
+    "reviewCta": "Revisar reserva",
+    "expiredAccess": "Acceso caducado. Consulta tu confirmación o solicita ayuda."
   }
 }

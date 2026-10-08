@@ -15,6 +15,7 @@
   var pendingPrice = null;
   var busy = false;
   var revision = 0;
+  var deadlineInitialContext = "";
   var revalidation = null;
   var revalidationSequence = 0;
   var mobileReviewAttempt = "";
@@ -48,6 +49,52 @@
     return context && context.expiresAt && context.serverNow &&
       Date.parse(context.expiresAt) <= Date.parse(context.serverNow) + Math.max(0, Date.now() - context.receivedAt);
   }
+  function guardReviewExpiry() {
+    if (!editExpired()) return false;
+    busy = false; reviewed = null; notice = "editDeadlinePassed";
+    if (active()) renderPreservingUi();
+    return true;
+  }
+  function protectExpiredReview() {
+    var submit = form.querySelector("#contact-submit");
+    // Shared form synchronizers may enable their valid fields. They cannot
+    // override this editor's existing deadline guard (nor own another service).
+    if (active() && route()[1] === "datos" && editExpired() && !submit.disabled) {
+      submit.disabled = true;
+      submit.setAttribute("aria-disabled", "true");
+    }
+  }
+  new window.MutationObserver(protectExpiredReview).observe(form.querySelector("#contact-submit"), {
+    attributes: true, attributeFilter: ["disabled"]
+  });
+  function editProvenance() {
+    var value = read() || snapshot, context = editContext();
+    return window.history.state && window.history.state.airportPendingToken ||
+      value && value.airport_pending_token || context && context.token;
+  }
+  function missingEditAuthority() {
+    var token = editProvenance(), context = editContext();
+    return !!token && (!context || context.token !== token);
+  }
+  function missingEditDraft() {
+    var token = editProvenance(), saved = read(), context = editContext();
+    // A dispatched replacement owns its frozen recovery payload. Presentation
+    // completeness must not replace that existing recovery with a new attempt.
+    if (context && context.attempt) return false;
+    return !!token && (!saved || saved.airport_pending_token !== token ||
+      ["name", "phone", "email", "message"].some(function (key) {
+        return !Object.prototype.hasOwnProperty.call(saved, key);
+      }));
+  }
+  function editRecoveryRequired() { return missingEditAuthority() || missingEditDraft(); }
+  function restorePendingContact() {
+    if (!editProvenance() || editRecoveryRequired()) return false;
+    // History can restore an older document or an unhydrated configurator.
+    // Read the current edit draft, not that document's cached snapshot/form.
+    // Own empty properties are deliberate deletions and must remain empty.
+    snapshot = read();
+    return window.PixkuyForms.restoreContactAirportHotelDraftFields(snapshot);
+  }
   function rememberUnsaved(context) {
     save();
     var draft = Object.assign({}, snapshot || {});
@@ -68,9 +115,14 @@
       });
     });
   }
-  function refreshEditDeadline() {
+  function refreshEditDeadline(initial) {
     var context = editContext();
     if(!context || !window.PixkuyAirportReview || !window.PixkuyAirportReview.requestStatus) return;
+    // pageshow and the ready fallback initialize the same document. Refresh once
+    // there; history restoration, visibility and explicit resume still refresh.
+    var key = context.token + "|" + context.editRevision;
+    if (initial && deadlineInitialContext === key) return;
+    deadlineInitialContext = key;
     window.PixkuyAirportReview.requestStatus(context.token).then(function (raw) {
       var current = editContext();
       if(!current || current.token !== context.token || !raw.serverNow || !raw.hold) return;
@@ -81,7 +133,10 @@
       if(active() && mount) mount.querySelectorAll('[data-airport-deadline]').forEach(function (line) {
         line.replaceWith(editDeadline(current));
       });
-    }).catch(function () { /* Backend authorization remains mandatory on every write. */ });
+    }).catch(function () {
+      if (deadlineInitialContext === key) deadlineInitialContext = "";
+      // Backend authorization remains mandatory on every write.
+    });
   }
   function pending() {
     if (editContext()) return null;
@@ -118,6 +173,13 @@
     return true;
   }
   function persist(value) {
+    var context = editContext(), prior = read();
+    if (context) {
+      value.airport_pending_token = context.token;
+      value.airport_draft_stage = route() ? route()[1] : "datos";
+    } else if (prior && prior.airport_pending_token && !value.airport_new_continuation) {
+      value.airport_pending_token = prior.airport_pending_token;
+    }
     if (!view.media.matches && !editContext() && !pending()) {
       value.airport_mobile_draft = true;
       value.airport_draft_stage = route() ? route()[1] : "datos";
@@ -130,6 +192,7 @@
     return !!(state && state.valid);
   }
   function save() {
+    if (editRecoveryRequired()) return false;
     var draft = window.PixkuyAirportCheckout.draft();
     if (!draft || !draft.airport_transfer_airport_id) return false;
     snapshot = draft;
@@ -145,7 +208,7 @@
   // Reuse the authorized review-return mechanism for reload and browser history.
   if (route() && route()[1] !== "traslado" && read()) window.sessionStorage.setItem(RETURN, "1");
 
-  function navigate(step, focus) {
+  function navigate(step, focus, replace) {
     if (!view.media.matches) {
       mobileReviewAttempt = "";
       revalidationSequence += 1;
@@ -153,7 +216,7 @@
       if (notice === "checking" || notice === "unverified") notice = "";
     }
     revision += 1;
-    window.history.pushState(null, "", "#airport/" + step + (focus ? "/" + focus : ""));
+    window.history[replace ? "replaceState" : "pushState"](editProvenance() ? {airportPendingToken:editProvenance()} : null, "", "#airport/" + step + (focus ? "/" + focus : ""));
     render();
   }
   var mobileAppearance = [];
@@ -363,7 +426,6 @@
     mount.appendChild(form);
     var editing = editContext();
     if (editing && editing.expiresAt && editing.serverNow) mount.appendChild(editDeadline(editing));
-    if (editing) mount.appendChild(button("exitEdit", returnToPaymentStatus, false));
     renderNotice(mount);
     mount.querySelectorAll('.airport-booking__primary').forEach(function (node) { node.classList.add('airport-mobile-contact-step__submit'); node.classList.remove('cta'); });
     var focus = route()[2];
@@ -530,6 +592,10 @@
           result.statusCode >= 400 && result.statusCode < 500 && !body.recovery)) {
       notice = "saveRejected"; reviewed = null; return;
     }
+    if (editing && body.recovery && body.recovery.action === "reservation_status") {
+      window.location.assign("/booking-success.html?token=" + encodeURIComponent(editing.token));
+      return;
+    }
     if (editing && body.recovery && ["unknown", "committed"].indexOf(body.recovery.state) >= 0) {
       notice = "saveUncertain"; reviewed = null; return;
     }
@@ -540,7 +606,7 @@
         window.sessionStorage.removeItem(EDIT_KEY);
         window.PixkuyFleetSelection.completeAttempt("airport_transfer", body.bookingStatusToken);
       }
-      window.PixkuyAirportReview.redirectToCheckout(body.checkoutUrl, body.bookingStatusToken);
+      return window.PixkuyAirportReview.redirectToCheckout(body.checkoutUrl, body.bookingStatusToken);
     } else if (body.code === "CHECKOUT_ALREADY_COMPLETED" ||
         body.recovery && body.recovery.state === "authoritative_status") {
       if (editing) window.sessionStorage.removeItem(EDIT_KEY);
@@ -563,7 +629,9 @@
     }).catch(function () { notice = "saveUncertain"; }).finally(function () { busy = false; if (active()) render(); });
   }
   function checkout() {
-    if(editExpired()) { save(); notice = "editDeadlinePassed"; renderPreservingUi(); return; }
+    if (editRecoveryRequired()) { render(); return; }
+    // An existing dispatched attempt uses its recovery path, never a new clock.
+    if (!(editContext() && editContext().attempt) && guardReviewExpiry()) return;
     if (busy) return;
     var editingAttempt = editContext();
     if (editingAttempt && editingAttempt.attempt) { recoverReplacement(); return; }
@@ -577,10 +645,16 @@
     var before = snapshot;
     var checkingOnly = notice !== "localError" && (!!notice || !reviewed);
     var operation = "availability";
+    var departing = false;
     var current = revision;
-    busy = true; render();
+    busy = true;
+    // Only the action state changes while the existing review is submitted.
+    // Keep its form, deadline and focus mounted; error/offer results still render.
+    mount.setAttribute("aria-busy", "true");
+    mount.querySelectorAll("button.airport-booking__primary, button.airport-booking__link").forEach(function (button) { button.disabled = true; });
     Promise.resolve().then(function () { return window.PixkuyAirportCheckout.prepare(); }).then(function (fresh) {
       if (current !== revision || !active() || route()[1] !== "revision") return;
+      if (editRecoveryRequired() || guardReviewExpiry()) return;
       snapshot = fresh;
       if (checkingOnly || commercialKey(before) !== commercialKey(fresh)) {
         changed = commercialKey(before) !== commercialKey(fresh);
@@ -599,7 +673,7 @@
         ? window.PixkuyAirportReview.requestReplacement(fresh, editing)
         : window.PixkuyAirportReview.requestCheckout(fresh);
       return request.then(function (result) {
-        receiveCheckoutResult(result, editing);
+        departing = receiveCheckoutResult(result, editing) === true;
       });
     }).catch(function (error) {
       if (current !== revision) return;
@@ -608,7 +682,7 @@
       // validation or storage failures without that evidence are not a lost payment.
       notice = failedEdit && failedEdit.attempt ? "saveUncertain" : pending() ? "uncertain" : operation === "checkout" ? "localError" : requestErrorKind(error, "technical");
       reviewed = null;
-    }).finally(function () { busy = false; if (active()) render(); });
+    }).finally(function () { busy = false; if (active() && !departing) render(); });
   }
   function recover() {
     if (busy) return;
@@ -670,6 +744,7 @@
     renderPreservingUi();
     request.then(function (fresh) {
       if (current !== revalidationSequence || !active() || !view.media.matches && routeRevision !== revision) return false;
+      if (editRecoveryRequired() || guardReviewExpiry()) return false;
       changed = commercialKey(before) !== commercialKey(fresh);
       notice = changed ? "offerChanged" : "";
       persist(fresh);
@@ -679,6 +754,7 @@
       return true;
     }).catch(function (error) {
       if (current !== revalidationSequence || !active() || !view.media.matches && routeRevision !== revision) return false;
+      if (guardReviewExpiry()) return false;
       var fleet = window.PixkuyFleetSelection.read("airport_transfer");
       if (fleet && fleet.explicit && !fleet.selected && fleet.offer && fleet.offer.models && fleet.offer.models.length) {
         goTrip();
@@ -722,7 +798,8 @@
   }
   function render(options) {
     if (!active()) {
-      restoreForm();
+      // Hourly may own the same canonical form during its route navigation.
+      if (!form.classList.contains("hourly-booking__form")) restoreForm();
       if (route() && route()[1] === "traslado") {
         if (!view.media.matches && window.PixkuyAirportMobileBookingFlow) window.PixkuyAirportMobileBookingFlow.open();
         window.PixkuyFleetSelection.enterPanel("airport_transfer");
@@ -739,6 +816,19 @@
       return;
     }
     snapshot = snapshot || read();
+    // History is provenance only: a confirmed/cleared edit may recover status,
+    // never silently become a new payable reservation when revisiting Review.
+    if (editContext() && !(window.history.state && window.history.state.airportPendingToken)) {
+      window.history.replaceState(Object.assign({},window.history.state,{airportPendingToken:editContext().token}),"",window.location.href);
+    }
+    if (editRecoveryRequired()) {
+      mountShell(2);
+      mount.appendChild(view.node("p", "airport-booking__notice", view.t("incomplete")));
+      mount.appendChild(button("recover", function () {
+        window.location.assign("/booking-cancelled.html?token=" + encodeURIComponent(editProvenance()));
+      }, true));
+      return;
+    }
     if (!snapshot) { goTrip(); return; }
     if (form.elements.namedItem("service_type").value !== "airport_hotel") {
       window.PixkuyForms.contactServiceState.setActiveServiceType("airport_hotel", {source:"airport-desktop-route", skipConfirm:true});
@@ -764,15 +854,64 @@
       return editing ? { token: editing.token, revision: editing.editRevision } : null;
     },
     active: active,
+    guardReviewExpiry: guardReviewExpiry,
+    leave: function () {
+      if (!active()) return false;
+      save(); revision += 1; revalidationSequence += 1; revalidation = null;
+      restoreForm(); return true;
+    },
+    resumePending: function () {
+      var saved = read(), context = editContext();
+      if (!saved || !(context || saved.airport_pending_token)) return false;
+      snapshot = saved;
+      window.sessionStorage.setItem(RETURN, "1");
+      restoreTripContext(saved);
+      window.PixkuyForms.contactServiceState.setActiveServiceType("airport_hotel", {source:"airport-pending-resume",skipConfirm:true});
+      window.PixkuyForms.applyContactAirportHotelHandoff(saved);
+      navigate(context && context.attempt || saved.airport_draft_stage === "revision" ? "revision" : "datos");
+      refreshEditDeadline();
+      return true;
+    },
+    resumeDraft: function () {
+      var saved = read(), fleet = window.PixkuyFleetSelection.read("airport_transfer");
+      // Menu re-entry resumes an ordinary draft, never a payment/edit context
+      // or an explicit new continuation, which starts in the configurator.
+      if (view.media.matches || !saved || !saved.airport_mobile_draft ||
+          !/^(datos|revision)$/.test(saved.airport_draft_stage) ||
+          saved.airport_pending_token || window.sessionStorage.getItem(EDIT_KEY) ||
+          fleet.reservationToken || pending()) return false;
+      if (!saved.airport_transfer_date || !saved.airport_transfer_time ||
+          !saved.airport_transfer_passenger_fare_key || !window.PixkuyAirportMobileDraft.locationOf(saved)) return false;
+      if (!restoreTripContext(saved)) return false;
+      window.PixkuyForms.contactServiceState.setActiveServiceType("airport_hotel", {source:"airport-draft-resume",skipConfirm:true});
+      if (!window.PixkuyForms.applyContactAirportHotelHandoff(saved)) return false;
+      snapshot = saved;
+      notice = ""; reviewed = null; changed = false; pendingPrice = null;
+      // The existing form/consent validator decides whether Review is usable.
+      // The offer remains subject to the normal refresh and checkout guards.
+      var step = saved.airport_draft_stage === "revision" && window.PixkuyAirportCheckout.validate() ? "revision" : "datos";
+      navigate(step, null, true);
+      var resumedRevision = revision;
+      // The handoff schedules the existing consent synchronizer on the next
+      // frame. Reflect its verified state after it runs, unless we have left.
+      window.requestAnimationFrame(function () {
+        if (revision === resumedRevision && active()) renderPreservingUi();
+      });
+      return true;
+    },
     revision: function () { return revision; },
     focusError: focusError,
     open: function () {
+      if (editProvenance()) {
+        if (!restorePendingContact()) { navigate("datos"); return true; }
+      }
       save(); notice = ""; reviewed = null; pendingPrice = null;
       window.PixkuyFleetSelection.editFromReview("airport_transfer");
       navigate("datos"); return true;
     },
     review: function (value) {
       if (!active()) return false;
+      if (editRecoveryRequired() || guardReviewExpiry()) return true;
       persist(value); reviewed = value; notice = ""; changed = false; pendingPrice = null;
       navigate("revision");
       return true;
@@ -813,15 +952,22 @@
       save(); navigate("traslado");
     }
   });
-  window.addEventListener("popstate", function () { revision += 1; render(); });
+  window.addEventListener("popstate", function () {
+    if (route()) restorePendingContact();
+    revision += 1; render();
+  });
   window.addEventListener("hashchange", render);
-  window.addEventListener("pageshow", function () {
+  window.addEventListener("pageshow", function (event) {
     // The draft adapter is registered first and restores the trip on pageshow.
     // Contact restoration also owns deferred reapplications. Wait for its
     // terminal event before preparing with the canonical hidden quote fields.
-    if (!view.media.matches && editContext()) restoreTripContext(snapshot || read());
+    if (editContext()) {
+      snapshot = read();
+      restoreTripContext(snapshot);
+      if (route() || new URLSearchParams(window.location.search).get("service") === "airport_hotel") restorePendingContact();
+    }
     mobileReviewHydrated = window.sessionStorage.getItem(RETURN) !== "1";
-    refreshEditDeadline();
+    refreshEditDeadline(!event.persisted);
     busy = false;
     if (!active()) return;
     if (window.PixkuyFleetSelection.expireAirportOfferIfNeeded) window.PixkuyFleetSelection.expireAirportOfferIfNeeded();
@@ -864,12 +1010,13 @@
   });
   window.addEventListener("pixkuy:airport-desktop-copy", function () { if (active()) renderPreservingUi(); });
   view.media.addEventListener("change", function () {
+    if (window.PixkuyHourlyBookingFlow && window.PixkuyHourlyBookingFlow.isActive()) return;
     revision += 1;
     if (form.elements.namedItem("service_type").value !== "airport_hotel") window.history.replaceState(null, "", "#contact");
     render();
   });
   window.addEventListener("beforeunload", function (event) {
-    if (active() && !save()) { event.preventDefault(); event.returnValue = ""; }
+    if (active() && !editRecoveryRequired() && !save()) { event.preventDefault(); event.returnValue = ""; }
   });
   view.ready.then(function () {
     window.setTimeout(function () {
@@ -879,7 +1026,7 @@
           if (editContext() || snapshot && (snapshot.airport_new_continuation || snapshot.airport_mobile_draft)) restoreTripContext(snapshot);
           render();
         }
-        refreshEditDeadline();
+        refreshEditDeadline(true);
       }
     }, 350);
   });

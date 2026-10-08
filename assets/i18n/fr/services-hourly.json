@@ -198,5 +198,28 @@
         }
       }
     }
+  },
+  "hourlyBooking": {
+    "start": "Début du service",
+    "serviceDetails": "Détails du service",
+    "notesOptional": "Notes / itinéraire (facultatif)",
+    "notesHelp": "Indiquez votre itinéraire ou toute information utile au service.",
+    "checkingAvailability": "Vérification des disponibilités…",
+    "availabilityError": "Impossible de vérifier les disponibilités. Réessayez ; vos informations sont conservées.",
+    "availabilityUnavailable": "Le véhicule sélectionné est indisponible. Consultez la configuration pour voir les options actuelles.",
+    "retryAvailability": "Vérifier à nouveau",
+    "confirmedText": "Paiement confirmé. Consultez ici les détails de votre service.",
+    "tripTitle": "Véhicule avec chauffeur privé",
+    "hourly": "À l’heure",
+    "fullDay": "Journée complète",
+    "duration": "Durée",
+    "end": "Fin du service",
+    "timezone": "Heure de Mexico",
+    "editTrip": "Configurer le service",
+    "reviewTitle": "Vérifiez votre réservation",
+    "mobileReviewTitle": "Vérifiez votre service",
+    "pendingServiceTitle": "Votre service",
+    "reviewCta": "Vérifier la réservation",
+    "expiredAccess": "Accès expiré. Consultez votre confirmation ou demandez de l’aide."
   }
 }

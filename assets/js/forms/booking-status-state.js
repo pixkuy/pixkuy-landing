@@ -447,16 +447,25 @@
   function normalizeResult(input) {
     var body = input.body || {};
     var reservationStatus = getReservationStatus(body);
+    // Only the token-scoped server response identifies Hourly; no storage or business-status inference.
+    var hourlyAccessExpired=input.statusCode===410 && body.code==="BOOKING_STATUS_TOKEN_EXPIRED" && body.serviceType==="hourly_daily";
+
 
     return {
-      view: resolveView(reservationStatus, input.statusCode, input.ok),
+      view: hourlyAccessExpired?"requestError":
+        getServiceType(body)==="hourly_daily"&&reservationStatus==="confirmed"&&getPaymentStatus(body)!=="paid"
+          ?"pending":resolveView(reservationStatus,input.statusCode,input.ok),
+      accessExpired:!!hourlyAccessExpired,
       reservationStatus: reservationStatus,
       paymentStatus: getPaymentStatus(body),
-      serviceType: getServiceType(body),
+      serviceType: hourlyAccessExpired?"hourly_daily":getServiceType(body),
       paymentAmountPaid: getPaymentAmountPaid(body),
       paymentAmountExpected: getPaymentAmountExpected(body),
       paymentCurrency: getPaymentCurrency(body),
       publicCode: getPublicCode(body),
+      hourlyMode:body.reservation&&body.reservation.hourlyMode||null,
+      serviceEndLocalDate:body.reservation&&body.reservation.serviceEndLocalDate||"",
+      serviceEndLocalTime:body.reservation&&body.reservation.serviceEndLocalTime||"",
       serviceStartLocalDate: getServiceStartLocalDate(body),
       serviceStartLocalTime: getServiceStartLocalTime(body),
       pickupAddress: getPickupAddress(body),
@@ -588,7 +597,7 @@
           window.clearTimeout(timeout);
           if (stopped) return;
           var result = normalizeResult(response);
-          if (result.view === "requestError" && currentState && currentState.result.view === "pending") {
+          if (result.view === "requestError" && !result.accessExpired && currentState && currentState.result.view === "pending") {
             stop();
             return;
           }

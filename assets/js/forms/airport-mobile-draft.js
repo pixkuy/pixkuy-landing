@@ -79,7 +79,10 @@
         if (input) input.value=value.airport_mobile_unresolved_address;
       }
       if (window.PixkuyAirportMobileBookingFlow) window.PixkuyAirportMobileBookingFlow.setLuggage(value.airport_transfer_luggage ?? value.luggage ?? "0");
-      window.PixkuyForms.restoreContactAirportHotelDraftFields(value);
+      // Restoring Airport's own trip in the background does not grant it the
+      // shared contact form. Hourly claims Data/Review before async copy loads.
+      if(!/^#hourly\/(datos|revision)$/.test(window.location.hash))
+        window.PixkuyForms.restoreContactAirportHotelDraftFields(value);
       document.dispatchEvent(new window.CustomEvent("pixkuy:airport-draft-restored"));
       ["date","time"].forEach(function (key) {
         var field=airport.panel.querySelector('[data-airport-tariff-role="'+key+'"] input');

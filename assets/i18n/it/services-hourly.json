@@ -198,5 +198,28 @@
         }
       }
     }
+  },
+  "hourlyBooking": {
+    "start": "Inizio del servizio",
+    "serviceDetails": "Dettagli del servizio",
+    "notesOptional": "Note / itinerario (facoltativo)",
+    "notesHelp": "Indichi il Suo itinerario o altre informazioni utili per il servizio.",
+    "checkingAvailability": "Verifica della disponibilità…",
+    "availabilityError": "Non è stato possibile verificare la disponibilità. Riprovi; i Suoi dati sono conservati.",
+    "availabilityUnavailable": "Il veicolo selezionato non è disponibile. Consulti la configurazione per le opzioni attuali.",
+    "retryAvailability": "Verificare di nuovo",
+    "confirmedText": "Pagamento verificato. Qui puoi consultare i dettagli del servizio.",
+    "tripTitle": "Veicolo con autista privato",
+    "hourly": "A ore",
+    "fullDay": "Giornata intera",
+    "duration": "Durata",
+    "end": "Fine del servizio",
+    "timezone": "Ora di Città del Messico",
+    "editTrip": "Configura il servizio",
+    "reviewTitle": "Verifichi la Sua prenotazione",
+    "mobileReviewTitle": "Verifica il tuo servizio",
+    "pendingServiceTitle": "Il tuo servizio",
+    "reviewCta": "Rivedi prenotazione",
+    "expiredAccess": "Accesso scaduto. Consulta la conferma o richiedi assistenza."
   }
 }

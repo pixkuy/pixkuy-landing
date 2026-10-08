@@ -369,6 +369,8 @@
     closeAllRoutes(route);
     pushServiceUrl(route);
 
+    const airport = window.PixkuyAirportDesktopBooking;
+    if (action === "airport" && airport && (airport.resumePending() || airport.resumeDraft())) return true;
     return api.open();
   }
 
@@ -427,6 +429,38 @@
   }
 
   function handleAction(action) {
+    // pushState does not emit hashchange/popstate. Release the current Hourly
+    // view before opening the destination through the existing menu routes.
+    const hourly = window.PixkuyHourlyBookingFlow;
+    const internal = ROUTES[action] || SCREENS[action] || ANCHORS[action];
+    const departed = internal && hourly && typeof hourly.leave === "function" && hourly.leave();
+    const airport = window.PixkuyAirportDesktopBooking;
+    if (internal && airport && airport.leave) airport.leave();
+    const handled = dispatchAction(action);
+    if (departed && handled) {
+      window.history.replaceState(Object.assign({}, window.history.state, { hourlyMenuDestination: action }), document.title, window.location.href);
+    }
+    return handled;
+  }
+
+  function restoreHourlyMenuDestination(event) {
+    const action = event.state && event.state.hourlyMenuDestination;
+    if (!isMobileViewport() || !(ROUTES[action] || SCREENS[action] || ANCHORS[action])) return;
+    const href = window.location.href;
+    // Existing route listeners first release the page being left. Reopen only
+    // menu history entries created by this Hourly exit, without adding history.
+    window.requestAnimationFrame(function restoreDestination() {
+      if (window.location.href !== href) return;
+      closeMenu();
+      closeAllRoutes(ROUTES[action]);
+      closeAllScreens(SCREENS[action]);
+      if (ROUTES[action]) getRouteApi(ROUTES[action]).open();
+      else if (SCREENS[action]) getScreenApi(SCREENS[action]).open({updateUrl:false});
+      else document.getElementById(ANCHORS[action])?.scrollIntoView({block:"start",behavior:"instant"});
+    });
+  }
+
+  function dispatchAction(action) {
     if (ROUTES[action]) {
       openService(action);
       return true;
@@ -543,6 +577,7 @@
     trigger.addEventListener("click", handleTriggerClick);
     root.addEventListener("click", handleRootClick);
     document.addEventListener("keydown", handleDocumentKeydown);
+    window.addEventListener("popstate", restoreHourlyMenuDestination);
     window.addEventListener("pageshow", handleViewportChange);
     window.addEventListener("resize", handleViewportChange);
 

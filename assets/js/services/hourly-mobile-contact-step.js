@@ -1722,6 +1722,14 @@
 
   function open(panel, payload) {
     const snapshot = buildSnapshotFromPayload(payload);
+    if(window.PixkuyHourlyBookingFlow && isTransactionalHourlySnapshot(snapshot)){
+      const form=getReservationFormsApi().getReservationForm();
+      fillReservationForm(snapshot,{
+        name:form.elements.namedItem("name").value,phone:form.elements.namedItem("phone").value,
+        email:form.elements.namedItem("email").value,notes:snapshot.hourly_daily_notes||""
+      },{skipLegacyValidation:true});
+      return window.PixkuyHourlyBookingFlow.openData(snapshot);
+    }
     const node = ensureContactStepNode(panel);
 
     if (!isMobileViewport() || !panel || !node || !hasCompleteHourlySnapshot(snapshot)) {

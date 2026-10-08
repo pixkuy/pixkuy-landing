@@ -26,7 +26,7 @@
   "editDataTitle": "Edite os dados da sua reserva",
   "editDataText": "A alteração dos seus dados mantém a mesma reserva.",
   "originalAmount": "Valor original",
-  "exitEdit": "Voltar ao estado do pagamento sem aplicar alterações",
+  "exitEdit": "Cancelar edição",
   "reviewTitle": "Reveja a sua reserva",
   "reviewText": "Confira o trajeto, o horário e os contactos antes de pagar.",
   "reviewCta": "Rever a minha reserva",

@@ -971,7 +971,8 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         data.hourlyDailyMode === 'hourly' ||
         data.hourlyDailyMode === 'full_day'
       ) &&
-      isDesktopViewport()
+      (isDesktopViewport() || (window.PixkuyFleetSelection?.hourlyEdit()?.contactOnly &&
+        window.PixkuyHourlyBookingFlow?.isActive()))
     ) {
       return getSubmitLabel(
         'services.cards.hourly.panel.reviewCta',
@@ -1051,6 +1052,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   }
 
   function restoreCheckoutReviewCommonFields(fields) {
+    if(/^#hourly\/(datos|revision)$/.test(window.location.hash))return false;
     var snapshot = readCheckoutReviewReturnSnapshot();
     var legalFieldNames;
 
