@@ -16,6 +16,7 @@
       "errorLead": "결제 세션을 사용할 수 없거나 만료되었습니다."
     },
     "details": {
+      "notes": "메모",
       "publicCode": "예약 코드",
       "service": "서비스",
       "pickup": "픽업",

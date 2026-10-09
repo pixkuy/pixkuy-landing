@@ -447,18 +447,18 @@
   function normalizeResult(input) {
     var body = input.body || {};
     var reservationStatus = getReservationStatus(body);
-    // Only the token-scoped server response identifies Hourly; no storage or business-status inference.
-    var hourlyAccessExpired=input.statusCode===410 && body.code==="BOOKING_STATUS_TOKEN_EXPIRED" && body.serviceType==="hourly_daily";
+    // Access expiration carries no evidence about settlement or reservation expiry.
+    var accessExpired=input.statusCode===410 && body.code==="BOOKING_STATUS_TOKEN_EXPIRED";
 
 
     return {
-      view: hourlyAccessExpired?"requestError":
-        getServiceType(body)==="hourly_daily"&&reservationStatus==="confirmed"&&getPaymentStatus(body)!=="paid"
+      view: accessExpired?"requestError":
+        reservationStatus==="confirmed"&&getPaymentStatus(body)!=="paid"
           ?"pending":resolveView(reservationStatus,input.statusCode,input.ok),
-      accessExpired:!!hourlyAccessExpired,
+      accessExpired:!!accessExpired,
       reservationStatus: reservationStatus,
       paymentStatus: getPaymentStatus(body),
-      serviceType: hourlyAccessExpired?"hourly_daily":getServiceType(body),
+      serviceType: accessExpired ? (body.serviceType || "") : getServiceType(body),
       paymentAmountPaid: getPaymentAmountPaid(body),
       paymentAmountExpected: getPaymentAmountExpected(body),
       paymentCurrency: getPaymentCurrency(body),

@@ -583,6 +583,7 @@
     document.body.setAttribute(NOTES_EDITOR_ACTIVE_ATTR, "true");
 
     window.requestAnimationFrame(function focusNotesEditor() {
+      if (editor.hidden || document.activeElement === editorInput) return;
       editorInput.focus({ preventScroll: true });
       editorInput.setSelectionRange(editorInput.value.length, editorInput.value.length);
     });
@@ -925,7 +926,7 @@
     );
     setText(
       submit,
-      getI18nValue("airportMobileContactStep.cta.submit", "")
+      window.PixkuyAirportDesktopView ? window.PixkuyAirportDesktopView.t("mobileReviewCta") : getI18nValue("services.cards.hourly.panel.reviewCta", "")
     );
     setText(
       globalError,
@@ -1703,4 +1704,5 @@
       }
     }
   });
+  window.addEventListener("pixkuy:airport-desktop-copy", function () { if (contactStepNode) syncCopy(); });
 })(window, document);

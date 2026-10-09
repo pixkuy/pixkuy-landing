@@ -1228,11 +1228,14 @@
       return false;
     }
 
+    var saved = stateApi.readReviewSnapshot();
+    if (saved && saved.mobileDraft && !isDesktopViewport()) snapshot.mobileDraft = saved.mobileDraft;
+
     if (!stateApi.writeReviewSnapshot(snapshot)) {
       return false;
     }
 
-    window.location.assign(DIRECT_TRANSFER_CHECKOUT_REVIEW_PATH);
+    window.location.assign(DIRECT_TRANSFER_CHECKOUT_REVIEW_PATH + "?lang=" + encodeURIComponent(document.documentElement.lang || "es"));
     return true;
   }
 
@@ -1690,6 +1693,12 @@
       return false;
     }
 
+    if (!isDesktopViewport() && snapshot.mobileDraft) {
+      window.PixkuyFleetSelection.editFromReview("direct_transfer");
+      window.sessionStorage.removeItem(stateApi.returnKey);
+      return true; // The mobile route restores its own form and legal proof.
+    }
+
     serviceState.setActiveServiceType("direct_transfer", {
       source: "direct-transfer-checkout-review-return"
     });
@@ -1894,7 +1903,9 @@
     setButtonsBusy(form, true);
 
     config = getConfig();
-    if (isDesktopViewport()) {
+    {
+      var mobileOwner = !isDesktopViewport() && window.PixkuyDirectTransferMobileContactStep;
+      var mobileRevision = mobileOwner && mobileOwner.revision();
       var precheckPayload = stateApi.buildPrecheckPayload(snapshot);
 
       if (!precheckPayload) {
@@ -1908,6 +1919,10 @@
         payload: precheckPayload
       })
         .then(function onPrecheckResult(result) {
+          if (mobileOwner && (!mobileOwner.isOpen() || mobileOwner.revision() !== mobileRevision)) {
+            setButtonsBusy(form, false);
+            return;
+          }
           if (isPrecheckAllowed(result)) {
             applyPrecheckPriceToSnapshot(snapshot, result, true);
 
@@ -1939,7 +1954,6 @@
       return;
     }
 
-    runMobileCheckout(form, stateApi, snapshot, config);
   }
 
   function init() {

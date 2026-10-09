@@ -16,6 +16,7 @@
       "errorLead": "The payment session is not available or has expired."
     },
     "details": {
+      "notes": "Notes",
       "publicCode": "Reservation code",
       "service": "Service",
       "pickup": "Pickup",

@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "recover": "Zahlungsstatus prüfen",
+    "uncertain": "Das Ergebnis dieses Versuchs ist unklar. Prüfen Sie den Status vor einer weiteren Zahlung.",
     "availabilityUnavailable": "Zu dieser Zeit sind keine Fahrzeuge verfügbar.",
     "availabilityTechnical": "Die Verfügbarkeit konnte nicht geprüft werden. Bitte versuche es erneut.",
     "emptyTitle": "Kein Direkttransfer zur Pruefung",

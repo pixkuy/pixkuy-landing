@@ -115,6 +115,7 @@
     if (typeof result.paymentAmountPaid === "number") {
       return formatMoney(dictionary, result.paymentAmountPaid, result.paymentCurrency);
     }
+    if (result.paymentStatus === "paid") return emptyValue(dictionary);
 
     return formatMoney(dictionary, result.paymentAmountExpected, result.paymentCurrency);
   }
@@ -473,7 +474,7 @@
     }
 
     setText(root, "[data-booking-status-state]", t(dictionary, copyPath + ".state"));
-    setText(root, "[data-booking-status-title]", t(dictionary, copyPath + ".title"));
+    setText(root, "[data-booking-status-title]", result.reservationStatus === "failed" ? t(dictionary, "paymentLabels.failed") : t(dictionary, copyPath + ".title"));
     setText(root, "[data-booking-status-lead]", t(dictionary, copyPath + ".lead"));
 
     setText(root, '[data-booking-status-label="publicCode"]', t(dictionary, "details.publicCode"));
@@ -487,7 +488,7 @@
     setText(root, '[data-booking-status-label="passengers"]', t(dictionary, "details.passengers"));
     setText(root, '[data-booking-status-label="luggage"]', t(dictionary, "details.luggage") || "Maletas");
     setText(root, '[data-booking-status-label="payment"]', t(dictionary, "details.payment"));
-    setText(root, '[data-booking-status-label="amount"]', t(dictionary, "details.amount"));
+    setText(root, '[data-booking-status-label="amount"]', t(dictionary, result.paymentStatus === "paid" || typeof result.paymentAmountPaid === "number" ? "details.amount" : "cancelled.details.amount"));
 	setText(root, '[data-booking-status-label="notes"]', t(dictionary, "details.notes"));
 	setText(root, '[data-booking-status-label="customerName"]', t(dictionary, "details.customerName"));
     setText(root, '[data-booking-status-label="customerPhone"]', t(dictionary, "details.customerPhone"));

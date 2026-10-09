@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "recover": "결제 상태 확인",
+    "uncertain": "이 시도의 결과를 확인할 수 없습니다. 다른 결제 전에 상태를 확인해 주세요.",
     "availabilityUnavailable": "요청하신 시간에 이용 가능한 차량이 없습니다.",
     "availabilityTechnical": "예약 가능 여부를 확인하지 못했습니다. 다시 시도해 주세요.",
     "emptyTitle": "검토할 직행 이동이 없습니다",

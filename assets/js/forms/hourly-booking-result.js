@@ -138,7 +138,7 @@
     amountRow.querySelector('dt').textContent=view.t(confirmed?'paidAmount':result.view==='pending'?'pendingAmount':'amount');
     amount.textContent=view.money(confirmed?result.paymentAmountPaid:result.paymentAmountExpected,result.paymentCurrency);
     payment.prepend(amountRow);
-    var key=!confirmed && raw.hold && raw.serverNow && !actions.canCreateNewReservation ? state.token+'|'+raw.hold.expiresAt : '';
+    var key=result.reservationStatus!=='failed' && !confirmed && raw.hold && raw.serverNow && !actions.canCreateNewReservation ? state.token+'|'+raw.hold.expiresAt : '';
     if (key !== mobileDeadlineKey) {
       if (mobileDeadline) mobileDeadline.remove();
       mobileDeadline=null;mobileDeadlineKey=key;

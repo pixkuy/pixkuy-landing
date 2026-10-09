@@ -261,6 +261,21 @@
     root.appendChild(error);
     container.appendChild(root);
 
+    function refreshCopy() {
+      // Update text in place: language/render is not a new act of consent.
+      // The canonical form may be detached temporarily while Review owns the screen.
+      label.firstChild.nodeValue = getCopy("terms.acceptance.checkbox", label.textContent);
+      error.textContent = getCopy("terms.acceptance.error", error.textContent);
+      var lang = document.documentElement.lang || "es";
+      ["viewTerms", "viewCancellations", "viewPrivacy"].forEach(function (key, index) {
+        var link = links.querySelectorAll("a")[index];
+        link.textContent = getCopy("terms.acceptance." + key, link.textContent);
+        link.setAttribute("href", [TERMS_URL, CANCELLATIONS_URL, PRIVACY_URL][index] + "?lang=" + encodeURIComponent(lang));
+      });
+    }
+    refreshCopy();
+    window.addEventListener("pixkuy:i18n-applied", refreshCopy);
+
     function setErrorVisible(visible) {
       error.hidden = !visible;
       checkbox.setAttribute("aria-invalid", visible ? "true" : "false");
@@ -278,6 +293,10 @@
       return latestSnapshot;
     }
 
+    checkbox.addEventListener("input", function () {
+      // Revoke proof before parent form listeners can rehydrate the old checked state.
+      if (!checkbox.checked) { latestSnapshot = null; clearFields(form); }
+    });
     checkbox.addEventListener("change", function onAcceptanceChange() {
       setErrorVisible(false);
       syncState();
@@ -314,6 +333,7 @@
       },
 
       destroy: function destroy() {
+        window.removeEventListener("pixkuy:i18n-applied", refreshCopy);
         clearFields(form);
         container.innerHTML = "";
       }

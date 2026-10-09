@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "recover": "Verificar estado do pagamento",
+    "uncertain": "Não podemos confirmar o resultado da tentativa. Consulte o estado antes de iniciar outro pagamento.",
     "availabilityUnavailable": "Não há veículos disponíveis neste horário.",
     "availabilityTechnical": "Não foi possível verificar a disponibilidade. Tente novamente.",
     "emptyTitle": "Nenhum transfer direto para rever",

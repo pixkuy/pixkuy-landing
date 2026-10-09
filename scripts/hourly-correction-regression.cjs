@@ -61,6 +61,13 @@ for(const scenario of ['changed','none','error','request-failure','context-chang
  assert.equal(error,['error','request-failure'].includes(scenario)?1:0);
 });
 const statusFile='assets/js/forms/booking-status-state.js';
+for(const file of ['assets/js/forms/booking-status-mobile.js','assets/js/forms/booking-status-desktop.js'])test(file+' uses paid evidence, never expected as missing paid amount',()=>{
+ const api=declarations(file,['formatMoney','amountLabel'],{Intl,emptyValue:()=> '—'});
+ const base={paymentAmountExpected:80000,paymentCurrency:'MXN',paymentAmountPaid:null};
+ assert.equal(api.amountLabel({}, {...base,paymentStatus:'paid'}),'—');
+ assert(api.amountLabel({}, {...base,paymentStatus:'pending'}).includes('800'));
+ assert(api.amountLabel({}, {...base,paymentStatus:'mismatch',paymentAmountPaid:90000}).includes('900'));
+});
 // Execute the real normalizer and its real pure accessors, not an alternate status implementation.
 const statusNames=['normalizeText','normalizeResult','resolveView',...Array.from(source(statusFile).matchAll(/function (get(?:ReservationStatus|PaymentStatus|ServiceType|PaymentAmountPaid|PaymentAmountExpected|PaymentCurrency|PublicCode|ServiceStartLocalDate|ServiceStartLocalTime|PickupAddress|DestinationAddress|DurationHours|PassengerCount|PassengerLabel|LuggageCount|CustomerNotes|VehicleDisplayName|CustomerFullName|CustomerEmail|CustomerPhone))\(/g),m=>m[1])];
 for(const storage of ['absent','throws','cleared'])test('Hourly public 410 independent of '+storage+' browser context',()=>{
@@ -68,7 +75,11 @@ for(const storage of ['absent','throws','cleared'])test('Hourly public 410 indep
  const normalize=declarations(statusFile,statusNames,{window}).normalizeResult;
  const result=normalize({statusCode:410,ok:false,body:{code:'BOOKING_STATUS_TOKEN_EXPIRED',serviceType:'hourly_daily'}});
  assert.equal(result.view,'requestError');assert.equal(result.accessExpired,true);assert.equal(result.serviceType,'hourly_daily');assert.equal(result.reservationStatus,'');
- for(const body of [{},{code:'BOOKING_STATUS_TOKEN_EXPIRED',serviceType:'airport_transfer'}])assert.equal(normalize({statusCode:410,ok:false,body}).accessExpired,false);
+ assert.equal(normalize({statusCode:410,ok:false,body:{}}).accessExpired,false);
+ for(const serviceType of ['airport_transfer','direct_transfer']){
+   const access=normalize({statusCode:410,ok:false,body:{code:'BOOKING_STATUS_TOKEN_EXPIRED',serviceType}});
+   assert.equal(access.accessExpired,true);assert.equal(access.view,'requestError');assert.equal(access.reservationStatus,'');
+ }
  assert.equal(normalize({statusCode:200,ok:true,body:{reservation:{serviceType:'hourly_daily',status:'hold_expired'}}}).view,'expired');
 });
 test('real Hourly view/flow: Review -> Data -> Configuration without browser history',async()=>{

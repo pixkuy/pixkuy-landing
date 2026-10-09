@@ -16,6 +16,7 @@
       "errorLead": "A sessão de pagamento não está disponível ou expirou."
     },
     "details": {
+      "notes": "Notas",
       "publicCode": "Código de reserva",
       "service": "Serviço",
       "pickup": "Recolha",

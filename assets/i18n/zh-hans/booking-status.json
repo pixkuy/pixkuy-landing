@@ -16,6 +16,7 @@
       "errorLead": "付款会话不可用或已过期。"
     },
     "details": {
+      "notes": "备注",
       "publicCode": "预订代码",
       "service": "服务",
       "pickup": "接载",

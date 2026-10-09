@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "recover": "Check payment status",
+    "uncertain": "We cannot confirm the outcome of this attempt. Check its status before starting another payment.",
     "availabilityUnavailable": "No vehicles are available at this time.",
     "availabilityTechnical": "We could not check availability. Please try again.",
     "emptyTitle": "No direct transfer to review",

@@ -142,6 +142,10 @@
   margin:18px 0 0;
 }
 
+.booking-status-page[data-direct-transfer-checkout-review-page] [data-direct-transfer-checkout-review-edit][hidden]{
+  display:none;
+}
+
 @media (max-height:760px) and (min-width:721px){
   .booking-status-page[data-direct-transfer-checkout-review-page]{
     padding-top:3vh;
@@ -166,12 +170,46 @@
 }
 
 @media (max-width:720px){
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__content { padding:0;border:0; }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__brand,
+  .booking-status-page[data-direct-transfer-checkout-review-page] [data-direct-transfer-checkout-review-content] > .booking-status__title,
+  .booking-status-page[data-direct-transfer-checkout-review-page] [data-direct-transfer-checkout-review-content] > .booking-status__lead {
+    display:none;
+  }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail {
+    padding:5px 10px;
+    gap:2px;
+    background:transparent;
+  }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__details {
+    padding:8px 0;
+    margin:6px 0 0;
+    background:rgba(15,17,19,.42);
+  }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail dd {
+    font-size:13px;
+    display:block;
+    -webkit-line-clamp:unset;
+  }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--service dt { display:none; }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--service dd { font-size:14px; }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__content > [data-direct-transfer-checkout-review-edit]:not([hidden]) {
+    display:inline-flex;width:auto;padding:0;border:0;background:none;min-height:32px;font-size:13px;
+  }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__content > [data-direct-transfer-checkout-review-edit]::before { content:'←';margin-right:6px; }
+  .direct-transfer-checkout-review__total { margin:12px 0; }
+  .direct-transfer-checkout-review__total .booking-status__detail { display:flex!important;justify-content:space-between;align-items:baseline; }
+  .direct-transfer-checkout-review__total .booking-status__detail dd { color:var(--accent);font-size:20px!important; }
+  .booking-status-page[data-direct-transfer-checkout-review-page] [data-direct-transfer-checkout-review-legal] { margin:10px 0 0;padding:10px; }
+  .direct-transfer-checkout-review__legal-card { padding:0;border:0;background:transparent; }
+  .booking-status-page[data-direct-transfer-checkout-review-page] [data-direct-transfer-checkout-review-legal] a { color:rgba(255,245,228,.85);font-size:12px; }
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__primary { border-radius:10px;min-height:44px; }
   .booking-status-page[data-direct-transfer-checkout-review-page]{
     padding:calc(72px + env(safe-area-inset-top)) 18px 24px;
   }
 
   .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__details{
-    grid-template-columns:1fr;
+    grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
   .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail,
@@ -180,10 +218,13 @@
   .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--vehicle,
   .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--customer-email,
   .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--notes{
-    grid-column:auto;
+    grid-column:1/-1;
   }
 
+  .booking-status-page[data-direct-transfer-checkout-review-page] :is(.booking-status__detail--date,.booking-status__detail--time,.booking-status__detail--passengers) { grid-column:auto; }
+
   .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--vehicle dd{
+    display:grid;
     grid-template-columns:minmax(0, 1fr) 92px;
   }
 

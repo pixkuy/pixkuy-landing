@@ -259,6 +259,7 @@
     if (typeof result.paymentAmountPaid === "number") {
       return formatMoney(dictionary, result.paymentAmountPaid, result.paymentCurrency);
     }
+    if (result.paymentStatus === "paid") return emptyValue(dictionary);
 
     return formatMoney(dictionary, result.paymentAmountExpected, result.paymentCurrency);
   }
@@ -835,7 +836,7 @@
     bindMobile(dictionary);
 
     setText(root, "[data-booking-status-state]", getCopy(dictionary, result.view, "state"));
-    setText(root, "[data-booking-status-title]", getCopy(dictionary, result.view, "title"));
+    setText(root, "[data-booking-status-title]", result.reservationStatus === "failed" ? t(dictionary, "paymentLabels.failed") : getCopy(dictionary, result.view, "title"));
     setText(root, "[data-booking-status-lead]", getCopy(dictionary, result.view, "lead"));
 
     setText(
@@ -896,7 +897,7 @@
     setText(
       root,
       '[data-booking-status-label="amount"]',
-      tFallback(dictionary, "mobile.details.amount", "details.amount")
+      result.paymentStatus === "paid" || typeof result.paymentAmountPaid === "number" ? tFallback(dictionary, "mobile.details.amount", "details.amount") : t(dictionary, "cancelled.details.amount")
     );
 	    setText(
       root,

@@ -16,6 +16,7 @@
       "errorLead": "Die Zahlungssitzung ist nicht verfügbar oder abgelaufen."
     },
     "details": {
+      "notes": "Anmerkungen",
       "publicCode": "Reservierungscode",
       "service": "Service",
       "pickup": "Abholung",

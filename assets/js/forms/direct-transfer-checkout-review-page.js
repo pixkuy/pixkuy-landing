@@ -24,6 +24,20 @@
   var I18N_FILE = "direct-transfer-checkout.json";
   var FALLBACK_LANG = "en";
   var API_CONFIG_ERROR_CODE = "DIRECT_TRANSFER_BOOKING_API_CONFIG_INVALID";
+  var currentDictionary = {};
+  var checkoutBusy = false;
+  function pendingAttempt() {
+    var attempt = window.PixkuyFleetSelection.read("direct_transfer").attempt;
+    return attempt && attempt.state !== "not_committed";
+  }
+  function syncRecovery() {
+    var proceed = getNode("[data-direct-transfer-checkout-review-proceed]");
+    var edit = getNode("[data-direct-transfer-checkout-review-edit]");
+    var pending = pendingAttempt();
+    if (proceed && pending) proceed.textContent = t(currentDictionary, "recover", "");
+    if (edit) { edit.hidden = !!pending; edit.setAttribute("aria-disabled", pending ? "true" : "false"); }
+    if (pending) showError(currentDictionary, {code:"CHECKOUT_STATE_UNCERTAIN"});
+  }
 
   function getStateApi() {
     var api = window.PixkuyDirectTransferTransactionalState;
@@ -336,6 +350,7 @@
   function buildVehicleRow(label, value, selectedModel) {
     var safeLabel = normalizeText(label);
     var safeValue = normalizeText(value);
+    var photo = selectedModel ? window.PixkuyFleetSelection.photo(selectedModel) : "";
 
     if (!safeLabel || !safeValue) {
       return "";
@@ -350,9 +365,7 @@
       '<span class="booking-status__vehicle-name">',
       escapeHtml(safeValue),
       "</span>",
-      '<span class="booking-status__vehicle-media" aria-hidden="true">',
-      selectedModel ? (window.PixkuyFleetSelection.photo(selectedModel) ? '<img src="' + escapeHtml(window.PixkuyFleetSelection.photo(selectedModel)) + '" alt="" loading="lazy" decoding="async">' : '') : '<img src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="" loading="lazy" decoding="async">',
-      "</span>",
+      photo ? '<span class="booking-status__vehicle-media" aria-hidden="true"><img src="' + escapeHtml(photo) + '" alt="" decoding="async"></span>' : "",
       "</dd>",
       "</div>"
     ].join("");
@@ -442,6 +455,22 @@
       notes ? buildRow(t(dictionary, "details.notes", "Notas"), notes, "notes") : ""
     ].join("");
 
+    document.querySelectorAll('[data-direct-review-contact],[data-direct-review-total]').forEach(function (node) { node.remove(); });
+    var edit = getNode("[data-direct-transfer-checkout-review-edit]");
+    var actions = getNode("[data-direct-transfer-checkout-review-content] .booking-status__actions");
+    if (window.matchMedia("(max-width:720px)").matches) {
+      var contact = document.createElement("dl");
+      contact.className = "booking-status__details direct-transfer-checkout-review__contact";
+      contact.setAttribute("data-direct-review-contact", "");
+      details.querySelectorAll('[class*="--customer-"],.booking-status__detail--notes').forEach(function (row) { contact.appendChild(row); });
+      details.after(contact);
+      var total = document.createElement("dl");
+      total.className = "direct-transfer-checkout-review__total";
+      total.setAttribute("data-direct-review-total", "");
+      total.appendChild(details.querySelector('.booking-status__detail--price'));
+      getNode("[data-direct-transfer-checkout-review-legal]").after(total);
+      if (edit) getNode("[data-direct-transfer-checkout-review-content]").prepend(edit);
+    } else if (edit && actions) actions.appendChild(edit);
     return true;
   }
 
@@ -468,6 +497,13 @@
       "</div>"
     ].join("");
 
+    var copy = window.__pixkuyI18nDict && window.__pixkuyI18nDict.terms && window.__pixkuyI18nDict.terms.acceptance;
+    if (copy) [ ['terms','viewTerms'], ['cancellations','viewCancellations'], ['privacy','viewPrivacy'] ].forEach(function (entry, index) {
+      if(index)legal.appendChild(document.createTextNode(' · '));
+      var link=document.createElement('a');link.href='legal/'+entry[0]+'.html?lang='+encodeURIComponent(getPreferredLang());
+      link.textContent=copy[entry[1]];legal.appendChild(link);
+    });
+
     return true;
   }
 
@@ -486,6 +522,7 @@
   }
 
   function renderSnapshot(snapshot, dictionary) {
+    currentDictionary = dictionary;
     var empty = getNode("[data-direct-transfer-checkout-review-empty]");
     var content = getNode("[data-direct-transfer-checkout-review-content]");
     var stateApi = getStateApi();
@@ -511,11 +548,13 @@
 
     setHidden(empty, true);
     setHidden(content, false);
+    syncRecovery();
 
     return true;
   }
 
   function setBusy(isBusy) {
+    checkoutBusy = Boolean(isBusy);
     var proceed = getNode("[data-direct-transfer-checkout-review-proceed]");
 
     if (!proceed) {
@@ -541,9 +580,11 @@
     var message;
 
     var precheck = error && error.result && error.result.body && error.result.body.result;
-    if (isApiConfigurationError(error)) {
+    if (pendingAttempt() || code === "CHECKOUT_STATE_UNCERTAIN") {
+      message = t(dictionary, "uncertain", "");
+    } else if (isApiConfigurationError(error)) {
       message = getApiConfigurationErrorMessage(dictionary);
-    } else if (error && error.httpStatus >= 500) {
+    } else if (error && (error.httpStatus >= 500 || error.result && error.result.statusCode >= 500 || error.name === "TypeError")) {
       message = t(dictionary, "availabilityTechnical", "");
     } else if (code === "DIRECT_TRANSFER_PRICE_MISMATCH") {
       message = t(dictionary, "quote.priceUpdated", "");
@@ -705,10 +746,7 @@
           headers: {
             "Content-Type": "application/json",
             "X-Pixkuy-Site-Key": config.publicSiteKey,
-            "Idempotency-Key": "pixkuy-direct-transfer-review-" +
-              Date.now() +
-              "-" +
-              Math.random().toString(36).slice(2)
+            "Idempotency-Key": window.PixkuyFleetSelection.createAttemptKey()
           },
           body: JSON.stringify(payload)
         });
@@ -732,9 +770,10 @@
     var stateApi = getStateApi();
 
     if (edit) {
-      edit.setAttribute("href", "/#contact");
+      edit.setAttribute("href", snapshot.mobileDraft ? "/?service=direct_transfer&lang=" + encodeURIComponent(getPreferredLang()) : "/?service=direct_transfer#contact");
 
-      edit.addEventListener("click", function onEditClick() {
+      edit.addEventListener("click", function onEditClick(event) {
+        if (checkoutBusy || pendingAttempt()) { event.preventDefault(); return; }
         if (!stateApi) {
           return;
         }
@@ -752,7 +791,16 @@
     }
 
     proceed.addEventListener("click", function onProceedClick() {
+      if (checkoutBusy) return;
       setBusy(true);
+      if (pendingAttempt()) {
+        window.PixkuyFleetSelection.recoverAttempt("direct_transfer")
+          .catch(function (error) { showError(currentDictionary, error); })
+          .finally(function () { setBusy(false); syncRecovery(); });
+        return;
+      }
+      var reviewedAmount = Number(snapshot.direct_transfer_amount_minor);
+      var reviewedModel = snapshot.fleet_selection && snapshot.fleet_selection.model_id;
 
       requestPrecheck(snapshot)
         .then(function onReviewPrecheck(result) {
@@ -781,7 +829,15 @@
           snapshot.direct_transfer_price_label = "";
           snapshot.direct_transfer_price_label = formatPrice(snapshot);
           stateApi.writeReviewSnapshot(snapshot);
-          renderDetails(snapshot, dictionary);
+          renderDetails(snapshot, currentDictionary);
+
+          // A changed amount/model must be visible before a new human gesture.
+          if (accepted && (reviewedAmount !== Number(snapshot.direct_transfer_amount_minor) ||
+              reviewedModel !== (snapshot.fleet_selection && snapshot.fleet_selection.model_id))) {
+            var changed = new Error("DIRECT_TRANSFER_REQUOTE_REQUIRED");
+            changed.code = changed.message;
+            throw changed;
+          }
 
           if (!accepted) {
             var precheckError = new Error(getPrecheckCode(result));
@@ -807,7 +863,8 @@
         })
         .catch(function onCheckoutError(error) {
           setBusy(false);
-          showError(dictionary, error);
+          showError(currentDictionary, error);
+          syncRecovery();
         });
     });
 
@@ -816,11 +873,14 @@
 
   function init() {
     var snapshot = readSnapshot();
+    window.matchMedia("(max-width:720px)").addEventListener("change", function () {
+      if (snapshot) renderSnapshot(readSnapshot() || snapshot, currentDictionary);
+    });
 
     window.addEventListener("pixkuy:i18n-applied", function refreshReviewLanguage() {
       var lang = getPreferredLang();
       loadDictionary().then(function renderCurrentLanguage(dictionary) {
-        if (lang === getPreferredLang()) renderSnapshot(snapshot, dictionary);
+        if (lang === getPreferredLang()) renderSnapshot(readSnapshot() || snapshot, dictionary);
       });
     });
 

@@ -16,6 +16,7 @@
       "errorLead": "La sessione di pagamento non è disponibile o è scaduta."
     },
     "details": {
+      "notes": "Note",
       "publicCode": "Codice prenotazione",
       "service": "Servizio",
       "pickup": "Raccolta",
