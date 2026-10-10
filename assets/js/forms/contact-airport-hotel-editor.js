@@ -1737,6 +1737,16 @@
       });
     }
 
+    window.addEventListener("pixkuy:i18n-applied", function () {
+      if (!isAirportHotelServiceActive(getReservationForm())) return;
+      // A restored handoff can precede the catalog labels. Rebuild its generic
+      // zone/fare fields once copy is available, using the restored trip inputs.
+      // Do not replay contact/consent or dispatch edits while restoring them.
+      editorState.serviceDate = normalizeText(nodes.serviceDateInput && nodes.serviceDateInput.value);
+      editorState.serviceTime = normalizeText(nodes.serviceTimeInput && nodes.serviceTimeInput.value);
+      rehydrateEditorFromTariffBridge(editorState, nodes);
+    });
+
     window.addEventListener("resize", function () {
       if (!editorState.airportPanelOpen) {
         return;
