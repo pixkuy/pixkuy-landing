@@ -172,6 +172,7 @@
   }
   function beginEdit(state) {
     if (!canEdit(state)) return false;
+    if(state.result.serviceType==='direct_transfer')return window.PixkuyDirectPendingEdit.begin(state);
     if(state.result.serviceType==="hourly_daily")return beginHourly(state,false);
     var edit = state.result.raw && state.result.raw.edit;
     var draft = edit && edit.draft;
@@ -234,7 +235,7 @@
       state &&
       state.result &&
       state.result.view === "pending" &&
-      ["airport_transfer","hourly_daily"].indexOf(state.result.serviceType)>=0 &&
+      ["airport_transfer","hourly_daily","direct_transfer"].indexOf(state.result.serviceType)>=0 &&
       state.result.raw &&
       state.result.raw.actions &&
       state.result.raw.actions.canModify === true &&

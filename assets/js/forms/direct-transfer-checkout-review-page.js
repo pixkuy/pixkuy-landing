@@ -876,6 +876,9 @@
   }
 
   function init() {
+    if(window.PixkuyDirectPendingEdit?.route()){
+      window.PixkuyDirectPendingEdit.mount({renderDetails,renderLegal,renderStaticCopy,loadDictionary,redirectToCheckout});return true;
+    }
     var snapshot = readSnapshot();
     window.matchMedia("(max-width:720px)").addEventListener("change", function () {
       if (snapshot) renderSnapshot(readSnapshot() || snapshot, currentDictionary);

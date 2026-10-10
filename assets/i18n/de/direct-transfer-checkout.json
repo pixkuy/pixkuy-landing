@@ -1,5 +1,8 @@
 {
   "directTransferCheckout": {
+    "pendingContactOnly": "Name, Telefonnummer und Hinweise können bearbeitet werden. Leistung und Frist bleiben unverändert.",
+    "pendingEmailLocked": "Die E-Mail-Adresse bleibt unverändert, damit die Zahlungssitzung und ihre Frist erhalten bleiben. Eine Änderung ist noch nicht verfügbar.",
+    "pendingUnavailable": "Die Änderungen konnten nicht gespeichert werden. Prüfen Sie zuerst den Status dieser Buchung.",
     "acceptedTitle": "Bedingungen akzeptiert",
     "contactTitle": "Kontakt",
     "recover": "Zahlungsstatus prüfen",
