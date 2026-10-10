@@ -16,6 +16,7 @@
   var busy = false;
   var revision = 0;
   var deadlineInitialContext = "";
+  var editStatusDiagnostic = 0; // 0 not checked, 1 loading, 2 editable, 3 denied, 4 unavailable.
   var revalidation = null;
   var revalidationSequence = 0;
   var mobileReviewAttempt = "";
@@ -49,6 +50,71 @@
     return context && context.expiresAt && context.serverNow &&
       Date.parse(context.expiresAt) <= Date.parse(context.serverNow) + Math.max(0, Date.now() - context.receivedAt);
   }
+  // Read-only diagnostic for a restored Data screen. No values, identifiers,
+  // requests or storage writes; never changes a validation result or disabled.
+  var dataDiagnosticFrame = 0;
+  var dataDiagnostic = null;
+  var dataGateWriter = 'U';
+  var dataGateWriteMask = '';
+  var dataDiagnosticNode = view.node("output", "booking-no-payment");
+  dataDiagnosticNode.hidden = true;
+  dataDiagnosticNode.setAttribute("data-airport-data-diagnostic", "");
+  form.querySelector("#contact-submit").after(dataDiagnosticNode);
+  function inspectDataGate() {
+    var api=window.PixkuyForms, context=editContext();
+    if(!api || !context || !active() || route()[1]!=="datos")return null;
+    var f=api.getReservationRequestFields(form)||{}, d=api.getReservationRequestData(f)||{};
+    var current=read()||{}, legal=api.LegalAcceptance;
+    var phone=null;try{phone=window.libphonenumber?.parsePhoneNumberFromString(d.phone);}catch(_){}
+    var location=window.PixkuyAirportMobileDraft.locationOf(current)||{};
+    var outbound=current.airport_transfer_direction==='destination_to_airport';
+    var liveId=outbound?d.originPlaceId:d.destinationPlaceId;
+    var liveLat=outbound?d.originLat:d.destinationLat,liveLng=outbound?d.originLng:d.destinationLng;
+    var host=form.querySelector('[data-airport-transfer-checkout-legal-acceptance]');
+    var flags={disabled:!!f.submit?.disabled,critical:['form','name','phone','email','tripDate','tripTime','origin','destination','passengers','luggage','message','submit','status','formError'].every(function(k){return !!f[k];}),
+      name:!!d.name,email:!!d.email,phone:!!d.phone,phoneLibrary:!!window.libphonenumber,phoneValid:!!phone?.isValid(),minimum:api.hasMinimumRequiredReservationData(d),
+      legal:!!legal?.readEvidence(form,'web_airport_checkout'),checked:!!host?.querySelector('[type=checkbox]')?.checked,legalInstance:!!host?.__pixkuyLegalAcceptanceInstance?.getSnapshot(),
+      busy:form.getAttribute('aria-busy')==='true',submitted:form.dataset.submitted==='1',inert:form.inert,expired:!!editExpired(),
+      date:!!d.airportHotelDate,time:!!d.airportHotelTime,zone:!!d.zone,fare:!!d.fare,band:!!d.passengerFareKey,
+      location:!!location.place_id,coordinates:location.lat!==null&&location.lat!==undefined&&location.lng!==null&&location.lng!==undefined&&Number.isFinite(Number(location.lat))&&Number.isFinite(Number(location.lng)),
+      fleetSavedDisabled:f.submit?.getAttribute('data-fleet-was-disabled')==='true',fleetChoice:!!form.querySelector('[data-fleet-choice-required=true]'),
+      revalidating:!!revalidation,hydrated:mobileReviewHydrated,editorBusy:busy,missingAuthority:missingEditAuthority(),missingDraft:missingEditDraft(),
+      dateMatches:context.authorizedServiceDate===d.airportHotelDate,timeMatches:current.airport_transfer_time===d.airportHotelTime,service:d.serviceType==='airport_hotel',
+      liveLocation:!!liveId,liveCoordinates:liveLat!==''&&liveLat!==null&&liveLat!==undefined&&liveLng!==''&&liveLng!==null&&liveLng!==undefined&&Number.isFinite(Number(liveLat))&&Number.isFinite(Number(liveLng))};
+    var bits=Object.values(flags).map(Number),hex='';
+    for(var offset=0;offset<bits.length;offset+=16)hex+=bits.slice(offset,offset+16).reduce(function(n,bit){return n*2+bit;},0).toString(16).padStart(4,'0');
+    return {code:'APD1-'+hex+'-S'+editStatusDiagnostic+'-W'+dataGateWriter+(dataGateWriteMask?'-'+dataGateWriteMask:''),flags:flags,statusCheck:editStatusDiagnostic,writer:dataGateWriter,writeMask:dataGateWriteMask};
+  }
+  // Observe assignments to this button only, forwarding the unchanged value to
+  // its native accessor. Keep only a source enum and a boolean mask, never stack
+  // URLs or form values. Other services get exactly the native get/set behavior.
+  var submitDiagnosticTarget=form.querySelector('#contact-submit');
+  var nativeDisabled=Object.getOwnPropertyDescriptor(window.HTMLButtonElement.prototype,'disabled');
+  if(active()&&route()[1]==='datos'&&editContext()&&nativeDisabled?.get&&nativeDisabled?.set)Object.defineProperty(submitDiagnosticTarget,'disabled',{
+    configurable:true,get:function(){return nativeDisabled.get.call(this);},set:function(value){
+      nativeDisabled.set.call(this,value);
+      try{
+        if(!active()||route()[1]!=='datos'||!editContext())return;
+        var stack=String(new Error().stack||''),sources={'reservation-request.js':'F','airport-transfer-booking-api-checkout.js':'L','fleet-selection-state.js':'V','hourly-booking-api-checkout.js':'H','submission-guard.js':'G'};
+        var names=Object.keys(sources).filter(function(name){return stack.includes('/'+name+':');}).sort(function(a,b){return stack.indexOf('/'+a+':')-stack.indexOf('/'+b+':');});
+        dataGateWriter=names.length?sources[names[0]]:'U';
+        var captured=inspectDataGate();if(captured)dataGateWriteMask=captured.code.split('-')[1];
+      }catch(_){/* Diagnostics cannot change the native assignment outcome. */}
+    }
+  });
+  function scheduleDataDiagnostic() {
+    if(dataDiagnosticFrame)return;
+    dataDiagnosticFrame=window.requestAnimationFrame(function(){
+      dataDiagnosticFrame=0;dataDiagnostic=inspectDataGate();
+      dataDiagnosticNode.hidden=!dataDiagnostic?.flags.disabled;
+      var text=dataDiagnostic ? view.t('reviewCta')+' · '+dataDiagnostic.code : '';
+      if(dataDiagnosticNode.textContent!==text)dataDiagnosticNode.textContent=text;
+    });
+  }
+  new window.MutationObserver(scheduleDataDiagnostic).observe(form,{attributes:true,subtree:true,attributeFilter:['disabled','aria-disabled','aria-busy','data-submitted','inert']});
+  form.addEventListener('input',scheduleDataDiagnostic);
+  form.addEventListener('change',scheduleDataDiagnostic);
+  window.addEventListener('pixkuy:i18n-applied',scheduleDataDiagnostic);
   function guardReviewExpiry() {
     if (!editExpired()) return false;
     busy = false; reviewed = null; notice = "editDeadlinePassed";
@@ -123,18 +189,23 @@
     var key = context.token + "|" + context.editRevision;
     if (initial && deadlineInitialContext === key) return;
     deadlineInitialContext = key;
+    editStatusDiagnostic = 1;
     window.PixkuyAirportReview.requestStatus(context.token).then(function (raw) {
       var current = editContext();
       if(!current || current.token !== context.token || !raw.serverNow || !raw.hold) return;
       current.serverNow = raw.serverNow; current.expiresAt = raw.hold.expiresAt; current.receivedAt = Date.now();
       if(!current.serviceBaseline && raw.edit?.draft)current.serviceBaseline=raw.edit.draft;
       window.sessionStorage.setItem(EDIT_KEY, JSON.stringify(current));
+      editStatusDiagnostic = raw.edit?.allowed ? 2 : 3;
+      scheduleDataDiagnostic();
       // Refresh only timing. Remounting the canonical form can replay its handoff
       // and overwrite local edits that have not been submitted.
       if(active() && mount) mount.querySelectorAll('[data-airport-deadline]').forEach(function (line) {
         line.replaceWith(editDeadline(current));
       });
     }).catch(function () {
+      editStatusDiagnostic = 4;
+      scheduleDataDiagnostic();
       if (deadlineInitialContext === key) deadlineInitialContext = "";
       // Backend authorization remains mandatory on every write.
     });
@@ -863,6 +934,7 @@
     view.focus(invalid || form.querySelector("[data-airport-desktop-field] input"));
   }
   window.PixkuyAirportDesktopBooking = {
+    dataGateDiagnostic: function () { return inspectDataGate(); },
     pendingEdit: function () {
       var editing = route() && editContext();
       return editing ? { token: editing.token, revision: editing.editRevision } : null;

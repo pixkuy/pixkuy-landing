@@ -60,4 +60,5 @@ try{for(const mode of (process.argv.includes('--changed')?['changed-pending']:pr
  }catch(e){row.result='FAIL';row.error=e.message;row.screen=await base.shot(t,'return-'+mode+'-failure').catch(()=>null);row.context=await p.evaluate(()=>{const c=JSON.parse(sessionStorage.getItem('pixkuy_direct_pending_edit_v1')||'null');return {hasContext:!!c,hasAttempt:!!c?.attempt};}).catch(()=>null);}
  if(t.backend){const closed=await t.backend.close();row.fixture=t.backend.fixture;row.provider={sessions:closed.providerSessions,emails:closed.emails};assert.equal(closed.emails,0);assert.equal(closed.providerSessions,1);}rows.push(row);console.log(JSON.stringify({mode,result:row.result,error:row.error,context:row.context,trace:row.trace}));await t.context.close();}
 }finally{await browser.close();await fs.writeFile(path.join(base.output,'results.json'),JSON.stringify(rows,null,2));await fs.writeFile(path.join(base.output,'served-hashes.json'),JSON.stringify([...base.resources],null,2));}if(rows.some(r=>r.result==='FAIL'))process.exitCode=1;}
-main().catch(e=>{console.error(e.message);process.exitCode=1;});
+module.exports={integration};
+if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});
