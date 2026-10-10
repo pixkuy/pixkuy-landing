@@ -1469,10 +1469,11 @@ function shouldUsePassengerChipUi(nodes) {
 
   function setControlDisplayValue(control, role, type, value, label) {
     const safeValue = typeof value === "string" ? value.trim() : "";
-    const safeLabel = typeof label === "string" ? label.trim() : "";
+    const safeLabel = (type === "airport" && resolveDisplayLabel(type, safeValue)) ||
+      (typeof label === "string" ? label.trim() : "");
 
     if (safeValue && safeLabel) {
-      control.textContent = window.PixkuyBookingPresentation && window.matchMedia('(max-width:720px)').matches
+      control.textContent = type !== "airport" && window.PixkuyBookingPresentation && window.matchMedia('(max-width:720px)').matches
         ? window.PixkuyBookingPresentation.shortAddress(safeLabel) : safeLabel;
       control.dataset.airportTariffValue = safeValue;
       control.removeAttribute("data-i18n");

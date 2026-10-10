@@ -1,5 +1,6 @@
 /* Presentation of the first three screens only; preserve service-specific controls. */
 @media(max-width:720px){
+  .airport-mobile-route #services-expand-airport .services-expand__field[data-airport-tariff-role] .services-expand__airport-shell > .services-expand__control[data-airport-tariff-type="airport"]{height:auto;max-height:none;min-height:48px;white-space:normal;overflow-wrap:anywhere;line-height:1.3;}
   .booking-short-address{position:relative;}
   .booking-short-address__input{color:transparent!important;-webkit-text-fill-color:transparent!important;caret-color:transparent;}
   [data-booking-short-address]{position:absolute;transform:translateY(-50%);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none;color:var(--fg);font-size:13px;font-weight:650;line-height:1.3;}

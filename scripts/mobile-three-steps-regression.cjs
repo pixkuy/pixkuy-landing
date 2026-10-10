@@ -114,8 +114,34 @@ async function directDraft(t,row){await enter(t);const p=t.page;await p.locator(
  await menu(t,'hourly');t.s='hourly_daily';await hourlyConfig(t);await menu(t,'direct');t.s='direct_transfer';await p.reload();await p.locator('[data-direct-transfer-config-notes]').waitFor({state:'visible'});assert.equal(await p.locator('[data-direct-transfer-config-notes]').inputValue(),'Notas Direct modificadas');
  await until(()=>p.locator(base.configCta(t.s)).isEnabled(),'restored Direct ready');await p.locator(base.configCta(t.s)).click();await p.locator('[data-direct-transfer-mobile-contact-field="name"]').waitFor({state:'visible'});assert.equal(await p.locator('[data-direct-transfer-mobile-contact-field="name"]').inputValue(),'Direct Usuario');assert.equal(await p.locator('[data-direct-transfer-mobile-contact-field="notes"]').inputValue(),'Notas Direct modificadas');assert(await p.locator('#pixkuy-direct-transfer-mobile-legal-acceptance').isChecked());row.screen=await base.shot(t,'direct-restored');
 }
+async function airportLabels(t,row){
+ await base.enter(t);const p=t.page;row.labels=[];
+ const control=()=>p.locator('#services-expand-airport .services-expand__airport-shell > .services-expand__control[data-airport-tariff-type="airport"]:visible');
+ const items=await p.evaluate(()=>window.PixkuyAirportTariffCatalog.getActiveItemsByType('airport').map(({id,iata})=>({id,iata})));
+ async function check(id,phase){
+  const expected=await p.evaluate(id=>window.PixkuyAirportTariffCatalog.resolveDisplayLabel('airport',id),id);
+  const actual=await control().innerText();row.labels.push({id,phase,expected,actual});assert.equal(actual,expected);assert(actual.length>items.find(item=>item.id===id).iata.length,'Keep the catalog name, not only IATA');
+  const geometry=await control().evaluate(n=>{const range=document.createRange();range.selectNodeContents(n);const box=n.getBoundingClientRect(),style=getComputedStyle(n);return {fits:[...range.getClientRects()].every(r=>r.left>=box.left&&r.right<=box.right&&r.top>=box.top&&r.bottom<=box.bottom),scroll:n.scrollWidth<=n.clientWidth+1,wrap:style.whiteSpace};});assert(geometry.fits&&geometry.scroll,'Full airport name fits its control');
+  const canonical=await p.evaluate(()=>window.PixkuyAirportZoneTariff.getState());assert.equal(canonical.originType==='airport'?canonical.originValue:canonical.destinationValue,id);
+ }
+ await check(items[0].id,'initial');
+ await p.evaluate(()=>window.PixkuyAirportZoneTariff.setResolvedDestination({placeLabel:'Hotel sintético — Calle Ejemplo 123, Ciudad de México',zoneId:'roma_condesa',placeId:'synthetic-place',primaryType:'lodging',lat:19.418,lng:-99.169}));
+ for(const direction of ['airport_to_hotel','hotel_to_airport']){
+  await p.locator('[data-airport-mobile-direction-option="'+direction+'"]').click();
+  for(const item of items){
+   await control().click();await p.locator('[data-airport-mobile-airport-option="'+item.id+'"]').click();await check(item.id,direction+'-changed');
+   await p.evaluate(()=>window.PixkuyAirportMobileDraft.saveTrip());await p.reload();await p.waitForFunction(()=>window.PixkuyAirportZoneTariff&&window.__pixkuyI18nLang);await control().waitFor({state:'visible'});await until(()=>p.evaluate(id=>{const s=window.PixkuyAirportZoneTariff.getState();return (s.originType==='airport'?s.originValue:s.destinationValue)===id;},item.id),'restored airport');await check(item.id,direction+'-restored');
+   const state=await p.evaluate(()=>window.PixkuyAirportZoneTariff.getState());assert.equal(state.originType==='airport',direction==='airport_to_hotel');assert.equal(state.lodgingEndpointPlaceId,'synthetic-place');assert(state.lodgingEndpointLabel.includes('Calle Ejemplo'));
+   const hotel=await p.locator('[data-airport-destination-label]:visible').getAttribute('data-booking-short-label');assert.equal(hotel,'Hotel sintético');
+   const shot=await base.shot(t,'airport-label-'+direction+'-'+item.id);assert(shot.scrollWidth<=t.width);
+  }
+ }
+ for(const lang of ['en','de','fr','it','ko','pt','ru','zh-hans','es']){await p.locator('#lang-trigger').click();await p.locator('[data-lang="'+lang+'"]').click();await until(()=>p.evaluate(lang=>window.__pixkuyI18nLang===lang,lang),'airport label language');await until(async()=>await control().innerText()===await p.evaluate(id=>window.PixkuyAirportTariffCatalog.resolveDisplayLabel('airport',id),items.at(-1).id),'translated catalog label');await check(items.at(-1).id,lang);}
+ assert.equal(t.state.requests.filter(r=>r.kind==='checkout').length,0);
+}
 async function main(){assert.equal(process.env.PIXKUY_AUDIT_FIXTURES,'1');await fs.mkdir(output,{recursive:true});const browser=await (process.argv.includes('--webkit')?webkit:chromium).launch({headless:true});base.setBrowser(browser);try{
- if(process.argv.includes('--review-languages'))await caseRun('review-languages','direct_transfer',320,reviewLanguages);
+ if(process.argv.includes('--airport-labels')){for(const width of [320,390])await caseRun('airport-labels','airport_transfer',width,airportLabels);}
+ else if(process.argv.includes('--review-languages'))await caseRun('review-languages','direct_transfer',320,reviewLanguages);
  else if(process.argv.includes('--desktop'))await caseRun('desktop','airport_transfer',1440,desktop);
  else if(process.argv.includes('--languages')){for(const s of ['airport_transfer','hourly_daily','direct_transfer'])await caseRun('languages',s,390,languages);}
  else for(const width of (process.argv.includes('--width=390')?[390]:[320,390])){if(process.argv.includes('--consumed'))await caseRun('consumed-draft','direct_transfer',width,consumed);else if(process.argv.includes('--focus-race'))await caseRun('entry-focus','airport_transfer',width,focusRace);else if(process.argv.includes('--availability'))await caseRun('availability','direct_transfer',width,availability);else if(process.argv.includes('--presentation')){for(const s of (process.argv.includes('--webkit')?['direct_transfer']:['airport_transfer','hourly_daily','direct_transfer']))await caseRun('three-screens',s,width,presentation);}else if(process.argv.includes('--config-only'))await caseRun('configuration-draft','airport_transfer',width,configDraft);else if(process.argv.includes('--direct-draft'))await caseRun('direct-draft','direct_transfer',width,directDraft);else{if(!process.argv.includes('--draft-only'))await caseRun('hourly-modes','hourly_daily',width,modes);await caseRun('independent-drafts','airport_transfer',width,drafts);}}
