@@ -313,6 +313,13 @@ let inMotionReturnContext = null;
       return false;
     }
 
+    const fleet = window.PixkuyFleetSelection.read('direct_transfer');
+    const token = fleet.reservationToken || fleet.attempt && fleet.attempt.response && fleet.attempt.response.bookingStatusToken;
+    if (token) {
+      window.location.assign('/booking-cancelled.html?token=' + encodeURIComponent(token));
+      return true;
+    }
+
     inMotionReturnContext = getInMotionReturnContextFromUrl();
 
     ensureRoute();

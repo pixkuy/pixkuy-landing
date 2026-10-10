@@ -1494,7 +1494,7 @@ function shouldUsePassengerChipUi(nodes) {
   }
   
     function getReservationMinimumDateLiteral() {
-    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate('airport_transfer');
     const formsApi = window.PixkuyForms || {};
     const getMinimumDateTime =
       typeof formsApi.getReservationMinimumDateTime === "function"

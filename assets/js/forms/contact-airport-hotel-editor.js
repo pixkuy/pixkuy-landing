@@ -496,7 +496,7 @@
   }
 
   function getAirportHotelMinimumDateLiteral() {
-    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
+    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate('airport_transfer');
     const formsApi = NAMESPACE && typeof NAMESPACE === "object"
       ? NAMESPACE
       : null;

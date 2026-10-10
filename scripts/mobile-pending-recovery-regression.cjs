@@ -26,6 +26,16 @@ async function prepare(t){
   if(t.noExpiry)delete body.hold.expiresAt;
   return route.fulfill({json:body});
  });
+ if(process.argv.includes('--persisted-hourly')&&s==='hourly_daily'){
+  // Start at a persisted pending reservation; do not re-test accepted initial screens.
+  t.token='synthetic-audit-'+s;t.initialWrites=0;
+  const proof={legal_acceptance_accepted:'true',legal_acceptance_terms_version:'terms_v1_2026_05',legal_acceptance_cancellation_policy_version:'cancellation_policy_v1_2026_05',legal_acceptance_privacy_version:'privacy_v1_2026_05',legal_acceptance_accepted_at:new Date().toISOString(),legal_acceptance_channel:'web_hourly_checkout',legal_acceptance_terms_url:'legal/terms.html',legal_acceptance_cancellations_url:'legal/cancellations.html',legal_acceptance_privacy_url:'legal/privacy.html'};
+  t.state.draft={service_type:s,locale:'es',hourly_daily_mode:'hourly',hourly_daily_pickup:'Origen sintético, Roma Norte',hourly_daily_date:'2027-01-13',hourly_daily_start_time:'23:00',hourly_daily_duration_hours:2,hourly_daily_passengers:2,hourly_daily_price:150000,hourly_daily_currency:'MXN',hourly_daily_pickup_place_id:'synthetic-place',hourly_daily_pickup_lat:19.427,hourly_daily_pickup_lng:-99.1677,hourly_daily_notes:'Notas sintéticas conservadas',customer:{full_name:'Persona sintética',email:'synthetic@example.invalid',phone:'+525512345678'},fleet_selection:{version:1,model_id:base.model.modelId,model_revision:1},fleet_model:base.model,...proof};
+  await p.goto(base.origin+'/booking-cancelled.html?token='+t.token);
+  await p.locator('[data-consent-reject]').click();
+  await p.evaluate(({payload,token})=>sessionStorage.setItem('pixkuy_fleet_b:hourly_daily',JSON.stringify({version:1,reservationToken:token,attempt:{state:'committed',key:'synthetic-persisted',payload,response:{bookingStatusToken:token}}})),{payload:t.state.draft,token:t.token});
+  return;
+ }
  if(process.argv.includes('--webkit')&&s==='airport_transfer'){
   await p.goto(base.origin+'/?service=airport_hotel&lang=es');await p.waitForFunction(()=>window.PixkuyAirportZoneTariff&&window.PixkuyAirportDesktopBooking);
   await p.locator('[data-consent-reject]').click({timeout:1000}).catch(()=>{});
@@ -87,4 +97,5 @@ async function contracts(){
  await fs.mkdir(out,{recursive:true});await fs.writeFile(path.join(out,'contracts.json'),JSON.stringify(rows,null,2));console.log('14 legal evidence contract checks PASS');
 }
 async function main(){assert.equal(process.env.PIXKUY_AUDIT_FIXTURES,'1');await fs.mkdir(out,{recursive:true});const browser=await(process.argv.includes('--webkit')?webkit:chromium).launch({headless:true});base.setBrowser(browser);try{for(const width of (process.argv.includes('--width=390')?[390]:[320,390]))for(const s of (process.argv.includes('--hourly')?['hourly_daily']:process.argv.includes('--direct')?['direct_transfer']:process.argv.includes('--recovery')?['airport_transfer']:['airport_transfer','hourly_daily'])){const t=await base.setup(width,s);t.pending=new Map();t.page.on('request',r=>t.pending.set(r,new URL(r.url()).pathname));t.page.on('requestfinished',r=>t.pending.delete(r));t.page.on('requestfailed',r=>t.pending.delete(r));const row={s,width,proof:process.argv.includes('--proof')?process.argv[process.argv.indexOf('--proof')+1]:'valid'};try{await(s==='direct_transfer'?direct:process.argv.includes('--recovery')?recovery:edit)(t,row);assert.deepEqual(t.state.errors,[]);row.result='PASS';}catch(e){row.result='FAIL';row.error=e.message;row.errorStack=e.stack;row.pendingRequests=[...t.pending.values()];row.diagnostic=await t.page.evaluate(()=>({checked:document.querySelector('#pixkuy-hourly-legal-acceptance')?.checked,proof:window.PixkuyForms?.LegalAcceptance?.readEvidence(document.querySelector('form[name=contact]'),'web_hourly_checkout'),offer:window.PixkuyFleetSelection?.hourlyOfferStatus(),fleet:window.PixkuyFleetSelection?.read('hourly_daily')})).catch(()=>null);row.failure=await base.shot(t,'failure').catch(()=>null);}row.requests=t.state.requests;results.push(row);console.log(JSON.stringify({s,width,result:row.result,error:row.error}));await t.context.close();}}finally{await browser.close();await fs.writeFile(path.join(out,before?'before.json':'results.json'),JSON.stringify(results,null,2));await fs.writeFile(path.join(out,'served-hashes.json'),JSON.stringify([...base.resources],null,2));}if(!before&&results.some(r=>r.result==='FAIL'))process.exitCode=1;}
-(process.argv.includes('--contracts')?contracts():main()).catch(e=>{console.error(e.message);process.exitCode=1;});
+module.exports={prepare,status,menu,wait,base};
+if(require.main===module)(process.argv.includes('--contracts')?contracts():main()).catch(e=>{console.error(e.message);process.exitCode=1;});

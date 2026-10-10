@@ -91,6 +91,23 @@
     return typeof value === "string" ? value.trim() : "";
   }
 
+  function syncVisibleHeight() {
+    const route = contactStepNode && contactStepNode.closest('[data-direct-transfer-mobile-route]');
+    if (!route) return;
+    if (isOpen()) {
+      route.style.setProperty('--direct-contact-visible-height', (window.visualViewport ? window.visualViewport.height : window.innerHeight) + 'px');
+      route.style.setProperty('--direct-contact-visible-top', (window.visualViewport ? window.visualViewport.offsetTop : 0) + 'px');
+    } else {
+      route.style.removeProperty('--direct-contact-visible-height');
+      route.style.removeProperty('--direct-contact-visible-top');
+    }
+  }
+  window.addEventListener('resize', syncVisibleHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncVisibleHeight);
+    window.visualViewport.addEventListener('scroll', syncVisibleHeight);
+  }
+
   function normalizeCoordinateValue(value) {
     const coordinate = Number(value);
 
@@ -1618,6 +1635,7 @@
     node.hidden = false;
     node.setAttribute("aria-hidden", "false");
     document.body.setAttribute(CONTACT_STEP_ACTIVE_ATTR, "true");
+    syncVisibleHeight();
 
     if(saved) restoreSavedContact(saved);
     saveMobileDraft();
@@ -1660,6 +1678,7 @@
     contactStepNode.hidden = true;
     contactStepNode.setAttribute("aria-hidden", "true");
     document.body.setAttribute(CONTACT_STEP_ACTIVE_ATTR, "false");
+    syncVisibleHeight();
 
     currentConfigStep = null;
     hideGlobalError();

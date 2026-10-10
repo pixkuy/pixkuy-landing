@@ -18,6 +18,7 @@
 }
 
 @media (max-width:720px){
+  body[data-direct-transfer-mobile-contact-step-active="true"] .mobile-topbar{background:#0f1113;}
   html:has(body[data-direct-transfer-mobile-contact-step-active="true"]),
   body[data-direct-transfer-mobile-contact-step-active="true"]{
     width:100%;
@@ -27,17 +28,20 @@
     overscroll-behavior:none;
     position:fixed;
     inset:0;
-    touch-action:none;
+    touch-action:pan-y;
   }
 
   body[data-direct-transfer-mobile-contact-step-active="true"] .direct-transfer-mobile-route{
     position:fixed;
     inset:0;
-    height:100svh;
-    max-height:100svh;
-    overflow:hidden !important;
-    overscroll-behavior:none;
-    touch-action:none;
+    top:var(--direct-contact-visible-top, 0px);
+    bottom:auto;
+    height:var(--direct-contact-visible-height, 100dvh);
+    max-height:var(--direct-contact-visible-height, 100dvh);
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
   }
 
   body[data-direct-transfer-mobile-contact-step-active="true"] .direct-transfer-mobile-route .direct-transfer-mobile-config-step[data-direct-transfer-mobile-config-step-hidden="true"]{
@@ -45,23 +49,21 @@
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step{
-    position:absolute;
-    inset:0;
+    position:relative;
+    inset:auto;
     z-index:3;
     display:flex;
     flex-direction:column;
     gap:0;
-    height:100svh;
-    min-height:100svh;
-    overflow-x:hidden;
-    overflow-y:hidden;
-    overscroll-behavior:none;
-    touch-action:none;
+    height:auto;
+    min-height:var(--direct-contact-visible-height, 100dvh);
+    overflow:visible;
+    touch-action:pan-y;
     box-sizing:border-box;
     padding:
       calc(60px + env(safe-area-inset-top))
       18px
-      calc(14px + env(safe-area-inset-bottom));
+      calc(28px + env(safe-area-inset-bottom));
     background-color:#0f1113;
     background-image:
       linear-gradient(180deg, rgba(15,17,19,.88) 0%, rgba(15,17,19,.78) 38%, rgba(15,17,19,.94) 100%),

@@ -788,9 +788,20 @@
   document.addEventListener("input", invalidateTripEdit, true);
   document.addEventListener("change", invalidateTripEdit, true);
   document.addEventListener("click", invalidateTripEdit, true);
-  function minimumDate() {
+  function minimumDate(service) {
     var parts = new Intl.DateTimeFormat("en-CA", {timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date(Date.now() + 24 * 60 * 60 * 1000));
-    return ["year","month","day"].map(function (key) { return parts.find(function (part) { return part.type === key; }).value; }).join("-");
+    var minimum = ["year","month","day"].map(function (key) { return parts.find(function (part) { return part.type === key; }).value; }).join("-");
+    if (service === 'airport_transfer' && /^#airport\/(datos|revision)(?:\/|$)/.test(window.location.hash)) {
+      try {
+        var edit = JSON.parse(window.sessionStorage.getItem(AIRPORT_REPLACEMENT_EDIT_KEY) || 'null');
+        var owner = read('airport_transfer').reservationToken;
+        if (edit && edit.token === owner && edit.editRevision && /^\d{4}-\d{2}-\d{2}$/.test(edit.authorizedServiceDate) &&
+            Date.parse(edit.expiresAt) > Date.parse(edit.serverNow) + Math.max(0, Date.now() - edit.receivedAt)) {
+          return edit.authorizedServiceDate < minimum ? edit.authorizedServiceDate : minimum;
+        }
+      } catch (_) { /* Missing authority retains the normal new-booking minimum. */ }
+    }
+    return minimum;
   }
   // Same capacity upper bounds as Airport getPassengerCountForFareKey (2/4/6).
   // Labels are ranges; Hourly pricing never consumes a fare key.

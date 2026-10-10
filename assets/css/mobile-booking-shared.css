@@ -1,6 +1,6 @@
 /* Presentation of the first three screens only; preserve service-specific controls. */
 @media(max-width:720px){
-  [data-airport-pending-edit] > .airport-booking__reference{font:12px/1.35 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:8px 0;color:var(--muted);overflow-wrap:anywhere;}
+  [data-airport-pending-edit] > :is(.airport-booking__reference,.airport-booking__notice){font:12px/1.35 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:8px 0;color:var(--muted);overflow-wrap:anywhere;}
   [data-airport-pending-edit] .legal-acceptance__checkbox:checked,
   .hourly-booking--contact-edit .legal-acceptance__checkbox:checked{background-color:var(--accent);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8 3 3 7-7' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E");background-size:100% 100%;background-repeat:no-repeat;box-shadow:none;}
   .airport-mobile-route #services-expand-airport .services-expand__field[data-airport-tariff-role] .services-expand__airport-shell > .services-expand__control[data-airport-tariff-type="airport"]{height:auto;max-height:none;min-height:48px;white-space:normal;overflow-wrap:anywhere;line-height:1.3;}
