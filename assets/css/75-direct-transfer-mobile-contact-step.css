@@ -17,7 +17,10 @@
   display:none !important;
 }
 
-@media (max-width:720px){
+/* The same Data component also hosts pending contact editing on desktop. */
+@media screen{
+  body[data-direct-transfer-mobile-contact-step-active="true"] .direct-transfer-mobile-route__screen{display:none;}
+  [data-direct-pending-contact] > :is(.airport-booking__reference,.airport-booking__lead){font:12px/1.35 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:8px 0;color:var(--muted);overflow-wrap:anywhere;}
   body[data-direct-transfer-mobile-contact-step-active="true"] .mobile-topbar{background:#0f1113;}
   html:has(body[data-direct-transfer-mobile-contact-step-active="true"]),
   body[data-direct-transfer-mobile-contact-step-active="true"]{
@@ -32,6 +35,8 @@
   }
 
   body[data-direct-transfer-mobile-contact-step-active="true"] .direct-transfer-mobile-route{
+    display:block;
+    z-index:80;
     position:fixed;
     inset:0;
     top:var(--direct-contact-visible-top, 0px);
@@ -279,6 +284,7 @@
   }
 
   .direct-transfer-mobile-route .direct-transfer-mobile-contact-step__legal .legal-acceptance__checkbox{
+    accent-color:var(--accent);
     width:15px;
     height:15px;
     min-width:15px;
@@ -500,4 +506,8 @@
   .direct-transfer-mobile-notes-editor__clear[hidden]{
     display:none !important;
   }
+}
+
+@media(min-width:721px){
+  [data-direct-pending-contact] > *{width:100%;max-width:680px;margin-left:auto;margin-right:auto;}
 }

@@ -37,12 +37,17 @@
   let operationRevision = 0;
   let restoringDraft = false;
   let restoredLegalProof = null;
+  let pendingContact = null;
   function readMobileDraft() {
     const store = window.PixkuyDirectTransferTransactionalState;
     const value = store && store.readReviewSnapshot();
     return value && value.mobileDraft && value.mobileDraft.version === 1 ? value.mobileDraft : null;
   }
   function saveMobileDraft(stage) {
+    if(pendingContact && contactStepNode){
+      const instance=contactStepNode.querySelector('[data-direct-transfer-mobile-checkout-legal-acceptance]')?.__pixkuyLegalAcceptanceInstance;
+      pendingContact.onChange(getContactData(),instance?.getSnapshot()||null);return;
+    }
     if (restoringDraft || !currentSnapshot || !contactStepNode) return;
     const store = window.PixkuyDirectTransferTransactionalState;
     const config = window.PixkuyDirectTransferMobileConfigStep;
@@ -765,7 +770,7 @@
     const actions = document.createElement("div");
     const submit = document.createElement("button");
     const globalError = document.createElement("p");
-    const notesEditor = buildNotesEditorNode();
+    const notesEditor = pendingContact ? null : buildNotesEditorNode();
 
     root.className = "direct-transfer-mobile-contact-step";
     root.setAttribute("data-direct-transfer-mobile-contact-step", "1");
@@ -806,7 +811,7 @@
     form.appendChild(buildField(FIELD_NAME, "text", "name"));
     form.appendChild(buildField(FIELD_PHONE, "tel", "tel"));
     form.appendChild(buildField(FIELD_EMAIL, "email", "email"));
-    form.appendChild(buildField(FIELD_NOTES, "", ""));
+    if(!pendingContact)form.appendChild(buildField(FIELD_NOTES, "", ""));
 
     globalError.className = "direct-transfer-mobile-contact-step__global-error";
     globalError.setAttribute("data-direct-transfer-mobile-contact-global-error", "1");
@@ -831,7 +836,7 @@
     root.appendChild(globalError);
     root.appendChild(actions);
     const noPayment=document.createElement('p');noPayment.className='booking-no-payment';noPayment.setAttribute('data-booking-no-payment','');root.appendChild(noPayment);
-    root.appendChild(notesEditor);
+    if(notesEditor)root.appendChild(notesEditor);
 
     return root;
   }
@@ -943,6 +948,11 @@
 
     if (!root) {
       return false;
+    }
+
+    if(pendingContact){
+      const reference=root.querySelector('[data-direct-pending-reference]');
+      if(reference)reference.textContent=pendingContact.publicCode;
     }
 
     setText(root.querySelector('[data-booking-no-payment]'),window.PixkuyAirportDesktopView?.t('noPayment') || '');
@@ -1099,7 +1109,7 @@
       ? contactStepNode.querySelector("[data-direct-transfer-mobile-contact-submit]")
       : null;
     const transactionalBridge = window.PixkuyDirectTransferMobileTransactionalBridge;
-    const isReady = hasFilledContactData();
+    const isReady = pendingContact ? hasRequiredContactData() && pendingContact.canReview() : hasFilledContactData();
 
     if (!submit) {
       return false;
@@ -1176,7 +1186,7 @@
       name: normalizeText(getContactField(FIELD_NAME).value),
       phone: normalizePhoneValue(getContactField(FIELD_PHONE).value),
       email: normalizeText(getContactField(FIELD_EMAIL).value),
-      notes: normalizeText(getContactField(FIELD_NOTES).value)
+      notes: normalizeText(getContactField(FIELD_NOTES)?.value || currentSnapshot?.direct_transfer_notes)
     };
   }
 
@@ -1370,6 +1380,7 @@
   }
 
   function applyCanonicalQuoteToCurrentSnapshot(detail) {
+    if(pendingContact)return false;
     if (
       !currentSnapshot ||
       !isOpen() ||
@@ -1443,6 +1454,10 @@
   }
 
   function submitContactStep() {
+    if(pendingContact){
+      if(!validateContactStep() || !validateLegalAcceptance() || !pendingContact.canReview())return false;
+      saveMobileDraft();pendingContact.onReview();return true;
+    }
     const formsApi = getReservationFormsApi();
     const form = formsApi ? formsApi.getReservationForm() : null;
     const snapshot = currentSnapshot;
@@ -1570,6 +1585,7 @@
 
       if (back) {
         event.preventDefault();
+        if(pendingContact){saveMobileDraft();pendingContact.onBack();return;}
 
         if (getNotesEditorNode() && getNotesEditorNode().hidden !== true) {
           closeNotesEditor();
@@ -1577,6 +1593,7 @@
         }
 
         close();
+        window.PixkuyDirectTransferMobileConfigStep.sync();
         saveMobileDraft('config');
         window.history.replaceState(Object.assign({},window.history.state,{directTransferStep:'config'}),document.title,window.location.href);
         return;
@@ -1644,18 +1661,36 @@
       window.history.replaceState(Object.assign({},state,{directTransferStep:'config'}),document.title,window.location.href);
       window.history.pushState(Object.assign({},state,{directTransferStep:'datos'}),document.title,window.location.href);
     }
-    const openingRevision=operationRevision, openedByRestore=restoringDraft;
-    window.requestAnimationFrame(function focusFirstContactField() {
-      if(openedByRestore || !isOpen() || openingRevision!==operationRevision) return;
-      if(node.contains(document.activeElement) && document.activeElement.matches('input,textarea,select'))return;
-      const first = getContactField(FIELD_NAME);
-
-      if (first && typeof first.focus === "function") {
-        first.focus({ preventScroll: true });
-      }
-    });
+    showStepStart();
 
     return true;
+  }
+
+  function showStepStart(){
+    const route=contactStepNode?.closest('[data-direct-transfer-mobile-route]');
+    blurActiveElementInside(currentConfigStep);
+    if(route)route.scrollTop=0;
+  }
+
+  function openPending(configStep,snapshot,options){
+    pendingContact=options;
+    const node=ensureContactStepNode(configStep);
+    currentConfigStep=configStep;currentSnapshot=snapshot;currentPayload=null;
+    node.setAttribute('data-direct-pending-contact','');
+    node.dataset.directPendingLegalChannel=options.proof?.channel||'web_direct_transfer_mobile_checkout';
+    for(const name of [FIELD_NAME,FIELD_PHONE,FIELD_EMAIL])getContactField(name).value=options.contact[name]||'';
+    getContactField(FIELD_EMAIL).readOnly=true;
+    node.hidden=false;node.setAttribute('aria-hidden','false');document.body.setAttribute(CONTACT_STEP_ACTIVE_ATTR,'true');
+    syncVisibleHeight();syncCopy();syncSummary(snapshot);
+    const view=window.PixkuyAirportDesktopView,summary=node.querySelector('[data-direct-transfer-mobile-contact-summary]');
+    const reference=view.node('p','airport-booking__reference',options.publicCode);reference.dataset.directPendingReference='';
+    summary.after(reference,view.deadline(options.expiresAt,options.serverNow,'editDeadlinePassed',syncSubmitAvailability));
+    const hint=view.node('p','booking-no-payment');hint.dataset.directPendingEmailHint='';getContactField(FIELD_EMAIL).after(hint);
+    window.PixkuyDirectTransferMobileTransactionalBridge.sync();
+    const legal=window.PixkuyForms.LegalAcceptance;
+    const proof=Object.fromEntries(Object.entries(legal.fieldNames).map(([key,name])=>[name,options.proof?.[key]||'']));
+    node.querySelector('[data-direct-transfer-mobile-checkout-legal-acceptance]').__pixkuyLegalAcceptanceInstance.restore(proof);
+    syncSubmitAvailability();showStepStart();return true;
   }
 
   function close() {
@@ -1708,7 +1743,9 @@
     applyCanonicalQuote: applyCanonicalQuoteToCurrentSnapshot,
     revision: function(){return operationRevision;},
     readDraft: readMobileDraft,
-    restoreDraft: restoreMobileDraft
+    restoreDraft: restoreMobileDraft,
+    openPending,
+    refreshPending:syncSubmitAvailability
   };
 
   window.PixkuyDirectTransferMobileContactContract = {

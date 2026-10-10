@@ -1,7 +1,7 @@
 {
   "directTransferCheckout": {
     "pendingContactOnly": "You can edit your name, phone and notes. The service and deadline stay unchanged.",
-    "pendingEmailLocked": "The email stays unchanged to preserve the payment session and its deadline. Email editing is not yet available.",
+    "pendingEmailLocked": "Email cannot be changed here.",
     "pendingUnavailable": "Your changes could not be saved. Check the booking status before continuing.",
     "acceptedTitle": "Conditions accepted",
     "contactTitle": "Contact",

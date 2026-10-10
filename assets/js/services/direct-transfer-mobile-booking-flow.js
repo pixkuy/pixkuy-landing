@@ -309,13 +309,14 @@ let inMotionReturnContext = null;
   }
 
   function openDirectTransferRoute() {
-    if (!isMobileViewport()) {
+    if (!isMobileViewport() && !window.PixkuyDirectPendingEdit?.activeData()) {
       return false;
     }
 
     const fleet = window.PixkuyFleetSelection.read('direct_transfer');
     const token = fleet.reservationToken || fleet.attempt && fleet.attempt.response && fleet.attempt.response.bookingStatusToken;
-    if (token) {
+    const pending=window.PixkuyDirectPendingEdit?.activeData();
+    if (token && !pending) {
       window.location.assign('/booking-cancelled.html?token=' + encodeURIComponent(token));
       return true;
     }
@@ -325,6 +326,7 @@ let inMotionReturnContext = null;
     ensureRoute();
     syncCopy();
     setRouteVisibility(true);
+    if(pending){window.PixkuyDirectPendingEdit.mountData(routeNode.querySelector('[data-direct-transfer-mobile-route-content]'));return true;}
     openConfigStep();
     const contact=getContactStepApi();
     const config=routeNode.querySelector('[data-direct-transfer-mobile-config-step]');
@@ -447,7 +449,7 @@ let inMotionReturnContext = null;
   }
 
   function syncActiveState() {
-    if (!isMobileViewport()) {
+    if (!isMobileViewport() && !window.PixkuyDirectPendingEdit?.activeData()) {
       if (isRouteOpen) {
         closeDirectTransferRoute({ updateUrl: false });
       }

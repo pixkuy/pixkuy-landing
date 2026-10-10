@@ -1,7 +1,7 @@
 {
   "directTransferCheckout": {
     "pendingContactOnly": "您可以修改姓名、电话和备注。服务内容及付款截止时间保持不变。",
-    "pendingEmailLocked": "为保留现有付款会话及截止时间，电子邮箱保持不变。暂不支持修改邮箱。",
+    "pendingEmailLocked": "此处无法修改电子邮箱。",
     "pendingUnavailable": "无法保存修改。请先查看此预订的状态再继续。",
     "acceptedTitle": "已接受条款",
     "contactTitle": "联系方式",

@@ -26,6 +26,8 @@
     inset:0;
     z-index:2;
     display:block;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
     background-color:#0f1113;
     background-image:
       linear-gradient(180deg, rgba(15,17,19,.88) 0%, rgba(15,17,19,.78) 38%, rgba(15,17,19,.94) 100%),
@@ -36,9 +38,9 @@
   }
 
   .direct-transfer-mobile-config-step__screen{
-    height:100svh;
+    height:auto;
     min-height:100svh;
-    overflow:hidden;
+    overflow:visible;
   }
 
   .direct-transfer-mobile-config-step__content{
@@ -46,9 +48,9 @@
     display:flex;
     flex-direction:column;
     width:100%;
-    height:100svh;
-    min-height:0;
-    overflow:hidden;
+    height:auto;
+    min-height:100svh;
+    overflow:visible;
     padding:
       calc(60px + env(safe-area-inset-top))
       18px
@@ -118,7 +120,8 @@
     display:grid;
     gap:9px;
     min-height:0;
-    overflow:auto;
+    overflow:visible;
+    flex-shrink:0;
     padding-bottom:10px;
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;

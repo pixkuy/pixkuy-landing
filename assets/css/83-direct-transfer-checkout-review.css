@@ -6,14 +6,7 @@
    - compact desktop review aligned with Airport/Hourly booking-status pattern
 */
 
-[data-direct-pending-edit] .direct-pending-form{display:grid;gap:8px;margin:18px 0;max-width:none;}
-[data-direct-pending-edit] .direct-pending-form :is(input:not([type="checkbox"]):not([type="hidden"]),textarea){width:100%;box-sizing:border-box;min-height:46px;padding:10px 12px;font:inherit;color:var(--fg);background:#0f1113;border:1px solid #636968;border-radius:8px;}
-[data-direct-pending-edit] .direct-pending-form textarea{min-height:88px;resize:vertical;}
-[data-direct-pending-edit] .direct-pending-form > label{font-size:13px;font-weight:600;}
-[data-direct-pending-edit] .direct-pending-form .legal-acceptance__checkbox{appearance:auto;accent-color:var(--accent);width:16px;height:16px;min-height:0;flex:none;}
-[data-direct-pending-edit] .direct-pending-form .booking-status__lead{font-size:12px;line-height:1.4;margin:0 0 8px;}
 [data-direct-pending-edit] [data-direct-pending-reference],[data-direct-pending-edit] [data-direct-pending-deadline]{display:block!important;font-size:12px;line-height:1.4;margin:8px 0;overflow-wrap:anywhere;}
-[data-direct-pending-edit] [data-direct-transfer-checkout-review-copy="text"]{display:block!important;font-size:12px;line-height:1.4;margin:8px 0;}
 [data-direct-pending-edit] [hidden]{display:none!important;}
 
 .booking-status-page[data-direct-transfer-checkout-review-page]{

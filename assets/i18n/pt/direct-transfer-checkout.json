@@ -1,7 +1,7 @@
 {
   "directTransferCheckout": {
     "pendingContactOnly": "Pode alterar nome, telefone e notas. O serviço e o prazo permanecem iguais.",
-    "pendingEmailLocked": "O e-mail permanece igual para preservar a sessão de pagamento e o prazo. A alteração ainda não está disponível.",
+    "pendingEmailLocked": "O e-mail não pode ser alterado aqui.",
     "pendingUnavailable": "Não foi possível guardar as alterações. Consulte o estado desta reserva antes de continuar.",
     "acceptedTitle": "Condições aceites",
     "contactTitle": "Contacto",

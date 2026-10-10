@@ -2161,6 +2161,7 @@
   }
 
   window.PixkuyDirectTransferMobileConfigStep = {
+    sync: syncCta,
     open,
     close,
     isOpen,

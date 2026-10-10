@@ -125,7 +125,7 @@
     host.__pixkuyLegalAcceptanceInstance = api.create({
       container: host,
       form: form,
-      channel: "web_direct_transfer_mobile_checkout",
+      channel: ["web_direct_transfer_mobile_checkout","web_direct_transfer_checkout"].includes(step.dataset.directPendingLegalChannel) ? step.dataset.directPendingLegalChannel : "web_direct_transfer_mobile_checkout",
       checkboxId: "pixkuy-direct-transfer-mobile-legal-acceptance"
     });
 
@@ -147,7 +147,7 @@
     var readyByContactStep;
     var isReady;
 
-    if (!isMobileViewport()) {
+    if (!isMobileViewport() && !window.PixkuyDirectPendingEdit?.activeData()) {
       return false;
     }
 
@@ -166,7 +166,7 @@
 
     readyByContactStep =
       submit.getAttribute("data-direct-transfer-mobile-contact-submit-ready") === "true" ||
-      hasFilledContactData(step);
+      !step.hasAttribute('data-direct-pending-contact') && hasFilledContactData(step);
     isReady = Boolean(readyByContactStep && isAccepted(instance));
 
     submit.disabled = !isReady;
