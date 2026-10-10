@@ -601,6 +601,7 @@ function syncActions(root, dictionary, result) {
     setHidden(root, "[data-booking-status-state]", true);
     setText(root, "[data-booking-status-title]", getCopy(dictionary, result.view, "title"));
     setText(root, "[data-booking-status-lead]", getCopy(dictionary, result.view, "lead"));
+    if(result.view==='pending'&&(result.contactUpdatePending||result.paymentWindowRenewed))root.querySelector('[data-booking-status-lead]').textContent+=' '+dictionary[result.contactUpdatePending?'contactUpdatePending':'contactEmailRenewed'];
 
     setText(root, '[data-booking-status-label="publicCode"]', t(dictionary, "details.publicCode"));
     setText(root, '[data-booking-status-label="service"]', t(dictionary, "details.service"));

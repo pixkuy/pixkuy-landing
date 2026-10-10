@@ -1,5 +1,7 @@
 {
   "bookingStatus": {
+    "contactEmailRenewed": "E-mail aggiornata. Il termine di pagamento è stato rinnovato.",
+    "contactUpdatePending": "La modifica dell’e-mail è ancora in corso. Continua per riprenderla.",
     "meta": {
       "successTitle": "Prenotazione ricevuta — Pixkuy Mobility",
       "cancelledTitle": "Pagamento non completato — Pixkuy Mobility"

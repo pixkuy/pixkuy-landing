@@ -1000,6 +1000,7 @@
     var config = getConfig();
     var savedAttempt = context && context.attempt;
     var payload = savedAttempt ? JSON.parse(JSON.stringify(savedAttempt.payload)) : buildPayload(snapshot);
+    var contactOnly=!savedAttempt && window.PixkuyFleetSelection.airportContactOnly(payload,context?.serviceBaseline);
     var apiBaseUrl;
     var checkoutUrl;
     if (
@@ -1018,6 +1019,7 @@
       ? apiBaseUrl.replace(/\/+$/, "") + REPLACE_CHECKOUT_ENDPOINT
       : REPLACE_CHECKOUT_ENDPOINT;
     if (savedAttempt) checkoutUrl = savedAttempt.url;
+    else if(contactOnly){checkoutUrl=checkoutUrl.replace(/\/replace-checkout$/, '/update-contact');payload=window.PixkuyFleetSelection.contactPayload(payload);}
     return getRecaptchaToken()
       .then(function addRecaptchaToken(recaptchaToken) {
         // Freeze the reviewed request before sending. A lost response must replay
@@ -1026,7 +1028,7 @@
           context.attempt = { payload: payload, url: checkoutUrl };
           window.sessionStorage.setItem(EDIT_KEY, JSON.stringify(context));
         }
-        if (normalizeText(recaptchaToken)) payload.recaptchaToken = normalizeText(recaptchaToken);
+        if (normalizeText(recaptchaToken) && !/\/update-contact$/.test(checkoutUrl)) payload.recaptchaToken = normalizeText(recaptchaToken);
         return window.fetch(checkoutUrl, {
           method: "POST",
           headers: {

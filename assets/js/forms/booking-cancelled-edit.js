@@ -200,6 +200,7 @@
         : window.PixkuyFleetSelection.createAttemptKey(),
       publicCode: state.result.publicCode,
       authorizedServiceDate: draft.airport_transfer_date,
+      serviceBaseline: draft,
       expiresAt: state.result.raw.hold.expiresAt,
       serverNow: state.result.raw.serverNow,
       receivedAt: Date.now(),

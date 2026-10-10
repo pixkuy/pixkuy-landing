@@ -1,5 +1,7 @@
 {
   "bookingStatus": {
+    "contactEmailRenewed": "Адрес электронной почты обновлён. Срок оплаты продлён.",
+    "contactUpdatePending": "Изменение адреса электронной почты ещё выполняется. Продолжите, чтобы возобновить его.",
     "meta": {
       "successTitle": "Бронирование получено — Pixkuy Mobility",
       "cancelledTitle": "Платеж не завершен — Pixkuy Mobility"

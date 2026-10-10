@@ -1,5 +1,7 @@
 {
   "bookingStatus": {
+    "contactEmailRenewed": "电子邮箱已更新，付款截止时间已延长。",
+    "contactUpdatePending": "电子邮箱更改仍在进行中。请继续以恢复此操作。",
     "meta": {
       "successTitle": "预订已收到 — Pixkuy Mobility",
       "cancelledTitle": "付款未完成 — Pixkuy Mobility"

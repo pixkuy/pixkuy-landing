@@ -459,6 +459,8 @@
       accessExpired:!!accessExpired,
       reservationStatus: reservationStatus,
       paymentStatus: getPaymentStatus(body),
+      paymentWindowRenewed:body.paymentWindowRenewed===true,
+      contactUpdatePending:body.contactUpdatePending===true,
       serviceType: accessExpired ? (body.serviceType || "") : getServiceType(body),
       paymentAmountPaid: getPaymentAmountPaid(body),
       paymentAmountExpected: getPaymentAmountExpected(body),

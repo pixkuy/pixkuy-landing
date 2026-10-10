@@ -476,6 +476,7 @@
     setText(root, "[data-booking-status-state]", t(dictionary, copyPath + ".state"));
     setText(root, "[data-booking-status-title]", result.reservationStatus === "failed" ? t(dictionary, "paymentLabels.failed") : t(dictionary, copyPath + ".title"));
     setText(root, "[data-booking-status-lead]", t(dictionary, copyPath + ".lead"));
+    if(result.view==='pending'&&(result.contactUpdatePending||result.paymentWindowRenewed))root.querySelector('[data-booking-status-lead]').textContent+=' '+dictionary[result.contactUpdatePending?'contactUpdatePending':'contactEmailRenewed'];
 
     setText(root, '[data-booking-status-label="publicCode"]', t(dictionary, "details.publicCode"));
     setText(root, '[data-booking-status-label="service"]', t(dictionary, "details.service"));

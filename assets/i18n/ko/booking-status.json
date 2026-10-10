@@ -1,5 +1,7 @@
 {
   "bookingStatus": {
+    "contactEmailRenewed": "이메일이 업데이트되어 결제 기한이 갱신되었습니다.",
+    "contactUpdatePending": "이메일 변경이 진행 중입니다. 계속하여 변경을 완료하세요.",
     "meta": {
       "successTitle": "예약 접수 완료 — Pixkuy Mobility",
       "cancelledTitle": "결제가 완료되지 않았습니다 — Pixkuy Mobility"

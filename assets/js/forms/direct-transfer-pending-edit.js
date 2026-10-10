@@ -28,13 +28,10 @@
       contact:{name:context.customer.full_name,phone:context.customer.phone,email:context.customer.email},proof:context.proof,
       publicCode:context.publicCode,expiresAt:context.expiresAt,
       serverNow:new Date(Date.parse(context.serverNow)+Math.max(0,Date.now()-context.receivedAt)).toISOString(),canReview,
-      onChange:(contact,proof)=>{context.customer.full_name=contact.name;context.customer.phone=contact.phone;context.proof=proof;write(context);},
+      onChange:(contact,proof)=>{context.customer.full_name=contact.name;context.customer.phone=contact.phone;context.customer.email=contact.email;context.proof=proof;write(context);},
       onBack:()=>location.assign('/booking-cancelled.html?token='+encodeURIComponent(context.token)),
       onReview:()=>location.assign('/direct-transfer-checkout-review.html?pending=1&lang='+encodeURIComponent(document.documentElement.lang||'es')+'#revision')
     });
-    let copyRevision=0;
-    async function copy(){const seq=++copyRevision,lang=document.documentElement.lang||'es';const response=await fetch('assets/i18n/'+lang+'/direct-transfer-checkout.json');const dict=await response.json();if(seq!==copyRevision)return;const hint=document.querySelector('[data-direct-pending-email-hint]');if(hint)hint.textContent=dict.directTransferCheckout.pendingEmailLocked;}
-    window.addEventListener('pixkuy:i18n-applied',()=>{copy().catch(()=>{});});copy().catch(()=>{});
     try{
       const response=await fetch((config.apiBaseUrl||'').replace(/\/$/,'')+'/v1/public/reservations/status?token='+encodeURIComponent(context.token),{headers:{'X-Pixkuy-Site-Key':config.publicSiteKey||'local_pixkuy_site_key'}});
       const raw=await response.json();
@@ -98,11 +95,11 @@
             payload:{service_type:'direct_transfer',customer:{...context.customer},...flat(),legal_acceptance_accepted:true}};write(context);}
           const attempt=context.attempt;
           const response=await fetch(endpoint('update-contact'),{method:'POST',headers:{...headers(),'Content-Type':'application/json','X-Pixkuy-Booking-Token':context.token,'X-Pixkuy-Edit-Revision':attempt.revision,'Idempotency-Key':attempt.key},body:JSON.stringify(attempt.payload)});
-          const body=await response.json();if(!response.ok){const e=new Error(body.code);e.code=body.code;throw e;}
-          if(body.bookingStatusToken!==context.token||body.hold?.expiresAt!==context.expiresAt||!body.checkoutUrl)throw new Error('INCOMPATIBLE_RESPONSE');
-          context.revision=body.editRevision;delete context.attempt;write(context);
+          const body=await response.json();if(!response.ok){const e=new Error(body.code);e.code=body.code;e.recovery=body.recovery;throw e;}
+          if(body.bookingStatusToken!==context.token||!body.checkoutUrl||!body.hold?.expiresAt||body.hold.expiresAt!==context.expiresAt&&!body.paymentWindowRenewed)throw new Error('INCOMPATIBLE_RESPONSE');
+          context.revision=body.editRevision;context.expiresAt=body.hold.expiresAt;delete context.attempt;write(context);
           if(!api.redirectToCheckout(body.checkoutUrl,context.token))throw new Error('CHECKOUT_HANDOFF_FAILED');
-        }catch(e){busy=false;if(e.code&&!['IDEMPOTENCY_REQUEST_IN_PROGRESS','CHECKOUT_STATE_UNCERTAIN'].includes(e.code)){delete context.attempt;verified=false;write(context);}error(e.code);gate();}
+        }catch(e){busy=false;if(e.recovery?.state==='authoritative_status'){status();return;}if(e.code&&!e.recovery&&!['IDEMPOTENCY_REQUEST_IN_PROGRESS','CHECKOUT_STATE_UNCERTAIN'].includes(e.code)){delete context.attempt;verified=false;write(context);}error(e.code);gate();}
       };
       if(context.attempt){edit.onclick=event=>{event.preventDefault();};edit.setAttribute('aria-disabled','true');}
       gate();

@@ -65,6 +65,7 @@
     if (kind) {
       root.querySelector('[data-booking-status-title]').textContent = view.t(confirmed ? 'mobileConfirmedTitle' : kind + 'Title');
       root.querySelector('[data-booking-status-lead]').textContent = actions.paymentWindowClosed ? view.t('paymentWindowClosed') : view.t(kind === 'returnPending' ? 'confirmAfterPayment' : kind + 'Text');
+      if(result.view==='pending'&&(result.contactUpdatePending||result.paymentWindowRenewed))root.querySelector('[data-booking-status-lead]').textContent+=' '+state.dictionary[result.contactUpdatePending?'contactUpdatePending':'contactEmailRenewed'];
       var notice = root.querySelector('[data-booking-status-notice]');
       notice.textContent = '';
       notice.hidden = true;
@@ -259,6 +260,7 @@
     var lead = view.node("p", "airport-booking__lead", view.t(kind + "Text"));
     var windowClosed = result.raw.actions && result.raw.actions.paymentWindowClosed === true;
     if (windowClosed) lead.textContent = view.t("paymentWindowClosed");
+    if(result.view==='pending'&&(result.contactUpdatePending||result.paymentWindowRenewed))lead.textContent+=' '+state.dictionary[result.contactUpdatePending?'contactUpdatePending':'contactEmailRenewed'];
     mount.append(title, lead);
     if(!confirmed && result.raw.hold && result.raw.serverNow) mount.appendChild(view.deadline(result.raw.hold.expiresAt,serverNow(result.raw),result.raw.actions.canCreateNewReservation ? 'paymentDeadlineResolved' : 'paymentDeadlinePassed',function () {
       window.queueMicrotask(function () { if(mount)mount.querySelectorAll('[data-airport-pay]').forEach(function (button) { button.disabled=true; }); });

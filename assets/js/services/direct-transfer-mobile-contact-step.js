@@ -1679,13 +1679,12 @@
     node.setAttribute('data-direct-pending-contact','');
     node.dataset.directPendingLegalChannel=options.proof?.channel||'web_direct_transfer_mobile_checkout';
     for(const name of [FIELD_NAME,FIELD_PHONE,FIELD_EMAIL])getContactField(name).value=options.contact[name]||'';
-    getContactField(FIELD_EMAIL).readOnly=true;
+    getContactField(FIELD_EMAIL).readOnly=false;
     node.hidden=false;node.setAttribute('aria-hidden','false');document.body.setAttribute(CONTACT_STEP_ACTIVE_ATTR,'true');
     syncVisibleHeight();syncCopy();syncSummary(snapshot);
     const view=window.PixkuyAirportDesktopView,summary=node.querySelector('[data-direct-transfer-mobile-contact-summary]');
     const reference=view.node('p','airport-booking__reference',options.publicCode);reference.dataset.directPendingReference='';
     summary.after(reference,view.deadline(options.expiresAt,options.serverNow,'editDeadlinePassed',syncSubmitAvailability));
-    const hint=view.node('p','booking-no-payment');hint.dataset.directPendingEmailHint='';getContactField(FIELD_EMAIL).after(hint);
     window.PixkuyDirectTransferMobileTransactionalBridge.sync();
     const legal=window.PixkuyForms.LegalAcceptance;
     const proof=Object.fromEntries(Object.entries(legal.fieldNames).map(([key,name])=>[name,options.proof?.[key]||'']));

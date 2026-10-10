@@ -127,6 +127,7 @@
       var current = editContext();
       if(!current || current.token !== context.token || !raw.serverNow || !raw.hold) return;
       current.serverNow = raw.serverNow; current.expiresAt = raw.hold.expiresAt; current.receivedAt = Date.now();
+      if(!current.serviceBaseline && raw.edit?.draft)current.serviceBaseline=raw.edit.draft;
       window.sessionStorage.setItem(EDIT_KEY, JSON.stringify(current));
       // Refresh only timing. Remounting the canonical form can replay its handoff
       // and overwrite local edits that have not been submitted.

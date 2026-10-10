@@ -490,21 +490,39 @@
       if (inflightPrechecks[service] && inflightPrechecks[service].promise === request) delete inflightPrechecks[service];
     });
   }
+  function contactPayload(payload){
+    var result={service_type:payload.service_type,customer:copy(payload.customer)};
+    Object.keys(payload).filter(function(key){return key.indexOf('legal_acceptance_')===0;}).forEach(function(key){result[key]=payload[key];});
+    if(payload.service_type==='airport_transfer' && Object.prototype.hasOwnProperty.call(payload,'airport_transfer_notes'))result.airport_transfer_notes=payload.airport_transfer_notes;
+    return result;
+  }
+  function airportContactOnly(payload,baseline){
+    if(!baseline||!payload)return false;
+    var capacity={van_1_2:2,van_3_4:4,van_5_6:6}[baseline.airport_transfer_passenger_fare_key];
+    if(Number(payload.airport_transfer_passengers??capacity)!==Number(baseline.airport_transfer_passengers??capacity)||Number(payload.airport_transfer_luggage??0)!==Number(baseline.airport_transfer_luggage??0))return false;
+    var keys=['airport_transfer_airport_id','airport_transfer_direction','airport_transfer_zone_id','airport_transfer_passenger_fare_key','airport_transfer_date','airport_transfer_time','airport_transfer_price','airport_transfer_currency'];
+    if(keys.some(function(k){return String(payload[k]??'')!==String(baseline[k]??'');}))return false;
+    var place=payload.airport_transfer_non_airport_location||{},original=baseline.airport_transfer_non_airport_location||{};
+    return ['place_id','lat','lng'].every(function(k){return String(place[k])===String(original[k]);}) &&
+      ['model_id','model_revision'].every(function(k){return String(payload.fleet_selection?.[k])===String(baseline.fleet_selection?.[k]);});
+  }
   function fetchCheckout(service, url, init) {
     var state = read(service);
     var payload = JSON.parse(init.body);
     state.draft = copy(payload);
+    var contactOnly=service==='hourly_daily' && hourlyEdit()?.contactOnly;
     if(service==="hourly_daily" && !pending(state) && hourlyEdit()){
       var edit=hourlyEdit();
-      url=url.replace(/\/checkout$/, "/replace-checkout");
+      url=url.replace(/\/checkout$/, contactOnly ? "/update-contact" : "/replace-checkout");
+      if(contactOnly)payload=contactPayload(payload);
       init=Object.assign({},init,{headers:Object.assign({},init.headers,{
         "X-Pixkuy-Booking-Token":edit.token,"X-Pixkuy-Edit-Revision":edit.editRevision})});
     }
     if (!pending(state)) {
       var selected = selection(service);
       if ((!selected || state.explicit) && state.offer) return Promise.reject(new Error("FLEET_MODEL_SELECTION_REQUIRED"));
-      if (selected) payload.fleet_selection = payload.fleet_selection || selected;
-      if (selected && (payload.fleet_selection.model_id !== selected.model_id || payload.fleet_selection.model_revision !== selected.model_revision)) return Promise.reject(new Error("FLEET_REVIEW_SELECTION_CHANGED"));
+      if (selected && !contactOnly) payload.fleet_selection = payload.fleet_selection || selected;
+      if (selected && !contactOnly && (payload.fleet_selection.model_id !== selected.model_id || payload.fleet_selection.model_revision !== selected.model_revision)) return Promise.reject(new Error("FLEET_REVIEW_SELECTION_CHANGED"));
       state.attempt = { state: "pending", key: service==="hourly_daily" && hourlyEdit() ? hourlyEdit().idempotencyKey : createAttemptKey(), payload: copy(payload), url: url, headers: copy(init.headers || {}) };
     }
     var attempt = state.attempt;
@@ -519,7 +537,9 @@
         var current = read(service);
         if (!current.attempt || current.attempt.key !== attempt.key) throw new Error("FLEET_ATTEMPT_CONFLICT");
         current.attempt.response = copy(body);
-        if (body.recovery && body.recovery.state === "not_committed") {
+        if(body.recovery?.state==='unknown' && /\/update-contact$/.test(attempt.url)){
+          current.attempt.state='unknown';
+        } else if (body.recovery && body.recovery.state === "not_committed") {
           current.attempt.state = "not_committed";
           current.explicit = true; current.selected = null;
         } else if (body.bookingStatusToken) {
@@ -844,7 +864,7 @@
     if(top)top.appendChild(label);else if(notes)notes.before(label);else placeControl(parent,label);
     setPassengers(control.value);
   }
-  window.PixkuyFleetSelection = { read: read, selection: selection, model: model, snapshot: snapshot, gallery: gallery, photo: modelPhoto,
+  window.PixkuyFleetSelection = { contactPayload:contactPayload, airportContactOnly:airportContactOnly, read: read, selection: selection, model: model, snapshot: snapshot, gallery: gallery, photo: modelPhoto,
     fetchPrecheck: fetchPrecheck, fetchCheckout: fetchCheckout, recoverAttempt: recoverAttempt, completeAttempt: completeAttempt, createAttemptKey: createAttemptKey,
     bindReservation: bindReservation, completeReservation: completeReservation,
     airportOfferStatus: airportOfferStatus,
