@@ -1,0 +1,62 @@
+/* Presentation of the first three screens only; preserve service-specific controls. */
+@media(max-width:720px){
+  .booking-short-address{position:relative;}
+  .booking-short-address__input{color:transparent!important;-webkit-text-fill-color:transparent!important;caret-color:transparent;}
+  [data-booking-short-address]{position:absolute;transform:translateY(-50%);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none;color:var(--fg);font-size:13px;font-weight:650;line-height:1.3;}
+  [data-booking-short-address][hidden]{display:none;}
+  .airport-mobile-route [data-airport-destination-label][data-booking-short-label]{font-size:0!important;line-height:0!important;}
+  .airport-mobile-route [data-airport-destination-label][data-booking-short-label]::after{content:attr(data-booking-short-label);font-size:13px;line-height:1.3;}
+  .hourly-mobile-route [data-fleet-hourly-passengers]{font:inherit;}
+  .hourly-mobile-route [data-fleet-passengers-label]{font-size:11.5px;line-height:1.2;font-weight:700;color:rgba(255,245,228,.74);}
+  body .hourly-mobile-route .services-hourly-panel__row--mobile-hero{grid-template-columns:minmax(52px,.65fr) minmax(112px,1.4fr) minmax(76px,1fr)!important;grid-template-areas:"pickup pickup pickup" "duration date time"!important;gap:8px!important;}
+  body .hourly-mobile-route .services-hourly-panel__config[data-services-hourly-mode-active="full_day"] .services-hourly-panel__row--mobile-hero{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-areas:"pickup pickup" "date time"!important;}
+  body .hourly-mobile-route .services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__row--mobile-hero{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-areas:"pickup pickup" "longterm longterm" "date time"!important;}
+  body .hourly-mobile-route .services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] :is(.services-hourly-panel__field--long-term,[data-hourly-mobile-long-term-select]){width:100%!important;max-width:none!important;min-width:0!important;}
+  body .hourly-mobile-route .services-hourly-panel__field--date-airport-mobile{transform:none!important;}
+  body .hourly-mobile-route .services-hourly-panel__field--time-mobile{width:100%!important;max-width:none!important;}
+  .hourly-mobile-route [data-services-hourly-mode-active="custom_long_term"] [data-hourly-mobile-vehicle-in-footer]{display:none!important;}
+  .hourly-booking--mobile .form-field[data-hourly-booking-field="phone"]{width:100%;max-width:none;grid-column:1/-1;}
+  .hourly-booking--mobile #contact-phone{width:100%;max-width:none;}
+  .direct-transfer-mobile-config-step__notes{display:grid;gap:5px;margin-top:12px;}
+  .direct-transfer-mobile-config-step__notes label{font-size:12px;font-weight:600;color:rgba(255,245,228,.70);}
+  [data-direct-transfer-config-notes]{width:100%;min-height:46px;resize:none;padding:10px;border:1px solid rgba(236,220,189,.35);border-radius:9px;background:rgba(15,17,19,.42);color:var(--fg);font:inherit;font-size:13px;}
+  .direct-transfer-mobile-contact-step__field[data-direct-transfer-mobile-contact-field-wrapper="notes"]{display:none;}
+  [data-direct-transfer-mobile-availability]{font-size:12px;line-height:1.4;margin:8px 0 0;color:var(--muted);}
+  [data-direct-transfer-mobile-availability]{grid-column:1/-1;width:100%;}
+  [data-direct-transfer-mobile-availability][data-state="available"]{color:#68b6a9;}
+  [data-direct-transfer-mobile-availability][hidden]{display:none;}
+  .direct-transfer-mobile-route .direct-transfer-mobile-config-step__row--trip{grid-template-columns:minmax(64px,.8fr) minmax(128px,1.4fr) minmax(80px,1fr);gap:6px;}
+  .direct-transfer-mobile-route .direct-transfer-mobile-config-step__field--passengers .direct-transfer-mobile-config-step__control,
+  .direct-transfer-mobile-route .direct-transfer-mobile-config-step__field--time{width:100%;min-width:0;max-width:none;}
+  body .direct-transfer-mobile-route .direct-transfer-mobile-config-step__fare{height:auto;max-height:none;min-height:108px;padding:10px 8px;box-sizing:border-box;}
+  body .direct-transfer-mobile-route .direct-transfer-mobile-config-step__fare[data-direct-transfer-mobile-fare-state="ready"] .direct-transfer-mobile-config-step__fare-pending{flex-wrap:wrap;}
+  body .direct-transfer-mobile-route :is(.direct-transfer-mobile-config-step__fare-amount,.direct-transfer-mobile-config-step__fare-currency){flex:0 0 auto;white-space:nowrap;}
+  .booking-no-payment{font-size:12px;line-height:1.4;margin:12px 0;color:var(--muted);}
+  [data-direct-transfer-mobile-contact-summary-row="notes"]{grid-column:1/-1;}
+  .direct-transfer-mobile-contact-step__summary-value{display:block!important;-webkit-line-clamp:unset!important;white-space:normal!important;overflow:visible!important;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__vehicle-media{display:none;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--vehicle dd{display:block;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail{gap:2px;padding:3px 10px;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__detail--service{grid-column:1/-1;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] :is(.booking-status__detail--passengers,.booking-status__detail--vehicle){grid-column:auto;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] [data-direct-review-contact]{display:block;padding:10px;}
+  [data-direct-review-contact] h2{font-size:14px;font-weight:750;margin:0 0 5px;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] [data-direct-review-contact] .booking-status__detail{padding:0;}
+  [data-direct-review-contact] dt{display:none;}
+  .direct-transfer-checkout-review__legal--accepted .direct-transfer-checkout-review__legal-card p{display:none;}
+  .booking-status-page[data-direct-transfer-checkout-review-page] .direct-transfer-checkout-review__total .booking-status__detail dd{color:rgb(61,158,122);}
+  .booking-status-page[data-direct-transfer-checkout-review-page] .booking-status__primary{font-family:inherit;font-size:14px;font-weight:700;line-height:1.2;min-height:44px;padding:12px;}
+  body .hourly-mobile-route [data-hourly-mobile-vehicle-in-footer="true"]{width:136px!important;min-width:0!important;max-width:136px!important;}
+  body .hourly-mobile-route .services-hourly-panel__row--mobile-footer-spacer{grid-template-columns:136px minmax(0,1fr)!important;}
+  body .hourly-mobile-route [data-hourly-mobile-vehicle-in-footer="true"] .services-hourly-panel__vehicle{width:136px!important;}
+  body .hourly-mobile-route [data-hourly-mobile-vehicle-in-footer="true"] :is(.services-hourly-panel__vehicle-copy,.services-hourly-panel__vehicle-media,.services-hourly-panel__vehicle-image){width:100%!important;max-width:136px!important;}
+  body .hourly-mobile-route [data-hourly-mobile-vehicle-in-footer="true"] .services-hourly-panel__vehicle-image{aspect-ratio:136/108;object-fit:cover;border-radius:9px;}
+  .airport-mobile-route #services-expand-airport .services-expand__fare-amount,
+  body .hourly-mobile-route .services-hourly-panel__price-amount,
+  body .direct-transfer-mobile-route .direct-transfer-mobile-config-step__fare-amount{font-size:clamp(34px,11vw,46px)!important;line-height:1.05!important;font-weight:800!important;}
+  body .hourly-mobile-route [data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__price-amount{font-size:15px!important;line-height:1.4!important;}
+  body .hourly-mobile-route .services-hourly-panel__price-value{display:flex!important;flex-wrap:wrap;align-items:baseline;gap:4px;}
+  body .hourly-mobile-route :is(.services-hourly-panel__price-amount,.services-hourly-panel__price-currency){flex:0 0 auto;white-space:nowrap;}
+  body .hourly-mobile-route [data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__price-amount{white-space:normal;}
+  body .hourly-mobile-route .services-hourly-panel__config[data-services-hourly-mode-active="custom_long_term"] .services-hourly-panel__row--mobile-footer-spacer{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"price"!important;}
+}

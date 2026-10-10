@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "acceptedTitle": "Condizioni accettate",
+    "contactTitle": "Contatto",
     "recover": "Verifica lo stato del pagamento",
     "uncertain": "Non possiamo confermare l’esito del tentativo. Ne verifichi lo stato prima di un altro pagamento.",
     "availabilityUnavailable": "Nessun veicolo disponibile a questo orario.",
@@ -10,7 +12,7 @@
     "title": "Rivedi il transfer diretto",
     "text": "Conferma percorso, orario, veicolo e contatti prima di continuare al pagamento.",
     "proceed": "Continua al pagamento",
-    "edit": "Modifica dati",
+    "edit": "Indietro",
     "error": "Rivedi i dati del transfer prima di continuare.",
     "quote": {
       "priceUpdated": "Il prezzo è cambiato. Controlla il prezzo aggiornato e continua di nuovo per accettarlo.",
@@ -44,7 +46,7 @@
       "passengers": "Passeggeri",
       "vehicle": "Veicolo",
       "estimate": "Percorso",
-      "price": "Prezzo",
+      "price": "Totale",
       "name": "Nome",
       "phone": "Telefono",
       "email": "Email",

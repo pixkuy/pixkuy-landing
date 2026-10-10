@@ -5,7 +5,7 @@
     "fields": {
       "name": "Полное имя",
       "phone": "Телефон/WhatsApp с международным префиксом",
-      "email": "Email",
+      "email": "Электронная почта",
       "notes": "Примечания к поездке"
     },
     "placeholders": {

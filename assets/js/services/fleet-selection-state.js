@@ -575,23 +575,23 @@
   // Called only after the public status confirms payment. A superseded checkout
   // attempt is not a paid reservation; pending edit/recovery keeps its context.
   function completeReservation(service, token, resolvedExpired) {
-    if (["airport_transfer","hourly_daily"].indexOf(service)<0 || !token) return false;
+    if (services.indexOf(service)<0 || !token) return false;
     var state = read(service);
     var attempt = state.attempt;
     var owner = state.reservationToken || attempt && attempt.response && attempt.response.bookingStatusToken;
     if (owner !== token) return false;
     var edit;
-    try { edit = JSON.parse(window.sessionStorage.getItem(service==="hourly_daily"?HOURLY_EDIT_KEY:AIRPORT_REPLACEMENT_EDIT_KEY) || "null"); }
+    try { edit = service==='direct_transfer' ? null : JSON.parse(window.sessionStorage.getItem(service==="hourly_daily"?HOURLY_EDIT_KEY:AIRPORT_REPLACEMENT_EDIT_KEY) || "null"); }
     catch (_) { return false; }
     if (edit && edit.token !== token) return false;
     if (!resolvedExpired && attempt && (attempt.state !== "committed" || !attempt.response || attempt.response.bookingStatusToken !== token)) return false;
     sequences[service] = (sequences[service] || 0) + 1;
     delete inflightPrechecks[service];
     if(service==="hourly_daily")hourlyCertificate=null;
-    else airportCertificate = null;
+    else if(service==='airport_transfer') airportCertificate = null;
     editingService = "";
     write(service, {version:1, selected:null, offer:null, attempt:null, explicit:false});
-    (service==="hourly_daily" ? ["pixkuy_hourly_checkout_review_snapshot","pixkuy_hourly_checkout_review_return",
+    (service==='direct_transfer' ? ['pixkuy_direct_transfer_checkout_review_snapshot','pixkuy_direct_transfer_checkout_review_return','pixkuy_booking_checkout:'+token] : service==="hourly_daily" ? ["pixkuy_hourly_checkout_review_snapshot","pixkuy_hourly_checkout_review_return",
       HOURLY_EDIT_KEY,"pixkuy_booking_checkout:"+token] : ["pixkuy_airport_transfer_checkout_review_snapshot", "pixkuy_airport_transfer_checkout_review_return",
       AIRPORT_REPLACEMENT_EDIT_KEY, "pixkuy_booking_checkout:" + token]).forEach(function (key) {
       window.sessionStorage.removeItem(key);
@@ -856,6 +856,10 @@
   });
   window.addEventListener("pageshow", function () {
     services.forEach(function (service) { render(service); syncPresentation(service); });
+  });
+  window.addEventListener('pixkuy:booking-status-ready',function(event){
+    var state=event.detail,result=state && state.result;
+    if(result && result.serviceType==='direct_transfer' && result.reservationStatus==='confirmed' && result.paymentStatus==='paid')completeReservation('direct_transfer',state.token);
   });
   if (window.addEventListener) window.addEventListener("pixkuy:i18n-applied", function (event) {
     if (event.detail && event.detail.dict && event.detail.dict.fleetSelection) dictionaries[language()] = event.detail.dict.fleetSelection;

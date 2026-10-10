@@ -22,7 +22,7 @@
   const NOTES_EDITOR_ACTIVE_ATTR = "data-airport-mobile-notes-editor-active";
 
   const COMPACT_NOTES_SELECTOR =
-    '.airport-mobile-route .airport-mobile-contact-step [data-airport-mobile-contact-field="notes"], body.airport-booking-active .airport-booking__form #contact-message';
+    '.airport-mobile-route .airport-mobile-contact-step [data-airport-mobile-contact-field="notes"], body.airport-booking-active .airport-booking__form #contact-message, [data-direct-transfer-config-notes]';
 
   const EDITOR_SELECTOR = "[data-airport-mobile-notes-editor]";
   const EDITOR_INPUT_SELECTOR = "[data-airport-mobile-notes-editor-input]";
@@ -90,7 +90,7 @@
   function isAirportMobileContactStepActive() {
     return (
       isMobileViewport() &&
-      document.body.getAttribute(CONTACT_STEP_ACTIVE_ATTR) === "true"
+      (document.body.getAttribute(CONTACT_STEP_ACTIVE_ATTR) === "true" || document.querySelector('[data-direct-transfer-config-notes]')?.getClientRects().length>0)
     );
   }
 

@@ -429,6 +429,7 @@
   }
 
   function handleAction(action) {
+    if(window.PixkuyDirectTransferMobileConfigStep?.isOpen()) window.PixkuyDirectTransferMobileConfigStep.saveDraft?.();
     // pushState does not emit hashchange/popstate. Release the current Hourly
     // view before opening the destination through the existing menu routes.
     const hourly = window.PixkuyHourlyBookingFlow;

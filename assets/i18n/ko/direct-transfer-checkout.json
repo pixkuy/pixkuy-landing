@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "acceptedTitle": "약관 동의 완료",
+    "contactTitle": "연락처",
     "recover": "결제 상태 확인",
     "uncertain": "이 시도의 결과를 확인할 수 없습니다. 다른 결제 전에 상태를 확인해 주세요.",
     "availabilityUnavailable": "요청하신 시간에 이용 가능한 차량이 없습니다.",
@@ -10,7 +12,7 @@
     "title": "직행 이동 검토",
     "text": "결제로 계속하기 전에 경로, 시간, 차량, 연락처 정보를 확인하세요.",
     "proceed": "결제로 계속",
-    "edit": "정보 수정",
+    "edit": "뒤로",
     "error": "계속하기 전에 이동 정보를 확인하세요.",
     "quote": {
       "priceUpdated": "가격이 변경되었습니다. 업데이트된 가격을 확인하고 다시 계속하여 수락하세요.",
@@ -44,7 +46,7 @@
       "passengers": "승객",
       "vehicle": "차량",
       "estimate": "경로",
-      "price": "가격",
+      "price": "합계",
       "name": "이름",
       "phone": "전화",
       "email": "이메일",

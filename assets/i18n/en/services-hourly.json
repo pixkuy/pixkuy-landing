@@ -107,11 +107,12 @@
           "longTermNotesHelper": "Indicate dates, type of use, approximate schedules, base city, expected trips and any relevant operational needs.",
           "priceLabel": "Final price",
           "fullDayPriceLabel": "Day rate",
-          "longTermPriceLabel": "Rate",
-          "longTermPriceValue": "According to operation",
+          "longTermCta": "Continue to contact details",
+          "longTermPriceLabel": "Personalised quote",
+          "longTermPriceValue": "Based on your requirements",
           "priceValuePending": "—",
           "cta": "Request",
-          "reviewCta": "Review booking",
+          "reviewCta": "Review my booking",
           "review": {
             "title": "Review your booking",
             "text": "Confirm that the details are correct before continuing to payment.",
@@ -219,7 +220,7 @@
     "reviewTitle": "Review your booking",
     "mobileReviewTitle": "Review your service",
     "pendingServiceTitle": "Your service",
-    "reviewCta": "Review booking",
+    "reviewCta": "Review my booking",
     "expiredAccess": "Access expired. Check your confirmation or contact us for help."
   }
 }

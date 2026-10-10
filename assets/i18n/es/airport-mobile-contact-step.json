@@ -5,7 +5,7 @@
     "fields": {
       "name": "Nombre completo",
       "phone": "Teléfono/WhatsApp con prefijo internacional",
-      "email": "Email",
+      "email": "Correo electrónico",
       "notes": "Notas del viaje"
     },
     "placeholders": {

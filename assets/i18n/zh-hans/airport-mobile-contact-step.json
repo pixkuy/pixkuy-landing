@@ -5,7 +5,7 @@
     "fields": {
       "name": "姓名",
       "phone": "带国际区号的电话/WhatsApp",
-      "email": "邮箱",
+      "email": "电子邮箱",
       "notes": "行程备注"
     },
     "placeholders": {

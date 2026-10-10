@@ -61,7 +61,12 @@
     restoringDraft=true;
     try {
       if (!open(configStep,saved.payload)) return false;
-      Object.keys(saved.contact || {}).forEach(name=>{const field=getContactField(name);if(field)field.value=saved.contact[name];});
+      restoreSavedContact(saved);
+      return true;
+    } finally {restoringDraft=false;}
+  }
+  function restoreSavedContact(saved) {
+      Object.keys(saved.contact || {}).forEach(name=>{const field=getContactField(name);if(field)field.value=name==='notes' && Object.prototype.hasOwnProperty.call(currentPayload,'notes') ? currentPayload.notes : saved.contact[name];});
       const bridge=window.PixkuyDirectTransferMobileTransactionalBridge;if(bridge)bridge.sync();
       const legal=window.PixkuyForms.LegalAcceptance, proof=saved.legal;
       const current=legal.buildSnapshot('web_direct_transfer_mobile_checkout');
@@ -72,10 +77,10 @@
         restoredLegalProof=proof;
         instance.checkbox.checked=true;
         legal.syncAcceptedFields(getReservationFormsApi().getReservationForm(),proof);
+      } else if(instance) {
+        restoredLegalProof=null;instance.checkbox.checked=false;legal.clearFields(getReservationFormsApi().getReservationForm());
       }
       syncSubmitAvailability();
-      return true;
-    } finally {restoringDraft=false;}
   }
 
   function isMobileViewport() {
@@ -205,6 +210,7 @@
   }
 
   function formatCurrencyValue(value, currency) {
+    if(window.PixkuyBookingPresentation)return window.PixkuyBookingPresentation.money(Number(value)*100,currency || 'MXN');
     const safeCurrency = normalizeText(currency) || "MXN";
     const numericValue = Number(value);
 
@@ -772,7 +778,7 @@
       "passengers",
       "vehicle",
       "estimate",
-      "price"
+      "price", "notes"
     ].forEach(function appendRow(key) {
       summaryList.appendChild(buildSummaryRow(key));
     });
@@ -807,6 +813,7 @@
     root.appendChild(form);
     root.appendChild(globalError);
     root.appendChild(actions);
+    const noPayment=document.createElement('p');noPayment.className='booking-no-payment';noPayment.setAttribute('data-booking-no-payment','');root.appendChild(noPayment);
     root.appendChild(notesEditor);
 
     return root;
@@ -869,19 +876,20 @@
       ? contactStepNode.querySelector("[data-direct-transfer-mobile-contact-summary-title]")
       : null;
     const values = {
-      origin: getCompactAddressLabel(safeSnapshot.direct_transfer_origin_address),
-      destination: getCompactAddressLabel(safeSnapshot.direct_transfer_destination_address),
-      date: safeSnapshot.direct_transfer_date || "",
+      origin: safeSnapshot.direct_transfer_origin_address,
+      destination: safeSnapshot.direct_transfer_destination_address,
+      date: window.PixkuyBookingPresentation.date(safeSnapshot.direct_transfer_date),
       time: safeSnapshot.direct_transfer_time || "",
       passengers: safeSnapshot.direct_transfer_passenger_bucket_label || "",
-      vehicle: safeSnapshot.direct_transfer_vehicle_label || "",
+      vehicle: safeSnapshot.fleet_model?.name || safeSnapshot.direct_transfer_vehicle_label || "",
       estimate: buildEstimateSummaryLabel(safeSnapshot),
-      price: safeSnapshot.direct_transfer_price_label || ""
+      price: formatCurrencyValue(safeSnapshot.direct_transfer_price,safeSnapshot.direct_transfer_currency),
+      notes: safeSnapshot.direct_transfer_notes || ""
     };
 
     setText(
       summaryTitle,
-      getI18nValue("directTransferMobileFlow.contactStep.summary.title", "")
+      getI18nValue("directTransferMobileFlow.whatsapp.serviceLabel", "")
     );
 
     Object.keys(values).forEach(function syncValue(key) {
@@ -919,6 +927,8 @@
     if (!root) {
       return false;
     }
+
+    setText(root.querySelector('[data-booking-no-payment]'),window.PixkuyAirportDesktopView?.t('noPayment') || '');
 
     setText(
       back,
@@ -958,13 +968,13 @@
       );
     }
 
-    ["origin", "destination", "date", "time", "passengers", "vehicle", "estimate", "price"]
+    ["origin", "destination", "date", "time", "passengers", "vehicle", "estimate", "price", "notes"]
       .forEach(function syncSummaryLabel(key) {
         setText(
           getSummaryLabelNode(key),
           getI18nValue(
             "directTransferMobileFlow.contactStep.summary." + key,
-            key === "estimate"
+            key === "notes" ? getI18nValue('directTransferMobileFlow.contactStep.fields.notes','') : key === "estimate"
               ? getI18nValue("directTransferMobileFlow.estimate.summaryLabel", "Ruta")
               : ""
           )
@@ -979,7 +989,7 @@
         );
         const error = getContactError(name);
         const fieldLabel = getI18nValue(
-          "directTransferMobileFlow.contactStep.fields." + name,
+          (name==='notes'?'directTransferMobileFlow.contactStep.fields.':'airportMobileContactStep.fields.') + name,
           ""
         );
         const placeholder = getI18nValue(
@@ -1586,6 +1596,7 @@
   }
 
   function open(configStep, payload) {
+    const saved=!restoringDraft ? readMobileDraft() : null;
     const snapshot = buildSnapshotFromPayload(payload);
     const node = ensureContactStepNode(configStep);
 
@@ -1597,6 +1608,7 @@
     currentConfigStep = configStep;
     currentSnapshot = snapshot;
     currentPayload = payload;
+    getContactField(FIELD_NOTES).value=snapshot.direct_transfer_notes || '';
 
     syncCopy();
     syncSummary(snapshot);
@@ -1607,6 +1619,7 @@
     node.setAttribute("aria-hidden", "false");
     document.body.setAttribute(CONTACT_STEP_ACTIVE_ATTR, "true");
 
+    if(saved) restoreSavedContact(saved);
     saveMobileDraft();
     if (!restoringDraft) {
       const state=Object.assign({},window.history.state,{directTransferMobileRoute:true});
@@ -1616,6 +1629,7 @@
     const openingRevision=operationRevision, openedByRestore=restoringDraft;
     window.requestAnimationFrame(function focusFirstContactField() {
       if(openedByRestore || !isOpen() || openingRevision!==operationRevision) return;
+      if(node.contains(document.activeElement) && document.activeElement.matches('input,textarea,select'))return;
       const first = getContactField(FIELD_NAME);
 
       if (first && typeof first.focus === "function") {

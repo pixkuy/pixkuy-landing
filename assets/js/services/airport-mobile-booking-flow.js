@@ -1196,6 +1196,8 @@
       ? fare.querySelector("[data-airport-mobile-fare-currency]")
       : null;
     const parts = getMobileFareParts(getMobileFareRawValue(fare));
+    const quote = window.PixkuyFleetSelection?.read('airport_transfer').precheck?.body?.result?.price;
+    if(window.PixkuyBookingPresentation && Number.isFinite(quote?.amountMinor))parts.amount=window.PixkuyBookingPresentation.amount(quote.amountMinor,parts.currency || 'MXN');
     const missingKeys = getMobileFareMissingFieldKeys(panel);
     const availabilityReady = Boolean(
       panel &&

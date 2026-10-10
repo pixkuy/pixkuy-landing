@@ -92,6 +92,7 @@
     if(notesPlaceholderKey)form.elements.message.setAttribute("data-i18n-ph",notesPlaceholderKey);
     form.elements.message.setAttribute("placeholder",notesPlaceholder||"");
     if(phoneMobileCopy){
+      ["name","email"].forEach(function(name){var label=form.querySelector('label[for="contact-'+name+'"]');if(label){label.setAttribute('data-i18n','contact.'+name);label.textContent=window.__pixkuyI18nDict?.contact?.[name] || label.textContent;}});
       if(phoneKey)phoneLabel.setAttribute("data-i18n",phoneKey);
       phoneLabel.textContent=window.__pixkuyI18nDict?.contact?.phone||phoneLabelText;
       if(phonePlaceholderKey)form.elements.phone.setAttribute("data-i18n-ph",phonePlaceholderKey);
@@ -284,7 +285,8 @@
       form.elements.message.removeAttribute("data-i18n-ph");form.elements.message.setAttribute("placeholder",view.t("notesHelp"));
       if(mobile){
         phoneMobileCopy=true;
-        phoneLabel.removeAttribute("data-i18n");phoneLabel.textContent=view.t("phone");
+        ["name","email"].forEach(function(name){var label=form.querySelector('label[for="contact-'+name+'"]');if(label){label.removeAttribute('data-i18n');label.textContent=window.__pixkuyI18nDict?.airportMobileContactStep?.fields?.[name] || label.textContent;}});
+        phoneLabel.removeAttribute("data-i18n");phoneLabel.textContent=window.__pixkuyI18nDict?.airportMobileContactStep?.fields?.phone || view.t("phone");
         form.elements.phone.removeAttribute("data-i18n-ph");form.elements.phone.setAttribute("placeholder","+52 55 1234 5678");
       }
     }else{

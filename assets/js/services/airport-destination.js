@@ -397,6 +397,7 @@ let desktopPlacePresentation = null;
 
 function renderDesktopPlaceLabel(node, label) {
   node.textContent = label;
+  if(window.PixkuyBookingPresentation)node.setAttribute('data-booking-short-label',window.PixkuyBookingPresentation.shortAddress(label,desktopPlacePresentation?.name));
   node.removeAttribute("aria-label");
   if (!isDesktopViewport() || !desktopPlacePresentation || desktopPlacePresentation.label !== label) {
     return;

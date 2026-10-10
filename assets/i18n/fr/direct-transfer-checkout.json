@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "acceptedTitle": "Conditions acceptées",
+    "contactTitle": "Contact",
     "recover": "Vérifier le statut du paiement",
     "uncertain": "Nous ne pouvons pas confirmer le résultat de cette tentative. Consultez son état avant un autre paiement.",
     "availabilityUnavailable": "Aucun véhicule disponible à cet horaire.",
@@ -10,7 +12,7 @@
     "title": "Verifiez votre transfert direct",
     "text": "Confirmez trajet, horaire, vehicule et coordonnees avant de passer au paiement.",
     "proceed": "Continuer vers le paiement",
-    "edit": "Modifier les donnees",
+    "edit": "Retour",
     "error": "Verifiez les donnees du transfert avant de continuer.",
     "quote": {
       "priceUpdated": "Le prix a changé. Vérifiez le prix actualisé et continuez à nouveau pour l’accepter.",
@@ -44,7 +46,7 @@
       "passengers": "Passagers",
       "vehicle": "Vehicule",
       "estimate": "Trajet",
-      "price": "Prix",
+      "price": "Total",
       "name": "Nom",
       "phone": "Telephone",
       "email": "E-mail",

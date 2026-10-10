@@ -107,11 +107,12 @@
           "longTermNotesHelper": "请说明日期、使用方式、大致时段、基础城市、预计行程以及任何相关运营需求。",
           "priceLabel": "最终价格",
           "fullDayPriceLabel": "日费",
-          "longTermPriceLabel": "价格",
-          "longTermPriceValue": "视运营而定",
+          "longTermCta": "继续填写联系信息",
+          "longTermPriceLabel": "定制报价",
+          "longTermPriceValue": "根据您的需求",
           "priceValuePending": "—",
           "cta": "请求",
-          "reviewCta": "检查预订",
+          "reviewCta": "核对我的预订",
           "review": {
             "title": "检查您的预订",
             "text": "继续付款前，请确认信息是否正确。",
@@ -219,7 +220,7 @@
     "reviewTitle": "请核对您的预订",
     "mobileReviewTitle": "请核对您的服务",
     "pendingServiceTitle": "您的服务",
-    "reviewCta": "检查预订",
+    "reviewCta": "核对我的预订",
     "expiredAccess": "访问已过期。请查看确认邮件或联系我们寻求帮助。"
   }
 }

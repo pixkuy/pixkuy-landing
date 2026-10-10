@@ -372,6 +372,7 @@
   }
 
   function formatPrice(snapshot) {
+    if(window.PixkuyBookingPresentation)return window.PixkuyBookingPresentation.money(Number(snapshot.direct_transfer_amount_minor),snapshot.direct_transfer_currency || 'MXN');
     var label = normalizeText(snapshot.direct_transfer_price_label);
     var amount = Number(snapshot.direct_transfer_price);
     var currency = normalizeText(snapshot.direct_transfer_currency) || "MXN";
@@ -396,6 +397,7 @@
   }
 
   function formatEstimate(snapshot, dictionary) {
+    if(window.PixkuyBookingPresentation)return window.PixkuyBookingPresentation.distanceTime(snapshot.direct_transfer_distance_meters,snapshot.direct_transfer_duration_seconds);
     var distance = Number(snapshot.direct_transfer_distance_meters);
     var seconds = Number(snapshot.direct_transfer_duration_seconds);
     var parts = [];
@@ -443,7 +445,7 @@
       buildRow(t(dictionary, "details.service", "Servicio"), t(dictionary, "serviceValue", "Direct transfer"), "service"),
       buildRow(t(dictionary, "details.origin", "Origen"), snapshot.direct_transfer_origin_address, "origin"),
       buildRow(t(dictionary, "details.destination", "Destino"), snapshot.direct_transfer_destination_address, "destination"),
-      buildRow(t(dictionary, "details.date", "Fecha"), snapshot.direct_transfer_date, "date"),
+      buildRow(t(dictionary, "details.date", "Fecha"), window.PixkuyBookingPresentation.date(snapshot.direct_transfer_date), "date"),
       buildRow(t(dictionary, "details.time", "Hora"), snapshot.direct_transfer_time, "time"),
       buildRow(t(dictionary, "details.passengers", "Pasajeros"), getPassengerLabel(snapshot, dictionary), "passengers"),
       buildVehicleRow(t(dictionary, "details.vehicle", "Vehiculo"), (snapshot.fleet_model ? snapshot.fleet_model.name : normalizeText(snapshot.direct_transfer_vehicle_label) || t(dictionary, "vehicleValue", "BYD M9")), snapshot.fleet_model),
@@ -462,6 +464,7 @@
       var contact = document.createElement("dl");
       contact.className = "booking-status__details direct-transfer-checkout-review__contact";
       contact.setAttribute("data-direct-review-contact", "");
+      var heading=document.createElement('h2');heading.textContent=t(dictionary,'contactTitle','');contact.appendChild(heading);
       details.querySelectorAll('[class*="--customer-"],.booking-status__detail--notes').forEach(function (row) { contact.appendChild(row); });
       details.after(contact);
       var total = document.createElement("dl");
@@ -485,7 +488,7 @@
     legal.innerHTML = [
       '<div class="direct-transfer-checkout-review__legal-card">',
       "<strong>",
-      escapeHtml(t(dictionary, "legalTitle", "Condiciones")),
+      escapeHtml(t(dictionary, acceptedAt ? "acceptedTitle" : "legalTitle", "Condiciones")),
       "</strong>",
       "<p>",
       escapeHtml(
@@ -497,6 +500,7 @@
       "</div>"
     ].join("");
 
+    legal.classList.toggle('direct-transfer-checkout-review__legal--accepted',!!acceptedAt);
     var copy = window.__pixkuyI18nDict && window.__pixkuyI18nDict.terms && window.__pixkuyI18nDict.terms.acceptance;
     if (copy) [ ['terms','viewTerms'], ['cancellations','viewCancellations'], ['privacy','viewPrivacy'] ].forEach(function (entry, index) {
       if(index)legal.appendChild(document.createTextNode(' · '));

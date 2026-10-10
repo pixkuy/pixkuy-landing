@@ -107,11 +107,12 @@
           "longTermNotesHelper": "Indica date, tipo di utilizzo, orari approssimativi, città base, spostamenti previsti ed eventuali necessità operative rilevanti.",
           "priceLabel": "Prezzo finale",
           "fullDayPriceLabel": "Tariffa giornaliera",
-          "longTermPriceLabel": "Tariffa",
-          "longTermPriceValue": "Secondo operatività",
+          "longTermCta": "Continua ai dati di contatto",
+          "longTermPriceLabel": "Preventivo personalizzato",
+          "longTermPriceValue": "In base alle sue esigenze",
           "priceValuePending": "—",
           "cta": "Richiedi",
-          "reviewCta": "Rivedi prenotazione",
+          "reviewCta": "Verifica la mia prenotazione",
           "review": {
             "title": "Rivedi la tua prenotazione",
             "text": "Conferma che i dati siano corretti prima di passare al pagamento.",
@@ -219,7 +220,7 @@
     "reviewTitle": "Verifichi la Sua prenotazione",
     "mobileReviewTitle": "Verifica il tuo servizio",
     "pendingServiceTitle": "Il tuo servizio",
-    "reviewCta": "Rivedi prenotazione",
+    "reviewCta": "Verifica la mia prenotazione",
     "expiredAccess": "Accesso scaduto. Consulta la conferma o richiedi assistenza."
   }
 }

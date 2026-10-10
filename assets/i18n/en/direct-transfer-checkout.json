@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "acceptedTitle": "Conditions accepted",
+    "contactTitle": "Contact",
     "recover": "Check payment status",
     "uncertain": "We cannot confirm the outcome of this attempt. Check its status before starting another payment.",
     "availabilityUnavailable": "No vehicles are available at this time.",
@@ -10,7 +12,7 @@
     "title": "Review your direct transfer",
     "text": "Confirm route, time, vehicle and contact details before continuing to payment.",
     "proceed": "Continue to payment",
-    "edit": "Edit details",
+    "edit": "Back",
     "error": "Review the transfer details before continuing.",
     "quote": {
       "priceUpdated": "The price changed. Review the updated price and continue again to accept it.",
@@ -44,7 +46,7 @@
       "passengers": "Passengers",
       "vehicle": "Vehicle",
       "estimate": "Route",
-      "price": "Price",
+      "price": "Total",
       "name": "Name",
       "phone": "Phone",
       "email": "Email",

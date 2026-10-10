@@ -192,6 +192,8 @@
     return !!(state && state.valid);
   }
   function save() {
+    // The shared form can already belong to another service during navigation.
+    if (form.elements.namedItem("service_type").value !== "airport_hotel") return false;
     if (editRecoveryRequired()) return false;
     var draft = window.PixkuyAirportCheckout.draft();
     if (!draft || !draft.airport_transfer_airport_id) return false;
@@ -236,6 +238,10 @@
       if (!mount || mount !== currentMount || view.media.matches) return;
       if (mobileEntryPending) {
         mobileEntryPending = false;
+        // A user can reach a field before this deferred entry frame (notably WebKit).
+        // Do not steal focus/keyboard or scroll away from an interaction already begun.
+        var focused=document.activeElement;
+        if(focused && /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(focused.tagName) && focused.getClientRects().length && window.getComputedStyle(focused).visibility!=='hidden')return;
         mount.querySelector('.airport-mobile-flow__back').focus({preventScroll:true});
         mobileScroller().scrollTop = 0;
       } else if (preserved) restoreUiPosition(preserved);
@@ -424,6 +430,7 @@
     var submit = form.querySelector('#contact-submit');
     mobileStyle(submit,{class:"airport-mobile-contact-step__submit", "data-i18n":null},view.t('mobileReviewCta'));
     mount.appendChild(form);
+    mount.appendChild(view.node('p','booking-no-payment',view.t('noPayment')));
     var editing = editContext();
     if (editing && editing.expiresAt && editing.serverNow) mount.appendChild(editDeadline(editing));
     renderNotice(mount);

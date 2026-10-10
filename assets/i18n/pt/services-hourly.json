@@ -107,11 +107,12 @@
           "longTermNotesHelper": "Indique datas, tipo de uso, horários aproximados, cidade base, deslocações previstas e qualquer necessidade operacional relevante.",
           "priceLabel": "Preço final",
           "fullDayPriceLabel": "Tarifa diária",
-          "longTermPriceLabel": "Tarifa",
-          "longTermPriceValue": "Conforme a operação",
+          "longTermCta": "Continuar para os dados",
+          "longTermPriceLabel": "Orçamento personalizado",
+          "longTermPriceValue": "Conforme as suas necessidades",
           "priceValuePending": "—",
           "cta": "Solicitar",
-          "reviewCta": "Rever reserva",
+          "reviewCta": "Rever a minha reserva",
           "review": {
             "title": "Reveja a sua reserva",
             "text": "Confirme que os dados estão corretos antes de avançar para o pagamento.",
@@ -219,7 +220,7 @@
     "reviewTitle": "Reveja a sua reserva",
     "mobileReviewTitle": "Revise o seu serviço",
     "pendingServiceTitle": "Seu serviço",
-    "reviewCta": "Rever reserva",
+    "reviewCta": "Rever a minha reserva",
     "expiredAccess": "Acesso expirado. Consulte a confirmação ou solicite ajuda."
   }
 }

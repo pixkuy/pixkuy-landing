@@ -72,6 +72,7 @@
   }
   function money(amount, currency) {
     if (!Number.isFinite(amount) || !currency) return "—";
+    if (window.PixkuyBookingPresentation) return window.PixkuyBookingPresentation.money(amount,currency);
     return new Intl.NumberFormat(document.documentElement.lang || "es", { maximumFractionDigits: 2 }).format(amount / 100) + " " + currency;
   }
   function passengerLabel(snapshot) {

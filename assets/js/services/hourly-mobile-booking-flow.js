@@ -208,7 +208,7 @@
       getI18nValue("contact.services.hourlyDaily", "Auto con conductor")
     );
     const helperText = getModeHelperText(panel);
-    const ctaText = getI18nValue(
+    const ctaText = getActiveHourlyMode(panel)==="custom_long_term" ? getI18nValue("services.cards.hourly.panel.longTermCta", "") : getI18nValue(
       "services.cards.hourly.mobileFlow.cta.continue",
       getI18nValue("services.cards.hourly.panel.cta", "")
     );

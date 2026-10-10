@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "acceptedTitle": "Condiciones aceptadas",
+    "contactTitle": "Contacto",
     "recover": "Comprobar estado del pago",
     "uncertain": "No podemos confirmar el resultado del intento. Consulte su estado antes de iniciar otro pago.",
     "availabilityUnavailable": "No hay vehículos disponibles en este horario.",
@@ -10,7 +12,7 @@
     "title": "Revisa tu traslado directo",
     "text": "Confirma ruta, horario, vehiculo y datos de contacto antes de continuar al pago.",
     "proceed": "Continuar al pago",
-    "edit": "Editar datos",
+    "edit": "Volver",
     "error": "Revisa los datos del traslado antes de continuar.",
     "quote": {
       "priceUpdated": "El precio cambió. Revisa el precio actualizado y continúa de nuevo para aceptarlo.",
@@ -44,7 +46,7 @@
       "passengers": "Pasajeros",
       "vehicle": "Vehiculo",
       "estimate": "Ruta",
-      "price": "Precio",
+      "price": "Total",
       "name": "Nombre",
       "phone": "Telefono",
       "email": "Email",

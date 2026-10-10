@@ -107,11 +107,12 @@
           "longTermNotesHelper": "Geben Sie Daten, Art der Nutzung, ungefähre Zeiten, Basisstadt, geplante Fahrten und relevante operative Anforderungen an.",
           "priceLabel": "Endpreis",
           "fullDayPriceLabel": "Tagestarif",
-          "longTermPriceLabel": "Tarif",
-          "longTermPriceValue": "Je nach Einsatz",
+          "longTermCta": "Weiter zu den Kontaktdaten",
+          "longTermPriceLabel": "Individuelles Angebot",
+          "longTermPriceValue": "Nach Ihrem Bedarf",
           "priceValuePending": "—",
           "cta": "Anfragen",
-          "reviewCta": "Reservierung prüfen",
+          "reviewCta": "Meine Buchung prüfen",
           "review": {
             "title": "Reservierung prüfen",
             "text": "Bestätige, dass die Angaben korrekt sind, bevor du zur Zahlung weitergehst.",
@@ -219,7 +220,7 @@
     "reviewTitle": "Prüfen Sie Ihre Buchung",
     "mobileReviewTitle": "Prüfen Sie Ihren Service",
     "pendingServiceTitle": "Ihr Service",
-    "reviewCta": "Reservierung prüfen",
+    "reviewCta": "Meine Buchung prüfen",
     "expiredAccess": "Zugriff abgelaufen. Prüfen Sie Ihre Bestätigung oder kontaktieren Sie uns."
   }
 }

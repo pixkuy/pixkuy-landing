@@ -55,6 +55,7 @@
     date: "",
     time: "",
     passengerFareKey: "van_1_2",
+    notes: "",
     quoteStatus: "pending",
     quote: null,
     quoteState: "none",
@@ -1278,8 +1279,7 @@
 
     return [
       '<span class="direct-transfer-mobile-config-step__fare-amount">',
-      "$",
-      escapeHtml(formatCurrencyAmount(state.quote.price)),
+      escapeHtml(window.PixkuyBookingPresentation ? window.PixkuyBookingPresentation.amount(state.quote.price*100,state.quote.currency || 'MXN') : '$'+formatCurrencyAmount(state.quote.price)),
       '</span>',
       '<span class="direct-transfer-mobile-config-step__fare-currency">',
       escapeHtml(getI18nValue("directTransferMobileFlow.fare.readySuffix", state.quote.currency || "MXN")),
@@ -1354,6 +1354,13 @@
     syncSameRouteError();
     syncRestrictionNotice();
     syncFareUi();
+    const status=step && step.querySelector('[data-direct-transfer-mobile-availability]');
+    if(status){
+      const unavailable=state.quoteErrorCode==='NO_AVAILABILITY' || state.quoteStatus==='unavailable';
+      const key=state.quoteStatus==='loading'?'checking':state.quoteStatus==='ready'&&canContinue()?'available':unavailable?'unavailable':state.quoteStatus==='error'?'error':'';
+      status.textContent=key==='error' ? (state.quoteErrorMessage || getI18nValue('services.cards.hourly.panel.availability.error','')) : key?getI18nValue('services.cards.hourly.panel.availability.'+key,''):'';
+      status.hidden=!key;status.setAttribute('data-state',key);
+    }
 
     if (!cta) {
       return false;
@@ -1417,6 +1424,7 @@
 
   function buildContactStepPayload() {
     return {
+      notes: state.notes,
       originAddress: normalizeQuoteAddress(state.originPlace, state.origin),
       destinationAddress: normalizeQuoteAddress(state.destinationPlace, state.destination),
       date: state.date,
@@ -1426,9 +1434,18 @@
       priceLabel: state.quote && state.quote.price
         ? "$" + formatCurrencyAmount(state.quote.price) + " " + getI18nValue("directTransferMobileFlow.fare.readySuffix", state.quote.currency || "MXN")
         : "",
-      vehicleLabel: getI18nValue("directTransferMobileFlow.vehicle.title", "BYD M9"),
+      vehicleLabel: window.PixkuyFleetSelection.model('direct_transfer')?.name || getI18nValue("directTransferMobileFlow.vehicle.title", "BYD M9"),
       quote: state.quote
     };
+  }
+
+  function saveConfigurationDraft() {
+    const store=window.PixkuyDirectTransferTransactionalState;
+    const fleet=window.PixkuyFleetSelection.read('direct_transfer');
+    if(!store || fleet.attempt && fleet.attempt.state!=='not_committed' || window.PixkuyDirectTransferMobileContactStep?.isOpen())return;
+    const saved=store.readReviewSnapshot() || {}, old=saved.mobileDraft || {};
+    const config={};['origin','originPlace','originCoverage','destination','destinationPlace','destinationCoverage','date','time','passengerFareKey','notes'].forEach(key=>config[key]=state[key]);
+    store.writeReviewSnapshot(Object.assign({},saved,{mobileDraft:Object.assign({},old,{version:1,stage:'config',config,payload:buildContactStepPayload()})}));
   }
 
   function buildCanonicalQuoteDetail() {
@@ -1819,6 +1836,7 @@
       buildDateFieldMarkup(dateLabel),
       buildTimeFieldMarkup(timeLabel),
       '</div>',
+      '<div class="direct-transfer-mobile-config-step__notes"><label for="direct-config-notes">'+escapeHtml(getI18nValue('directTransferMobileFlow.contactStep.fields.notes',''))+'</label><textarea id="direct-config-notes" rows="1" readonly role="button" aria-haspopup="dialog" data-direct-transfer-config-notes>'+escapeHtml(state.notes)+'</textarea></div>',
       '</div>',
 
       '<div class="direct-transfer-mobile-config-step__footer">',
@@ -1834,6 +1852,7 @@
       '<p class="direct-transfer-mobile-config-step__fare-pending" data-direct-transfer-mobile-fare-value>' + escapeHtml(getFareText()) + '</p>',
       '</div>',
       '<button type="button" class="cta direct-transfer-mobile-config-step__cta" data-direct-transfer-mobile-config-cta disabled aria-disabled="true">' + escapeHtml(ctaText) + '</button>',
+      '<p role="status" data-direct-transfer-mobile-availability hidden></p>',
       '</div>',
 
       '</div>',
@@ -1924,7 +1943,7 @@
     const contact=window.PixkuyDirectTransferMobileContactStep;
     const saved=contact && contact.readDraft();
     if (saved && saved.config) {
-      ['origin','originPlace','originCoverage','destination','destinationPlace','destinationCoverage','date','time','passengerFareKey'].forEach(key=>{
+      ['origin','originPlace','originCoverage','destination','destinationPlace','destinationCoverage','date','time','passengerFareKey','notes'].forEach(key=>{
         if(Object.prototype.hasOwnProperty.call(saved.config,key))state[key]=saved.config[key];
       });
       state=resetCanonicalPriceState(state);
@@ -2089,6 +2108,7 @@
     });
 
     step.addEventListener("input", function onConfigInput(event) {
+      if(event.target.matches('[data-direct-transfer-config-notes]')){state.notes=event.target.value;saveConfigurationDraft();return;}
       if (!event.target || !event.target.matches(CONFIG_FIELD_SELECTOR)) {
         return;
       }
@@ -2144,7 +2164,8 @@
     open,
     close,
     isOpen,
-    draft: function(){const result={};['origin','originPlace','originCoverage','destination','destinationPlace','destinationCoverage','date','time','passengerFareKey'].forEach(key=>result[key]=state[key]);return result;}
+    saveDraft: saveConfigurationDraft,
+    draft: function(){const result={};['origin','originPlace','originCoverage','destination','destinationPlace','destinationCoverage','date','time','passengerFareKey','notes'].forEach(key=>result[key]=state[key]);return result;}
   };
 
   window.PixkuyDirectTransferMobileQuoteContract = {

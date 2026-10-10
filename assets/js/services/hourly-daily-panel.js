@@ -44,6 +44,7 @@
   tripDate: '',
   startTime: '',
   durationHours: 2,
+  hourlyDurationHours: 2,
   longTermOption: '',
   notes: '',
   price: null,
@@ -474,7 +475,6 @@ onClearSelection: function () {
   function syncDerivedState() {
     if (state.mode === MODES.FULL_DAY) {
       state.durationHours = HOURLY_PRICING_CONSTANTS.fullDayHours;
-      state.longTermOption = '';
     }
 
     if (state.mode === MODES.LONG_TERM) {
@@ -573,6 +573,7 @@ onClearSelection: function () {
   }
 
   function getHourlyCtaText(labels) {
+    if(state.mode===MODES.LONG_TERM && isConfigComplete())return getI18nValue('services.cards.hourly.panel.longTermCta') || labels.cta;
     if (isConfigComplete() || isHourlyContinueBlockedByAvailability()) {
       return labels.cta;
     }
@@ -650,8 +651,10 @@ onClearSelection: function () {
   function formatCurrency(value, currency) {
     const labels = getLabels();
     const currencyCode = currency || 'MXN';
+    if (state.mode === MODES.LONG_TERM) return labels.longTermPriceValue;
 
     if (typeof value !== 'number') return labels.pricePending;
+    if (window.PixkuyBookingPresentation) return window.PixkuyBookingPresentation.money(value*100,currencyCode);
 
     try {
       const amount = new Intl.NumberFormat('es-MX', {
@@ -805,7 +808,7 @@ onClearSelection: function () {
     const ctaButton = configMount.querySelector('[data-services-hourly-cta]');
     const ctaDisabled = shouldDisableHourlyContinue();
     const priceText = formatCurrency(state.price, state.currency);
-    const priceLabelText = state.mode === MODES.FULL_DAY
+    const priceLabelText = state.mode === MODES.LONG_TERM ? labels.longTermPriceLabel : state.mode === MODES.FULL_DAY
       ? labels.fullDayPriceLabel
       : labels.priceLabel;
 
@@ -1389,15 +1392,12 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
     HOURLY_DURATION_OPTIONS.indexOf(nextDuration) >= 0
   ) {
     state.durationHours = nextDuration;
+    state.hourlyDurationHours = nextDuration;
   } else if (state.mode === MODES.HOURLY) {
-    state.durationHours = 2;
+    state.durationHours = state.hourlyDurationHours;
   }
 
-  state.longTermOption =
-    state.mode === MODES.LONG_TERM &&
-    LONG_TERM_OPTIONS.indexOf(nextCustomTerm) >= 0
-      ? nextCustomTerm
-      : '';
+  if (state.mode === MODES.LONG_TERM && LONG_TERM_OPTIONS.indexOf(nextCustomTerm) >= 0) state.longTermOption = nextCustomTerm;
 
   renderAll();
   return true;
@@ -1947,15 +1947,10 @@ async function applyNextAvailableSuggestion(nextAvailableStartLocal) {
         const shouldSyncWithoutRemount = isMobileModeSwitchWithoutRemount(nextMode);
 
         invalidateAvailabilityState();
+        if (state.mode === MODES.HOURLY) state.hourlyDurationHours = state.durationHours;
         state.mode = nextMode;
 
-        if (state.mode === MODES.HOURLY && HOURLY_DURATION_OPTIONS.indexOf(state.durationHours) === -1) {
-          state.durationHours = 2;
-        }
-
-        if (state.mode !== MODES.LONG_TERM) {
-          state.longTermOption = '';
-        }
+        if (state.mode === MODES.HOURLY) state.durationHours = state.hourlyDurationHours;
 
         if (shouldSyncWithoutRemount) {
           syncMobileCompactModeUi();
@@ -1976,6 +1971,7 @@ async function applyNextAvailableSuggestion(nextAvailableStartLocal) {
 
         invalidateAvailabilityState();
         state.durationHours = nextDuration;
+        state.hourlyDurationHours = nextDuration;
 
         if (isMobileHourlyViewport() && state.mode === MODES.HOURLY) {
           syncDerivedState();

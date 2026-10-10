@@ -1,5 +1,7 @@
 {
   "directTransferCheckout": {
+    "acceptedTitle": "已接受条款",
+    "contactTitle": "联系方式",
     "recover": "检查付款状态",
     "uncertain": "尚无法确认此次尝试的结果。再次付款前请查询状态。",
     "availabilityUnavailable": "所选时间没有可用车辆。",
@@ -10,7 +12,7 @@
     "title": "确认直达接送",
     "text": "付款前请确认路线、时间、车辆和联系方式。",
     "proceed": "继续付款",
-    "edit": "编辑信息",
+    "edit": "返回",
     "error": "继续前请检查接送信息。",
     "quote": {
       "priceUpdated": "价格已变更。请检查更新后的价格，并再次继续以接受该价格。",
@@ -44,7 +46,7 @@
       "passengers": "乘客",
       "vehicle": "车辆",
       "estimate": "路线",
-      "price": "价格",
+      "price": "总计",
       "name": "姓名",
       "phone": "电话",
       "email": "Email",

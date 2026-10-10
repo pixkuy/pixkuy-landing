@@ -107,11 +107,12 @@
           "longTermNotesHelper": "Indiquez les dates, le type d’usage, les horaires approximatifs, la ville de base, les déplacements prévus et tout besoin opérationnel pertinent.",
           "priceLabel": "Prix final",
           "fullDayPriceLabel": "Tarif journée",
-          "longTermPriceLabel": "Tarif",
-          "longTermPriceValue": "Selon l’opération",
+          "longTermCta": "Continuer vers les coordonnées",
+          "longTermPriceLabel": "Devis personnalisé",
+          "longTermPriceValue": "Selon vos besoins",
           "priceValuePending": "—",
           "cta": "Demander",
-          "reviewCta": "Vérifier la réservation",
+          "reviewCta": "Vérifier ma réservation",
           "review": {
             "title": "Vérifiez votre réservation",
             "text": "Confirmez que les informations sont correctes avant de passer au paiement.",
@@ -219,7 +220,7 @@
     "reviewTitle": "Vérifiez votre réservation",
     "mobileReviewTitle": "Vérifiez votre service",
     "pendingServiceTitle": "Votre service",
-    "reviewCta": "Vérifier la réservation",
+    "reviewCta": "Vérifier ma réservation",
     "expiredAccess": "Accès expiré. Consultez votre confirmation ou demandez de l’aide."
   }
 }

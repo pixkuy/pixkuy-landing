@@ -1,5 +1,6 @@
 (function () {
   const ACTIVE_ATTR = "data-panel-handoff-active";
+  const OWNER_ATTR = "data-panel-handoff-owner";
   const ORIGIN_SNAPSHOT_ATTR = "data-panel-handoff-origin-snapshot";
   const DESTINATION_SNAPSHOT_ATTR = "data-panel-handoff-destination-snapshot";
   let isRevertingTripValues = false;
@@ -99,6 +100,10 @@
   function getActiveState(form) {
     return form && form.getAttribute(ACTIVE_ATTR) === "true";
   }
+  function ownsTripSummary(form) {
+    const service = form && form.querySelector('[name="service_type"]');
+    return getActiveState(form) && service && service.value === form.getAttribute(OWNER_ATTR);
+  }
 
   function setActiveState(form, nextValue) {
     if (!form) {
@@ -182,6 +187,8 @@
     }
 
     const { form, fields } = formData;
+    const service = form.querySelector('[name="service_type"]');
+    form.setAttribute(OWNER_ATTR, service ? service.value : '');
     const nodes = getSummaryNodes(form);
     if (!nodes) {
       return false;
@@ -326,7 +333,7 @@
     form = formData.form;
     fields = formData.fields;
 
-    if (!getActiveState(form)) {
+    if (!ownsTripSummary(form)) {
       return;
     }
 
@@ -414,7 +421,7 @@
     form = formData.form;
     fields = formData.fields;
 
-    if (!getActiveState(form)) {
+    if (!ownsTripSummary(form)) {
       return;
     }
 
