@@ -1320,9 +1320,7 @@
     }
 
     // create() clears hidden fields; preserve acceptance belonging to this draft.
-    var acceptedFields = hasSyncedLegalAcceptance(form)
-      ? Array.from(form.querySelectorAll('[name^="legal_acceptance_"]')).map(function (field) { return [field, field.value]; })
-      : null;
+    var acceptedFields = api.readEvidence(form, 'web_airport_checkout');
     host.__pixkuyLegalAcceptanceInstance = api.create({
       container: host,
       form: form,
@@ -1330,8 +1328,7 @@
       checkboxId: "pixkuy-airport-transfer-legal-acceptance"
     });
     if (acceptedFields && host.__pixkuyLegalAcceptanceInstance) {
-      acceptedFields.forEach(function (entry) { entry[0].value = entry[1]; });
-      host.__pixkuyLegalAcceptanceInstance.checkbox.checked = true;
+      host.__pixkuyLegalAcceptanceInstance.restore(acceptedFields);
     }
 
     bindLegalAcceptanceSubmitState(form, host.__pixkuyLegalAcceptanceInstance);
@@ -1340,14 +1337,7 @@
   }
 
   function hasSyncedLegalAcceptance(form) {
-    return Boolean(
-      getFieldValue(form, "legal_acceptance_accepted") === "true" &&
-      getFieldValue(form, "legal_acceptance_terms_version") &&
-      getFieldValue(form, "legal_acceptance_cancellation_policy_version") &&
-      getFieldValue(form, "legal_acceptance_privacy_version") &&
-      getFieldValue(form, "legal_acceptance_accepted_at") &&
-      getFieldValue(form, "legal_acceptance_channel")
-    );
+    return Boolean(getLegalAcceptanceApi().readEvidence(form, 'web_airport_checkout'));
   }
 
   function validateLegalAcceptance(form) {
@@ -1363,6 +1353,7 @@
       return false;
     }
 
+    instance.checkbox.checked = false;
     return instance.validate();
   }
 
@@ -1370,13 +1361,6 @@
     return form ? form.querySelector(LEGAL_ACCEPTANCE_HOST_SELECTOR) : null;
   }
 
-  function isLegalAcceptanceInstanceAccepted(instance) {
-    return Boolean(
-      instance &&
-      typeof instance.isAccepted === "function" &&
-      instance.isAccepted()
-    );
-  }
 
   function isAirportMobileContactStepVisible() {
     var step = document.querySelector(
@@ -1437,6 +1421,11 @@
 
     instance = getLegalAcceptanceInstance(form);
     host = getExistingLegalAcceptanceHost(form);
+    if (instance && window.PixkuyAirportDesktopBooking?.pendingEdit()) instance.error.hidden = false;
+    if (instance && instance.checkbox.checked) window.requestAnimationFrame(function () {
+      // Let an explicit input/change gesture record its proof before reconciling.
+      if (getFieldValue(form, 'service_type') === 'airport_hotel' && !hasSyncedLegalAcceptance(form)) instance.restore(null);
+    });
 
     if (host) {
       host.hidden = false;
@@ -1445,7 +1434,7 @@
     setLegalAcceptanceSubmitDisabled(
       form,
       !hasRequiredAirportTransferCheckoutData(data, form) ||
-        !isLegalAcceptanceInstanceAccepted(instance)
+        !hasSyncedLegalAcceptance(form)
     );
 
     return true;

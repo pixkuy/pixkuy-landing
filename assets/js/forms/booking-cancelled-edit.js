@@ -42,6 +42,8 @@
       airport_hotel_direction: direction,
       airportId: draft.airport_transfer_airport_id,
       zoneId: draft.airport_transfer_zone_id,
+      zoneLabel: draft.airport_transfer_zone_label || "",
+      airport_hotel_zone_label: draft.airport_transfer_zone_label || "",
       passenger_fare_key: draft.airport_transfer_passenger_fare_key,
       passengerFareKey: draft.airport_transfer_passenger_fare_key,
       passenger_bucket_label: draft.airport_transfer_passenger_bucket_label,
@@ -102,6 +104,12 @@
     window.sessionStorage.setItem(FLEET_KEY, JSON.stringify(current));
   }
 
+  function ownsAttempt(attempt, token, context) {
+    if (!attempt || attempt.state === 'not_committed') return true;
+    return !!(attempt.response && attempt.response.bookingStatusToken === token ||
+      context && context.token === token && attempt.headers && attempt.headers['X-Pixkuy-Booking-Token'] === token);
+  }
+
   function beginHourly(state,startNew){
     var raw=state.result.raw,edit=raw.edit;
     var source=startNew?raw.continuation&&raw.continuation.draft:edit&&edit.allowed&&edit.draft;
@@ -109,6 +117,7 @@
     var store=window.PixkuyHourlyBookingDraft,fleet=window.PixkuyFleetSelection;
     if(!store||!fleet)return false;
     var current=fleet.read("hourly_daily"),prior=fleet.hourlyEdit();
+    if (!ownsAttempt(current.attempt, state.token, prior)) return false;
     if(current.reservationToken&&current.reservationToken!==state.token)return false;
     if(!startNew && prior && prior.token===state.token && current.attempt &&
       current.attempt.state!=="not_committed" &&
@@ -162,6 +171,7 @@
     window.location.assign("/?service=hourly_daily#hourly/"+(startNew?"servicio":"datos"));return true;
   }
   function beginEdit(state) {
+    if (!canEdit(state)) return false;
     if(state.result.serviceType==="hourly_daily")return beginHourly(state,false);
     var edit = state.result.raw && state.result.raw.edit;
     var draft = edit && edit.draft;
@@ -169,6 +179,10 @@
     var prior;
     try { prior = JSON.parse(window.sessionStorage.getItem(EDIT_KEY) || "null"); }
     catch (_) { prior = null; }
+    var fleet = window.PixkuyFleetSelection.read("airport_transfer");
+    if (!ownsAttempt(fleet.attempt, state.token, prior)) return false;
+    var owner = fleet.reservationToken || fleet.attempt && fleet.attempt.response && fleet.attempt.response.bookingStatusToken;
+    if (owner && owner !== state.token) return false;
     if (prior && prior.token === state.token && prior.attempt) {
       // Recover the original replacement even if the public revision advanced.
       if (!window.sessionStorage.getItem(SNAPSHOT_KEY)) window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(buildSnapshot(draft)));
@@ -190,6 +204,20 @@
       createdAt: new Date().toISOString()
     };
     var snapshot = buildSnapshot(draft);
+    var saved;
+    try { saved = JSON.parse(window.sessionStorage.getItem(SNAPSHOT_KEY) || "null"); } catch (_) {}
+    // A same-edit revocation takes precedence over the original receipt.
+    var evidence = prior && prior.token === state.token && saved && saved.airport_pending_token === state.token ? saved : draft;
+    if (!Object.prototype.hasOwnProperty.call(evidence, "legal_acceptance_accepted") &&
+        fleet.attempt && fleet.attempt.state === "committed" && fleet.attempt.response && fleet.attempt.response.bookingStatusToken === state.token) {
+      evidence = Object.assign({}, fleet.attempt.payload && fleet.attempt.payload.form_payload_raw, fleet.attempt.payload);
+    }
+    var legal = window.PixkuyForms.LegalAcceptance;
+    var proof = legal.readEvidence(evidence, "web_airport_checkout");
+    Object.keys(snapshot).filter(function (key) { return key.indexOf("legal_acceptance_") === 0; }).forEach(function (key) { delete snapshot[key]; delete snapshot.form_payload_raw[key]; });
+    snapshot.legal_acceptance_accepted = false;
+    if (proof) Object.keys(legal.fieldNames).forEach(function (key) { snapshot[legal.fieldNames[key]] = proof[key]; });
+    Object.keys(snapshot).filter(function (key) { return key.indexOf("legal_acceptance_") === 0; }).forEach(function (key) { snapshot.form_payload_raw[key] = snapshot[key]; });
     snapshot.airport_pending_token = state.token;
     snapshot.airport_draft_stage = "datos";
     window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
@@ -222,6 +250,7 @@
       var raw = state.result.raw;
       if (!raw.actions.canCreateNewReservation || !raw.continuation || !raw.continuation.draft) return false;
       var fleet = window.PixkuyFleetSelection.read("airport_transfer");
+      if (!ownsAttempt(fleet.attempt, state.token, null)) return false;
       if (fleet.reservationToken && fleet.reservationToken !== state.token) return false;
       window.PixkuyFleetSelection.completeReservation("airport_transfer", state.token, true);
       window.sessionStorage.removeItem(EDIT_KEY);

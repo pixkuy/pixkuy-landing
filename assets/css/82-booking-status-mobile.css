@@ -47,6 +47,9 @@
   .booking-status-mobile[data-airport-return] dt{font-size:12px;line-height:1.35;color:rgba(255,245,228,.70);}
   .booking-status-mobile[data-airport-return] dd{font-size:14px;line-height:1.35;font-weight:650;white-space:pre-wrap;color:var(--fg);}
   .booking-status-mobile[data-airport-return] .booking-status-mobile__detail:has([data-booking-status-label="service"], [data-booking-status-label="duration"]){display:none;}
+  .booking-status-mobile[data-direct-pending-return] .booking-status-mobile__detail:not([hidden]):has([data-booking-status-service],[data-booking-status-duration]){display:block;}
+  .booking-status-mobile[data-direct-pending-return] .booking-status-mobile__detail:has([data-booking-status-service]){grid-column:1/-1;}
+  .booking-status-mobile[data-direct-pending-return] [data-booking-status-label="service"]{display:none;}
   .booking-status-mobile[data-airport-return] .booking-status-mobile__detail:has([data-booking-status-pickup],[data-booking-status-destination],[data-booking-status-vehicle]){grid-column:1 / -1;}
   .booking-status-mobile[data-airport-return] .booking-status-mobile__vehicle-value{display:flex;align-items:center;justify-content:space-between;gap:8px;}
   .booking-status-mobile[data-airport-return] .booking-status-mobile__vehicle-thumb{width:64px;height:40px;flex:0 0 64px;}

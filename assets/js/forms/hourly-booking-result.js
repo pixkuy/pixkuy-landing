@@ -355,8 +355,8 @@
     layout.append(main, aside); mount.append(layout, actions);
   }
   if (window.PixkuyBookingStatusState) window.PixkuyBookingStatusState.onReady(function (value) {
+    if (!state || state.result !== value.result) receivedAt = window.performance.now();
     state = value;
-    receivedAt = window.performance.now();
     if(state.result.serviceType === "hourly_daily") document.querySelectorAll('[data-booking-cancelled-new]').forEach(function (button) {
       if(button.dataset.airportContinuationBound) return;
       button.dataset.airportContinuationBound='1';

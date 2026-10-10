@@ -24,6 +24,7 @@
   var readyCallbacks = [];
   var currentState = null;
   var statusRequest = null;
+  var dictionaryRequest = 0;
   var POLL_INTERVAL_MS = 2000;
   var POLL_WINDOW_MS = 30000;
   var MAX_STATUS_REQUESTS = 16;
@@ -681,6 +682,17 @@
       }).finally(function () { window.clearTimeout(timeout); });
     }
   };
+
+  window.addEventListener('pixkuy:i18n-applied', function () {
+    var lang = normalizeLangCode(document.documentElement.lang);
+    if (!currentState || currentState.lang === lang || !/\/booking-cancelled\.html$/.test(window.location.pathname)) return;
+    var request = ++dictionaryRequest;
+    loadDictionary(lang).then(function (loaded) {
+      if (request !== dictionaryRequest || normalizeLangCode(document.documentElement.lang) !== lang) return;
+      // Copy update only: retain the exact authoritative result and expiry.
+      notifyReady(Object.assign({}, currentState, loaded));
+    }).catch(function () { /* Keep the last usable copy; do not change payment state. */ });
+  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

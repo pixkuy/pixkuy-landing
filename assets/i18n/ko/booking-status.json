@@ -43,7 +43,7 @@
     "serviceLabels": {
       "hourly_daily": "전용 기사 포함 차량",
       "airport_transfer": "공항 이동 서비스",
-      "direct_transfer": "Direct Transfer",
+      "direct_transfer": "직행 이동",
       "notAvailable": "Pixkuy 서비스"
     },
     "paymentLabels": {

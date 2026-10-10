@@ -43,7 +43,7 @@
     "serviceLabels": {
       "hourly_daily": "私人车辆与司机",
       "airport_transfer": "机场接送",
-      "direct_transfer": "Direct Transfer",
+      "direct_transfer": "点对点专车",
       "notAvailable": "Pixkuy 服务"
     },
     "paymentLabels": {

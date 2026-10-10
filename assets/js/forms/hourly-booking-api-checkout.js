@@ -935,9 +935,7 @@ var availabilityPrecheckSequence = 0;
 
     // Creating the control clears shared hidden fields. Restore only evidence
     // already belonging to this Hourly draft, with its original timestamp.
-    var acceptedFields = hasSyncedLegalAcceptance(form)
-      ? Array.from(form.querySelectorAll('[name^="legal_acceptance_"]')).map(function (field) { return [field, field.value]; })
-      : null;
+    var acceptedFields = api.readEvidence(form, 'web_hourly_checkout');
     host.__pixkuyLegalAcceptanceInstance = api.create({
       container: host,
       form: form,
@@ -946,8 +944,7 @@ var availabilityPrecheckSequence = 0;
     });
 
     if (acceptedFields && host.__pixkuyLegalAcceptanceInstance) {
-      acceptedFields.forEach(function (entry) { entry[0].value = entry[1]; });
-      host.__pixkuyLegalAcceptanceInstance.checkbox.checked = true;
+      host.__pixkuyLegalAcceptanceInstance.restore(acceptedFields);
     }
 
     bindLegalAcceptanceSubmitState(form, host.__pixkuyLegalAcceptanceInstance);
@@ -956,14 +953,7 @@ var availabilityPrecheckSequence = 0;
   }
 
   function hasSyncedLegalAcceptance(form) {
-    return Boolean(
-      getFieldValue(form, "legal_acceptance_accepted") === "true" &&
-      getFieldValue(form, "legal_acceptance_terms_version") &&
-      getFieldValue(form, "legal_acceptance_cancellation_policy_version") &&
-      getFieldValue(form, "legal_acceptance_privacy_version") &&
-      getFieldValue(form, "legal_acceptance_accepted_at") &&
-      getFieldValue(form, "legal_acceptance_channel") === "web_hourly_checkout"
-    );
+    return Boolean(getLegalAcceptanceApi().readEvidence(form, 'web_hourly_checkout'));
   }
 
   function validateLegalAcceptance(form) {
@@ -979,6 +969,7 @@ var availabilityPrecheckSequence = 0;
       return false;
     }
 
+    instance.checkbox.checked = false;
     return instance.validate();
   }
   
@@ -986,13 +977,6 @@ var availabilityPrecheckSequence = 0;
     return form ? form.querySelector(LEGAL_ACCEPTANCE_HOST_SELECTOR) : null;
   }
 
-  function isLegalAcceptanceInstanceAccepted(instance) {
-    return Boolean(
-      instance &&
-      typeof instance.isAccepted === "function" &&
-      instance.isAccepted()
-    );
-  }
 
   function syncLegalAcceptanceVisibility(form) {
     var api = getReservationApi();
@@ -1050,6 +1034,10 @@ var availabilityPrecheckSequence = 0;
 
     instance = getLegalAcceptanceInstance(form);
     host = getExistingLegalAcceptanceHost(form);
+    if (instance && window.PixkuyFleetSelection?.hourlyEdit()) instance.error.hidden = false;
+    if (instance && instance.checkbox.checked) window.requestAnimationFrame(function () {
+      if (getFieldValue(form, 'service_type') === 'hourly_daily' && !hasSyncedLegalAcceptance(form)) instance.restore(null);
+    });
 
     if (host) {
       host.hidden = false;
@@ -1058,7 +1046,7 @@ var availabilityPrecheckSequence = 0;
     setLegalAcceptanceSubmitDisabled(
       form,
       !hasRequiredHourlyCheckoutData(data) ||
-        !isLegalAcceptanceInstanceAccepted(instance)
+        !hasSyncedLegalAcceptance(form)
     );
 
     return true;

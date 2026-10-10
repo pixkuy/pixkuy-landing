@@ -43,7 +43,7 @@
     "serviceLabels": {
       "hourly_daily": "Private vehicle with driver",
       "airport_transfer": "Airport transfer",
-      "direct_transfer": "Direct Transfer",
+      "direct_transfer": "Direct transfer",
       "notAvailable": "Pixkuy service"
     },
     "paymentLabels": {

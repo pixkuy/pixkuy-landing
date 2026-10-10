@@ -1331,7 +1331,7 @@
     const values = {
       airport: value.airport_transfer_airport_label,
       hotel: value.airport_transfer_destination_label,
-      zone: value.airport_transfer_zone_label,
+      zone: value.airport_transfer_zone_label || window.PixkuyAirportTariffCatalog.resolveDisplayLabel('zone', value.airport_transfer_zone_id),
       date: view.date(value.airport_transfer_date, true),
       time: value.airport_transfer_time,
       passengers: getPassengerBucketLabel(value.airport_transfer_passenger_fare_key),
@@ -1340,6 +1340,7 @@
       fare: view.price(value)
     };
     Object.keys(values).forEach(function (key) {
+      if (key === 'zone' && !values[key]) return;
       const row = buildSummaryRow(key);
       row.querySelector("dt").textContent = getI18nValue("airportMobileContactStep.summary." + key, key === "vehicle" ? getI18nValue("fleetSelection.model", "") : "");
       row.querySelector("dd").textContent = values[key] || "";

@@ -138,6 +138,20 @@
     };
   }
 
+  function readEvidence(source, channel) {
+    if (!source) return null;
+    var policy = buildSnapshot(channel), proof = {};
+    Object.keys(FIELD_NAMES).forEach(function (key) {
+      var field = source.elements && source.elements.namedItem(FIELD_NAMES[key]);
+      proof[key] = field ? field.value : source[FIELD_NAMES[key]] ?? source[key];
+    });
+    if (![true, "true"].includes(proof.accepted) || proof.channel !== channel ||
+        !Number.isFinite(Date.parse(proof.acceptedAt)) ||
+        ["termsVersion", "cancellationsVersion", "privacyVersion", "termsUrl", "cancellationsUrl", "privacyUrl"].some(function (key) { return proof[key] !== policy[key]; })) return null;
+    proof.accepted = "true";
+    return proof;
+  }
+
   function syncAcceptedFields(form, snapshot) {
     if (!form || !snapshot) {
       return false;
@@ -315,6 +329,14 @@
         return latestSnapshot;
       },
 
+      restore: function restore(evidence) {
+        latestSnapshot = readEvidence(evidence, channel);
+        checkbox.checked = !!latestSnapshot;
+        if (latestSnapshot) syncAcceptedFields(form, latestSnapshot);
+        else clearFields(form);
+        return !!latestSnapshot;
+      },
+
       sync: function sync() {
         return syncState();
       },
@@ -342,6 +364,7 @@
 
   FORMS_NAMESPACE.LegalAcceptance = {
     create: createLegalAcceptance,
+    readEvidence: readEvidence,
     buildSnapshot: buildSnapshot,
     syncAcceptedFields: syncAcceptedFields,
     clearFields: clearFields,

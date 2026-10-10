@@ -432,7 +432,13 @@
     mount.appendChild(form);
     mount.appendChild(view.node('p','booking-no-payment',view.t('noPayment')));
     var editing = editContext();
-    if (editing && editing.expiresAt && editing.serverNow) mount.appendChild(editDeadline(editing));
+    if (editing) {
+      mount.setAttribute('data-airport-pending-edit', '');
+      var summary = mount.querySelector('.airport-mobile-contact-step__summary');
+      var reference = view.node('p', 'airport-booking__reference', view.t('reference') + ': ' + editing.publicCode);
+      summary.before(reference);
+      if (editing.expiresAt && editing.serverNow) reference.after(editDeadline(editing));
+    }
     renderNotice(mount);
     mount.querySelectorAll('.airport-booking__primary').forEach(function (node) { node.classList.add('airport-mobile-contact-step__submit'); node.classList.remove('cta'); });
     var focus = route()[2];
@@ -869,6 +875,12 @@
     },
     resumePending: function () {
       var saved = read(), context = editContext();
+      var fleet = window.PixkuyFleetSelection.read("airport_transfer");
+      var token = fleet.reservationToken || fleet.attempt && fleet.attempt.response && fleet.attempt.response.bookingStatusToken;
+      if (!context && token) {
+        window.location.assign('/booking-cancelled.html?token=' + encodeURIComponent(token));
+        return true;
+      }
       if (!saved || !(context || saved.airport_pending_token)) return false;
       snapshot = saved;
       window.sessionStorage.setItem(RETURN, "1");
@@ -965,6 +977,7 @@
   });
   window.addEventListener("hashchange", render);
   window.addEventListener("pageshow", function (event) {
+    if (!editContext() && new URLSearchParams(window.location.search).get('service') === 'airport_hotel' && window.PixkuyAirportDesktopBooking.resumePending()) return;
     // The draft adapter is registered first and restores the trip on pageshow.
     // Contact restoration also owns deferred reapplications. Wait for its
     // terminal event before preparing with the canonical hidden quote fields.
