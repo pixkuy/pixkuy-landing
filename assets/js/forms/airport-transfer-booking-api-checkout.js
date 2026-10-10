@@ -1405,7 +1405,12 @@
     if (hasSyncedLegalAcceptance(form)) {
       instance = getLegalAcceptanceInstance(form);
       host = getExistingLegalAcceptanceHost(form);
-      if (instance && instance.checkbox) instance.checkbox.checked = true;
+      if (instance && instance.restore(getLegalAcceptanceApi().readEvidence(form, 'web_airport_checkout'))) {
+        // Reconcile the visual instance with the existing proof, never a new act
+        // of consent. Only this valid-proof branch clears its previous error.
+        instance.error.hidden = true;
+        instance.checkbox.setAttribute('aria-invalid', 'false');
+      }
 
       if (host) {
         host.hidden = false;
