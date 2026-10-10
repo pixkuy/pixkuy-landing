@@ -1670,6 +1670,7 @@
     const route=contactStepNode?.closest('[data-direct-transfer-mobile-route]');
     blurActiveElementInside(currentConfigStep);
     if(route)route.scrollTop=0;
+    window.scrollTo({top:0,left:0,behavior:'instant'});
   }
 
   function openPending(configStep,snapshot,options){
