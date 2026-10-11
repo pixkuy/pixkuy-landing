@@ -931,8 +931,8 @@
     }
 
     showNotice(root, getNotice(dictionary, result), getTone(result.view));
-    // An already open Airport confirmation must retain disclosure focus on refresh.
-    if (!(result.serviceType === "airport_transfer" && result.view === "confirmed" &&
+    // Already open compact confirmations retain disclosure focus on refresh.
+    if (!((result.serviceType === "airport_transfer" || result.serviceType === "direct_transfer") && result.view === "confirmed" &&
           result.paymentStatus === "paid" && isOpen())) open();
 
     return true;

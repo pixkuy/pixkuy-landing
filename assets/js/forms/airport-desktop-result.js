@@ -12,7 +12,7 @@
     if (!directLayout) return;
     directLayout.forEach(function (entry) {
       entry.anchor.replaceWith(entry.node);
-      entry.node.classList.remove('airport-return__reference');
+      entry.node.classList.remove('airport-return__reference','airport-return__service','airport-return__estimated-duration');
     });
     directLayout = null;
   }
@@ -41,24 +41,30 @@
     if (view.t('paymentRemaining') === 'paymentRemaining') return;
     var result = state.result, raw = result.raw, actions = raw.actions || {};
     var directPending = result.serviceType === 'direct_transfer' && result.reservationStatus === 'pending_payment' && result.view === 'pending' && ['pending','processing'].indexOf(result.paymentStatus) >= 0;
+    var directConfirmed = result.serviceType === 'direct_transfer' && result.reservationStatus === 'confirmed' && result.view === 'confirmed' && result.paymentStatus === 'paid';
+    var directCompact = directPending || directConfirmed;
     var pending = (result.serviceType === 'airport_transfer' || directPending) && result.view === 'pending' && result.paymentStatus !== 'processing';
     root.toggleAttribute('data-airport-pending-return', pending);
     root.toggleAttribute('data-direct-pending-return', directPending);
-    if (!directPending && directLayout) {
+    if (!directCompact && directLayout) {
       restoreDirectLayout();
-      root.querySelectorAll('.airport-return__disclosure,.airport-return__resume').forEach(function (node) { node.remove(); });
+      root.removeAttribute('data-airport-return');
+      root.removeAttribute('data-airport-confirmed');
+      root.querySelector('[data-booking-status-lead]').hidden=false;
+      root.querySelectorAll('.airport-return__disclosure,.airport-return__resume,.airport-return__vehicle-summary,[data-airport-confirmed-timezone]').forEach(function (node) { node.remove(); });
     }
     var panel = root.querySelector('[data-booking-cancelled-mobile-panel], [data-booking-status-mobile-panel]');
     var details = root.querySelector('[data-booking-status-details]');
-    if (!panel || !details || details.hidden || result.serviceType !== "airport_transfer" && !directPending) {
+    if (!panel || !details || details.hidden || result.serviceType !== "airport_transfer" && !directCompact) {
       if(result.serviceType === 'direct_transfer')root.removeAttribute('data-airport-return');
       root.querySelectorAll('.airport-return__reference,.airport-return__service,.airport-return__disclosure,.airport-return__resume').forEach(function(node){node.hidden=true;});
       if(mobileDeadline)mobileDeadline.remove();mobileDeadline=null;mobileDeadlineKey="";
       return;
     }
     root.setAttribute('data-airport-return', 'true');
-    if (directPending && !directLayout) {
-      var nodes = ['public-code','amount','notes-row'].map(function (key) {
+    if (directCompact && !directLayout) {
+      // Keep the original nodes/handlers for status transitions out of the compact view.
+      var nodes = ['public-code','amount','notes-row','service','date','time','duration','pickup','destination','vehicle','passengers','luggage'].map(function (key) {
         var node = root.querySelector('[data-booking-status-' + key + ']');
         return key === 'notes-row' ? node : node && node.parentNode;
       }).concat(['retry','modify','new'].map(function (key) { return root.querySelector('[data-booking-cancelled-' + key + ']'); }));
@@ -82,7 +88,7 @@
     root.querySelector('[data-booking-status-payment]').parentNode.hidden=!!kind;
     if (processing) root.querySelector('[data-booking-status-payment]').textContent=view.t('paymentChecking');
     var reference = root.querySelector('[data-booking-status-public-code]').parentNode;
-    if (reference.tagName !== 'DL' && !directPending) {
+    if (reference.tagName !== 'DL' && !directCompact) {
       var referenceList=view.node('dl','');
       while(reference.firstChild)referenceList.appendChild(reference.firstChild);
       reference.remove();reference=referenceList;
@@ -109,7 +115,7 @@
       value.parentNode.hidden=!label && !address;
     });
     root.querySelector('[data-booking-status-date]').textContent = view.date(result.serviceStartLocalDate, true);
-    if (directPending) {
+    if (directCompact) {
       var passenger = root.querySelector('[data-booking-status-passengers]');
       var band = String(result.passengerLabel || '').match(/(\d+)\s*[–-]\s*(\d+)/);
       if(band)passenger.textContent = band[1] + '–' + band[2];
@@ -222,9 +228,10 @@
     }
   }
   function render() {
-    // Mobile Airport can use the current dictionary even while the superseded
+    // Compact confirmations can use the current dictionary even while the superseded
     // initial copy request is unresolved. renderMobileResult guards copy readiness.
-    if (!view.media.matches && (ready || state && state.result.serviceType === 'airport_transfer')) renderMobileResult();
+    if (!view.media.matches && (ready || state && (state.result.serviceType === 'airport_transfer' ||
+        state.result.serviceType === 'direct_transfer' && state.result.view === 'confirmed' && state.result.paymentStatus === 'paid'))) renderMobileResult();
     if (mount) mount.remove();
     mount = null;
     document.body.classList.remove("airport-booking-active");
