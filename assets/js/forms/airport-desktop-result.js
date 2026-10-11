@@ -52,7 +52,7 @@
     var details = root.querySelector('[data-booking-status-details]');
     if (!panel || !details || details.hidden || result.serviceType !== "airport_transfer" && !directPending) {
       if(result.serviceType === 'direct_transfer')root.removeAttribute('data-airport-return');
-      root.querySelectorAll('.airport-return__reference,.airport-return__disclosure,.airport-return__resume').forEach(function(node){node.hidden=true;});
+      root.querySelectorAll('.airport-return__reference,.airport-return__service,.airport-return__disclosure,.airport-return__resume').forEach(function(node){node.hidden=true;});
       if(mobileDeadline)mobileDeadline.remove();mobileDeadline=null;mobileDeadlineKey="";
       return;
     }
@@ -188,6 +188,16 @@
       timezone.replaceChildren(view.node('dt','',view.t('confirmedTimezone')));
       ['date','time'].forEach(function(key){details.appendChild(root.querySelector('[data-booking-status-'+key+']').parentNode);});
       details.appendChild(timezone);
+      var serviceRow=root.querySelector('[data-booking-status-service]').parentNode;
+      serviceRow.classList.add('airport-return__service');serviceRow.hidden=false;
+      reference.after(serviceRow);
+      var durationValue=root.querySelector('[data-booking-status-duration]');
+      var durationRow=durationValue.parentNode;
+      durationRow.classList.add('airport-return__estimated-duration');
+      durationRow.hidden=!(Number.isFinite(result.durationHours) && result.durationHours > 0 &&
+        durationValue.textContent.trim() && durationValue.textContent.trim() !== (state.dictionary.details.empty || '—'));
+      durationRow.querySelector('dt').textContent=view.t('estimatedDuration');
+      details.appendChild(durationRow);
       ['pickup','destination'].forEach(function(key){var value=root.querySelector('[data-booking-status-'+key+']');if(value)details.appendChild(value.parentNode);});
       var vehicleSummary=root.querySelector('.airport-return__vehicle-summary');
       if(!vehicleSummary) {vehicleSummary=view.node('dl','airport-return__vehicle-summary');resume.before(vehicleSummary);}
@@ -212,7 +222,9 @@
     }
   }
   function render() {
-    if (ready && !view.media.matches) renderMobileResult();
+    // Mobile Airport can use the current dictionary even while the superseded
+    // initial copy request is unresolved. renderMobileResult guards copy readiness.
+    if (!view.media.matches && (ready || state && state.result.serviceType === 'airport_transfer')) renderMobileResult();
     if (mount) mount.remove();
     mount = null;
     document.body.classList.remove("airport-booking-active");

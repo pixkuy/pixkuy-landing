@@ -76,6 +76,10 @@
   .booking-status-mobile[data-airport-return] [hidden]{display:none !important;}
   .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__title::before{content:"✓";color:#3d9e7a;margin-right:8px;font-size:18px;}
   .booking-status-mobile[data-airport-confirmed] .airport-return__reference{margin:6px 0;}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__detail.airport-return__service{display:block;margin:0 0 8px;}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__service dt{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);}
+  .booking-status-mobile[data-airport-confirmed] .airport-return__service dd{font-size:12px;font-weight:400;color:rgba(255,245,228,.72);}
+  .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__detail.airport-return__estimated-duration{display:block;grid-column:1 / -1;}
   .booking-status-mobile[data-airport-confirmed] .airport-return__resume{margin:6px 0 10px;}
   .booking-status-mobile[data-airport-confirmed] .airport-return__payment{margin:0;}
   .booking-status-mobile[data-airport-confirmed] .booking-status-mobile__details{grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;border:0;padding:0;margin:16px 0;}
