@@ -79,6 +79,15 @@
   var rafId = null;
   var activeIndex = 0;
   var isVisible = false;
+  var loadObserver = null;
+  var initFrameId = null;
+  var sourceAssigned = false;
+  var playPending = false;
+  var pageSuspended = false;
+  var pendingSeekTime = null;
+  // Both viewport variants preserve the user's pause for this page lifetime.
+  var playbackIntent = window.__pixkuyInMotionPlaybackIntent || { pausedByUser: false };
+  window.__pixkuyInMotionPlaybackIntent = playbackIntent;
 
   function isDesktopViewport() {
     return Boolean(desktopQuery && desktopQuery.matches);
@@ -232,19 +241,83 @@
     soundNode.innerHTML = '<span aria-hidden="true">♪</span>';
   }
 
-  function tryPlayVideo() {
-    var promise;
-
-    if (!videoNode || isReducedMotion()) {
+  function ensureVideoSource() {
+    if (!videoNode || sourceAssigned || !isDesktopViewport() || document.hidden || pageSuspended ||
+        playbackIntent.completed || playbackIntent.failure) {
       return;
     }
 
-    promise = videoNode.play();
+    var rect = rootNode.getBoundingClientRect();
+    // Assign media only when the active section actually overlaps the viewport.
+    if (!rootNode.isConnected || !rect.width || !rect.height ||
+        rect.bottom <= 0 || rect.top >= window.innerHeight ||
+        rect.right <= 0 || rect.left >= window.innerWidth) {
+      return;
+    }
 
-    if (promise && typeof promise.catch === "function") {
-      promise.catch(function ignoreAutoplayFailure() {
+    sourceAssigned = true;
+    videoNode.src = VIDEO_SRC;
+    if (loadObserver) {
+      loadObserver.disconnect();
+    }
+  }
+
+  function tryPlayVideo(explicit) {
+    var promise;
+    var target = videoNode;
+
+    if (!target || !isVisible || !isDesktopViewport() || document.hidden || pageSuspended || playPending) {
+      return;
+    }
+
+    if (explicit === true) {
+      // Reload a failed resource only on this explicit action; autoplay rejection needs no load.
+      var retryMedia = playbackIntent.failure === "media" || Boolean(target.error);
+      playbackIntent.pausedByUser = false;
+      playbackIntent.completed = false;
+      playbackIntent.failure = null;
+      if (retryMedia && sourceAssigned) {
+        pendingSeekTime = pendingSeekTime === null ? target.currentTime : pendingSeekTime;
+        target.load();
+      } else if (target.ended) {
+        target.currentTime = 0;
+      }
+      ensureVideoSource();
+    }
+
+    if (!target || !sourceAssigned || !isVisible || !isDesktopViewport() ||
+        document.hidden || pageSuspended || playbackIntent.pausedByUser ||
+        playbackIntent.completed || playbackIntent.failure || target.ended || playPending || !target.paused ||
+        (isReducedMotion() && explicit !== true)) {
+      return;
+    }
+
+    playPending = true;
+    promise = target.play();
+
+    if (promise && typeof promise.then === "function") {
+      promise.then(function onPlaying() {
+        if (target !== videoNode) {
+          target.pause();
+          return;
+        }
+        playPending = false;
+        if (!isVisible || document.hidden || pageSuspended || playbackIntent.pausedByUser) {
+          pauseVideo();
+        }
+      }, function onPlayFailure(error) {
+        if (target !== videoNode) {
+          return;
+        }
+        playPending = false;
+        if (error.name !== "AbortError") {
+          playbackIntent.failure = target.error ? "media" :
+            (error.name === "NotAllowedError" ? "autoplay" : "play");
+        }
         setPlayState();
       });
+    } else {
+      playPending = false;
     }
   }
 
@@ -266,13 +339,41 @@
       return;
     }
 
-    videoNode.addEventListener(
-      "loadedmetadata",
-      function onLoadedMetadata() {
-        videoNode.currentTime = chapter.time;
-      },
-      { once: true }
-    );
+    pendingSeekTime = chapter.time;
+  }
+
+  function handleMetadata(event) {
+    if (event.currentTarget !== videoNode) {
+      return;
+    }
+    if (pendingSeekTime !== null) {
+      videoNode.currentTime = pendingSeekTime;
+      pendingSeekTime = null;
+    }
+    updateProgressBar();
+  }
+
+  function handleDocumentVisibility() {
+    if (document.hidden || pageSuspended) {
+      pauseVideo();
+      return;
+    }
+    ensureVideoSource();
+    tryPlayVideo();
+  }
+
+  function handlePageHide() {
+    pageSuspended = true;
+    if (initFrameId !== null) {
+      window.cancelAnimationFrame(initFrameId);
+      initFrameId = null;
+    }
+    pauseVideo();
+  }
+
+  function handlePageShow() {
+    pageSuspended = false;
+    requestInit();
   }
 
   function updateProgressBar() {
@@ -380,7 +481,7 @@
   function handleVisibility(entries) {
     var entry = entries && entries[0];
 
-    if (!entry) {
+    if (!entry || entry.target !== rootNode) {
       return;
     }
 
@@ -407,6 +508,15 @@
     });
 
     observer.observe(rootNode);
+    loadObserver = new IntersectionObserver(function onVisibleSection(entries) {
+      if (entries.some(function overlaps(entry) {
+        return entry.target === rootNode && entry.isIntersecting && entry.intersectionRatio > 0;
+      })) {
+        ensureVideoSource();
+        tryPlayVideo();
+      }
+    }, { rootMargin: "0px", threshold: [0, 0.001] });
+    loadObserver.observe(rootNode);
   }
 
   function teardownObserver() {
@@ -415,6 +525,10 @@
     }
 
     observer = null;
+    if (loadObserver) {
+      loadObserver.disconnect();
+    }
+    loadObserver = null;
     isVisible = false;
     document.body.removeAttribute(BODY_ACTIVE_ATTR);
   }
@@ -479,10 +593,9 @@
 
     videoNode = document.createElement("video");
     videoNode.className = "in-motion-desktop-cinema__video";
-    videoNode.src = VIDEO_SRC;
     videoNode.poster = POSTER_SRC;
     videoNode.muted = true;
-    videoNode.loop = true;
+    videoNode.loop = false;
     videoNode.playsInline = true;
     videoNode.preload = "metadata";
     videoNode.setAttribute("aria-label", getCopy("videoLabel"));
@@ -553,7 +666,22 @@
     videoNode.addEventListener("play", setPlayState);
     videoNode.addEventListener("pause", setPlayState);
     videoNode.addEventListener("timeupdate", syncChapterFromVideoTime);
-    videoNode.addEventListener("loadedmetadata", updateProgressBar);
+    videoNode.addEventListener("loadedmetadata", handleMetadata);
+    videoNode.addEventListener("ended", function onEnded(event) {
+      if (event.currentTarget !== videoNode) {
+        return;
+      }
+      playbackIntent.completed = true;
+      setPlayState();
+    });
+    videoNode.addEventListener("error", function onMediaError(event) {
+      if (event.currentTarget !== videoNode) {
+        return;
+      }
+      playbackIntent.failure = "media";
+      pauseVideo();
+      setPlayState();
+    });
 
     playNode.addEventListener("click", function onPlayClick() {
       if (!videoNode) {
@@ -561,10 +689,11 @@
       }
 
       if (videoNode.paused) {
-        tryPlayVideo();
+        tryPlayVideo(true);
         return;
       }
 
+      playbackIntent.pausedByUser = true;
       pauseVideo();
     });
 
@@ -575,10 +704,6 @@
 
       videoNode.muted = !videoNode.muted;
       videoNode.volume = videoNode.muted ? 0 : 1;
-
-      if (!videoNode.muted) {
-        tryPlayVideo();
-      }
 
       setSoundState();
     });
@@ -630,6 +755,9 @@
     progressBarNode = null;
     chapterButtons = [];
     activeIndex = 0;
+    sourceAssigned = false;
+    playPending = false;
+    pendingSeekTime = null;
   }
 
   function shouldRender() {
@@ -637,22 +765,47 @@
   }
 
   function init() {
-    teardown();
+    initFrameId = null;
 
     if (!shouldRender()) {
+      teardown();
       return;
     }
 
+    if (rootNode && rootNode.isConnected) {
+      rootNode.setAttribute("aria-label", getCopy("ariaLabel"));
+      videoNode.setAttribute("aria-label", getCopy("videoLabel"));
+      typeNode.textContent = getCopy("typeMask");
+      rootNode.querySelector("[data-in-motion-desktop-cinema-chapters]").setAttribute("aria-label", getCopy("timelineLabel"));
+      chapterButtons.forEach(function refreshChapter(button, index) {
+        var chapter = CHAPTERS[index];
+        button.setAttribute("aria-label", getChapterCopy(chapter, "label"));
+        button.children[0].textContent = getChapterCopy(chapter, "index");
+        button.children[1].textContent = getChapterCopy(chapter, "label");
+        button.children[2].textContent = getChapterCopy(chapter, "time");
+      });
+      updateActiveChapter(activeIndex);
+      setPlayState();
+      setSoundState();
+      handleDocumentVisibility();
+      return;
+    }
+
+    teardown();
     buildDesktopCinema();
   }
 
   function requestInit() {
-    window.requestAnimationFrame(init);
+    if (initFrameId === null) {
+      initFrameId = window.requestAnimationFrame(init);
+    }
   }
 
   function bindLifecycle() {
     window.addEventListener("pixkuy:i18n-applied", requestInit);
-    window.addEventListener("pageshow", requestInit);
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("pagehide", handlePageHide);
+    document.addEventListener("visibilitychange", handleDocumentVisibility);
 
     if (desktopQuery && typeof desktopQuery.addEventListener === "function") {
       desktopQuery.addEventListener("change", requestInit);
