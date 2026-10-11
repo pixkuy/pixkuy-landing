@@ -201,6 +201,10 @@
     }
   },
   "hourlyBooking": {
+    "confirmedServiceHourly": "Личный водитель",
+    "confirmedServiceFullDay": "Личный водитель · Полный день",
+    "confirmedServiceLongTerm": "Личный водитель · Длительные планы",
+    "contractedDuration": "Забронированная длительность",
     "start": "Начало услуги",
     "serviceDetails": "Сведения об услуге",
     "notesOptional": "Примечания / маршрут (необязательно)",

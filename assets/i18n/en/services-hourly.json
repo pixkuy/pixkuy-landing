@@ -201,6 +201,10 @@
     }
   },
   "hourlyBooking": {
+    "confirmedServiceHourly": "Private chauffeur",
+    "confirmedServiceFullDay": "Private chauffeur · Full day",
+    "confirmedServiceLongTerm": "Private chauffeur · Long-term plans",
+    "contractedDuration": "Booked duration",
     "start": "Service start",
     "serviceDetails": "Service details",
     "notesOptional": "Notes / itinerary (optional)",

@@ -201,6 +201,10 @@
     }
   },
   "hourlyBooking": {
+    "confirmedServiceHourly": "Motorista particular",
+    "confirmedServiceFullDay": "Motorista particular · Dia inteiro",
+    "confirmedServiceLongTerm": "Motorista particular · Planos longos",
+    "contractedDuration": "Duração contratada",
     "start": "Início do serviço",
     "serviceDetails": "Detalhes do serviço",
     "notesOptional": "Notas / itinerário (opcional)",

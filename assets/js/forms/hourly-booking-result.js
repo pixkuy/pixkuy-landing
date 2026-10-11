@@ -31,6 +31,7 @@
     // The copy-ready event will render; never seed a persistent clock with keys.
     if (view.t('paymentRemaining') === 'paymentRemaining') return;
     var result = state.result, raw = result.raw, actions = raw.actions || {};
+    if (result.view === 'confirmed' && result.paymentStatus === 'paid' && view.t('confirmedServiceHourly') === 'confirmedServiceHourly') return;
     root.toggleAttribute('data-hourly-pending-return',result.serviceType==='hourly_daily'&&result.view==='pending');
     var panel = root.querySelector('[data-booking-cancelled-mobile-panel], [data-booking-status-mobile-panel]');
     var details = root.querySelector('[data-booking-status-details]');
@@ -45,7 +46,7 @@
     if(!hourlyEnd){hourlyEnd=view.field(view.t("end"),"");hourlyEnd.setAttribute("data-hourly-result-end","");details.appendChild(hourlyEnd);}
     hourlyEnd.querySelector("dt").textContent=view.t("end");
     hourlyEnd.querySelector("dd").textContent=view.date(result.serviceEndLocalDate,true)+" · "+result.serviceEndLocalTime;
-    var hourlyMode=details.querySelector("[data-hourly-result-mode]");
+    var hourlyMode=root.querySelector("[data-hourly-result-mode]");
     if(!hourlyMode){hourlyMode=view.field(view.t("tripTitle"),"");hourlyMode.setAttribute("data-hourly-result-mode","");details.prepend(hourlyMode);}
     hourlyMode.querySelector("dt").textContent=view.t("tripTitle");
     hourlyMode.querySelector("dd").textContent=view.t(result.hourlyMode==="full_day"?"fullDay":"hourly");
@@ -196,8 +197,21 @@
       var confirmedPickup=view.pickupField(view.t('origin'),result.pickupAddress,result.pickupAddressDetail);
       pickup.classList.add('hourly-booking__pickup');
       pickup.querySelector('dd').replaceChildren.apply(pickup.querySelector('dd'),Array.from(confirmedPickup.querySelector('dd').childNodes));
-      details.append(hourlyMode,pickup,hourlyStart,hourlyEnd);
-      if(duration)details.appendChild(duration.parentNode);
+      var modeKey={hourly:'confirmedServiceHourly',full_day:'confirmedServiceFullDay',custom_long_term:'confirmedServiceLongTerm'}[result.hourlyMode];
+      var contracted=Number.isFinite(result.durationHours) && result.durationHours > 0
+        ? new Intl.NumberFormat(state.lang,{style:'unit',unit:'hour',unitDisplay:'long',maximumFractionDigits:20}).format(result.durationHours) : '';
+      var serviceValue=hourlyMode.querySelector('dd');
+      serviceValue.setAttribute('data-hourly-confirmed-service','');
+      serviceValue.textContent=(modeKey ? view.t(modeKey) : state.dictionary.serviceLabels.hourly_daily)+(contracted ? ' · '+contracted : '');
+      hourlyMode.querySelector('dt').textContent=state.dictionary.details.service;
+      reference.after(hourlyMode);
+      details.append(pickup,hourlyStart,hourlyEnd);
+      if(duration){
+        duration.textContent=contracted;
+        duration.parentNode.hidden=!contracted;
+        duration.parentNode.querySelector('dt').textContent=view.t('contractedDuration');
+        details.appendChild(duration.parentNode);
+      }
       details.appendChild(timezone);
     }
     if(result.view==='pending'){
@@ -225,7 +239,8 @@
       return;
     }
     if(state && state.result.serviceType!=="hourly_daily")return;
-    if (ready && !view.media.matches) renderMobileResult();
+    // A confirmed mobile return can use current copy without waiting for an obsolete initial load.
+    if (!view.media.matches && (ready || state && state.result.view === 'confirmed' && state.result.paymentStatus === 'paid')) renderMobileResult();
     if (mount) mount.remove();
     mount = null;
     document.body.classList.remove("hourly-booking-active");

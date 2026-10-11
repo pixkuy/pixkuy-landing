@@ -201,6 +201,10 @@
     }
   },
   "hourlyBooking": {
+    "confirmedServiceHourly": "私人司机服务",
+    "confirmedServiceFullDay": "私人司机服务 · 全天",
+    "confirmedServiceLongTerm": "私人司机服务 · 长期方案",
+    "contractedDuration": "预订时长",
     "start": "服务开始",
     "serviceDetails": "服务详情",
     "notesOptional": "备注 / 行程（选填）",

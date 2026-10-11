@@ -201,6 +201,10 @@
     }
   },
   "hourlyBooking": {
+    "confirmedServiceHourly": "Servicio privado por horas",
+    "confirmedServiceFullDay": "Servicio privado · Día completo",
+    "confirmedServiceLongTerm": "Servicio privado · Planes largos",
+    "contractedDuration": "Duración contratada",
     "start": "Inicio del servicio",
     "serviceDetails": "Detalles del servicio",
     "notesOptional": "Notas / itinerario (opcional)",
