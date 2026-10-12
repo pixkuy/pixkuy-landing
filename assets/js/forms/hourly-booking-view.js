@@ -40,6 +40,30 @@
     else aside.appendChild(base.node("p","",t("unverified")));
     return aside;
   }
+  // Desktop review uses Airport's existing components with Hourly's fields.
+  function desktopTrip(snapshot){
+    var list=base.node("dl","airport-booking__details hourly-booking__trip-details");
+    list.append(base.field(t("tripTitle"),t(snapshot.hourly_daily_mode==="full_day"?"fullDay":"hourly")),
+      pickupField(t("origin"),snapshot.hourly_daily_pickup),
+      base.field(t("start"),base.date(snapshot.hourly_daily_date)+" · "+snapshot.hourly_daily_start_time),
+      base.field(t("end"),end(snapshot)),
+      base.field(t("duration"),snapshot.hourly_daily_duration_hours+" h"),
+      base.field(t("passengers"),window.PixkuyFleetSelection.passengerLabel(snapshot.hourly_daily_passengers)));
+    return list;
+  }
+  function desktopBlock(title,content,edit){
+    var section=base.node("section","airport-booking__block"),heading=base.node("div","airport-booking__block-heading");
+    heading.appendChild(base.node("h2","",t(title)));
+    if(edit){var action=base.action(t("edit"),edit);action.replaceChildren(base.icon("edit"),base.node("span","",t("edit")));action.setAttribute("aria-label",t("edit")+": "+t(title));heading.appendChild(action);}
+    section.append(heading,content);return section;
+  }
+  function reviewSummary(snapshot,fresh,reservationAmount){
+    var aside=base.node("aside","airport-booking__summary");
+    var model=window.PixkuyFleetSelection.model("hourly_daily")||snapshot.fleet_model||{};
+    aside.append(base.node("h2","",t("amountTitle")),base.vehicle({fleet_model:model}),
+      base.node("p","airport-booking__total",price(snapshot,fresh,reservationAmount)||t("unverified")));
+    return aside;
+  }
   // Same compact summary hierarchy as Airport's createBookingView; Hourly
   // civil dates, duration and notes remain owned by this service.
   function dataSummary(snapshot,fresh,contactOnly,reservationAmount){
@@ -103,6 +127,7 @@
     return total;
   }
   window.PixkuyHourlyBookingView={t:t,node:base.node,action:base.action,field:base.field,summary:summary,mobileSummary:mobileSummary,mobileTotal:mobileTotal,pickupField:pickupField,
+    desktopTrip:desktopTrip,desktopBlock:desktopBlock,reviewSummary:reviewSummary,
     money:base.money,deadline:base.deadline,date:base.date,locationField:base.locationField,vehicle:base.vehicle,icon:base.icon,
     mobileShell:function(back,step){
       var shell=base.node("section","hourly-booking hourly-booking--mobile"),row=base.node("div","hourly-mobile-flow__back-row");

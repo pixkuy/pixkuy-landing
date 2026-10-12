@@ -4,9 +4,6 @@
       "hourly": {
         "title": "私人司机与专车服务",
         "text": "可按小时或全天预订，用于接送、私人日程或墨西哥城的运营待命。",
-        "contact": {
-          "helper": "请配置模式、接载点、日期和时间，以准备请求。"
-        },
         "bullets": [
           "灵活安排",
           "多站停靠",
@@ -112,6 +109,8 @@
           "longTermPriceValue": "根据您的需求",
           "priceValuePending": "—",
           "cta": "请求",
+
+          "dataCta": "继续填写资料",
           "reviewCta": "核对我的预订",
           "review": {
             "title": "检查您的预订",

@@ -581,7 +581,7 @@
     var edit = getNode("[data-hourly-checkout-review-edit]");
 
     if (edit) {
-      edit.setAttribute("href", "/#contact");
+      edit.setAttribute("href", "/#hourly/datos");
 
       edit.addEventListener("click", function onEditClick() {
         try {

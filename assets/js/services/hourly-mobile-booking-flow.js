@@ -89,6 +89,7 @@
 
   function getModeHelperText(panel) {
     const mode = getActiveHourlyMode(panel);
+    if(mode==='custom_long_term'&&window.PixkuyLongTermRequest?.configurationLead())return window.PixkuyLongTermRequest.configurationLead();
     const fallback = getI18nValue(
       "services.cards.hourly.panel.text",
       getI18nValue("services.cards.hourly.text", "")
@@ -1028,7 +1029,7 @@
   }
 
   function openHourlyRoute() {
-    if(window.PixkuyHourlyBookingFlow?.resumeEntry())return true;
+    if(!/^#long-term\//.test(location.hash)&&window.PixkuyHourlyBookingFlow?.resumeEntry())return true;
     const panel = getPanel();
 
     if (!isMobileViewport() || !panel) {
@@ -1122,6 +1123,7 @@
       hourly_daily_duration_hours: "",
       hourly_daily_custom_term: normalizeText(safeDetail.hourly_daily_custom_term) || longTermValue,
       hourly_daily_notes: normalizeText(safeDetail.hourly_daily_notes) || notes,
+      hourly_daily_passengers: window.PixkuyFleetSelection.passengers(),
       hourly_daily_price: "",
       hourly_daily_currency: normalizeText(safeDetail.hourly_daily_currency) || "MXN",
       hourly_daily_km_included: "",
@@ -1453,7 +1455,7 @@
   }
 
   function isHourlyBookingDestination() {
-    return /^#hourly\/(datos|revision|servicio)$/.test(window.location.hash);
+    return /^#hourly\/(datos|revision|servicio)$/.test(window.location.hash) || /^#long-term\/(datos|config)$/.test(window.location.hash);
   }
 
   function shouldOpenFromUrl() {

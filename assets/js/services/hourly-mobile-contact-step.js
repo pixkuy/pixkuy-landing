@@ -4,7 +4,7 @@
    - crear la segunda pantalla móvil del flujo Hourly / Daily
    - mostrar resumen compacto del servicio configurado
    - recoger datos personales mínimos
-   - usar form[name="contact"] como infraestructura técnica de envío Netlify
+   - usar los controles propios de Hourly; Planes largos tiene su solicitud independiente
    - no hacer scroll a #contact
    - no activar el handoff visual legacy
    - no tocar Google Places, Google Ads ni success modal
@@ -134,7 +134,7 @@
   }
 
   function getReservationFormsApi() {
-    const api = window.PixkuyForms;
+    const api = window.PixkuyHourlyBookingForm;
 
     if (!api || typeof api !== "object") {
       return null;
@@ -151,9 +151,7 @@
     return api;
   }
 
-  function getServiceLabel() {
-    return getI18nValue("contact.services.hourlyDaily", "");
-  }
+
 
   function getModeLabel(mode) {
     if (mode === MODE_FULL_DAY) {
@@ -458,21 +456,7 @@
     return true;
   }
 
-  function writeFormValue(form, name, value, shouldDispatch) {
-    const field = form ? form.querySelector('[name="' + name + '"]') : null;
 
-    if (!field) {
-      return false;
-    }
-
-    setInputValue(field, value);
-
-    if (shouldDispatch === true) {
-      dispatchInputEvents(field);
-    }
-
-    return true;
-  }
 
   function buildSummaryRow(key) {
     const row = document.createElement("div");
@@ -1297,110 +1281,17 @@
     };
   }
 
-  function buildRequestSummary(snapshot) {
-    const safeSnapshot = snapshot || {};
-    const parts = [];
-    const labels = {
-      mode: getI18nValue("services.cards.hourly.panel.modeLabel", ""),
-      pickup: getI18nValue("services.cards.hourly.panel.pickupLabel", ""),
-      date: getI18nValue("services.cards.hourly.panel.dateLabel", ""),
-      time: getI18nValue("services.cards.hourly.panel.timeLabel", ""),
-      duration: safeSnapshot.hourly_daily_mode === MODE_LONG_TERM
-        ? getI18nValue("services.cards.hourly.panel.longTermDurationLabel", "")
-        : getI18nValue("services.cards.hourly.panel.durationLabel", ""),
-      price: safeSnapshot.hourly_daily_mode === MODE_LONG_TERM
-        ? getI18nValue("services.cards.hourly.panel.longTermPriceLabel", "")
-        : getI18nValue("services.cards.hourly.panel.priceLabel", "")
-    };
 
-    if (safeSnapshot.hourly_daily_mode) {
-      parts.push(labels.mode + ": " + getModeLabel(safeSnapshot.hourly_daily_mode));
-    }
-
-    if (safeSnapshot.hourly_daily_pickup) {
-      parts.push(labels.pickup + ": " + safeSnapshot.hourly_daily_pickup);
-    }
-
-    if (safeSnapshot.hourly_daily_date) {
-      parts.push(labels.date + ": " + safeSnapshot.hourly_daily_date);
-    }
-
-    if (safeSnapshot.hourly_daily_start_time) {
-      parts.push(labels.time + ": " + safeSnapshot.hourly_daily_start_time);
-    }
-
-    if (getDurationLabel(safeSnapshot)) {
-      parts.push(labels.duration + ": " + getDurationLabel(safeSnapshot));
-    }
-
-    if (getPriceLabel(safeSnapshot)) {
-      parts.push(labels.price + ": " + getPriceLabel(safeSnapshot));
-    }
-
-    return parts.filter(Boolean).join(" | ");
-  }
 
   function fillReservationForm(snapshot, contactData, options) {
     const formsApi = getReservationFormsApi();
-    const form = formsApi ? formsApi.getReservationForm() : null;
-    const fields = form && formsApi ? formsApi.getReservationRequestFields(form) : null;
-    const summary = buildRequestSummary(snapshot);
-    const safeOptions = options && typeof options === "object" ? options : {};
-
-    if (!form || !fields) {
-      return false;
-    }
-
-    writeFormValue(form, "service_type", "hourly_daily", false);
-
-    writeFormValue(form, "name", contactData.name, true);
-    writeFormValue(form, "phone", contactData.phone, true);
-    writeFormValue(form, "email", contactData.email, true);
-
-    writeFormValue(form, "trip_date", snapshot.hourly_daily_date, true);
-    writeFormValue(form, "trip_time", snapshot.hourly_daily_start_time, true);
-    writeFormValue(form, "origin", snapshot.hourly_daily_pickup, true);
-    writeFormValue(form, "destination", "", true);
-    writeFormValue(form, "passengers", "", true);
-    writeFormValue(form, "luggage", "", true);
-    writeFormValue(form, "message", contactData.notes || snapshot.hourly_daily_notes, true);
-
-    writeFormValue(form, "service_label", getServiceLabel(), false);
-    writeFormValue(form, "request_summary", summary, false);
-    writeFormValue(form, "hourly_daily_trip_summary", summary, false);
-    writeFormValue(form, "hourly_daily_pickup_label", snapshot.hourly_daily_pickup, false);
-    writeFormValue(form, "hourly_daily_mode_label", getModeLabel(snapshot.hourly_daily_mode), false);
-    writeFormValue(form, "hourly_daily_duration_label", getDurationLabel(snapshot), false);
-    writeFormValue(form, "hourly_daily_price_label", getPriceLabel(snapshot), false);
-
-    writeFormValue(form, "hourly_daily_mode", snapshot.hourly_daily_mode, false);
-    writeFormValue(form, "hourly_daily_vehicle_type", snapshot.hourly_daily_vehicle_type, false);
-    writeFormValue(form, "hourly_daily_pickup", snapshot.hourly_daily_pickup, false);
-    writeFormValue(form, "hourly_daily_pickup_place_id", snapshot.hourly_daily_pickup_place_id, false);
-    writeFormValue(form, "hourly_daily_pickup_lat", snapshot.hourly_daily_pickup_lat, false);
-    writeFormValue(form, "hourly_daily_pickup_lng", snapshot.hourly_daily_pickup_lng, false);
-    writeFormValue(form, "hourly_daily_date", snapshot.hourly_daily_date, false);
-    writeFormValue(form, "hourly_daily_start_time", snapshot.hourly_daily_start_time, false);
-    writeFormValue(form, "hourly_daily_duration_hours", snapshot.hourly_daily_duration_hours, false);
-    writeFormValue(form, "hourly_daily_custom_term", snapshot.hourly_daily_custom_term, false);
-    writeFormValue(form, "hourly_daily_notes", contactData.notes || snapshot.hourly_daily_notes, false);
-    writeFormValue(form, "hourly_daily_price", snapshot.hourly_daily_price, false);
-    writeFormValue(form, "hourly_daily_currency", snapshot.hourly_daily_currency, false);
-    writeFormValue(form, "hourly_daily_km_included", snapshot.hourly_daily_km_included, false);
-    writeFormValue(form, "hourly_daily_extra_km_price", snapshot.hourly_daily_extra_km_price, false);
-    writeFormValue(form, "hourly_daily_out_of_zone_supplement", snapshot.hourly_daily_out_of_zone_supplement, false);
-
-    formsApi.syncReservationRequestState(fields);
-
-    if (safeOptions.skipLegacyValidation === true) {
-      return true;
-    }
-
-    if (typeof formsApi.refreshReservationRequestValidationUX === "function") {
-      return formsApi.refreshReservationRequestValidationUX(fields);
-    }
-
-    return true;
+    if (!formsApi) return false;
+    formsApi.restore(Object.assign({}, snapshot, {
+      name: contactData.name, phone: contactData.phone, email: contactData.email,
+      message: contactData.notes || snapshot.hourly_daily_notes || '',
+      hourly_daily_notes: contactData.notes || snapshot.hourly_daily_notes || ''
+    }));
+    return options?.skipLegacyValidation === true || formsApi.refreshReservationRequestValidationUX();
   }
   
     function trackHourlyMobileContactRequest(snapshot) {
@@ -1569,6 +1460,8 @@
   }
 
   function submitContactStep() {
+    // Long-term requests never serialize or submit the legacy Netlify form.
+    if(currentSnapshot?.hourly_daily_mode==='custom_long_term')return window.PixkuyLongTermRequest.open(currentSnapshot);
     const formsApi = getReservationFormsApi();
     const form = formsApi ? formsApi.getReservationForm() : null;
     const snapshot = currentSnapshot;
@@ -1610,13 +1503,6 @@
         showGlobalError();
         return false;
       });
-    }
-
-    trackHourlyMobileContactRequest(snapshot);
-
-    if (form && typeof form.requestSubmit === "function") {
-      form.requestSubmit();
-      return true;
     }
 
     showGlobalError();
@@ -1721,6 +1607,7 @@
   }
 
   function open(panel, payload) {
+    if(payload?.hourly_daily_mode==='custom_long_term')return window.PixkuyLongTermRequest.open(payload);
     const snapshot = buildSnapshotFromPayload(payload);
     if(window.PixkuyHourlyBookingFlow && isTransactionalHourlySnapshot(snapshot)){
       const form=getReservationFormsApi().getReservationForm();

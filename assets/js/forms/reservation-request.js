@@ -50,24 +50,7 @@
       tourPrivatePrice: form.querySelector('input[name="tour_private_price"]'),
       tourPrivateCurrency: form.querySelector('input[name="tour_private_currency"]'),
 
-      hourlyDailyVisiblePickup: form.querySelector('[data-contact-hourly-daily-pickup]'),
-      hourlyDailyVisibleDate: form.querySelector('[data-contact-hourly-daily-date]'),
-      hourlyDailyVisibleTime: form.querySelector('[data-contact-hourly-daily-time]'),
 
-      hourlyDailyPassengers: form.querySelector('input[name="hourly_daily_passengers"]'),
-      hourlyDailyMode: form.querySelector('input[name="hourly_daily_mode"]'),
-      hourlyDailyVehicleType: form.querySelector('input[name="hourly_daily_vehicle_type"]'),
-      hourlyDailyPickup: form.querySelector('input[name="hourly_daily_pickup"]'),
-      hourlyDailyPickupPlaceId: form.querySelector('input[name="hourly_daily_pickup_place_id"]'),
-      hourlyDailyPickupLat: form.querySelector('input[name="hourly_daily_pickup_lat"]'),
-      hourlyDailyPickupLng: form.querySelector('input[name="hourly_daily_pickup_lng"]'),
-      hourlyDailyDate: form.querySelector('input[name="hourly_daily_date"]'),
-      hourlyDailyStartTime: form.querySelector('input[name="hourly_daily_start_time"]'),
-      hourlyDailyDurationHours: form.querySelector('input[name="hourly_daily_duration_hours"]'),
-      hourlyDailyCustomTerm: form.querySelector('input[name="hourly_daily_custom_term"]'),
-      hourlyDailyNotes: form.querySelector('input[name="hourly_daily_notes"]'),
-      hourlyDailyPrice: form.querySelector('input[name="hourly_daily_price"]'),
-      hourlyDailyCurrency: form.querySelector('input[name="hourly_daily_currency"]'),
 
       eventSpecialEventId: form.querySelector('input[name="event_special_event_id"]'),
       eventSpecialVariant: form.querySelector('input[name="event_special_variant"]'),
@@ -520,20 +503,6 @@
       tourPrivatePrice: fields.tourPrivatePrice ? getTrimmedValue(fields.tourPrivatePrice) : '',
       tourPrivateCurrency: fields.tourPrivateCurrency ? getTrimmedValue(fields.tourPrivateCurrency) : '',
 
-      hourlyDailyPassengers: fields.hourlyDailyPassengers ? getTrimmedValue(fields.hourlyDailyPassengers) : '',
-      hourlyDailyMode: fields.hourlyDailyMode ? getTrimmedValue(fields.hourlyDailyMode) : '',
-      hourlyDailyVehicleType: fields.hourlyDailyVehicleType ? getTrimmedValue(fields.hourlyDailyVehicleType) : '',
-      hourlyDailyPickup: fields.hourlyDailyPickup ? getTrimmedValue(fields.hourlyDailyPickup) : '',
-      hourlyDailyPickupPlaceId: fields.hourlyDailyPickupPlaceId ? getTrimmedValue(fields.hourlyDailyPickupPlaceId) : '',
-      hourlyDailyPickupLat: fields.hourlyDailyPickupLat ? getTrimmedValue(fields.hourlyDailyPickupLat) : '',
-      hourlyDailyPickupLng: fields.hourlyDailyPickupLng ? getTrimmedValue(fields.hourlyDailyPickupLng) : '',
-      hourlyDailyDate: fields.hourlyDailyDate ? getTrimmedValue(fields.hourlyDailyDate) : '',
-      hourlyDailyStartTime: fields.hourlyDailyStartTime ? getTrimmedValue(fields.hourlyDailyStartTime) : '',
-      hourlyDailyDurationHours: fields.hourlyDailyDurationHours ? getTrimmedValue(fields.hourlyDailyDurationHours) : '',
-      hourlyDailyCustomTerm: fields.hourlyDailyCustomTerm ? getTrimmedValue(fields.hourlyDailyCustomTerm) : '',
-      hourlyDailyNotes: fields.hourlyDailyNotes ? getTrimmedValue(fields.hourlyDailyNotes) : '',
-      hourlyDailyPrice: fields.hourlyDailyPrice ? getTrimmedValue(fields.hourlyDailyPrice) : '',
-      hourlyDailyCurrency: fields.hourlyDailyCurrency ? getTrimmedValue(fields.hourlyDailyCurrency) : '',
 
       eventSpecialEventId: fields.eventSpecialEventId ? getTrimmedValue(fields.eventSpecialEventId) : '',
       eventSpecialVariant: fields.eventSpecialVariant ? getTrimmedValue(fields.eventSpecialVariant) : '',
@@ -619,29 +588,7 @@
   );
 }
 
-function hasAttemptableHourlyDailyReservationData(data) {
-  if (!data) return false;
 
-  return Boolean(
-    data.name &&
-    isValidInternationalPhoneNumber(data.phone) &&
-    data.email &&
-    data.serviceType === 'hourly_daily' &&
-    data.hourlyDailyMode &&
-    data.hourlyDailyPickup &&
-    data.hourlyDailyDate &&
-    data.hourlyDailyStartTime &&
-    (
-      (data.hourlyDailyMode === 'hourly' && data.hourlyDailyDurationHours) ||
-      (data.hourlyDailyMode === 'full_day' && data.hourlyDailyDurationHours) ||
-      (data.hourlyDailyMode === 'custom_long_term' && data.hourlyDailyCustomTerm)
-    ) &&
-    (
-      data.hourlyDailyMode === 'custom_long_term' ||
-      (data.hourlyDailyPrice && data.hourlyDailyCurrency)
-    )
-  );
-}
 
 function hasAttemptableEventSpecialReservationData(data) {
   if (!data) return false;
@@ -726,9 +673,6 @@ function hasAttemptableDirectTransferReservationData(data) {
       return hasAttemptableTourPrivateReservationData(data);
     }
 
-    if (data.serviceType === 'hourly_daily') {
-      return hasAttemptableHourlyDailyReservationData(data);
-    }
 
     if (data.serviceType === 'event_special') {
       return hasAttemptableEventSpecialReservationData(data);
@@ -795,29 +739,7 @@ function hasAttemptableDirectTransferReservationData(data) {
   );
 }
 
-function hasMinimumRequiredHourlyDailyReservationData(data) {
-  if (!data) return false;
 
-  return Boolean(
-    data.name &&
-    isValidInternationalPhoneNumber(data.phone) &&
-    isValidEmail(data.email) &&
-    data.serviceType === 'hourly_daily' &&
-    data.hourlyDailyMode &&
-    data.hourlyDailyPickup &&
-    data.hourlyDailyDate &&
-    data.hourlyDailyStartTime &&
-    (
-      (data.hourlyDailyMode === 'hourly' && data.hourlyDailyDurationHours) ||
-      (data.hourlyDailyMode === 'full_day' && data.hourlyDailyDurationHours) ||
-      (data.hourlyDailyMode === 'custom_long_term' && data.hourlyDailyCustomTerm)
-    ) &&
-    (
-      data.hourlyDailyMode === 'custom_long_term' ||
-      (data.hourlyDailyPrice && data.hourlyDailyCurrency)
-    )
-  );
-}
 
 function hasMinimumRequiredEventSpecialReservationData(data) {
   if (!data) return false;
@@ -889,21 +811,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   );
 }
 
-  function validateHourlyDailySpecificFields(data) {
-    if (!data || data.serviceType !== 'hourly_daily') {
-      return {
-        hourly_daily_pickup: true,
-        hourly_daily_date: true,
-        hourly_daily_time: true
-      };
-    }
-
-    return {
-      hourly_daily_pickup: Boolean(data.hourlyDailyPickup),
-      hourly_daily_date: Boolean(data.hourlyDailyDate),
-      hourly_daily_time: Boolean(data.hourlyDailyStartTime)
-    };
-  }
 
   function hasMinimumRequiredReservationData(data) {
     if (!data) return false;
@@ -916,9 +823,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       return hasMinimumRequiredTourPrivateReservationData(data);
     }
 
-    if (data.serviceType === 'hourly_daily') {
-      return hasMinimumRequiredHourlyDailyReservationData(data);
-    }
 
     if (data.serviceType === 'event_special') {
       return hasMinimumRequiredEventSpecialReservationData(data);
@@ -964,21 +868,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.active()) {
       return window.PixkuyAirportDesktopView.t('mobileReviewCta');
     }
-    if (
-      data &&
-      data.serviceType === 'hourly_daily' &&
-      (
-        data.hourlyDailyMode === 'hourly' ||
-        data.hourlyDailyMode === 'full_day'
-      ) &&
-      (isDesktopViewport() || (window.PixkuyFleetSelection?.hourlyEdit()?.contactOnly &&
-        window.PixkuyHourlyBookingFlow?.isActive()))
-    ) {
-      return getSubmitLabel(
-        'services.cards.hourly.panel.reviewCta',
-        'Revisar reserva'
-      );
-    }
 
     if (
       data &&
@@ -1013,84 +902,8 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     form.setAttribute('data-reservation-request-ready', '1');
   }
   
-    function readCheckoutReviewReturnSnapshot() {
-    var raw;
-    var parsed;
 
-    try {
-      if (window.sessionStorage.getItem('pixkuy_hourly_checkout_review_return') !== '1') {
-        return null;
-      }
 
-      raw = window.sessionStorage.getItem('pixkuy_hourly_checkout_review_snapshot');
-    } catch (error) {
-      return null;
-    }
-
-    if (!raw) {
-      return null;
-    }
-
-    try {
-      parsed = JSON.parse(raw);
-    } catch (error) {
-      return null;
-    }
-
-    return parsed && typeof parsed === 'object' ? parsed : null;
-  }
-
-  function restoreFieldValue(field, value) {
-    if (!field || value === undefined || value === null) {
-      return false;
-    }
-
-    field.value = typeof value === 'string' ? value : String(value);
-    field.dispatchEvent(new Event('input', { bubbles: true }));
-    field.dispatchEvent(new Event('change', { bubbles: true }));
-    return true;
-  }
-
-  function restoreCheckoutReviewCommonFields(fields) {
-    if(/^#hourly\/(datos|revision)$/.test(window.location.hash))return false;
-    var snapshot = readCheckoutReviewReturnSnapshot();
-    var legalFieldNames;
-
-    if (!snapshot || !hasCriticalFields(fields)) {
-      return false;
-    }
-
-    restoreFieldValue(fields.name, snapshot.name);
-    restoreFieldValue(fields.phone, snapshot.phone);
-    restoreFieldValue(fields.email, snapshot.email);
-
-    if (fields.serviceType) {
-      restoreFieldValue(fields.serviceType, 'hourly_daily');
-    }
-
-    legalFieldNames = [
-      'legal_acceptance_accepted',
-      'legal_acceptance_terms_version',
-      'legal_acceptance_cancellation_policy_version',
-      'legal_acceptance_privacy_version',
-      'legal_acceptance_accepted_at',
-      'legal_acceptance_channel',
-      'legal_acceptance_terms_url',
-      'legal_acceptance_cancellations_url',
-      'legal_acceptance_privacy_url'
-    ];
-
-    legalFieldNames.forEach(function restoreLegalField(fieldName) {
-      var field = fields.form.querySelector('input[name="' + fieldName + '"]');
-
-      if (field && snapshot[fieldName]) {
-        field.value = snapshot[fieldName];
-      }
-    });
-
-    syncReservationRequestState(fields);
-    return true;
-  }
 
   function setSubmitEnabled(fields, enabled) {
     if (!fields || !fields.submit) return;
@@ -1117,7 +930,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   var usesSpecificServiceModel;
   var isAirportHotel;
   var isTourPrivate;
-  var isHourlyDaily;
   var isEventSpecial;
   var isDirectTransfer;
 
@@ -1138,7 +950,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     (
       data.serviceType === 'airport_hotel' ||
       data.serviceType === 'tour_private' ||
-      data.serviceType === 'hourly_daily' ||
       data.serviceType === 'event_special' ||
       data.serviceType === 'direct_transfer'
     )
@@ -1154,10 +965,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     data.serviceType === 'tour_private'
   );
 
-  isHourlyDaily = Boolean(
-    data &&
-    data.serviceType === 'hourly_daily'
-  );
+
 
   isEventSpecial = Boolean(
     data &&
@@ -1176,7 +984,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     fields.origin.required = false;
     fields.destination.required = false;
     fields.passengers.required = false;
-    fields.luggage.required = !(isAirportHotel || isTourPrivate || isHourlyDaily || isEventSpecial || isDirectTransfer);
+    fields.luggage.required = !(isAirportHotel || isTourPrivate || isEventSpecial || isDirectTransfer);
     return true;
   }
 
@@ -1340,9 +1148,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     setFieldValidity(fields.destination, 'destination', true);
     setFieldValidity(fields.passengers, 'passengers', true);
     setFieldValidity(fields.luggage, 'luggage', true);
-    setFieldValidity(fields.hourlyDailyVisiblePickup, 'hourly_daily_pickup', true);
-    setFieldValidity(fields.hourlyDailyVisibleDate, 'hourly_daily_date', true);
-    setFieldValidity(fields.hourlyDailyVisibleTime, 'hourly_daily_time', true);
   }
 
   function validateReservationRequestFields(fields) {
@@ -1365,7 +1170,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         trip_date: (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         )
@@ -1379,7 +1183,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         trip_time: (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         )
@@ -1393,7 +1196,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         origin: (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         )
@@ -1402,7 +1204,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         destination: (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         )
@@ -1412,7 +1213,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
           ? hasAirportHotelFareKeySelected(data)
           : (
               data.serviceType === 'tour_private' ||
-              data.serviceType === 'hourly_daily' ||
               data.serviceType === 'event_special' ||
               data.serviceType === 'direct_transfer'
                 ? true
@@ -1421,14 +1221,12 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         luggage: (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         )
           ? true
           : isZeroOrPositiveInteger(data.luggage)
-      },
-      validateHourlyDailySpecificFields(data)
+      }
     );
 
     return validity;
@@ -1452,7 +1250,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         if (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         ) {
@@ -1476,7 +1273,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         if (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         ) {
@@ -1496,7 +1292,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         if (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         ) {
@@ -1508,7 +1303,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         if (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         ) {
@@ -1519,7 +1313,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       case 'passengers':
         if (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         ) {
@@ -1534,20 +1327,12 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         if (
           data.serviceType === 'airport_hotel' ||
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'hourly_daily' ||
           data.serviceType === 'event_special' ||
           data.serviceType === 'direct_transfer'
         ) {
           return true;
         }
 
-        validity = validateReservationRequestFields(fields);
-        return validity && Object.prototype.hasOwnProperty.call(validity, fieldName)
-          ? validity[fieldName]
-          : true;
-      case 'hourly_daily_pickup':
-      case 'hourly_daily_date':
-      case 'hourly_daily_time':
         validity = validateReservationRequestFields(fields);
         return validity && Object.prototype.hasOwnProperty.call(validity, fieldName)
           ? validity[fieldName]
@@ -1599,12 +1384,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         return fields.passengers;
       case 'luggage':
         return fields.luggage;
-      case 'hourly_daily_pickup':
-        return fields.hourlyDailyVisiblePickup;
-      case 'hourly_daily_date':
-        return fields.hourlyDailyVisibleDate;
-      case 'hourly_daily_time':
-        return fields.hourlyDailyVisibleTime;
       default:
         return null;
     }
@@ -1660,9 +1439,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     setFieldValidity(fields.destination, 'destination', validity.destination);
     setFieldValidity(fields.passengers, 'passengers', validity.passengers);
     setFieldValidity(fields.luggage, 'luggage', validity.luggage);
-    setFieldValidity(fields.hourlyDailyVisiblePickup, 'hourly_daily_pickup', validity.hourly_daily_pickup);
-    setFieldValidity(fields.hourlyDailyVisibleDate, 'hourly_daily_date', validity.hourly_daily_date);
-    setFieldValidity(fields.hourlyDailyVisibleTime, 'hourly_daily_time', validity.hourly_daily_time);
 
     return true;
   }
@@ -1801,9 +1577,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       destination: fields.destination,
       passengers: fields.passengers,
       luggage: fields.luggage,
-      hourly_daily_pickup: fields.hourlyDailyVisiblePickup,
-      hourly_daily_date: fields.hourlyDailyVisibleDate,
-      hourly_daily_time: fields.hourlyDailyVisibleTime
     };
 
     keys = Object.keys(fieldMap);
@@ -1894,9 +1667,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
             }
           }
 
-          if (currentFieldName === 'hourly_daily_pickup') {
-            return;
-          }
+
 
           refreshValidationUX(currentFields, currentFieldName);
         };
@@ -1977,7 +1748,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     syncReservationDateTimeMinimum(fields);
     bindLiveState(fields);
     bindSubmitValidation(fields);
-    restoreCheckoutReviewCommonFields(fields);
     syncReservationRequestState(fields);
 
     window.addEventListener('pixkuy:i18n-applied', function () {

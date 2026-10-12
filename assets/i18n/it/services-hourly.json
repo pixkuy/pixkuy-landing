@@ -4,9 +4,6 @@
       "hourly": {
         "title": "Auto con autista privato",
         "text": "Prenota a ore o per l’intera giornata per trasferimenti, agenda privata o disponibilità operativa a Città del Messico.",
-        "contact": {
-          "helper": "Configura modalità, punto di raccolta, data e ora per preparare la richiesta."
-        },
         "bullets": [
           "Disponibilità flessibile",
           "Più fermate",
@@ -112,6 +109,8 @@
           "longTermPriceValue": "In base alle sue esigenze",
           "priceValuePending": "—",
           "cta": "Richiedi",
+
+          "dataCta": "Continua ai dati",
           "reviewCta": "Verifica la mia prenotazione",
           "review": {
             "title": "Rivedi la tua prenotazione",

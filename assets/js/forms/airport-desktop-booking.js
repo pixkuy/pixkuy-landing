@@ -181,7 +181,7 @@
     } else if (prior && prior.airport_pending_token && !value.airport_new_continuation) {
       value.airport_pending_token = prior.airport_pending_token;
     }
-    if (!view.media.matches && !editContext() && !pending()) {
+    if (!editContext() && !pending()) {
       value.airport_mobile_draft = true;
       value.airport_draft_stage = route() ? route()[1] : "datos";
     }
@@ -212,12 +212,10 @@
   if (route() && route()[1] !== "traslado" && read()) window.sessionStorage.setItem(RETURN, "1");
 
   function navigate(step, focus, replace) {
-    if (!view.media.matches) {
-      mobileReviewAttempt = "";
-      revalidationSequence += 1;
-      revalidation = null;
-      if (notice === "checking" || notice === "unverified") notice = "";
-    }
+    mobileReviewAttempt = "";
+    revalidationSequence += 1;
+    revalidation = null;
+    if (notice === "checking" || notice === "unverified") notice = "";
     revision += 1;
     window.history[replace ? "replaceState" : "pushState"](editProvenance() ? {airportPendingToken:editProvenance()} : null, "", "#airport/" + step + (focus ? "/" + focus : ""));
     render();
@@ -400,6 +398,7 @@
     if (editing && editing.expiresAt && editing.serverNow) main.appendChild(editDeadline(editing));
     renderNotice(main);
     fields();
+    form.inert = !mobileReviewHydrated;
     form.classList.add("airport-booking__form");
     main.appendChild(form);
     var submit = form.querySelector("#contact-submit");
@@ -489,7 +488,7 @@
     return ["termsVersion","cancellationsVersion","privacyVersion","channel"].every(function (key) { return snapshot[api.fieldNames[key]] === policy[key]; });
   }
   function conditions() {
-    var accepted = view.media.matches ? snapshot.legal_acceptance_accepted === "true" : mobileLegalCurrent();
+    var accepted = mobileLegalCurrent();
     var legal = view.node("section", "airport-booking__conditions");
     var status = view.node("p", "airport-booking__conditions-status");
     status.append(view.icon(accepted ? "check" : "document"), view.node("span", "", view.t(accepted ? "accepted" : "conditions")));
@@ -553,11 +552,11 @@
     else if (pending()) aside.appendChild(button("recover", recover, true));
     else if (changed) aside.appendChild(button("acceptOffer", function () { changed = false; reviewed = snapshot; notice = ""; render(); }, true));
     else {
-      var mobileRetry = !view.media.matches && notice === "technical";
-      var mobileWaiting = !view.media.matches && (revalidation || notice === "checking" || notice === "unverified");
-      var checkoutButton = button(notice === "localError" ? "retryCheckout" : !view.media.matches ? mobileWaiting ? "mobileChecking" : mobileRetry ? "checkAgain" : editContext() ? "replacePayCta" : "payCta" : notice ? "checkAgain" : editContext() ? "replacePayCta" : "payCta", mobileRetry ? revalidateOffer : checkout, true);
+      var retry = notice === "technical";
+      var waiting = revalidation || notice === "checking" || notice === "unverified";
+      var checkoutButton = button(notice === "localError" ? "retryCheckout" : waiting ? "mobileChecking" : retry ? "checkAgain" : editContext() ? "replacePayCta" : "payCta", retry ? revalidateOffer : checkout, true);
       checkoutButton.setAttribute('data-airport-pay','');
-      if (revalidation || editExpired() || !view.media.matches && !mobileRetry && (notice && notice !== "localError" || !offerFresh() || !mobileLegalCurrent())) checkoutButton.disabled = true;
+      if (revalidation || editExpired() || !retry && (notice && notice !== "localError" || !offerFresh() || !mobileLegalCurrent())) checkoutButton.disabled = true;
       aside.appendChild(checkoutButton);
     }
     if (view.media.matches) aside.appendChild(view.node("p", "airport-booking__lead", view.t("confirmAfterPayment")));
@@ -757,7 +756,7 @@
     revalidation = request;
     renderPreservingUi();
     request.then(function (fresh) {
-      if (current !== revalidationSequence || !active() || !view.media.matches && routeRevision !== revision) return false;
+      if (current !== revalidationSequence || !active() || routeRevision !== revision) return false;
       if (editRecoveryRequired() || guardReviewExpiry()) return false;
       changed = commercialKey(before) !== commercialKey(fresh);
       notice = changed ? "offerChanged" : "";
@@ -767,7 +766,7 @@
       mobileReviewAttempt = "";
       return true;
     }).catch(function (error) {
-      if (current !== revalidationSequence || !active() || !view.media.matches && routeRevision !== revision) return false;
+      if (current !== revalidationSequence || !active() || routeRevision !== revision) return false;
       if (guardReviewExpiry()) return false;
       var fleet = window.PixkuyFleetSelection.read("airport_transfer");
       if (fleet && fleet.explicit && !fleet.selected && fleet.offer && fleet.offer.models && fleet.offer.models.length) {
@@ -781,7 +780,7 @@
     }).finally(function () {
       if (current !== revalidationSequence) return;
       if (revalidation === request) revalidation = null;
-      if (!view.media.matches && routeRevision !== revision) {
+      if (routeRevision !== revision) {
         mobileReviewAttempt = "";
         if (notice === "checking") notice = "unverified";
       }
@@ -791,7 +790,8 @@
   }
   function mobileReviewActive() {
     var editing = editContext();
-    return !view.media.matches && active() && route()[1] === "revision" && !(editing && editing.attempt) && !pending();
+    // Both presentations use the same review certificate and recovery contract.
+    return active() && route()[1] === "revision" && !(editing && editing.attempt) && !pending();
   }
   function mobileReviewFresh() {
     return offerFresh() && snapshot && commercialKey(snapshot) === commercialKey(window.PixkuyAirportCheckout.draft() || {});
@@ -896,7 +896,7 @@
       var saved = read(), fleet = window.PixkuyFleetSelection.read("airport_transfer");
       // Menu re-entry resumes an ordinary draft, never a payment/edit context
       // or an explicit new continuation, which starts in the configurator.
-      if (view.media.matches || !saved || !saved.airport_mobile_draft ||
+      if (!saved || !saved.airport_mobile_draft ||
           !/^(datos|revision)$/.test(saved.airport_draft_stage) ||
           saved.airport_pending_token || window.sessionStorage.getItem(EDIT_KEY) ||
           fleet.reservationToken || pending()) return false;
@@ -999,7 +999,7 @@
     // Restoration can finish before load/pageshow; the mobile draft adapter
     // still has to restore its panel context in that case.
     mobileReviewHydrated = document.readyState === "complete";
-    if (!view.media.matches && active()) {
+    if (active()) {
       if (!event.detail.restored) notice = "incomplete";
       renderPreservingUi();
     }

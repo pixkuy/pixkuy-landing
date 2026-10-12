@@ -1,6 +1,6 @@
 (function (window, document) {
   "use strict";
-  // Adapter for the partial mobile trip. The existing review snapshot and fleet
+  // Adapter for the partial Airport trip in either viewport. The review snapshot and fleet
   // state remain the only stores; a draft never contains an offer certificate.
   var KEY = "pixkuy_airport_transfer_checkout_review_snapshot";
   var ready = false;
@@ -17,16 +17,16 @@
     return {place_id:placeId,lat:Number(lat),lng:Number(lng),address:saved.address || value.airport_transfer_destination_label || value.airport_hotel_hotel || ""};
   }
   function ordinary() {
-    if (!window.matchMedia("(max-width:720px)").matches) return false;
     if (window.sessionStorage.getItem("pixkuy_airport_pending_edit_v1")) return false;
     var fleet = window.PixkuyFleetSelection && window.PixkuyFleetSelection.read("airport_transfer");
-    return !!fleet && !(fleet.attempt && fleet.attempt.state !== "not_committed");
+    return !!fleet && !fleet.reservationToken && !(fleet.attempt && fleet.attempt.state !== "not_committed");
   }
   function saveTrip() {
     var flow = window.PixkuyAirportDesktopBooking;
     var airport = window.PixkuyAirportZoneTariff;
     if (!ready || restoring || !ordinary() || !airport || flow && flow.active()) return false;
-    if (!window.PixkuyAirportMobileBookingFlow || !window.PixkuyAirportMobileBookingFlow.isOpen()) return false;
+    var mobile = window.matchMedia("(max-width:720px)").matches;
+    if (mobile ? !window.PixkuyAirportMobileBookingFlow || !window.PixkuyAirportMobileBookingFlow.isOpen() : airport.panel.hidden) return false;
     var previous = read() || {};
     var state = airport.getState();
     var toAirport = state.originType !== "airport";
@@ -35,7 +35,8 @@
     var addressInput = Array.from(airport.panel.querySelectorAll("[data-airport-lodging-input]")).find(function (node) { return node.getClientRects().length; });
     var address = state.lodgingEndpointLabel || addressInput && addressInput.value || "";
     var location = state.lodgingEndpointPlaceId ? {address:address,place_id:state.lodgingEndpointPlaceId,lat:state.lodgingEndpointLat,lng:state.lodgingEndpointLng} : null;
-    var luggage = airport.panel.querySelector("[data-airport-mobile-luggage-select]");
+    var luggage = mobile ? airport.panel.querySelector("[data-airport-mobile-luggage-select]") : null;
+    var luggageValue = luggage ? luggage.value : previous.luggage ?? previous.airport_transfer_luggage ?? "";
     var value = {service_type:"airport_transfer",legacy_service_type:"airport_hotel",airport_mobile_draft:true,airport_draft_stage:"traslado"};
     ["name","phone","email","message","notes"].forEach(function (key) { value[key] = previous[key] || ""; });
     Object.keys(previous).filter(function (key) { return key.indexOf("legal_acceptance_") === 0; }).forEach(function (key) { value[key] = previous[key]; });
@@ -50,7 +51,7 @@
       airport_transfer_passenger_fare_key:state.selectedFareKey,passenger_fare_key:state.selectedFareKey,
       airport_transfer_date:state.serviceDate,airport_hotel_date:state.serviceDate,
       airport_transfer_time:state.serviceTime,airport_hotel_time:state.serviceTime,
-      airport_transfer_luggage:luggage?luggage.value:"0",luggage:luggage?luggage.value:"0",
+      airport_transfer_luggage:luggageValue,luggage:luggageValue,
       airport_transfer_origin:toAirport?address:airportLabel,airport_transfer_destination:toAirport?airportLabel:address
     });
     value = window.PixkuyFleetSelection.snapshot("airport_transfer", value);
@@ -79,9 +80,11 @@
         if (input) input.value=value.airport_mobile_unresolved_address;
       }
       if (window.PixkuyAirportMobileBookingFlow) window.PixkuyAirportMobileBookingFlow.setLuggage(value.airport_transfer_luggage ?? value.luggage ?? "0");
-      // Restoring Airport's own trip in the background does not grant it the
-      // shared contact form. Hourly claims Data/Review before async copy loads.
-      if(!/^#hourly\/(datos|revision)$/.test(window.location.hash))
+      // Restoring the panel in the background never grants Airport another
+      // service's contact or legal fields. Re-entry uses the normal handoff.
+      var requestedService = new URLSearchParams(window.location.search).get("service");
+      var airportRoute = /^#airport\/(datos|revision|traslado)(?:\/|$)/.test(window.location.hash);
+      if (airportRoute || requestedService === "airport_hotel" && !/^#hourly\//.test(window.location.hash))
         window.PixkuyForms.restoreContactAirportHotelDraftFields(value);
       document.dispatchEvent(new window.CustomEvent("pixkuy:airport-draft-restored"));
       ["date","time"].forEach(function (key) {

@@ -100,7 +100,12 @@
     var logo = node("img", "airport-booking__logo");
     logo.src = "assets/img/pixkuy-logo_only words-white.webp";
     logo.alt = "Pixkuy Mobility";
-    identity.appendChild(logo);
+    var home = node("a", "");
+    home.href = "/";
+    home.style.display = "flex";
+    home.setAttribute("aria-label", t("home"));
+    home.appendChild(logo);
+    identity.appendChild(home);
     if (options.showBack !== false && typeof back === "function") {
       identity.appendChild(action(t(options.backLabel || "backTrip"), back, false, "arrowLeft"));
     }

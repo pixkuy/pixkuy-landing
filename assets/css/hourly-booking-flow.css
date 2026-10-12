@@ -1,4 +1,17 @@
 /* Hourly composition uses the existing Pixkuy palette and Airport spacing. */
+/* Only the final desktop screens adopt Airport's approved composition. */
+@media(min-width:721px){
+  .hourly-booking.hourly-booking--desktop-final h1 { margin-bottom:12px; }
+  .hourly-booking.hourly-booking--desktop-final h2 { margin:0 0 16px; }
+  .hourly-booking--desktop-final .airport-booking__block .airport-booking__details { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .hourly-booking--desktop-final .airport-booking__block .airport-booking__detail { display:block;grid-column:1/-1; }
+  .hourly-booking--desktop-final .airport-booking__block:first-of-type:not(:last-of-type) .airport-booking__detail:last-child { display:block; }
+  .hourly-booking--desktop-final .airport-booking__block .hourly-booking__trip-details .airport-booking__detail:nth-child(n+3),
+  .hourly-booking--desktop-final.airport-booking--result .airport-booking__block .airport-booking__detail--half { grid-column:auto; }
+  .hourly-booking--desktop-final .hourly-booking__timezone { margin:12px 0 0; }
+  .hourly-booking.hourly-booking--desktop-final .airport-booking__secondary { border:1px solid #636968;border-radius:8px;padding:10px 16px; }
+  .hourly-booking--desktop-final .airport-booking__actions .airport-booking__link { min-height:44px;padding:9px 12px;border:1px solid #505758;border-radius:7px; }
+}
 body.hourly-booking-active { background:var(--bg);overflow:auto; }
 body.hourly-booking-active > :not(.hourly-booking):not(.hourly-mobile-route):not(.mobile-topbar):not(.mobile-topbar-menu):not(.lang):not(#pixkuy-legal-overlay):not(.hourly-mobile-notes-editor):not(script):not(style):not(link):not(.consent-banner):not(.consent-preferences) { display:none!important; }
 .hourly-booking { color:var(--fg);max-width:1280px;margin:0 auto;padding:24px 32px 48px;line-height:1.5; }
@@ -14,7 +27,7 @@ body.hourly-booking-active > :not(.hourly-booking):not(.hourly-mobile-route):not
 .hourly-booking dt,.hourly-booking__timezone { color:var(--muted);font-size:.875rem; }
 .hourly-booking dd { margin:4px 0 0;white-space:pre-wrap; }
 .hourly-booking__form { margin:0;max-width:none; }
-.hourly-booking__form #contact-submit { width:100%; }
+.hourly-booking__form #hourly-contact-submit { width:100%; }
 .hourly-booking .airport-booking__link { display:inline-flex;align-items:center;min-height:44px;border:0;background:transparent;color:var(--accent);font:inherit;text-align:left;padding:8px 4px;cursor:pointer; }
 .hourly-booking .airport-booking__primary { min-height:48px;margin-top:16px; }
 .hourly-booking button:disabled { opacity:.55;cursor:default; }
@@ -116,8 +129,8 @@ body.hourly-booking-active > :not(.hourly-booking):not(.hourly-mobile-route):not
   .hourly-booking--mobile.hourly-booking--data .legal-acceptance__links { grid-column:2;gap:2px 6px;font-size:10.75px;line-height:1.2; }
   .hourly-booking--mobile.hourly-booking--data .legal-acceptance__links a { font-size:10.75px;line-height:1.2; }
   .hourly-booking--mobile.hourly-booking--data .form-actions { margin:0;padding-top:6px; }
-  .hourly-booking--mobile.hourly-booking--data #contact-submit { margin:0;min-height:44px;padding:0 16px;border:0;border-radius:9px;background:rgba(31,122,109,.86);color:rgba(255,249,238,.98);box-shadow:none;font-size:14px;line-height:1;font-weight:800; }
-  .hourly-booking--mobile.hourly-booking--data #contact-submit:disabled { background:rgba(255,245,228,.14);color:rgba(255,245,228,.38); }
+  .hourly-booking--mobile.hourly-booking--data #hourly-contact-submit { margin:0;min-height:44px;padding:0 16px;border:0;border-radius:9px;background:rgba(31,122,109,.86);color:rgba(255,249,238,.98);box-shadow:none;font-size:14px;line-height:1;font-weight:800; }
+  .hourly-booking--mobile.hourly-booking--data #hourly-contact-submit:disabled { background:rgba(255,245,228,.14);color:rgba(255,245,228,.38); }
   .hourly-booking--mobile.hourly-booking--data .hourly-booking__content > p { margin:6px 0;font-size:11px;line-height:1.3; }
 }
 

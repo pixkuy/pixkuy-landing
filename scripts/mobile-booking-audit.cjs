@@ -8,7 +8,8 @@ const crypto = require('node:crypto');
 const os = require('node:os');
 const {chromium} = require('../../../pixkuy_frontend/node_modules/playwright');
 const fixtures = require('./airport-controlled-fixtures.cjs');
-const origin = 'http://localhost:8888';
+const origin = process.env.PIXKUY_TEST_ORIGIN || 'http://localhost:8888';
+assert(['http://localhost:8888','https://local.pixkuy.test'].includes(origin), 'Local audit origins only');
 const output = path.resolve(process.env.PIXKUY_AUDIT_OUTPUT || path.join(os.tmpdir(), 'pixkuy-mobile-booking-regression'));
 const langs = ['es','en','de','fr','it','ko','pt','ru','zh-hans'];
 const services = ['airport_transfer','hourly_daily','direct_transfer'];
@@ -18,6 +19,11 @@ const results = [], resources = new Map();
 const reviewRoute=s=>s==='direct_transfer'?/\/direct-transfer-checkout-review\.html/:s==='hourly_daily'?/#hourly\/revision$/:/#airport\/revision$/;
 const paymentSelector=s=>s==='direct_transfer'?'[data-direct-transfer-checkout-review-proceed]':s==='hourly_daily'?'[data-hourly-pay]':'[data-airport-pay]';
 let browser;
+async function launchChrome() {
+  const cdp=process.env.PIXKUY_AUDIT_CDP;
+  if(cdp){assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(cdp),'Isolated loopback CDP only');return chromium.connectOverCDP(cdp);}
+  return chromium.launch({channel:'chrome',headless:true});
+}
 function statusBody(s, mode, draft={}) {
   const amount=draft.hourly_daily_price||draft.airport_transfer_price||draft.direct_transfer_price||(s==='hourly_daily'?150000:80000);
   const paid=mode==='confirmed', pending=['pending','inconsistent'].includes(mode);
@@ -27,7 +33,7 @@ function statusBody(s, mode, draft={}) {
   return {serverNow:new Date().toISOString(),reservation:{serviceType:s,status:state,publicCode:'PKY-AUDIT',operationalStatus:'pending_coordination',serviceTimezone:'America/Mexico_City',serviceStartLocalDate:date,serviceStartLocalTime:'23:00',serviceEndLocalDate:'2027-01-14',serviceEndLocalTime:'01:00',durationHours:s==='hourly_daily'?2:null,hourlyMode:s==='hourly_daily'?'hourly':null,pickupAddress:s==='airport_transfer'?'MEX — Aeropuerto Internacional Ciudad de México':'Origen sintético, Roma Norte',destinationAddress:s==='hourly_daily'?null:'Destino sintético, Condesa',passengerCount:s==='hourly_daily'?2:null,passengerLabel:s==='hourly_daily'?'2':'1–2',luggageCount:s==='airport_transfer'?2:null,vehicleDisplayName:model.name,vehiclePhotoUrl:model.photoUrl,customerNotes:source.hourly_daily_notes||source.airport_transfer_notes||source.direct_transfer_notes||'Notas sintéticas de auditoría'},customer:{fullName:source.customer.full_name,email:source.customer.email,phone:source.customer.phone},payment:{status:paid?'paid':'pending',amountExpected:amount,amountPaid:paid?amount:null,currency:'MXN'},hold:{status:mode==='hold_expired'?'expired':'active',expiresAt:new Date(Date.now()+(mode==='hold_expired'?-1000:1800000)).toISOString()},actions:{canModify:edit,canRetryCheckout:mode==='pending',canCreateNewReservation:mode==='hold_expired'&&s!=='direct_transfer',paymentWindowClosed:mode==='hold_expired'},edit:{allowed:edit,revision:'synthetic-revision-1',draft:edit?source:null},continuation:mode==='hold_expired'&&s!=='direct_transfer'?{draft:source}:null};
 }
 async function setup(width,s) {
-  const context=await browser.newContext({viewport:{width,height:844},locale:'es-MX',serviceWorkers:'block'});
+  const context=await browser.newContext({viewport:{width,height:844},locale:'es-MX',serviceWorkers:'block',ignoreHTTPSErrors:origin==='https://local.pixkuy.test'});
   const state={service:s,mode:'pending',availability:'available',delay:0,checkout:'success',draft:{},requests:[],blocked:[],errors:[],amount:null};
   await context.addInitScript(()=>window.addEventListener('pixkuy:booking-status-ready',e=>window.__auditStatus=e.detail));
   await context.route('**/*',async route=>{
@@ -103,9 +109,12 @@ async function enter(t) {
     await page.locator('[data-services-hourly-time]').fill('23:00');await page.locator('[data-services-hourly-time]').dispatchEvent('change');
     await page.locator('[data-fleet-hourly-passengers]').selectOption('2');
     await page.waitForFunction(()=>window.PixkuyFleetSelection.selection('hourly_daily')&&window.PixkuyFleetSelection.hourlyOfferStatus().valid);
-    await page.locator('[data-services-hourly-notes]').click();
-    await page.locator('[data-hourly-mobile-notes-editor-input]').fill('Notas sintéticas de auditoría');
-    await page.locator('[data-hourly-mobile-notes-editor-close]').click();
+    if(t.width>720)await page.locator('[data-services-hourly-notes]').fill('Notas sintéticas de auditoría');
+    else{
+      await page.locator('[data-services-hourly-notes]').click();
+      await page.locator('[data-hourly-mobile-notes-editor-input]').fill('Notas sintéticas de auditoría');
+      await page.locator('[data-hourly-mobile-notes-editor-close]').click();
+    }
   } else {
     const step=page.locator('[data-direct-transfer-mobile-config-step]');
     await step.waitFor({state:'visible'});
@@ -135,7 +144,7 @@ async function contact(t,submitNow=true) {
   assert.equal(await page.locator(legal).isChecked(),false);await page.locator(legal).check();
   t.data=await shot(t,'datos');
   if(!submitNow)return;
-  const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':'#contact-submit';
+  const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':s==='hourly_daily'?'#hourly-contact-submit':'#contact-submit';
   await page.locator(submit).click();
   await page.waitForURL(reviewRoute(s));
 }
@@ -164,7 +173,7 @@ async function edges(s,width) {
     if(s==='hourly_daily')await t.page.waitForFunction(()=>window.PixkuyFleetSelection.selection('hourly_daily')&&window.PixkuyFleetSelection.hourlyOfferStatus().valid);
     await contact(t,false);
     row.notes=await shot(t,'notas');
-    const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':'#contact-submit';
+    const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':s==='hourly_daily'?'#hourly-contact-submit':'#contact-submit';
     await t.page.locator(submit).click();await t.page.waitForURL(reviewRoute(s));
     t.state.checkout='lost';
     const pay=t.page.locator(paymentSelector(s));
@@ -203,11 +212,11 @@ async function flow(s,width) {
       await t.page.getByRole('button',{name:'Modificar datos',exact:true}).click();
       await t.page.waitForURL(s==='hourly_daily'?/#hourly\/datos$/:/#airport\/datos$/);
       row.edit=await shot(t,'modificar-datos');
-      await t.page.locator('#contact-name').fill('Persona Modificada');
+      await t.page.locator(s==='hourly_daily'?'#hourly-contact-name':'#contact-name').fill('Persona Modificada');
       if(s==='airport_transfer') {await t.page.locator('#contact-message').click();await t.page.locator('[data-airport-mobile-notes-editor-input]').fill('Notas editadas');await t.page.locator('[data-airport-mobile-notes-editor-close]').click();}
       const legal=t.page.locator(s==='hourly_daily'?'#pixkuy-hourly-legal-acceptance':'#pixkuy-airport-transfer-legal-acceptance');
       row.editLegal=await legal.isChecked();if(!row.editLegal)await legal.check();
-      await t.page.locator('#contact-submit').click();
+      await t.page.locator(s==='hourly_daily'?'#hourly-contact-submit':'#contact-submit').click();
       await t.page.waitForURL(s==='hourly_daily'?/#hourly\/revision$/:/#airport\/revision$/);
       row.editReview=await shot(t,'nueva-revision');
       await t.page.locator(s==='hourly_daily'?'[data-hourly-pay]':'[data-airport-pay]').click();
@@ -293,7 +302,7 @@ async function recovery(s,width) {
   try {
     await enter(t);await t.page.waitForFunction(selector=>!document.querySelector(selector).disabled,configCta(s));
     await contact(t,false);
-    const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':'#contact-submit';
+    const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':s==='hourly_daily'?'#hourly-contact-submit':'#contact-submit';
     await t.page.locator(submit).click();await t.page.waitForURL(reviewRoute(s));
     t.state.checkout='lost';await t.page.locator(paymentSelector(s)).click();
     await t.page.waitForTimeout(600);
@@ -312,10 +321,12 @@ async function recovery(s,width) {
 async function main() {
   assert.equal(process.env.PIXKUY_AUDIT_FIXTURES,'1','Explicit fixture mode required');
   if(process.argv.includes('--catalogs'))return catalogs();
-  await fs.mkdir(output,{recursive:true});browser=await chromium.launch({headless:true});
+  await fs.mkdir(output,{recursive:true});browser=process.argv.includes('--chrome')?await launchChrome():await chromium.launch({headless:true});
+  const widths=process.env.PIXKUY_AUDIT_WIDTH?[Number(process.env.PIXKUY_AUDIT_WIDTH)]:[320,390];
+  assert(widths.every(w=>[320,390,1440].includes(w)),'Known audit viewports only');
   const selected=process.env.PIXKUY_AUDIT_SERVICE?services.filter(s=>s===process.env.PIXKUY_AUDIT_SERVICE):services;
   const suffix=process.env.PIXKUY_AUDIT_SERVICE?'-'+process.env.PIXKUY_AUDIT_SERVICE:'';
-  try {for(const s of selected)for(const width of [320,390]){if(process.argv.includes('--regression'))await regression(s,width);else if(process.argv.includes('--failed'))await statuses(s,width);else if(process.argv.includes('--recovery'))await recovery(s,width);else if(process.argv.includes('--extra'))await extra(s,width);else if(process.argv.includes('--edges'))await edges(s,width);else {if(!process.argv.includes('--status-only'))await flow(s,width);if(!process.argv.includes('--flow-only'))await statuses(s,width);}await fs.writeFile(path.join(output,(process.argv.includes('--regression')?'regression':process.argv.includes('--failed')?'failed':process.argv.includes('--recovery')?'recovery':process.argv.includes('--extra')?'extra':process.argv.includes('--edges')?'edges':process.argv.includes('--status-only')?'statuses':'browser')+suffix+'.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({s,width,result:results.at(-1).error||'recorded'}));}if(results.some(r=>r.error))process.exitCode=1;}
+  try {for(const s of selected)for(const width of widths){if(process.argv.includes('--regression'))await regression(s,width);else if(process.argv.includes('--failed'))await statuses(s,width);else if(process.argv.includes('--recovery'))await recovery(s,width);else if(process.argv.includes('--extra'))await extra(s,width);else if(process.argv.includes('--edges'))await edges(s,width);else {if(!process.argv.includes('--status-only'))await flow(s,width);if(!process.argv.includes('--flow-only'))await statuses(s,width);}await fs.writeFile(path.join(output,(process.argv.includes('--regression')?'regression':process.argv.includes('--failed')?'failed':process.argv.includes('--recovery')?'recovery':process.argv.includes('--extra')?'extra':process.argv.includes('--edges')?'edges':process.argv.includes('--status-only')?'statuses':'browser')+suffix+'.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({s,width,result:results.at(-1).error||'recorded'}));}if(results.some(r=>r.error||r.errors?.length))process.exitCode=1;}
   finally {await browser.close();await fs.writeFile(path.join(output,'browser-resource-hashes.json'),JSON.stringify([...resources].map(([file,sha256])=>({file,sha256})),null,2));}
 }
 async function regression(s,width) {
@@ -324,7 +335,7 @@ async function regression(s,width) {
     await enter(t);await t.page.waitForFunction(selector=>!document.querySelector(selector).disabled,configCta(s));
     await contact(t,false);
     const checkbox=t.page.locator(s==='airport_transfer'?'#pixkuy-airport-transfer-legal-acceptance':s==='hourly_daily'?'#pixkuy-hourly-legal-acceptance':'#pixkuy-direct-transfer-mobile-legal-acceptance');
-    const proof=()=>t.page.locator('form[name="contact"] [name="legal_acceptance_accepted_at"]').inputValue();
+    const proof=()=>t.page.locator((s==='hourly_daily'?'form[name="hourly-booking"]':'form[name="contact"]')+' [name="legal_acceptance_accepted_at"]').inputValue();
     async function language(lang){await t.page.locator('#lang-trigger').click();await t.page.locator('[data-lang="'+lang+'"]').click();await t.page.waitForFunction(lang=>document.documentElement.lang===lang,lang);await t.page.waitForTimeout(200);}
     await checkbox.uncheck();await language('en');assert.equal(await checkbox.isChecked(),false);assert.equal(await proof(),'');
     await checkbox.check();const acceptedAt=await proof();assert(acceptedAt);
@@ -336,7 +347,7 @@ async function regression(s,width) {
     row.checks.push('nine languages, original consent timestamp and unchecked consent preserved');
     await language('es');
     if(s==='airport_transfer'&&width===390){await language('en');await t.page.setViewportSize({width:1440,height:1000});assert.equal(await proof(),acceptedAt);row.screens.push(await shot(t,'desktop-legal'));await t.page.setViewportSize({width,height:844});await language('es');}
-    const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':'#contact-submit';
+    const submit=s==='direct_transfer'?'[data-direct-transfer-mobile-contact-submit]':s==='hourly_daily'?'#hourly-contact-submit':'#contact-submit';
     await t.page.locator(submit).click();await t.page.waitForURL(reviewRoute(s));
     assert.equal(t.state.requests.filter(r=>r.kind==='checkout').length,0);
     row.screens.push(await shot(t,'fixed-review'));
@@ -387,5 +398,5 @@ async function regression(s,width) {
   }catch(e){row.error=e.message;row.failure=await shot(t,'regression-error').catch(()=>null);}
   row.requests=t.state.requests;row.errors=t.state.errors;results.push(row);await t.context.close();
 }
-module.exports={setup,shot,enter,contact,configCta,statusBody,output,origin,services,results,resources,model,setBrowser:b=>{browser=b;}};
+module.exports={setup,shot,enter,contact,configCta,statusBody,output,origin,services,results,resources,model,launchChrome,setBrowser:b=>{browser=b;}};
 if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});

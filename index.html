@@ -84,7 +84,6 @@
 <link rel="stylesheet" href="assets/css/77-services-direct-transfer.css" />
 <link rel="stylesheet" href="assets/css/78-direct-transfer-desktop-vehicle-gallery.css" />
 <link rel="stylesheet" href="assets/css/79-contact-direct-transfer.css" />
-<link rel="stylesheet" href="assets/css/40-contact-hourly-daily.css" />
 <link rel="stylesheet" href="assets/css/83-hourly-desktop-checkout-review.css" />
   <link rel="stylesheet" href="assets/css/44-contact-event-special.css" />
   <link rel="stylesheet" href="assets/css/45-services-events-spotlight.css" />
@@ -158,6 +157,7 @@
   </script>
 <link rel="stylesheet" href="assets/css/85-airport-desktop-booking.css" />
 <link rel="stylesheet" href="assets/css/hourly-booking-flow.css" />
+<link rel="stylesheet" href="assets/css/long-term-request.css" />
 <script src="assets/js/services/booking-presentation.js"></script>
 <link rel="stylesheet" href="assets/css/mobile-booking-shared.css">
 </head>
@@ -1622,12 +1622,6 @@
         <input type="hidden" name="tour_private_guide_language_label" value="" />
         <input type="hidden" name="tour_private_price_label" value="" />
 		
-		<!-- Resumen operativo hourly_daily -->
-        <input type="hidden" name="hourly_daily_trip_summary" value="" />
-        <input type="hidden" name="hourly_daily_pickup_label" value="" />
-        <input type="hidden" name="hourly_daily_mode_label" value="" />
-        <input type="hidden" name="hourly_daily_duration_label" value="" />
-        <input type="hidden" name="hourly_daily_price_label" value="" />
 		
 		<!-- Resumen operativo event_special -->
         <input type="hidden" name="event_special_trip_summary" value="" />
@@ -1702,21 +1696,6 @@
         <input type="hidden" name="tour_private_price" value="" />
         <input type="hidden" name="tour_private_currency" value="" />
 		
-		<!-- Payload semántico hourly_daily -->
-        <input type="hidden" name="hourly_daily_mode" value="" />
-        <input type="hidden" name="hourly_daily_vehicle_type" value="" />
-        <input type="hidden" name="hourly_daily_passengers" value="1" />
-        <input type="hidden" name="hourly_daily_pickup" value="" />
-        <input type="hidden" name="hourly_daily_date" value="" />
-        <input type="hidden" name="hourly_daily_start_time" value="" />
-        <input type="hidden" name="hourly_daily_duration_hours" value="" />
-        <input type="hidden" name="hourly_daily_custom_term" value="" />
-        <input type="hidden" name="hourly_daily_notes" value="" />
-        <input type="hidden" name="hourly_daily_price" value="" />
-        <input type="hidden" name="hourly_daily_currency" value="" />
-        <input type="hidden" name="hourly_daily_km_included" value="" />
-        <input type="hidden" name="hourly_daily_extra_km_price" value="" />
-        <input type="hidden" name="hourly_daily_out_of_zone_supplement" value="" />
 		
 		<!-- Payload semántico event_special -->
         <input type="hidden" name="event_special_event_id" value="" />
@@ -1771,9 +1750,6 @@
         <input type="hidden" name="tour_private_pickup_place_id" value="" />
         <input type="hidden" name="tour_private_pickup_lat" value="" />
         <input type="hidden" name="tour_private_pickup_lng" value="" />
-        <input type="hidden" name="hourly_daily_pickup_place_id" value="" />
-        <input type="hidden" name="hourly_daily_pickup_lat" value="" />
-        <input type="hidden" name="hourly_daily_pickup_lng" value="" />
 		<input type="hidden" name="event_special_origin_address_place_id" value="" />
         <input type="hidden" name="event_special_origin_address_lat" value="" />
         <input type="hidden" name="event_special_origin_address_lng" value="" />
@@ -1840,10 +1816,6 @@
                   data-i18n="contact.services.tourPrivate"
                 ></option>
                 <option
-                  value="hourly_daily"
-                  data-i18n="contact.services.hourlyDaily"
-                ></option>
-                <option
                   value="event_special"
                   data-i18n="contact.services.eventSpecial.label"
                 ></option>
@@ -1862,14 +1834,6 @@
               data-contact-service-trigger="tour_private"
               aria-pressed="false"
               data-i18n="contact.services.tourPrivate"
-            ></button>
-
-                        <button
-              type="button"
-              class="contact-service-switcher__button"
-              data-contact-service-trigger="hourly_daily"
-              aria-pressed="false"
-              data-i18n="contact.services.hourlyDaily"
             ></button>
 
             <button
@@ -2875,461 +2839,6 @@
 
                    <div
             class="contact-service-panel"
-            data-contact-service-panel="hourly_daily"
-            aria-hidden="true"
-            hidden
-          >
-            <div
-              class="contact-hourly-daily-editor"
-              data-contact-hourly-daily-editor
-            >
-              <div class="contact-hourly-daily-editor__header">
-                <p
-                  class="muted small"
-                  data-contact-hourly-daily-helper
-                  data-i18n="services.cards.hourly.contact.helper"
-                ></p>
-              </div>
-
-              <div class="contact-hourly-daily-editor__hero" data-contact-hourly-daily-hero>
-                <div class="contact-hourly-daily-editor__vehicle" data-contact-hourly-daily-vehicle>
-                  <p
-                    class="contact-hourly-daily-editor__vehicle-label"
-                    data-i18n="fleet.m9.title"
-                  >Van ejecutiva</p>
-
-                  <div
-                    class="contact-hourly-daily-editor__vehicle-media"
-                    data-contact-hourly-daily-vehicle-media
-                  >
-                    <img
-                      class="contact-hourly-daily-editor__vehicle-image"
-                      data-contact-hourly-daily-vehicle-image
-                      src="assets/img/fleet/bydm9_xhoras001d.jpeg"
-                      alt="BYD M9 — van ejecutiva eléctrica"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                </div>
-
-                <div class="contact-hourly-daily-editor__hero-fields" data-contact-hourly-daily-hero-fields>
-                  <div class="form-field contact-hourly-daily-editor__mode-field">
-                    <label
-                      for="contact-hourly-daily-mode-trigger"
-                      class="visually-hidden"
-                      data-i18n="services.cards.hourly.panel.modeLabel"
-                    ></label>
-
-                    <div
-                      class="contact-hourly-daily-select"
-                      data-contact-hourly-daily-modepicker
-                    >
-                      <input
-                        id="contact-hourly-daily-mode"
-                        type="hidden"
-                        data-contact-hourly-daily-mode
-                      />
-
-                      <button
-                        id="contact-hourly-daily-mode-trigger"
-                        type="button"
-                        class="contact-hourly-daily-select__trigger"
-                        data-contact-hourly-daily-mode-trigger
-                        aria-haspopup="listbox"
-                        aria-expanded="false"
-                        aria-controls="contact-hourly-daily-mode-listbox"
-                      >
-                        <span
-                          class="contact-hourly-daily-select__value"
-                          data-contact-hourly-daily-mode-value
-                        ></span>
-                        <span
-                          class="contact-hourly-daily-select__chevron"
-                          aria-hidden="true"
-                        >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
-                            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                        </span>
-                      </button>
-
-                      <div
-                        class="contact-hourly-daily-select__panel contact-hourly-daily-select__panel--stacked"
-                        data-contact-hourly-daily-mode-panel
-                        hidden
-                      >
-                        <div
-                          id="contact-hourly-daily-mode-listbox"
-                          class="contact-hourly-daily-select__listbox contact-hourly-daily-select__listbox--stacked"
-                          role="listbox"
-                          aria-labelledby="contact-hourly-daily-mode-trigger"
-                        >
-                          <button
-                            type="button"
-                            class="contact-hourly-daily-select__option contact-hourly-daily-select__option--stacked"
-                            role="option"
-                            data-contact-hourly-daily-mode-option="hourly"
-                            aria-selected="false"
-                            data-i18n="services.cards.hourly.panel.tabs.hourly"
-                          ></button>
-
-                          <button
-                            type="button"
-                            class="contact-hourly-daily-select__option contact-hourly-daily-select__option--stacked"
-                            role="option"
-                            data-contact-hourly-daily-mode-option="full_day"
-                            aria-selected="false"
-                            data-i18n="services.cards.hourly.panel.tabs.fullDay"
-                          ></button>
-
-                          <button
-                            type="button"
-                            class="contact-hourly-daily-select__option contact-hourly-daily-select__option--stacked"
-                            role="option"
-                            data-contact-hourly-daily-mode-option="custom_long_term"
-                            aria-selected="false"
-                            data-i18n="services.cards.hourly.panel.tabs.longTerm"
-                          ></button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-field form-field--place contact-hourly-daily-editor__pickup" data-place-field="hourly_daily_pickup">
-                    <label
-                      for="contact-hourly-daily-pickup"
-                      class="visually-hidden"
-                      data-i18n="services.cards.hourly.panel.pickupLabel"
-                    ></label>
-
-                    <div
-                      class="place-autocomplete"
-                      data-place-autocomplete="hourly_daily_pickup"
-                      data-place-language-source="document"
-                    >
-                       <input
-                        id="contact-hourly-daily-pickup"
-                        type="text"
-                        name="hourly_daily_pickup"
-                        placeholder=""
-                        autocomplete="off"
-                        data-contact-hourly-daily-pickup
-                        data-place-input="hourly_daily_pickup"
-                        data-i18n-ph="services.cards.hourly.panel.pickupPlaceholder"
-                        aria-describedby="contact-hourly-daily-pickup-error"
-                      />
-
-                      <button
-                        type="button"
-                        class="place-autocomplete__clear"
-                        data-place-clear="hourly_daily_pickup"
-                        hidden
-                      >
-                        <span aria-hidden="true">×</span>
-                      </button>
-
-                      <div
-                        class="place-autocomplete__mount"
-                        data-place-mount="hourly_daily_pickup"
-                        data-contact-hourly-daily-pickup-mount
-                        aria-hidden="true"
-                      ></div>
-                    </div>
-
-                    <p
-                      id="contact-hourly-daily-pickup-error"
-                      class="form-error"
-                      hidden
-                      data-error-for="hourly_daily_pickup"
-                      data-i18n="contact.validation.hourlyDailyPickupRequired"
-                    ></p>
-                  </div>
-
-                  <div class="contact-hourly-daily-editor__hero-datetime">
-                    <div class="form-field form-field--date contact-hourly-daily-editor__date">
-                      <label
-                        for="contact-hourly-daily-date"
-                        class="visually-hidden"
-                        data-i18n="services.cards.hourly.panel.dateLabel"
-                      ></label>
-                      <input
-                        id="contact-hourly-daily-date"
-                        type="date"
-                        data-contact-hourly-daily-date
-                        aria-describedby="contact-hourly-daily-date-error"
-                      />
-                      <span
-                        class="form-field-overlay form-field-overlay--date"
-                        aria-hidden="true"
-                        data-i18n="contact.datePlaceholder"
-                      >dd/mm/aaaa</span>
-                      <span class="form-field-icon form-field-icon--date" aria-hidden="true">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
-                          <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"></line>
-                          <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"></line>
-                          <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"></line>
-                        </svg>
-                      </span>
-                      <p
-                        id="contact-hourly-daily-date-error"
-                        class="form-error"
-                        hidden
-                        data-error-for="hourly_daily_date"
-                        data-i18n="contact.validation.hourlyDailyDateRequired"
-                      ></p>
-                    </div>
-
-                    <div class="form-field form-field--time contact-hourly-daily-editor__time">
-                      <label
-                        for="contact-hourly-daily-time"
-                        class="visually-hidden"
-                        data-i18n="services.cards.hourly.panel.timeLabel"
-                      ></label>
-                      <input
-                        id="contact-hourly-daily-time"
-                        type="time"
-                        data-contact-hourly-daily-time
-                        aria-describedby="contact-hourly-daily-time-error"
-                      />
-                      <span
-                        class="form-field-overlay form-field-overlay--time"
-                        aria-hidden="true"
-                      >--:--</span>
-                      <span class="form-field-icon form-field-icon--time" aria-hidden="true">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
-                          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
-                          <polyline points="12 7 12 12 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-                        </svg>
-                      </span>
-                      <p
-                        id="contact-hourly-daily-time-error"
-                        class="form-error"
-                        hidden
-                        data-error-for="hourly_daily_time"
-                        data-i18n="contact.validation.hourlyDailyTimeRequired"
-                      ></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                class="contact-hourly-daily-editor__duration"
-                data-contact-hourly-daily-duration-field
-              >
-                <label
-                  class="services-expand__label"
-                  data-i18n="services.cards.hourly.panel.durationLabel"
-                ></label>
-
-                <div
-                  class="services-expand__passengers-segmented"
-                  role="group"
-                  data-contact-hourly-daily-duration-group
-                >
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="2"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">2h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="3"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">3h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="4"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">4h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="5"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">5h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="6"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">6h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="7"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">7h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="8"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">8h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="9"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">9h</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="10"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">10h</span>
-                  </button>
-				  
-				  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-duration-option="11"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-text">11h</span>
-                  </button>
-                </div>
-              </div>
-
-              <div
-                class="contact-hourly-daily-editor__long-term"
-                data-contact-hourly-daily-long-term-field
-                hidden
-              >
-                <label
-                  class="services-expand__label"
-                  data-i18n="services.cards.hourly.panel.longTermDurationLabel"
-                ></label>
-
-                <div
-                  class="services-expand__passengers-segmented"
-                  role="group"
-                  data-contact-hourly-daily-long-term-group
-                >
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-long-term-option="week"
-                    aria-pressed="false"
-                  >
-                    <span
-                      class="services-expand__passenger-chip-text"
-                      data-i18n="services.cards.hourly.panel.longTerm.week"
-                    ></span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-long-term-option="fortnight"
-                    aria-pressed="false"
-                  >
-                    <span
-                      class="services-expand__passenger-chip-text"
-                      data-i18n="services.cards.hourly.panel.longTerm.fortnight"
-                    ></span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-long-term-option="monthly"
-                    aria-pressed="false"
-                  >
-                    <span
-                      class="services-expand__passenger-chip-text"
-                      data-i18n="services.cards.hourly.panel.longTerm.monthly"
-                    ></span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-hourly-daily-long-term-option="custom"
-                    aria-pressed="false"
-                  >
-                    <span
-                      class="services-expand__passenger-chip-text"
-                      data-i18n="services.cards.hourly.panel.longTerm.custom"
-                    ></span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="form-field">
-                <label
-                  for="contact-hourly-daily-notes"
-                  class="visually-hidden"
-                  data-i18n="services.cards.hourly.panel.notesLabel"
-                ></label>
-                <textarea
-                  id="contact-hourly-daily-notes"
-                  rows="4"
-                  placeholder=""
-                  data-contact-hourly-daily-notes
-                  data-i18n-ph="services.cards.hourly.panel.notesPlaceholder"
-                ></textarea>
-              </div>
-
-              <div
-                class="services-hourly-panel__meta contact-hourly-daily-editor__meta"
-                data-contact-hourly-daily-meta
-              >
-                <div
-                  class="contact-hourly-daily-editor__disclaimers"
-                  data-contact-hourly-daily-disclaimers
-                ></div>
-              </div>
-
-              <div
-                class="contact-panel-fare"
-                data-contact-hourly-daily-price
-                hidden
-              >
-                <p
-                  class="contact-panel-fare__label"
-                  data-contact-hourly-daily-price-label
-                ></p>
-                <strong
-                  class="contact-panel-fare__value"
-                  data-contact-hourly-daily-price-value
-                ></strong>
-              </div>
-            </div>
-          </div>
-
-                    <div
-            class="contact-service-panel"
             data-contact-service-panel="event_special"
             aria-hidden="true"
             hidden
@@ -4295,6 +3804,7 @@
 <script src="assets/js/forms/booking-public-config.js"></script>
 <script src="assets/js/forms/recaptcha-enterprise.js"></script>
 <script src="assets/js/forms/legal-acceptance.js"></script>
+<script src="assets/js/forms/hourly-booking-form.js"></script>
 <script src="assets/js/forms/hourly-booking-api-checkout.js"></script>
 <script src="assets/js/forms/airport-transfer-booking-api-checkout.js"></script>
 <script src="assets/js/services/direct-transfer-transactional-state.js"></script>
@@ -4303,12 +3813,12 @@
 <script src="assets/js/forms/contact-service-switcher.js"></script>
 <script src="assets/js/forms/contact-airport-hotel-editor.js"></script>
 <script src="assets/js/forms/contact-airport-hotel-lodging-adapter.js"></script>
+<script src="assets/js/forms/whatsapp-contact.js"></script>
 <script src="assets/js/forms/whatsapp-handoff.js"></script>
 <script src="assets/js/services/mobile-booking-entry.js"></script>
 <script src="assets/js/forms/panel-handoff-summary.js"></script>
 <script src="assets/js/forms/contact-tour-private-editor.js?v=20260411-1"></script>
 <script src="assets/js/services/hourly-daily-pricing.js"></script>
-<script src="assets/js/forms/contact-hourly-daily-editor.js"></script>
 <script src="assets/js/services/events-special-address.js"></script>
 <script src="assets/js/services/events-special-catalog-source.js"></script>
 <script src="assets/js/services/events-package-catalog.js"></script>
@@ -4409,6 +3919,7 @@
 <script src="assets/js/forms/airport-desktop-view.js"></script>
 <script src="assets/js/forms/hourly-booking-draft.js"></script>
 <script src="assets/js/forms/hourly-booking-view.js"></script>
+<script src="assets/js/forms/long-term-request.js"></script>
 <script src="assets/js/forms/hourly-booking-flow.js"></script>
 <script src="assets/js/forms/airport-mobile-draft.js"></script>
 <script src="assets/js/forms/airport-desktop-booking.js"></script>

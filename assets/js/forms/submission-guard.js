@@ -20,8 +20,7 @@
   const ENHANCED_CONVERSION_DATA_STORAGE_KEY = "pixkuy_google_ads_enhanced_conversion_data";
   const LEAD_SUCCESS_CONTEXT_STORAGE_KEY = "pixkuy_lead_success_context";
   const DUPLICATE_NAME_FIELDS = [
-    "tour_private_pickup",
-    "hourly_daily_pickup"
+    "tour_private_pickup"
   ];
 
   const SERVICE_FIELD_NAMES = {
@@ -67,29 +66,6 @@
       "tour_private_currency"
     ],
 
-    hourly_daily: [
-      "hourly_daily_trip_summary",
-      "hourly_daily_pickup_label",
-      "hourly_daily_mode_label",
-      "hourly_daily_duration_label",
-      "hourly_daily_price_label",
-      "hourly_daily_mode",
-      "hourly_daily_vehicle_type",
-      "hourly_daily_pickup",
-      "hourly_daily_pickup_place_id",
-      "hourly_daily_pickup_lat",
-      "hourly_daily_pickup_lng",
-      "hourly_daily_date",
-      "hourly_daily_start_time",
-      "hourly_daily_duration_hours",
-      "hourly_daily_custom_term",
-      "hourly_daily_notes",
-      "hourly_daily_price",
-      "hourly_daily_currency",
-      "hourly_daily_km_included",
-      "hourly_daily_extra_km_price",
-      "hourly_daily_out_of_zone_supplement"
-    ],
 
     event_special: [
       "event_special_trip_summary",
@@ -308,12 +284,6 @@
       setContextValue(context, "currency", getFieldValue(form, "tour_private_currency"));
     }
 
-    if (serviceType === "hourly_daily") {
-      setContextValue(context, "mode", getFieldValue(form, "hourly_daily_mode"));
-      setContextNumber(context, "duration_hours", getFieldValue(form, "hourly_daily_duration_hours"));
-      setContextNumber(context, "price", getFieldValue(form, "hourly_daily_price"));
-      setContextValue(context, "currency", getFieldValue(form, "hourly_daily_currency"));
-    }
 
     if (serviceType === "direct_transfer") {
       setContextValue(context, "passenger_fare_key", getFieldValue(form, "direct_transfer_passenger_fare_key"));
@@ -548,7 +518,7 @@
 
   function lockForm(form) {
     const buttons = form
-      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-hourly-mobile-contact-submit], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit], [data-events-mobile-contact-submit], [data-direct-transfer-mobile-contact-submit]'))
+      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit], [data-events-mobile-contact-submit], [data-direct-transfer-mobile-contact-submit]'))
       : [];
 
     if (!form) {

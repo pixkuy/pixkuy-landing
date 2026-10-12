@@ -279,6 +279,12 @@
       view.field(view.t("luggage"), result.luggageCount === null ? "—" : String(result.luggageCount)),
       view.field(view.t("name"), result.customerFullName));
     [3,4,5,6].forEach(function (index) { details.children[index].classList.add("airport-booking__detail--half"); });
+    // Reuse the localized duration already rendered from the authoritative snapshot.
+    var duration = document.querySelector('[data-booking-status-desktop] [data-booking-status-duration], [data-booking-cancelled-desktop] [data-booking-status-duration]');
+    if (Number.isFinite(result.durationHours) && result.durationHours > 0 && duration &&
+        duration.textContent.trim() && duration.textContent.trim() !== (state.dictionary.details.empty || "—")) {
+      details.appendChild(view.field(view.t("estimatedDuration"), duration.textContent.trim()));
+    }
     if (result.customerPhone) details.appendChild(view.field(view.t("phone"), result.customerPhone));
     if (result.customerEmail) details.appendChild(view.field(view.t("email"), result.customerEmail));
     if (result.customerNotes) details.appendChild(view.field(view.t("notes"), result.customerNotes));

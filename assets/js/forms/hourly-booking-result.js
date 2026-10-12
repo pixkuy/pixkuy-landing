@@ -268,6 +268,7 @@
     var kind = confirmed ? "confirmed" : result.view === "expired" ? "expired" : retry ? "failed" : "pending";
     mount = view.shell(confirmed ? 4 : 3, confirmed ? home : trip, null, {backLabel:confirmed ? "home" : "backTrip"});
     mount.classList.add("airport-booking--result");
+    mount.classList.add("hourly-booking--desktop-final");
     mount.classList.add("hourly-booking");
         document.body.appendChild(mount);
     document.body.classList.add("hourly-booking-active");
@@ -275,8 +276,11 @@
     var lead = view.node("p", "airport-booking__lead", view.t(kind + "Text"));
     var windowClosed = result.raw.actions && result.raw.actions.paymentWindowClosed === true;
     if (windowClosed) lead.textContent = view.t("paymentWindowClosed");
-    if(result.view==='pending'&&(result.contactUpdatePending||result.paymentWindowRenewed))lead.textContent+=' '+state.dictionary[result.contactUpdatePending?'contactUpdatePending':'contactEmailRenewed'];
     mount.append(title, lead);
+    if(result.view==='pending'&&(result.contactUpdatePending||result.paymentWindowRenewed)){
+      var renewal=view.node("p","airport-booking__notice",state.dictionary[result.contactUpdatePending?'contactUpdatePending':'contactEmailRenewed']);
+      renewal.setAttribute("role","status");mount.appendChild(renewal);
+    }
     if(!confirmed && result.raw.hold && result.raw.serverNow) mount.appendChild(view.deadline(result.raw.hold.expiresAt,serverNow(result.raw),result.raw.actions.canCreateNewReservation ? 'paymentDeadlineResolved' : 'paymentDeadlinePassed',function () {
       window.queueMicrotask(function () { if(mount)mount.querySelectorAll('[data-airport-pay]').forEach(function (button) { button.disabled=true; }); });
     }));
@@ -285,18 +289,18 @@
     var details = view.node("dl", "airport-booking__details");
     details.append(view.field(view.t("reference"),result.publicCode),
       view.field(view.t("tripTitle"),view.t(result.hourlyMode==="full_day"?"fullDay":"hourly")),
-      view.locationField(view.t("origin"),result.pickupAddress,{address:result.pickupAddressDetail}),
-      view.field(view.t("date"),view.date(result.serviceStartLocalDate)),
-      view.field(view.t("time"),result.serviceStartLocalTime+" · "+view.t("timezone")),
-      view.field(view.t("duration"),result.durationHours+" h"),
+      view.pickupField(view.t("origin"),result.pickupAddress,result.pickupAddressDetail),
+      view.field(view.t("start"),view.date(result.serviceStartLocalDate)+" · "+result.serviceStartLocalTime),
       view.field(view.t("end"),view.date(result.serviceEndLocalDate)+" · "+result.serviceEndLocalTime),
+      view.field(view.t("contractedDuration"),Number.isFinite(result.durationHours)&&result.durationHours>0?new Intl.NumberFormat(state.lang,{style:'unit',unit:'hour',unitDisplay:'long',maximumFractionDigits:20}).format(result.durationHours):"—"),
       view.field(view.t("passengers"),window.PixkuyFleetSelection.passengerLabel(result.passengerCount)),
       view.field(view.t("name"),result.customerFullName));
-    [3,4,5,6,7].forEach(function(index){details.children[index].classList.add("airport-booking__detail--half");});
+    [3,4,5,6].forEach(function(index){details.children[index].classList.add("airport-booking__detail--half");});
+    if(result.luggageCount!=null)details.appendChild(view.field(view.t("luggage"),String(result.luggageCount)));
     if (result.customerPhone) details.appendChild(view.field(view.t("phone"), result.customerPhone));
     if (result.customerEmail) details.appendChild(view.field(view.t("email"), result.customerEmail));
     if (result.customerNotes) details.appendChild(view.field(view.t("notes"), result.customerNotes));
-    main.appendChild(details);
+    main.append(details,view.node("p","hourly-booking__timezone",view.t("timezone")));
     if (result.publicCode && window.navigator.clipboard) main.appendChild(view.action(view.t("copy"), function () {
       window.navigator.clipboard.writeText(result.publicCode).catch(function () { view.focus(details.firstElementChild); });
     }));

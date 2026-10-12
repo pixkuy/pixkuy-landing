@@ -4,9 +4,6 @@
       "hourly": {
         "title": "Privater Fahrer- und Fahrservice",
         "text": "Buchen Sie einen privaten Fahrservice in Mexiko-Stadt stundenweise oder für den ganzen Tag, mit festem Fahrer und Premiumfahrzeug.",
-        "contact": {
-          "helper": "Wählen Sie Modus, Abholpunkt, Datum und Uhrzeit, um die Anfrage vorzubereiten."
-        },
         "bullets": [
           "Flexible Verfügbarkeit",
           "Mehrere Stopps",
@@ -112,6 +109,8 @@
           "longTermPriceValue": "Nach Ihrem Bedarf",
           "priceValuePending": "—",
           "cta": "Anfragen",
+
+          "dataCta": "Weiter zu den Angaben",
           "reviewCta": "Meine Buchung prüfen",
           "review": {
             "title": "Reservierung prüfen",

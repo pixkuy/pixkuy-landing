@@ -43,6 +43,15 @@
     var statusConfigPatch = {};
     var statusConfig = window.PIXKUY_BOOKING_STATUS_CONFIG;
 
+    // The local HTTPS vhost proxies reservations to the local Booking API.
+    // Netlify Dev also serves LAN HTTP, whose API URL cannot be fetched from HTTPS.
+    if (
+      window.location.origin === "https://local.pixkuy.test" &&
+      /^http:\/\/(?:192\.168\.0\.14|localhost|127\.0\.0\.1):3002\/?$/.test(apiBaseUrl)
+    ) {
+      apiBaseUrl = window.location.origin;
+    }
+
     if (apiBaseUrl) {
       apiConfigPatch.apiBaseUrl = apiBaseUrl;
       statusConfigPatch.apiBaseUrl = apiBaseUrl;

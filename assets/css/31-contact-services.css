@@ -567,7 +567,6 @@
 
   .contact-service-switcher__mobile-select option[value="airport_hotel"],
   .contact-service-switcher__mobile-select option[value="tour_private"],
-  .contact-service-switcher__mobile-select option[value="hourly_daily"],
   .contact-service-switcher__mobile-select option[value="event_special"]{
     display:none;
   }
@@ -577,7 +576,6 @@
   }
 
   .contact-service-panel[data-contact-service-panel="tour_private"],
-  .contact-service-panel[data-contact-service-panel="hourly_daily"],
   .contact-service-panel[data-contact-service-panel="event_special"]{
     display:none !important;
   }

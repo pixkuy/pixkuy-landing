@@ -4,9 +4,6 @@
       "hourly": {
         "title": "Chauffeur privé et service de voiture",
         "text": "Réservez à l’heure ou à la journée pour des transferts, un agenda privé ou une disponibilité opérationnelle à Mexico.",
-        "contact": {
-          "helper": "Configurez le mode, la prise en charge, la date et l’heure pour préparer la demande."
-        },
         "bullets": [
           "Disponibilité flexible",
           "Plusieurs arrêts",
@@ -112,6 +109,8 @@
           "longTermPriceValue": "Selon vos besoins",
           "priceValuePending": "—",
           "cta": "Demander",
+
+          "dataCta": "Continuer vers les coordonnées",
           "reviewCta": "Vérifier ma réservation",
           "review": {
             "title": "Vérifiez votre réservation",

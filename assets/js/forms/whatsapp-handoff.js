@@ -184,31 +184,7 @@
     };
   }
   
-  function getHourlyDailyEditorData(form) {
-  if (!form) {
-    return {
-      mode: '',
-      pickup: '',
-      tripDate: '',
-      tripTime: '',
-      durationHours: '',
-      customTerm: '',
-      price: '',
-      currency: ''
-    };
-  }
 
-  return {
-    mode: getVisibleFieldValue(form, 'hourly_daily_mode'),
-    pickup: getVisibleFieldValue(form, 'hourly_daily_pickup'),
-    tripDate: getVisibleFieldValue(form, 'hourly_daily_date'),
-    tripTime: getVisibleFieldValue(form, 'hourly_daily_start_time'),
-    durationHours: getVisibleFieldValue(form, 'hourly_daily_duration_hours'),
-    customTerm: getVisibleFieldValue(form, 'hourly_daily_custom_term'),
-    price: getVisibleFieldValue(form, 'hourly_daily_price'),
-    currency: getVisibleFieldValue(form, 'hourly_daily_currency')
-  };
-}
 
   function getEventSpecialEditorData(form) {
     if (!form) {
@@ -316,7 +292,6 @@
     var serviceType;
     var airportHotelData;
     var tourPrivateData;
-    var hourlyDailyData;
     var eventSpecialData;
     var directTransferData;
     var fallbackOrigin;
@@ -332,9 +307,6 @@
       : null;
     tourPrivateData = serviceType === 'tour_private'
       ? getTourPrivateEditorData(form)
-      : null;
-    hourlyDailyData = serviceType === 'hourly_daily'
-      ? getHourlyDailyEditorData(form)
       : null;
     eventSpecialData = serviceType === 'event_special'
       ? getEventSpecialEditorData(form)
@@ -356,9 +328,7 @@
                   tourPrivateData && tourPrivateData.tripDate
                     ? tourPrivateData.tripDate
                     : (
-                        hourlyDailyData && hourlyDailyData.tripDate
-                          ? hourlyDailyData.tripDate
-                          : getVisibleFieldValue(form, 'trip_date')
+                        getVisibleFieldValue(form, 'trip_date')
                       )
                 )
           ),
@@ -371,9 +341,7 @@
                   tourPrivateData && tourPrivateData.tripTime
                     ? tourPrivateData.tripTime
                     : (
-                        hourlyDailyData && hourlyDailyData.tripTime
-                          ? hourlyDailyData.tripTime
-                          : getVisibleFieldValue(form, 'trip_time')
+                        getVisibleFieldValue(form, 'trip_time')
                       )
                 )
           ),
@@ -412,9 +380,7 @@
             eventSpecialData && eventSpecialData.notes
               ? eventSpecialData.notes
               : (
-                  hourlyDailyData && hourlyDailyData.mode
-                    ? (getVisibleFieldValue(form, 'hourly_daily_notes') || getVisibleFieldValue(form, 'message'))
-                    : getVisibleFieldValue(form, 'message')
+                  getVisibleFieldValue(form, 'message')
                 )
           ),
       tourLabel: tourPrivateData && tourPrivateData.tourLabel ? tourPrivateData.tourLabel : '',
@@ -429,7 +395,7 @@
               : (
                   tourPrivateData && tourPrivateData.price
                     ? tourPrivateData.price
-                    : (hourlyDailyData && hourlyDailyData.price ? hourlyDailyData.price : '')
+                    : ('')
                 )
           ),
       currency: directTransferData && directTransferData.currency
@@ -440,13 +406,9 @@
               : (
                   tourPrivateData && tourPrivateData.currency
                     ? tourPrivateData.currency
-                    : (hourlyDailyData && hourlyDailyData.currency ? hourlyDailyData.currency : '')
+                    : ('')
                 )
           ),
-      hourlyDailyMode: hourlyDailyData && hourlyDailyData.mode ? hourlyDailyData.mode : '',
-      hourlyDailyPickup: hourlyDailyData && hourlyDailyData.pickup ? hourlyDailyData.pickup : '',
-      hourlyDailyDurationHours: hourlyDailyData && hourlyDailyData.durationHours ? hourlyDailyData.durationHours : '',
-      hourlyDailyCustomTerm: hourlyDailyData && hourlyDailyData.customTerm ? hourlyDailyData.customTerm : '',
       eventSpecialEventLabel: eventSpecialData && eventSpecialData.eventLabel ? eventSpecialData.eventLabel : '',
       eventSpecialVenueLabel: eventSpecialData && eventSpecialData.venueLabel ? eventSpecialData.venueLabel : '',
       eventSpecialVariantLabel: eventSpecialData && eventSpecialData.variantLabel ? eventSpecialData.variantLabel : '',
@@ -470,7 +432,6 @@
       serviceType: getI18nValue('contact.whatsappMessage.serviceType', 'Tipo de servicio'),
       serviceAirportHotel: getI18nValue('contact.services.airportHotel', 'Aeropuerto y hotel'),
       serviceTourPrivate: getI18nValue('contact.services.tourPrivate', 'Tours y visitas privadas'),
-      serviceHourlyDaily: getI18nValue('contact.services.hourlyDaily', 'Por horas o por día'),
       serviceEventSpecial: getI18nValue('contact.services.eventSpecial.label', 'Eventos y ocasiones especiales'),
       serviceDirectTransfer: getI18nValue('directTransferMobileFlow.whatsapp.serviceLabel', 'Traslado directo'),
       serviceOther: getI18nValue('contact.services.other', 'Otro servicio'),
@@ -493,16 +454,6 @@
       price: getI18nValue('contact.whatsappMessage.price', 'Precio final'),
       yes: getI18nValue('ui.yes', 'Sí'),
       no: getI18nValue('ui.no', 'No'),
-      hourlyDailyMode: getI18nValue('services.cards.hourly.panel.modeLabel', 'Modalidad'),
-      hourlyDailyDuration: getI18nValue('services.cards.hourly.panel.durationLabel', 'Duración'),
-      hourlyDailyLongTerm: getI18nValue('services.cards.hourly.panel.longTermDurationLabel', 'Periodo solicitado'),
-      hourlyTabHourly: getI18nValue('services.cards.hourly.panel.tabs.hourly', 'Por horas'),
-      hourlyTabFullDay: getI18nValue('services.cards.hourly.panel.tabs.fullDay', 'Día completo'),
-      hourlyTabLongTerm: getI18nValue('services.cards.hourly.panel.tabs.longTerm', 'Planes largos'),
-      hourlyLongTermWeek: getI18nValue('services.cards.hourly.panel.longTerm.week', 'Semana'),
-      hourlyLongTermFortnight: getI18nValue('services.cards.hourly.panel.longTerm.fortnight', '15 días'),
-      hourlyLongTermMonthly: getI18nValue('services.cards.hourly.panel.longTerm.monthly', 'Mensual'),
-      hourlyLongTermCustom: getI18nValue('services.cards.hourly.panel.longTerm.custom', 'Otro periodo'),
       event: getI18nValue('contact.services.eventSpecial.eventLabel', 'Evento'),
       venue: getI18nValue('contact.services.eventSpecial.venueLabel', 'Recinto'),
       variant: getI18nValue('contact.services.eventSpecial.variantLabel', 'Modalidad'),
@@ -521,8 +472,7 @@
       lines.push(labels.serviceType + ': ' + labels.serviceAirportHotel);
     } else if (data.serviceType === 'tour_private') {
       lines.push(labels.serviceType + ': ' + labels.serviceTourPrivate);
-    } else if (data.serviceType === 'hourly_daily') {
-      lines.push(labels.serviceType + ': ' + labels.serviceHourlyDaily);
+
     } else if (data.serviceType === 'event_special') {
       lines.push(labels.serviceType + ': ' + labels.serviceEventSpecial);
     } else if (data.serviceType === 'direct_transfer') {
@@ -603,35 +553,13 @@
       lines.push(labels.estimatedDestinationArrival + ': ' + data.eventSpecialEstimatedDestinationArrivalTime);
     }
 	
-	if (data.serviceType === 'hourly_daily' && data.hourlyDailyMode) {
-      if (data.hourlyDailyMode === 'hourly') {
-        lines.push(labels.hourlyDailyMode + ': ' + labels.hourlyTabHourly);
-      } else if (data.hourlyDailyMode === 'full_day') {
-        lines.push(labels.hourlyDailyMode + ': ' + labels.hourlyTabFullDay);
-      } else if (data.hourlyDailyMode === 'custom_long_term') {
-        lines.push(labels.hourlyDailyMode + ': ' + labels.hourlyTabLongTerm);
-      }
-    }
 
-    if (data.serviceType === 'hourly_daily' && data.hourlyDailyPickup) {
-      lines.push(labels.pickup + ': ' + data.hourlyDailyPickup);
-    }
 
-    if (data.serviceType === 'hourly_daily' && data.hourlyDailyDurationHours) {
-      lines.push(labels.hourlyDailyDuration + ': ' + data.hourlyDailyDurationHours + 'h');
-    }
 
-    if (data.serviceType === 'hourly_daily' && data.hourlyDailyCustomTerm) {
-      if (data.hourlyDailyCustomTerm === 'week') {
-        lines.push(labels.hourlyDailyLongTerm + ': ' + labels.hourlyLongTermWeek);
-      } else if (data.hourlyDailyCustomTerm === 'fortnight') {
-        lines.push(labels.hourlyDailyLongTerm + ': ' + labels.hourlyLongTermFortnight);
-      } else if (data.hourlyDailyCustomTerm === 'monthly') {
-        lines.push(labels.hourlyDailyLongTerm + ': ' + labels.hourlyLongTermMonthly);
-      } else if (data.hourlyDailyCustomTerm === 'custom') {
-        lines.push(labels.hourlyDailyLongTerm + ': ' + labels.hourlyLongTermCustom);
-      }
-    }
+
+
+
+
 
     if (data.serviceType === 'direct_transfer' && data.directTransferVehicle) {
       lines.push(labels.vehicle + ': ' + data.directTransferVehicle);
@@ -674,17 +602,7 @@
   }
 
   function getWhatsappPhoneNumber() {
-    var parts;
-
-    parts = [
-      '52',
-      '1',
-      '55',
-      '2883',
-      '7400'
-    ];
-
-    return parts.join('').replace(/[^\d]/g, '');
+    return window.PixkuyWhatsappContact.phone();
   }
 
   function buildWhatsappUrl(phoneNumber, message) {

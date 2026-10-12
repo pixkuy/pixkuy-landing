@@ -56,7 +56,7 @@ var availabilityPrecheckSequence = 0;
   }
 
   function getReservationApi() {
-    var api = window.PixkuyForms;
+    var api = window.PixkuyHourlyBookingForm;
 
     if (
       !api ||
@@ -77,13 +77,13 @@ var availabilityPrecheckSequence = 0;
   }
 
   function getForm() {
-    var api = window.PixkuyForms;
+    var api = window.PixkuyHourlyBookingForm;
 
     if (api && typeof api.getReservationForm === "function") {
       return api.getReservationForm();
     }
 
-    return document.querySelector('form[name="contact"]');
+    return null;
   }
 
   function getField(form, name) {
@@ -509,28 +509,7 @@ var availabilityPrecheckSequence = 0;
     return [baseMessage, description.message].filter(Boolean).join(" ");
   }
 
-  function focusHourlyDailyTimeField(fields) {
-    var timeField = fields ? fields.hourlyDailyVisibleTime : null;
 
-    if (!timeField || typeof timeField.focus !== "function") {
-      return false;
-    }
-
-    if (typeof timeField.scrollIntoView === "function") {
-      timeField.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-    }
-
-    window.setTimeout(function focusTimeFieldAfterScroll() {
-      timeField.focus({
-        preventScroll: true
-      });
-    }, 120);
-
-    return true;
-  }
 
   function showAvailabilityError(form, result) {
     var fields;
@@ -542,9 +521,9 @@ var availabilityPrecheckSequence = 0;
     }
 
     fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      window.PixkuyHourlyBookingForm &&
+      typeof window.PixkuyHourlyBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyHourlyBookingForm.getReservationRequestFields(form)
         : null;
 
     message = getAvailabilityErrorMessage(
@@ -555,7 +534,7 @@ var availabilityPrecheckSequence = 0;
     showCheckoutMessage(form, message, "availability");
 
     if (isDesktopViewport()) {
-      focusHourlyDailyTimeField(fields);
+      fields?.formError?.focus({preventScroll:true});
     } else {
       mobileApi = window.PixkuyHourlyMobileContactStep;
 
@@ -583,9 +562,9 @@ var availabilityPrecheckSequence = 0;
     }
 
     fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      window.PixkuyHourlyBookingForm &&
+      typeof window.PixkuyHourlyBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyHourlyBookingForm.getReservationRequestFields(form)
         : null;
     mobileError = getMobileCheckoutErrorNode();
 
@@ -815,9 +794,9 @@ var availabilityPrecheckSequence = 0;
 
   function hideCheckoutError(form) {
     var fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      window.PixkuyHourlyBookingForm &&
+      typeof window.PixkuyHourlyBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyHourlyBookingForm.getReservationRequestFields(form)
         : null;
     var mobileError = getMobileCheckoutErrorNode();
 
@@ -1238,7 +1217,7 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
     if (
       !form ||
       form.nodeType !== 1 ||
-      !form.matches('form[name="contact"]')
+      form !== getForm()
     ) {
       return;
     }
@@ -1272,7 +1251,7 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
 
     syncLegalAcceptanceVisibility(form);
 
-    if (!hasRequiredHourlyCheckoutData(data)) {
+    if (!api.refreshReservationRequestValidationUX(fields) || !form.reportValidity() || !hasRequiredHourlyCheckoutData(data)) {
       showCheckoutError(form);
       return;
     }
@@ -1410,13 +1389,6 @@ function redirectToCheckout(checkoutUrl, bookingStatusToken) {
 
     window.addEventListener("pixkuy:i18n-applied", function onI18nApplied() {
       scheduleLegalAcceptanceVisibilitySync(getForm());
-    });
-
-    document.addEventListener("pixkuy:contact-service-change", function clearPreviousHourlyMessage() {
-      var activeForm = getForm();
-      if (activeForm && activeForm.hasAttribute("data-hourly-checkout-error-category")) {
-        hideCheckoutError(activeForm);
-      }
     });
 
     scheduleLegalAcceptanceVisibilitySync(form);

@@ -21,7 +21,7 @@
     window.dispatchEvent(new CustomEvent("pixkuy:contact-hourly-daily-sync",{detail:{snapshot:panelSnapshot(value)}}));
   }
   function restore(value){
-    var form=document.querySelector('form[name="contact"]');
+    var form=window.PixkuyHourlyBookingForm?.getReservationForm();
     if(!form||!value)return false;
     var edit=window.PixkuyFleetSelection?.hourlyEdit();
     if(edit?.contactOnly && value.hourlyPendingToken===edit.token){
@@ -37,9 +37,8 @@
       var field=form.elements.namedItem(key);
       if(field && typeof value[key]!=="object" && value[key]!=null)field.value=String(value[key]);
     });
-    var notes=form.elements.namedItem("message");if(notes)notes.value=value.hourly_daily_notes||value.message||"";
-    var api=window.PixkuyForms;
-    if(api?.applyContactHourlyDailyHandoff)api.applyContactHourlyDailyHandoff(value);
+    var notes=form.elements.namedItem("message");if(notes)notes.value=value.hourly_daily_notes??value.message??"";
+    var api=window.PixkuyHourlyBookingForm;
     if(api)api.syncReservationRequestState(api.getReservationRequestFields(form));
     if(window.PixkuyFleetSelection && value.hourly_daily_passengers!=null)
       window.PixkuyFleetSelection.setPassengers(value.hourly_daily_passengers);

@@ -4,9 +4,6 @@
       "hourly": {
                 "title": "Servicio de auto con conductor privado",
         "text": "Reserva por horas o día completo para traslados, agenda privada o disponibilidad operativa en Ciudad de México.",
-        "contact": {
-          "helper": "Configura modalidad, recogida, fecha y hora para preparar la solicitud."
-        },
         "bullets": [
           "Disponibilidad flexible",
           "Varias paradas",
@@ -112,6 +109,8 @@
           "longTermPriceValue": "Según sus necesidades",
           "priceValuePending": "—",
           "cta": "Solicitar",
+
+          "dataCta": "Continuar a Datos",
           "reviewCta": "Revisar reserva",
           "review": {
             "title": "Revisa tu reserva",

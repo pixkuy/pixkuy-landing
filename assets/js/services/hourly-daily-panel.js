@@ -423,25 +423,7 @@ onClearSelection: function () {
   }
 
   function getReservationMinimumDateLiteral() {
-    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
-    const formsApi = window.PixkuyForms || {};
-    const getMinimumDateTime =
-      typeof formsApi.getReservationMinimumDateTime === 'function'
-        ? formsApi.getReservationMinimumDateTime
-        : null;
-    const formatDate =
-      typeof formsApi.formatReservationDateForInput === 'function'
-        ? formsApi.formatReservationDateForInput
-        : null;
-    const minimumDateTime = getMinimumDateTime
-      ? getMinimumDateTime()
-      : null;
-
-    if (!minimumDateTime || !formatDate) {
-      return '';
-    }
-
-    return String(formatDate(minimumDateTime) || '').trim();
+    return window.PixkuyFleetSelection?.minimumDate() || '';
   }
 
   function isServicesDateAtOrAfterMinimum(dateLiteral) {
@@ -575,6 +557,8 @@ onClearSelection: function () {
   function getHourlyCtaText(labels) {
     if(state.mode===MODES.LONG_TERM && isConfigComplete())return getI18nValue('services.cards.hourly.panel.longTermCta') || labels.cta;
     if (isConfigComplete() || isHourlyContinueBlockedByAvailability()) {
+      if(!isMobileHourlyViewport() && [MODES.HOURLY,MODES.FULL_DAY].includes(state.mode))
+        return getI18nValue('services.cards.hourly.panel.dataCta') || labels.cta;
       return labels.cta;
     }
 
@@ -1046,7 +1030,7 @@ onClearSelection: function () {
           data-services-hourly-cta
           ${ctaDisabled ? 'disabled aria-disabled="true"' : ''}
         >
-          ${ctaDisabled ? labels.ctaDisabled : labels.cta}
+          ${getHourlyCtaText(labels)}
         </button>
 
         <p
@@ -1293,7 +1277,7 @@ onClearSelection: function () {
               data-services-hourly-notes
               rows="4"
               placeholder="${(state.mode === MODES.LONG_TERM ? labels.longTermNotesPlaceholder : labels.notesPlaceholder).replace(/"/g, '&quot;')}"
-            >${state.notes}</textarea>
+            >${state.notes.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
           </div>
         </div>
 
@@ -1310,7 +1294,7 @@ onClearSelection: function () {
             data-services-hourly-cta
             ${ctaDisabled ? 'disabled aria-disabled="true"' : ''}
           >
-            ${ctaDisabled ? labels.ctaDisabled : labels.cta}
+            ${getHourlyCtaText(labels)}
           </button>
 
           <p
@@ -1330,6 +1314,7 @@ onClearSelection: function () {
     configMount.hidden = false;
     configMount.setAttribute('data-services-hourly-mode-active', state.mode);
     configMount.innerHTML = buildConfigMarkup();
+    if(state.mode===MODES.LONG_TERM && isMobileHourlyViewport())window.PixkuyFleetSelection.mountHourlyPassengers(configMount);
     if (state.mode !== MODES.LONG_TERM) {
       window.PixkuyFleetSelection.mountHourlyPassengers(configMount);
       window.PixkuyFleetSelection.render("hourly_daily");
@@ -1348,6 +1333,7 @@ onClearSelection: function () {
 
   function renderAll() {
   renderConfig();
+  window.PixkuyLongTermRequest?.panelChanged(buildHourlySubmitDetail());
   window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
 }
 
@@ -1398,6 +1384,10 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
   }
 
   if (state.mode === MODES.LONG_TERM && LONG_TERM_OPTIONS.indexOf(nextCustomTerm) >= 0) state.longTermOption = nextCustomTerm;
+
+  if (isMobileHourlyViewport() && ['1-2','3-4','5-6'].includes(safeSnapshot.passengerBand)) {
+    window.PixkuyFleetSelection.setPassengers(Number(safeSnapshot.passengerBand.split('-')[1]),{independent:true});
+  }
 
   renderAll();
   return true;
@@ -1487,6 +1477,7 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
 
     trackHourlyQuoteReady();
 
+    window.PixkuyLongTermRequest?.panelChanged(buildHourlySubmitDetail());
     window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
   }
   
@@ -1889,6 +1880,9 @@ function handleHourlyContinue() {
   clearAvailabilityStatus();
 
   if (!isTransactionalHourlyMode()) {
+    if (window.PixkuyLongTermRequest) {
+      return window.PixkuyLongTermRequest.open(detail);
+    }
     trackHourlyContinueClick();
     dispatchHourlySubmit(detail);
     return Promise.resolve(true);
@@ -1946,6 +1940,8 @@ async function applyNextAvailableSuggestion(nextAvailableStartLocal) {
         const nextMode = normalizeText(modeButton.getAttribute('data-services-hourly-mode')) || MODES.HOURLY;
         const shouldSyncWithoutRemount = isMobileModeSwitchWithoutRemount(nextMode);
 
+        const separateDraft = window.PixkuyLongTermRequest?.switchMode(state.mode, nextMode, buildHourlySubmitDetail());
+        if (separateDraft) { applyContactHourlyDailySync(separateDraft); return; }
         invalidateAvailabilityState();
         if (state.mode === MODES.HOURLY) state.hourlyDurationHours = state.durationHours;
         state.mode = nextMode;

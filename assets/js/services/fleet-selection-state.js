@@ -143,17 +143,19 @@
       direct_transfer: "#services-expand-direct",
       hourly_daily: "[data-services-hourly-config]"
     };
-    var form = document.querySelector('form[name="contact"]');
+    var parent = document.querySelector(roots[service]);
+    var longTerm = service === "hourly_daily" && parent && parent.getAttribute("data-services-hourly-mode-active") === "custom_long_term";
+    if (longTerm && window.innerWidth <= 720) return null;
+    var form = service === "hourly_daily" ? null : document.querySelector('form[name="contact"]');
     var type = form && form.querySelector('[name="service_type"]');
     var formService = type && (type.value === "airport_hotel" ? "airport_transfer" : type.value);
-    if (editingService === service && formService === service) {
-      var editors = {airport_transfer:"[data-contact-airport-hotel-editor]",direct_transfer:"[data-contact-direct-transfer-editor]",hourly_daily:"[data-contact-hourly-daily-editor]"};
+    if (service !== "hourly_daily" && editingService === service && formService === service) {
+      var editors = {airport_transfer:"[data-contact-airport-hotel-editor]",direct_transfer:"[data-contact-direct-transfer-editor]"};
       return form.querySelector(editors[service]);
     }
     var mobileDirect = service === "direct_transfer" && document.querySelector("[data-direct-transfer-mobile-config-step]");
     if (mobileDirect && !mobileDirect.hidden && window.matchMedia("(max-width: 720px)").matches) return mobileDirect;
-    var parent = document.querySelector(roots[service]);
-    if (service === "hourly_daily" && parent && parent.getAttribute("data-services-hourly-mode-active") === "custom_long_term") return null;
+    if (longTerm) return null;
     return parent;
   }
   function placeControl(parent, control) {
@@ -191,7 +193,7 @@
     }));
   }
   function editFromReview(service) {
-    if (services.indexOf(service) < 0 || !document.querySelector('form[name="contact"]')) return false;
+    if (services.indexOf(service) < 0 || (service !== "hourly_daily" && !document.querySelector('form[name="contact"]'))) return false;
     // Continuing from Airport's vehicle step confirms even its sole offered model.
     // A later replacement must use the existing explicit-choice contract.
     if (service === "airport_transfer") {
@@ -312,7 +314,7 @@
         });
       } else if (!(service === "airport_transfer" && replacementEditing() && models.length)) {
         message.textContent = text("refresh");
-        var edit = document.createElement("a"); edit.href = "/#contact"; edit.textContent = text("edit");
+        var edit = document.createElement("a"); edit.href = service === "hourly_daily" ? "#hourly/servicio" : "/#contact"; edit.textContent = text("edit");
         var desktopEdit = service === "airport_transfer" && window.PixkuyAirportDesktopBooking && window.PixkuyAirportDesktopBooking.pendingEdit();
         if (desktopEdit) {
           edit.href = "#airport/traslado";
@@ -647,19 +649,15 @@
     if (image.getAttribute("src") !== photo) image.setAttribute("src", photo);
   }
   function syncFormPresentation(service) {
+    if (service !== "airport_transfer") return;
     var form = document.querySelector('form[name="contact"]');
     if (!form || service === "direct_transfer") return; // Direct v0023 owns its existing card.
     var type = form.querySelector('[name="service_type"]');
     var active = type && (type.value === service || (service === "airport_transfer" && type.value === "airport_hotel"));
-    var root = form.querySelector(service === "airport_transfer" ? "[data-contact-airport-hotel-editor]" : "[data-contact-hourly-daily-editor]");
+    var root = form.querySelector("[data-contact-airport-hotel-editor]");
     if (!root) return;
     var row = root.querySelector("[data-fleet-model-summary]");
     var selected = model(service);
-    if (service === "hourly_daily") {
-      var label = root.querySelector(".contact-hourly-daily-editor__vehicle-label");
-      if (label) { label.removeAttribute("data-i18n"); label.textContent = selected ? selected.name : text("model"); }
-      syncImage(root.querySelector("[data-contact-hourly-daily-vehicle-media]"), selected, "contact-hourly-daily-editor__vehicle-image");
-    }
     if (!active || !selected) { if (row) row.parentNode.removeChild(row); return; }
     if (!row) {
       row = document.createElement("p"); row.className = "form-group";
@@ -667,7 +665,6 @@
       root.insertBefore(row, root.firstChild);
     }
     row.textContent = text("model") + ": " + selected.name;
-    if (service === "hourly_daily") row.textContent += " · " + text("passengers") + ": " + passengerLabel(passengers());
   }
   function syncPresentation(service) {
     var galleries = {airport_transfer:["PixkuyAirportMobileVehicleGallery"],direct_transfer:["PixkuyDirectTransferDesktopVehicleGallery","PixkuyDirectTransferMobileVehicleGallery"],hourly_daily:["PixkuyHourlyDesktopVehicleGallery","PixkuyHourlyMobileVehicleGallery"]};
@@ -778,7 +775,7 @@
     var target = event.target;
     if (!target || !target.closest || target.closest('[data-fleet-selection]')) return;
     if (event.type === "click") {
-      if (!target.closest('[data-airport-tariff-passenger-option], [data-airport-tariff-swap], [data-airport-destination-clear], [data-direct-transfer-panel-passenger-option], [data-direct-transfer-panel-address-clear], [data-direct-transfer-mobile-address-clear], [data-contact-airport-hotel-passenger-option], [data-contact-airport-hotel-swap], [data-contact-airport-hotel-hotel-clear], [data-contact-hourly-daily-mode-option], [data-contact-hourly-daily-duration-option], [data-contact-direct-transfer-passenger-option], [data-contact-direct-transfer-origin-clear], [data-contact-direct-transfer-destination-clear]')) return;
+      if (!target.closest('[data-airport-tariff-passenger-option], [data-airport-tariff-swap], [data-airport-destination-clear], [data-direct-transfer-panel-passenger-option], [data-direct-transfer-panel-address-clear], [data-direct-transfer-mobile-address-clear], [data-contact-airport-hotel-passenger-option], [data-contact-airport-hotel-swap], [data-contact-airport-hotel-hotel-clear], [data-contact-direct-transfer-passenger-option], [data-contact-direct-transfer-origin-clear], [data-contact-direct-transfer-destination-clear]')) return;
     } else if (!target.matches('input:not([type="hidden"]):not([type="checkbox"]), select')) return;
     if (target.closest("[data-services-hourly-config]")) return;
     // The Direct input event already invalidated the quote for this value.
@@ -799,7 +796,7 @@
     var roots = {
       airport_transfer: '#services-expand-airport, [data-contact-airport-hotel-editor]',
       direct_transfer: '#services-expand-direct, [data-direct-transfer-mobile-config-step], [data-contact-direct-transfer-editor]',
-      hourly_daily: '[data-services-hourly-config], [data-contact-hourly-daily-editor]'
+      hourly_daily: '[data-services-hourly-config]'
     };
     services.forEach(function (service) {
       if (target.closest(roots[service])) invalidateOffer(service);
@@ -831,11 +828,12 @@
   }
   function passengerLabel(value) { return passengerBand(value).label; }
   function passengers() { return passengerBand(read("hourly_daily").passengers || 2).maxPassengers; }
-  function setPassengers(value) {
+  function setPassengers(value, options) {
     var number = passengerBand(value).maxPassengers, state = read("hourly_daily");
     state.passengers = number; write("hourly_daily", state);
-    document.querySelectorAll('[name="hourly_daily_passengers"], [data-fleet-hourly-passengers]').forEach(function (field) { field.value = String(number); });
-    syncFormPresentation("hourly_daily");
+    var independent=options?.independent || window.innerWidth<=720 && !!document.querySelector('[data-services-hourly-mode-active="custom_long_term"]');
+    document.querySelectorAll(independent?'[data-fleet-hourly-passengers]':'[name="hourly_daily_passengers"], [data-fleet-hourly-passengers]').forEach(function (field) { field.value = String(number); });
+    if(!independent)syncFormPresentation("hourly_daily");
     return number;
   }
   function mountHourlyPassengers(parent) {

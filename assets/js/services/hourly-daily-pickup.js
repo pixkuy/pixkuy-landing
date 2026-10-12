@@ -146,7 +146,9 @@
         var shouldPreserveVisibleInput = safeMeta.preserveInputValue === true;
 
         if (!selectedPlace) {
-          if (!shouldPreserveVisibleInput) {
+          // Mobile clear preserves the already emptied input and emits no input
+          // event. Still clear the panel's pickup and location metadata.
+          if (!shouldPreserveVisibleInput || input.value === '') {
             onClearSelection();
           }
           return;

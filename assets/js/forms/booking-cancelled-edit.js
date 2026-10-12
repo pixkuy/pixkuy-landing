@@ -7,6 +7,7 @@
   var EDIT_KEY = "pixkuy_airport_pending_edit_v1";
   var FLEET_KEY = "pixkuy_fleet_b:airport_transfer";
   var currentState = null;
+  var hourlyStatusReceivedAt = 0;
 
   function t(dictionary, path, fallback) {
     var value = String(path || "").split(".").reduce(function (cursor, key) {
@@ -154,7 +155,9 @@
       delete snapshot.fleet_selection;delete snapshot.fleet_model;snapshot.legal_acceptance_accepted=false;
     }else{
       var context={version:1,token:state.token,editRevision:edit.revision,idempotencyKey:prior && prior.token===state.token && prior.editRevision===edit.revision && !attempt ? prior.idempotencyKey : fleet.createAttemptKey(),contactOnly:true,
-        publicCode:state.result.publicCode,expiresAt:raw.hold.expiresAt,serverNow:raw.serverNow,receivedAt:Date.now(),
+        publicCode:state.result.publicCode,expiresAt:raw.hold.expiresAt,
+        // Carry the elapsed Pending time into the persisted editor clock.
+        serverNow:new Date(Date.parse(raw.serverNow)+Math.max(0,window.performance.now()-hourlyStatusReceivedAt)).toISOString(),receivedAt:Date.now(),
         reservationAmount:{amountMinor:raw.payment.amountExpected,currency:raw.payment.currency},
         contact:{name:snapshot.name,phone:snapshot.phone,email:snapshot.email}};
       window.sessionStorage.setItem("pixkuy_hourly_pending_edit_v1",JSON.stringify(context));
@@ -280,6 +283,7 @@
   };
 
   window.PixkuyBookingStatusState.onReady(function renderEdit(state) {
+    if(state.result.serviceType==="hourly_daily"&&(!currentState||currentState.result!==state.result))hourlyStatusReceivedAt=window.performance.now();
     currentState = state;
     var allowed = canEdit(state);
     document.querySelectorAll("[data-booking-cancelled-modify]").forEach(function (button) {

@@ -4,9 +4,6 @@
       "hourly": {
         "title": "Private driver & car service",
         "text": "Book by the hour or full day for transfers, private agendas or operational availability in Mexico City.",
-        "contact": {
-          "helper": "Set the mode, pickup, date and time to prepare the request."
-        },
         "bullets": [
           "Flexible availability",
           "Multiple stops",
@@ -112,6 +109,8 @@
           "longTermPriceValue": "Based on your requirements",
           "priceValuePending": "—",
           "cta": "Request",
+
+          "dataCta": "Continue to Details",
           "reviewCta": "Review my booking",
           "review": {
             "title": "Review your booking",

@@ -21,6 +21,7 @@
   let mobileHintTimeout = null;
   let mobileHintObserver = null;
   let openService = null;
+  let airportScrollFrame = null;
 
   function getI18nValue(path) {
     const dict = window.__pixkuyI18nDict;
@@ -97,7 +98,19 @@
   function getRequestedServiceFromUrl() {
     try {
       const params = new URLSearchParams(window.location.search || '');
-      const rawService = String(params.get('service') || '').trim().toLowerCase();
+      let rawService = String(params.get('service') || '').trim().toLowerCase();
+      // Older Hourly links/review returns must enter the owned route, never Netlify.
+      if (window.location.hash === '#contact') {
+        let returning = false;
+        try { returning = window.sessionStorage.getItem('pixkuy_hourly_checkout_review_return') === '1'; } catch (_) {}
+        if (rawService === 'hourly_daily' || returning) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('service', 'hourly_daily');
+          url.hash = returning ? '#hourly/datos' : '#hourly/servicio';
+          window.history.replaceState(window.history.state, '', url.toString());
+          rawService = 'hourly_daily';
+        }
+      }
 
       if (
         mobileQuery.matches &&
@@ -227,6 +240,10 @@
   }
 
   function setExpandedState(nextServiceKey) {
+    if (airportScrollFrame !== null) {
+      window.cancelAnimationFrame(airportScrollFrame);
+      airportScrollFrame = null;
+    }
     openService = nextServiceKey || null;
 
     placeExpandForViewport();
@@ -251,6 +268,16 @@
 
     const nextService = openService === serviceKey ? null : serviceKey;
     setExpandedState(nextService);
+
+    // A deliberate desktop re-entry uses Airport's existing draft/status owner.
+    // Programmatic panel opens (including Back to trip) still show Configuration.
+    const airport = window.PixkuyAirportDesktopBooking;
+    if (!mobileQuery.matches && nextService === 'airport' && airport &&
+        (airport.resumePending() || airport.resumeDraft())) return;
+
+    if (nextService === 'airport') {
+      scrollDesktopAirportPanelIntoView();
+    }
 
     if (nextService === 'hourly') {
       scrollDesktopHourlyPanelIntoView(nextService);
@@ -428,6 +455,27 @@
 
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(runScroll);
+    });
+  }
+
+  function scrollDesktopAirportPanelIntoView() {
+    if (mobileQuery.matches) return;
+
+    // Let expansion/layout finish, then scroll once. Async offer rendering
+    // must not repeatedly pull the viewport back to the configuration.
+    airportScrollFrame = window.requestAnimationFrame(() => {
+      airportScrollFrame = window.requestAnimationFrame(() => {
+        airportScrollFrame = null;
+        const panel = services.airport.panel;
+        if (mobileQuery.matches || openService !== 'airport' || panel.hidden || expand.hidden) return;
+
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const topOffset = Math.min(96, Math.max(56, Math.round(viewportHeight * 0.1)));
+        window.scrollTo({
+          top: Math.max(panel.getBoundingClientRect().top + window.scrollY - topOffset, 0),
+          behavior: 'smooth'
+        });
+      });
     });
   }
 

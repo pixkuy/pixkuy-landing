@@ -63,7 +63,7 @@ async function run(){
       const time=panel.locator('[data-services-hourly-time]');
       await time.fill("10:00");await time.dispatchEvent("change");
       await panel.locator('[data-fleet-hourly-passengers]').selectOption("2");
-      await panel.locator('[data-services-hourly-notes]').fill("Synthetic notes preserved");
+      await panel.locator('[data-services-hourly-notes]').fill(viewport.width<=720 ? "Notas extensas de fixture. ".repeat(40) : "Synthetic notes preserved");
       await panel.locator('[data-services-hourly-notes]').dispatchEvent("input");
       await panel.locator('[data-services-hourly-cta]').click();
       await page.waitForURL(/#hourly\/datos$/);
@@ -71,9 +71,9 @@ async function run(){
       await page.locator('.hourly-booking [name="phone"]').fill("+525512345678");
       await page.locator('.hourly-booking [name="email"]').fill("synthetic@example.invalid");
       assert.equal(await page.locator('[name="hourly_daily_passengers"]').inputValue(),"2");
-      assert.equal(await page.locator('form[name="contact"]').count(),1,"one canonical form");
+      assert.equal(await page.locator('form[name="hourly-booking"]').count(),1,"one independent Hourly form");
       await page.locator(".hourly-booking #pixkuy-hourly-legal-acceptance").check();
-      await page.locator(".hourly-booking #contact-submit").click();
+      await page.locator(".hourly-booking #hourly-contact-submit").click();
       await page.waitForURL(/#hourly\/revision$/);
       assert.equal(checkoutCount,0,"Data -> Review does not dispatch payment");
       if(viewport.width<=720){
@@ -81,7 +81,7 @@ async function run(){
         assert.equal(await back.count(),1);
         await back.click();await page.waitForURL(/#hourly\/datos$/);
         assert.equal(await page.locator('.hourly-booking [name="name"]').inputValue(),"Synthetic Customer");
-        await page.locator('.hourly-booking #contact-submit').click();await page.waitForURL(/#hourly\/revision$/);
+        await page.locator('.hourly-booking #hourly-contact-submit').click();await page.waitForURL(/#hourly\/revision$/);
       }
       if(viewport.width<=720){
         // Both real navigation listeners run in the page's normal registration order.
@@ -92,10 +92,8 @@ async function run(){
         await page.locator('[data-mobile-topbar-menu-trigger]').click();
         assert(await page.locator('[data-mobile-topbar-menu-panel]').isVisible());
         await page.locator('[data-mobile-topbar-menu-dismiss]').first().click();
-        // Force long content through the actual data form, then reach legal/payment in Review.
-        await page.locator('.hourly-booking--mobile .hourly-mobile-flow__back').click();
-        await page.locator('.hourly-booking [name="message"]').fill('Notas extensas de fixture. '.repeat(40));
-        await page.locator('.hourly-booking #contact-submit').click();await page.waitForURL(/#hourly\/revision$/);
+        // Long notes were entered in Configuration, their only editor.
+        assert((await page.locator('[data-hourly-mobile-route-content]').innerText()).includes("Notas extensas de fixture."));
         const scroller=page.locator('[data-hourly-mobile-route-content]');
         assert.equal(await scroller.evaluate(n=>getComputedStyle(n).overflowY),'auto');
         await page.locator('[data-hourly-pay]').scrollIntoViewIfNeeded();

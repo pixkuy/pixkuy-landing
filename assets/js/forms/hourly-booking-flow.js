@@ -1,10 +1,10 @@
 (function(window,document){
   "use strict";
   var view=window.PixkuyHourlyBookingView,draft=window.PixkuyHourlyBookingDraft,api=window.PixkuyHourlyCheckout;
-  var form=document.querySelector('form[name="contact"]');
+  var form=window.PixkuyHourlyBookingForm?.getReservationForm();
   if(!view||!draft||!api||!form)return;
   var home=document.createComment("Hourly canonical form home"),mount=null,busy=false,notice="",snapshot=null,reviewed="",renderedStep="";
-  var submit=form.querySelector("#contact-submit"),submitText=submit.textContent,submitKey=submit.getAttribute("data-i18n");
+  var submit=form.querySelector("#hourly-contact-submit"),submitText=submit.textContent,submitKey=submit.getAttribute("data-i18n");
   var checkingAvailability=false,suspended=false,restoringDraft=false,editEntryPositioned=false,hydrated=false,navigationVersion=0;
   var keyboardNavigation=false;
   document.addEventListener("keydown",function(event){
@@ -13,12 +13,7 @@
     mount?.querySelectorAll("[data-hourly-touch-focus]").forEach(function(node){node.removeAttribute("data-hourly-touch-focus");});
   },true);
   document.addEventListener("pointerdown",function(){keyboardNavigation=false;},true);
-  var notesReadOnly=form.elements.message.readOnly;
-  var notesLabel=form.querySelector('label[for="contact-message"]');
-  var notesKey=notesLabel&&notesLabel.getAttribute("data-i18n");
-  var notesPlaceholderKey=form.elements.message.getAttribute("data-i18n-ph");
-  var notesPlaceholder=form.elements.message.getAttribute("placeholder");
-  var phoneLabel=form.querySelector('label[for="contact-phone"]'),phoneLabelText=phoneLabel.textContent;
+  var phoneLabel=form.querySelector('label[for="hourly-contact-phone"]'),phoneLabelText=phoneLabel.textContent;
   var phoneKey=phoneLabel.getAttribute("data-i18n"),phonePlaceholderKey=form.elements.phone.getAttribute("data-i18n-ph");
   var phonePlaceholder=form.elements.phone.getAttribute("placeholder"),phoneMobileCopy=false;
   form.before(home);
@@ -30,8 +25,6 @@
     // Only Data owns editable fields. Review, an unmounted route and another
     // service's form cannot overwrite the proposal with their current values.
     if(fromEntry!==true && (renderedStep!=="datos" || !mount?.contains(form)))return snapshot;
-    if(renderedStep==="datos" && form.elements.message && form.elements.hourly_daily_notes)
-      form.elements.hourly_daily_notes.value=form.elements.message.value;
     var value=api.draft();if(value){
       var owner=editing()?.token || snapshot?.hourlyPendingToken;
       if(owner)value.hourlyPendingToken=owner;
@@ -87,12 +80,9 @@
     return false;
   }
   function restore(){
-    home.after(form);form.classList.remove("hourly-booking__form");form.inert=false;form.elements.message.readOnly=notesReadOnly;
-    if(notesKey){notesLabel.setAttribute("data-i18n",notesKey);notesLabel.textContent=window.__pixkuyI18nDict?.contact?.notes||notesLabel.textContent;}
-    if(notesPlaceholderKey)form.elements.message.setAttribute("data-i18n-ph",notesPlaceholderKey);
-    form.elements.message.setAttribute("placeholder",notesPlaceholder||"");
+    home.after(form);form.classList.remove("hourly-booking__form");form.inert=false;
     if(phoneMobileCopy){
-      ["name","email"].forEach(function(name){var label=form.querySelector('label[for="contact-'+name+'"]');if(label){label.setAttribute('data-i18n','contact.'+name);label.textContent=window.__pixkuyI18nDict?.contact?.[name] || label.textContent;}});
+      ["name","email"].forEach(function(name){var label=form.querySelector('label[for="hourly-contact-'+name+'"]');if(label){label.setAttribute('data-i18n','contact.'+name);label.textContent=window.__pixkuyI18nDict?.contact?.[name] || label.textContent;}});
       if(phoneKey)phoneLabel.setAttribute("data-i18n",phoneKey);
       phoneLabel.textContent=window.__pixkuyI18nDict?.contact?.phone||phoneLabelText;
       if(phonePlaceholderKey)form.elements.phone.setAttribute("data-i18n-ph",phonePlaceholderKey);
@@ -108,22 +98,30 @@
   function leave(){
     if(!mount)return false;
     save();navigationVersion++;checkingAvailability=false;api.setBusy(false);restore();renderedStep="";suspended=true;
-    // The draft belongs to Hourly, not the shared form's next owner. Do not
-    // dispatch edits or reset other services' drafts while handing it back.
-    ["name","phone","email","message","request_summary"].forEach(function(key){
-      var field=form.elements.namedItem(key);
-      if(field && snapshot && field.value===String(snapshot[key]||""))field.value="";
-    });
     return true;
   }
   function button(key,fn,primary){var b=view.action(view.t(key),fn,primary);b.disabled=busy;return b;}
-  function trip(){
+  function trip(focusNotes){
     if(contactEdit()){exitEdit();return;}
     save();reviewed="";notice="";go("servicio");
     draft.syncPanel(snapshot);
-    if(window.PixkuyForms?.applyContactHourlyDailyHandoff)window.PixkuyForms.applyContactHourlyDailyHandoff(snapshot);
     if(!view.media.matches&&window.PixkuyHourlyMobileBookingFlow)window.PixkuyHourlyMobileBookingFlow.open();
-    else document.querySelector("#services-expand-hourly")?.scrollIntoView({block:"start"});
+    else {
+      // Expand first; one guarded frame owns both focus and positioning.
+      // A later route must not be moved by an obsolete return callback.
+      var version=navigationVersion;
+      window.PixkuyServicesExpand.open("hourly",{scroll:false});
+      window.requestAnimationFrame(function(){
+        if(version!==navigationVersion||step()!=="servicio"||!view.media.matches)return;
+        var target=document.querySelector(focusNotes===true?'[data-services-hourly-notes]':'[data-services-hourly-config]');
+        if(!target)return;
+        if(focusNotes===true)target.focus({preventScroll:true});
+        else {var heading=document.querySelector('#services-expand-hourly h3');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}}
+        var rect=target.getBoundingClientRect(),height=window.innerHeight||document.documentElement.clientHeight;
+        var offset=focusNotes===true?Math.max(96,(height-rect.height)/2):Math.min(96,Math.max(56,Math.round(height*.1)));
+        window.scrollTo({top:Math.max(0,rect.top+window.scrollY-offset),behavior:"instant"});
+      });
+    }
   }
   function backData(){if(contactEdit()&&attempt()){exitEdit();return;}go("datos");}
   function fingerprint(value){
@@ -175,8 +173,8 @@
     checkingAvailability=false;api.setBusy(false);notice="";render();return false;
   }
   function protectReview(){
-    // Legacy form synchronizers also write disabled. Only enforce this route's
-    // additional availability guard; never enable over their validation result.
+    // Consent synchronization also writes disabled. Preserve the additional
+    // availability guard without enabling over its validation result.
     if(reviewBlocked()&&!submit.disabled){submit.disabled=true;submit.setAttribute("aria-disabled","true");}
   }
   new MutationObserver(protectReview).observe(submit,{attributes:true,attributeFilter:["disabled"]});
@@ -212,9 +210,6 @@
     if(resumed){
       var saved=snapshot||draft.read();suspended=false;restoringDraft=true;
       try{
-        // Activate the existing service owner before its synchronizers run:
-        // another owner deliberately clears Hourly's hidden fields.
-        window.PixkuyForms.contactServiceState.setActiveServiceType("hourly_daily",{source:"hourly-route-return",skipConfirm:true});
         draft.restore(saved);snapshot=saved;
       }finally{restoringDraft=false;}
     }
@@ -230,68 +225,70 @@
     if(!snapshot)return;
     document.body.classList.add("hourly-booking-active");
     var mobile=!view.media.matches;
+    var desktopReview=!mobile&&current==="revision";
     if(mobile && window.PixkuyHourlyMobileBookingFlow && !window.PixkuyHourlyMobileBookingFlow.isOpen())
       window.PixkuyHourlyMobileBookingFlow.open();
     mount=mobile?view.mobileShell(current==="revision"?backData:trip,current):
-      view.shell(current==="datos"?1:2,current==="revision"?backData:trip,backData);
+      view.shell(current==="datos"?1:2,desktopReview?trip:current==="revision"?backData:trip,backData,desktopReview?{showBack:false}:undefined);
     if(mobile){
       document.querySelector("#services-expand-hourly")?.setAttribute("data-hourly-booking-hidden","");
       routeContent=document.querySelector("[data-hourly-mobile-route-content]");
       if(routeContent){routeContent.setAttribute("data-hourly-booking-step",current);if(previousStep!==current)routeContent.scrollTop=0;}
     }
     mount.classList.add("hourly-booking");
+    if(desktopReview)mount.classList.add("hourly-booking--desktop-final");
     if(mobile)mount.classList.add(current==="datos"?"hourly-booking--data":"hourly-booking--review");
     if(contactEdit()){
       mount.classList.add("hourly-booking--contact-edit");
       var topBack=mount.querySelector(".airport-booking__identity button");
       if(topBack)topBack.textContent=window.__pixkuyI18nDict?.airportMobileFlow?.back||view.t("backData");
     }
-    if(!mobile && current==="revision" && !contactEdit())mount.querySelector(".airport-booking__identity button").textContent=view.t("backData");
     mount.setAttribute("aria-label",view.t(current==="datos"?"dataTitle":"reviewTitle"));
     var layout=view.node("div","hourly-booking__layout"),content=view.node("section","hourly-booking__content");
     var heading=view.node("h1","",view.t(current==="datos"?"dataTitle":"reviewTitle"));heading.tabIndex=-1;if(!mobile)content.appendChild(heading);
+    var summary=desktopReview?view.reviewSummary(snapshot,fresh(),reservationAmount()):null;
+    var statusHost=desktopReview?summary:content;
+    if(desktopReview)content.appendChild(view.node("p","airport-booking__lead",view.t("reviewText")));
     var edit=editing();
     if(edit){
-      content.appendChild(view.node("p","",edit.publicCode));
+      statusHost.appendChild(view.node("p",desktopReview?"airport-booking__reference":"",edit.publicCode));
       var estimated=new Date(Date.parse(edit.serverNow)+Math.max(0,Date.now()-edit.receivedAt)).toISOString();
-      content.appendChild(view.deadline(edit.expiresAt,estimated,"editDeadlinePassed",function(){
+      statusHost.appendChild(view.deadline(edit.expiresAt,estimated,"editDeadlinePassed",function(){
         if(mount)mount.querySelectorAll("[data-hourly-pay]").forEach(function(b){b.disabled=true;});
         protectReview();
       }));
       if(!contactEdit())content.appendChild(button("exitEdit",exitEdit));
     }
-    if(notice){var message=view.node("p","hourly-booking__notice",view.t(notice));message.setAttribute("role","status");content.appendChild(message);}
-    if(notice==="availabilityError")content.appendChild(button("retryAvailability",checkAvailability));
-    if(notice==="availabilityUnavailable")content.appendChild(button("editTrip",trip));
+    if(notice){var message=view.node("p","hourly-booking__notice",view.t(notice));message.setAttribute("role","status");statusHost.appendChild(message);}
+    if(notice==="availabilityError")statusHost.appendChild(button("retryAvailability",checkAvailability));
+    if(notice==="availabilityUnavailable")statusHost.appendChild(button("editTrip",trip));
     if(attempt()){
-      content.appendChild(button("recoverSave",recover,true));
+      statusHost.appendChild(button("recoverSave",recover,true));
       if(attempt().response&&attempt().response.bookingStatusToken){
-        content.appendChild(button("resumePayment",function(){window.location.assign("/booking-cancelled.html?token="+encodeURIComponent(attempt().response.bookingStatusToken));}));
+        statusHost.appendChild(button("resumePayment",function(){window.location.assign("/booking-cancelled.html?token="+encodeURIComponent(attempt().response.bookingStatusToken));}));
       }
     }
     if(current==="datos"){
       form.classList.add("hourly-booking__form");form.inert=busy||!!attempt();
       if(contactEdit()){
-        form.elements.message.readOnly=true;
         if(!mobile&&snapshot.hourly_daily_notes){var readNotes=view.node("dl","");readNotes.appendChild(view.field(view.t("notes"),snapshot.hourly_daily_notes));content.appendChild(readNotes);}
       }
-      ["name","phone","email","message"].forEach(function(name){
+      ["name","phone","email"].forEach(function(name){
         var field=form.elements.namedItem(name),wrapper=field&&field.closest(".form-field");
         if(wrapper)wrapper.setAttribute("data-hourly-booking-field",name);
       });
       submit.removeAttribute("data-i18n");submit.textContent=view.t("reviewCta");
       content.append(form,view.node("p","",view.t("noPayment")));
-      if(notesLabel){notesLabel.removeAttribute("data-i18n");notesLabel.textContent=view.t("notesOptional");}
-      form.elements.message.removeAttribute("data-i18n-ph");form.elements.message.setAttribute("placeholder",view.t("notesHelp"));
       if(mobile){
         phoneMobileCopy=true;
-        ["name","email"].forEach(function(name){var label=form.querySelector('label[for="contact-'+name+'"]');if(label){label.removeAttribute('data-i18n');label.textContent=window.__pixkuyI18nDict?.airportMobileContactStep?.fields?.[name] || label.textContent;}});
+        ["name","email"].forEach(function(name){var label=form.querySelector('label[for="hourly-contact-'+name+'"]');if(label){label.removeAttribute('data-i18n');label.textContent=window.__pixkuyI18nDict?.airportMobileContactStep?.fields?.[name] || label.textContent;}});
         phoneLabel.removeAttribute("data-i18n");phoneLabel.textContent=window.__pixkuyI18nDict?.airportMobileContactStep?.fields?.phone || view.t("phone");
         form.elements.phone.removeAttribute("data-i18n-ph");form.elements.phone.setAttribute("placeholder","+52 55 1234 5678");
       }
     }else{
-      var contact=view.node("dl","hourly-booking__contact");
+      var contact=view.node("dl",desktopReview?"airport-booking__details":"hourly-booking__contact");
       [["name","name"],["phone","phone"],["email","email"],["notes","hourly_daily_notes"]].forEach(function(entry){
+        if(desktopReview&&entry[0]==="notes")return;
         if(mobile && entry[0]==="notes" && !String(snapshot[entry[1]]||"").trim())return;
         var row=view.field(view.t(entry[0]),snapshot[entry[1]]);
         if(mobile&&entry[0]==="notes")row.classList.add("hourly-booking__review-notes");
@@ -300,8 +297,15 @@
       if(mobile){
         var contactBlock=view.node("section","hourly-booking__review-block");
         contactBlock.append(view.node("h2","",view.t("contact")),contact);content.appendChild(contactBlock);
-      }else content.appendChild(contact);
-      if(!mobile)content.appendChild(button("edit",backData));
+      }else{
+        var tripDetails=view.desktopTrip(snapshot);
+        var tripContent=view.node("div","");tripContent.append(tripDetails,view.node("p","hourly-booking__timezone",view.t("timezone")));
+        content.append(view.desktopBlock("tripTitle",tripContent,contactEdit()?null:trip),view.desktopBlock("contact",contact,backData));
+        if(String(snapshot.hourly_daily_notes||"").trim()){
+          var notes=view.node("dl","airport-booking__details");notes.appendChild(view.field(view.t("notes"),snapshot.hourly_daily_notes));
+          content.appendChild(view.desktopBlock("notes",notes,contactEdit()?null:function(){trip(true);}));
+        }
+      }
       var legal=view.node("div","legal-acceptance__links");
       [["terms","mobileTerms"],["cancellations","mobileCancellations"],["privacy","mobilePrivacy"]].forEach(function(entry){
         var link=view.node("a","",view.t(entry[1]));link.href="legal/"+entry[0]+".html";link.target="_blank";link.rel="noopener";legal.appendChild(link);
@@ -310,13 +314,18 @@
         var conditions=view.node("section","hourly-booking__review-block hourly-booking__review-conditions");
         conditions.append(view.node("p","",view.t("accepted")),legal);
         content.append(conditions,view.mobileTotal(snapshot,fresh(),reservationAmount()));
-      }else content.append(legal,view.node("p","",view.t("accepted")));
+      }else{
+        var conditions=view.node("section","airport-booking__conditions"),accepted=view.node("p","airport-booking__conditions-status");
+        accepted.append(view.icon("check"),view.node("span","",view.t("accepted")));
+        legal.querySelectorAll("a").forEach(function(link){link.prepend(view.icon("document"));});
+        conditions.append(accepted,legal);content.appendChild(conditions);
+      }
       var proceed=button(edit?"replacePayCta":"payCta",pay,true);
       proceed.setAttribute("data-hourly-pay","");proceed.disabled=busy||expired()||!fresh()||!!attempt();
-      content.appendChild(proceed);
-      if(!fresh()&&!mobile)content.appendChild(button("backData",function(){notice="unverified";go("datos");}));
+      statusHost.appendChild(proceed);
+      if(!fresh()&&!mobile)statusHost.appendChild(button("backData",function(){notice="unverified";go("datos");}));
     }
-    var summary=mobile?view.mobileSummary(snapshot,fresh(),current,contactEdit(),reservationAmount()):view.summary(snapshot,fresh(),reservationAmount());
+    summary=summary||(mobile?view.mobileSummary(snapshot,fresh(),current,contactEdit(),reservationAmount()):view.summary(snapshot,fresh(),reservationAmount()));
     if(mobile){summary.classList.add("hourly-booking__summary--mobile");layout.append(summary,content);heading=summary.querySelector("h2");heading.tabIndex=-1;}
     else layout.append(content,summary);
     heading.setAttribute("data-hourly-route-heading","");
@@ -349,14 +358,12 @@
       ["name","phone","email"].forEach(function(key){if(snapshot)form.elements.namedItem(key).value=snapshot[key]||"";});
       suspended=false;
     }
-    if(value&&value.service_type==="hourly_daily")draft.restore(value);
+    // Configuration already owns the current offer. Copy its fields without
+    // replaying the draft-to-panel sync, which would invalidate that offer.
+    if(value&&value.service_type==="hourly_daily")window.PixkuyHourlyBookingForm.restore(value);
     if(renderedStep!=="datos" && renderedStep!=="revision" && form.elements.message)
       form.elements.message.value=form.elements.hourly_daily_notes.value;
     save(true);
-    // Synchronize the existing editor as well as the hidden form. Its i18n
-    // refresh must never restore an old configuration over the active route.
-    if(snapshot && window.PixkuyForms?.applyContactHourlyDailyHandoff)
-      window.PixkuyForms.applyContactHourlyDailyHandoff(snapshot);
     reviewed="";go("datos");return true;
   }
   function review(value){
@@ -365,14 +372,12 @@
     if(!guardReviewExpiry())return true;
     if(editing())value.hourlyPendingToken=editing().token;
     snapshot=draft.save(value);
-    if(window.PixkuyForms?.applyContactHourlyDailyHandoff)
-      window.PixkuyForms.applyContactHourlyDailyHandoff(snapshot);
     reviewed=fingerprint(value);notice="";go("revision");return true;
   }
   window.PixkuyHourlyBookingFlow={openData:openData,review:review,guardReviewExpiry:guardReviewExpiry,leave:leave,resumeEntry:resumeEntry,navigationVersion:function(){return navigationVersion;},isActive:function(){return hydrated && !!mount && !suspended&&(step()==="datos"||step()==="revision");}};
   window.addEventListener("pixkuy:hourly-daily-panel-submit",function(event){
     if(!view.media.matches)return;
-    window.setTimeout(function(){if(["hourly","full_day"].indexOf(event.detail.hourly_daily_mode)>=0)openData();},0);
+    window.setTimeout(function(){if(["hourly","full_day"].indexOf(event.detail.hourly_daily_mode)>=0)openData(Object.assign({},event.detail,{service_type:"hourly_daily"}));},0);
   });
   function keepReviewLabel(){if(step()==="datos")window.queueMicrotask(function(){var label=view.t("reviewCta");if(submit.textContent!==label)submit.textContent=label;guardReview();});}
   form.addEventListener("input",function(){if(step()==="datos"){reviewed="";save();keepReviewLabel();}});
@@ -398,7 +403,6 @@
     if(hourlyDestination() && validDraft(saved)){
       restoringDraft=true;
       try{
-        window.PixkuyForms.contactServiceState.setActiveServiceType("hourly_daily",{source:"hourly-route-restore",skipConfirm:true});
         draft.restore(saved);
         window.sessionStorage.removeItem(draft.returnKey);
       }finally{restoringDraft=false;}

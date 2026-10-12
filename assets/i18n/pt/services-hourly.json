@@ -4,9 +4,6 @@
       "hourly": {
         "title": "Serviço de carro com motorista privado",
         "text": "Reserve à hora ou por dia completo para transfers, agenda privada ou disponibilidade operacional na Cidade do México.",
-        "contact": {
-          "helper": "Configure modalidade, recolha, data e hora para preparar o pedido."
-        },
         "bullets": [
           "Disponibilidade flexível",
           "Várias paragens",
@@ -112,6 +109,8 @@
           "longTermPriceValue": "Conforme as suas necessidades",
           "priceValuePending": "—",
           "cta": "Solicitar",
+
+          "dataCta": "Continuar para os dados",
           "reviewCta": "Rever a minha reserva",
           "review": {
             "title": "Reveja a sua reserva",

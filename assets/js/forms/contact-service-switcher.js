@@ -6,7 +6,7 @@
   }
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
-  const MOBILE_BLOCKED_SERVICE_TYPES = ["airport_hotel", "tour_private", "hourly_daily", "event_special", "direct_transfer"];
+  const MOBILE_BLOCKED_SERVICE_TYPES = ["airport_hotel", "tour_private", "event_special", "direct_transfer"];
   const MOBILE_FALLBACK_SERVICE_TYPE = "airport_hotel";
 
   let mobileBlockedOptionSnapshots = [];
@@ -112,7 +112,6 @@
     return (
       safeServiceType === "airport_hotel" ||
       safeServiceType === "tour_private" ||
-      safeServiceType === "hourly_daily" ||
       safeServiceType === "event_special" ||
       safeServiceType === "direct_transfer" ||
       safeServiceType === "other"
@@ -265,12 +264,7 @@
         ? normalizeText(serviceStateApi.getActiveServiceType())
         : "";
 
-    // The dedicated Hourly route owns this form while entering/reviewing data.
     // Keyboard height changes must not invoke the generic contact fallback.
-    if (form && form.elements.service_type && form.elements.service_type.value === "hourly_daily" &&
-        window.PixkuyHourlyBookingFlow && window.PixkuyHourlyBookingFlow.isActive()) {
-      return "hourly_daily";
-    }
 
     if (!isMobileBlockedServiceType(activeServiceType)) {
       return activeServiceType;
@@ -337,25 +331,18 @@
     const shouldHideSharedPlacesAndPassengers =
       activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private" ||
-      activeServiceType === "hourly_daily" ||
       activeServiceType === "event_special" ||
       activeServiceType === "direct_transfer";
     const shouldHideSharedTripDateTime =
       activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private" ||
-      activeServiceType === "hourly_daily" ||
       activeServiceType === "event_special" ||
       activeServiceType === "direct_transfer";
     const shouldHideSharedLuggage =
       activeServiceType === "tour_private" ||
-      activeServiceType === "hourly_daily" ||
       activeServiceType === "event_special" ||
       activeServiceType === "direct_transfer";
-    const shouldHideSharedMessage =
-      activeServiceType === "hourly_daily" &&
-      !isMobileServiceSelectViewport() &&
-      !form.classList.contains("hourly-booking__form") &&
-      !(window.PixkuyHourlyBookingFlow && window.PixkuyHourlyBookingFlow.isActive());
+    const shouldHideSharedMessage = false;
 
     if (originField) {
       originField.hidden = shouldHideSharedPlacesAndPassengers;
@@ -427,7 +414,6 @@
     var requestSummaryField;
     var airportHotelFieldNames;
     var tourPrivateFieldNames;
-    var hourlyDailyFieldNames;
     var eventSpecialFieldNames;
     var directTransferFieldNames;
 
@@ -497,29 +483,7 @@
       "tour_private_price_label"
     ];
 	
-    hourlyDailyFieldNames = [
-      "hourly_daily_mode",
-      "hourly_daily_vehicle_type",
-      "hourly_daily_pickup",
-      "hourly_daily_pickup_place_id",
-      "hourly_daily_pickup_lat",
-      "hourly_daily_pickup_lng",
-      "hourly_daily_date",
-      "hourly_daily_start_time",
-      "hourly_daily_duration_hours",
-      "hourly_daily_custom_term",
-      "hourly_daily_notes",
-      "hourly_daily_price",
-      "hourly_daily_currency",
-      "hourly_daily_km_included",
-      "hourly_daily_extra_km_price",
-      "hourly_daily_out_of_zone_supplement",
-      "hourly_daily_trip_summary",
-      "hourly_daily_pickup_label",
-      "hourly_daily_mode_label",
-      "hourly_daily_duration_label",
-      "hourly_daily_price_label"
-    ];
+
 
     eventSpecialFieldNames = [
       "event_special_trip_summary",
@@ -585,7 +549,6 @@
 
     if (activeServiceType === "airport_hotel") {
       clearFields(tourPrivateFieldNames);
-      clearFields(hourlyDailyFieldNames);
       clearFields(eventSpecialFieldNames);
       clearFields(directTransferFieldNames);
       return true;
@@ -593,24 +556,15 @@
 
     if (activeServiceType === "tour_private") {
       clearFields(airportHotelFieldNames);
-      clearFields(hourlyDailyFieldNames);
       clearFields(eventSpecialFieldNames);
       clearFields(directTransferFieldNames);
       return true;
     }
 
-    if (activeServiceType === "hourly_daily") {
-      clearFields(airportHotelFieldNames);
-      clearFields(tourPrivateFieldNames);
-      clearFields(eventSpecialFieldNames);
-      clearFields(directTransferFieldNames);
-      return true;
-    }
 
     if (activeServiceType === "event_special") {
       clearFields(airportHotelFieldNames);
       clearFields(tourPrivateFieldNames);
-      clearFields(hourlyDailyFieldNames);
       clearFields(directTransferFieldNames);
       return true;
     }
@@ -618,7 +572,6 @@
 	    if (activeServiceType === "direct_transfer") {
       clearFields(airportHotelFieldNames);
       clearFields(tourPrivateFieldNames);
-      clearFields(hourlyDailyFieldNames);
       clearFields(eventSpecialFieldNames);
       return true;
     }
@@ -627,7 +580,6 @@
     requestSummaryField.value = "";
     clearFields(airportHotelFieldNames);
     clearFields(tourPrivateFieldNames);
-    clearFields(hourlyDailyFieldNames);
     clearFields(eventSpecialFieldNames);
     clearFields(directTransferFieldNames);
 
@@ -732,7 +684,7 @@
         if (!isMobileServiceSelectViewport() &&
             !/^#airport\//.test(window.location.hash) &&
             serviceStateApi.getActiveServiceType() === "airport_hotel") {
-          serviceStateApi.setActiveServiceType("hourly_daily", {
+          serviceStateApi.setActiveServiceType("tour_private", {
             source: "contact-desktop-default", skipConfirm: true
           });
         }
@@ -868,7 +820,7 @@
 
         if (activeServiceType === "other") {
       const result = serviceStateApi.setActiveServiceType(
-        isMobileServiceSelectViewport() ? getMobileFallbackServiceType() : "hourly_daily",
+        isMobileServiceSelectViewport() ? getMobileFallbackServiceType() : "tour_private",
         {
           source: "contact-service-default"
         }
