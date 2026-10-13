@@ -76,6 +76,16 @@
   var frameCallbackId = null;
   var activeIndex = 0;
   var isVisible = false;
+  var loadObserver = null;
+  var initFrameId = null;
+  var returnFrameId = null;
+  var sourceAssigned = false;
+  var playPending = false;
+  var pageSuspended = false;
+  var pendingSeekTime = null;
+  // Shared with desktop so switching viewport cannot revoke a manual pause.
+  var playbackIntent = window.__pixkuyInMotionPlaybackIntent || { pausedByUser: false };
+  window.__pixkuyInMotionPlaybackIntent = playbackIntent;
 
   function isMobileViewport() {
     return Boolean(mobileQuery && mobileQuery.matches);
@@ -173,20 +183,117 @@
     toggleNode.textContent = getI18nValue("inMotionScrollCinema.pause");
   }
 
-  function tryPlayVideo() {
-    var promise;
-
-    if (!videoNode || isReducedMotion()) {
+  function ensureVideoSource() {
+    if (!videoNode || sourceAssigned || !isMobileViewport() || document.hidden || pageSuspended ||
+        playbackIntent.completed || playbackIntent.failure) {
       return;
     }
 
-    promise = videoNode.play();
+    var rect = rootNode.getBoundingClientRect();
+    // Assign media only when the active section actually overlaps the viewport.
+    if (!rootNode.isConnected || !rect.width || !rect.height ||
+        rect.bottom <= 0 || rect.top >= window.innerHeight ||
+        rect.right <= 0 || rect.left >= window.innerWidth) {
+      return;
+    }
 
-    if (promise && typeof promise.catch === "function") {
-      promise.catch(function ignoreAutoplayFailure() {
+    sourceAssigned = true;
+    videoNode.src = VIDEO_SRC;
+    if (loadObserver) {
+      loadObserver.disconnect();
+    }
+  }
+
+  function tryPlayVideo(explicit) {
+    var promise;
+    var target = videoNode;
+
+    if (!target || !isVisible || !isMobileViewport() || document.hidden || pageSuspended || playPending) {
+      return;
+    }
+
+    if (explicit === true) {
+      // Reload a failed resource only on this explicit action; autoplay rejection needs no load.
+      var retryMedia = playbackIntent.failure === "media" || Boolean(target.error);
+      playbackIntent.pausedByUser = false;
+      playbackIntent.completed = false;
+      playbackIntent.failure = null;
+      if (retryMedia && sourceAssigned) {
+        pendingSeekTime = pendingSeekTime === null ? target.currentTime : pendingSeekTime;
+        target.load();
+      } else if (target.ended) {
+        target.currentTime = 0;
+      }
+      ensureVideoSource();
+    }
+
+    if (!target || !sourceAssigned || !isVisible || !isMobileViewport() ||
+        document.hidden || pageSuspended || playbackIntent.pausedByUser ||
+        playbackIntent.completed || playbackIntent.failure || target.ended || playPending || !target.paused ||
+        (isReducedMotion() && explicit !== true)) {
+      return;
+    }
+
+    playPending = true;
+    promise = target.play();
+
+    if (promise && typeof promise.then === "function") {
+      promise.then(function onPlaying() {
+        if (target !== videoNode) {
+          target.pause();
+          return;
+        }
+        playPending = false;
+        if (!isVisible || document.hidden || pageSuspended || playbackIntent.pausedByUser) {
+          pauseVideo();
+        }
+      }, function onPlayFailure(error) {
+        if (target !== videoNode) {
+          return;
+        }
+        playPending = false;
+        if (error.name !== "AbortError") {
+          playbackIntent.failure = target.error ? "media" :
+            (error.name === "NotAllowedError" ? "autoplay" : "play");
+        }
         setToggleState();
       });
+    } else {
+      playPending = false;
     }
+  }
+
+  function handleMetadata(event) {
+    if (event.currentTarget === videoNode && pendingSeekTime !== null) {
+      videoNode.currentTime = pendingSeekTime;
+      pendingSeekTime = null;
+    }
+  }
+
+  function handleDocumentVisibility() {
+    if (document.hidden || pageSuspended) {
+      cancelFrameSync();
+      pauseVideo();
+      return;
+    }
+    ensureVideoSource();
+    requestFrameSync();
+    tryPlayVideo();
+  }
+
+  function handlePageHide() {
+    pageSuspended = true;
+    if (initFrameId !== null) {
+      window.cancelAnimationFrame(initFrameId);
+      initFrameId = null;
+    }
+    cancelFrameSync();
+    pauseVideo();
+  }
+
+  function handlePageShow() {
+    pageSuspended = false;
+    requestInit();
   }
 
   function pauseVideo() {
@@ -248,16 +355,20 @@
 
   function activateChapter(index, shouldSeek) {
     var chapter = CHAPTERS[index];
+    var target = videoNode;
 
     if (!chapter || !videoNode) {
       return;
     }
 
     withViewTransition(function updateChapterState() {
+      if (target !== videoNode) {
+        return;
+      }
       updateActiveChapter(index);
 
       if (shouldSeek) {
-        videoNode.currentTime = chapter.time;
+        seekVideoToTime(chapter.time);
       }
     });
 
@@ -281,7 +392,7 @@
   }
 
   function requestFrameSync() {
-    if (!videoNode || !isVisible || frameCallbackId !== null) {
+    if (!videoNode || !isVisible || document.hidden || pageSuspended || frameCallbackId !== null) {
       return;
     }
 
@@ -312,7 +423,7 @@
   function handleVisibility(entries) {
     var entry = entries && entries[0];
 
-    if (!entry) {
+    if (!entry || entry.target !== rootNode) {
       return;
     }
 
@@ -340,6 +451,15 @@
     });
 
     observer.observe(rootNode);
+    loadObserver = new IntersectionObserver(function onVisibleSection(entries) {
+      if (entries.some(function overlaps(entry) {
+        return entry.target === rootNode && entry.isIntersecting && entry.intersectionRatio > 0;
+      })) {
+        ensureVideoSource();
+        tryPlayVideo();
+      }
+    }, { rootMargin: "0px", threshold: [0, 0.001] });
+    loadObserver.observe(rootNode);
   }
 
   function teardownObserver() {
@@ -348,6 +468,10 @@
     }
 
     observer = null;
+    if (loadObserver) {
+      loadObserver.disconnect();
+    }
+    loadObserver = null;
     isVisible = false;
     document.body.removeAttribute(BODY_ACTIVE_ATTR);
     cancelFrameSync();
@@ -398,10 +522,9 @@
 
     videoNode = document.createElement("video");
     videoNode.className = "in-motion-scroll-cinema__video";
-    videoNode.src = VIDEO_SRC;
     videoNode.poster = POSTER_SRC;
     videoNode.muted = true;
-    videoNode.loop = true;
+    videoNode.loop = false;
     videoNode.playsInline = true;
     videoNode.preload = "metadata";
     videoNode.setAttribute("aria-label", getI18nValue("inMotionScrollCinema.videoLabel"));
@@ -445,25 +568,34 @@
     videoNode.addEventListener("play", setToggleState);
     videoNode.addEventListener("pause", setToggleState);
     videoNode.addEventListener("timeupdate", syncChapterFromVideoTime);
+    videoNode.addEventListener("loadedmetadata", handleMetadata);
+    videoNode.addEventListener("ended", function onEnded(event) {
+      if (event.currentTarget !== videoNode) {
+        return;
+      }
+      playbackIntent.completed = true;
+      setToggleState();
+    });
+    videoNode.addEventListener("error", function onMediaError(event) {
+      if (event.currentTarget !== videoNode) {
+        return;
+      }
+      playbackIntent.failure = "media";
+      pauseVideo();
+      setToggleState();
+    });
 
     toggleNode.addEventListener("click", function onToggleClick() {
       if (!videoNode) {
         return;
       }
 
-      if (videoNode.muted) {
-        videoNode.muted = false;
-        videoNode.volume = 1;
-        tryPlayVideo();
-        setToggleState();
-        return;
-      }
-
       if (videoNode.paused) {
-        tryPlayVideo();
+        tryPlayVideo(true);
         return;
       }
 
+      playbackIntent.pausedByUser = true;
       pauseVideo();
     });
 	
@@ -474,10 +606,6 @@
 
       videoNode.muted = !videoNode.muted;
       videoNode.volume = videoNode.muted ? 0 : 1;
-
-      if (!videoNode.muted) {
-        tryPlayVideo();
-      }
 
       setSoundState();
     });
@@ -504,6 +632,10 @@
 
   function teardown() {
     teardownObserver();
+    if (returnFrameId !== null) {
+      window.cancelAnimationFrame(returnFrameId);
+      returnFrameId = null;
+    }
 
     if (videoNode) {
       pauseVideo();
@@ -524,6 +656,9 @@
     ctaNode = null;
     chapterButtons = [];
     activeIndex = 0;
+    sourceAssigned = false;
+    playPending = false;
+    pendingSeekTime = null;
   }
 
   function shouldRender() {
@@ -531,22 +666,44 @@
   }
 
   function init() {
-    teardown();
+    initFrameId = null;
 
     if (!shouldRender()) {
+      teardown();
       return;
     }
 
+    if (rootNode && rootNode.isConnected) {
+      rootNode.setAttribute("aria-label", getI18nValue("inMotionScrollCinema.ariaLabel"));
+      videoNode.setAttribute("aria-label", getI18nValue("inMotionScrollCinema.videoLabel"));
+      rootNode.querySelector(".in-motion-scroll-cinema__scrub").setAttribute("aria-label", getI18nValue("inMotionScrollCinema.progressLabel"));
+      chapterButtons.forEach(function refreshChapter(button, index) {
+        var label = getChapterText(CHAPTERS[index], "label");
+        button.setAttribute("aria-label", label);
+        button.querySelector(".in-motion-scroll-cinema__chapter-label").textContent = label;
+      });
+      updateActiveChapter(activeIndex);
+      setToggleState();
+      setSoundState();
+      handleDocumentVisibility();
+      return;
+    }
+
+    teardown();
     buildScrollCinema();
   }
 
   function requestInit() {
-    window.requestAnimationFrame(init);
+    if (initFrameId === null) {
+      initFrameId = window.requestAnimationFrame(init);
+    }
   }
 
   function bindLifecycle() {
     window.addEventListener("pixkuy:i18n-applied", requestInit);
-    window.addEventListener("pageshow", requestInit);
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("pagehide", handlePageHide);
+    document.addEventListener("visibilitychange", handleDocumentVisibility);
 
     if (mobileQuery && typeof mobileQuery.addEventListener === "function") {
       mobileQuery.addEventListener("change", requestInit);
@@ -610,9 +767,7 @@
       return true;
     }
 
-    videoNode.addEventListener("loadedmetadata", function onLoadedMetadata() {
-      videoNode.currentTime = safeTime;
-    }, { once: true });
+    pendingSeekTime = safeTime;
 
     return true;
   }
@@ -795,7 +950,11 @@
 
     seekVideoToTime(time);
 
-    window.requestAnimationFrame(function syncReturnedChapter() {
+    if (returnFrameId !== null) {
+      window.cancelAnimationFrame(returnFrameId);
+    }
+    returnFrameId = window.requestAnimationFrame(function syncReturnedChapter() {
+      returnFrameId = null;
       if (chapterIndex >= 0) {
         updateActiveChapter(chapterIndex);
       }
