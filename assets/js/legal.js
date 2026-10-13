@@ -266,31 +266,6 @@
     return overlay;
   }
 
-  function getI18nRuntime() {
-    // i18n.js in this project uses window.__pixkuyI18nRuntime
-    // We do not invent: we rely on what i18n.js actually exposes.
-    return window.__pixkuyI18nRuntime || null;
-  }
-  
-    function getCurrentI18nDict(rt) {
-    var runtime = rt || getI18nRuntime();
-    var lang = runtime && typeof runtime.getCurrentLang === "function"
-      ? runtime.getCurrentLang()
-      : "";
-    var runtimeDict = runtime && typeof runtime.getDict === "function"
-      ? runtime.getDict(lang)
-      : null;
-
-    if (
-      window.__pixkuyI18nDict &&
-      typeof window.__pixkuyI18nDict === "object"
-    ) {
-      return window.__pixkuyI18nDict;
-    }
-
-    return runtimeDict || null;
-  }
-  
     function clearNode(node) {
     if (!node) return false;
 
@@ -396,23 +371,23 @@
   }
 
   function applyI18nToOverlay(overlay) {
-    var rt = getI18nRuntime();
-    if (!rt || typeof rt.getCurrentLang !== "function" || typeof rt.getDict !== "function") return;
-
-    var dict = getCurrentI18nDict(rt);
-    if (!dict) return;
+    var modules = window.__pixkuyI18nModules;
+    var dict = window.__pixkuyI18nDict;
+    if (!overlay || !dict || !modules || typeof modules.getValue !== "function") return;
 
     // Apply aria-label from i18n key (no literals)
     var ariaKey = overlay.getAttribute("data-i18n-aria");
     if (ariaKey && dict) {
-      var val = rt.getByPath(dict, ariaKey);
+      var val = modules.getValue(dict, ariaKey);
       if (typeof val === "string" && val) overlay.setAttribute("aria-label", val);
     }
 
-    // Apply translations inside overlay
-    if (typeof rt.applyToRoot === "function") {
-      rt.applyToRoot(overlay);
-    }
+    // Use the live i18n contract, scoped to this overlay. Reapplying the whole
+    // document here could disturb the active booking screen and its controls.
+    overlay.querySelectorAll("[data-i18n]").forEach(function (node) {
+      var value = modules.getValue(dict, node.getAttribute("data-i18n"));
+      if (typeof value === "string" && node.innerHTML !== value) node.innerHTML = value;
+    });
 
     renderTermsSections(overlay, dict);
   }
@@ -559,6 +534,9 @@ openOverlayForHref(href);
   function init() {
     document.addEventListener("click", delegateClick, { passive: false });
     document.addEventListener("keydown", handleKeydown);
+    window.addEventListener("pixkuy:i18n-applied", function () {
+      applyI18nToOverlay(document.getElementById(OVERLAY_ID));
+    });
 
     // Create overlay early (so first open is instant)
     ensureOverlay();
