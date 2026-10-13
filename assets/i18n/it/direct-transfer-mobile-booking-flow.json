@@ -44,7 +44,7 @@
       "quoteStale": "Questo preventivo è scaduto. Controlla il prezzo aggiornato e continua di nuovo.",
       "acceptUpdated": "Continua di nuovo per accettare il prezzo aggiornato.",
       "quoteMismatch": "Il prezzo accettato non corrisponde al preventivo attuale.",
-      "quoteTampered": "I dati del preventivo non corrispondono. Controlla il prezzo attuale prima di continuare.",
+      "quoteTampered": "Il preventivo è stato aggiornato. Controllalo e continua di nuovo per accettarlo.",
       "airportTransfer": "Questo tragitto deve essere gestito come Aeroporto / Hotel.",
       "outOfCoverage": "Per questo tragitto possiamo aiutarti via WhatsApp o con un servizio auto con autista.",
       "readySuffix": "MXN"

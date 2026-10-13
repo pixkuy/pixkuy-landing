@@ -6,7 +6,7 @@
   }
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
-  const MOBILE_BLOCKED_SERVICE_TYPES = ["tour_private", "event_special", "direct_transfer"];
+  const MOBILE_BLOCKED_SERVICE_TYPES = ["tour_private", "event_special"];
   const MOBILE_FALLBACK_SERVICE_TYPE = "other";
 
   let mobileBlockedOptionSnapshots = [];
@@ -112,7 +112,6 @@
     return (
       safeServiceType === "tour_private" ||
       safeServiceType === "event_special" ||
-      safeServiceType === "direct_transfer" ||
       safeServiceType === "other"
     );
   }
@@ -329,16 +328,13 @@
       : null;
     const shouldHideSharedPlacesAndPassengers =
       activeServiceType === "tour_private" ||
-      activeServiceType === "event_special" ||
-      activeServiceType === "direct_transfer";
+      activeServiceType === "event_special";
     const shouldHideSharedTripDateTime =
       activeServiceType === "tour_private" ||
-      activeServiceType === "event_special" ||
-      activeServiceType === "direct_transfer";
+      activeServiceType === "event_special";
     const shouldHideSharedLuggage =
       activeServiceType === "tour_private" ||
-      activeServiceType === "event_special" ||
-      activeServiceType === "direct_transfer";
+      activeServiceType === "event_special";
     const shouldHideSharedMessage = false;
 
     if (originField) {
@@ -411,7 +407,6 @@
     var requestSummaryField;
     var tourPrivateFieldNames;
     var eventSpecialFieldNames;
-    var directTransferFieldNames;
 
     function clearFields(fieldNames) {
       var index;
@@ -499,49 +494,15 @@
       "event_special_currency",
       "event_special_notes"
     ];
-	
-	    directTransferFieldNames = [
-      "direct_transfer_trip_summary",
-      "direct_transfer_origin_label",
-      "direct_transfer_destination_label",
-      "direct_transfer_passenger_bucket_label",
-      "direct_transfer_price_label",
-      "direct_transfer_origin_address",
-      "direct_transfer_origin_place_id",
-      "direct_transfer_origin_lat",
-      "direct_transfer_origin_lng",
-      "direct_transfer_destination_address",
-      "direct_transfer_destination_place_id",
-      "direct_transfer_destination_lat",
-      "direct_transfer_destination_lng",
-      "direct_transfer_date",
-      "direct_transfer_time",
-      "direct_transfer_passenger_fare_key",
-      "direct_transfer_passenger_bucket_label",
-      "direct_transfer_price",
-      "direct_transfer_currency",
-      "direct_transfer_duration_seconds",
-      "direct_transfer_distance_meters",
-      "direct_transfer_vehicle_label",
-      "direct_transfer_notes"
-    ];
 
     if (activeServiceType === "tour_private") {
       clearFields(eventSpecialFieldNames);
-      clearFields(directTransferFieldNames);
       return true;
     }
 
 
     if (activeServiceType === "event_special") {
       clearFields(tourPrivateFieldNames);
-      clearFields(directTransferFieldNames);
-      return true;
-    }
-	
-	    if (activeServiceType === "direct_transfer") {
-      clearFields(tourPrivateFieldNames);
-      clearFields(eventSpecialFieldNames);
       return true;
     }
 
@@ -549,7 +510,6 @@
     requestSummaryField.value = "";
     clearFields(tourPrivateFieldNames);
     clearFields(eventSpecialFieldNames);
-    clearFields(directTransferFieldNames);
 
     return true;
   }

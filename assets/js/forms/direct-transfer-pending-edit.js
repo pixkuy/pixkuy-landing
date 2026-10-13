@@ -35,7 +35,8 @@
     return snapshot;
   }
   async function mountData(configStep){
-    const context=read(),step=window.PixkuyDirectTransferMobileContactStep;
+    const context=read(),step=window.matchMedia("(min-width:721px)").matches ? window.PixkuyDirectDesktopBooking : window.PixkuyDirectTransferMobileContactStep;
+    configStep=configStep || document.querySelector("[data-services-direct-transfer-config]");
     if(!context||configStep.dataset.directPendingMounted)return;
     configStep.dataset.directPendingMounted='1';
     if(context.attempt){location.assign('/direct-transfer-checkout-review.html?pending=1#revision');return;}
@@ -57,7 +58,10 @@
       if(!activeData())return;
       if(!response.ok||raw.reservation?.serviceType!=='direct_transfer'||raw.reservation.status!=='pending_payment'||raw.payment?.status!=='pending'||!raw.edit?.allowed||raw.edit.revision!==context.revision||raw.hold?.expiresAt!==context.expiresAt)throw new Error('STATE_CHANGED');
       context.serverNow=raw.serverNow;context.receivedAt=Date.now();write(context);verified=true;step.refreshPending();
-    }catch(_){const error=document.querySelector('[data-direct-transfer-mobile-contact-global-error]');error.hidden=false;error.textContent=window.PixkuyAirportDesktopView.t('uncertain');}
+    }catch(_){const error=window.matchMedia('(min-width:721px)').matches
+      ? window.PixkuyDirectBookingForm.getReservationRequestFields().formError
+      : document.querySelector('[data-direct-transfer-mobile-contact-global-error]');
+      if(error){error.hidden=false;error.textContent=window.PixkuyAirportDesktopView.t('uncertain');}}
   }
   function begin(state){
     const raw=state.result.raw, fleet=window.PixkuyFleetSelection.read('direct_transfer');
@@ -133,6 +137,7 @@
     window.addEventListener('hashchange',()=>{if(location.hash!=='#revision'){location.assign(dataUrl());return;}render();});
     window.matchMedia('(max-width:720px)').addEventListener('change',render);
     window.addEventListener('pixkuy:i18n-applied',load);
+    window.addEventListener('pixkuy:airport-desktop-copy',load);
     Promise.all([load(),ready()]).then(async()=>{
       if(!context)return;
       try{const response=await fetch(endpoint('status?token='+encodeURIComponent(context.token)),{headers:headers()});const raw=await response.json();

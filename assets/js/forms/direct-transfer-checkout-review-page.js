@@ -432,7 +432,47 @@
       t(dictionary, "passengerBuckets." + fareKey, fareKey);
   }
 
+  function desktopEdit(field) {
+    if(checkoutBusy || pendingAttempt())return;
+    if(window.PixkuyDirectPendingEdit?.route() && field !== 'contact')return;
+    window.sessionStorage.setItem(getStateApi().returnKey,"1");
+    location.assign("/?service=direct_transfer&lang="+encodeURIComponent(getPreferredLang())+(field==="notes"?"#direct/servicio/notes":field==="trip"?"#direct/servicio":"#direct/datos"));
+  }
+  function renderDesktopDetails(snapshot) {
+    var base=window.PixkuyAirportDesktopView,view=window.PixkuyDirectDesktopView,content=getNode("[data-direct-transfer-checkout-review-content]");
+    var editing=window.PixkuyDirectPendingEdit?.route();
+    var root=document.querySelector('[data-direct-desktop-review]');
+    if(!root){
+      root=base.shell(2,function(){desktopEdit('trip');},function(){getNode('[data-direct-transfer-checkout-review-edit]').click();},{showBack:false});
+      root.classList.add('direct-booking');root.setAttribute('data-direct-desktop-review','');document.body.appendChild(root);root.appendChild(content);
+    } else {
+      var header=base.shell(2,function(){desktopEdit('trip');},function(){getNode('[data-direct-transfer-checkout-review-edit]').click();},{showBack:false});
+      ['.airport-booking__header','.airport-booking__step-caption','.airport-booking__progress'].forEach(function(selector){root.querySelector(selector).replaceWith(header.querySelector(selector));});
+    }
+    document.body.classList.add('direct-booking-active');
+    content.classList.remove('booking-status__content');
+    if(editing){var tripAction=root.querySelector('.airport-booking__progress li:first-child button');if(tripAction)tripAction.disabled=true;}
+    var details=getNode('[data-direct-transfer-checkout-review-details]');details.hidden=true;
+    var layout=content.querySelector('[data-direct-review-layout]');
+    if(layout){['#direct-transfer-checkout-review-title','[data-direct-transfer-checkout-review-copy="text"]','[data-direct-transfer-checkout-review-legal]','[data-direct-transfer-checkout-review-error]','.booking-status__actions'].forEach(function(selector){var node=layout.querySelector(selector);if(node)content.appendChild(node);});layout.remove();}
+    layout=base.node('div','airport-booking__layout');layout.setAttribute('data-direct-review-layout','');
+    var left=base.node('div','airport-booking__main');
+    var title=getNode('#direct-transfer-checkout-review-title'),lead=getNode('[data-direct-transfer-checkout-review-copy="text"]');
+    title.className='';lead.className='airport-booking__lead';left.append(title,lead);
+    left.appendChild(view.block('yourTrip',view.trip(snapshot),editing?null:function(){desktopEdit('trip');}));
+    var contact=base.node('dl','airport-booking__details');['name','phone','email'].forEach(function(k){contact.appendChild(base.field(base.t(k),snapshot[k]));});
+    left.appendChild(view.block('contact',contact,function(){getNode('[data-direct-transfer-checkout-review-edit]').click();}));
+    left.appendChild(view.block('notes',base.node('p','',snapshot.direct_transfer_notes||'—'),editing?null:function(){desktopEdit('notes');}));
+    left.appendChild(getNode('[data-direct-transfer-checkout-review-legal]'));
+    var aside=view.summary(snapshot);layout.append(left,aside);details.after(layout);
+    ['[data-direct-transfer-checkout-review-error]','.booking-status__actions'].forEach(function(selector){var node=content.querySelector(selector);if(node)aside.appendChild(node);});
+    var proceed=getNode('[data-direct-transfer-checkout-review-proceed]');if(proceed)proceed.className='cta airport-booking__primary';
+    var edit=getNode('[data-direct-transfer-checkout-review-edit]');if(edit)edit.className='airport-booking__link';
+    return true;
+  }
+
   function renderDetails(snapshot, dictionary) {
+    if (window.matchMedia("(min-width:721px)").matches) return renderDesktopDetails(snapshot);
     var details = getNode("[data-direct-transfer-checkout-review-details]");
     var notes = normalizeText(snapshot.direct_transfer_notes || snapshot.message);
     var estimate = formatEstimate(snapshot, dictionary);
@@ -500,12 +540,22 @@
       "</div>"
     ].join("");
 
+    var desktop=window.matchMedia("(min-width:721px)").matches;
+    legal.classList.toggle('booking-status__notice',!desktop);
+    legal.classList.toggle('airport-booking__conditions',desktop);
+    if(desktop){
+      var base=window.PixkuyAirportDesktopView,status=base.node('p','airport-booking__conditions-status');
+      status.append(base.icon('check'),base.node('span','',base.t(acceptedAt?'accepted':'conditions')));
+      legal.replaceChildren(status);
+    }
     legal.classList.toggle('direct-transfer-checkout-review__legal--accepted',!!acceptedAt);
+    var links=desktop?window.PixkuyAirportDesktopView.node('div','legal-acceptance__links'):legal;
+    if(desktop)legal.appendChild(links);
     var copy = window.__pixkuyI18nDict && window.__pixkuyI18nDict.terms && window.__pixkuyI18nDict.terms.acceptance;
     if (copy) [ ['terms','viewTerms'], ['cancellations','viewCancellations'], ['privacy','viewPrivacy'] ].forEach(function (entry, index) {
-      if(index)legal.appendChild(document.createTextNode(' · '));
+      if(index&&!desktop)links.appendChild(document.createTextNode(' · '));
       var link=document.createElement('a');link.href='legal/'+entry[0]+'.html?lang='+encodeURIComponent(getPreferredLang());
-      link.textContent=copy[entry[1]];legal.appendChild(link);
+      link.textContent=copy[entry[1]];if(desktop)link.prepend(window.PixkuyAirportDesktopView.icon('document'));links.appendChild(link);
     });
 
     return true;
@@ -590,6 +640,8 @@
       message = getApiConfigurationErrorMessage(dictionary);
     } else if (error && (error.httpStatus >= 500 || error.result && error.result.statusCode >= 500 || error.name === "TypeError")) {
       message = t(dictionary, "availabilityTechnical", "");
+    } else if (code === "DIRECT_TRANSFER_QUOTE_UPDATED") {
+      message = t(dictionary, "quote.updated", "");
     } else if (code === "DIRECT_TRANSFER_PRICE_MISMATCH") {
       message = t(dictionary, "quote.priceUpdated", "");
     } else if (code === "DIRECT_TRANSFER_QUOTE_STALE") {
@@ -615,6 +667,18 @@
     }
 
     setText(errorNode, message);
+    if (error && error.before && error.after) {
+      [
+        ["price", formatPrice(error.before), formatPrice(error.after)],
+        ["estimate", quoteRouteLabel(error.before), quoteRouteLabel(error.after)],
+        ["vehicle", normalizeText(error.before.fleet_model && error.before.fleet_model.name), normalizeText(error.after.fleet_model && error.after.fleet_model.name)]
+      ].forEach(function (entry) {
+        if (entry[1] === entry[2]) return;
+        var difference = document.createElement("p");
+        difference.textContent = t(dictionary, "details." + entry[0], "") + ": " + entry[1] + " → " + entry[2];
+        errorNode.appendChild(difference);
+      });
+    }
     setHidden(errorNode, false);
 
     return true;
@@ -690,10 +754,10 @@
     );
   }
 
-  function requestPrecheck(snapshot) {
+  function requestPrecheck(snapshot, options) {
     var stateApi = getStateApi();
     var config = getConfig();
-    var payload = stateApi && stateApi.buildPrecheckPayload(snapshot);
+    var payload = stateApi && stateApi.buildPrecheckPayload(snapshot, options);
 
     if (!payload) {
       return Promise.reject(new Error("DIRECT_TRANSFER_REQUOTE_REQUIRED"));
@@ -719,7 +783,41 @@
     });
   }
 
-  function requestCheckout(snapshot) {
+  function quoteRouteLabel(snapshot) {
+    var locale = getPreferredLang();
+    return new Intl.NumberFormat(locale, {style:"unit", unit:"meter"}).format(Number(snapshot.direct_transfer_distance_meters)) + " · " +
+      new Intl.NumberFormat(locale, {style:"unit", unit:"second"}).format(Number(snapshot.direct_transfer_duration_seconds));
+  }
+
+  // Expiry is a certificate lifetime, not a travel condition. The backend's
+  // fingerprint still includes it (and duration); never synthesize that hash.
+  function quoteConditions(snapshot) {
+    var context = getStateApi().buildPrecheckPayload(snapshot, {compareCanonicalQuote:false});
+    if (context) delete context.locale;
+    return JSON.stringify([context, Number(snapshot.direct_transfer_amount_minor), snapshot.direct_transfer_currency,
+      snapshot.direct_transfer_pricing_version, Number(snapshot.direct_transfer_distance_meters),
+      Number(snapshot.direct_transfer_duration_seconds), snapshot.fleet_selection && snapshot.fleet_selection.model_id,
+      snapshot.fleet_selection && snapshot.fleet_selection.model_revision]);
+  }
+
+  function quoteExpired(snapshot) {
+    return !(Date.parse(snapshot.direct_transfer_quote_expires_at) > Date.now());
+  }
+
+  function prepareDesktopQuote(snapshot, assertCurrent) {
+    var renewing = quoteExpired(snapshot);
+    return requestPrecheck(snapshot, {compareCanonicalQuote:!renewing}).then(function (result) {
+      assertCurrent();
+      // The server can observe expiry before the local clock. One fresh quote
+      // request, with full route/availability evaluation, never a retry loop.
+      if (!renewing && getPrecheckCode(result) === "DIRECT_TRANSFER_QUOTE_STALE") {
+        return requestPrecheck(snapshot, {compareCanonicalQuote:false}).then(function (fresh) { assertCurrent(); return fresh; });
+      }
+      return result;
+    });
+  }
+
+  function requestCheckout(snapshot, assertCurrent, recaptchaToken) {
     var stateApi = getStateApi();
 
     if (
@@ -733,8 +831,12 @@
       return Promise.reject(new Error("INVALID_DIRECT_TRANSFER_CHECKOUT_REVIEW_PAYLOAD"));
     }
 
-    return getRecaptchaToken()
+    return (recaptchaToken === undefined ? getRecaptchaToken() : Promise.resolve(recaptchaToken))
       .then(function addRecaptchaToken(recaptchaToken) {
+        if (assertCurrent) {
+          assertCurrent();
+          if (quoteExpired(snapshot)) throw new Error("DIRECT_TRANSFER_QUOTE_STALE");
+        }
         var config = getConfig();
         var checkoutUrl = buildCheckoutUrl(config);
         var payload = stateApi.buildCheckoutPayload(snapshot, {
@@ -774,7 +876,7 @@
     var stateApi = getStateApi();
 
     if (edit) {
-      edit.setAttribute("href", snapshot.mobileDraft ? "/?service=direct_transfer&lang=" + encodeURIComponent(getPreferredLang()) : "/?service=direct_transfer#contact");
+      edit.setAttribute("href", snapshot.mobileDraft ? "/?service=direct_transfer&lang=" + encodeURIComponent(getPreferredLang()) : "/?service=direct_transfer&lang=" + encodeURIComponent(getPreferredLang()) + "#direct/datos");
 
       edit.addEventListener("click", function onEditClick(event) {
         if (checkoutBusy || pendingAttempt()) { event.preventDefault(); return; }
@@ -803,13 +905,39 @@
           .finally(function () { setBusy(false); syncRecovery(); });
         return;
       }
+      var desktop = window.matchMedia("(min-width:721px)").matches;
+      if (desktop) {
+        snapshot = readSnapshot();
+        if (!snapshot) {
+          setBusy(false);
+          showError(currentDictionary, new Error("INVALID_DIRECT_TRANSFER_CHECKOUT_REVIEW_PAYLOAD"));
+          return;
+        }
+      }
       var reviewedAmount = Number(snapshot.direct_transfer_amount_minor);
       var reviewedModel = snapshot.fleet_selection && snapshot.fleet_selection.model_id;
-
-      requestPrecheck(snapshot)
+      var before = JSON.parse(JSON.stringify(snapshot));
+      var stored = JSON.stringify(readSnapshot());
+      var route = window.location.href;
+      var checkoutToken;
+      function assertCurrent() {
+        if (window.location.href !== route || JSON.stringify(readSnapshot()) !== stored || pendingAttempt()) {
+          throw new Error("FLEET_STALE_OFFER");
+        }
+      }
+      setHidden(getNode("[data-direct-transfer-checkout-review-error]"), true);
+      // Obtain transport credentials before renewal so their delay cannot age
+      // the newly issued quote. Mobile retains its existing transition.
+      (desktop ? getRecaptchaToken() : Promise.resolve()).then(function (token) {
+        checkoutToken = token;
+        if (desktop) assertCurrent();
+        return desktop ? prepareDesktopQuote(snapshot, assertCurrent) : requestPrecheck(snapshot);
+      })
         .then(function onReviewPrecheck(result) {
+          if (desktop) assertCurrent();
           var price = getPrecheckPrice(result);
           var accepted = isPrecheckAllowed(result);
+          if (desktop) snapshot = JSON.parse(JSON.stringify(snapshot));
 
           if (
             !stateApi ||
@@ -817,7 +945,7 @@
             !stateApi.applyCanonicalQuote(
               snapshot,
               price,
-              accepted ? new Date().toISOString() : ""
+              accepted && !desktop ? new Date().toISOString() : ""
             )
           ) {
             var missingQuoteError = new Error(getPrecheckCode(result));
@@ -832,14 +960,19 @@
           }
           snapshot.direct_transfer_price_label = "";
           snapshot.direct_transfer_price_label = formatPrice(snapshot);
-          stateApi.writeReviewSnapshot(snapshot);
+          var conditionsChanged = desktop ? quoteConditions(before) !== quoteConditions(snapshot) :
+            reviewedAmount !== Number(snapshot.direct_transfer_amount_minor) || reviewedModel !== (snapshot.fleet_selection && snapshot.fleet_selection.model_id);
+          if (desktop && accepted && !conditionsChanged) snapshot.direct_transfer_quote_accepted_at = new Date().toISOString();
+          if (!stateApi.writeReviewSnapshot(snapshot)) throw new Error("HANDOFF_STORAGE_REQUIRED");
+          stored = JSON.stringify(readSnapshot());
           renderDetails(snapshot, currentDictionary);
 
-          // A changed amount/model must be visible before a new human gesture.
-          if (accepted && (reviewedAmount !== Number(snapshot.direct_transfer_amount_minor) ||
-              reviewedModel !== (snapshot.fleet_selection && snapshot.fleet_selection.model_id))) {
-            var changed = new Error("DIRECT_TRANSFER_REQUOTE_REQUIRED");
+          // Operational duration/distance and model revision remain conditions,
+          // even when the payable amount happens to stay the same.
+          if (accepted && conditionsChanged) {
+            var changed = new Error(desktop ? "DIRECT_TRANSFER_QUOTE_UPDATED" : "DIRECT_TRANSFER_REQUOTE_REQUIRED");
             changed.code = changed.message;
+            if (desktop) { changed.before = before; changed.after = snapshot; }
             throw changed;
           }
 
@@ -850,7 +983,7 @@
             throw precheckError;
           }
 
-          return requestCheckout(snapshot);
+          return requestCheckout(snapshot, desktop ? assertCurrent : null, checkoutToken);
         })
         .then(function onCheckoutResult(result) {
           var checkoutUrl = result && result.body ? result.body.checkoutUrl : "";
@@ -876,6 +1009,9 @@
   }
 
   function init() {
+    window.addEventListener('pixkuy:airport-desktop-copy',function(){
+      if(!window.PixkuyDirectPendingEdit?.route() && readSnapshot()) renderSnapshot(readSnapshot(),currentDictionary);
+    });
     if(window.PixkuyDirectPendingEdit?.route()){
       window.PixkuyDirectPendingEdit.mount({renderDetails,renderLegal,renderStaticCopy,loadDictionary,redirectToCheckout});return true;
     }
@@ -891,7 +1027,7 @@
       });
     });
 
-    loadDictionary().then(function onDictionaryLoaded(dictionary) {
+    window.PixkuyAirportDesktopView.ready.then(loadDictionary).then(function onDictionaryLoaded(dictionary) {
       renderSnapshot(snapshot, dictionary);
 
       if (snapshot) {

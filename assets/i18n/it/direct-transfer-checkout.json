@@ -18,6 +18,7 @@
     "edit": "Indietro",
     "error": "Rivedi i dati del transfer prima di continuare.",
     "quote": {
+      "updated": "Il preventivo è stato aggiornato. Controllalo e continua di nuovo per accettarlo.",
       "priceUpdated": "Il prezzo è cambiato. Controlla il prezzo aggiornato e continua di nuovo per accettarlo.",
       "requoteRequired": "Richiedi e controlla il prezzo attuale prima di continuare.",
       "stale": "Questo preventivo è scaduto. Controlla il prezzo aggiornato e continua di nuovo.",

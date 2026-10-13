@@ -35,6 +35,7 @@
   let quoteRequestId = 0;
   let addressControllerMountRequestId = 0;
   let controllers = [];
+  const addressRevisions = {origin:0,destination:0};
 
   const state = {
     origin: "",
@@ -43,6 +44,7 @@
     destination: "",
     destinationPlace: null,
     destinationCoverage: null,
+    notes: "",
     date: "",
     time: "",
     passengerFareKey: DEFAULT_PASSENGER_BUCKET,
@@ -51,6 +53,16 @@
     quoteErrorCode: ""
   };
 
+  const CONFIG_DRAFT_KEY='pixkuy_direct_desktop_config_v1';
+  try {
+    const saved=JSON.parse(window.sessionStorage.getItem(CONFIG_DRAFT_KEY)||'null');
+    if(saved?.version===1)['origin','originPlace','destination','destinationPlace','date','time','passengerFareKey','notes'].forEach(function(key){if(Object.hasOwn(saved,key))state[key]=saved[key];});
+  } catch (_) {}
+  function saveConfiguration() {
+    if(!window.matchMedia('(min-width:721px)').matches)return;
+    const saved={version:1};['origin','originPlace','destination','destinationPlace','date','time','passengerFareKey','notes'].forEach(function(key){saved[key]=state[key];});
+    try {window.sessionStorage.setItem(CONFIG_DRAFT_KEY,JSON.stringify(saved));}catch(_){}
+  }
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
   }
@@ -318,8 +330,8 @@
     }
 
     if (
-      (hasOriginPlace && !isDirectTransferCoveredPlace("origin")) ||
-      (hasDestinationPlace && !isDirectTransferCoveredPlace("destination"))
+      (hasOriginPlace && state.originCoverage && state.originCoverage.isWithinCoverage === false) ||
+      (hasDestinationPlace && state.destinationCoverage && state.destinationCoverage.isWithinCoverage === false)
     ) {
       return "out_of_coverage";
     }
@@ -558,6 +570,8 @@
         state.destination &&
         !areSameLocations() &&
         !getDirectTransferRestrictionType() &&
+        isDirectTransferCoveredPlace("origin") &&
+        isDirectTransferCoveredPlace("destination") &&
         state.date &&
         state.time &&
         state.passengerFareKey &&
@@ -793,21 +807,7 @@
   }
 
   function getSharedReservationMinimumDateValue() {
-    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate();
-    const formsApi = window.PixkuyForms || {};
-    const getMinimumDateTime = typeof formsApi.getReservationMinimumDateTime === "function"
-      ? formsApi.getReservationMinimumDateTime
-      : null;
-    const formatDate = typeof formsApi.formatReservationDateForInput === "function"
-      ? formsApi.formatReservationDateForInput
-      : null;
-    const minimumDateTime = getMinimumDateTime ? getMinimumDateTime() : null;
-
-    if (!minimumDateTime || !formatDate) {
-      return "";
-    }
-
-    return normalizeText(formatDate(minimumDateTime));
+    return window.PixkuyDirectTransferTransactionalState.getDirectTransferMinimumDateValue();
   }
 
   function getDirectTransferMinimumDateValue() {
@@ -1036,6 +1036,9 @@
   }
 
   function requestQuoteIfReady() {
+    // Data owns its revalidation. A restored, hidden Configuration must not
+    // replace its quote or invalidate its Fleet offer in the background.
+    if (/^#direct\/datos(?:\/|$)/.test(window.location.hash)) return false;
     const quoteApi = getQuoteApi();
     const requestId = quoteRequestId + 1;
 
@@ -1105,7 +1108,9 @@
 
   async function setAddressPlace(role, selectedPlace) {
     const label = getSelectedPlaceLabel(selectedPlace, "");
+    const revision=++addressRevisions[role];
     const coverage = await resolveDirectTransferCoverage(selectedPlace);
+    if(revision!==addressRevisions[role])return false;
 
     clearAvailabilityStatus();
 
@@ -1125,6 +1130,7 @@
   }
 
   function setAddressValue(role, value) {
+    addressRevisions[role]++;
     clearAvailabilityStatus();
 
     if (role === "destination") {
@@ -1267,6 +1273,7 @@
 
     return [
       '<div class="services-direct-transfer-panel__config-inner">',
+        '<div class="services-direct-transfer-panel__fields">',
         '<div class="services-direct-transfer-panel__route">',
           buildAddressMarkup("origin"),
           buildAddressMarkup("destination"),
@@ -1276,16 +1283,9 @@
           escapeHtml(getI18nValue("directTransferMobileFlow.validation.sameRoute", "El origen y el destino no pueden ser iguales.")),
         '</p>',
 
-        buildRestrictionMarkup(),
+        '<div data-direct-transfer-panel-restriction' + (getDirectTransferRestrictionType() ? '' : ' hidden') + '>' + buildRestrictionMarkup() + '</div>',
 
         '<div class="services-direct-transfer-panel__trip-row">',
-          '<div class="services-direct-transfer-panel__field services-direct-transfer-panel__field--passengers">',
-            '<label class="services-expand__label" id="direct-transfer-desktop-passengers-label">' + escapeHtml(passengersLabel) + '</label>',
-            '<div class="services-expand__passengers-segmented services-direct-transfer-panel__passengers" role="group" aria-labelledby="direct-transfer-desktop-passengers-label">',
-              buildPassengerOptionsMarkup(),
-            '</div>',
-          '</div>',
-
           '<div class="services-direct-transfer-panel__field services-direct-transfer-panel__field--date services-expand__field--date">',
             '<label class="services-expand__label" for="direct-transfer-desktop-date">' + escapeHtml(dateLabel) + '</label>',
             '<div class="services-expand__date-wrap services-direct-transfer-panel__date-wrap">',
@@ -1323,7 +1323,20 @@
           '</div>',
         '</div>',
 
-        '<div class="services-direct-transfer-panel__summary">',
+        '<div class="services-direct-transfer-panel__field services-direct-transfer-panel__field--passengers">',
+          '<label class="services-expand__label" id="direct-transfer-desktop-passengers-label">' + escapeHtml(passengersLabel) + '</label>',
+          '<div class="services-expand__passengers-segmented services-direct-transfer-panel__passengers" role="group" aria-labelledby="direct-transfer-desktop-passengers-label">',
+            buildPassengerOptionsMarkup(),
+          '</div>',
+        '</div>',
+        '<div class="services-direct-transfer-panel__notes">',
+          '<label class="services-expand__label" for="direct-desktop-notes">' + escapeHtml(getI18nValue("contact.notes", "")) + '</label>',
+          '<textarea id="direct-desktop-notes" class="services-expand__control" data-direct-transfer-panel-notes rows="3">' + escapeHtml(state.notes) + '</textarea>',
+        '</div>',
+        '</div>',
+        '<aside class="services-direct-transfer-panel__summary" data-direct-transfer-panel-summary aria-labelledby="direct-transfer-desktop-vehicle-title">',
+          '<h4 id="direct-transfer-desktop-vehicle-title">' + escapeHtml(getI18nValue("fleetSelection.model", "Vehículo")) + '</h4>',
+          '<p class="airport-desktop-vehicle__empty" data-direct-transfer-panel-fare-message role="status" aria-live="polite"' + (isReady ? ' hidden' : '') + '>' + escapeHtml(getFareText()) + '</p>',
           '<div class="services-direct-transfer-panel__vehicle">',
             '<img class="services-direct-transfer-panel__vehicle-image" src="assets/img/fleet/bydm9_xhoras001d.jpeg" alt="' + escapeHtml(vehicleLabel) + '" loading="lazy" decoding="async" />',
             '<span>' + escapeHtml(vehicleLabel) + '</span>',
@@ -1335,7 +1348,7 @@
               '<p data-direct-transfer-panel-estimate-duration hidden><span>' + escapeHtml(getI18nValue("directTransferMobileFlow.estimate.durationLongLabel", "Tiempo estimado")) + ':</span> <strong></strong></p>',
             '</div>',
             '<span class="services-expand__label">' + escapeHtml(fareLabel) + '</span>',
-            '<strong class="services-expand__fare services-direct-transfer-panel__fare-value">' + escapeHtml(getFareText()) + '</strong>',
+            '<strong class="services-expand__fare services-direct-transfer-panel__fare-value">' + escapeHtml(isReady ? getFareText() : '—') + '</strong>',
             '<div class="services-direct-transfer-panel__airport-action" data-direct-transfer-panel-airport-action hidden>',
               '<a class="services-direct-transfer-panel__airport-link" data-direct-transfer-panel-airport-link href="' + escapeHtml(buildAirportUrl()) + '">',
                 escapeHtml(getI18nValue("directTransferMobileFlow.cta.airport", "Ir a Aeropuerto / Hotel")),
@@ -1343,11 +1356,11 @@
             '</div>',
           '</div>',
 
+          '<p class="services-direct-transfer-panel__availability" data-direct-transfer-panel-availability role="status" aria-live="polite" hidden></p>',
           '<button type="button" class="services-expand__cta services-direct-transfer-panel__cta" data-direct-transfer-panel-cta' + (isReady ? '' : ' disabled aria-disabled="true"') + '>',
             escapeHtml(ctaText),
           '</button>',
-          '<p class="services-direct-transfer-panel__availability" data-direct-transfer-panel-availability role="status" aria-live="polite" hidden></p>',
-        '</div>',
+        '</aside>',
       '</div>'
     ].join("");
   }
@@ -1444,6 +1457,7 @@
 
     return {
       surface,
+      direct_transfer_notes: state.notes,
       contextKey: [
         state.date,
         state.time,
@@ -1483,8 +1497,10 @@
   }
 
   function syncView() {
+    saveConfiguration();
     const fare = configMount.querySelector(".services-direct-transfer-panel__fare");
     const fareValue = configMount.querySelector(".services-direct-transfer-panel__fare-value");
+    const fareMessage = configMount.querySelector("[data-direct-transfer-panel-fare-message]");
     const cta = configMount.querySelector("[data-direct-transfer-panel-cta]");
     const suggestion = window.PixkuySharedAvailabilitySuggestion;
     const sameRoute = configMount.querySelector(".services-direct-transfer-panel__same-route");
@@ -1499,6 +1515,12 @@
     const airportAction = configMount.querySelector("[data-direct-transfer-panel-airport-action]");
     const airportLink = configMount.querySelector("[data-direct-transfer-panel-airport-link]");
     const restrictionType = getDirectTransferRestrictionType();
+    const restriction = configMount.querySelector("[data-direct-transfer-panel-restriction]");
+    if (restriction) {
+      const markup = buildRestrictionMarkup();
+      if (restriction.innerHTML !== markup) restriction.innerHTML = markup;
+      restriction.hidden = !restrictionType;
+    }
     const isReady = state.quoteStatus === "ready" &&
       state.quote &&
       state.quote.price &&
@@ -1512,7 +1534,11 @@
     }
 
     if (fareValue) {
-      fareValue.textContent = getFareText();
+      fareValue.textContent = isReady ? getFareText() : "—";
+    }
+    if (fareMessage) {
+      fareMessage.textContent = isReady ? "" : getFareText();
+      fareMessage.hidden = Boolean(isReady);
     }
 
     if (airportAction) {
@@ -1619,6 +1645,7 @@
     configMount.dataset.directTransferPanelBound = "1";
 
     configMount.addEventListener("input", function onInput(event) {
+      if(event.target.matches("[data-direct-transfer-panel-notes]")){state.notes=event.target.value;saveConfiguration();return;}
       const addressInput = event.target.closest("[data-direct-transfer-panel-address-input]");
       const field = event.target.closest("[data-direct-transfer-panel-field]");
 
@@ -1705,8 +1732,40 @@
     return true;
   }
 
+  async function restoreDraft(snapshot) {
+    if(!snapshot)return false;
+    resetQuote();
+    state.date=normalizeText(snapshot.direct_transfer_date);state.time=normalizeText(snapshot.direct_transfer_time);
+    state.passengerFareKey=PASSENGER_BUCKETS.includes(snapshot.direct_transfer_passenger_fare_key)?snapshot.direct_transfer_passenger_fare_key:DEFAULT_PASSENGER_BUCKET;
+    state.notes=String(snapshot.direct_transfer_notes || "");
+    for(const role of ["origin","destination"]){
+      const prefix="direct_transfer_"+role+"_", label=normalizeText(snapshot[prefix+"address"]);
+      setAddressValue(role,label);
+      if(label && snapshot[prefix+"place_id"] && snapshot[prefix+"lat"]!=="" && snapshot[prefix+"lng"]!==""){
+        await setAddressPlace(role,{
+          label:label,formattedAddress:label,placeId:snapshot[prefix+"place_id"],
+          lat:Number(snapshot[prefix+"lat"]),lng:Number(snapshot[prefix+"lng"]),
+          countryCode:snapshot[prefix+"country_code"]||"",types:snapshot[prefix+"types"]||[],
+          administrativeAreaLevel1:snapshot[prefix+"administrative_area_level_1"]||"",
+          administrativeAreaLevel2:snapshot[prefix+"administrative_area_level_2"]||"",
+          locality:snapshot[prefix+"locality"]||"",iataCode:snapshot[prefix+"iata_code"]||"",
+          addressComponents:snapshot[prefix+"address_components"]||[]
+        });
+      }
+    }
+    render();requestQuoteIfReady();return true;
+  }
+  window.PixkuyDirectTransferPanel={restore:restoreDraft,contextKey:function(){return buildPanelQuoteDetail("panel").contextKey;}};
   render();
   bindEvents();
+  new MutationObserver(function(){
+    if(!window.matchMedia('(min-width:721px)').matches || document.getElementById('services-expand-direct').hidden || state.quote)return;
+    if(state.originPlace || state.destinationPlace){
+      const origin=state.originPlace,destination=state.destinationPlace;
+      Promise.all([origin?setAddressPlace('origin',origin):null,destination?setAddressPlace('destination',destination):null]).then(syncView);
+    }
+  }).observe(document.getElementById('services-expand-direct'),{attributes:true,attributeFilter:['hidden']});
+
 
   window.addEventListener("pixkuy:direct-transfer-canonical-price", function onCanonicalPrice(event) {
     const detail = event && event.detail && typeof event.detail === "object"

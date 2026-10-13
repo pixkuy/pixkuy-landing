@@ -228,6 +228,11 @@
     vehicleNode.appendChild(name);
 
     src = getVehicleThumbnailSrc(result.vehicleDisplayName);
+    if(result.serviceType === "direct_transfer"){
+      var pendingModel = result.raw.edit && result.raw.edit.draft && result.raw.edit.draft.fleet_model;
+      src = result.vehiclePhotoUrl || (pendingModel && pendingModel.id && pendingModel.name === result.vehicleDisplayName ? pendingModel.photoUrl : "");
+      if(src && window.PixkuyFleetSelection)src = window.PixkuyFleetSelection.photo({photoUrl:src});
+    }
 
     if (!src) {
       return false;

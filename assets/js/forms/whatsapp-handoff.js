@@ -129,75 +129,11 @@
       notes: getVisibleFieldValue(form, 'event_special_notes') || getVisibleFieldValue(form, 'message')
     };
   }
-  
-    function getDirectTransferEditorData(form) {
-    if (!form) {
-      return {
-        originAddress: '',
-        destinationAddress: '',
-        tripDate: '',
-        tripTime: '',
-        passengers: '',
-        vehicle: '',
-        distanceMeters: '',
-        durationSeconds: '',
-        price: '',
-        currency: '',
-        notes: ''
-      };
-    }
-
-    return {
-      originAddress: getVisibleFieldValue(form, 'direct_transfer_origin_address'),
-      destinationAddress: getVisibleFieldValue(form, 'direct_transfer_destination_address'),
-      tripDate: getVisibleFieldValue(form, 'direct_transfer_date'),
-      tripTime: getVisibleFieldValue(form, 'direct_transfer_time'),
-      passengers: getVisibleFieldValue(form, 'direct_transfer_passenger_bucket_label'),
-      vehicle: getVisibleFieldValue(form, 'direct_transfer_vehicle_label'),
-      distanceMeters: getVisibleFieldValue(form, 'direct_transfer_distance_meters'),
-      durationSeconds: getVisibleFieldValue(form, 'direct_transfer_duration_seconds'),
-      price: getVisibleFieldValue(form, 'direct_transfer_price'),
-      currency: getVisibleFieldValue(form, 'direct_transfer_currency'),
-      notes: getVisibleFieldValue(form, 'direct_transfer_notes') || getVisibleFieldValue(form, 'message')
-    };
-  }
-
-  function formatDirectTransferDistance(value) {
-    var meters;
-    var kilometers;
-    var roundedKilometers;
-
-    meters = Number(value);
-
-    if (!Number.isFinite(meters) || meters <= 0) {
-      return '';
-    }
-
-    kilometers = meters / 1000;
-    roundedKilometers = kilometers >= 10
-      ? Math.round(kilometers)
-      : Math.round(kilometers * 10) / 10;
-
-    return String(roundedKilometers).replace('.', ',') + ' km';
-  }
-
-  function formatDirectTransferDuration(value) {
-    var seconds;
-
-    seconds = Number(value);
-
-    if (!Number.isFinite(seconds) || seconds <= 0) {
-      return '';
-    }
-
-    return String(Math.max(1, Math.round(seconds / 60))) + ' min aprox.';
-  }
 
   function getVisibleFormData(form) {
     var serviceType;
     var tourPrivateData;
     var eventSpecialData;
-    var directTransferData;
     var fallbackOrigin;
     var fallbackDestination;
     var fallbackPassengers;
@@ -212,38 +148,27 @@
     eventSpecialData = serviceType === 'event_special'
       ? getEventSpecialEditorData(form)
       : null;
-    directTransferData = serviceType === 'direct_transfer'
-      ? getDirectTransferEditorData(form)
-      : null;
 
     return {
       name: getVisibleFieldValue(form, 'name'),
       phone: getVisibleFieldValue(form, 'phone'),
       email: getVisibleFieldValue(form, 'email'),
-      tripDate: directTransferData && directTransferData.tripDate
-        ? directTransferData.tripDate
-        : (
+      tripDate: (
             tourPrivateData && tourPrivateData.tripDate
               ? tourPrivateData.tripDate
               : getVisibleFieldValue(form, 'trip_date')
           ),
-      tripTime: directTransferData && directTransferData.tripTime
-        ? directTransferData.tripTime
-        : (
+      tripTime: (
             tourPrivateData && tourPrivateData.tripTime
               ? tourPrivateData.tripTime
               : getVisibleFieldValue(form, 'trip_time')
           ),
-      origin: directTransferData && directTransferData.originAddress
-        ? directTransferData.originAddress
-        : (
+      origin: (
             eventSpecialData && eventSpecialData.originAddress
               ? eventSpecialData.originAddress
               : fallbackOrigin
           ),
-      destination: directTransferData && directTransferData.destinationAddress
-        ? directTransferData.destinationAddress
-        : (
+      destination: (
             eventSpecialData && eventSpecialData.destinationAddress
               ? eventSpecialData.destinationAddress
               : fallbackDestination
@@ -251,9 +176,7 @@
       serviceType: serviceType,
       zone: getVisibleFieldValue(form, 'zone'),
       fare: getVisibleFieldValue(form, 'fare'),
-      passengers: directTransferData && directTransferData.passengers
-        ? directTransferData.passengers
-        : (
+      passengers: (
             eventSpecialData && eventSpecialData.passengers
               ? eventSpecialData.passengers
               : (
@@ -261,9 +184,7 @@
                 )
           ),
       luggage: getVisibleFieldValue(form, 'luggage'),
-      notes: directTransferData && directTransferData.notes
-        ? directTransferData.notes
-        : (
+      notes: (
             eventSpecialData && eventSpecialData.notes
               ? eventSpecialData.notes
               : (
@@ -274,9 +195,7 @@
       pickup: tourPrivateData && tourPrivateData.pickup ? tourPrivateData.pickup : '',
       hasGuide: tourPrivateData && tourPrivateData.hasGuide ? tourPrivateData.hasGuide : '',
       guideLanguage: tourPrivateData && tourPrivateData.guideLanguage ? tourPrivateData.guideLanguage : '',
-      price: directTransferData && directTransferData.price
-        ? directTransferData.price
-        : (
+      price: (
             eventSpecialData && eventSpecialData.price
               ? eventSpecialData.price
               : (
@@ -285,9 +204,7 @@
                     : ('')
                 )
           ),
-      currency: directTransferData && directTransferData.currency
-        ? directTransferData.currency
-        : (
+      currency: (
             eventSpecialData && eventSpecialData.currency
               ? eventSpecialData.currency
               : (
@@ -303,9 +220,6 @@
       eventSpecialReturnPickupLabel: eventSpecialData && eventSpecialData.returnPickupLabel ? eventSpecialData.returnPickupLabel : '',
       eventSpecialEstimatedEventArrivalTime: eventSpecialData && eventSpecialData.estimatedEventArrivalTime ? eventSpecialData.estimatedEventArrivalTime : '',
       eventSpecialEstimatedDestinationArrivalTime: eventSpecialData && eventSpecialData.estimatedDestinationArrivalTime ? eventSpecialData.estimatedDestinationArrivalTime : '',
-      directTransferVehicle: directTransferData && directTransferData.vehicle ? directTransferData.vehicle : '',
-      directTransferDistance: directTransferData && directTransferData.distanceMeters ? formatDirectTransferDistance(directTransferData.distanceMeters) : '',
-      directTransferDuration: directTransferData && directTransferData.durationSeconds ? formatDirectTransferDuration(directTransferData.durationSeconds) : ''
     };
   }
   
@@ -319,7 +233,6 @@
       serviceType: getI18nValue('contact.whatsappMessage.serviceType', 'Tipo de servicio'),
       serviceTourPrivate: getI18nValue('contact.services.tourPrivate', 'Tours y visitas privadas'),
       serviceEventSpecial: getI18nValue('contact.services.eventSpecial.label', 'Eventos y ocasiones especiales'),
-      serviceDirectTransfer: getI18nValue('directTransferMobileFlow.whatsapp.serviceLabel', 'Traslado directo'),
       serviceOther: getI18nValue('contact.services.other', 'Otro servicio'),
       name: getI18nValue('contact.whatsappMessage.name', 'Nombre'),
       phone: getI18nValue('contact.whatsappMessage.phone', 'Teléfono'),
@@ -359,8 +272,6 @@
 
     } else if (data.serviceType === 'event_special') {
       lines.push(labels.serviceType + ': ' + labels.serviceEventSpecial);
-    } else if (data.serviceType === 'direct_transfer') {
-      lines.push(labels.serviceType + ': ' + labels.serviceDirectTransfer);
     } else if (data.serviceType === 'other') {
       lines.push(labels.serviceType + ': ' + labels.serviceOther);
     }
@@ -445,17 +356,8 @@
 
 
 
-    if (data.serviceType === 'direct_transfer' && data.directTransferVehicle) {
-      lines.push(labels.vehicle + ': ' + data.directTransferVehicle);
-    }
 
-    if (data.serviceType === 'direct_transfer' && data.directTransferDistance) {
-      lines.push(labels.distance + ': ' + data.directTransferDistance);
-    }
 
-    if (data.serviceType === 'direct_transfer' && data.directTransferDuration) {
-      lines.push(labels.duration + ': ' + data.directTransferDuration);
-    }
 
     if (data.passengers) {
       lines.push(labels.passengers + ': ' + data.passengers);

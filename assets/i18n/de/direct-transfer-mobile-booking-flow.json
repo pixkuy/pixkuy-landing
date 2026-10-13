@@ -44,7 +44,7 @@
       "quoteStale": "Dieses Angebot ist abgelaufen. Prüfe den aktualisierten Preis und fahre erneut fort.",
       "acceptUpdated": "Fahre erneut fort, um den aktualisierten Preis zu akzeptieren.",
       "quoteMismatch": "Der akzeptierte Preis stimmt nicht mit dem aktuellen Angebot überein.",
-      "quoteTampered": "Die Angebotsdaten stimmen nicht überein. Prüfe den aktuellen Preis, bevor du fortfährst.",
+      "quoteTampered": "Das Angebot wurde aktualisiert. Prüfe es und fahre erneut fort, um es anzunehmen.",
       "airportTransfer": "Diese Strecke muss als Flughafen / Hotel verwaltet werden.",
       "outOfCoverage": "Für diese Strecke können wir dir per WhatsApp oder mit einem Fahrzeug-mit-Chauffeur-Service helfen.",
       "readySuffix": "MXN"

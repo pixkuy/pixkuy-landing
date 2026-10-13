@@ -1628,7 +1628,8 @@
 
   #services-expand-airport .airport-desktop-vehicle .services-hourly-panel__availability[hidden]{ display:none !important; }
 
-  #services-expand-airport .airport-desktop-vehicle__empty{
+  #services-expand-airport .airport-desktop-vehicle__empty,
+  #services-expand-direct .services-direct-transfer-panel__summary > .airport-desktop-vehicle__empty{
     order:3;
     display:flex;
     align-items:center;
@@ -1645,7 +1646,8 @@
     text-align:center;
   }
 
-  #services-expand-airport .airport-desktop-vehicle__empty[hidden]{ display:none; }
+  #services-expand-airport .airport-desktop-vehicle__empty[hidden],
+  #services-expand-direct .services-direct-transfer-panel__summary > .airport-desktop-vehicle__empty[hidden]{ display:none; }
 
   #services-expand-airport .airport-desktop-vehicle > .services-expand__field--fare{
     order:5;

@@ -2,8 +2,8 @@
    Direct Transfer Booking API checkout bridge.
    Responsabilidad:
    - interceptar solo direct_transfer transaccional
-   - desktop panel: precheck y handoff a #contact como Airport/Hourly
-   - contact/mobile: llamar Booking API y redirigir a Stripe Checkout
+   - desktop panel: precheck y handoff a Datos propios de Direct
+   - Datos desktop/móvil: validar y preparar la Revisión transaccional
    - preservar Netlify Forms para servicios no transaccionales
 */
 
@@ -108,7 +108,7 @@
   }
 
   function getReservationApi() {
-    var api = window.PixkuyForms;
+    var api = window.PixkuyDirectBookingForm;
 
     if (
       !api ||
@@ -122,13 +122,13 @@
   }
 
   function getForm() {
-    var api = window.PixkuyForms;
+    var api = window.PixkuyDirectBookingForm;
 
     if (api && typeof api.getReservationForm === "function") {
       return api.getReservationForm();
     }
 
-    return document.querySelector('form[name="contact"]');
+    return null;
   }
 
   function getFieldValue(form, name) {
@@ -454,8 +454,8 @@
   function showCheckoutError(form, message) {
     var fields =
       window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      typeof window.PixkuyDirectBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyDirectBookingForm.getReservationRequestFields(form)
         : null;
     var errorText = normalizeText(message) || getI18nValue(
       "contact.validation.formIncomplete",
@@ -481,8 +481,8 @@
   function hideCheckoutError(form) {
     var fields =
       window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      typeof window.PixkuyDirectBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyDirectBookingForm.getReservationRequestFields(form)
         : null;
     var mobileError = document.querySelector(
       '[data-direct-transfer-mobile-contact-step][aria-hidden="false"] [data-direct-transfer-mobile-contact-global-error]'
@@ -552,12 +552,14 @@
       return existing;
     }
 
+    var restoredProof = api.readEvidence(form, "web_direct_transfer_checkout");
     host.__pixkuyLegalAcceptanceInstance = api.create({
       container: host,
       form: form,
       channel: "web_direct_transfer_checkout",
       checkboxId: "pixkuy-direct-transfer-legal-acceptance"
     });
+    host.__pixkuyLegalAcceptanceInstance.restore(restoredProof);
 
     return host.__pixkuyLegalAcceptanceInstance;
   }
@@ -609,6 +611,10 @@
   }
 
   function syncLegalAcceptanceVisibility(form) {
+    if (window.PixkuyDirectPendingEdit?.activeData() && isDesktopViewport()) {
+      window.PixkuyDirectDesktopBooking?.refreshPending();
+      return true;
+    }
     var api = getReservationApi();
     var fields;
     var data;
@@ -646,7 +652,7 @@
 
     Array.prototype.slice.call(form.querySelectorAll('button[type="submit"]'))
       .forEach(function syncSubmit(button) {
-        button.disabled = !stateApi.isSnapshotReadyForPrecheck(snapshot) ||
+        button.disabled = form.getAttribute("data-booking-api-checkout-busy") === "1" || !api.validate(false) || !stateApi.isSnapshotReadyForPrecheck(snapshot) ||
           !isLegalAcceptanceInstanceAccepted(instance);
         button.setAttribute("aria-disabled", button.disabled ? "true" : "false");
       });
@@ -791,46 +797,14 @@
     ].join("");
   }
 
-  function ensureCanonicalQuoteFormField(form, name, value) {
-    var field;
 
-    if (!form) {
-      return false;
-    }
-
-    field = form.querySelector('[name="' + name + '"]');
-
-    if (!field) {
-      field = document.createElement("input");
-      field.type = "hidden";
-      field.name = name;
-      form.appendChild(field);
-    }
-
-    field.value = normalizeText(value);
-    return true;
-  }
 
   function syncCanonicalQuoteToForm(snapshot) {
-    var form = getForm();
-    var names = [
-      "direct_transfer_price",
-      "direct_transfer_amount_minor",
-      "direct_transfer_currency",
-      "direct_transfer_price_label",
-      "direct_transfer_duration_seconds",
-      "direct_transfer_distance_meters",
-      "direct_transfer_pricing_version",
-      "direct_transfer_quote_fingerprint",
-      "direct_transfer_quote_expires_at",
-      "direct_transfer_quote_accepted_at"
-    ];
-
-    names.forEach(function syncCanonicalField(name) {
-      ensureCanonicalQuoteFormField(form, name, snapshot && snapshot[name]);
-    });
-
-    return Boolean(form);
+    var current = window.PixkuyDirectBookingForm.raw();
+    if (getCanonicalQuoteContextKey(current) !== getCanonicalQuoteContextKey(snapshot)) return false;
+    window.PixkuyDirectBookingForm.patch(Object.fromEntries(Object.entries(snapshot || {}).filter(function(entry){ return /^direct_transfer_(price|amount|currency|duration|distance|pricing|quote)/.test(entry[0]); })));
+    window.PixkuyDirectDesktopBooking?.refreshQuote();
+    return true;
   }
 
   function getCanonicalQuoteContextKey(snapshot) {
@@ -932,186 +906,10 @@
     return true;
   }
 
-  function getPanelHandoffSummaryApi() {
-    var forms = window.PixkuyForms;
-
-    if (!forms || typeof forms !== "object") {
-      return null;
-    }
-
-    if (
-      typeof forms.setPanelHandoffSummary !== "function" ||
-      typeof forms.clearPanelHandoffSummary !== "function"
-    ) {
-      return null;
-    }
-
-    return forms;
-  }
-
-  function buildContactHandoffLocation(snapshot, role) {
-    var safeSnapshot = snapshot && typeof snapshot === "object" ? snapshot : {};
-    var prefix = role === "destination"
-      ? "direct_transfer_destination_"
-      : "direct_transfer_origin_";
-    var address = normalizeText(safeSnapshot[prefix + "address"]);
-    var lat = Number(safeSnapshot[prefix + "lat"]);
-    var lng = Number(safeSnapshot[prefix + "lng"]);
-    var location;
-
-    if (!address || !Number.isFinite(lat) || !Number.isFinite(lng)) {
-      return null;
-    }
-
-    location = {
-      label: address,
-      address: address,
-      formattedAddress: address,
-      placeId: normalizeText(safeSnapshot[prefix + "place_id"]),
-      place_id: normalizeText(safeSnapshot[prefix + "place_id"]),
-      id: normalizeText(safeSnapshot[prefix + "place_id"]),
-      lat: lat,
-      lng: lng,
-      countryCode: normalizeText(safeSnapshot[prefix + "country_code"]),
-      country_code: normalizeText(safeSnapshot[prefix + "country_code"]),
-      administrativeAreaLevel1: normalizeText(safeSnapshot[prefix + "administrative_area_level_1"]),
-      administrative_area_level_1: normalizeText(safeSnapshot[prefix + "administrative_area_level_1"]),
-      administrativeAreaLevel2: normalizeText(safeSnapshot[prefix + "administrative_area_level_2"]),
-      administrative_area_level_2: normalizeText(safeSnapshot[prefix + "administrative_area_level_2"]),
-      locality: normalizeText(safeSnapshot[prefix + "locality"]),
-      iataCode: normalizeText(safeSnapshot[prefix + "iata_code"]),
-      iata_code: normalizeText(safeSnapshot[prefix + "iata_code"]),
-      types: Array.isArray(safeSnapshot[prefix + "types"])
-        ? safeSnapshot[prefix + "types"].slice(0, 12)
-        : [],
-      addressComponents: Array.isArray(safeSnapshot[prefix + "address_components"])
-        ? safeSnapshot[prefix + "address_components"].slice(0, 16)
-        : [],
-      address_components: Array.isArray(safeSnapshot[prefix + "address_components"])
-        ? safeSnapshot[prefix + "address_components"].slice(0, 16)
-        : []
-    };
-
-    return location;
-  }
-
-  function buildContactHandoffPayload(snapshot) {
-    var safeSnapshot = snapshot && typeof snapshot === "object" ? snapshot : {};
-    var origin = buildContactHandoffLocation(safeSnapshot, "origin");
-    var destination = buildContactHandoffLocation(safeSnapshot, "destination");
-
-    if (!origin || !destination) {
-      return null;
-    }
-
-    return {
-      originAddress: origin,
-      destinationAddress: destination,
-      direct_transfer_date: normalizeText(safeSnapshot.direct_transfer_date),
-      direct_transfer_time: normalizeText(safeSnapshot.direct_transfer_time),
-      direct_transfer_passenger_fare_key: normalizeText(safeSnapshot.direct_transfer_passenger_fare_key),
-      direct_transfer_passenger_bucket_label: normalizeText(safeSnapshot.direct_transfer_passenger_bucket_label),
-      direct_transfer_price: normalizeText(safeSnapshot.direct_transfer_price),
-      direct_transfer_currency: normalizeText(safeSnapshot.direct_transfer_currency) || "MXN",
-      direct_transfer_price_label: normalizeText(safeSnapshot.direct_transfer_price_label),
-      direct_transfer_duration_seconds: normalizeText(safeSnapshot.direct_transfer_duration_seconds),
-      direct_transfer_distance_meters: normalizeText(safeSnapshot.direct_transfer_distance_meters),
-      direct_transfer_vehicle_label: normalizeText(safeSnapshot.direct_transfer_vehicle_label) || "BYD M9",
-      direct_transfer_notes: normalizeText(safeSnapshot.direct_transfer_notes),
-      direct_transfer_pricing_version: normalizeText(safeSnapshot.direct_transfer_pricing_version),
-      direct_transfer_quote_fingerprint: normalizeText(safeSnapshot.direct_transfer_quote_fingerprint),
-      direct_transfer_quote_expires_at: normalizeText(safeSnapshot.direct_transfer_quote_expires_at),
-      direct_transfer_quote_accepted_at: normalizeText(safeSnapshot.direct_transfer_quote_accepted_at)
-    };
-  }
-
-  function buildPanelSummaryPayload(snapshot) {
-    var safeSnapshot = snapshot && typeof snapshot === "object" ? snapshot : {};
-    var origin = normalizeText(safeSnapshot.direct_transfer_origin_address);
-    var destination = normalizeText(safeSnapshot.direct_transfer_destination_address);
-    var fare = normalizeText(safeSnapshot.direct_transfer_price_label);
-
-    if (!origin || !destination || !fare) {
-      return null;
-    }
-
-    return {
-      zone: getI18nValue("services.cards.directTransfer.title", "Traslado directo"),
-      fare: fare,
-      origin: origin,
-      destination: destination
-    };
-  }
-
-  function scrollToContactForm(form) {
-    var targetForm = form || document.getElementById("contact");
-    var focusTarget = targetForm
-      ? targetForm.querySelector('[name="name"]') ||
-        targetForm.querySelector('[data-contact-direct-transfer-origin-input]')
-      : null;
-
-    if (targetForm && typeof targetForm.scrollIntoView === "function") {
-      targetForm.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    window.setTimeout(function focusContactField() {
-      if (focusTarget && typeof focusTarget.focus === "function") {
-        focusTarget.focus();
-      }
-    }, 120);
-  }
-
   function handoffPanelSnapshotToContact(snapshot) {
-    var forms = window.PixkuyForms;
-    var serviceState = forms && forms.contactServiceState;
-    var form = getForm();
-    var handoffPayload = buildContactHandoffPayload(snapshot);
-    var summaryApi = getPanelHandoffSummaryApi();
-    var summaryPayload = buildPanelSummaryPayload(snapshot);
-
-    if (
-      !form ||
-      !forms ||
-      !serviceState ||
-      typeof serviceState.setActiveServiceType !== "function" ||
-      typeof forms.applyContactDirectTransferHandoff !== "function" ||
-      !handoffPayload
-    ) {
-      return false;
-    }
-
-    serviceState.setActiveServiceType("direct_transfer", {
-      skipConfirm: true,
-      source: "direct-transfer-panel-handoff"
-    });
-
-    if (summaryApi) {
-      summaryApi.clearPanelHandoffSummary();
-    }
-
-    if (!forms.applyContactDirectTransferHandoff(handoffPayload)) {
-      return false;
-    }
-
-    if (summaryApi && summaryPayload) {
-      summaryApi.setPanelHandoffSummary(summaryPayload);
-    }
-
-    form.dispatchEvent(
-      new window.CustomEvent("pixkuy:direct-transfer-panel-handoff", {
-        bubbles: true,
-        detail: {
-          serviceDate: normalizeText(snapshot && snapshot.direct_transfer_date),
-          serviceTime: normalizeText(snapshot && snapshot.direct_transfer_time),
-          passengerFareKey: normalizeText(snapshot && snapshot.direct_transfer_passenger_fare_key),
-          passengerBucketLabel: normalizeText(snapshot && snapshot.direct_transfer_passenger_bucket_label),
-          priceLabel: normalizeText(snapshot && snapshot.direct_transfer_price_label)
-        }
-      })
-    );
-
-    scrollToContactForm(form);
-    return true;
+    var owner=window.PixkuyDirectDesktopBooking;
+    if (!owner) return false;
+    return owner.open(snapshot);
   }
 
   function applyPanelSnapshotToContact(snapshot) {
@@ -1330,6 +1128,7 @@
     snapshot.direct_transfer_distance_meters = normalizeText(
       detail.direct_transfer_distance_meters
     );
+    snapshot.direct_transfer_notes = normalizeText(detail.direct_transfer_notes);
     snapshot.direct_transfer_vehicle_label =
       normalizeText(detail.direct_transfer_vehicle_label) || "BYD M9";
     snapshot.direct_transfer_pricing_version = normalizeText(
@@ -1365,6 +1164,7 @@
     if (!detail || !stateApi || typeof stateApi.buildPrecheckPayload !== "function") {
       return;
     }
+    if (detail.surface === "panel" && /^#direct\/datos(?:\/|$)/.test(window.location.hash)) return;
 
     snapshot = buildPanelSnapshot(detail);
     compareCanonicalQuote = Boolean(
@@ -1384,12 +1184,14 @@
 
     waitForPublicConfigReady()
       .then(function requestCanonicalPrecheck() {
+        if (detail.surface === "panel" && /^#direct\/datos(?:\/|$)/.test(window.location.hash)) return null;
         return requestPrecheck({
           config: getConfig(),
           payload: payload
         });
       })
       .then(function onCanonicalPrecheckResult(result) {
+        if (!result || (detail.surface === "panel" && /^#direct\/datos(?:\/|$)/.test(window.location.hash))) return;
         var suggestion = window.PixkuySharedAvailabilitySuggestion;
 
         if (!suggestion || !suggestion.isCurrentRequest({
@@ -1397,7 +1199,7 @@
           currentRequestId: canonicalPrecheckRequestId,
           contextKey: contextKey,
           currentContextKey: canonicalPrecheckContextKey,
-          liveContextKey: canonicalPrecheckContextKey
+          liveContextKey: detail.surface === "panel" ? window.PixkuyDirectTransferPanel.contextKey() : canonicalPrecheckContextKey
         })) {
           return;
         }
@@ -1435,7 +1237,7 @@
           currentRequestId: canonicalPrecheckRequestId,
           contextKey: contextKey,
           currentContextKey: canonicalPrecheckContextKey,
-          liveContextKey: canonicalPrecheckContextKey
+          liveContextKey: detail.surface === "panel" ? window.PixkuyDirectTransferPanel.contextKey() : canonicalPrecheckContextKey
         })) {
           return;
         }
@@ -1623,6 +1425,7 @@
         });
       })
       .then(function onPanelPrecheckResult(result) {
+        if (getCanonicalQuoteContextKey(snapshot) !== window.PixkuyDirectTransferPanel.contextKey()) return;
         if (isPrecheckAllowed(result)) {
           applyPrecheckPriceToSnapshot(snapshot, result, true);
           setPanelPrecheckMessage(
@@ -1642,6 +1445,7 @@
         setPanelPrecheckMessage(getPrecheckErrorMessage(result), "error", result);
       })
       .catch(function onPanelPrecheckError(error) {
+        if (getCanonicalQuoteContextKey(snapshot) !== window.PixkuyDirectTransferPanel.contextKey()) return;
         setPanelPrecheckMessage(
           isApiConfigurationError(error)
             ? getApiConfigurationErrorMessage()
@@ -1651,173 +1455,13 @@
       });
   }
 
-  function restoreCheckoutReviewReturn(attempt) {
-    var currentAttempt = Number(attempt) || 0;
-    var stateApi = getStateApi();
-    var forms = window.PixkuyForms;
-    var serviceState = forms && forms.contactServiceState;
-    var form;
-    var snapshot;
-
-    if (!stateApi || !window.sessionStorage) {
-      return false;
-    }
-
-    try {
-      if (window.sessionStorage.getItem(stateApi.returnKey) !== "1") {
-        return false;
-      }
-    } catch (error) {
-      return false;
-    }
-
-    if (
-      !forms ||
-      !serviceState ||
-      typeof serviceState.setActiveServiceType !== "function" ||
-      typeof forms.applyContactDirectTransferHandoff !== "function"
-    ) {
-      if (currentAttempt < 30) {
-        window.setTimeout(function retryRestore() {
-          restoreCheckoutReviewReturn(currentAttempt + 1);
-        }, 100);
-      }
-
-      return false;
-    }
-
-    form = getForm();
-    snapshot = stateApi.readReviewSnapshot();
-
-    if (!form || !snapshot) {
-      return false;
-    }
-
-    if (!isDesktopViewport() && snapshot.mobileDraft) {
-      window.PixkuyFleetSelection.editFromReview("direct_transfer");
-      window.sessionStorage.removeItem(stateApi.returnKey);
-      return true; // The mobile route restores its own form and legal proof.
-    }
-
-    serviceState.setActiveServiceType("direct_transfer", {
-      source: "direct-transfer-checkout-review-return"
-    });
-    forms.applyContactDirectTransferHandoff(snapshot);
+  function restoreCheckoutReviewReturn() {
+    var stateApi=getStateApi(), own=window.PixkuyDirectBookingForm;
+    if (!stateApi || !own || window.sessionStorage.getItem(stateApi.returnKey)!=="1") return false;
+    var snapshot=stateApi.readReviewSnapshot();if (!snapshot) return false;
+    own.restore(snapshot);
     window.PixkuyFleetSelection.editFromReview("direct_transfer");
-
-    ["name", "phone", "email"].forEach(function restoreField(name) {
-      var field = form.querySelector('[name="' + name + '"]');
-
-      if (field && snapshot[name]) {
-        field.value = snapshot[name];
-        field.dispatchEvent(new window.Event("input", { bubbles: true }));
-        field.dispatchEvent(new window.Event("change", { bubbles: true }));
-      }
-    });
-
-    try {
-      window.sessionStorage.removeItem(stateApi.returnKey);
-    } catch (error) {
-      // no-op
-    }
-
-    return true;
-  }
-
-  function runMobileCheckout(form, stateApi, snapshot, config) {
-    var owner=window.PixkuyDirectTransferMobileContactStep;
-    var revision=owner && owner.revision();
-    function stillOwnsOperation(){
-      return owner && owner.isOpen() && owner.revision()===revision &&
-        getFieldValue(form,"service_type")==="direct_transfer";
-    }
-    var precheckPayload = stateApi.buildPrecheckPayload(snapshot);
-    var idempotencyKey = createIdempotencyKey();
-
-    if (!isSnapshotAtOrAfterMinimumLeadTime(snapshot)) {
-      setButtonsBusy(form, false);
-      showCheckoutError(form, getMinimumLeadTimeMessage());
-      return false;
-    }
-
-    if (!precheckPayload) {
-      setButtonsBusy(form, false);
-      showCheckoutError(form);
-      return false;
-    }
-
-    requestPrecheck({
-      config: config,
-      payload: precheckPayload
-    })
-      .then(function onPrecheckResult(result) {
-        if (!stillOwnsOperation()) {setButtonsBusy(form,false);return null;}
-        if (!isPrecheckAllowed(result)) {
-          applyPrecheckPriceToSnapshot(snapshot, result, false);
-          setButtonsBusy(form, false);
-          showCheckoutError(form, getPrecheckErrorMessage(result));
-          return null;
-        }
-
-        if (!applyPrecheckPriceToSnapshot(snapshot, result, true)) {
-          throw new Error("INVALID_DIRECT_TRANSFER_CANONICAL_QUOTE");
-        }
-
-        return getRecaptchaToken().then(function requestMobileCheckout(recaptchaToken) {
-          if (!stillOwnsOperation()) {setButtonsBusy(form,false);return null;}
-          var checkoutPayload = stateApi.buildCheckoutPayload(snapshot, {
-            recaptchaToken: recaptchaToken
-          });
-
-          if (!checkoutPayload) {
-            throw new Error("INVALID_DIRECT_TRANSFER_CHECKOUT_PAYLOAD");
-          }
-
-          return requestCheckout({
-            config: config,
-            idempotencyKey: idempotencyKey,
-            payload: checkoutPayload
-          });
-        });
-      })
-      .then(function onCheckoutResult(result) {
-        var checkoutUrl;
-        var bookingStatusToken;
-        var checkoutError;
-
-        if (!result) {
-          return false;
-        }
-
-        checkoutUrl = result && result.body ? result.body.checkoutUrl : "";
-        bookingStatusToken = result && result.body
-          ? result.body.bookingStatusToken
-          : "";
-
-        if (!result.ok || !checkoutUrl || !bookingStatusToken) {
-          checkoutError = new Error(
-            getPrecheckCode(result) || "BOOKING_API_CHECKOUT_FAILED"
-          );
-          checkoutError.result = result;
-          throw checkoutError;
-        }
-
-        if (!redirectToCheckout(checkoutUrl, bookingStatusToken)) {
-          throw new Error("BOOKING_CHECKOUT_HANDOFF_FAILED");
-        }
-
-        return true;
-      })
-      .catch(function onCheckoutError(error) {
-        setButtonsBusy(form, false);
-        showCheckoutError(
-          form,
-          isApiConfigurationError(error)
-            ? getApiConfigurationErrorMessage()
-            : (error && error.result ? getPrecheckErrorMessage(error.result) : "")
-        );
-      });
-
+    window.sessionStorage.removeItem(stateApi.returnKey);
     return true;
   }
 
@@ -1833,13 +1477,16 @@
     if (
       !form ||
       form.nodeType !== 1 ||
-      !form.matches('form[name="contact"]')
+      form !== getForm()
     ) {
       return;
     }
 
     reservationApi = getReservationApi();
     stateApi = getStateApi();
+
+    // The existing pending editor owns replacement authorization and timing.
+    if (isDesktopViewport() && window.PixkuyDirectPendingEdit?.activeData()) return;
 
     if (!reservationApi || !stateApi) {
       return;
@@ -1863,6 +1510,7 @@
       return;
     }
 
+    if (!reservationApi.validate(true)) { showCheckoutError(form); return; }
     syncLegalAcceptanceVisibility(form);
 
     snapshot = stateApi.buildSnapshot(form, data);
@@ -1872,7 +1520,7 @@
       return;
     }
 
-    if (!isDesktopViewport() && !isSnapshotAtOrAfterMinimumLeadTime(snapshot)) {
+    if (!isSnapshotAtOrAfterMinimumLeadTime(snapshot)) {
       showCheckoutError(form, getMinimumLeadTimeMessage());
       return;
     }
@@ -1894,7 +1542,7 @@
       return;
     }
 
-    if (!isDesktopViewport() && !isSnapshotAtOrAfterMinimumLeadTime(snapshot)) {
+    if (!isSnapshotAtOrAfterMinimumLeadTime(snapshot)) {
       showCheckoutError(form, getMinimumLeadTimeMessage());
       return;
     }
@@ -1904,6 +1552,7 @@
 
     config = getConfig();
     {
+      var ownRevision = reservationApi.revision();
       var mobileOwner = !isDesktopViewport() && window.PixkuyDirectTransferMobileContactStep;
       var mobileRevision = mobileOwner && mobileOwner.revision();
       var precheckPayload = stateApi.buildPrecheckPayload(snapshot);
@@ -1919,7 +1568,7 @@
         payload: precheckPayload
       })
         .then(function onPrecheckResult(result) {
-          if (mobileOwner && (!mobileOwner.isOpen() || mobileOwner.revision() !== mobileRevision)) {
+          if (reservationApi.revision() !== ownRevision || (mobileOwner && (!mobileOwner.isOpen() || mobileOwner.revision() !== mobileRevision))) {
             setButtonsBusy(form, false);
             return;
           }
@@ -1989,6 +1638,12 @@
 
     return true;
   }
+
+  window.PixkuyDirectBookingCheckout = {
+    refreshFormState: function () {
+      return syncLegalAcceptanceVisibility(getForm());
+    }
+  };
 
   init();
 })(window, document);

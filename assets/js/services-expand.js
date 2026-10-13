@@ -527,40 +527,14 @@
     });
   }
   
-    function scrollDesktopDirectPanelIntoView(serviceKey) {
-    if (mobileQuery.matches || serviceKey !== 'direct') return;
-
-    const entry = services.direct;
-    if (!entry || !entry.panel || entry.panel.hidden || expand.hidden) return;
-
-    let attempts = 0;
-    const maxAttempts = 4;
-
-    function runScroll() {
-      if (mobileQuery.matches || entry.panel.hidden || expand.hidden) return;
-
-      const targetRect = expand.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-      const panelHeight = Math.min(targetRect.height, viewportHeight - 48);
-      const targetTop = Math.max(
-        targetRect.top + window.scrollY - Math.max((viewportHeight - panelHeight) / 2, 18),
-        0
-      );
-
-      window.scrollTo({
-        top: targetTop,
-        behavior: 'smooth'
-      });
-
-      attempts += 1;
-      if (attempts >= maxAttempts) return;
-
-      window.setTimeout(runScroll, 120);
-    }
-
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(runScroll);
-    });
+  function scrollDesktopDirectPanelIntoView(serviceKey) {
+    if(mobileQuery.matches || serviceKey !== 'direct')return;
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+      const panel=services.direct && services.direct.panel;
+      if(mobileQuery.matches || openService !== 'direct' || !panel || panel.hidden || expand.hidden)return;
+      const offset=Math.min(96,Math.max(56,Math.round(window.innerHeight * .1)));
+      window.scrollTo({top:Math.max(panel.getBoundingClientRect().top+window.scrollY-offset,0),behavior:'smooth'});
+    }));
   }
 
   function getDesktopServiceDeepLinkTarget(serviceKey) {

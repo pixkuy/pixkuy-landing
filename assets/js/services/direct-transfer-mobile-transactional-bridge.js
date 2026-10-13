@@ -44,13 +44,13 @@
   }
 
   function getReservationForm() {
-    var api = window.PixkuyForms;
+    var api = window.PixkuyDirectBookingForm;
 
     if (api && typeof api.getReservationForm === "function") {
       return api.getReservationForm();
     }
 
-    return document.querySelector('form[name="contact"]');
+    return null;
   }
 
   function getLegalAcceptanceApi() {

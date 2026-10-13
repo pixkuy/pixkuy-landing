@@ -235,7 +235,7 @@
     vehicleNode.textContent = "";
     vehicleNode.appendChild(name);
 
-    src = result.serviceType==="hourly_daily" ? result.vehiclePhotoUrl : getVehicleThumbnailSrc(result.vehicleDisplayName);
+    src = ["hourly_daily","direct_transfer"].includes(result.serviceType) ? result.vehiclePhotoUrl : getVehicleThumbnailSrc(result.vehicleDisplayName);
 
     if (!src) {
       return false;

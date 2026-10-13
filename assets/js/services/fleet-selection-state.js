@@ -146,19 +146,17 @@
     var parent = document.querySelector(roots[service]);
     var longTerm = service === "hourly_daily" && parent && parent.getAttribute("data-services-hourly-mode-active") === "custom_long_term";
     if (longTerm && window.innerWidth <= 720) return null;
-    var form = service !== "direct_transfer" ? null : document.querySelector('form[name="contact"]');
-    var type = form && form.querySelector('[name="service_type"]');
-    var formService = type && (type.value === "airport_hotel" ? "airport_transfer" : type.value);
-    if (service === "direct_transfer" && editingService === service && formService === service) {
-      var editors = {direct_transfer:"[data-contact-direct-transfer-editor]"};
-      return form.querySelector(editors[service]);
-    }
     var mobileDirect = service === "direct_transfer" && document.querySelector("[data-direct-transfer-mobile-config-step]");
     if (mobileDirect && !mobileDirect.hidden && window.matchMedia("(max-width: 720px)").matches) return mobileDirect;
     if (longTerm) return null;
     return parent;
   }
   function placeControl(parent, control) {
+    var directSummary = parent.id === "services-expand-direct" && window.matchMedia("(min-width: 721px)").matches && parent.querySelector("[data-direct-transfer-panel-summary]");
+    if (directSummary) {
+      directSummary.insertBefore(control, directSummary.querySelector(".services-direct-transfer-panel__vehicle"));
+      return;
+    }
     if (parent.id === "services-expand-airport" && window.matchMedia("(min-width: 721px)").matches) {
       var desktopFare = parent.querySelector(".airport-desktop-vehicle > .services-expand__field--fare");
       if (desktopFare) {
@@ -193,7 +191,7 @@
     }));
   }
   function editFromReview(service) {
-    if (services.indexOf(service) < 0 || (service === "direct_transfer" && !document.querySelector('form[name="contact"]'))) return false;
+    if (services.indexOf(service) < 0) return false;
     // Continuing from Airport's vehicle step confirms even its sole offered model.
     // A later replacement must use the existing explicit-choice contract.
     if (service === "airport_transfer") {
@@ -756,7 +754,7 @@
     var target = event.target;
     if (!target || !target.closest || target.closest('[data-fleet-selection]')) return;
     if (event.type === "click") {
-      if (!target.closest('[data-airport-tariff-passenger-option], [data-airport-tariff-swap], [data-airport-destination-clear], [data-direct-transfer-panel-passenger-option], [data-direct-transfer-panel-address-clear], [data-direct-transfer-mobile-address-clear], [data-contact-direct-transfer-passenger-option], [data-contact-direct-transfer-origin-clear], [data-contact-direct-transfer-destination-clear]')) return;
+      if (!target.closest('[data-airport-tariff-passenger-option], [data-airport-tariff-swap], [data-airport-destination-clear], [data-direct-transfer-panel-passenger-option], [data-direct-transfer-panel-address-clear], [data-direct-transfer-mobile-address-clear]')) return;
     } else if (!target.matches('input:not([type="hidden"]):not([type="checkbox"]), select')) return;
     if (target.closest("[data-services-hourly-config]")) return;
     // The Direct input event already invalidated the quote for this value.
@@ -776,7 +774,7 @@
     }
     var roots = {
       airport_transfer: '#services-expand-airport',
-      direct_transfer: '#services-expand-direct, [data-direct-transfer-mobile-config-step], [data-contact-direct-transfer-editor]',
+      direct_transfer: '#services-expand-direct, [data-direct-transfer-mobile-config-step]',
       hourly_daily: '[data-services-hourly-config]'
     };
     services.forEach(function (service) {

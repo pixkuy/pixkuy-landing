@@ -44,7 +44,7 @@
       "quoteStale": "Ce devis a expiré. Vérifiez le prix actualisé et continuez à nouveau.",
       "acceptUpdated": "Continuez à nouveau pour accepter le prix actualisé.",
       "quoteMismatch": "Le prix accepté ne correspond pas au devis actuel.",
-      "quoteTampered": "Les données du devis ne correspondent pas. Vérifiez le prix actuel avant de continuer.",
+      "quoteTampered": "Le devis a été mis à jour. Vérifiez-le et continuez à nouveau pour l’accepter.",
       "airportTransfer": "Ce trajet doit être traité comme Aéroport / Hôtel.",
       "outOfCoverage": "Pour ce trajet, nous pouvons vous aider par WhatsApp ou avec un service de véhicule avec chauffeur.",
       "readySuffix": "MXN"

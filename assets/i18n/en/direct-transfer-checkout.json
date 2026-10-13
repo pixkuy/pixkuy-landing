@@ -18,6 +18,7 @@
     "edit": "Back",
     "error": "Review the transfer details before continuing.",
     "quote": {
+      "updated": "The quote has been updated. Review it and continue again to accept it.",
       "priceUpdated": "The price changed. Review the updated price and continue again to accept it.",
       "requoteRequired": "Request and review the current price before continuing.",
       "stale": "This quote expired. Review the refreshed price and continue again.",

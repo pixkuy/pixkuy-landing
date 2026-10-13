@@ -48,15 +48,10 @@
       return null;
     }
 
-    return Math.floor(Date.UTC(
-      Number(dateMatch[1]),
-      Number(dateMatch[2]) - 1,
-      Number(dateMatch[3]),
-      Number(timeMatch[1]),
-      Number(timeMatch[2]),
-      0,
-      0
-    ) / 60000);
+    var y=Number(dateMatch[1]),m=Number(dateMatch[2]),d=Number(dateMatch[3]),h=Number(timeMatch[1]),minute=Number(timeMatch[2]);
+    var civil=new Date(Date.UTC(y,m-1,d,h,minute));
+    if(h>23 || minute>59 || civil.getUTCFullYear()!==y || civil.getUTCMonth()!==m-1 || civil.getUTCDate()!==d)return null;
+    return Math.floor(civil.getTime()/60000);
   }
 
   function getCurrentMexicoCityLocalValues(now) {
@@ -155,6 +150,8 @@
   }
 
   function getFieldValue(form, name) {
+    var own = window.PixkuyDirectBookingForm;
+    if (own && form === own.getReservationForm()) return normalizeText(String(own.value(name) ?? ""));
     var field = getField(form, name);
 
     return normalizeText(field && field.value);
@@ -256,6 +253,8 @@
   }
 
   function getFormPayloadRaw(form) {
+    var own = window.PixkuyDirectBookingForm;
+    if (own && form === own.getReservationForm()) return own.raw();
     var payload = {};
     var data;
 
@@ -507,11 +506,16 @@
     if (
       !origin ||
       !destination ||
-      !fareKey ||
+      !origin.place_id || !destination.place_id ||
+      !validateDirectTransferMinimumLeadTime(safeSnapshot.direct_transfer_date,safeSnapshot.direct_transfer_time).valid ||
+      !["van_1_2","van_3_4","van_5_6"].includes(fareKey) ||
       !passengers ||
       !amountMinor ||
       !normalizeText(safeSnapshot.direct_transfer_date) ||
       !normalizeText(safeSnapshot.direct_transfer_time) ||
+      !hasLegalAcceptance(safeSnapshot) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeText(safeSnapshot.email)) ||
+      !/^\+[1-9]\d{6,14}$/.test(normalizeText(safeSnapshot.phone)) ||
       !normalizeText(safeSnapshot.name) ||
       !normalizeText(safeSnapshot.email) ||
       !normalizeText(safeSnapshot.phone) ||
@@ -539,7 +543,7 @@
       direct_transfer_quote_expires_at: quoteExpiresAt,
       direct_transfer_quote_accepted_at: quoteAcceptedAt,
       direct_transfer_vehicle_label:
-        normalizeText(safeSnapshot.direct_transfer_vehicle_label) || "BYD M9",
+        normalizeText(safeSnapshot.fleet_model && safeSnapshot.fleet_model.name) || normalizeText(safeSnapshot.direct_transfer_vehicle_label),
       direct_transfer_notes: normalizeText(safeSnapshot.direct_transfer_notes),
       request_summary: buildRequestSummary(safeSnapshot),
       locale: normalizeText(safeSnapshot.locale) || getDocumentLocale(),
@@ -580,16 +584,8 @@
   }
 
   function hasLegalAcceptance(snapshot) {
-    var safeSnapshot = snapshot && typeof snapshot === "object" ? snapshot : {};
-
-    return Boolean(
-      normalizeText(safeSnapshot.legal_acceptance_accepted) === "true" &&
-        normalizeText(safeSnapshot.legal_acceptance_terms_version) &&
-        normalizeText(safeSnapshot.legal_acceptance_cancellation_policy_version) &&
-        normalizeText(safeSnapshot.legal_acceptance_privacy_version) &&
-        normalizeText(safeSnapshot.legal_acceptance_accepted_at) &&
-        normalizeText(safeSnapshot.legal_acceptance_channel)
-    );
+    var legal=window.PixkuyForms && window.PixkuyForms.LegalAcceptance;
+    return !!(legal && ['web_direct_transfer_checkout','web_direct_transfer_mobile_checkout'].some(function(channel){return !!legal.readEvidence(snapshot,channel);}));
   }
 
   function buildPrecheckPayload(snapshot, options) {
@@ -610,7 +606,9 @@
     if (
       !origin ||
       !destination ||
-      !fareKey ||
+      !origin.place_id || !destination.place_id ||
+      !validateDirectTransferMinimumLeadTime(safeSnapshot.direct_transfer_date,safeSnapshot.direct_transfer_time).valid ||
+      !["van_1_2","van_3_4","van_5_6"].includes(fareKey) ||
       !passengers ||
       (compareCanonicalQuote && !amountMinor) ||
       !normalizeText(safeSnapshot.direct_transfer_date) ||

@@ -18,6 +18,7 @@
     "edit": "Retour",
     "error": "Verifiez les donnees du transfert avant de continuer.",
     "quote": {
+      "updated": "Le devis a été mis à jour. Vérifiez-le et continuez à nouveau pour l’accepter.",
       "priceUpdated": "Le prix a changé. Vérifiez le prix actualisé et continuez à nouveau pour l’accepter.",
       "requoteRequired": "Demandez et vérifiez le prix actuel avant de continuer.",
       "stale": "Ce devis a expiré. Vérifiez le prix actualisé et continuez à nouveau.",

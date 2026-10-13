@@ -59,15 +59,6 @@
       eventSpecialPrice: form.querySelector('input[name="event_special_price"]'),
       eventSpecialCurrency: form.querySelector('input[name="event_special_currency"]'),
 
-      directTransferOriginAddress: form.querySelector('input[name="direct_transfer_origin_address"]'),
-      directTransferOriginPlaceId: form.querySelector('input[name="direct_transfer_origin_place_id"]'),
-      directTransferDestinationAddress: form.querySelector('input[name="direct_transfer_destination_address"]'),
-      directTransferDestinationPlaceId: form.querySelector('input[name="direct_transfer_destination_place_id"]'),
-      directTransferDate: form.querySelector('input[name="direct_transfer_date"]'),
-      directTransferTime: form.querySelector('input[name="direct_transfer_time"]'),
-      directTransferPassengerFareKey: form.querySelector('input[name="direct_transfer_passenger_fare_key"]'),
-      directTransferPrice: form.querySelector('input[name="direct_transfer_price"]'),
-      directTransferCurrency: form.querySelector('input[name="direct_transfer_currency"]'),
 
       passengers: form.querySelector('input[name="passengers"]'),
       luggage: form.querySelector('input[name="luggage"]'),
@@ -492,15 +483,6 @@
       eventSpecialPrice: fields.eventSpecialPrice ? getTrimmedValue(fields.eventSpecialPrice) : '',
       eventSpecialCurrency: fields.eventSpecialCurrency ? getTrimmedValue(fields.eventSpecialCurrency) : '',
 
-      directTransferOriginAddress: fields.directTransferOriginAddress ? getTrimmedValue(fields.directTransferOriginAddress) : '',
-      directTransferOriginPlaceId: fields.directTransferOriginPlaceId ? getTrimmedValue(fields.directTransferOriginPlaceId) : '',
-      directTransferDestinationAddress: fields.directTransferDestinationAddress ? getTrimmedValue(fields.directTransferDestinationAddress) : '',
-      directTransferDestinationPlaceId: fields.directTransferDestinationPlaceId ? getTrimmedValue(fields.directTransferDestinationPlaceId) : '',
-      directTransferDate: fields.directTransferDate ? getTrimmedValue(fields.directTransferDate) : '',
-      directTransferTime: fields.directTransferTime ? getTrimmedValue(fields.directTransferTime) : '',
-      directTransferPassengerFareKey: fields.directTransferPassengerFareKey ? getTrimmedValue(fields.directTransferPassengerFareKey) : '',
-      directTransferPrice: fields.directTransferPrice ? getTrimmedValue(fields.directTransferPrice) : '',
-      directTransferCurrency: fields.directTransferCurrency ? getTrimmedValue(fields.directTransferCurrency) : '',
 
       passengers: getTrimmedValue(fields.passengers),
       luggage: getTrimmedValue(fields.luggage),
@@ -602,25 +584,6 @@ function hasAttemptableEventSpecialReservationData(data) {
   return false;
 }
 
-function hasAttemptableDirectTransferReservationData(data) {
-  if (!data) return false;
-
-  return Boolean(
-    data.name &&
-    isValidInternationalPhoneNumber(data.phone) &&
-    data.email &&
-    data.serviceType === 'direct_transfer' &&
-    data.directTransferOriginAddress &&
-    data.directTransferOriginPlaceId &&
-    data.directTransferDestinationAddress &&
-    data.directTransferDestinationPlaceId &&
-    data.directTransferDate &&
-    data.directTransferTime &&
-    data.directTransferPassengerFareKey &&
-    data.directTransferPrice &&
-    data.directTransferCurrency
-  );
-}
 
   function hasAttemptableReservationData(data) {
     if (!data) return false;
@@ -633,10 +596,6 @@ function hasAttemptableDirectTransferReservationData(data) {
 
     if (data.serviceType === 'event_special') {
       return hasAttemptableEventSpecialReservationData(data);
-    }
-
-    if (data.serviceType === 'direct_transfer') {
-      return hasAttemptableDirectTransferReservationData(data);
     }
 
     return hasAttemptableOtherReservationData(data);
@@ -732,25 +691,6 @@ function hasMinimumRequiredEventSpecialReservationData(data) {
   return false;
 }
 
-function hasMinimumRequiredDirectTransferReservationData(data) {
-  if (!data) return false;
-
-  return Boolean(
-    data.name &&
-    isValidInternationalPhoneNumber(data.phone) &&
-    isValidEmail(data.email) &&
-    data.serviceType === 'direct_transfer' &&
-    data.directTransferOriginAddress &&
-    data.directTransferOriginPlaceId &&
-    data.directTransferDestinationAddress &&
-    data.directTransferDestinationPlaceId &&
-    data.directTransferDate &&
-    data.directTransferTime &&
-    data.directTransferPassengerFareKey &&
-    data.directTransferPrice &&
-    data.directTransferCurrency
-  );
-}
 
 
   function hasMinimumRequiredReservationData(data) {
@@ -764,10 +704,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
 
     if (data.serviceType === 'event_special') {
       return hasMinimumRequiredEventSpecialReservationData(data);
-    }
-
-    if (data.serviceType === 'direct_transfer') {
-      return hasMinimumRequiredDirectTransferReservationData(data);
     }
 
     return hasMinimumRequiredOtherReservationData(data);
@@ -802,18 +738,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   }
 
   function getSubmitLabelForData(data) {
-    if (
-      data &&
-      (
-        data.serviceType === 'direct_transfer'
-      ) &&
-      isDesktopViewport()
-    ) {
-      return getSubmitLabel(
-        'services.cards.hourly.panel.reviewCta',
-        'Revisar reserva'
-      );
-    }
+
 
     return getSubmitLabel('contact.submit', 'Enviar solicitud');
   }
@@ -862,7 +787,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
   var usesSpecificServiceModel;
   var isTourPrivate;
   var isEventSpecial;
-  var isDirectTransfer;
 
   if (
     !fields ||
@@ -880,8 +804,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     data &&
     (
       data.serviceType === 'tour_private' ||
-      data.serviceType === 'event_special' ||
-      data.serviceType === 'direct_transfer'
+      data.serviceType === 'event_special'
     )
   );
   
@@ -897,12 +820,6 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     data &&
     data.serviceType === 'event_special'
   );
-  
-  
-  isDirectTransfer = Boolean(
-    data &&
-    data.serviceType === 'direct_transfer'
-  );
 
   if (usesSpecificServiceModel) {
     fields.tripDate.required = false;
@@ -910,7 +827,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
     fields.origin.required = false;
     fields.destination.required = false;
     fields.passengers.required = false;
-    fields.luggage.required = !(isTourPrivate || isEventSpecial || isDirectTransfer);
+    fields.luggage.required = !(isTourPrivate || isEventSpecial);
     return true;
   }
 
@@ -1095,8 +1012,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
         email: Boolean(data.email) && isValidEmail(data.email),
         trip_date: (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         )
           ? true
           : (
@@ -1107,8 +1023,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
             ),
         trip_time: (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         )
           ? true
           : (
@@ -1119,29 +1034,25 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
             ),
         origin: (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         )
           ? true
           : Boolean(data.origin) && !areSameLocations(data.origin, data.destination),
         destination: (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         )
           ? true
           : Boolean(data.destination) && !areSameLocations(data.origin, data.destination),
         passengers: (
               data.serviceType === 'tour_private' ||
-              data.serviceType === 'event_special' ||
-              data.serviceType === 'direct_transfer'
+              data.serviceType === 'event_special'
                 ? true
                 : isPositiveIntegerUpTo(data.passengers, 6)
             ),
         luggage: (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         )
           ? true
           : isZeroOrPositiveInteger(data.luggage)
@@ -1168,8 +1079,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       case 'trip_date':
         if (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         ) {
           return true;
         }
@@ -1190,8 +1100,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       case 'trip_time':
         if (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         ) {
           return true;
         }
@@ -1208,8 +1117,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       case 'origin':
         if (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         ) {
           return true;
         }
@@ -1218,8 +1126,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       case 'destination':
         if (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         ) {
           return true;
         }
@@ -1228,8 +1135,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       case 'passengers':
         if (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         ) {
           return true;
         }
@@ -1241,8 +1147,7 @@ function hasMinimumRequiredDirectTransferReservationData(data) {
       case 'luggage':
         if (
           data.serviceType === 'tour_private' ||
-          data.serviceType === 'event_special' ||
-          data.serviceType === 'direct_transfer'
+          data.serviceType === 'event_special'
         ) {
           return true;
         }

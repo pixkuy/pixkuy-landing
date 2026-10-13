@@ -44,7 +44,7 @@
       "quoteStale": "Esta cotação expirou. Reveja o preço atualizado e continue novamente.",
       "acceptUpdated": "Continue novamente para aceitar o preço atualizado.",
       "quoteMismatch": "O preço aceito não corresponde à cotação atual.",
-      "quoteTampered": "Os dados da cotação não correspondem. Reveja o preço atual antes de continuar.",
+      "quoteTampered": "A cotação foi atualizada. Reveja-a e continue novamente para aceitá-la.",
       "airportTransfer": "Este trajeto deve ser tratado como Aeroporto / Hotel.",
       "outOfCoverage": "Para este trajeto, podemos ajudar por WhatsApp ou com um serviço de carro com motorista.",
       "readySuffix": "MXN"

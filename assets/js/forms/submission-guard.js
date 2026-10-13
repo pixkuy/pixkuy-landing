@@ -86,31 +86,6 @@
       "event_special_destination_address_lng"
     ],
 
-    direct_transfer: [
-      "direct_transfer_trip_summary",
-      "direct_transfer_origin_label",
-      "direct_transfer_destination_label",
-      "direct_transfer_passenger_bucket_label",
-      "direct_transfer_price_label",
-      "direct_transfer_origin_address",
-      "direct_transfer_origin_place_id",
-      "direct_transfer_origin_lat",
-      "direct_transfer_origin_lng",
-      "direct_transfer_destination_address",
-      "direct_transfer_destination_place_id",
-      "direct_transfer_destination_lat",
-      "direct_transfer_destination_lng",
-      "direct_transfer_date",
-      "direct_transfer_time",
-      "direct_transfer_passenger_fare_key",
-      "direct_transfer_passenger_bucket_label",
-      "direct_transfer_price",
-      "direct_transfer_currency",
-      "direct_transfer_duration_seconds",
-      "direct_transfer_distance_meters",
-      "direct_transfer_vehicle_label",
-      "direct_transfer_notes"
-    ]
   };
 
   function getReservationForm() {
@@ -228,8 +203,7 @@
         body.getAttribute("data-airport-mobile-screen") === "true" ||
         body.getAttribute("data-hourly-mobile-screen") === "true" ||
         body.getAttribute("data-tours-mobile-screen") === "true" ||
-        body.getAttribute("data-events-mobile-screen") === "true" ||
-        body.getAttribute("data-direct-transfer-mobile-screen") === "true"
+        body.getAttribute("data-events-mobile-screen") === "true"
       )
     ) {
       return "mobile_route";
@@ -259,13 +233,6 @@
     }
 
 
-    if (serviceType === "direct_transfer") {
-      setContextValue(context, "passenger_fare_key", getFieldValue(form, "direct_transfer_passenger_fare_key"));
-      setContextNumber(context, "price", getFieldValue(form, "direct_transfer_price"));
-      setContextValue(context, "currency", getFieldValue(form, "direct_transfer_currency"));
-      setContextNumber(context, "distance_meters", getFieldValue(form, "direct_transfer_distance_meters"));
-      setContextNumber(context, "duration_seconds", getFieldValue(form, "direct_transfer_duration_seconds"));
-    }
 
     if (serviceType === "event_special") {
       setContextValue(context, "event_id", getFieldValue(form, "event_special_event_id"));
@@ -492,7 +459,7 @@
 
   function lockForm(form) {
     const buttons = form
-      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit], [data-events-mobile-contact-submit], [data-direct-transfer-mobile-contact-submit]'))
+      ? Array.prototype.slice.call(form.querySelectorAll('button[type="submit"], [data-airport-mobile-contact-submit], [data-tours-mobile-contact-submit], [data-events-mobile-contact-submit]'))
       : [];
 
     if (!form) {

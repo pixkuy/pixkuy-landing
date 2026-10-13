@@ -18,6 +18,7 @@
     "edit": "Volver",
     "error": "Revisa los datos del traslado antes de continuar.",
     "quote": {
+      "updated": "La cotización se ha actualizado. Revísala y continúa de nuevo para aceptarla.",
       "priceUpdated": "El precio cambió. Revisa el precio actualizado y continúa de nuevo para aceptarlo.",
       "requoteRequired": "Solicita y revisa el precio actual antes de continuar.",
       "stale": "Esta cotización venció. Revisa el precio actualizado y continúa de nuevo.",

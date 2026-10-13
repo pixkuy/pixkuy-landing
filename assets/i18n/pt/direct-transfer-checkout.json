@@ -18,6 +18,7 @@
     "edit": "Voltar",
     "error": "Reveja os dados do transfer antes de continuar.",
     "quote": {
+      "updated": "A cotação foi atualizada. Reveja-a e continue novamente para aceitá-la.",
       "priceUpdated": "O preço mudou. Reveja o preço atualizado e continue novamente para aceitá-lo.",
       "requoteRequired": "Solicite e reveja o preço atual antes de continuar.",
       "stale": "Esta cotação expirou. Reveja o preço atualizado e continue novamente.",

@@ -8,6 +8,15 @@
   var mobileDeadline = null;
   var mobileDeadlineKey = "";
   var directLayout = null;
+  function desktopPassengerLabel(result) {
+    if (result.serviceType === 'direct_transfer') {
+      var band = String(result.passengerLabel || '').match(/(?:^|\D)(1\s*[–-]\s*2|3\s*[–-]\s*4|5\s*[–-]\s*6)(?:\D|$)/);
+      var key = band && 'van_' + band[1].replace(/\s/g, '').replace(/[–-]/, '_');
+      var buckets = view.t('passengerBuckets');
+      if (key && buckets[key]) return buckets[key];
+    }
+    return result.passengerLabel || result.passengerCount;
+  }
   function restoreDirectLayout() {
     if (!directLayout) return;
     directLayout.forEach(function (entry) {
@@ -17,8 +26,8 @@
     directLayout = null;
   }
   function serverNow(raw) { return new Date(Date.parse(raw.serverNow) + window.performance.now() - receivedAt).toISOString(); }
-  function home() { window.location.assign("/"); }
-  function trip() { window.location.assign("/?service=airport_hotel#services"); }
+  function home() { window.location.assign(state?.result.serviceType === 'direct_transfer' ? '/?lang='+encodeURIComponent(document.documentElement.lang) : '/'); }
+  function trip() { window.location.assign("/?service="+(state?.result.serviceType === "direct_transfer" ? "direct_transfer" : "airport_hotel")+"&lang="+encodeURIComponent(document.documentElement.lang)+"#services"); }
   function mobileLocation(label, address) {
     label=String(label || '').trim();address=String(address || '').trim();
     if (!label) return address || '—';
@@ -250,7 +259,7 @@
       } catch (_) { /* Leave the existing handoff visible if context is missing. */ }
       return;
     }
-    if (!ready || !view.media.matches || !state || state.result.serviceType !== "airport_transfer") return;
+    if (!ready || !view.media.matches || !state || !["airport_transfer","direct_transfer"].includes(state.result.serviceType)) return;
     if (["confirmed", "pending", "expired"].indexOf(state.result.view) < 0) return;
     var result = state.result;
     var confirmed = result.view === "confirmed" && result.paymentStatus === "paid";
@@ -275,9 +284,10 @@
     details.append(view.field(view.t("reference"), result.publicCode), view.locationField(view.t("origin"), result.pickupAddress, {address:result.pickupAddressDetail}),
       view.locationField(view.t("destination"), result.destinationAddress, {address:result.destinationAddressDetail}), view.field(view.t("date"), view.date(result.serviceStartLocalDate)),
       view.field(view.t("time"), result.serviceStartLocalTime + " · " + view.t("timezone")),
-      view.field(view.t("passengers"), result.passengerLabel || result.passengerCount),
+      view.field(view.t("passengers"), desktopPassengerLabel(result)),
       view.field(view.t("luggage"), result.luggageCount === null ? "—" : String(result.luggageCount)),
       view.field(view.t("name"), result.customerFullName));
+    if(result.serviceType === "direct_transfer")details.children[6].remove();
     [3,4,5,6].forEach(function (index) { details.children[index].classList.add("airport-booking__detail--half"); });
     // Reuse the localized duration already rendered from the authoritative snapshot.
     var duration = document.querySelector('[data-booking-status-desktop] [data-booking-status-duration], [data-booking-cancelled-desktop] [data-booking-status-duration]');
@@ -294,7 +304,14 @@
     }));
     var aside = view.node("aside", "airport-booking__summary");
     aside.appendChild(view.node("h2", "", view.t("yourTrip")));
-    if (result.vehicleDisplayName) aside.appendChild(view.vehicle({fleet_model:{name:result.vehicleDisplayName,photoUrl:result.vehiclePhotoUrl}}));
+    var resultPhoto = result.vehiclePhotoUrl;
+    // Direct exposes the assigned model photo in its editable server draft while
+    // pending; the immutable paid photo remains authoritative after confirmation.
+    if(result.serviceType === 'direct_transfer' && result.view === 'pending' && !resultPhoto){
+      var pendingModel = result.raw.edit && result.raw.edit.draft && result.raw.edit.draft.fleet_model;
+      if(pendingModel && pendingModel.id && pendingModel.name === result.vehicleDisplayName)resultPhoto = pendingModel.photoUrl;
+    }
+    if (result.vehicleDisplayName) aside.appendChild(view.vehicle({fleet_model:{name:result.vehicleDisplayName,photoUrl:resultPhoto}}));
     aside.appendChild(view.node("p", "", confirmed ? view.t("paid") : view.t(kind + "Title")));
     aside.appendChild(view.node("p", "airport-booking__total", view.money(confirmed ? result.paymentAmountPaid : result.paymentAmountExpected, result.paymentCurrency)));
     var actions = view.node("div", "airport-booking__actions");
@@ -353,6 +370,10 @@
     if (result.view === "manualReview" || result.view === "unknown" || result.view === "cancelled") {
       message.textContent = view.t("uncertain");
     }
+    if(confirmed && result.serviceType === 'direct_transfer')actions.appendChild(view.action(view.t('bookAnother'),function(){
+      ['pixkuy_direct_transfer_checkout_review_snapshot','pixkuy_direct_transfer_checkout_review_return','pixkuy_direct_desktop_config_v1'].forEach(function(key){window.sessionStorage.removeItem(key);});
+      window.location.assign('/?lang='+encodeURIComponent(document.documentElement.lang)+'#services');
+    },false));
     actions.appendChild(view.action(view.t("home"), home, false, "home"));
     var contact = document.querySelector('[data-booking-status-desktop] [data-booking-status-whatsapp], [data-booking-cancelled-desktop] [data-booking-status-whatsapp]');
     if (contact) {
@@ -379,8 +400,8 @@
         if(window.PixkuyBookingCancelledEdit)window.PixkuyBookingCancelledEdit.beginNew(state);
       });
     });
-    if (state.result.serviceType === "airport_transfer" && state.result.view === "confirmed" && state.result.paymentStatus === "paid") {
-      window.PixkuyFleetSelection.completeReservation("airport_transfer", state.token);
+    if (["airport_transfer","direct_transfer"].includes(state.result.serviceType) && state.result.view === "confirmed" && state.result.paymentStatus === "paid") {
+      window.PixkuyFleetSelection.completeReservation(state.result.serviceType, state.token);
     }
     render();
   });

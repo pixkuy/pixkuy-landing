@@ -44,7 +44,7 @@
       "quoteStale": "This quote expired. Review the refreshed price and continue again.",
       "acceptUpdated": "Continue again to accept the updated price.",
       "quoteMismatch": "The accepted price does not match the current quote.",
-      "quoteTampered": "The quote details do not match. Review the current price before continuing.",
+      "quoteTampered": "The quote has been updated. Review it and continue again to accept it.",
       "airportTransfer": "This route must be handled as Airport / Hotel.",
       "outOfCoverage": "For this route, we can help you via WhatsApp or with a private driver service.",
       "readySuffix": "MXN"

@@ -4,7 +4,7 @@
    - crear la segunda pantalla móvil del flujo direct_transfer
    - mostrar resumen compacto del traslado configurado
    - recoger datos personales mínimos
-   - usar form[name="contact"] como infraestructura técnica de envío Netlify
+   - transferir el contacto al estado propio Direct para preparar Revisión
    - no hacer scroll a #contact
    - no activar el editor visual legacy de #contact
    - no tocar Google Places, Google Ads, WhatsApp ni success modal
@@ -207,7 +207,7 @@
   }
 
   function getReservationFormsApi() {
-    const api = window.PixkuyForms;
+    const api = window.PixkuyDirectBookingForm;
 
     if (!api || typeof api !== "object") {
       return null;
@@ -494,22 +494,6 @@
 
     input.dispatchEvent(new window.Event("input", { bubbles: true }));
     input.dispatchEvent(new window.Event("change", { bubbles: true }));
-
-    return true;
-  }
-
-  function writeFormValue(form, name, value, shouldDispatch) {
-    const field = form ? form.querySelector('[name="' + name + '"]') : null;
-
-    if (!field) {
-      return false;
-    }
-
-    setInputValue(field, value);
-
-    if (shouldDispatch === true) {
-      dispatchInputEvents(field);
-    }
 
     return true;
   }
@@ -1163,24 +1147,6 @@
     return true;
   }
 
-  function ensureHiddenFormValue(form, name, value) {
-    let field = form ? form.querySelector('[name="' + name + '"]') : null;
-
-    if (!form) {
-      return false;
-    }
-
-    if (!field) {
-      field = document.createElement("input");
-      field.type = "hidden";
-      field.name = name;
-      form.appendChild(field);
-    }
-
-    setInputValue(field, value);
-    return true;
-  }
-
   function getContactData() {
     return {
       name: normalizeText(getContactField(FIELD_NAME).value),
@@ -1190,137 +1156,11 @@
     };
   }
 
-  function buildRequestSummary(snapshot) {
-    const safeSnapshot = snapshot || {};
-    const labels = {
-      origin: getI18nValue("directTransferMobileFlow.contactStep.summary.origin", ""),
-      destination: getI18nValue("directTransferMobileFlow.contactStep.summary.destination", ""),
-      date: getI18nValue("directTransferMobileFlow.contactStep.summary.date", ""),
-      time: getI18nValue("directTransferMobileFlow.contactStep.summary.time", ""),
-      passengers: getI18nValue("directTransferMobileFlow.contactStep.summary.passengers", ""),
-      vehicle: getI18nValue("directTransferMobileFlow.contactStep.summary.vehicle", ""),
-      estimate: getI18nValue(
-        "directTransferMobileFlow.contactStep.summary.estimate",
-        getI18nValue("directTransferMobileFlow.estimate.summaryLabel", "Ruta")
-      ),
-      price: getI18nValue("directTransferMobileFlow.contactStep.summary.price", "")
-    };
-    const parts = [];
-
-    if (safeSnapshot.direct_transfer_origin_address) {
-      parts.push(labels.origin + ": " + safeSnapshot.direct_transfer_origin_address);
-    }
-
-    if (safeSnapshot.direct_transfer_destination_address) {
-      parts.push(labels.destination + ": " + safeSnapshot.direct_transfer_destination_address);
-    }
-
-    if (safeSnapshot.direct_transfer_date) {
-      parts.push(labels.date + ": " + safeSnapshot.direct_transfer_date);
-    }
-
-    if (safeSnapshot.direct_transfer_time) {
-      parts.push(labels.time + ": " + safeSnapshot.direct_transfer_time);
-    }
-
-    if (safeSnapshot.direct_transfer_passenger_bucket_label) {
-      parts.push(labels.passengers + ": " + safeSnapshot.direct_transfer_passenger_bucket_label);
-    }
-
-    if (safeSnapshot.direct_transfer_vehicle_label) {
-      parts.push(labels.vehicle + ": " + safeSnapshot.direct_transfer_vehicle_label);
-    }
-
-    if (buildEstimateSummaryLabel(safeSnapshot)) {
-      parts.push(labels.estimate + ": " + buildEstimateSummaryLabel(safeSnapshot));
-    }
-
-    if (safeSnapshot.direct_transfer_price_label) {
-      parts.push(labels.price + ": " + safeSnapshot.direct_transfer_price_label);
-    }
-
-    return parts.filter(Boolean).join(" | ");
-  }
-
   function fillReservationForm(snapshot, contactData, options) {
-    const formsApi = getReservationFormsApi();
-    const form = formsApi ? formsApi.getReservationForm() : null;
-    const fields = form && formsApi ? formsApi.getReservationRequestFields(form) : null;
-    const summary = buildRequestSummary(snapshot);
-    const safeOptions = options && typeof options === "object" ? options : {};
-
-    if (!form || !fields) {
-      return false;
-    }
-
-    writeFormValue(form, "service_type", "direct_transfer", false);
-
-    writeFormValue(form, "name", contactData.name, true);
-    writeFormValue(form, "phone", contactData.phone, true);
-    writeFormValue(form, "email", contactData.email, true);
-
-    writeFormValue(form, "trip_date", snapshot.direct_transfer_date, true);
-    writeFormValue(form, "trip_time", snapshot.direct_transfer_time, true);
-    writeFormValue(form, "origin", snapshot.direct_transfer_origin_address, true);
-    writeFormValue(form, "destination", snapshot.direct_transfer_destination_address, true);
-    writeFormValue(form, "passengers", "", true);
-    writeFormValue(form, "luggage", "", true);
-    writeFormValue(form, "message", contactData.notes, true);
-
-    writeFormValue(form, "service_label", getServiceLabel(), false);
-    writeFormValue(form, "request_summary", summary, false);
-    writeFormValue(form, "direct_transfer_trip_summary", summary, false);
-
-    writeFormValue(form, "direct_transfer_origin_label", snapshot.direct_transfer_origin_address, false);
-    writeFormValue(form, "direct_transfer_destination_label", snapshot.direct_transfer_destination_address, false);
-    writeFormValue(form, "direct_transfer_passenger_bucket_label", snapshot.direct_transfer_passenger_bucket_label, false);
-    writeFormValue(form, "direct_transfer_price_label", snapshot.direct_transfer_price_label, false);
-
-    writeFormValue(form, "direct_transfer_origin_address", snapshot.direct_transfer_origin_address, false);
-    writeFormValue(form, "direct_transfer_origin_place_id", snapshot.direct_transfer_origin_place_id, false);
-    writeFormValue(form, "direct_transfer_origin_lat", snapshot.direct_transfer_origin_lat, false);
-    writeFormValue(form, "direct_transfer_origin_lng", snapshot.direct_transfer_origin_lng, false);
-
-    writeFormValue(form, "direct_transfer_destination_address", snapshot.direct_transfer_destination_address, false);
-    writeFormValue(form, "direct_transfer_destination_place_id", snapshot.direct_transfer_destination_place_id, false);
-    writeFormValue(form, "direct_transfer_destination_lat", snapshot.direct_transfer_destination_lat, false);
-    writeFormValue(form, "direct_transfer_destination_lng", snapshot.direct_transfer_destination_lng, false);
-
-    writeFormValue(form, "direct_transfer_date", snapshot.direct_transfer_date, false);
-    writeFormValue(form, "direct_transfer_time", snapshot.direct_transfer_time, false);
-    writeFormValue(form, "direct_transfer_passenger_fare_key", snapshot.direct_transfer_passenger_fare_key, false);
-    writeFormValue(form, "direct_transfer_passenger_bucket_label", snapshot.direct_transfer_passenger_bucket_label, false);
-    writeFormValue(form, "direct_transfer_price", snapshot.direct_transfer_price, false);
-    ensureHiddenFormValue(form, "direct_transfer_amount_minor", snapshot.direct_transfer_amount_minor);
-    writeFormValue(form, "direct_transfer_currency", snapshot.direct_transfer_currency, false);
-    writeFormValue(form, "direct_transfer_duration_seconds", snapshot.direct_transfer_duration_seconds, false);
-    writeFormValue(form, "direct_transfer_distance_meters", snapshot.direct_transfer_distance_meters, false);
-    writeFormValue(form, "direct_transfer_pricing_version", snapshot.direct_transfer_pricing_version, false);
-    writeFormValue(form, "direct_transfer_quote_fingerprint", snapshot.direct_transfer_quote_fingerprint, false);
-    writeFormValue(form, "direct_transfer_quote_expires_at", snapshot.direct_transfer_quote_expires_at, false);
-    writeFormValue(form, "direct_transfer_quote_accepted_at", snapshot.direct_transfer_quote_accepted_at, false);
-    writeFormValue(form, "direct_transfer_vehicle_label", snapshot.direct_transfer_vehicle_label, false);
-    writeFormValue(form, "direct_transfer_notes", contactData.notes, false);
-
-    writeFormValue(form, "origin_place_id", snapshot.direct_transfer_origin_place_id, false);
-    writeFormValue(form, "origin_lat", snapshot.direct_transfer_origin_lat, false);
-    writeFormValue(form, "origin_lng", snapshot.direct_transfer_origin_lng, false);
-
-    writeFormValue(form, "destination_place_id", snapshot.direct_transfer_destination_place_id, false);
-    writeFormValue(form, "destination_lat", snapshot.direct_transfer_destination_lat, false);
-    writeFormValue(form, "destination_lng", snapshot.direct_transfer_destination_lng, false);
-
-    formsApi.syncReservationRequestState(fields);
-
-    if (safeOptions.skipLegacyValidation === true) {
-      return true;
-    }
-
-    if (typeof formsApi.refreshReservationRequestValidationUX === "function") {
-      return formsApi.refreshReservationRequestValidationUX(fields);
-    }
-
-    return true;
+    const own=getReservationFormsApi();if(!own)return false;
+    own.setTrip(Object.assign({},snapshot,{direct_transfer_notes:contactData.notes}));
+    own.contact(contactData);
+    return options && options.skipLegacyValidation === true || own.validate(true);
   }
 
   function validateLegalAcceptance() {

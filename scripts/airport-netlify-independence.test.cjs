@@ -173,7 +173,7 @@ async function remainingServices(){
   const source=html.slice(html.indexOf('<form\n')>=0?html.indexOf('<form\n'):html.indexOf('<form\r\n'));
   const oldMarkup=source.slice(0,source.indexOf('</form>')+7);
   assert(oldMarkup.includes('name="contact"'));assert(!oldMarkup.includes('airport_hotel'));
-  assert(!oldMarkup.includes('data-airport-canonical-controls'));assert(!oldMarkup.includes('hourly_daily'));
+  assert(!oldMarkup.includes('data-airport-canonical-controls'));assert(!oldMarkup.includes('hourly_daily'));assert(!oldMarkup.includes('direct_transfer'));
   // Controls/attributes are read from the real remaining HTML, not supplied by
   // an alternate form implementation. This checks readers, not layout/events.
   const form=c.document.createElement('form');form.name='contact';c.document.body.append(form);
@@ -191,7 +191,7 @@ async function remainingServices(){
   const whatsapp=c.document.createElement('a');whatsapp.setAttribute('data-contact-whatsapp','1');c.document.body.append(whatsapp);
   c.window.PixkuyWhatsappContact={phone:()=> '0000000000'}; // Controlled destination; link is never opened.
   c.run('assets/js/forms/whatsapp-handoff.js');assert(api.initWhatsappHandoff());
-  for(const service of ['tour_private','event_special','direct_transfer','other']){
+  for(const service of ['tour_private','event_special','other']){
     form.elements.namedItem('service_type').value=service;
     const value=api.getReservationRequestData(fields);assert(value,service+' readable');
     assert(api.hasMinimumRequiredReservationData(value),service+' guard accepts complete own fields');
