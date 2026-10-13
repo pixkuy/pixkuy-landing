@@ -189,13 +189,22 @@
         )
     );
 
+    var available = Boolean(checkoutAllowed && availabilityAvailable);
+    var unavailable = Boolean(response && response.ok &&
+      availability.available === false && availability.status !== "available");
+    // Only the availability contract certifies unavailability. Validation,
+    // policy, rate-limit and malformed responses are operational failures.
+    // Keep the existing price/explicit-model-choice outcomes distinct.
+    var failed = !available && !unavailable &&
+      code !== "PRICE_MISMATCH" && code !== "FLEET_MODEL_SELECTION_REQUIRED";
+
     return {
-      ok: Boolean(response && response.ok),
+      ok: Boolean(response && response.ok && !failed),
       statusCode: response ? response.status : 0,
       raw: body || {},
       code: code,
-      nextAvailableStartLocal: nextAvailableStartLocal,
-      available: Boolean(checkoutAllowed && availabilityAvailable)
+      nextAvailableStartLocal: failed ? "" : nextAvailableStartLocal,
+      available: available
     };
   }
 

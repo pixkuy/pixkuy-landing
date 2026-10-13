@@ -4,13 +4,148 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
 const ts=require(process.env.PIXKUY_TYPESCRIPT_MODULE||'../../../pixkuy-booking-api/node_modules/typescript');
-const source=rel=>fs.readFileSync(path.join(root,rel),'utf8');
+const source=rel=>{
+ const before=process.env.PIXKUY_HOURLY_PRECHECK_PREIMAGE;
+ const file=before&&rel.startsWith('assets/')&&fs.existsSync(path.join(before,rel))?path.join(before,rel):path.join(root,rel);
+ return fs.readFileSync(file,'utf8');
+};
 function declarations(rel,names,bindings){
  const text=source(rel),ast=ts.createSourceFile(rel,text,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),found=[];
  function visit(n){if(ts.isFunctionDeclaration(n)&&n.name&&names.includes(n.name.text))found.push(n.getText(ast));ts.forEachChild(n,visit);}visit(ast);
  assert.equal(found.length,names.length);return vm.runInNewContext(found.join('\n')+'\n({'+names.join(',')+'})',bindings);
 }
 const panel='assets/js/services/hourly-daily-panel.js',draftPath='assets/js/forms/hourly-booking-draft.js';
+// Focused offline precheck boundary: real panel handlers, pickup adapter,
+// pricing, Fleet transport/certificates and suggestion code. DOM/Places I/O and
+// HTTP are controlled; no browser, socket, booking writer or real availability.
+function hourlyPrecheckHarness(mobile=false){
+ const fixture=source('scripts/airport-netlify-independence.test.cjs');
+ const {Events,Element,Event}=vm.runInNewContext(fixture.slice(fixture.indexOf('class Events {'),fixture.indexOf('function storage('))+'\n({Events,Element,Event})',{assert});
+ const document=new Events(),window=new Events(),timers=new Map(),requests=[],storage=new Map();let timerId=0,places;
+ document.documentElement={lang:'es'};document.querySelector=()=>null;document.querySelectorAll=()=>[];
+ document.createElement=tag=>new Element(tag,document);document.createTextNode=text=>({textContent:text,remove(){}});
+ const config=document.createElement('div'),pickup=document.createElement('input'),pickupRoot=document.createElement('div'),mount=document.createElement('div');
+ const cta=document.createElement('button'),status=document.createElement('p'),price=document.createElement('p');
+ const nodes={'[data-services-hourly-cta]':cta,'[data-services-hourly-availability]':status,'.services-hourly-panel__price':price,
+  '[data-services-hourly-pickup-root]':pickupRoot,'[data-place-input="hourly_daily_pickup"]':pickup,'[data-place-mount="hourly_daily_pickup"]':mount};
+ config.querySelector=s=>nodes[s]||null;config.querySelectorAll=()=>[];pickupRoot.querySelector=()=>null;
+ window.document=document;window.location={origin:'https://local.pixkuy.test'};window.innerWidth=mobile?390:1440;
+ window.matchMedia=()=>({matches:!mobile});window.Response=Response;window.CustomEvent=Event;
+ window.sessionStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)};
+ window.setTimeout=(fn,ms)=>{timers.set(++timerId,{fn,ms});return timerId;};window.clearTimeout=id=>timers.delete(id);
+ window.PIXKUY_BOOKING_API_CONFIG={apiBaseUrl:'',publicSiteKey:'offline-fixture'};
+ window.PixkuyForms={googlePlaces:{createAutocompleteController:options=>{places=options;return {mount(){},destroy(){}};}}};
+ window.fetch=(url,init)=>{
+  if(!init)return Promise.resolve(new Response(JSON.stringify({fleetSelection:{}})));
+  assert.equal(url,'/v1/public/reservations/hourly-availability-precheck');
+  return new Promise((resolve,reject)=>requests.push({payload:JSON.parse(init.body),resolve:(body,status=200)=>resolve(new Response(JSON.stringify(body),{status})),reject}));
+ };
+ const box={window,document,URL,CustomEvent:Event,console};
+ for(const file of ['hourly-daily-pricing','fleet-selection-state','hourly-availability-precheck','hourly-daily-pickup','shared-availability-suggestion'])
+  vm.runInNewContext(source('assets/js/services/'+file+'.js'),box);
+ // Use the production default state, rather than injecting a complete trip.
+ const ast=ts.createSourceFile(panel,source(panel),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);let stateText;
+ function visit(node){if(ts.isVariableDeclaration(node)&&node.name.getText(ast)==='state')stateText=node.initializer.getText(ast);ts.forEachChild(node,visit);}visit(ast);
+ const MODES={HOURLY:'hourly',FULL_DAY:'full_day',LONG_TERM:'custom_long_term'};
+ const state=vm.runInNewContext('('+stateText+')',{MODES});
+ const noop=()=>{},bindings={...box,state,MODES,configMount:config,panelRoot:{dataset:{}},pickupControllerHandle:null,
+  availabilityBlockReason:'',availabilityBusy:false,lastAvailabilityResult:null,availabilityRequestSequence:0,activeAvailabilityContextKey:'',automaticHourlyCheck:null,
+  HOURLY_PRICING_API:window.PixkuyHourlyDailyPricing,HOURLY_PRICING_CONSTANTS:window.PixkuyHourlyDailyPricing.constants,
+  HOURLY_DURATION_OPTIONS:window.PixkuyHourlyDailyPricing.getDurationOptions().filter(x=>x<12),
+  isMobileHourlyViewport:()=>mobile,shouldShowDateFieldInServices:()=>true,isMobileModeSwitchWithoutRemount:()=>false,
+  getReservationMinimumDateLiteral:()=> '2026-10-14',trackHourlyQuoteReady:noop,trackHourlyContinueClick:noop,syncSafariDesktopTimeSelect:noop};
+ const functions=['normalizeText','getI18nValue','getLabels','getComputedPrice','syncDerivedState','isServicesDateAtOrAfterMinimum','isConfigComplete',
+  'isHourlyContinueBlockedByAvailability','shouldDisableHourlyContinue','setAvailabilityBlock','clearAvailabilityBlock','syncAvailabilityPricePresentation',
+  'invalidateAvailabilityState','getHourlyCtaText','formatCurrency','destroyPickupController','mountPickupController','syncLiveFieldValues',
+  'getHourlyAvailabilityPrecheckApi','isTransactionalHourlyMode','getNextAvailableTimeLabel','getNextAvailableMessage','getAvailabilityMessage',
+  'isAvailabilityRequestFailure','getHourlyAvailabilityContextKey','isCurrentHourlyAvailabilityRequest','restoreAvailabilityStatusPlacement',
+  'placeUnavailableStatusInMobileFooter','setAvailabilityStatus','setUnavailableAvailabilityStatus','clearAvailabilityStatus','setHourlyContinueBusy',
+  'buildHourlySubmitDetail','runHourlyAvailabilityPrecheck','applyNextAvailableSuggestion','bindEvents','renderAll'];
+ const api=declarations(panel,functions,bindings);
+ // Only markup/layout is replaced. All state transitions and request builders
+ // are production functions, including the remount after changing mode.
+ bindings.renderConfig=()=>{api.syncDerivedState();api.mountPickupController();api.syncLiveFieldValues();};
+ api.renderAll();api.bindEvents();
+ const flush=async()=>{for(let i=0;i<25;i++)await new Promise(resolve=>setImmediate(resolve));};
+ const tick=async()=>{for(const [id,timer] of [...timers])if(timer.ms===350){timers.delete(id);timer.fn();}await flush();};
+ const field=(type,value)=>{const target=document.createElement('input');target.setAttribute('data-services-hourly-'+type,'');target.value=value;config.dispatchEvent({type:'input',target});};
+ const choose=mode=>config.dispatchEvent({type:'click',target:{closest:s=>s==='[data-services-hourly-mode]'?{getAttribute:()=>mode}:null}});
+ const select=()=>places.onSelection({label:'Las Suites Campos Elíseos, Campos Elíseos 470, Polanco',placeId:'offline-place',lat:19.43,lng:-99.20},{});
+ const fill=async(order=['pickup','date','time'])=>{for(const step of order){if(step==='pickup')select();else field(step,step==='date'?'2026-11-05':'10:45');await tick();}};
+ return {api,state,cta,status,price,requests,window,field,choose,select,fill,tick,flush,timers};
+}
+function hourlyFixture(available,next){return {status:'ok',checkoutAllowed:available,
+ availability:{available,status:available?'available':'unavailable',...(next?{nextAvailableStartLocal:next}:{})},
+ fleet:{version:1,requestKey:'controlled-offer',status:available?'available':'unavailable',models:available?[{modelId:'controlled-model',modelRevision:1,name:'Controlled vehicle'}]:[]}};}
+test('Hourly precheck: first entry orders build the same complete request; pending is not available',async()=>{
+ for(const mobile of [false,true])for(const order of [['pickup','date','time'],['time','date','pickup']]){
+  const h=hourlyPrecheckHarness(mobile);await h.fill(order);assert.equal(h.requests.length,1);assert(h.cta.disabled);
+  const p=h.requests[0].payload;assert.equal(p.hourly_daily_mode,'hourly');assert.equal(p.hourly_daily_duration_hours,2);assert.equal(p.hourly_daily_price,150000);
+  assert.equal(p.hourly_daily_pickup_place_id,'offline-place');assert.equal(p.hourly_daily_pickup_lat,19.43);assert.equal(p.hourly_daily_passengers,2);
+  h.requests[0].resolve(hourlyFixture(true));await h.flush();assert.equal(h.cta.disabled,false);assert.match(h.status.textContent,/confirmada/);
+ }
+});
+test('Hourly precheck: HTTP and malformed responses never become genuine unavailability',async()=>{
+ for(const [status,body] of [[400,{code:'INVALID_PICKUP_COORDINATES'}],[404,{code:'HOURLY_SERVICE_POLICY_NOT_FOUND'}],[429,{message:'Rate limit'}],[200,{}],[409,{code:'CHECKOUT_REPLACEMENT_STALE'}],[503,{code:'FLEET_AVAILABILITY_UNDETERMINED'}]]){
+  const h=hourlyPrecheckHarness();await h.fill();
+  const normalized=h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail(),{interactive:false});
+  h.requests[0].resolve(body,status);const result=await normalized;await h.flush();
+  assert.match(h.status.textContent,/No pudimos confirmar/,'HTTP '+status);assert(h.cta.disabled,'technical failure must not unlock Continue');assert(h.price.hidden);
+  assert.match(h.api.getAvailabilityMessage(result),/No pudimos confirmar/,'translation/remount must preserve error classification');
+  if(status<500)assert.equal(result.code,body.code||'','retain authority/error code for existing consumers');
+  for(const consumer of ['assets/js/forms/hourly-booking-api-checkout.js','assets/js/services/hourly-mobile-contact-step.js']){
+   const classify=declarations(consumer,['isAvailabilityRequestFailure'],{normalizeText:v=>typeof v==='string'?v.trim():''}).isAvailabilityRequestFailure;
+   assert(classify(result),consumer);assert.equal(classify({ok:false,code:'PRICE_MISMATCH'}),false);
+  }
+ }
+});
+test('Hourly precheck: network failure remains blocked and incomplete context sends no request',async()=>{
+ const h=hourlyPrecheckHarness();h.field('date','2026-11-05');h.field('time','10:45');await h.tick();
+ assert.equal(h.requests.length,0);assert(h.cta.disabled);assert.equal(h.status.textContent,'');
+ const invalid=await h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail());
+ assert.equal(invalid.code,'INVALID_PRECHECK_PAYLOAD');assert.equal(h.requests.length,0);
+ h.select();await h.tick();h.requests[0].reject(new Error('Controlled transport failure'));await h.flush();
+ assert.match(h.status.textContent,/No pudimos confirmar/);assert(h.cta.disabled);assert(h.price.hidden);
+});
+test('Hourly precheck: supplied alternative is shown and applied only after current revalidation',async()=>{
+ const h=hourlyPrecheckHarness();await h.fill();h.requests[0].resolve(hourlyFixture(false,'2026-11-06T11:17'));await h.flush();
+ assert(h.cta.disabled);assert.match(h.status.textContent,/No hay disponibilidad/);assert.equal(h.status.children.at(-1).getAttribute('data-services-hourly-next-available'),'2026-11-06T11:17');
+ const applying=h.api.applyNextAvailableSuggestion('2026-11-06T11:17');await h.flush();assert.equal(h.requests.length,2);
+ h.requests[1].resolve(hourlyFixture(false,'2026-11-06T11:23'));await h.flush();
+ assert.equal(h.state.tripDate,'2026-11-06');assert.equal(h.state.startTime,'11:23');assert(h.cta.disabled);assert.equal(h.requests.length,3);
+ await h.tick();assert.equal(h.requests.length,3,'the explicit recheck owns the pending debounce');
+ h.requests[2].resolve(hourlyFixture(true));await applying;await h.flush();assert.equal(h.cta.disabled,false);
+});
+test('Hourly precheck: unavailable without alternative stays blocked; price mismatch stays distinct',async()=>{
+ for(const mismatch of [false,true]){
+  const h=hourlyPrecheckHarness();await h.fill();h.requests[0].resolve(mismatch?{code:'PRICE_MISMATCH'}:hourlyFixture(false),mismatch?409:200);await h.flush();
+  assert.match(h.status.textContent,mismatch?/tarifa ha cambiado/:/No hay disponibilidad/);assert(h.cta.disabled);assert.equal(h.status.children.length,0);
+ }
+});
+test('Hourly precheck: out-of-order mode responses cannot restore a foreign offer',async()=>{
+ const h=hourlyPrecheckHarness();await h.fill();h.choose('full_day');assert(h.cta.disabled);await h.tick();h.choose('hourly');assert(h.cta.disabled);await h.tick();
+ assert.deepEqual(h.requests.map(r=>[r.payload.hourly_daily_mode,r.payload.hourly_daily_duration_hours]),[['hourly',2],['full_day',12],['hourly',2]]);
+ h.requests[1].resolve(hourlyFixture(true));h.requests[0].resolve(hourlyFixture(false));await h.flush();assert(h.cta.disabled);assert.equal(h.window.PixkuyFleetSelection.hourlyOfferStatus().valid,false);
+ h.requests[2].resolve(hourlyFixture(true));await h.flush();assert.equal(h.cta.disabled,false);assert.equal(h.window.PixkuyFleetSelection.read('hourly_daily').precheck.payload.hourly_daily_mode,'hourly');
+ h.choose('full_day');assert(h.cta.disabled,'mode switch must immediately block old offer');
+});
+test('Hourly precheck: an old suggestion refresh cannot change the current mode',async()=>{
+ const h=hourlyPrecheckHarness();await h.fill();h.requests[0].resolve(hourlyFixture(false,'2026-11-06T11:17'));await h.flush();
+ const applying=h.api.applyNextAvailableSuggestion('2026-11-06T11:17');await h.flush();h.choose('full_day');await h.tick();
+ h.requests[2].resolve(hourlyFixture(true));await h.flush();h.requests[1].resolve(hourlyFixture(false,'2026-11-06T11:23'));await applying;await h.flush();
+ assert.equal(h.state.mode,'full_day');assert.equal(h.state.tripDate,'2026-11-05');assert.equal(h.state.startTime,'10:45');assert.equal(h.cta.disabled,false);
+ assert.equal(h.window.PixkuyFleetSelection.read('hourly_daily').precheck.payload.hourly_daily_mode,'full_day');
+});
+test('Hourly precheck: error then full day then hourly uses three context-specific responses',async()=>{
+ // This is a possible controlled sequence, not the missing historical response.
+ const h=hourlyPrecheckHarness();await h.fill();h.requests[0].resolve({code:'INVALID_PICKUP_COORDINATES'},400);await h.flush();
+ assert.match(h.status.textContent,/No pudimos confirmar/);
+ h.choose('full_day');await h.tick();h.requests[1].resolve(hourlyFixture(true));await h.flush();assert.equal(h.cta.disabled,false);
+ h.choose('hourly');assert(h.cta.disabled);assert.equal(h.window.PixkuyFleetSelection.hourlyOfferStatus().valid,false);
+ await h.tick();assert.equal(h.requests.length,3);assert.equal(h.requests[2].payload.hourly_daily_duration_hours,2);
+ h.requests[2].resolve(hourlyFixture(true));await h.flush();assert.equal(h.cta.disabled,false);
+ assert.equal(h.window.PixkuyFleetSelection.read('hourly_daily').precheck.payload.hourly_daily_duration_hours,2);
+});
 test('Long-term mobile clear: actual clear click persists empty pickup through mode transitions',()=>{
  const noop=()=>{},normalizeText=v=>typeof v==='string'?v.trim():'';
  // DOM/rendering and external Places I/O are boundaries; event handlers, facade,

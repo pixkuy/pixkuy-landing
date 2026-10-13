@@ -308,7 +308,8 @@
   function isAvailabilityRequestFailure(result) {
     const code = normalizeText(result && result.code);
 
-    return code === "PRECHECK_REQUEST_FAILED" || code === "PRECHECK_UNAVAILABLE";
+    return Boolean(result && result.ok === false && code !== "PRICE_MISMATCH") ||
+      code === "PRECHECK_REQUEST_FAILED" || code === "PRECHECK_UNAVAILABLE";
   }
 
   function buildSnapshotFromPayload(payload) {

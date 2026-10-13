@@ -488,7 +488,8 @@ onClearSelection: function () {
   }
 
   function shouldDisableHourlyContinue() {
-    return !isConfigComplete() || isHourlyContinueBlockedByAvailability() || availabilityBusy;
+    return !isConfigComplete() || isHourlyContinueBlockedByAvailability() || availabilityBusy ||
+      (isTransactionalHourlyMode() && !window.PixkuyFleetSelection.hourlyOfferStatus().valid);
   }
 
   function setAvailabilityBlock(reason, result) {
@@ -1538,7 +1539,7 @@ function getAvailabilityMessage(result) {
     return labels.availability.priceMismatch;
   }
 
-  if (code === 'PRECHECK_REQUEST_FAILED' || code === 'INVALID_PRECHECK_PAYLOAD') {
+  if (isAvailabilityRequestFailure(result) || code === 'INVALID_PRECHECK_PAYLOAD') {
     return labels.availability.error;
   }
 
@@ -1552,7 +1553,8 @@ function getAvailabilityMessage(result) {
 function isAvailabilityRequestFailure(result) {
   const code = normalizeText(result && result.code);
 
-  return code === 'PRECHECK_REQUEST_FAILED' || code === 'PRECHECK_UNAVAILABLE';
+  return Boolean(result && result.ok === false && code !== 'PRICE_MISMATCH') ||
+    code === 'PRECHECK_REQUEST_FAILED' || code === 'PRECHECK_UNAVAILABLE';
 }
 
 function getHourlyAvailabilityContextKey(detail) {
@@ -1820,7 +1822,7 @@ function runHourlyAvailabilityPrecheck(detail, options) {
   clearAvailabilityStatus();
 
   if (!precheckApi || typeof precheckApi.precheck !== 'function') {
-    clearAvailabilityBlock();
+    setAvailabilityBlock('PRECHECK_UNAVAILABLE', { code: 'PRECHECK_REQUEST_FAILED' });
     setAvailabilityStatus(labels.availability.error, 'error');
     return Promise.resolve(false);
   }
@@ -1851,7 +1853,7 @@ function runHourlyAvailabilityPrecheck(detail, options) {
       }
 
       if (isAvailabilityRequestFailure(result)) {
-        clearAvailabilityBlock();
+        setAvailabilityBlock(result.code, result);
         setAvailabilityStatus(labels.availability.error, 'error');
         setHourlyContinueBusy(false);
         return false;
@@ -1867,7 +1869,7 @@ function runHourlyAvailabilityPrecheck(detail, options) {
         return false;
       }
 
-      clearAvailabilityBlock();
+      setAvailabilityBlock('PRECHECK_REQUEST_FAILED', { code: 'PRECHECK_REQUEST_FAILED' });
       setAvailabilityStatus(labels.availability.error, 'error');
       setHourlyContinueBusy(false);
       return false;
