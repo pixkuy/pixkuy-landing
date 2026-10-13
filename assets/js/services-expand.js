@@ -99,6 +99,18 @@
     try {
       const params = new URLSearchParams(window.location.search || '');
       let rawService = String(params.get('service') || '').trim().toLowerCase();
+      // Airport's historical return marker is consumed by its owned controller.
+      if (window.location.hash === '#contact') {
+        let airportReturn = false;
+        try { airportReturn = window.sessionStorage.getItem('pixkuy_airport_transfer_checkout_review_return') === '1'; } catch (_) {}
+        if (rawService === 'airport_hotel' || !rawService && airportReturn) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('service', 'airport_hotel');
+          url.hash = airportReturn ? '#airport/datos' : '#airport/traslado';
+          window.history.replaceState(window.history.state, '', url.toString());
+          rawService = 'airport_hotel';
+        }
+      }
       // Older Hourly links/review returns must enter the owned route, never Netlify.
       if (window.location.hash === '#contact') {
         let returning = false;

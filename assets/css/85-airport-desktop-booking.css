@@ -80,7 +80,7 @@
   .airport-booking__form .legal-acceptance { margin: 0; }
   .airport-booking__form [data-airport-transfer-checkout-legal-acceptance] { display: block !important; }
   .airport-booking__form .form-error { color: #f59d9d; }
-  .airport-booking__form #contact-form-error { margin-bottom: 16px; }
+  .airport-booking__form #airport-booking-error { margin-bottom: 16px; }
   .airport-booking__conditions { display: grid; gap: 8px; margin-top: 20px; padding: 14px 0; border-top: 1px solid #343a3b; border-bottom: 1px solid #343a3b; }
   .airport-booking__conditions-status { display: flex; align-items: center; gap: 9px; margin: 0; font-weight: 600; }
   .airport-booking__conditions .legal-acceptance__links { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }

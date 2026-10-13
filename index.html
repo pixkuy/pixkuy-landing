@@ -1606,14 +1606,6 @@
         <input type="hidden" name="service_label" value="" />
         <input type="hidden" name="request_summary" value="" />
 
-        <!-- Resumen operativo airport_hotel -->
-        <input type="hidden" name="airport_hotel_trip_summary" value="" />
-        <input type="hidden" name="airport_hotel_direction_label" value="" />
-        <input type="hidden" name="airport_hotel_airport_label" value="" />
-        <input type="hidden" name="airport_hotel_hotel_label" value="" />
-        <input type="hidden" name="airport_hotel_zone_label" value="" />
-        <input type="hidden" name="airport_hotel_fare_label" value="" />
-        <input type="hidden" name="airport_hotel_passenger_bucket_label" value="" />
 
         <!-- Resumen operativo tour_private -->
         <input type="hidden" name="tour_private_trip_summary" value="" />
@@ -1671,16 +1663,8 @@
         <input type="hidden" name="campaign_landing_url" value="" />
         <input type="hidden" name="campaign_referrer" value="" />
 
-        <!-- Payload semántico airport_hotel -->
         <input type="hidden" name="zone" value="" />
         <input type="hidden" name="fare" value="" />
-        <input type="hidden" name="airport_hotel_direction" value="" />
-        <input type="hidden" name="airport_hotel_airport" value="" />
-        <input type="hidden" name="airport_hotel_hotel" value="" />
-        <input type="hidden" name="airport_hotel_date" value="" />
-        <input type="hidden" name="airport_hotel_time" value="" />
-        <input type="hidden" name="passenger_fare_key" value="" />
-        <input type="hidden" name="passenger_bucket_label" value="" />
 
         <!-- Payload semántico tour_private -->
         <input type="hidden" name="tour_private_tour_id" value="" />
@@ -1806,12 +1790,6 @@
                 autocomplete="off"
               >
                 <option
-                  value="airport_hotel"
-                  data-i18n="contact.services.airportHotel"
-                >
-                  Transfer Aeropuerto
-                </option>
-                <option
                   value="tour_private"
                   data-i18n="contact.services.tourPrivate"
                 ></option>
@@ -1865,313 +1843,8 @@
             </button>
           </div>
 
-          <!-- Shared canonical controls for the Airport desktop/mobile adapters. -->
-          <div
-            data-airport-canonical-controls
-            aria-hidden="true"
-            hidden
-          >
-            <div
-              class="contact-airport-hotel-editor"
-              data-contact-airport-hotel-editor
-            >
-              <div
-                class="contact-airport-hotel-editor__grid"
-                data-contact-airport-hotel-layout="side-aware"
-              >
-                <div
-                  class="contact-airport-hotel-editor__field"
-                  data-contact-airport-hotel-role="origin"
-                >
-                  <label
-                    class="services-expand__label"
-                    for="contact-airport-hotel-airport"
-                    data-i18n="contact.services.airportHotelAirportLabel"
-                  >
-                    Aeropuerto
-                  </label>
-
-                  <div
-                    class="contact-airport-hotel-editor__airport-shell"
-                    data-contact-airport-hotel-airport-shell="0"
-                    data-contact-airport-hotel-airport-side="origin"
-                  >
-                                        <button
-                      type="button"
-                      class="services-expand__control services-expand__control--select"
-                      id="contact-airport-hotel-airport"
-                      data-contact-airport-hotel-airport-trigger
-                      aria-expanded="false"
-                      aria-haspopup="listbox"
-                      data-i18n="contact.services.airportHotelAirportPlaceholder"
-                    ></button>
-                  </div>
-
-                  <div
-                    class="contact-airport-hotel-editor__lodging-shell"
-                    data-contact-airport-hotel-future-lodging-shell="0"
-                    data-contact-airport-hotel-future-lodging-side="origin"
-                    hidden
-                  >
-                    <div
-                      class="contact-airport-hotel-editor__resolved"
-                      data-contact-airport-hotel-future-resolved="0"
-                      hidden
-                    >
-                      <div class="contact-airport-hotel-editor__resolved-main">
-                        <span
-                          class="contact-airport-hotel-editor__resolved-label"
-                          data-contact-airport-hotel-future-resolved-label="0"
-                        ></span>
-
-                        <button
-                          type="button"
-                          class="contact-airport-hotel-editor__resolved-clear"
-                          data-contact-airport-hotel-future-resolved-clear="0"
-                        >
-                          <span class="visually-hidden" data-i18n="services.cards.airport.panel.clearResolvedDestination"></span>
-                          <span aria-hidden="true">×</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div
-                      class="contact-airport-hotel-editor__search"
-                      data-contact-airport-hotel-future-search="0"
-                      hidden
-                    >
-                      <div
-                        class="place-autocomplete__mount"
-                        data-contact-airport-hotel-future-mount="0"
-                        aria-hidden="true"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="contact-airport-hotel-editor__swap">
-                  <button
-                    type="button"
-                    class="services-expand__swap-button"
-                    data-contact-airport-hotel-swap
-                    data-contact-airport-hotel-swap-aria-label="services.cards.airport.panel.swapAriaLabel"
-                    aria-label=""
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false" aria-hidden="true">
-                      <path d="M8 7h10m0 0-3-3m3 3-3 3M16 17H6m0 0 3-3m-3 3 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
-                </div>
-
-                <div
-                  class="contact-airport-hotel-editor__field"
-                  data-contact-airport-hotel-role="destination"
-                >
-                  <label
-                    class="services-expand__label"
-                    for="contact-airport-hotel-hotel"
-                    data-i18n="contact.services.airportHotelHotelLabel"
-                  >
-                    Dirección o lugar
-                  </label>
-
-                  <div
-                    class="contact-airport-hotel-editor__airport-shell"
-                    data-contact-airport-hotel-future-airport-shell="1"
-                    data-contact-airport-hotel-future-airport-side="destination"
-                    hidden
-                  >
-                    <button
-                      type="button"
-                      class="services-expand__control services-expand__control--select"
-                      data-contact-airport-hotel-future-airport-display="1"
-                      aria-hidden="true"
-                      tabindex="-1"
-                    ></button>
-                  </div>
-
-                  <div
-                    class="place-autocomplete"
-                    data-contact-airport-hotel-hotel-root
-                    data-contact-airport-hotel-hotel-root-id="1"
-                    data-contact-airport-hotel-hotel-side="destination"
-                  >
-                    <input
-                      id="contact-airport-hotel-hotel"
-                      type="text"
-                      placeholder=""
-                      autocomplete="new-password"
-                      autocapitalize="off"
-                      spellcheck="false"
-                      data-contact-airport-hotel-hotel-input
-                      data-i18n-ph="services.cards.airport.panel.hotelPlaceholder"
-                    />
-
-                    <button
-                      type="button"
-                      class="place-autocomplete__clear"
-                      data-contact-airport-hotel-hotel-clear
-                      data-contact-airport-hotel-hotel-clear-aria-label="services.cards.airport.panel.clearResolvedDestination"
-                      aria-label=""
-                      hidden
-                    >
-                      <span aria-hidden="true">×</span>
-                    </button>
-
-                    <div
-                      class="place-autocomplete__mount"
-                      data-contact-airport-hotel-hotel-mount
-                      aria-hidden="true"
-                    ></div>
-                  </div>
-                </div>
-                            </div>
-
-             <div
-                class="contact-airport-hotel-editor__config-row"
-                data-contact-airport-hotel-config-row
-              >
-			 
-			 <div
-                class="contact-airport-hotel-editor__passengers"
-                data-contact-airport-hotel-passengers
-              >
-                <label
-                  class="services-expand__label"
-                  data-contact-airport-hotel-passengers-label
-                  data-i18n="services.cards.airport.panel.passengersLabel"
-                >
-                  Pasajeros
-                </label>
-
-                <div
-                  class="services-expand__passengers-segmented"
-                  role="group"
-                  data-contact-airport-hotel-passengers-group
-                >
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-airport-hotel-passenger-option="van_1_2"
-                    data-contact-airport-hotel-fare-key="van_1_2"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-icon" aria-hidden="true">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
-                        <path d="M12 12a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M6.5 18.5c.9-2.4 3-3.8 5.5-3.8s4.6 1.4 5.5 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                      </svg>
-                    </span>
-                    <span class="services-expand__passenger-chip-text">1–2</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-airport-hotel-passenger-option="van_3_4"
-                    data-contact-airport-hotel-fare-key="van_3_4"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-icon" aria-hidden="true">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
-                        <path d="M9 11.5a2.75 2.75 0 1 0 0-5.5 2.75 2.75 0 0 0 0 5.5Z" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M15.5 12.2a2.35 2.35 0 1 0 0-4.7 2.35 2.35 0 0 0 0 4.7Z" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M4.8 18.3c.8-2.1 2.6-3.4 4.8-3.4 1.3 0 2.4.4 3.3 1.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                        <path d="M13.3 18.3c.6-1.5 1.8-2.4 3.4-2.4 1.2 0 2.2.5 3 1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                      </svg>
-                    </span>
-                    <span class="services-expand__passenger-chip-text">3–4</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="services-expand__passenger-chip"
-                    data-contact-airport-hotel-passenger-option="van_5_6"
-                    data-contact-airport-hotel-fare-key="van_5_6"
-                    aria-pressed="false"
-                  >
-                    <span class="services-expand__passenger-chip-icon" aria-hidden="true">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" focusable="false">
-                        <path d="M8 10.8a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M12 9.8a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Z" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M16.3 10.8a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M4.8 18.2c.7-1.9 2.1-3 4-3 .8 0 1.5.2 2.1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                        <path d="M9.2 18.6c.8-2.3 2.5-3.6 4.8-3.6s4 1.3 4.8 3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                      </svg>
-                    </span>
-                    <span class="services-expand__passenger-chip-text">5–6</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="form-field form-field--date contact-airport-hotel-editor__date">
-                <label
-                  for="contact-airport-hotel-date"
-                  class="visually-hidden"
-                  data-i18n="services.cards.airport.panel.dateLabel"
-                ></label>
-                <input
-                  id="contact-airport-hotel-date"
-                  type="date"
-                  data-contact-airport-hotel-date
-                  aria-describedby="contact-airport-hotel-date-error"
-                />
-                <span
-                  class="form-field-overlay form-field-overlay--date"
-                  aria-hidden="true"
-                  data-i18n="contact.datePlaceholder"
-                >dd/mm/aaaa</span>
-                <span class="form-field-icon form-field-icon--date" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"></line>
-                    <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"></line>
-                    <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"></line>
-                  </svg>
-                </span>
-                <p
-                  id="contact-airport-hotel-date-error"
-                  class="form-error"
-                  hidden
-                  data-error-for="airport_hotel_date"
-                  data-i18n="contact.validation.tripDateRequired"
-                ></p>
-              </div>
-
-              <div class="form-field form-field--time contact-airport-hotel-editor__time">
-                <label
-                  for="contact-airport-hotel-time"
-                  class="visually-hidden"
-                  data-i18n="services.cards.airport.panel.timeLabel"
-                ></label>
-                <input
-                  id="contact-airport-hotel-time"
-                  type="time"
-                  data-contact-airport-hotel-time
-                  aria-describedby="contact-airport-hotel-time-error"
-                />
-                <span
-                  class="form-field-overlay form-field-overlay--time"
-                  aria-hidden="true"
-                >--:--</span>
-                <span class="form-field-icon form-field-icon--time" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" focusable="false">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
-                    <polyline points="12 7 12 12 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-                  </svg>
-                </span>
-                <p
-                  id="contact-airport-hotel-time-error"
-                  class="form-error"
-                  hidden
-                  data-error-for="airport_hotel_time"
-                  data-i18n="contact.validation.tripTimeRequired"
-                ></p>
-              </div>
-            </div>
-			
-		</div>
-
+          <!-- Summary nodes shared by the remaining contact services. -->
+          <div hidden>
             <div
               class="contact-panel-summary contact-panel-summary--zone"
               data-contact-panel-zone
@@ -3805,14 +3478,13 @@
 <script src="assets/js/forms/recaptcha-enterprise.js"></script>
 <script src="assets/js/forms/legal-acceptance.js"></script>
 <script src="assets/js/forms/hourly-booking-form.js"></script>
+<script src="assets/js/forms/airport-booking-form.js"></script>
 <script src="assets/js/forms/hourly-booking-api-checkout.js"></script>
 <script src="assets/js/forms/airport-transfer-booking-api-checkout.js"></script>
 <script src="assets/js/services/direct-transfer-transactional-state.js"></script>
 <script src="assets/js/forms/direct-transfer-booking-api-checkout.js"></script>
 <script src="assets/js/forms/contact-service-state.js"></script>
 <script src="assets/js/forms/contact-service-switcher.js"></script>
-<script src="assets/js/forms/contact-airport-hotel-editor.js"></script>
-<script src="assets/js/forms/contact-airport-hotel-lodging-adapter.js"></script>
 <script src="assets/js/forms/whatsapp-contact.js"></script>
 <script src="assets/js/forms/whatsapp-handoff.js"></script>
 <script src="assets/js/services/mobile-booking-entry.js"></script>

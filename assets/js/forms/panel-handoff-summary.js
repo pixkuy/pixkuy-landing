@@ -501,40 +501,6 @@
     return true;
   }
   
-  function registerServiceSpecificHooks() {
-    const formsApi = getFormsNamespace();
-    const serviceStateApi =
-      formsApi &&
-      formsApi.contactServiceState &&
-      typeof formsApi.contactServiceState === "object"
-        ? formsApi.contactServiceState
-        : null;
-
-    if (!serviceStateApi) {
-      return false;
-    }
-
-    if (typeof serviceStateApi.registerSpecificDraftProbe === "function") {
-      serviceStateApi.registerSpecificDraftProbe("airport_hotel", function () {
-        const formData = getFormAndFields();
-
-        if (!formData || !formData.form) {
-          return false;
-        }
-
-        return getActiveState(formData.form);
-      });
-    }
-
-    if (typeof serviceStateApi.registerSpecificReset === "function") {
-      serviceStateApi.registerSpecificReset("airport_hotel", function () {
-        clearPanelHandoffSummary();
-      });
-    }
-
-    return true;
-  }
-
   function initPanelHandoffSummary() {
     const formData = getFormAndFields();
     if (!formData) {
@@ -552,7 +518,6 @@
     setActiveState(form, false);
     clearTripSnapshots(form);
     bindTripInvalidation();
-    registerServiceSpecificHooks();
 
     return true;
   }

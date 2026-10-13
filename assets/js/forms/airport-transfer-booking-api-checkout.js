@@ -152,7 +152,7 @@
   }
 
   function getReservationApi() {
-    var api = window.PixkuyForms;
+    var api = window.PixkuyAirportBookingForm;
 
     if (
       !api ||
@@ -173,13 +173,13 @@
   }
 
   function getForm() {
-    var api = window.PixkuyForms;
+    var api = window.PixkuyAirportBookingForm;
 
     if (api && typeof api.getReservationForm === "function") {
       return api.getReservationForm();
     }
 
-    return document.querySelector('form[name="contact"]');
+    return null;
   }
 
   function getField(form, name) {
@@ -189,7 +189,7 @@
   function getFieldValue(form, name) {
     var field = getField(form, name);
 
-    return normalizeText(field && field.value);
+    return normalizeText(field ? field.value : window.PixkuyAirportBookingForm?.raw()[name]);
   }
 
   function getDocumentLocale() {
@@ -325,22 +325,7 @@
   }
 
   function getFormPayloadRaw(form) {
-    var payload = {};
-    var data;
-
-    if (!form || typeof window.FormData !== "function") {
-      return payload;
-    }
-
-    data = new window.FormData(form);
-
-    data.forEach(function copyValue(value, key) {
-      if (typeof value === "string") {
-        payload[key] = value;
-      }
-    });
-
-    return payload;
+    return form && window.PixkuyAirportBookingForm ? window.PixkuyAirportBookingForm.raw() : {};
   }
 
   function addLegalAcceptanceFields(payload, form) {
@@ -366,9 +351,9 @@
   }
 
   function getAirportTransferDirection(data, form) {
-    var snapshotApi = window.PixkuyForms &&
-      typeof window.PixkuyForms.getContactAirportHotelSnapshot === "function"
-        ? window.PixkuyForms.getContactAirportHotelSnapshot
+    var snapshotApi = window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getSnapshot === "function"
+        ? window.PixkuyAirportBookingForm.getSnapshot
         : null;
     var snapshot = snapshotApi ? snapshotApi() : null;
 
@@ -395,9 +380,9 @@
   }
 
   function getAirportId(form) {
-    var snapshotApi = window.PixkuyForms &&
-      typeof window.PixkuyForms.getContactAirportHotelSnapshot === "function"
-        ? window.PixkuyForms.getContactAirportHotelSnapshot
+    var snapshotApi = window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getSnapshot === "function"
+        ? window.PixkuyAirportBookingForm.getSnapshot
         : null;
     var snapshot = snapshotApi ? snapshotApi() : null;
 
@@ -453,9 +438,9 @@
   
     function getAirportTransferSnapshot() {
     var snapshotApi =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getContactAirportHotelSnapshot === "function"
-        ? window.PixkuyForms.getContactAirportHotelSnapshot
+      window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getSnapshot === "function"
+        ? window.PixkuyAirportBookingForm.getSnapshot
         : null;
 
     return snapshotApi ? snapshotApi() : null;
@@ -703,9 +688,9 @@
     var previousSnapshot = null;
     var quoteBinding = getCurrentAirportTransferQuoteBinding(form, data);
     var airportSnapshot =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getContactAirportHotelSnapshot === "function"
-        ? window.PixkuyForms.getContactAirportHotelSnapshot()
+      window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getSnapshot === "function"
+        ? window.PixkuyAirportBookingForm.getSnapshot()
         : null;
 
     if (!quoteBinding && !draft) {
@@ -915,9 +900,9 @@
     );
     var form = getForm();
     var fields =
-      form && window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      form && window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyAirportBookingForm.getReservationRequestFields(form)
         : null;
 
     if (
@@ -946,54 +931,9 @@
   }
 
   function focusAirportTransferNonAirportLocation(form, data) {
+    window.PixkuyAirportDesktopBooking?.configure();
     var role = getAirportTransferNonAirportRole(data, form);
-    var roleNode;
-    var clearButton;
-    var input;
-    var mobileContactStep;
-
-    if (isDesktopViewport()) {
-      input = form.querySelector(
-        '[data-contact-airport-hotel-role="' + role + '"] ' +
-          "[data-contact-airport-hotel-hotel-input]"
-      );
-
-      return focusNode(
-        input || form.querySelector("[data-contact-airport-hotel-hotel-input]")
-      );
-    }
-
-    mobileContactStep = window.PixkuyAirportMobileContactStep;
-
-    if (mobileContactStep && typeof mobileContactStep.close === "function") {
-      mobileContactStep.close();
-    }
-
-    roleNode = document.querySelector(
-      '#services-expand-airport [data-airport-tariff-role="' + role + '"]'
-    );
-    clearButton = roleNode
-      ? roleNode.querySelector("[data-airport-destination-clear]")
-      : null;
-
-    if (clearButton && clearButton.hidden !== true) {
-      clearButton.click();
-    }
-
-    window.requestAnimationFrame(function focusAfterLocationClear() {
-      window.requestAnimationFrame(function focusCanonicalLodgingInput() {
-        var activeRoleNode = document.querySelector(
-          '#services-expand-airport [data-airport-tariff-role="' + role + '"]'
-        );
-        var activeInput = activeRoleNode
-          ? activeRoleNode.querySelector("[data-airport-lodging-input]")
-          : null;
-
-        focusNode(activeInput);
-      });
-    });
-
-    return true;
+    return focusNode(document.querySelector('#services-expand-airport [data-airport-tariff-role="' + role + '"] [data-airport-lodging-input]'));
   }
 
   function showAirportLocationCollisionError(form, data) {
@@ -1006,9 +946,9 @@
     }
 
     fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyAirportBookingForm.getReservationRequestFields(form)
         : null;
     message = getAirportLocationCollisionMessage();
 
@@ -1059,34 +999,8 @@
   }
 
   function focusAirportTransferTimeField(form) {
-    var fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
-        : null;
-    var timeField =
-      fields && fields.airportHotelVisibleTime
-        ? fields.airportHotelVisibleTime
-        : getField(form, "airport_hotel_time");
-
-    if (!timeField || typeof timeField.focus !== "function") {
-      return false;
-    }
-
-    if (typeof timeField.scrollIntoView === "function") {
-      timeField.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-    }
-
-    window.setTimeout(function focusTimeFieldAfterScroll() {
-      timeField.focus({
-        preventScroll: true
-      });
-    }, 120);
-
-    return true;
+    window.PixkuyAirportDesktopBooking?.configure();
+    return focusNode(document.querySelector('#services-expand-airport [data-airport-tariff-role="time"] input'));
   }
 
   function showAvailabilityError(form, result, data) {
@@ -1102,9 +1016,9 @@
     }
 
     fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyAirportBookingForm.getReservationRequestFields(form)
         : null;
 
     message = getAvailabilityErrorMessage(
@@ -1183,9 +1097,9 @@
     }
 
     fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyAirportBookingForm.getReservationRequestFields(form)
         : null;
 
     message = getI18nValue(
@@ -1212,9 +1126,9 @@
 
   function hideCheckoutError(form) {
     var fields =
-      window.PixkuyForms &&
-      typeof window.PixkuyForms.getReservationRequestFields === "function"
-        ? window.PixkuyForms.getReservationRequestFields(form)
+      window.PixkuyAirportBookingForm &&
+      typeof window.PixkuyAirportBookingForm.getReservationRequestFields === "function"
+        ? window.PixkuyAirportBookingForm.getReservationRequestFields(form)
         : null;
 
     if (fields && fields.formError) {
@@ -1551,7 +1465,7 @@
     if (
       !form ||
       form.nodeType !== 1 ||
-      !form.matches('form[name="contact"]')
+      form !== getForm()
     ) {
       return;
     }
@@ -1717,33 +1631,32 @@
     acceptPrice: function (amountMinor) {
       if (!Number.isSafeInteger(amountMinor) || amountMinor <= 0) return false;
       var form = getForm();
-      var fare = getField(form, "fare");
-      if (!fare) return false;
-      fare.value = String(amountMinor / 100);
-      var label = getField(form, "airport_hotel_fare_label");
-      if (label) label.value = String(amountMinor / 100) + " MXN";
-      var api = getReservationApi();
-      var data = api.getReservationRequestData(api.getReservationRequestFields(form));
-      var summary = buildRequestSummary(data, form);
-      ["request_summary", "airport_hotel_trip_summary"].forEach(function (name) {
-        var field = getField(form, name);
-        if (field) field.value = summary;
-      });
+      if (!form) return false;
+      window.PixkuyAirportBookingForm.acceptPrice(amountMinor);
       invalidateAirportTransferQuoteBinding();
       return true;
     },
     prepare: function (options) {
       var form = getForm();
       var api = getReservationApi();
+      if (!form || !api || !api.refreshReservationRequestValidationUX() || !hasSyncedLegalAcceptance(form)) {
+        return Promise.reject(new Error("INCOMPLETE_CHECKOUT_CONTEXT"));
+      }
       var data = api.getReservationRequestData(api.getReservationRequestFields(form));
+      var requestedContext = JSON.stringify(buildAvailabilityPrecheckDetail(form, data));
       return verifyAvailabilityBeforeCheckout(form, data, options).then(function (result) {
+        var liveData = api.getReservationRequestData(api.getReservationRequestFields(form));
+        if (!api.refreshReservationRequestValidationUX() || !hasSyncedLegalAcceptance(form) ||
+            requestedContext !== JSON.stringify(buildAvailabilityPrecheckDetail(form, liveData))) {
+          invalidateAirportTransferQuoteBinding();
+          throw new Error("AIRPORT_CHECKOUT_CONTEXT_CHANGED");
+        }
         if (!result.available || !result.checkoutAllowed ||
             !rememberAirportTransferQuoteBinding(result, buildAvailabilityPrecheckDetail(form, data))) {
           var error = new Error(result.code || "PRECHECK_UNAVAILABLE");
           error.result = result;
           throw error;
         }
-        var liveData = api.getReservationRequestData(api.getReservationRequestFields(form));
         var snapshot = buildCheckoutReviewSnapshot(form, liveData);
         var price = result.raw && result.raw.result && result.raw.result.price;
         if (snapshot && price && Number.isSafeInteger(price.amountMinor) && price.amountMinor > 0) {
@@ -1801,7 +1714,7 @@
         event.target &&
         typeof event.target.matches === "function" &&
         event.target.matches(
-          "[data-airport-lodging-input], [data-contact-airport-hotel-hotel-input]"
+          "[data-airport-lodging-input]"
         )
       ) {
         restoreAirportCollisionMessage();
@@ -1833,6 +1746,10 @@
     });
 
     document.addEventListener("pixkuy:airport-draft-restored", function () {
+      scheduleLegalAcceptanceVisibilitySync(getForm());
+    });
+
+    document.addEventListener("pixkuy:airport-context-changed", function () {
       scheduleLegalAcceptanceVisibilitySync(getForm());
     });
 

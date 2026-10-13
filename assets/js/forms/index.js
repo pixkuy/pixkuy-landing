@@ -63,28 +63,6 @@
     );
   }
 
-  function bootContactAirportHotelEditor() {
-    if (!window.PixkuyForms) {
-      return false;
-    }
-
-    return safeInit(
-      window.PixkuyForms.initContactAirportHotelEditor,
-      'initContactAirportHotelEditor'
-    );
-  }
-
-  function bootContactAirportHotelLodgingAdapter() {
-    if (!window.PixkuyForms) {
-      return false;
-    }
-
-    return safeInit(
-      window.PixkuyForms.initContactAirportHotelLodgingAdapter,
-      'initContactAirportHotelLodgingAdapter'
-    );
-  }
-
   function bootContactTourPrivateEditor() {
     if (!window.PixkuyForms) {
       return false;
@@ -779,8 +757,6 @@
     bootReservationRequestForm();
     bootContactServiceState();
     bootContactServiceSwitcher();
-    bootContactAirportHotelEditor();
-    bootContactAirportHotelLodgingAdapter();
     bootContactTourPrivateEditor();
     bootContactEventSpecialEditor();
     bootContactDirectTransferEditor();

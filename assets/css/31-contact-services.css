@@ -565,7 +565,6 @@
     width:100%;
   }
 
-  .contact-service-switcher__mobile-select option[value="airport_hotel"],
   .contact-service-switcher__mobile-select option[value="tour_private"],
   .contact-service-switcher__mobile-select option[value="event_special"]{
     display:none;

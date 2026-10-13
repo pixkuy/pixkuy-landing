@@ -8,7 +8,6 @@
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
 
   const SERVICE_TYPES = Object.freeze({
-    AIRPORT_HOTEL: "airport_hotel",
     TOUR_PRIVATE: "tour_private",
     EVENT_SPECIAL: "event_special",
     DIRECT_TRANSFER: "direct_transfer",
@@ -29,7 +28,6 @@
 
   function isSupportedServiceType(value) {
     return (
-      value === SERVICE_TYPES.AIRPORT_HOTEL ||
       value === SERVICE_TYPES.TOUR_PRIVATE ||
       value === SERVICE_TYPES.EVENT_SPECIAL ||
       value === SERVICE_TYPES.DIRECT_TRANSFER ||

@@ -191,28 +191,11 @@ const handoffDeps = {
   assert.equal(state.lodgingEndpointZoneId, hotel.zoneId);
 });
 
-const editorSource = fs.readFileSync(
-  path.join(root, "assets/js/forms/contact-airport-hotel-editor.js"),
-  "utf8"
-);
+// The owned provider and free-text invalidation boundary are exercised by
+// airport-netlify-independence.test.cjs; the legacy editor was retired.
 const checkoutSource = fs.readFileSync(
   path.join(root, "assets/js/forms/airport-transfer-booking-api-checkout.js"),
   "utf8"
-);
-const inputHandler = editorSource.match(
-  /nodes\.hotelInput\.addEventListener\("input", function \(\) \{[\s\S]*?\n\s*nodes\.serviceDateInput\.addEventListener/
-);
-
-assert.ok(inputHandler, "Airport hotel input handler must exist");
-assert.match(
-  inputHandler[0],
-  /clearResolvedDestination/,
-  "Free text must invalidate the prior canonical lodging selection"
-);
-assert.match(
-  inputHandler[0],
-  /syncAirportHotelPayloadFields/,
-  "Canonical hidden fields must be synchronized after free-text invalidation"
 );
 assert.match(
   checkoutSource,
@@ -262,6 +245,8 @@ async function verifyFleetBAttemptState() {
   const fleetContext = {
     document:{documentElement:{lang:"en"},querySelector(){return null;},querySelectorAll(){return [];},addEventListener(){},dispatchEvent(){}},
     location:{origin:"http://localhost:8888"},Response,URL,crypto:require("node:crypto").webcrypto,
+    // This fixture checks attempts, not offer-expiry scheduling.
+    setTimeout(){return 1;},
     matchMedia(){return {matches:false};},addEventListener(){},CustomEvent:class { constructor(type,options){this.type=type;this.detail=options?.detail;} },
     sessionStorage:{getItem(key){return storage.get(key)||null;},setItem(key,value){storage.set(key,value);}},
     fetch:async function(url,init){

@@ -1493,26 +1493,8 @@ function shouldUsePassengerChipUi(nodes) {
     return requireCatalogApi().resolveFare(state);
   }
   
-    function getReservationMinimumDateLiteral() {
-    if (window.PixkuyFleetSelection) return window.PixkuyFleetSelection.minimumDate('airport_transfer');
-    const formsApi = window.PixkuyForms || {};
-    const getMinimumDateTime =
-      typeof formsApi.getReservationMinimumDateTime === "function"
-        ? formsApi.getReservationMinimumDateTime
-        : null;
-    const formatDate =
-      typeof formsApi.formatReservationDateForInput === "function"
-        ? formsApi.formatReservationDateForInput
-        : null;
-    const minimumDateTime = getMinimumDateTime
-      ? getMinimumDateTime()
-      : null;
-
-    if (!minimumDateTime || !formatDate) {
-      return "";
-    }
-
-    return normalizeText(formatDate(minimumDateTime));
+  function getReservationMinimumDateLiteral() {
+    return window.PixkuyFleetSelection ? window.PixkuyFleetSelection.minimumDate('airport_transfer') : "";
   }
 
   function syncTemporalDateInput(nodes, state) {

@@ -85,7 +85,7 @@
       var requestedService = new URLSearchParams(window.location.search).get("service");
       var airportRoute = /^#airport\/(datos|revision|traslado)(?:\/|$)/.test(window.location.hash);
       if (airportRoute || requestedService === "airport_hotel" && !/^#hourly\//.test(window.location.hash))
-        window.PixkuyForms.restoreContactAirportHotelDraftFields(value);
+        window.PixkuyAirportBookingForm.restore(value);
       document.dispatchEvent(new window.CustomEvent("pixkuy:airport-draft-restored"));
       ["date","time"].forEach(function (key) {
         var field=airport.panel.querySelector('[data-airport-tariff-role="'+key+'"] input');

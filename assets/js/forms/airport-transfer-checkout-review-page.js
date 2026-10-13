@@ -1059,7 +1059,7 @@
     var edit = getNode("[data-airport-transfer-checkout-review-edit]");
 
     if (edit) {
-      edit.setAttribute("href", "/#contact");
+      edit.setAttribute("href", "/?service=airport_hotel&lang=" + encodeURIComponent(getDocumentLocale()) + "#airport/datos");
 
       edit.addEventListener("click", function onEditClick() {
         try {

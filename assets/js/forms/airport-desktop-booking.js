@@ -1,7 +1,7 @@
 (function (window, document) {
   "use strict";
   var view = window.PixkuyAirportDesktopView;
-  var form = document.querySelector('form[name="contact"]');
+  var form = window.PixkuyAirportBookingForm?.getReservationForm();
   if (!view || !form) return;
   var KEY = "pixkuy_airport_transfer_checkout_review_snapshot";
   var RETURN = "pixkuy_airport_transfer_checkout_review_return";
@@ -23,7 +23,7 @@
   var deferredRender = false;
   var mobileUiFrame = 0;
   var mobileEntryPending = false;
-  var originalSubmitKey = document.getElementById("contact-submit").getAttribute("data-i18n");
+  var originalSubmitKey = document.getElementById("airport-contact-submit").getAttribute("data-i18n");
   form.before(placeholder);
 
   function route() { return /^#airport\/(datos|revision|traslado)(?:\/(name|phone|email|luggage|message|legal))?$/.exec(window.location.hash); }
@@ -56,7 +56,7 @@
     return true;
   }
   function protectExpiredReview() {
-    var submit = form.querySelector("#contact-submit");
+    var submit = form.querySelector("#airport-contact-submit");
     // Shared form synchronizers may enable their valid fields. They cannot
     // override this editor's existing deadline guard (nor own another service).
     if (active() && route()[1] === "datos" && editExpired() && !submit.disabled) {
@@ -64,7 +64,7 @@
       submit.setAttribute("aria-disabled", "true");
     }
   }
-  new window.MutationObserver(protectExpiredReview).observe(form.querySelector("#contact-submit"), {
+  new window.MutationObserver(protectExpiredReview).observe(form.querySelector("#airport-contact-submit"), {
     attributes: true, attributeFilter: ["disabled"]
   });
   function editProvenance() {
@@ -93,7 +93,7 @@
     // Read the current edit draft, not that document's cached snapshot/form.
     // Own empty properties are deliberate deletions and must remain empty.
     snapshot = read();
-    return window.PixkuyForms.restoreContactAirportHotelDraftFields(snapshot);
+    return window.PixkuyAirportBookingForm.restoreContact(snapshot);
   }
   function rememberUnsaved(context) {
     save();
@@ -110,7 +110,7 @@
       window.queueMicrotask(function () {
         if(!active()) return;
         rememberUnsaved(context);
-        form.querySelector("#contact-submit").disabled = true;
+        form.querySelector("#airport-contact-submit").disabled = true;
         if(mount)mount.querySelectorAll('[data-airport-pay]').forEach(function (button) { button.disabled = true; });
       });
     });
@@ -193,8 +193,7 @@
     return !!(state && state.valid);
   }
   function save() {
-    // The shared form can already belong to another service during navigation.
-    if (form.elements.namedItem("service_type").value !== "airport_hotel") return false;
+    if (!window.PixkuyAirportBookingForm.hydrated()) return false;
     if (editRecoveryRequired()) return false;
     var draft = window.PixkuyAirportCheckout.draft();
     if (!draft || !draft.airport_transfer_airport_id) return false;
@@ -255,13 +254,13 @@
     mobileAppearance = [];
     placeholder.after(form);
     form.classList.remove("airport-booking__form");
-    document.getElementById("contact-submit").setAttribute("data-i18n", originalSubmitKey);
+    document.getElementById("airport-contact-submit").setAttribute("data-i18n", originalSubmitKey);
     if (mount) mount.remove();
     mount = null;
     document.body.classList.remove("airport-booking-active");
     document.body.setAttribute("data-airport-mobile-contact-step-active", "false");
     document.getElementById("services-expand-airport").removeAttribute("data-airport-mobile-primary-step-hidden");
-    var api = window.PixkuyForms;
+    var api = window.PixkuyAirportBookingForm;
     if (api && api.syncReservationRequestState) api.syncReservationRequestState(api.getReservationRequestFields(form));
   }
   function goTrip() {
@@ -401,7 +400,7 @@
     form.inert = !mobileReviewHydrated;
     form.classList.add("airport-booking__form");
     main.appendChild(form);
-    var submit = form.querySelector("#contact-submit");
+    var submit = form.querySelector("#airport-contact-submit");
     submit.removeAttribute("data-i18n"); submit.textContent = view.t("reviewCta");
     main.append(view.node("p", "airport-booking__lead", view.t("noPayment")));
     if (editing) main.appendChild(button("exitEdit", returnToPaymentStatus, false));
@@ -427,7 +426,7 @@
     });
     var actions = form.querySelector('.form-actions');
     mobileStyle(actions,{class:actions.className + " airport-mobile-contact-step__actions"});
-    var submit = form.querySelector('#contact-submit');
+    var submit = form.querySelector('#airport-contact-submit');
     mobileStyle(submit,{class:"airport-mobile-contact-step__submit", "data-i18n":null},view.t('mobileReviewCta'));
     mount.appendChild(form);
     mount.appendChild(view.node('p','booking-no-payment',view.t('noPayment')));
@@ -812,9 +811,9 @@
   }
   function render(options) {
     if (!active()) {
-      // Hourly may own the same canonical form during its route navigation.
-      if (!form.classList.contains("hourly-booking__form")) restoreForm();
+      restoreForm();
       if (route() && route()[1] === "traslado") {
+        if (view.media.matches) window.PixkuyServicesExpand?.open("airport", {scroll:false});
         if (!view.media.matches && window.PixkuyAirportMobileBookingFlow) window.PixkuyAirportMobileBookingFlow.open();
         window.PixkuyFleetSelection.enterPanel("airport_transfer");
         var panel = document.getElementById("services-expand-airport");
@@ -844,9 +843,8 @@
       return;
     }
     if (!snapshot) { goTrip(); return; }
-    if (form.elements.namedItem("service_type").value !== "airport_hotel") {
-      window.PixkuyForms.contactServiceState.setActiveServiceType("airport_hotel", {source:"airport-desktop-route", skipConfirm:true});
-      window.PixkuyForms.applyContactAirportHotelHandoff(snapshot);
+    if (!window.PixkuyAirportBookingForm.hydrated()) {
+      window.PixkuyAirportBookingForm.restore(snapshot);
       window.PixkuyFleetSelection.editFromReview("airport_transfer");
     }
     var preserved = options && options.preserve ? captureUiState() : null;
@@ -868,6 +866,7 @@
       return editing ? { token: editing.token, revision: editing.editRevision } : null;
     },
     active: active,
+    configure: goTrip,
     guardReviewExpiry: guardReviewExpiry,
     leave: function () {
       if (!active()) return false;
@@ -884,10 +883,9 @@
       }
       if (!saved || !(context || saved.airport_pending_token)) return false;
       snapshot = saved;
-      window.sessionStorage.setItem(RETURN, "1");
       restoreTripContext(saved);
-      window.PixkuyForms.contactServiceState.setActiveServiceType("airport_hotel", {source:"airport-pending-resume",skipConfirm:true});
-      window.PixkuyForms.applyContactAirportHotelHandoff(saved);
+      window.PixkuyAirportBookingForm.restore(saved);
+      window.sessionStorage.removeItem(RETURN); mobileReviewHydrated = true;
       navigate(context && context.attempt || saved.airport_draft_stage === "revision" ? "revision" : "datos");
       refreshEditDeadline();
       return true;
@@ -903,8 +901,7 @@
       if (!saved.airport_transfer_date || !saved.airport_transfer_time ||
           !saved.airport_transfer_passenger_fare_key || !window.PixkuyAirportMobileDraft.locationOf(saved)) return false;
       if (!restoreTripContext(saved)) return false;
-      window.PixkuyForms.contactServiceState.setActiveServiceType("airport_hotel", {source:"airport-draft-resume",skipConfirm:true});
-      if (!window.PixkuyForms.applyContactAirportHotelHandoff(saved)) return false;
+      if (!window.PixkuyAirportBookingForm.restore(saved)) return false;
       snapshot = saved;
       notice = ""; reviewed = null; changed = false; pendingPrice = null;
       // The existing form/consent validator decides whether Review is usable.
@@ -951,7 +948,7 @@
     if (!active()) return;
     revision += 1;
     save(); reviewed = null;
-    var submit = document.getElementById("contact-submit");
+    var submit = document.getElementById("airport-contact-submit");
     window.queueMicrotask(function () {
       var label = view.t(view.media.matches ? "reviewCta" : "mobileReviewCta");
       if (submit.textContent !== label) submit.textContent = label;
@@ -960,7 +957,7 @@
   form.addEventListener("change", function () { if (active()) save(); });
   form.addEventListener("blur", function () {
     if (active()) window.queueMicrotask(function () {
-      var submit = form.querySelector("#contact-submit");
+      var submit = form.querySelector("#airport-contact-submit");
       var label = view.t(view.media.matches ? "reviewCta" : "mobileReviewCta");
       if (submit.textContent !== label) submit.textContent = label;
     });
@@ -977,11 +974,23 @@
     revision += 1; render();
   });
   window.addEventListener("hashchange", render);
+  function hydrateReturn() {
+    if (!route() || route()[1] === "traslado") return;
+    var saved = read();
+    if (!saved) return;
+    snapshot = saved;
+    if (!window.PixkuyAirportBookingForm.hydrated()) {
+      restoreTripContext(saved);
+      window.PixkuyAirportBookingForm.restore(saved);
+    }
+    window.sessionStorage.removeItem(RETURN);
+    mobileReviewHydrated = true;
+  }
   window.addEventListener("pageshow", function (event) {
+    hydrateReturn();
     if (!editContext() && new URLSearchParams(window.location.search).get('service') === 'airport_hotel' && window.PixkuyAirportDesktopBooking.resumePending()) return;
     // The draft adapter is registered first and restores the trip on pageshow.
-    // Contact restoration also owns deferred reapplications. Wait for its
-    // terminal event before preparing with the canonical hidden quote fields.
+    // The owned provider restores contact once; no legacy editor reapplication.
     if (editContext()) {
       snapshot = read();
       restoreTripContext(snapshot);
@@ -993,16 +1002,6 @@
     if (!active()) return;
     if (window.PixkuyFleetSelection.expireAirportOfferIfNeeded) window.PixkuyFleetSelection.expireAirportOfferIfNeeded();
     render();
-  });
-  document.addEventListener("pixkuy:airport-draft-restored", function (event) {
-    if (!event.detail || !event.detail.reviewReturnCompleted) return;
-    // Restoration can finish before load/pageshow; the mobile draft adapter
-    // still has to restore its panel context in that case.
-    mobileReviewHydrated = document.readyState === "complete";
-    if (active()) {
-      if (!event.detail.restored) notice = "incomplete";
-      renderPreservingUi();
-    }
   });
   document.addEventListener("pixkuy:fleet-offer-expired", function (event) {
     if (event.detail && event.detail.service === "airport_transfer" && active()) {
@@ -1033,7 +1032,6 @@
   view.media.addEventListener("change", function () {
     if (window.PixkuyHourlyBookingFlow && window.PixkuyHourlyBookingFlow.isActive()) return;
     revision += 1;
-    if (form.elements.namedItem("service_type").value !== "airport_hotel") window.history.replaceState(null, "", "#contact");
     render();
   });
   window.addEventListener("beforeunload", function (event) {
@@ -1042,6 +1040,7 @@
   view.ready.then(function () {
     window.setTimeout(function () {
       if (route()) {
+        hydrateReturn();
         if(!mount) {
           snapshot = read();
           if (editContext() || snapshot && (snapshot.airport_new_continuation || snapshot.airport_mobile_draft)) restoreTripContext(snapshot);

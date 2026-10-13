@@ -61,101 +61,6 @@
     return value;
   }
 
-  function getAirportHotelSelectedFareKey() {
-    var bridge;
-    var bridgeState;
-    var selectedFareKey;
-
-    bridge = window.PixkuyAirportZoneTariff;
-
-    if (!bridge || typeof bridge !== 'object' || typeof bridge.getState !== 'function') {
-      return '';
-    }
-
-    bridgeState = bridge.getState();
-
-    if (!bridgeState || typeof bridgeState !== 'object') {
-      return '';
-    }
-
-    selectedFareKey = bridgeState.selectedFareKey;
-    return typeof selectedFareKey === 'string' ? selectedFareKey.trim() : '';
-  }
-
-  function resolveAirportHotelPassengersLabel() {
-    var utilsApi;
-    var fareKey;
-
-    utilsApi = window.PixkuyAirportTariffUtils;
-    fareKey = getAirportHotelSelectedFareKey();
-
-    if (
-      !utilsApi ||
-      typeof utilsApi !== 'object' ||
-      typeof utilsApi.resolveFareKeyDisplayLabel !== 'function' ||
-      !fareKey
-    ) {
-      return '';
-    }
-
-    return utilsApi.resolveFareKeyDisplayLabel(fareKey) || '';
-  }
-
-  function getAirportHotelEditorData(form) {
-    var formsApi;
-    var getTripSnapshot;
-    var snapshot;
-
-    if (!form) {
-      return {
-        origin: '',
-        destination: '',
-        passengers: '',
-        tripDate: '',
-        tripTime: ''
-      };
-    }
-
-    formsApi = window.PixkuyForms;
-    getTripSnapshot = formsApi && typeof formsApi.getContactAirportHotelTripSnapshot === 'function'
-      ? formsApi.getContactAirportHotelTripSnapshot
-      : null;
-
-    if (!getTripSnapshot) {
-      return {
-        origin: '',
-        destination: '',
-        passengers: '',
-        tripDate: getVisibleFieldValue(form, 'airport_hotel_date'),
-        tripTime: getVisibleFieldValue(form, 'airport_hotel_time')
-      };
-    }
-
-    snapshot = getTripSnapshot();
-
-    if (!snapshot || typeof snapshot !== 'object') {
-      return {
-        origin: '',
-        destination: '',
-        passengers: '',
-        tripDate: getVisibleFieldValue(form, 'airport_hotel_date'),
-        tripTime: getVisibleFieldValue(form, 'airport_hotel_time')
-      };
-    }
-
-    return {
-      origin: typeof snapshot.origin === 'string' ? snapshot.origin.trim() : '',
-      destination: typeof snapshot.destination === 'string' ? snapshot.destination.trim() : '',
-      passengers: resolveAirportHotelPassengersLabel(),
-      tripDate: typeof snapshot.serviceDate === 'string' && snapshot.serviceDate.trim()
-        ? snapshot.serviceDate.trim()
-        : getVisibleFieldValue(form, 'airport_hotel_date'),
-      tripTime: typeof snapshot.serviceTime === 'string' && snapshot.serviceTime.trim()
-        ? snapshot.serviceTime.trim()
-        : getVisibleFieldValue(form, 'airport_hotel_time')
-    };
-  }
-
   function getTourPrivateEditorData(form) {
     if (!form) {
       return {
@@ -290,7 +195,6 @@
 
   function getVisibleFormData(form) {
     var serviceType;
-    var airportHotelData;
     var tourPrivateData;
     var eventSpecialData;
     var directTransferData;
@@ -302,9 +206,6 @@
     fallbackOrigin = getVisibleFieldValue(form, 'origin');
     fallbackDestination = getVisibleFieldValue(form, 'destination');
     fallbackPassengers = getVisibleFieldValue(form, 'passengers');
-    airportHotelData = serviceType === 'airport_hotel'
-      ? getAirportHotelEditorData(form)
-      : null;
     tourPrivateData = serviceType === 'tour_private'
       ? getTourPrivateEditorData(form)
       : null;
@@ -322,42 +223,30 @@
       tripDate: directTransferData && directTransferData.tripDate
         ? directTransferData.tripDate
         : (
-            airportHotelData && airportHotelData.tripDate
-              ? airportHotelData.tripDate
-              : (
-                  tourPrivateData && tourPrivateData.tripDate
-                    ? tourPrivateData.tripDate
-                    : (
-                        getVisibleFieldValue(form, 'trip_date')
-                      )
-                )
+            tourPrivateData && tourPrivateData.tripDate
+              ? tourPrivateData.tripDate
+              : getVisibleFieldValue(form, 'trip_date')
           ),
       tripTime: directTransferData && directTransferData.tripTime
         ? directTransferData.tripTime
         : (
-            airportHotelData && airportHotelData.tripTime
-              ? airportHotelData.tripTime
-              : (
-                  tourPrivateData && tourPrivateData.tripTime
-                    ? tourPrivateData.tripTime
-                    : (
-                        getVisibleFieldValue(form, 'trip_time')
-                      )
-                )
+            tourPrivateData && tourPrivateData.tripTime
+              ? tourPrivateData.tripTime
+              : getVisibleFieldValue(form, 'trip_time')
           ),
       origin: directTransferData && directTransferData.originAddress
         ? directTransferData.originAddress
         : (
             eventSpecialData && eventSpecialData.originAddress
               ? eventSpecialData.originAddress
-              : (airportHotelData && airportHotelData.origin ? airportHotelData.origin : fallbackOrigin)
+              : fallbackOrigin
           ),
       destination: directTransferData && directTransferData.destinationAddress
         ? directTransferData.destinationAddress
         : (
             eventSpecialData && eventSpecialData.destinationAddress
               ? eventSpecialData.destinationAddress
-              : (airportHotelData && airportHotelData.destination ? airportHotelData.destination : fallbackDestination)
+              : fallbackDestination
           ),
       serviceType: serviceType,
       zone: getVisibleFieldValue(form, 'zone'),
@@ -368,9 +257,7 @@
             eventSpecialData && eventSpecialData.passengers
               ? eventSpecialData.passengers
               : (
-                  airportHotelData && airportHotelData.passengers
-                    ? airportHotelData.passengers
-                    : (tourPrivateData && tourPrivateData.passengers ? tourPrivateData.passengers : fallbackPassengers)
+                  tourPrivateData && tourPrivateData.passengers ? tourPrivateData.passengers : fallbackPassengers
                 )
           ),
       luggage: getVisibleFieldValue(form, 'luggage'),
@@ -430,7 +317,6 @@
     labels = {
       intro: getI18nValue('contact.whatsappMessage.intro', 'Hola, quiero solicitar un traslado con Pixkuy.'),
       serviceType: getI18nValue('contact.whatsappMessage.serviceType', 'Tipo de servicio'),
-      serviceAirportHotel: getI18nValue('contact.services.airportHotel', 'Aeropuerto y hotel'),
       serviceTourPrivate: getI18nValue('contact.services.tourPrivate', 'Tours y visitas privadas'),
       serviceEventSpecial: getI18nValue('contact.services.eventSpecial.label', 'Eventos y ocasiones especiales'),
       serviceDirectTransfer: getI18nValue('directTransferMobileFlow.whatsapp.serviceLabel', 'Traslado directo'),
@@ -468,9 +354,7 @@
 
     lines = [labels.intro];
 
-    if (data.serviceType === 'airport_hotel') {
-      lines.push(labels.serviceType + ': ' + labels.serviceAirportHotel);
-    } else if (data.serviceType === 'tour_private') {
+    if (data.serviceType === 'tour_private') {
       lines.push(labels.serviceType + ': ' + labels.serviceTourPrivate);
 
     } else if (data.serviceType === 'event_special') {

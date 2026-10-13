@@ -24,25 +24,6 @@
   ];
 
   const SERVICE_FIELD_NAMES = {
-    airport_hotel: [
-      "airport_hotel_trip_summary",
-      "airport_hotel_direction_label",
-      "airport_hotel_airport_label",
-      "airport_hotel_hotel_label",
-      "airport_hotel_zone_label",
-      "airport_hotel_fare_label",
-      "airport_hotel_passenger_bucket_label",
-      "zone",
-      "fare",
-      "airport_hotel_direction",
-      "airport_hotel_airport",
-      "airport_hotel_hotel",
-      "airport_hotel_date",
-      "airport_hotel_time",
-      "passenger_fare_key",
-      "passenger_bucket_label"
-    ],
-
     tour_private: [
       "tour_private_trip_summary",
       "tour_private_pickup_label",
@@ -267,13 +248,6 @@
 
     if (flowSurface) {
       context.flow_surface = flowSurface;
-    }
-
-    if (serviceType === "airport_hotel") {
-      setContextValue(context, "direction", getFieldValue(form, "airport_hotel_direction"));
-      setContextValue(context, "passenger_fare_key", getFieldValue(form, "passenger_fare_key"));
-      setContextNumber(context, "price", getFieldValue(form, "fare"));
-      setContextValue(context, "currency", "MXN");
     }
 
     if (serviceType === "tour_private") {

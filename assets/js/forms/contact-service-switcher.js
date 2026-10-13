@@ -6,8 +6,8 @@
   }
 
   const NAMESPACE = (window.PixkuyForms = window.PixkuyForms || {});
-  const MOBILE_BLOCKED_SERVICE_TYPES = ["airport_hotel", "tour_private", "event_special", "direct_transfer"];
-  const MOBILE_FALLBACK_SERVICE_TYPE = "airport_hotel";
+  const MOBILE_BLOCKED_SERVICE_TYPES = ["tour_private", "event_special", "direct_transfer"];
+  const MOBILE_FALLBACK_SERVICE_TYPE = "other";
 
   let mobileBlockedOptionSnapshots = [];
 
@@ -110,7 +110,6 @@
     const safeServiceType = normalizeText(serviceType);
 
     return (
-      safeServiceType === "airport_hotel" ||
       safeServiceType === "tour_private" ||
       safeServiceType === "event_special" ||
       safeServiceType === "direct_transfer" ||
@@ -329,12 +328,10 @@
       ? messageField.closest('.form-field')
       : null;
     const shouldHideSharedPlacesAndPassengers =
-      activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private" ||
       activeServiceType === "event_special" ||
       activeServiceType === "direct_transfer";
     const shouldHideSharedTripDateTime =
-      activeServiceType === "airport_hotel" ||
       activeServiceType === "tour_private" ||
       activeServiceType === "event_special" ||
       activeServiceType === "direct_transfer";
@@ -412,7 +409,6 @@
   function syncOperationalSummaryFields(form, activeServiceType) {
     var serviceLabelField;
     var requestSummaryField;
-    var airportHotelFieldNames;
     var tourPrivateFieldNames;
     var eventSpecialFieldNames;
     var directTransferFieldNames;
@@ -442,23 +438,6 @@
     if (!serviceLabelField || !requestSummaryField) {
       return false;
     }
-
-    airportHotelFieldNames = [
-      "zone",
-      "fare",
-      "airport_hotel_direction",
-      "airport_hotel_airport",
-      "airport_hotel_hotel",
-      "passenger_fare_key",
-      "passenger_bucket_label",
-      "airport_hotel_trip_summary",
-      "airport_hotel_direction_label",
-      "airport_hotel_airport_label",
-      "airport_hotel_hotel_label",
-      "airport_hotel_zone_label",
-      "airport_hotel_fare_label",
-      "airport_hotel_passenger_bucket_label"
-    ];
 
     tourPrivateFieldNames = [
       "tour_private_tour_id",
@@ -547,15 +526,7 @@
       "direct_transfer_notes"
     ];
 
-    if (activeServiceType === "airport_hotel") {
-      clearFields(tourPrivateFieldNames);
-      clearFields(eventSpecialFieldNames);
-      clearFields(directTransferFieldNames);
-      return true;
-    }
-
     if (activeServiceType === "tour_private") {
-      clearFields(airportHotelFieldNames);
       clearFields(eventSpecialFieldNames);
       clearFields(directTransferFieldNames);
       return true;
@@ -563,14 +534,12 @@
 
 
     if (activeServiceType === "event_special") {
-      clearFields(airportHotelFieldNames);
       clearFields(tourPrivateFieldNames);
       clearFields(directTransferFieldNames);
       return true;
     }
 	
 	    if (activeServiceType === "direct_transfer") {
-      clearFields(airportHotelFieldNames);
       clearFields(tourPrivateFieldNames);
       clearFields(eventSpecialFieldNames);
       return true;
@@ -578,7 +547,6 @@
 
     serviceLabelField.value = "";
     requestSummaryField.value = "";
-    clearFields(airportHotelFieldNames);
     clearFields(tourPrivateFieldNames);
     clearFields(eventSpecialFieldNames);
     clearFields(directTransferFieldNames);
@@ -586,38 +554,6 @@
     return true;
   }
   
-    function clearDirectTransferExitNameValidation(form, previousServiceType, nextServiceType) {
-    const nameField = form ? form.querySelector("#contact-name") : null;
-    const nameWrapper = nameField && typeof nameField.closest === "function"
-      ? nameField.closest(".form-field")
-      : null;
-    const nameError = form
-      ? form.querySelector('[data-error-for="name"]')
-      : null;
-
-    if (
-      normalizeText(previousServiceType) !== "direct_transfer" ||
-      normalizeText(nextServiceType) !== "airport_hotel"
-    ) {
-      return false;
-    }
-
-    if (nameWrapper) {
-      nameWrapper.classList.remove("is-invalid");
-    }
-
-    if (nameField) {
-      nameField.setAttribute("aria-invalid", "false");
-    }
-
-    if (nameError) {
-      nameError.hidden = true;
-      nameError.removeAttribute("data-error-i18n-override");
-    }
-
-    return true;
-  }
-
   function syncPanelState(form, panels, activeServiceType) {
     panels.forEach(function (panel) {
       const serviceType = normalizeText(
@@ -676,24 +612,6 @@
     if (!nodes || !serviceStateApi) {
       return false;
     }
-
-    // Airport keeps its canonical fields but no longer has a desktop contact panel.
-    // Defer until a synchronous handoff has entered the new Airport route.
-    function restoreDesktopContactService() {
-      window.queueMicrotask(function () {
-        if (!isMobileServiceSelectViewport() &&
-            !/^#airport\//.test(window.location.hash) &&
-            serviceStateApi.getActiveServiceType() === "airport_hotel") {
-          serviceStateApi.setActiveServiceType("tour_private", {
-            source: "contact-desktop-default", skipConfirm: true
-          });
-        }
-      });
-    }
-    window.addEventListener("hashchange", restoreDesktopContactService);
-    window.addEventListener("resize", restoreDesktopContactService);
-    form.addEventListener("pixkuy:contact-service-change", restoreDesktopContactService);
-    restoreDesktopContactService();
 
     nodes.buttons.forEach(function (button) {
       if (button.dataset.contactServiceSwitcherBound === "1") {
@@ -777,14 +695,9 @@
         return;
       }
 
-      clearDirectTransferExitNameValidation(
-        form,
-        detail.previousServiceType,
-        nextServiceType
-      );
 
       renderActiveService(form, nextServiceType, {
-        focusPanel: detail.source === "airport-panel-handoff"
+        focusPanel: false
       });
     });
 

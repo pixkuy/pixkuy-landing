@@ -4,7 +4,7 @@
    - crear la segunda pantalla móvil del flujo Airport / Hotel
    - mostrar resumen compacto del traslado configurado
    - recoger datos personales mínimos
-   - usar form[name="contact"] como infraestructura técnica de envío Netlify
+   - usar el proveedor Airport propio como infraestructura de contacto y checkout
    - no hacer scroll a #contact
    - no activar el handoff visual legacy
    - no tocar Google Places, Google Ads ni success modal
@@ -135,23 +135,7 @@
     return api && typeof api === "object" ? api : null;
   }
 
-  function getReservationFormsApi() {
-    const api = window.PixkuyForms;
-
-    if (!api || typeof api !== "object") {
-      return null;
-    }
-
-    if (
-      typeof api.getReservationForm !== "function" ||
-      typeof api.getReservationRequestFields !== "function" ||
-      typeof api.syncReservationRequestState !== "function"
-    ) {
-      return null;
-    }
-
-    return api;
-  }
+  function getReservationFormsApi() { return window.PixkuyAirportBookingForm || null; }
 
   function getAirportState() {
     const api = getAirportApi();
@@ -262,22 +246,6 @@
 
     input.dispatchEvent(new window.Event("input", { bubbles: true }));
     input.dispatchEvent(new window.Event("change", { bubbles: true }));
-
-    return true;
-  }
-
-  function writeFormValue(form, name, value, shouldDispatch) {
-    const field = form ? form.querySelector('[name="' + name + '"]') : null;
-
-    if (!field) {
-      return false;
-    }
-
-    setInputValue(field, value);
-
-    if (shouldDispatch === true) {
-      dispatchInputEvents(field);
-    }
 
     return true;
   }
@@ -915,134 +883,13 @@
     };
   }
 
-  function buildRequestSummary(snapshot) {
-    const parts = [];
-
-    if (!snapshot) {
-      return "";
-    }
-
-    if (snapshot.directionLabel) {
-      parts.push(snapshot.directionLabel);
-    }
-
-    if (snapshot.airport) {
-      parts.push(snapshot.airport);
-    }
-
-    if (snapshot.hotel) {
-      parts.push(snapshot.hotel);
-    }
-
-    if (snapshot.zone) {
-      parts.push(snapshot.zone);
-    }
-
-    if (snapshot.passengerBucketLabel) {
-      parts.push(snapshot.passengerBucketLabel);
-    }
-
-    if (snapshot.luggage !== "") {
-      parts.push(
-        getI18nValue("airportMobileContactStep.summary.luggage", "") +
-          ": " +
-          snapshot.luggage
-      );
-    }
-
-    if (snapshot.fare) {
-      parts.push(snapshot.fare);
-    }
-
-    return parts.filter(Boolean).join(" | ");
-  }
-
   function fillReservationForm(snapshot, contactData, options) {
-    const formsApi = getReservationFormsApi();
-    const form = formsApi ? formsApi.getReservationForm() : null;
-    const fields = form && formsApi ? formsApi.getReservationRequestFields(form) : null;
-    const summary = buildRequestSummary(snapshot);
-    const isHotelOrigin = snapshot.direction === "hotel_to_airport";
-    const safeOptions = options && typeof options === "object" ? options : {};
-
-    if (!form || !fields) {
-      return false;
-    }
-
-    writeFormValue(form, "service_type", "airport_hotel", false);
-
-    writeFormValue(form, "name", contactData.name, true);
-    writeFormValue(form, "phone", contactData.phone, true);
-    writeFormValue(form, "email", contactData.email, true);
-
-    writeFormValue(form, "trip_date", snapshot.serviceDate, true);
-    writeFormValue(form, "trip_time", snapshot.serviceTime, true);
-    writeFormValue(form, "origin", snapshot.origin, true);
-    writeFormValue(form, "destination", snapshot.destination, true);
-    writeFormValue(form, "passengers", "", true);
-    writeFormValue(form, "luggage", snapshot.luggage, true);
-    writeFormValue(form, "message", contactData.notes, true);
-
-    writeFormValue(form, "zone", snapshot.zone, false);
-    writeFormValue(form, "fare", snapshot.fare, false);
-    writeFormValue(form, "airport_hotel_direction", snapshot.direction, false);
-    writeFormValue(form, "airport_hotel_airport", snapshot.airport, false);
-    writeFormValue(form, "airport_hotel_hotel", snapshot.hotel, false);
-    writeFormValue(form, "airport_hotel_date", snapshot.serviceDate, false);
-    writeFormValue(form, "airport_hotel_time", snapshot.serviceTime, false);
-    writeFormValue(form, "passenger_fare_key", snapshot.passengerFareKey, false);
-    writeFormValue(form, "passenger_bucket_label", snapshot.passengerBucketLabel, false);
-
-    writeFormValue(
-      form,
-      "service_label",
-      getI18nValue("contact.services.airportHotel", "")
-    );
-    writeFormValue(form, "request_summary", summary, false);
-    writeFormValue(form, "airport_hotel_trip_summary", summary, false);
-    writeFormValue(form, "airport_hotel_direction_label", snapshot.directionLabel, false);
-    writeFormValue(form, "airport_hotel_airport_label", snapshot.airport, false);
-    writeFormValue(form, "airport_hotel_hotel_label", snapshot.hotel, false);
-    writeFormValue(form, "airport_hotel_zone_label", snapshot.zone, false);
-    writeFormValue(form, "airport_hotel_fare_label", snapshot.fare, false);
-    writeFormValue(
-      form,
-      "airport_hotel_passenger_bucket_label",
-      snapshot.passengerBucketLabel,
-      false
-    );
-
-    writeFormValue(
-      form,
-      "origin_place_id",
-      isHotelOrigin ? snapshot.lodgingPlaceId : "",
-      false
-    );
-    writeFormValue(form, "origin_lat", isHotelOrigin ? snapshot.lodgingLat : "", false);
-    writeFormValue(form, "origin_lng", isHotelOrigin ? snapshot.lodgingLng : "", false);
-
-    writeFormValue(
-      form,
-      "destination_place_id",
-      isHotelOrigin ? "" : snapshot.lodgingPlaceId,
-      false
-    );
-    writeFormValue(form, "destination_lat", isHotelOrigin ? "" : snapshot.lodgingLat, false);
-    writeFormValue(form, "destination_lng", isHotelOrigin ? "" : snapshot.lodgingLng, false);
-
-    formsApi.syncReservationRequestState(fields);
-
-    if (safeOptions.skipLegacyValidation === true) {
-      return true;
-    }
-
-    if (typeof formsApi.refreshReservationRequestValidationUX === "function") {
-      return formsApi.refreshReservationRequestValidationUX(fields);
-    }
-
-    return true;
+    const owner = getReservationFormsApi();
+    if (!owner || !snapshot.state || !snapshot.payload || !owner.fromPanel(snapshot.state, snapshot.payload, snapshot.passengerBucketLabel)) return false;
+    owner.restoreContact(Object.assign({}, owner.raw(), contactData, {message:contactData.notes,luggage:snapshot.luggage}));
+    return options?.skipLegacyValidation === true || owner.refreshReservationRequestValidationUX();
   }
-  
+
     function parseFareAmount(value) {
     const normalizedValue = normalizeText(value)
       .replace(/[^\d.,]/g, "")
