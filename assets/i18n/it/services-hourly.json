@@ -200,7 +200,7 @@
     }
   },
   "hourlyBooking": {
-    "confirmedServiceHourly": "Autista privato",
+    "confirmedServiceHourly": "Autista privato a ore",
     "confirmedServiceFullDay": "Autista privato · Giornata intera",
     "confirmedServiceLongTerm": "Autista privato · Piani lunghi",
     "contractedDuration": "Durata prenotata",

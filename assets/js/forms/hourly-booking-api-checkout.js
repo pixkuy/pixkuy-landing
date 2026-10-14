@@ -1013,7 +1013,6 @@ var availabilityPrecheckSequence = 0;
 
     instance = getLegalAcceptanceInstance(form);
     host = getExistingLegalAcceptanceHost(form);
-    if (instance && window.PixkuyFleetSelection?.hourlyEdit()) instance.error.hidden = false;
     if (instance && instance.checkbox.checked) window.requestAnimationFrame(function () {
       if (getFieldValue(form, 'service_type') === 'hourly_daily' && !hasSyncedLegalAcceptance(form)) instance.restore(null);
     });

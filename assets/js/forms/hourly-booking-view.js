@@ -3,6 +3,7 @@
   var base=window.PixkuyAirportDesktopView,copy={},summaryCopy={};
   if(!base)return;
   function t(key){return copy[key]||copy[{yourTrip:"tripTitle",trip:"tripTitle",backTrip:"editTrip"}[key]]||base.t(key);}
+  function serviceDescription(mode){return t(mode==="full_day"?"confirmedServiceFullDay":"confirmedServiceHourly");}
   function load(){
     var lang=(document.documentElement.lang||"es").toLowerCase();
     return Promise.all([base.ready,window.fetch("assets/i18n/"+lang+"/services-hourly.json").then(function(r){
@@ -27,7 +28,7 @@
     var photo=window.PixkuyFleetSelection.photo(model);
     if(photo){var image=base.node("img","hourly-booking__photo");image.src=photo;image.alt=model.name||"";image.addEventListener("error",function(){image.remove();});aside.appendChild(image);}
     aside.appendChild(base.node("h2","",model.name||t("tripTitle")));
-    list.append(base.field(t("tripTitle"),t(snapshot.hourly_daily_mode==="full_day"?"fullDay":"hourly")),
+    list.append(base.field(t("tripTitle"),serviceDescription(snapshot.hourly_daily_mode)),
       base.field(t("origin"),snapshot.hourly_daily_pickup),
       base.field(t("date"),base.date(snapshot.hourly_daily_date)),
       base.field(t("time"),snapshot.hourly_daily_start_time),
@@ -43,7 +44,7 @@
   // Desktop review uses Airport's existing components with Hourly's fields.
   function desktopTrip(snapshot){
     var list=base.node("dl","airport-booking__details hourly-booking__trip-details");
-    list.append(base.field(t("tripTitle"),t(snapshot.hourly_daily_mode==="full_day"?"fullDay":"hourly")),
+    list.append(base.field(t("tripTitle"),serviceDescription(snapshot.hourly_daily_mode)),
       pickupField(t("origin"),snapshot.hourly_daily_pickup),
       base.field(t("start"),base.date(snapshot.hourly_daily_date)+" · "+snapshot.hourly_daily_start_time),
       base.field(t("end"),end(snapshot)),
@@ -126,7 +127,7 @@
     total.append(base.node("span","",t("mobileTotal")),base.node("strong","",price(snapshot,fresh,reservationAmount)||"—"));
     return total;
   }
-  window.PixkuyHourlyBookingView={t:t,node:base.node,action:base.action,field:base.field,summary:summary,mobileSummary:mobileSummary,mobileTotal:mobileTotal,pickupField:pickupField,
+  window.PixkuyHourlyBookingView={t:t,serviceDescription:serviceDescription,node:base.node,action:base.action,field:base.field,summary:summary,mobileSummary:mobileSummary,mobileTotal:mobileTotal,pickupField:pickupField,
     desktopTrip:desktopTrip,desktopBlock:desktopBlock,reviewSummary:reviewSummary,
     money:base.money,deadline:base.deadline,date:base.date,locationField:base.locationField,vehicle:base.vehicle,icon:base.icon,
     mobileShell:function(back,step){

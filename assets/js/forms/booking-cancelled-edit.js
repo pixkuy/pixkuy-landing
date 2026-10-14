@@ -111,7 +111,7 @@
       context && context.token === token && attempt.headers && attempt.headers['X-Pixkuy-Booking-Token'] === token);
   }
 
-  function beginHourly(state,startNew){
+  function beginHourly(state,startNew,target){
     var raw=state.result.raw,edit=raw.edit;
     var source=startNew?raw.continuation&&raw.continuation.draft:edit&&edit.allowed&&edit.draft;
     if(!source || startNew&&!raw.actions.canCreateNewReservation)return false;
@@ -142,10 +142,11 @@
     }
     var consent=null,attempt=current.attempt;
     if(!startNew&&current.reservationToken===state.token){
-      if(attempt&&attempt.state==="committed"&&attempt.response&&attempt.response.bookingStatusToken===state.token)consent=attempt.payload;
-      else if(prior&&prior.token===state.token&&prior.contactOnly){
-        var saved=store.read();if(saved?.hourlyPendingToken===state.token)consent=saved;
-      }
+      // Same-reservation local evidence (including an explicit revocation) is
+      // newer than the committed request. Service editing also owns this draft.
+      var saved=store.read();
+      if(prior&&prior.token===state.token&&saved?.hourlyPendingToken===state.token)consent=saved;
+      else if(attempt&&attempt.state==="committed"&&attempt.response&&attempt.response.bookingStatusToken===state.token)consent=attempt.payload;
     }
     var snapshot=store.fromPublic(source,consent);
     if(startNew){
@@ -154,7 +155,7 @@
       if(unsaved)["name","email","phone","message","hourly_daily_notes"].forEach(function(key){if(key in unsaved)snapshot[key]=unsaved[key];});
       delete snapshot.fleet_selection;delete snapshot.fleet_model;snapshot.legal_acceptance_accepted=false;
     }else{
-      var context={version:1,token:state.token,editRevision:edit.revision,idempotencyKey:prior && prior.token===state.token && prior.editRevision===edit.revision && !attempt ? prior.idempotencyKey : fleet.createAttemptKey(),contactOnly:true,
+      var context={version:1,token:state.token,editRevision:edit.revision,idempotencyKey:prior && prior.token===state.token && prior.editRevision===edit.revision && !attempt ? prior.idempotencyKey : fleet.createAttemptKey(),contactOnly:target!=="servicio",serviceBaseline:source,
         publicCode:state.result.publicCode,expiresAt:raw.hold.expiresAt,
         // Carry the elapsed Pending time into the persisted editor clock.
         serverNow:new Date(Date.parse(raw.serverNow)+Math.max(0,window.performance.now()-hourlyStatusReceivedAt)).toISOString(),receivedAt:Date.now(),
@@ -171,7 +172,7 @@
     }
     if(!startNew)snapshot.hourlyPendingToken=state.token;
     store.save(snapshot);window.sessionStorage.setItem(store.returnKey,"1");
-    window.location.assign("/?service=hourly_daily#hourly/"+(startNew?"servicio":"datos"));return true;
+    window.location.assign("/?service=hourly_daily#hourly/"+(startNew||target==="servicio"?"servicio":"datos"));return true;
   }
   function beginEdit(state) {
     if (!canEdit(state)) return false;
@@ -251,6 +252,9 @@
   window.PixkuyBookingCancelledEdit = {
     allowed: canEdit,
     begin: beginEdit,
+    beginConfigure: function(state) {
+      return canEdit(state) && state.result.serviceType==="hourly_daily" && beginHourly(state,false,"servicio");
+    },
     beginNew: function (state) {
       if(state.result.serviceType==="hourly_daily")return beginHourly(state,true);
       var raw = state.result.raw;

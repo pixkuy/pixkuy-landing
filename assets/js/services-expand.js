@@ -576,6 +576,10 @@
 
     function runScroll() {
       if (mobileQuery.matches || expand.hidden) return;
+      // Pending Hourly routes own their focus/scroll in the booking controller.
+      // Stop already queued deep-link retries before they override that arrival.
+      if (serviceKey === 'hourly' && /^#hourly\/(datos|revision|servicio)$/.test(window.location.hash) &&
+          window.PixkuyFleetSelection?.hourlyEdit()) return;
 
       const target = getDesktopServiceDeepLinkTarget(serviceKey);
       if (!target || target.hidden || target.offsetHeight <= 0) {

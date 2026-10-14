@@ -63,7 +63,7 @@
     var state=read("hourly_daily");
     return {valid:!!(hourlyCertificate && state.offer && state.offer.models.length &&
       hourlyCertificate.requestKey===state.offer.requestKey && Date.now()<hourlyCertificate.validUntil),
-      validUntil:hourlyCertificate?hourlyCertificate.validUntil:0};
+      validUntil:hourlyCertificate?hourlyCertificate.validUntil:0,generation:sequences.hourly_daily||0};
   }
   function selection(service) {
     var state = read(service);
@@ -506,13 +506,32 @@
     return ['place_id','lat','lng'].every(function(k){return String(place[k])===String(original[k]);}) &&
       ['model_id','model_revision'].every(function(k){return String(payload.fleet_selection?.[k])===String(baseline.fleet_selection?.[k]);});
   }
+  function hourlyContactOnly(payload, baseline) {
+    if(!payload || !baseline)return false;
+    var text=function(value){return String(value??'').trim();};
+    var keys=['hourly_daily_mode','hourly_daily_pickup','hourly_daily_pickup_place_id',
+      'hourly_daily_date','hourly_daily_start_time','hourly_daily_currency'];
+    if(keys.some(function(key){return text(payload[key])!==text(baseline[key]);}))return false;
+    var numbers=['hourly_daily_duration_hours','hourly_daily_passengers','hourly_daily_price','hourly_daily_pickup_lat','hourly_daily_pickup_lng'];
+    if(numbers.some(function(key){
+      var a=payload[key],b=baseline[key];
+      if(a==null||a===''||b==null||b==='')return text(a)!==text(b);
+      return !Number.isFinite(Number(a))||Number(a)!==Number(b);
+    }))return false;
+    var notes=function(value){return text(value.hourly_daily_notes??value.form_payload_raw?.hourly_daily_notes??value.form_payload_raw?.message);};
+    return notes(payload)===notes(baseline) && ['model_id','model_revision'].every(function(key){
+      return text(payload.fleet_selection?.[key])===text(baseline.fleet_selection?.[key]);
+    });
+  }
   function fetchCheckout(service, url, init) {
     var state = read(service);
     var payload = JSON.parse(init.body);
     state.draft = copy(payload);
-    var contactOnly=service==='hourly_daily' && hourlyEdit()?.contactOnly;
+    var edit=service==='hourly_daily' && hourlyEdit();
+    // Entering Configuration is not itself a service change. Compare the
+    // reviewed payload with the authorized baseline before choosing the writer.
+    var contactOnly=!!(edit && (edit.serviceBaseline ? hourlyContactOnly(payload,edit.serviceBaseline) : edit.contactOnly));
     if(service==="hourly_daily" && !pending(state) && hourlyEdit()){
-      var edit=hourlyEdit();
       url=url.replace(/\/checkout$/, contactOnly ? "/update-contact" : "/replace-checkout");
       if(contactOnly)payload=contactPayload(payload);
       init=Object.assign({},init,{headers:Object.assign({},init.headers,{

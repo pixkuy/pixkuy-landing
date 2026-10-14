@@ -239,3 +239,8 @@ body.hourly-booking-active > :not(.hourly-booking):not(.hourly-mobile-route):not
   .hourly-booking--contact-edit .hourly-booking__data-summary .airport-booking__location-name { display:block;font-weight:750; }
   .hourly-booking--contact-edit .hourly-booking__data-summary .airport-booking__location-address { display:block; }
 }
+
+/* Pointer-driven restoration focuses the heading without a keyboard ring. */
+@media(min-width:721px){
+  #services-expand-hourly h3[data-hourly-programmatic-focus]:focus { outline:none; }
+}

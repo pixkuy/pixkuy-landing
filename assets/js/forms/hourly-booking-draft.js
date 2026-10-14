@@ -70,7 +70,10 @@
       hourly_daily_pickup_lng:draft.hourly_daily_pickup_lng==null?"":String(draft.hourly_daily_pickup_lng),
       hourly_daily_price:String(draft.hourly_daily_price/100),legal_acceptance_accepted:false
     });
-    var verified=Object.prototype.hasOwnProperty.call(draft,"legal_acceptance_accepted")?acceptance(draft):acceptance(evidence);
+    // Evidence supplied by the pending editor is bound to this reservation.
+    // Empty string is the real hidden-field value after unchecking consent.
+    var local=Object.prototype.hasOwnProperty.call(evidence||{},"legal_acceptance_accepted");
+    var verified=local?acceptance(evidence):acceptance(draft);
     Object.keys(snapshot).forEach(function(key){if(key.indexOf("legal_acceptance_")===0)delete snapshot[key];});
     Object.assign(snapshot,verified||{legal_acceptance_accepted:false});
     delete snapshot.customer;return snapshot;

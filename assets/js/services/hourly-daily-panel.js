@@ -156,6 +156,10 @@
     let deepLinkedHourlyScrollDone = false;
 
   function isHourlyDailyDeepLink() {
+    // The pending desktop editor owns arrival; this legacy deep-link scroller
+    // must not reposition its Data/Review or restored Configuration.
+    if (!isMobileHourlyViewport() && /^#hourly\/(datos|revision|servicio)$/.test(window.location.hash) &&
+        window.PixkuyFleetSelection?.hourlyEdit()) return false;
     try {
       const params = new URLSearchParams(window.location.search || '');
       const rawService = String(params.get('service') || '').trim().toLowerCase();

@@ -9,7 +9,11 @@
   var mobileDeadlineKey = "";
   function serverNow(raw) { return new Date(Date.parse(raw.serverNow) + window.performance.now() - receivedAt).toISOString(); }
   function home() { window.location.assign("/"); }
-  function trip() { window.location.assign("/?service=hourly_daily#services"); }
+  function trip() {
+    var edit=window.PixkuyBookingCancelledEdit;
+    if(state && edit?.allowed(state))return edit.beginConfigure(state);
+    window.location.assign("/?service=hourly_daily#services");
+  }
   function mobileLocation(label, address) {
     label=String(label || '').trim();address=String(address || '').trim();
     if (!label) return address || '—';
@@ -288,7 +292,7 @@
     var main = view.node("section", "airport-booking__block");
     var details = view.node("dl", "airport-booking__details");
     details.append(view.field(view.t("reference"),result.publicCode),
-      view.field(view.t("tripTitle"),view.t(result.hourlyMode==="full_day"?"fullDay":"hourly")),
+      view.field(view.t("tripTitle"),view.serviceDescription(result.hourlyMode)),
       view.pickupField(view.t("origin"),result.pickupAddress,result.pickupAddressDetail),
       view.field(view.t("start"),view.date(result.serviceStartLocalDate)+" · "+result.serviceStartLocalTime),
       view.field(view.t("end"),view.date(result.serviceEndLocalDate)+" · "+result.serviceEndLocalTime),

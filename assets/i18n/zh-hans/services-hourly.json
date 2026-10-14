@@ -200,7 +200,7 @@
     }
   },
   "hourlyBooking": {
-    "confirmedServiceHourly": "私人司机服务",
+    "confirmedServiceHourly": "按小时计费的私人司机服务",
     "confirmedServiceFullDay": "私人司机服务 · 全天",
     "confirmedServiceLongTerm": "私人司机服务 · 长期方案",
     "contractedDuration": "预订时长",

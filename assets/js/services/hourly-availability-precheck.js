@@ -20,6 +20,7 @@
   var DEFAULT_PUBLIC_SITE_KEY = "local_pixkuy_site_key";
   var PRECHECK_ENDPOINT = "/v1/public/reservations/hourly-availability-precheck";
   var DEFAULT_HOURLY_PASSENGERS = 6;
+  var pendingConfigRequest = 0;
   
   function normalizeText(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -209,7 +210,6 @@
   }
 
   function precheck(detail, options) {
-    var config = getConfig();
     var payload = buildPayload(detail);
 
     if (!isTransactionalHourlyDetail(detail)) {
@@ -230,14 +230,24 @@
       });
     }
 
-    return window.PixkuyFleetSelection.fetchPrecheck("hourly_daily", buildPrecheckUrl(config), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Pixkuy-Site-Key": config.publicSiteKey
-      },
-      body: JSON.stringify(payload)
-    }, options).then(function handleResponse(response) {
+    // Restored Data can request availability before the asynchronous runtime
+    // config arrives. Resolve both URL and site only after its existing barrier.
+    var loader = window.PixkuyBookingPublicConfig;
+    var request = ++pendingConfigRequest;
+    var generation = window.PixkuyFleetSelection.hourlyOfferStatus().generation;
+    return Promise.resolve(loader && loader.ready).then(function () {
+      if(request !== pendingConfigRequest || generation !== window.PixkuyFleetSelection.hourlyOfferStatus().generation)
+        throw new Error("FLEET_STALE_OFFER");
+      var config = getConfig();
+      return window.PixkuyFleetSelection.fetchPrecheck("hourly_daily", buildPrecheckUrl(config), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Pixkuy-Site-Key": config.publicSiteKey
+        },
+        body: JSON.stringify(payload)
+      }, options);
+    }).then(function handleResponse(response) {
       return response.json().catch(function () {
         return {};
       }).then(function handleBody(body) {

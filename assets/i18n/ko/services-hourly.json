@@ -200,7 +200,7 @@
     }
   },
   "hourlyBooking": {
-    "confirmedServiceHourly": "전용 기사 서비스",
+    "confirmedServiceHourly": "시간제 전용 기사 서비스",
     "confirmedServiceFullDay": "전용 기사 서비스 · 종일",
     "confirmedServiceLongTerm": "전용 기사 서비스 · 장기 플랜",
     "contractedDuration": "예약 시간",

@@ -200,7 +200,7 @@
     }
   },
   "hourlyBooking": {
-    "confirmedServiceHourly": "Личный водитель",
+    "confirmedServiceHourly": "Личный водитель с почасовой оплатой",
     "confirmedServiceFullDay": "Личный водитель · Полный день",
     "confirmedServiceLongTerm": "Личный водитель · Длительные планы",
     "contractedDuration": "Забронированная длительность",

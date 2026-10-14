@@ -77,6 +77,55 @@ function hourlyPrecheckHarness(mobile=false){
 function hourlyFixture(available,next){return {status:'ok',checkoutAllowed:available,
  availability:{available,status:available?'available':'unavailable',...(next?{nextAvailableStartLocal:next}:{})},
  fleet:{version:1,requestKey:'controlled-offer',status:available?'available':'unavailable',models:available?[{modelId:'controlled-model',modelRevision:1,name:'Controlled vehicle'}]:[]}};}
+test('Hourly pending edit: precheck waits for the real runtime config loader before resolving URL and site',async()=>{
+ const h=hourlyPrecheckHarness();let release;const calls=[];
+ h.window.PIXKUY_BOOKING_API_CONFIG={apiBaseUrl:'',publicSiteKey:'initial-site'};
+ h.window.fetch=(url,init)=>{
+  if(url==='/.netlify/functions/booking-public-config')return new Promise(resolve=>release=resolve);
+  calls.push({url,init});return Promise.resolve(new Response(JSON.stringify(hourlyFixture(true))));
+ };
+ vm.runInNewContext(source('assets/js/forms/booking-public-config.js'),{window:h.window});
+ h.select();h.field('date','2026-11-05');h.field('time','10:45');
+ const pending=h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail(),{interactive:false});
+ await h.flush();assert.equal(calls.length,0,'must not POST to Landing before config arrives');
+ release(new Response(JSON.stringify({ok:true,bookingApi:{apiBaseUrl:'https://booking.example.invalid'},publicSite:{siteKey:'runtime-site'}})));
+ const result=await pending;assert.equal(result.available,true);assert.equal(calls.length,1);
+ assert.equal(calls[0].url,'https://booking.example.invalid/v1/public/reservations/hourly-availability-precheck');
+ assert.equal(calls[0].init.headers['X-Pixkuy-Site-Key'],'runtime-site');
+});
+test('Hourly pending edit: only unchanged service uses contact endpoint; all commercial changes replace',async()=>{
+ const baseline={service_type:'hourly_daily',hourly_daily_mode:'hourly',hourly_daily_pickup:'Synthetic',hourly_daily_pickup_place_id:'place',hourly_daily_pickup_lat:19.4,hourly_daily_pickup_lng:-99.1,hourly_daily_date:'2027-01-13',hourly_daily_start_time:'10:00',hourly_daily_duration_hours:2,hourly_daily_passengers:2,hourly_daily_price:150000,hourly_daily_currency:'MXN',hourly_daily_notes:'Keep',fleet_selection:{model_id:'model',model_revision:1}};
+ const changes=[{customer:{full_name:'Edited',email:'contact@example.invalid',phone:'+525500000000'},locale:'en'},
+  {hourly_daily_pickup:'Other'},{hourly_daily_pickup_place_id:'other'},{hourly_daily_pickup_lat:19.5},{hourly_daily_pickup_lng:-99.2},
+  {hourly_daily_date:'2027-01-14'},{hourly_daily_start_time:'11:00'},{hourly_daily_duration_hours:3},{hourly_daily_passengers:4},
+  {hourly_daily_price:200000},{hourly_daily_currency:'USD'},{hourly_daily_notes:''},{hourly_daily_mode:'full_day'},
+  {fleet_selection:{model_id:'model',model_revision:2}}];
+ for(const [index,change] of changes.entries()){
+  const h=hourlyPrecheckHarness();await h.flush();const calls=[];
+  h.window.sessionStorage.setItem('pixkuy_hourly_pending_edit_v1',JSON.stringify({version:1,token:'synthetic',editRevision:'2026-10-13T10:00:00.000Z',idempotencyKey:'existing-key',contactOnly:true,serviceBaseline:baseline}));
+  h.window.fetch=(url,init)=>{calls.push({url,body:JSON.parse(init.body),headers:init.headers});return Promise.resolve(new Response(JSON.stringify({recovery:{state:'unknown'}})));};
+  const payload={...baseline,...change};delete payload.hourly_daily_notes;payload.form_payload_raw={hourly_daily_notes:change.hourly_daily_notes??baseline.hourly_daily_notes};
+  await h.window.PixkuyFleetSelection.fetchCheckout('hourly_daily','/v1/public/reservations/checkout',{method:'POST',headers:{},body:JSON.stringify(payload)});
+  assert.equal(calls.length,1);assert(calls[0].url.endsWith(index===0?'/update-contact':'/replace-checkout'),JSON.stringify(change));
+  assert.equal(calls[0].headers['X-Pixkuy-Booking-Token'],'synthetic');assert.equal(calls[0].headers['Idempotency-Key'],'existing-key');
+  await h.window.PixkuyFleetSelection.fetchCheckout('hourly_daily','/wrong/checkout',{method:'POST',headers:{},body:JSON.stringify({...baseline,hourly_daily_price:999999})});
+  assert.deepEqual(calls[1],calls[0],'uncertain attempt freezes endpoint, token, key and payload');
+ }
+});
+test('Hourly pending edit: config wait cannot resurrect invalidated or superseded context',async()=>{
+ for(const nextRequest of [false,true]){
+  const h=hourlyPrecheckHarness();let release;
+  h.window.PixkuyBookingPublicConfig={ready:new Promise(resolve=>release=resolve)};
+  h.select();h.field('date','2026-11-05');h.field('time','10:45');
+  const first=h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail(),{interactive:false});
+  h.field('time','11:00');
+  const next=nextRequest?h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail(),{interactive:false}):null;
+  release();await h.flush();assert.equal((await first).available,false);
+  assert.equal(h.requests.length,nextRequest?1:0);
+  if(next){assert.equal(h.requests[0].payload.hourly_daily_start_time,'11:00');h.requests[0].resolve(hourlyFixture(true));assert.equal((await next).available,true);}
+  else assert.equal(h.window.PixkuyFleetSelection.hourlyOfferStatus().valid,false);
+ }
+});
 test('Hourly precheck: first entry orders build the same complete request; pending is not available',async()=>{
  for(const mobile of [false,true])for(const order of [['pickup','date','time'],['time','date','pickup']]){
   const h=hourlyPrecheckHarness(mobile);await h.fill(order);assert.equal(h.requests.length,1);assert(h.cta.disabled);
@@ -206,11 +255,11 @@ test('Post-retirement: desktop return expands once, focuses notes and ignores ob
  for(const focusNotes of [false,true]){
   const frames=[],scrolls=[],focus=[],expands=[],value={hourly_daily_mode:'full_day',name:'Keep contact',legal_acceptance_accepted:true};let route='datos',synced;
   const target={getBoundingClientRect:()=>({top:500,height:80}),focus:options=>focus.push(options)};
-  const bindings={navigationVersion:0,reviewed:'old',notice:'old',snapshot:value,contactEdit:()=>false,save(){},
+  const bindings={navigationVersion:0,reviewed:'old',notice:'old',snapshot:value,keyboardNavigation:false,attempt:()=>null,editing:()=>null,contactEdit:()=>false,save(){},
    go:next=>{route=next;bindings.navigationVersion++;},step:()=>route,draft:{syncPanel:v=>synced=v},view:{media:{matches:true}},
-   document:{documentElement:{clientHeight:900},querySelector:s=>s.endsWith(' h3')?{focus(){},tabIndex:0}:target},
+   document:{documentElement:{clientHeight:900},querySelector:s=>s.endsWith(' h3')?{focus(){},setAttribute(){},removeAttribute(){},tabIndex:0}:target},
    window:{innerHeight:900,scrollY:100,requestAnimationFrame:fn=>frames.push(fn),scrollTo:options=>scrolls.push(options),PixkuyServicesExpand:{open:(key,options)=>expands.push({key,options})}}};
-  const trip=declarations('assets/js/forms/hourly-booking-flow.js',['trip'],bindings).trip;
+  const trip=declarations('assets/js/forms/hourly-booking-flow.js',['trip','openConfiguration'],bindings).trip;
   trip(focusNotes);assert.equal(route,'servicio');assert.equal(synced,value);assert.equal(expands.length,1);assert.equal(expands[0].key,'hourly');assert.equal(expands[0].options.scroll,false);assert.equal(frames.length,1);
   frames.shift()();assert.equal(scrolls.length,1);assert.equal(scrolls[0].behavior,'instant');assert.equal(focus.length,focusNotes?1:0);if(focusNotes)assert(focus[0].preventScroll);
   trip(focusNotes);route='datos';bindings.navigationVersion++;frames.shift()();assert.equal(scrolls.length,1);assert.equal(value.name,'Keep contact');assert(value.legal_acceptance_accepted);
@@ -553,4 +602,69 @@ for(const origin of ['ordinary','motion'])test(`combined mobile configuration ex
 });
 test('combined mobile configuration reload via hash without service query',async()=>{
  const f=combinedFlowFixture({hasService:false});await f.ready();assert(f.window.PixkuyHourlyMobileBookingFlow.isOpen());assert.equal(f.returns.length,0);
+});
+
+
+// Focused pending-edit refinements. Actual status projection, legal policy,
+// draft adapter and pending entry; only storage/status rows are synthetic.
+function pendingLegalFixture(){
+ const window={sessionStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},performance:{now:()=>0},location:{assign:url=>{window.destination=url;}}},document={},storage=new Map();
+ vm.runInNewContext(source('assets/js/forms/legal-acceptance.js'),{window,document});
+ vm.runInNewContext(source('assets/js/forms/hourly-booking-draft.js'),{window,document});
+ const legal=window.PixkuyForms.LegalAcceptance,policy=legal.buildSnapshot('web_hourly_checkout');
+ const accepted=Object.fromEntries(Object.entries(legal.fieldNames).map(([key,field])=>[field,String(policy[key])]));
+ const apiFile=process.env.PIXKUY_STATUS_PREIMAGE||path.resolve(root,'../../pixkuy-booking-api/src/modules/public-api/publicReservationStatusRepository.ts');
+ const text=fs.readFileSync(apiFile,'utf8'),ast=ts.createSourceFile(apiFile,text,ts.ScriptTarget.Latest,true),nodes=[];
+ function visit(n){if(ts.isVariableDeclaration(n)&&['toTimeString','buildEditableHourlyDraft'].includes(n.name.getText(ast)))nodes.push('const '+n.getText(ast)+';');ts.forEachChild(n,visit);}visit(ast);
+ assert.equal(nodes.length,2);
+ const project=vm.runInNewContext(ts.transpileModule(nodes.join('\n')+'\nbuildEditableHourlyDraft;', {compilerOptions:{target:ts.ScriptTarget.ES2020}}).outputText);
+ const row={service_type:'hourly_daily',hourly_mode:'hourly',pickup_address:'Synthetic pickup',public_model_id:'fixture',public_model_name:'Fixture',public_model_revision:1,service_start_local_time:'10:00:00',amount_expected:150000,form_payload_raw:accepted};
+ return {window,storage,accepted,row,project,store:window.PixkuyHourlyBookingDraft};
+}
+test('Pending refinements: status preserves only recorded legal evidence and current policy guards',()=>{
+ const f=pendingLegalFixture(),projected=f.project(f.row);
+ for(const [key,value] of Object.entries(f.accepted))assert.equal(projected[key],value,key);
+ assert.equal(f.store.fromPublic(projected).legal_acceptance_accepted,'true');
+ assert.equal(f.store.fromPublic(f.project({...f.row,form_payload_raw:{}})).legal_acceptance_accepted,false);
+ for(const invalid of [{legal_acceptance_terms_version:'obsolete'},{legal_acceptance_accepted_at:''},{legal_acceptance_channel:'other'}])
+  assert.equal(f.store.fromPublic(f.project({...f.row,form_payload_raw:{...f.accepted,...invalid}})).legal_acceptance_accepted,false);
+ assert.equal(f.project({...f.row,form_payload_raw:{...f.accepted,legal_acceptance_secret:'excluded'}}).legal_acceptance_secret,undefined);
+ for(const revoked of ['',false,'false'])assert.equal(f.store.fromPublic(projected,{...f.accepted,legal_acceptance_accepted:revoked}).legal_acceptance_accepted,false);
+});
+test('Pending refinements: same-reservation service-edit draft precedes committed evidence; foreign drafts never supply consent',()=>{
+ for(const receipt of [false,true])for(const local of ['accepted','revoked','foreign']){
+  const f=pendingLegalFixture(),token='synthetic-token',prior={token,contactOnly:false},current={reservationToken:token,attempt:receipt?{state:'committed',payload:f.accepted,response:{bookingStatusToken:token}}:null};
+  f.store.save({...f.accepted,legal_acceptance_accepted:local==='revoked'?'':'true',hourlyPendingToken:local==='foreign'?'foreign':token});
+  f.window.PixkuyFleetSelection={read:()=>current,hourlyEdit:()=>prior,createAttemptKey:()=> 'captured-id'};
+  const draft=f.project({...f.row,form_payload_raw:{}}),state={token,result:{publicCode:'SYNTHETIC',raw:{edit:{allowed:true,revision:'r1',draft},payment:{amountExpected:150000,currency:'MXN'},hold:{expiresAt:'2027-01-01'},serverNow:'2026-10-14'}}};
+  const api=declarations('assets/js/forms/booking-cancelled-edit.js',['beginHourly','ownsAttempt'],{window:f.window,hourlyStatusReceivedAt:0});
+  assert(api.beginHourly(state,false));
+  assert.equal(f.store.read().legal_acceptance_accepted,local==='accepted'||local==='foreign'&&receipt?'true':false,local+' receipt='+receipt);
+  assert.equal(f.window.destination,'/?service=hourly_daily#hourly/datos');
+ }
+});
+test('Pending refinements: hourly description exists in nine locales and full-day remains distinct',()=>{
+ for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
+  const copy=JSON.parse(source('assets/i18n/'+lang+'/services-hourly.json')).hourlyBooking;
+  assert(copy.confirmedServiceHourly);assert.notEqual(copy.confirmedServiceHourly,copy.confirmedServiceFullDay);
+  if(lang==='en')assert.equal(copy.confirmedServiceHourly,'Private chauffeur by the hour');
+ }
+});
+
+test('Pending refinements: legacy scrollers defer only to pending Hourly desktop routes',()=>{
+ for(const mobile of [false,true])for(const editing of [false,true])for(const hash of ['#hourly/datos','#hourly/revision','#hourly/servicio','#services']){
+  const location={hash,search:'?service=hourly_daily'},fleet={hourlyEdit:()=>editing?{}:null};
+  const own=!mobile&&editing&&hash.startsWith('#hourly/');
+  const deep=declarations(panel,['isHourlyDailyDeepLink'],{window:{location,PixkuyFleetSelection:fleet},URLSearchParams,isMobileHourlyViewport:()=>mobile});
+  assert.equal(deep.isHourlyDailyDeepLink(),!own);
+  for(const service of ['hourly','airport','direct']){
+   const frames=[],scrolls=[];
+   const bindings={mobileQuery:{matches:mobile},expand:{hidden:false},document:{documentElement:{clientHeight:844}},
+    getDesktopServiceDeepLinkTarget:()=>({hidden:false,offsetHeight:200,getBoundingClientRect:()=>({top:500})}),
+    window:{location,PixkuyFleetSelection:fleet,innerHeight:844,scrollY:0,requestAnimationFrame:fn=>frames.push(fn),setTimeout(){},scrollTo:v=>scrolls.push(v)}};
+   declarations('assets/js/services-expand.js',['scrollDesktopServiceDeepLinkTargetIntoView'],bindings).scrollDesktopServiceDeepLinkTargetIntoView(service);
+   while(frames.length)frames.shift()();
+   assert.equal(scrolls.length,mobile||own&&service==='hourly'?0:1);
+  }
+ }
 });

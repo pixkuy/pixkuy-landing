@@ -11,6 +11,7 @@
     if(event.key!=="Tab" && !event.key.startsWith("Arrow"))return;
     keyboardNavigation=true;
     mount?.querySelectorAll("[data-hourly-touch-focus]").forEach(function(node){node.removeAttribute("data-hourly-touch-focus");});
+    document.querySelector('#services-expand-hourly h3[data-hourly-programmatic-focus]')?.removeAttribute("data-hourly-programmatic-focus");
   },true);
   document.addEventListener("pointerdown",function(){keyboardNavigation=false;},true);
   var phoneLabel=form.querySelector('label[for="hourly-contact-phone"]'),phoneLabelText=phoneLabel.textContent;
@@ -65,7 +66,13 @@
       statusReturn(token);return false;
     }
     var target=step();
-    if(edit && (!target || target==="servicio"))target=sent?"revision":"datos";
+    if(edit && target==="servicio" && !sent){
+      if(!edit.serviceBaseline){statusReturn(edit.token);return false;}
+      // A direct URL/history entry must enter the same service-edit mode as Back.
+      edit.contactOnly=false;
+      window.sessionStorage.setItem("pixkuy_hourly_pending_edit_v1",JSON.stringify(edit));
+    }
+    if(edit && !target)target=sent?"revision":"datos";
     else if(!validDraft(snapshot) && (target==="datos"||target==="revision"))target="servicio";
     else if(sent && validDraft(snapshot))target="revision";
     if(target && target!==step())window.history.replaceState(historyContext(),"","#hourly/"+target);
@@ -102,8 +109,18 @@
   }
   function button(key,fn,primary){var b=view.action(view.t(key),fn,primary);b.disabled=busy;return b;}
   function trip(focusNotes){
-    if(contactEdit()){exitEdit();return;}
+    if(attempt()){go("revision");return;}
+    var edit=editing();
+    if(edit){
+      // Old contact-only contexts must reacquire the authorized service baseline.
+      if(!edit.serviceBaseline){statusReturn(edit.token);return;}
+      edit.contactOnly=false;
+      window.sessionStorage.setItem("pixkuy_hourly_pending_edit_v1",JSON.stringify(edit));
+    }
     save();reviewed="";notice="";go("servicio");
+    openConfiguration(focusNotes);
+  }
+  function openConfiguration(focusNotes){
     draft.syncPanel(snapshot);
     if(!view.media.matches&&window.PixkuyHourlyMobileBookingFlow)window.PixkuyHourlyMobileBookingFlow.open();
     else {
@@ -113,10 +130,18 @@
       window.PixkuyServicesExpand.open("hourly",{scroll:false});
       window.requestAnimationFrame(function(){
         if(version!==navigationVersion||step()!=="servicio"||!view.media.matches)return;
-        var target=document.querySelector(focusNotes===true?'[data-services-hourly-notes]':'[data-services-hourly-config]');
+        var target=document.querySelector(focusNotes===true?'[data-services-hourly-notes]':'#services-expand-hourly');
         if(!target)return;
         if(focusNotes===true)target.focus({preventScroll:true});
-        else {var heading=document.querySelector('#services-expand-hourly h3');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}}
+        else {
+          var heading=document.querySelector('#services-expand-hourly h3');
+          if(heading){
+            heading.tabIndex=-1;
+            if(!keyboardNavigation)heading.setAttribute("data-hourly-programmatic-focus","");
+            else heading.removeAttribute("data-hourly-programmatic-focus");
+            heading.focus({preventScroll:true});
+          }
+        }
         var rect=target.getBoundingClientRect(),height=window.innerHeight||document.documentElement.clientHeight;
         var offset=focusNotes===true?Math.max(96,(height-rect.height)/2):Math.min(96,Math.max(56,Math.round(height*.1)));
         window.scrollTo({top:Math.max(0,rect.top+window.scrollY-offset),behavior:"instant"});
@@ -149,7 +174,7 @@
       checkingAvailability=false;
       // Server authority wins over the displayed countdown. Reacquire status
       // for rejected editing; do not label expiration/stale authority as no cars.
-      if(contactEdit() && ["BOOKING_STATUS_NOT_FOUND","BOOKING_STATUS_TOKEN_EXPIRED",
+      if(editing() && ["BOOKING_STATUS_NOT_FOUND","BOOKING_STATUS_TOKEN_EXPIRED",
         "CHECKOUT_REPLACEMENT_STALE","CHECKOUT_REPLACEMENT_NOT_ALLOWED",
         "CHECKOUT_ALREADY_COMPLETED","CHECKOUT_PAYMENT_WINDOW_CLOSED",
         "CHECKOUT_STATE_UNCERTAIN"].includes(result.code)){
@@ -257,7 +282,7 @@
         if(mount)mount.querySelectorAll("[data-hourly-pay]").forEach(function(b){b.disabled=true;});
         protectReview();
       }));
-      if(!contactEdit())content.appendChild(button("exitEdit",exitEdit));
+      if(mobile&&!contactEdit())content.appendChild(button("exitEdit",exitEdit));
     }
     if(notice){var message=view.node("p","hourly-booking__notice",view.t(notice));message.setAttribute("role","status");statusHost.appendChild(message);}
     if(notice==="availabilityError")statusHost.appendChild(button("retryAvailability",checkAvailability));
@@ -408,6 +433,7 @@
       }finally{restoringDraft=false;}
     }
     hydrated=true;notice="";render();
+    if(step()==="servicio" && editing() && !attempt())openConfiguration();
     if((step()==="datos"||step()==="revision")&&mount&&!fresh()&&!attempt())checkAvailability();
   }).catch(function(){
     var token=editing()?.token || window.PixkuyFleetSelection.read("hourly_daily").reservationToken;
