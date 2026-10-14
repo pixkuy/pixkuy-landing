@@ -25,6 +25,8 @@
     availabilityPriceMismatch: "services.cards.airport.panel.availability.priceMismatch",
     availabilityOperationalConfirmation: "fleet.operational",
     availabilityError: "services.cards.airport.panel.availability.error",
+    availabilityFareUnavailable: "services.cards.airport.panel.availability.fareUnavailable",
+    availabilitySaleUnavailable: "services.cards.airport.panel.availability.saleUnavailable",
     availabilityNonAirportLocationIsSelectedAirport:
       "services.cards.airport.panel.availability.nonAirportLocationIsSelectedAirport"
   };
@@ -305,6 +307,13 @@
       requestedLocalDate
     );
 
+    if (code === "AIRPORT_TRANSFER_NON_AIRPORT_LOCATION_IS_SELECTED_AIRPORT") {
+      return getAirportAvailabilityCopy(
+        "availabilityNonAirportLocationIsSelectedAirport",
+        "Elige una dirección de recogida o destino diferente del aeropuerto seleccionado."
+      );
+    }
+
     if (code === "AIRPORT_TRANSFER_MINIMUM_LEAD_TIME_NOT_MET") {
       return [getAirportAvailabilityCopy("availabilityMinimumLeadTime", "Reserve con al menos 24 horas de antelación. Seleccione una fecha y hora posteriores."), nextAvailableMessage].filter(Boolean).join(" ");
     }
@@ -324,14 +333,14 @@
     }
 
     if (code === "AIRPORT_TRANSFER_SALE_MODE_UNAVAILABLE") {
-      return "Este traslado no está disponible para reserva en línea.";
+      return getAirportAvailabilityCopy("availabilitySaleUnavailable", "Este traslado no está disponible para reserva en línea.");
     }
 
     if (
       code === "AIRPORT_TRANSFER_ZONE_NOT_TARIFFED" ||
       code === "AIRPORT_TRANSFER_FARE_NOT_FOUND"
     ) {
-      return "No hay una tarifa reservable para este traslado.";
+      return getAirportAvailabilityCopy("availabilityFareUnavailable", "No hay una tarifa reservable para este traslado.");
     }
 
     if (!isAirportConfirmedUnavailable(result)) {
@@ -672,10 +681,13 @@
   function isAirportConfirmedUnavailable(result) {
     const raw = result && result.raw && result.raw.result;
     const availability = raw && raw.availability;
-    const code = String(result && result.code || "") + " " + String(availability && availability.code || "");
-    if (/FAILED|UNDETERMINED|TECHNICAL|PENDING/.test(code)) return false;
-    return /NO_AVAILABILITY|FLEET_UNAVAILABLE|TRANSFER_UNAVAILABLE/.test(code) ||
-      Boolean(availability && availability.available === false && availability.status === "unavailable");
+    const code = normalizeAirportPrecheckResult(result).code;
+    if (result && (result.ok === false || result.statusCode >= 400) ||
+        raw && raw.price && raw.price.available === false) return false;
+    // The HTTP contract also uses status=unavailable for invalid locations and
+    // failed prerequisites. Only operational availability codes certify scarcity.
+    return /^(NO_AVAILABILITY|FLEET_UNAVAILABLE|AIRPORT_TRANSFER_UNAVAILABLE|NO_COMPATIBLE_VEHICLE|VEHICLE_NOT_AVAILABLE|AIRPORT_TRANSFER_MINIMUM_LEAD_TIME_NOT_MET)$/.test(code) ||
+      Boolean(!code && availability && availability.available === false && availability.status === "unavailable");
   }
 
   function setAirportMobileAvailabilityState(nodes, state, status, key, result) {
@@ -754,6 +766,7 @@
     const statusNode = ensureAirportAvailabilityStatusNode(nodes);
     const suggestion = window.PixkuySharedAvailabilitySuggestion;
     const normalizedResult = normalizeAirportPrecheckResult(result);
+    if (!isAirportConfirmedUnavailable(result)) normalizedResult.nextAvailableStartLocal = "";
     const fullMessage = getAirportAvailabilityMessage(result, state.serviceDate);
     const nextMessage = getAirportNextAvailableMessage(
       normalizedResult,

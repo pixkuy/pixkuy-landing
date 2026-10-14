@@ -107,6 +107,8 @@
       "available": "Disponibilité confirmée. Vous pouvez continuer.",
       "unavailable": "Aucune disponibilité pour cette date et cette heure. Choisissez une autre option.",
       "minimumLeadTime": "Veuillez réserver au moins 24 heures à l’avance. Sélectionnez une date et une heure ultérieures.",
+      "fareUnavailable": "Aucun tarif réservable n’est disponible pour ce transfert.",
+      "saleUnavailable": "Ce transfert ne peut pas être réservé en ligne.",
       "nonAirportLocationIsSelectedAirport": "Choisissez une adresse de prise en charge ou de destination différente de l’aéroport sélectionné.",
       "nextAvailableSlot": "Prochaine heure disponible : {time}",
       "priceMismatch": "Le tarif a changé. Actualisez la configuration avant de continuer.",

@@ -107,6 +107,8 @@
       "available": "可用性已确认。您可以继续。",
       "unavailable": "该日期和时间没有可用服务。请选择其他选项。",
       "minimumLeadTime": "请至少提前24小时预订。请选择更晚的日期和时间。",
+      "fareUnavailable": "此接送服务暂无可预订的价格。",
+      "saleUnavailable": "此接送服务暂不支持在线预订。",
       "nonAirportLocationIsSelectedAirport": "请选择与所选机场不同的接送或目的地地址。",
       "nextAvailableSlot": "下一个可用时间：{time}",
       "priceMismatch": "价格已发生变化。继续前请刷新配置。",

@@ -107,6 +107,8 @@
       "available": "Availability confirmed. You can continue.",
       "unavailable": "No availability for that date and time. Choose another option.",
       "minimumLeadTime": "Please book at least 24 hours in advance. Select a later date and time.",
+      "fareUnavailable": "No bookable fare is available for this transfer.",
+      "saleUnavailable": "This transfer is not available for online booking.",
       "nonAirportLocationIsSelectedAirport": "Choose a pickup or destination address different from the selected airport.",
       "nextAvailableSlot": "Next available time: {time}",
       "priceMismatch": "The fare has changed. Refresh the configuration before continuing.",
