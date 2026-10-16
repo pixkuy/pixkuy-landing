@@ -546,9 +546,10 @@ onClearSelection: function () {
     activeAvailabilityContextKey = '';
     window.clearTimeout(automaticHourlyCheck);
     automaticHourlyCheck=window.setTimeout(()=>{
-      // Pending contact editing is owned by the Data/Review precheck. The
-      // restored configuration must not race it with a background request.
-      if(window.PixkuyFleetSelection.hourlyEdit()?.contactOnly || window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily'))return;
+      // Data/Review owns revalidation after restoring any draft, not just a
+      // pending contact edit. A background panel call can supersede its wait
+      // for runtime config and turn a successful refresh into a stale error.
+      if(window.PixkuyHourlyBookingFlow?.isActive() || window.PixkuyFleetSelection.hourlyEdit()?.contactOnly || window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily'))return;
       if(isTransactionalHourlyMode() && isConfigComplete())
         runHourlyAvailabilityPrecheck(buildHourlySubmitDetail(),{dispatchOnAvailable:false,interactive:false});
     },350);

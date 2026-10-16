@@ -446,4 +446,110 @@ async function mobileLot(){
  }catch(e){report.result='FAIL';report.error=e.stack;report.url=t?.page.url();if(t)await snap('failure').catch(()=>{});throw e;}
  finally{clearTimeout(timer);await Promise.all(deliveryTasks);await Promise.all(scriptTasks);report.errors.push(...(t?.state.errors||[]));report.requests=t?.state.requests;await fs.writeFile(path.join(base.output,'mobile-lot.json'),JSON.stringify(report,null,2));await fs.writeFile(path.join(base.output,'resources.json'),JSON.stringify([...base.resources],null,2));await browser.close();console.log(JSON.stringify({result:report.result,checks:report.checks,error:report.error}));}
 }
-(process.argv.includes('--mobile-lot')?mobileLot():main()).catch(e=>{console.error(e.message);process.exitCode=1;});
+// Focused unsent Data reload. Real document/controllers; only static delivery,
+// Places selection and HTTP are controlled. No checkout endpoint is permitted.
+async function dataReload(){
+ assert.equal(process.env.PIXKUY_AUDIT_FIXTURES,'1');await fs.mkdir(base.output,{recursive:true});
+ const browser=await base.launchChrome();base.setBrowser(browser);
+ const report={transport:'offline captured',before,rows:[]},timer=setTimeout(()=>browser.close(),180000);let current;
+ try{for(const width of (before?[390]:[390,1440]))for(const mode of ['hourly','full_day']){
+  const only=process.argv.find(v=>v.startsWith('--reload-case='))?.split('=')[1];if(only&&only!==mode+'-'+width)continue;
+  const t=await base.setup(width,'hourly_daily'),p=t.page,row={width,mode,requests:[],checks:[]};report.rows.push(row);
+  current=t;row.errors=t.state.errors;
+  let hold=false,configHold=false,configRelease,technical=false;const pending=[];
+  t.state.models=[{...base.model,passengersSupported:4}];
+  await t.context.addInitScript(()=>{
+   window.__reloadPrechecks=[];let api;
+   Object.defineProperty(window,'PixkuyHourlyAvailabilityPrecheck',{configurable:true,get:()=>api,set:value=>{
+    api=value;const original=value.precheck;
+    value.precheck=function(detail,options){
+     const entry={mode:detail.hourly_daily_mode,duration:detail.hourly_daily_duration_hours,at:performance.now(),caller:new Error().stack};window.__reloadPrechecks.push(entry);
+     return original.call(this,detail,options).then(result=>{entry.result={code:result.code,available:result.available,ok:result.ok,http:result.statusCode};entry.completedAt=performance.now();return result;});
+    };
+   }});
+  });
+  await t.context.route('**/*',async route=>{
+   const u=new URL(route.request().url());
+   if(/\.(mp4|webm)$/.test(u.pathname))return route.abort();
+   if(u.origin!==base.origin||u.pathname.startsWith('/v1/')||u.pathname.startsWith('/.netlify/'))return route.fallback();
+   assert.equal(route.request().method(),'GET');const file=path.resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));assert(file.startsWith(root+path.sep));
+   const types={'.js':'application/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.svg':'image/svg+xml','.jpeg':'image/jpeg','.jpg':'image/jpeg','.png':'image/png','.webp':'image/webp'};
+   let body;
+   try{
+    const preimage=process.env.PIXKUY_HOURLY_PRECHECK_PREIMAGE;
+    if(before&&preimage){try{body=await fs.readFile(path.join(preimage,path.relative(root,file)));}catch(e){if(e.code!=='ENOENT')throw e;}}
+    body=body||await fs.readFile(file);return route.fulfill({body,contentType:types[path.extname(file)]||'application/octet-stream'});
+   }catch(e){if(e.code!=='ENOENT')throw e;return route.fulfill({status:404,body:''});}
+  });
+  await t.context.route('**/.netlify/functions/booking-public-config',async route=>{
+   if(configHold)await new Promise(resolve=>configRelease=resolve);
+   return route.fulfill({json:{ok:true,bookingApi:{apiBaseUrl:base.origin},publicSite:{siteKey:'offline-site'}}});
+  });
+  await t.context.route('**/v1/public/reservations/**',async route=>{
+   const u=new URL(route.request().url());assert(u.pathname.endsWith('/hourly-availability-precheck'),'No business operations allowed');
+   const payload=route.request().postDataJSON(),entry={payload,http:technical?503:200};row.requests.push(entry);
+   if(hold)await new Promise(resolve=>pending.push(resolve));
+   if(technical)return route.fulfill({status:503,json:{code:'FLEET_AVAILABILITY_UNDETERMINED'}});
+   return route.fallback();
+  });
+  await base.enter(t);
+  if(mode==='full_day')await p.locator('[data-services-hourly-mode="full_day"]').click();
+  else if(width<=720)await p.locator('[data-hourly-mobile-duration-select]').selectOption('8');
+  else await p.locator('[data-services-hourly-duration="8"]').click();
+  await p.locator('[data-services-hourly-date]').fill('2027-01-29');await p.locator('[data-services-hourly-time]').fill('21:48');
+  await p.locator('[data-fleet-hourly-passengers]').selectOption('4');
+  await p.waitForFunction(()=>window.PixkuyFleetSelection.hourlyOfferStatus().valid);
+  await p.locator('[data-services-hourly-cta]:visible').click();await p.waitForURL(/#hourly\/datos$/);
+  await p.locator('#hourly-contact-name').fill('Persona Sintética');await p.locator('#hourly-contact-phone').fill('+525512345678');await p.locator('#hourly-contact-email').fill('reload@example.invalid');
+  await p.locator('#pixkuy-hourly-legal-acceptance').check();
+  await p.waitForFunction(()=>!document.querySelector('#hourly-contact-submit').disabled);
+  const read=()=>p.evaluate(()=>({hash:location.hash,notice:document.querySelector('.hourly-booking__notice')?.textContent||'',disabled:document.querySelector('#hourly-contact-submit')?.disabled,
+   fresh:window.PixkuyFleetSelection.hourlyOfferStatus().valid,draft:window.PixkuyHourlyCheckout.draft(),consent:document.querySelector('#pixkuy-hourly-legal-acceptance')?.checked}));
+  row.initial=await read();let start=row.requests.length;hold=true;configHold=before;
+  await p.reload({waitUntil:'domcontentloaded'});await p.locator('#hourly-contact-submit').waitFor();
+  // Let the existing 350ms panel debounce fire while transport is held. This is
+  // a test schedule, not a product delay or retry.
+  await p.waitForTimeout(600);row.loading=await read();row.reloadRequests=row.requests.slice(start);
+  if(before){configHold=false;configRelease();await p.waitForTimeout(100);row.reloadRequests=row.requests.slice(start);}
+  hold=false;for(const release of pending.splice(0))release();
+  await p.waitForTimeout(250);row.reloaded=await read();row.reloadTrace=await p.evaluate(()=>window.__reloadPrechecks);
+  await p.screenshot({path:path.join(base.output,mode+'-'+width+'-reload.png'),fullPage:false});
+  if(!before){
+   assert.equal(row.reloadRequests.length,1,'one owner for restored availability');assert.match(row.loading.notice,/Comprobando/);assert(row.loading.disabled);
+   assert(row.reloaded.fresh);assert.equal(row.reloaded.notice,'');assert.equal(row.reloaded.disabled,false);assert(row.reloaded.consent);
+   for(const key of Object.keys(row.initial.draft).filter(k=>/^(name|phone|email|hourly_daily_|legal_acceptance_|fleet_)/.test(k)))
+    assert.deepEqual(row.reloaded.draft[key],row.initial.draft[key],key);
+   row.checks.push('reload single request; data, consent and valid gate restored');
+   start=row.requests.length;configHold=true;hold=true;
+   await p.reload({waitUntil:'domcontentloaded'});await p.locator('#hourly-contact-submit').waitFor();await p.waitForTimeout(600);
+   assert.equal(row.requests.length,start);assert.match((await read()).notice,/Comprobando/);
+   configHold=false;configRelease();await p.waitForTimeout(100);assert.equal(row.requests.length,start+1);hold=false;for(const release of pending.splice(0))release();
+   await p.waitForFunction(()=>!document.querySelector('#hourly-contact-submit').disabled);assert.equal((await read()).notice,'');
+   row.lateTrace=await p.evaluate(()=>window.__reloadPrechecks);
+   assert.equal(row.lateTrace.length,1,'Data owns the initial revalidation');row.checks.push('late runtime config waits, one request');
+   technical=true;start=row.requests.length;await p.reload({waitUntil:'domcontentloaded'});
+   const retry=p.getByRole('button',{name:/Volver a comprobar|Comprobar de nuevo|Check again/});await retry.waitFor();await p.waitForTimeout(600);
+   assert.equal(row.requests.length,start+1);assert((await read()).disabled);assert((await read()).consent);
+   technical=false;await retry.click();await p.waitForFunction(()=>!document.querySelector('#hourly-contact-submit').disabled);row.checks.push('persistent failure stays blocked without automatic retry; explicit recovery');
+   hold=true;await p.reload({waitUntil:'domcontentloaded'});await p.locator('#hourly-contact-submit').waitFor();
+   await p.waitForTimeout(100);assert.equal(pending.length,1);const oldResponse=pending.shift();hold=false;
+   await p.locator(width<=720?'.hourly-booking .hourly-mobile-flow__back':'.hourly-booking .airport-booking__identity button').click();await p.waitForURL(/#hourly\/servicio$/);
+   await p.locator('[data-services-hourly-time]').fill('22:18');await p.locator('[data-services-hourly-time]').dispatchEvent('change');
+   await p.waitForFunction(()=>window.PixkuyFleetSelection.hourlyOfferStatus().valid);
+   oldResponse();await p.waitForTimeout(150);
+   const current=await p.evaluate(()=>window.PixkuyFleetSelection.read('hourly_daily').precheck.payload);
+   assert.equal(current.hourly_daily_start_time,'22:18');assert.equal(current.hourly_daily_mode,mode);
+   await p.locator('[data-services-hourly-cta]:visible').click();await p.waitForURL(/#hourly\/datos$/);
+   await p.waitForFunction(()=>!document.querySelector('#hourly-contact-submit').disabled);
+   const final=await read();assert.equal(final.notice,'');assert(final.consent);assert.equal(final.draft.hourly_daily_start_time,'22:18');
+   for(const key of ['name','phone','email','hourly_daily_notes'])assert.equal(final.draft[key],row.initial.draft[key]);
+   row.checks.push('Back revalidates changed trip; late restored response cannot replace current offer');
+  }
+  assert.deepEqual(t.state.errors,[]);row.errors=t.state.errors;row.result=before?'OBSERVED':'PASS';await t.context.close();
+ }}catch(e){report.error=e.stack;report.diagnostic=await current?.page.evaluate(()=>({hash:location.hash,trace:window.__reloadPrechecks,
+  fields:Array.from(document.querySelectorAll('[data-services-hourly-config] input,[data-services-hourly-config] select')).map(n=>({type:n.type,value:n.value})),
+  state:window.PixkuyFleetSelection?.hourlyOfferStatus()})).catch(()=>null);throw e;
+ }finally{clearTimeout(timer);await fs.writeFile(path.join(base.output,'reload-result.json'),JSON.stringify(report,null,2));await browser.close();}
+ console.log(JSON.stringify({result:before?'OBSERVED':'PASS',cases:report.rows.map(r=>({mode:r.mode,width:r.width,requests:r.reloadRequests.length,notice:r.reloaded.notice,checks:r.checks}))}));
+}
+(process.argv.includes('--data-reload')?dataReload():process.argv.includes('--mobile-lot')?mobileLot():main()).catch(e=>{console.error(e.message);process.exitCode=1;});

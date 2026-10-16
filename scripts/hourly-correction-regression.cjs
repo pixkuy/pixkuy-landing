@@ -77,6 +77,25 @@ function hourlyPrecheckHarness(mobile=false){
 function hourlyFixture(available,next){return {status:'ok',checkoutAllowed:available,
  availability:{available,status:available?'available':'unavailable',...(next?{nextAvailableStartLocal:next}:{})},
  fleet:{version:1,requestKey:'controlled-offer',status:available?'available':'unavailable',models:available?[{modelId:'controlled-model',modelRevision:1,name:'Controlled vehicle'}]:[]}};}
+test('Hourly restored Data: panel debounce cannot supersede its runtime-config wait',async()=>{
+ for(const mobile of [true,false])for(const mode of ['hourly','full_day']){
+  const h=hourlyPrecheckHarness(mobile);let release,active=true;
+  // Route ownership is the narrow collaborator here. The browser regression
+  // traverses the real form, draft restoration and isActive implementation.
+  h.window.PixkuyHourlyBookingFlow={isActive:()=>active};
+  h.window.PixkuyBookingPublicConfig={ready:new Promise(resolve=>release=resolve)};
+  h.choose(mode);h.select();h.field('date','2027-01-29');h.field('time','21:48');
+  const dataRequest=h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail(),{interactive:false});
+  await h.tick();assert.equal(h.requests.length,0,'config not ready; no transport');
+  release();await h.flush();assert.equal(h.requests.length,1);
+  h.requests[0].resolve(hourlyFixture(true));assert.equal((await dataRequest).available,true,'Data request must not be superseded by the hidden panel');
+  assert(h.window.PixkuyFleetSelection.hourlyOfferStatus().valid);
+  // Back returns ownership to Configuration; its normal debounce still works.
+  active=false;h.field('time','22:18');await h.tick();assert.equal(h.requests.length,2);
+  h.requests[1].resolve(hourlyFixture(true));await h.flush();assert.equal(h.cta.disabled,false);
+ }
+});
+
 test('Hourly pending edit: precheck waits for the real runtime config loader before resolving URL and site',async()=>{
  const h=hourlyPrecheckHarness();let release;const calls=[];
  h.window.PIXKUY_BOOKING_API_CONFIG={apiBaseUrl:'',publicSiteKey:'initial-site'};
