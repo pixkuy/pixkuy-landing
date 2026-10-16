@@ -1951,6 +1951,17 @@
     renderStep();
     setStepVisibility(true);
 
+    // Pending edits can arrive from a status receipt, without a local Places
+    // coverage cache. Resolve those coordinates through the existing guard.
+    ['origin','destination'].forEach(role=>{
+      const place=state[role+'Place'];
+      if(place && !state[role+'Coverage'])resolveDirectTransferCoverage(place).then(coverage=>{
+        if(state[role+'Place']!==place || !isOpen())return;
+        state[role+'Coverage']=coverage;syncCta();
+        if(!window.PixkuyDirectTransferMobileContactStep?.isOpen())requestQuoteIfReady();
+      });
+    });
+
     return true;
   }
 

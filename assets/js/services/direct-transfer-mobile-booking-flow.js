@@ -316,8 +316,13 @@ let inMotionReturnContext = null;
     const fleet = window.PixkuyFleetSelection.read('direct_transfer');
     const token = fleet.reservationToken || fleet.attempt && fleet.attempt.response && fleet.attempt.response.bookingStatusToken;
     const pending=window.PixkuyDirectPendingEdit?.activeData();
-    if (token && !pending) {
+    const editing=window.PixkuyDirectPendingEdit?.serviceEdit();
+    if (token && !pending && (!editing || editing.token !== token)) {
       window.location.assign('/booking-cancelled.html?token=' + encodeURIComponent(token));
+      return true;
+    }
+    if (!pending && fleet.attempt && fleet.attempt.state !== 'not_committed' && window.PixkuyDirectTransferTransactionalState?.readReviewSnapshot()) {
+      window.location.assign('/direct-transfer-checkout-review.html?lang=' + encodeURIComponent(document.documentElement.lang || 'es') + '#revision');
       return true;
     }
 

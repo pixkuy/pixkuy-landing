@@ -50,7 +50,7 @@
       publicCode:context.publicCode,expiresAt:context.expiresAt,
       serverNow:new Date(Date.parse(context.serverNow)+Math.max(0,Date.now()-context.receivedAt)).toISOString(),canReview,
       onChange:(contact,proof)=>{context.customer.full_name=contact.name;context.customer.phone=contact.phone;context.customer.email=contact.email;context.proof=proof;write(context);},
-      onBack:()=>{if(window.matchMedia('(min-width:721px)').matches)configure();else location.assign('/booking-cancelled.html?token='+encodeURIComponent(context.token));},
+      onBack:()=>configure(),
       onReview:()=>location.assign('/direct-transfer-checkout-review.html?pending=1&lang='+encodeURIComponent(document.documentElement.lang||'es')+'#revision')
     });
     try{
@@ -82,6 +82,14 @@
     const saved=snapshotOf(context),legal=window.PixkuyForms.LegalAcceptance;
     Object.entries(legal.fieldNames).forEach(([key,name])=>saved[name]=context.proof?.[key]||'');
     saved.desktopDraft={version:1,stage:'servicio'};
+    if(window.matchMedia('(max-width:720px)').matches){
+      const config={date:saved.direct_transfer_date,time:saved.direct_transfer_time,passengerFareKey:saved.direct_transfer_passenger_fare_key,notes:saved.direct_transfer_notes||''};
+      for(const side of ['origin','destination']){
+        config[side]=saved['direct_transfer_'+side+'_address'];
+        config[side+'Place']={label:config[side],placeId:saved['direct_transfer_'+side+'_place_id'],lat:Number(saved['direct_transfer_'+side+'_lat']),lng:Number(saved['direct_transfer_'+side+'_lng'])};
+      }
+      saved.mobileDraft={version:1,stage:'config',config,contact:{name:saved.name,phone:saved.phone,email:saved.email,notes:config.notes},legal:context.proof};
+    }
     window.PixkuyDirectTransferTransactionalState.writeReviewSnapshot(saved);
     location.assign('/?service=direct_transfer&lang='+encodeURIComponent(document.documentElement.lang||'es')+'#direct/servicio');
     return true;
@@ -134,11 +142,12 @@
       api.renderStaticCopy(dictionary);api.renderDetails(snapshot,dictionary);api.renderLegal(snapshot,dictionary);
       q('[data-direct-transfer-checkout-review-empty]').hidden=true;q('[data-direct-transfer-checkout-review-content]').hidden=false;
       document.body.setAttribute('data-direct-pending-edit','true');
-      document.querySelectorAll('[data-direct-pending-form],[data-direct-pending-reference],[data-direct-pending-deadline]').forEach(n=>n.remove());
+      document.querySelectorAll('[data-direct-pending-form],[data-direct-pending-reference],[data-direct-pending-deadline],.booking-pending-meta').forEach(n=>n.remove());
       const details=q('[data-direct-transfer-checkout-review-details]');
       const reference=view.node('p','booking-status__lead',view.t('reference')+': '+context.publicCode);reference.dataset.directPendingReference='';details.before(reference);
       const estimate=new Date(Date.parse(context.serverNow)+Math.max(0,Date.now()-context.receivedAt)).toISOString();
       const deadline=view.deadline(context.expiresAt,estimate,'editDeadlinePassed',gate);deadline.dataset.directPendingDeadline='';reference.after(deadline);
+      if(!view.media.matches){const meta=view.node('div','booking-pending-meta');meta.append(reference,deadline);details.prepend(meta);}
       const edit=q('[data-direct-transfer-checkout-review-edit]');edit.hidden=false;edit.removeAttribute('aria-disabled');edit.href=dataUrl();
       edit.onclick=event=>{event.preventDefault();if(!busy)location.assign(dataUrl());};
       const proceed=q('[data-direct-transfer-checkout-review-proceed]');proceed.textContent=dictionary.proceed;
@@ -175,5 +184,15 @@
       }catch(_){verified=false;error();gate();}
     });
   }
-  window.PixkuyDirectPendingEdit={begin,beginConfigure,configure,serviceEdit,route,mount,activeData,mountData};
+  function mobileServiceMeta(parent){
+    const context=serviceEdit(),view=window.PixkuyAirportDesktopView;
+    if(!context || !parent || view.media.matches)return;
+    parent.querySelector('.booking-pending-meta')?.remove();
+    const meta=view.node('div','booking-pending-meta');
+    meta.appendChild(view.node('p','',view.t('reference')+': '+context.publicCode));
+    const estimate=new Date(Date.parse(context.serverNow)+Math.max(0,Date.now()-context.receivedAt)).toISOString();
+    meta.appendChild(view.deadline(context.expiresAt,estimate,'editDeadlinePassed'));
+    parent.appendChild(meta);
+  }
+  window.PixkuyDirectPendingEdit={begin,beginConfigure,configure,serviceEdit,route,mount,activeData,mountData,mobileServiceMeta};
 })(window,document);

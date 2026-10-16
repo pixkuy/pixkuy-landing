@@ -265,7 +265,13 @@
       if(field)field.remove();
       syncPresentation(service);return null;
     }
-    if (!parent || (state.offer && !state.offer.models.length && !state.attempt) || (!state.offer && !state.attempt) || (state.offer && state.offer.models.length === 1 && validSelection(state, service) && !state.attempt)) {
+    // A known Airport edit keeps its checkout identity, but that history alone
+    // does not require a second mobile selector above the canonical photo/fare.
+    var airportMobileEdit = service === "airport_transfer" && parent && parent.closest(".airport-mobile-route") &&
+      window.matchMedia("(max-width: 720px)").matches && window.PixkuyAirportDesktopBooking?.pendingEdit();
+    var knownAirportEdit = airportMobileEdit && !state.explicit && !pending(state) && state.attempt?.state === "committed" &&
+      state.attempt.response?.bookingStatusToken === airportMobileEdit.token;
+    if (!parent || (state.offer && !state.offer.models.length && !state.attempt) || (!state.offer && !state.attempt) || (state.offer && state.offer.models.length === 1 && validSelection(state, service) && (!state.attempt || knownAirportEdit))) {
       if (field) field.parentNode.removeChild(field);
       return null;
     }

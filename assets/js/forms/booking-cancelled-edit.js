@@ -174,7 +174,7 @@
     store.save(snapshot);window.sessionStorage.setItem(store.returnKey,"1");
     window.location.assign("/?service=hourly_daily#hourly/"+(startNew||target==="servicio"?"servicio":"datos"));return true;
   }
-  function beginEdit(state) {
+  function beginEdit(state, target) {
     if (!canEdit(state)) return false;
     if(state.result.serviceType==='direct_transfer')return window.PixkuyDirectPendingEdit.begin(state);
     if(state.result.serviceType==="hourly_daily")return beginHourly(state,false);
@@ -226,12 +226,12 @@
     if (proof) Object.keys(legal.fieldNames).forEach(function (key) { snapshot[legal.fieldNames[key]] = proof[key]; });
     Object.keys(snapshot).filter(function (key) { return key.indexOf("legal_acceptance_") === 0; }).forEach(function (key) { snapshot.form_payload_raw[key] = snapshot[key]; });
     snapshot.airport_pending_token = state.token;
-    snapshot.airport_draft_stage = "datos";
+    snapshot.airport_draft_stage = target === "traslado" ? "traslado" : "datos";
     window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
     window.sessionStorage.setItem(RETURN_KEY, "1");
     window.sessionStorage.setItem(EDIT_KEY, JSON.stringify(context));
     persistFleetDraft(draft, state.token);
-    window.location.assign("/?service=airport_hotel#airport/datos");
+    window.location.assign("/?service=airport_hotel#airport/" + snapshot.airport_draft_stage);
     return true;
   }
 
@@ -253,7 +253,10 @@
     allowed: canEdit,
     begin: beginEdit,
     beginConfigure: function(state) {
-      return canEdit(state) && state.result.serviceType==="hourly_daily" && beginHourly(state,false,"servicio");
+      if (!canEdit(state)) return false;
+      if (state.result.serviceType === 'direct_transfer') return window.PixkuyDirectPendingEdit.beginConfigure(state);
+      if (state.result.serviceType === 'airport_transfer') return beginEdit(state,'traslado');
+      return state.result.serviceType==="hourly_daily" && beginHourly(state,false,"servicio");
     },
     beginNew: function (state) {
       if(state.result.serviceType==="hourly_daily")return beginHourly(state,true);
@@ -291,20 +294,20 @@
     currentState = state;
     var allowed = canEdit(state);
     document.querySelectorAll("[data-booking-cancelled-modify]").forEach(function (button) {
-    var mobileHourly=state.result.serviceType==="hourly_daily"&&!!button.closest('[data-booking-cancelled-mobile]');
+    var mobileEdit=["hourly_daily","airport_transfer","direct_transfer"].includes(state.result.serviceType)&&!!button.closest('[data-booking-cancelled-mobile]');
     var serviceButton=button.parentNode.querySelector('[data-booking-cancelled-modify-service]');
-    if(mobileHourly&&!serviceButton){
+    if(mobileEdit&&!serviceButton){
       serviceButton=document.createElement('button');serviceButton.type='button';serviceButton.className=button.className;
       serviceButton.setAttribute('data-booking-cancelled-modify-service','');button.before(serviceButton);
       serviceButton.addEventListener('click',function(){window.PixkuyBookingCancelledEdit.beginConfigure(currentState);});
     }
     if(serviceButton){
       serviceButton.textContent=t(state.dictionary,'cancelled.actions.modifyService','Modificar servicio');
-      visible(serviceButton,allowed&&mobileHourly);serviceButton.disabled=!allowed;
+      visible(serviceButton,allowed&&mobileEdit);serviceButton.disabled=!allowed;
     }
     button.textContent = t(
       state.dictionary,
-      mobileHourly?"cancelled.actions.modifyContact":"cancelled.actions.modify",
+      mobileEdit?"cancelled.actions.modifyContact":"cancelled.actions.modify",
       "Modificar datos"
     );
     visible(button, allowed);

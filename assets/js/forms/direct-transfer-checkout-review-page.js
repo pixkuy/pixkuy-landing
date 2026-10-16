@@ -515,6 +515,7 @@
       notes ? buildRow(t(dictionary, "details.notes", "Notas"), notes, "notes") : ""
     ].join("");
 
+    window.PixkuyDirectPendingEdit?.mobileServiceMeta(details);
     document.querySelectorAll('[data-direct-review-contact],[data-direct-review-total]').forEach(function (node) { node.remove(); });
     var edit = getNode("[data-direct-transfer-checkout-review-edit]");
     var actions = getNode("[data-direct-transfer-checkout-review-content] .booking-status__actions");

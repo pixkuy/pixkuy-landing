@@ -51,7 +51,7 @@ class Element extends Events {
   closest(s){return this.matches(s)?this:this.parentNode?.closest(s)||null;}
   querySelectorAll(s){return this.all().filter(n=>n.matches(s));} querySelector(s){return this.querySelectorAll(s)[0]||null;}
   get elements(){const a=this.all().filter(n=>['INPUT','TEXTAREA','BUTTON','SELECT'].includes(n.tagName));a.namedItem=k=>a.find(n=>n.name===k)||null;for(const n of a)if(n.name)a[n.name]=n;return a;}
-  setCustomValidity(v){this.validationMessage=v;} focus(){this.ownerDocument.activeElement=this;} blur(){this.ownerDocument.activeElement=null;} scrollIntoView(){} getClientRects(){return this.hidden?[]:[{}];}
+  setCustomValidity(v){this.validationMessage=v;} focus(){this.ownerDocument.activeElement=this;(this.ownerDocument.focusCalls??=[]).push(this);} blur(){this.ownerDocument.activeElement=null;} scrollIntoView(){(this.ownerDocument.scrollCalls??=[]).push(this);} getClientRects(){return this.hidden?[]:[{}];}
   cloneNode(deep){const n=new Element(this.tagName,this.ownerDocument);Object.assign(n,{attrs:{...this.attrs},className:this.className,textContent:this.textContent});if(deep)this.children.forEach(c=>n.append(c.cloneNode(true)));return n;}
   set innerHTML(value){this.replaceChildren();this._html=value; /* SVG is presentation only in this test. */} get innerHTML(){return this._html||this.children.map(c=>c.tagName+':'+(c.textContent||'')).join('');}
 }
@@ -63,6 +63,7 @@ function runtime({mobile=false,legacy=false,readers=false,saved={},route='#servi
   if(legacy){const old=document.createElement('form');old.name='contact';document.body.append(old);const n=document.createElement('input');n.name='name';n.value='LEGACY MUST NOT LEAK';old.append(n);}
   const panel=document.createElement('section');panel.id='services-expand-airport';document.body.append(panel);
   for(const role of ['date','time']){const wrap=document.createElement('div');wrap.setAttribute('data-airport-tariff-role',role);wrap.append(document.createElement('input'));panel.append(wrap);}
+  const configBack=document.createElement('button');configBack.setAttribute('data-airport-mobile-flow-back','');panel.append(configBack);
   const mobileRoot=document.createElement('div');mobileRoot.className='airport-mobile-route__content';document.body.append(mobileRoot);
   const window=new Events(), frames=[], timers=[], calls=[];
   let href='https://local.pixkuy.test/'+route;
@@ -150,12 +151,17 @@ async function scenario(options){
   const pendingReload=runtime({...options,saved:w.sessionStorage.dump(),route:'#airport/revision'});await pendingReload.settle();
   pendingReload.window.dispatchEvent(new Event('pageshow'));await pendingReload.settle();
   assert.equal(pendingReload.window.sessionStorage.getItem('pixkuy_fleet_b:airport_transfer'),frozen,'reload preserves uncertain attempt and identity');
+  if(options.mobile)assert(pendingReload.window.PixkuyAirportDesktopBooking.resumePending(),'Home resumes the uncertain Airport attempt, not its frozen configurator');
   assert(!pendingReload.calls.some(v=>v.url.endsWith('/checkout')),'reload never retries creation');
   // Traverse the actual pending-status -> editor adapter, then a fresh document.
   const status=runtime({...options});await status.settle();status.document.readyState='loading';
   status.run('assets/js/forms/booking-status-state.js');status.run('assets/js/forms/booking-cancelled-edit.js');status.document.readyState='complete';
   const now=new Date().toISOString(),expiry=new Date(Date.now()+25*60000).toISOString();
   const publicState={token:'controlled-status-token',result:{serviceType:'airport_transfer',view:'pending',publicCode:'CONTROLLED',raw:{actions:{canModify:true},edit:{allowed:true,revision:'revision-fixture',draft:sent.body},hold:{expiresAt:expiry},serverNow:now}}};
+  assert(status.window.PixkuyBookingCancelledEdit.beginConfigure(publicState));
+  assert.equal(status.window.location.hash,'#airport/traslado');
+  assert.equal(JSON.parse(status.window.sessionStorage.getItem('pixkuy_airport_pending_edit_v1')).expiresAt,expiry);
+  assert.equal(status.window.PixkuyBookingCancelledEdit.beginConfigure({...publicState,result:{...publicState.result,view:'expired'}}),false,'Expired status cannot authorize editing');
   assert(status.window.PixkuyBookingCancelledEdit.begin(publicState));
   const editStored=status.window.sessionStorage.dump(), authority=editStored.pixkuy_airport_pending_edit_v1;
   const editor=runtime({...options,saved:editStored,route:'?service=airport_hotel#airport/datos'});await editor.settle();editor.window.dispatchEvent(new Event('pageshow'));await editor.settle();
@@ -209,6 +215,66 @@ async function remainingServices(){
   return {case:'Remaining Netlify services and shared translations',result:'PASS',scope:'actual HTML controls -> real readers/negative guards/WhatsApp formatting; nine existing dictionaries; no submit or link opening'};
 }
 (async()=>{
+  if(process.argv.includes('--mobile-model-presentation')){
+    for(const mobile of [true,false]){
+      const r=runtime({mobile,route:'#airport/traslado'}),w=r.window,d=r.document,f=w.PixkuyFleetSelection;await r.settle();
+      const route=d.createElement('section');route.className='airport-mobile-route';d.body.append(route);route.append(d.getElementById('services-expand-airport'));
+      const token='synthetic-presentation-owner',edit={version:1,token,editRevision:'synthetic-revision',idempotencyKey:'synthetic-edit-key'};
+      w.sessionStorage.setItem('pixkuy_airport_pending_edit_v1',JSON.stringify(edit));
+      const one={modelId:'fixture-model',modelRevision:1,name:'BYD M9',photoUrl:'/fixture.jpg'};
+      const body={result:{checkoutAllowed:true,availability:{available:true},price:{available:true,amountMinor:127500},fleet:{version:1,status:'available',requestKey:'presentation-fixture',models:[one]}}};
+      await f.acceptOffer('airport_transfer',body,{},{interactive:false,fleetContextKey:w.PixkuyAirportZoneTariff.fleetContextKey()});
+      const key='pixkuy_fleet_b:airport_transfer',state=f.read('airport_transfer');
+      state.reservationToken=token;state.attempt={state:'committed',key:'existing-attempt',payload:{service_type:'airport_transfer'},response:{bookingStatusToken:token}};
+      w.sessionStorage.setItem(key,JSON.stringify(state));const original=w.sessionStorage.getItem(key);f.render('airport_transfer');
+      const field=()=>d.querySelector('[data-fleet-selection="airport_transfer"]');
+      assert(mobile?!field():!!field(),'Certified sole model in mobile known edit uses its canonical photo/fare, desktop unchanged');
+      assert.equal(w.sessionStorage.getItem(key),original,'Presentation never consumes or changes the attempt');
+      if(!mobile)continue;
+      const variants=[
+        ['multiple models',v=>v.offer.models.push({...one,modelId:'other-model'})],
+        ['selection required',v=>{v.selected=null;v.explicit=true;}],
+        ['uncertain attempt',v=>v.attempt.state='unknown'],
+        ['other owner',v=>v.attempt.response.bookingStatusToken='other-owner']
+      ];
+      for(const [label,change]of variants){const value=JSON.parse(original);change(value);w.sessionStorage.setItem(key,JSON.stringify(value));f.render('airport_transfer');assert(field(),label+' retains necessary control');assert.equal(w.sessionStorage.getItem(key),JSON.stringify(value));}
+    }
+    console.log('PASS Airport mobile sole-model presentation; multi-model, explicit choice, uncertain/foreign attempt controls retained; desktop unchanged; no transport.');return;
+  }
+  if(process.argv.includes('--configuration-arrival')){
+    for(const mobile of [true,false]){
+      const r=runtime({mobile}),w=r.window,d=r.document;await r.settle();
+      const panel=d.getElementById('services-expand-airport'),date=panel.querySelector('[data-airport-tariff-role="date"] input'),back=panel.querySelector('[data-airport-mobile-flow-back]'),scroller=d.querySelector('.airport-mobile-route__content');
+      scroller.scrollTop=180;w.PixkuyAirportDesktopBooking.configure();await r.settle();
+      assert(d.activeElement===(mobile?back:date),'Configuration arrival focuses its accessible navigation, never a mobile date input');
+      if(mobile){
+        assert.equal(scroller.scrollTop,0);assert(!(d.scrollCalls||[]).includes(panel));
+        // Deferred restoration/render must not steal focus after an explicit date interaction.
+        date.focus();scroller.scrollTop=140;const count=d.focusCalls.length;
+        w.dispatchEvent(new Event('hashchange'));await r.settle();assert.equal(d.activeElement,date);assert.equal(d.focusCalls.length,count);assert.equal(scroller.scrollTop,140);
+        const deps={normalizeText:v=>String(v||'').trim(),getActiveLodgingSide:()=> 'destination',resolveDisplayLabel:type=>type==='airport'?'MEX':'Reforma',getZoneIdForFare:()=> 'reforma',resolveFare:()=>({price:775,currency:'MXN'}),formatPrice:n=>n+' MXN',resolveFareKeyDisplayLabel:()=> '1–2',debugSwapTrace(){}};
+        assert(w.PixkuyAirportTariffHandoff.handoffPanelSelectionToContact(r.state,deps));await r.settle();
+        const dataBack=d.querySelector('.airport-booking .airport-mobile-flow__back');assert(dataBack,'real mobile Data Back');
+        dataBack.dispatchEvent(new Event('click'));await r.settle();assert.equal(w.location.hash,'#airport/traslado');assert.equal(d.activeElement,back);assert.equal(scroller.scrollTop,0);
+        const restored=runtime({mobile:true,saved:w.sessionStorage.dump(),route:'#airport/traslado'});await restored.settle();
+        restored.window.dispatchEvent(new Event('hashchange'));await restored.settle();
+        assert.equal(restored.document.activeElement,restored.document.querySelector('[data-airport-mobile-flow-back]'));
+      }
+    }
+    console.log('PASS real Airport controller: configuration arrival, Data Back, reload, no repeated focus; desktop boundary unchanged. DOM adapter does not validate rendering/native picker.');return;
+  }
+  if(process.argv.includes('--contact-feedback')){
+    for(const mobile of [false,true]){
+      const r=runtime({mobile}),own=r.window.PixkuyAirportBookingForm,form=own.getReservationForm(),fields=own.getReservationRequestFields();
+      fields.name.value='Synthetic';form.dispatchEvent(new Event('blur',{target:fields.name}));
+      for(const key of ['phone','email'])assert.notEqual(fields[key].getAttribute('aria-invalid'),'true','Untouched '+key);
+      fields.phone.value='12';form.dispatchEvent(new Event('blur',{target:fields.phone}));
+      assert.equal(fields.phone.getAttribute('aria-invalid'),'true');assert.notEqual(fields.email.getAttribute('aria-invalid'),'true');
+      assert.equal(own.refreshReservationRequestValidationUX(),false);assert.equal(fields.email.getAttribute('aria-invalid'),'true');
+      assert.equal(own.syncReservationRequestState(),false);
+    }
+    console.log('PASS Airport contact feedback mobile/desktop; invalid guard retained');return;
+  }
   const results=[];
   for(const mobile of [false,true])for(const absence of ['DOM','controllers']){
     results.push(await scenario({mobile,legacy:absence==='controllers',readers:absence==='DOM'}));

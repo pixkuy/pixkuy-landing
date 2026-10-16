@@ -23,6 +23,7 @@
   var deferredRender = false;
   var mobileUiFrame = 0;
   var mobileEntryPending = false;
+  var mobileConfigurationActive = false;
   var originalSubmitKey = document.getElementById("airport-contact-submit").getAttribute("data-i18n");
   form.before(placeholder);
 
@@ -435,8 +436,9 @@
       mount.setAttribute('data-airport-pending-edit', '');
       var summary = mount.querySelector('.airport-mobile-contact-step__summary');
       var reference = view.node('p', 'airport-booking__reference', view.t('reference') + ': ' + editing.publicCode);
-      summary.before(reference);
-      if (editing.expiresAt && editing.serverNow) reference.after(editDeadline(editing));
+      var meta = view.node('div','booking-pending-meta');meta.appendChild(reference);
+      if (editing.expiresAt && editing.serverNow) meta.appendChild(editDeadline(editing));
+      summary.appendChild(meta);
     }
     renderNotice(mount);
     mount.querySelectorAll('.airport-booking__primary').forEach(function (node) { node.classList.add('airport-mobile-contact-step__submit'); node.classList.remove('cta'); });
@@ -539,7 +541,13 @@
       progress.setAttribute("role", "status"); aside.appendChild(progress);
     }
     var editing = editContext();
-    if(editing && editing.expiresAt && editing.serverNow) aside.appendChild(editDeadline(editing));
+    if(editing && !view.media.matches){
+      var meta=view.node('div','booking-pending-meta');
+      meta.appendChild(view.node('p','',view.t('reference')+': '+editing.publicCode));
+      if(editing.expiresAt && editing.serverNow)meta.appendChild(editDeadline(editing));
+      mount.querySelector('.airport-mobile-review__trip').appendChild(meta);
+    }
+    else if(editing && editing.expiresAt && editing.serverNow) aside.appendChild(editDeadline(editing));
     else if(!editing && view.media.matches) aside.appendChild(view.node("p", "airport-booking__lead", view.t("paymentPolicy")));
     if (editing && notice === "paymentWindowClosed") aside.appendChild(button("recover", function () {
       window.location.assign("/booking-cancelled.html?token=" + encodeURIComponent(editing.token));
@@ -822,12 +830,21 @@
           if (window.PixkuyAirportZoneTariff && window.PixkuyAirportZoneTariff.reconcileAvailability) {
             window.PixkuyAirportZoneTariff.reconcileAvailability();
           }
-          panel.scrollIntoView({block:"start", behavior:"instant"});
-          view.focus(panel.querySelector('[data-airport-tariff-role="date"] input'));
+          if (view.media.matches) {
+            panel.scrollIntoView({block:"start", behavior:"instant"});
+            view.focus(panel.querySelector('[data-airport-tariff-role="date"] input'));
+          } else if (!mobileConfigurationActive) {
+            // The canonical mobile route owns its fixed-header inset and scroll.
+            // Arrival is navigation, not an interaction with the native date picker.
+            mobileConfigurationActive = true;
+            mobileScroller().scrollTop = 0;
+            panel.querySelector('[data-airport-mobile-flow-back]').focus({preventScroll:true});
+          }
         }
-      }
+      } else mobileConfigurationActive = false;
       return;
     }
+    mobileConfigurationActive = false;
     snapshot = snapshot || read();
     // History is provenance only: a confirmed/cleared edit may recover status,
     // never silently become a new payable reservation when revisiting Review.
@@ -879,6 +896,11 @@
       var token = fleet.reservationToken || fleet.attempt && fleet.attempt.response && fleet.attempt.response.bookingStatusToken;
       if (!context && token) {
         window.location.assign('/booking-cancelled.html?token=' + encodeURIComponent(token));
+        return true;
+      }
+      if (!context && pending() && saved) {
+        snapshot = saved; notice = 'uncertain';
+        navigate('revision');
         return true;
       }
       if (!saved || !(context || saved.airport_pending_token)) return false;

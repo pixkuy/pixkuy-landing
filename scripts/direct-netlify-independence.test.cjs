@@ -79,11 +79,19 @@ async function check(options){
   const fields=()=>options.mobile?Object.fromEntries(['name','phone','email'].map(k=>[k,d.querySelector('[data-direct-transfer-mobile-contact-field="'+k+'"]')])):own.getReservationRequestFields();
   const set=(key,value)=>{fields()[key].value=value;fields()[key].dispatchEvent(new Event('input',{bubbles:true}));};
   const submit=()=>options.mobile?mobile.submit():own.getReservationForm().dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+  if(options.mobile){
+    set('name','Synthetic');fields().name.dispatchEvent(new Event('blur'));
+    assert.notEqual(fields().phone.getAttribute('aria-invalid'),'true');assert.notEqual(fields().email.getAttribute('aria-invalid'),'true');
+    set('phone','12');fields().phone.dispatchEvent(new Event('blur'));
+    assert.equal(fields().phone.getAttribute('aria-invalid'),'true','Only the blurred invalid field shows feedback');
+    assert.notEqual(fields().email.getAttribute('aria-invalid'),'true');
+  }
   set('name','Synthetic customer');set('phone','+525512345678');set('email','invalid');
   let before=r.requests.length;submit();await settle();assert.equal(r.requests.length,before,'Invalid contact must not query or advance');
   set('email','direct@example.invalid');submit();await settle();assert.equal(r.requests.length,before,'Missing consent blocks');
   const legalHost=d.querySelector(options.mobile?'[data-direct-transfer-mobile-checkout-legal-acceptance]':'[data-direct-transfer-checkout-legal-acceptance]');
   const instance=legalHost.__pixkuyLegalAcceptanceInstance;assert(instance);instance.checkbox.checked=true;instance.checkbox.dispatchEvent(new Event('change',{bubbles:true}));await settle();
+  if(options.mobile){set('email','invalid');assert(d.querySelector('[data-direct-transfer-mobile-contact-submit]').disabled,'Invalid mobile contact remains disabled with consent');set('email','direct@example.invalid');}
   submit();await settle();assert.equal(r.requests.length,before+1,'Actual Data submit revalidates');assert(r.redirects.some(u=>u.includes('direct-transfer-checkout-review.html')));
   const saved=state.readReviewSnapshot(),payload=state.buildCheckoutPayload(saved);assert(payload);
   assert.equal(payload.customer.full_name,'Synthetic customer');assert.equal(payload.customer.email,'direct@example.invalid');assert.equal(payload.direct_transfer_notes,panelPayload.notes);
@@ -164,4 +172,55 @@ async function remainingForm(){
   assert.equal(r.requests.length,0);return 'PASS: other/tour_private/event_special selection, actual controls/readers/validation, own guard isolation; no submission';
 }
 async function main(){const results=[];for(const mobile of [false,true])for(const variant of [{controllers:true},{dom:true},{}])results.push(await check({mobile,...variant}));const remaining=await remainingForm();console.log(JSON.stringify({result:'PASS',results,remaining,transport:'captured',browser:false,realOperations:0},null,2));}
-main().catch(error=>{console.error(error);process.exitCode=1;});
+async function contactFeedback(){
+  for(const mobile of [false,true]){
+    const r=await runtime({mobile}),form=r.own.getReservationForm(),f=r.own.getReservationRequestFields();
+    f.name.value='Synthetic';form.dispatchEvent(new Event('blur',{target:f.name}));
+    for(const k of ['phone','email'])assert.notEqual(f[k].getAttribute('aria-invalid'),'true','Untouched '+k);
+    assert.equal(r.own.validate(true),false);assert.equal(f.email.getAttribute('aria-invalid'),'true');
+  }
+  console.log('PASS Direct owner contact feedback; shared desktop/mobile provider; invalid guard retained');
+}
+async function mobileEntry(){
+  const r=await runtime({mobile:true}),w=r.window;
+  r.state.writeReviewSnapshot(w.PixkuyDirectTransferMobileContactContract.buildSnapshotFromPayload(panelPayload));
+  const frozen={version:1,attempt:{state:'unknown',key:'synthetic-uncertain',payload:{service_type:'direct_transfer'},url:'/captured-only'}};
+  w.sessionStorage.setItem('pixkuy_fleet_b:direct_transfer',JSON.stringify(frozen));
+  r.document.readyState='loading';r.load('services/direct-transfer-mobile-booking-flow');
+  // The real entry controller must redirect before trying to mount Configuration.
+  // This DOM adapter intentionally does not implement that visual shell.
+  try{w.PixkuyDirectTransferMobileBookingFlow.open();}catch(e){assert.fail('Uncertain attempt entered configurator: '+e.message);}
+  assert(w.location.pathname.includes('direct-transfer-checkout-review'));
+  assert.equal(w.sessionStorage.getItem('pixkuy_fleet_b:direct_transfer'),JSON.stringify(frozen));
+  assert.equal(r.requests.length,0);
+  w.sessionStorage.setItem('pixkuy_fleet_b:hourly_daily',JSON.stringify({version:1,reservationToken:'other-service'}));
+  w.sessionStorage.setItem('pixkuy_fleet_b:direct_transfer',JSON.stringify({version:1,reservationToken:'known-direct'}));
+  w.PixkuyDirectTransferMobileBookingFlow.open();assert.equal(w.location.pathname,'/booking-cancelled.html');
+  assert.equal(new URLSearchParams(w.location.search).get('token'),'known-direct');
+  assert.equal(JSON.parse(w.sessionStorage.getItem('pixkuy_fleet_b:hourly_daily')).reservationToken,'other-service');
+  // A known pending contact edit uses the actual mobile Back handler to enter
+  // the service editor; receipt proof and coordinates cross that boundary.
+  for(const channel of ['web_direct_transfer_mobile_checkout','web_direct_transfer_checkout'])for(const accepted of [true,false]){
+    const e=await runtime({mobile:true}),api=e.window.PixkuyDirectPendingEdit;
+    const proof=e.legal.buildSnapshot(channel);
+    const flat=Object.fromEntries(Object.entries(e.legal.fieldNames).map(([key,name])=>[name,proof[key]]));
+    const draft={...e.window.PixkuyDirectTransferMobileContactContract.buildSnapshotFromPayload(panelPayload),...flat,legal_acceptance_accepted:accepted?'true':'false',service_type:'direct_transfer',customer:{full_name:'Synthetic contact',email:'fixture@example.invalid',phone:'+525512345678'}};
+    const raw={reservation:{serviceType:'direct_transfer',status:'pending_payment',publicCode:'SYNTHETIC'},payment:{status:'pending'},actions:{canModify:true},edit:{allowed:true,revision:'synthetic',draft},hold:{expiresAt:'2027-01-18T12:30:00Z'},serverNow:'2027-01-18T12:00:00Z'};
+    assert(api.begin({token:'synthetic-edit',result:{serviceType:'direct_transfer',view:'pending',raw}}));
+    assert.equal(api.begin({token:'synthetic-edit',result:{serviceType:'direct_transfer',view:'expired',raw}}),false,'Expired status cannot authorize editing');
+    e.window.fetch=async()=>new Response(JSON.stringify(raw));await api.mountData(e.config);await settle();
+    e.document.querySelector('[data-direct-transfer-mobile-contact-back]').dispatchEvent(new Event('click',{bubbles:true}));await settle();
+    assert.equal(e.window.location.hash,'#direct/servicio');
+    const saved=e.state.readReviewSnapshot(),context=api.serviceEdit();
+    assert.equal(context.token,'synthetic-edit');assert.equal(context.expiresAt,raw.hold.expiresAt);
+    assert.equal(saved.mobileDraft.config.originPlace.placeId,'origin');assert.equal(saved.mobileDraft.config.destinationPlace.placeId,'destination');
+    assert.equal(saved.mobileDraft.contact.email,'fixture@example.invalid');assert.equal(!!saved.mobileDraft.legal,accepted);
+    assert.equal(e.requests.length,0);
+    const reloaded=await runtime({mobile:true,saved:e.window.sessionStorage.dump()});
+    assert(reloaded.window.PixkuyDirectTransferMobileContactStep.open(reloaded.config,panelPayload));await settle();
+    const instance=reloaded.document.querySelector('[data-direct-transfer-mobile-checkout-legal-acceptance]').__pixkuyLegalAcceptanceInstance;
+    assert.equal(instance.isAccepted(),accepted);assert.equal(reloaded.document.querySelector('[data-direct-transfer-mobile-contact-field="email"]').value,'fixture@example.invalid');
+  }
+  console.log('PASS Direct mobile entry resumes uncertain identity in Review; no request');
+}
+(process.argv.includes('--mobile-entry')?mobileEntry():process.argv.includes('--contact-feedback')?contactFeedback():main()).catch(error=>{console.error(error);process.exitCode=1;});

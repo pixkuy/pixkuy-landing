@@ -74,16 +74,15 @@
       Object.keys(saved.contact || {}).forEach(name=>{const field=getContactField(name);if(field)field.value=name==='notes' && Object.prototype.hasOwnProperty.call(currentPayload,'notes') ? currentPayload.notes : saved.contact[name];});
       const bridge=window.PixkuyDirectTransferMobileTransactionalBridge;if(bridge)bridge.sync();
       const legal=window.PixkuyForms.LegalAcceptance, proof=saved.legal;
-      const current=legal.buildSnapshot('web_direct_transfer_mobile_checkout');
+      const current=legal.buildSnapshot(contactStepNode.dataset.directPendingLegalChannel || 'web_direct_transfer_mobile_checkout');
       const host=contactStepNode.querySelector('[data-direct-transfer-mobile-checkout-legal-acceptance]');
       const instance=host && host.__pixkuyLegalAcceptanceInstance;
       if(instance && proof && proof.accepted==='true' && proof.acceptedAt && proof.channel===current.channel &&
           proof.termsVersion===current.termsVersion && proof.cancellationsVersion===current.cancellationsVersion && proof.privacyVersion===current.privacyVersion){
         restoredLegalProof=proof;
-        instance.checkbox.checked=true;
-        legal.syncAcceptedFields(getReservationFormsApi().getReservationForm(),proof);
+        instance.restore(Object.fromEntries(Object.entries(legal.fieldNames).map(([key,name])=>[name,proof[key]||''])));
       } else if(instance) {
-        restoredLegalProof=null;instance.checkbox.checked=false;legal.clearFields(getReservationFormsApi().getReservationForm());
+        restoredLegalProof=null;instance.restore(null);
       }
       syncSubmitAvailability();
   }
@@ -1093,7 +1092,7 @@
       ? contactStepNode.querySelector("[data-direct-transfer-mobile-contact-submit]")
       : null;
     const transactionalBridge = window.PixkuyDirectTransferMobileTransactionalBridge;
-    const isReady = pendingContact ? hasRequiredContactData() && pendingContact.canReview() : hasFilledContactData();
+    const isReady = hasRequiredContactData() && (!pendingContact || pendingContact.canReview());
 
     if (!submit) {
       return false;
@@ -1383,6 +1382,10 @@
           });
         }
 
+        if (name !== FIELD_NOTES) {
+          field.addEventListener('blur',function(){setFieldValidity(name,getContactValidity(getContactData())[name]);});
+        }
+
         if (name === FIELD_NOTES) {
           field.addEventListener("focus", function onNotesFocus(event) {
             event.preventDefault();
@@ -1482,11 +1485,15 @@
     currentConfigStep = configStep;
     currentSnapshot = snapshot;
     currentPayload = payload;
+    const editing=window.PixkuyDirectPendingEdit?.serviceEdit();
+    if(editing)node.dataset.directPendingLegalChannel=editing.proof?.channel || 'web_direct_transfer_mobile_checkout';
     getContactField(FIELD_NOTES).value=snapshot.direct_transfer_notes || '';
 
     syncCopy();
     syncSummary(snapshot);
     syncSubmitAvailability();
+
+    window.PixkuyDirectPendingEdit?.mobileServiceMeta(node.querySelector('[data-direct-transfer-mobile-contact-summary]'));
 
     configStep.setAttribute(PRIMARY_STEP_HIDDEN_ATTR, "true");
     node.hidden = false;
@@ -1525,7 +1532,8 @@
     syncVisibleHeight();syncCopy();syncSummary(snapshot);
     const view=window.PixkuyAirportDesktopView,summary=node.querySelector('[data-direct-transfer-mobile-contact-summary]');
     const reference=view.node('p','airport-booking__reference',options.publicCode);reference.dataset.directPendingReference='';
-    summary.after(reference,view.deadline(options.expiresAt,options.serverNow,'editDeadlinePassed',syncSubmitAvailability));
+    const meta=view.node('div','booking-pending-meta');
+    meta.append(reference,view.deadline(options.expiresAt,options.serverNow,'editDeadlinePassed',syncSubmitAvailability));summary.appendChild(meta);
     window.PixkuyDirectTransferMobileTransactionalBridge.sync();
     const legal=window.PixkuyForms.LegalAcceptance;
     const proof=Object.fromEntries(Object.entries(legal.fieldNames).map(([key,name])=>[name,options.proof?.[key]||'']));

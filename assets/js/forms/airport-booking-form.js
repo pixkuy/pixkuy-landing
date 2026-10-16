@@ -61,13 +61,16 @@
       text(value[side + 'Lat']) !== '' && text(value[side + 'Lng']) !== '' &&
       Number.isFinite(Number(value[side + 'Lat'])) && Number.isFinite(Number(value[side + 'Lng'])));
   }
+  var touched = {}, submitted = false;
   function validate(show) {
+    if (show === true) submitted = true;
     var value = data(), parsed = phone(value.phone);
     var checks = {name:!!value.name, phone:/^\+[1-9]\d{6,14}$/.test(value.phone) && !!parsed?.isValid(),
       email:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.email), luggage:value.luggage === '' || /^\d+$/.test(value.luggage)};
     Object.keys(checks).forEach(function (name) {
       var input = form.elements.namedItem(name); input.setCustomValidity(checks[name] ? '' : copy('contact.validation.' + name + 'Required'));
-      if (show || checks[name]) { input.setAttribute('aria-invalid', String(!checks[name])); form.querySelector('[data-error-for="' + name + '"]').hidden = checks[name]; }
+      var visible = !checks[name] && (submitted || touched[name] === true);
+      input.setAttribute('aria-invalid', String(visible)); form.querySelector('[data-error-for="' + name + '"]').hidden = !visible;
     });
     return Object.values(checks).every(Boolean) && validContext();
   }
@@ -152,7 +155,7 @@
   }
   form.addEventListener('submit', function (event) { event.preventDefault(); });
   form.addEventListener('input', function () { error.hidden = true; validate(false); });
-  form.addEventListener('blur', function (event) { if (event.target.name === 'phone') { var parsed = phone(event.target.value); if (parsed?.isValid()) event.target.value = parsed.number; } validate(true); }, true);
+  form.addEventListener('blur', function (event) { if (event.target.name === 'phone') { var parsed = phone(event.target.value); if (parsed?.isValid()) event.target.value = parsed.number; } if (['name','phone','email','luggage'].includes(event.target.name)) { touched[event.target.name] = true; validate(false); } }, true);
   window.addEventListener('pixkuy:i18n-applied', translate); translate();
   window.PixkuyAirportBookingForm = {getReservationForm:function () { return form; }, home:home,
     getReservationRequestFields:fields, getReservationRequestData:data, getSnapshot:snapshot, raw:raw,

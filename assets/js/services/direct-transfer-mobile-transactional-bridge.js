@@ -81,7 +81,8 @@
     var email = normalizeText(getContactField(step, "email") &&
       getContactField(step, "email").value);
 
-    return Boolean(name && phone && email);
+    var validity=window.PixkuyDirectTransferMobileContactContract?.getContactValidity({name:name,phone:phone,email:email});
+    return !!validity && validity.name && validity.phone && validity.email;
   }
 
   function ensureLegalHost(step) {
