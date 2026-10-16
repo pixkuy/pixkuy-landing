@@ -15,8 +15,8 @@ const window=Object.assign(new Events(),{document,sessionStorage:storage(),local
     assert(/^assets\/i18n\/[a-z-]+\.json$/.test(url)||url==='assets/js/data/direct-transfer-coverage.geojson','Network forbidden: '+url);
     return Promise.resolve(new Response(fs.readFileSync(path.join(root,url)),{status:200}));
   }});
-const sandbox=vm.createContext({window,document,Event,CustomEvent:Event,URL,URLSearchParams,console,setTimeout:window.setTimeout,clearTimeout:window.clearTimeout});
-for(const file of ['data/airport-zone-catalog','services/direct-transfer-airport-guard','services/direct-transfer-coverage','forms/legal-acceptance','services/fleet-selection-state','services/direct-transfer-transactional-state','forms/direct-transfer-booking-form'])vm.runInContext(fs.readFileSync(path.join(root,'assets/js/'+file+'.js'),'utf8'),sandbox,{filename:file,timeout:1500});
+const sandbox=vm.createContext({window,document,sessionStorage:window.sessionStorage,location:window.location,Event,CustomEvent:Event,URL,URLSearchParams,console,setTimeout:window.setTimeout,clearTimeout:window.clearTimeout});
+for(const file of ['data/airport-zone-catalog','services/direct-transfer-airport-guard','services/direct-transfer-coverage','forms/legal-acceptance','services/fleet-selection-state','services/direct-transfer-transactional-state','forms/direct-transfer-booking-form','forms/direct-transfer-pending-edit'])vm.runInContext(fs.readFileSync(path.join(root,'assets/js/'+file+'.js'),'utf8'),sandbox,{filename:file,timeout:1500});
 assert.equal(document.querySelector('form[name="contact"]'),null);assert.equal(window.PixkuyForms.getReservationRequestData,undefined);
 assert.equal(window.PixkuyFleetSelection.editFromReview('direct_transfer'),true,'Direct Fleet editing must not require the legacy form');
 const own=window.PixkuyDirectBookingForm,state=window.PixkuyDirectTransferTransactionalState,legal=window.PixkuyForms.LegalAcceptance;
@@ -62,6 +62,7 @@ async function coverageRace(){
 }
 async function run(){
   await coverageRace();
+  await unavailablePricePresentation();
   const compiler=require('../../../pixkuy-booking-api/node_modules/typescript');
   const bridgeFile='assets/js/forms/direct-transfer-booking-api-checkout.js';
   const bridgeAst=compiler.createSourceFile(bridgeFile,fs.readFileSync(path.join(root,bridgeFile),'utf8'),compiler.ScriptTarget.Latest,true);
@@ -122,5 +123,63 @@ async function run(){
   restored.destinationCoverage={isWithinCoverage:false};assert.equal(restriction(),'out_of_coverage');
   restored.destinationPlace={iataCode:'MEX',types:['airport']};assert.equal(restriction(),'airport');
   console.log(JSON.stringify({result:'PASS',cases:['own controls and serializer without legacy DOM/readers','real phone parser','negative contact, context, civil date and current desktop/mobile consent','location metadata and notes preserved','historical snapshot/consent restored','late coverage cannot replace current/cleared Place','real airport guard and local GeoJSON coverage','nine existing dictionaries','requested passenger band is independent of vehicle capacity','canonical quote requires matching own context at desktop/mobile widths','hidden Configuration cannot start a quote in Data','updated unaccepted quote is saved and passed to summary; restore preserves it','desktop quote refresh does not render or persist on mobile'],limits:['Offline DOM, not visual','No real availability, SQL, Stripe or communication','Real bridge/owner functions extracted from AST; summary render spy is not visual validation','Width assertions do not traverse mobile navigation']},null,2));
+}
+async function unavailablePricePresentation(){
+  window.Response=Response;
+  const ts=require('../../../pixkuy-booking-api/node_modules/typescript');
+  function functions(file,names){
+    const ast=ts.createSourceFile(file,fs.readFileSync(path.join(root,file),'utf8'),ts.ScriptTarget.Latest,true),parts=[];
+    function visit(n){if((ts.isFunctionDeclaration(n)||ts.isFunctionExpression(n))&&names.includes(n.name?.text))parts.push(n.getText(ast));ts.forEachChild(n,visit);}visit(ast);
+    assert.equal(parts.length,names.length);return parts.join('\n');
+  }
+  const panel=functions('assets/js/services/direct-transfer-panel.js',['normalizeText','getSelectedPlaceLabel','setAddressPlace','getFareText','formatCurrencyAmount','formatPriceLabel','isRecoverableCanonicalQuoteCode','onCanonicalPrice','syncView']);
+  const bridge=functions('assets/js/forms/direct-transfer-booking-api-checkout.js',['getPrecheckPrice','parsePositiveIntegerValue','notifyCanonicalPriceChanged','getCanonicalQuoteContextKey','setPanelPrecheckMessage']);
+  const state={quote:{price:9650,currency:'MXN'},origin:'NH',destination:'Acapulco',passengerFareKey:'van_3_4'};
+  const fare=document.createElement('div'),value=document.createElement('span'),message=document.createElement('p'),cta=document.createElement('button');
+  const nodes={'.services-direct-transfer-panel__fare':fare,'.services-direct-transfer-panel__fare-value':value,'[data-direct-transfer-panel-fare-message]':message,'[data-direct-transfer-panel-cta]':cta,'[data-direct-transfer-panel-availability]':document.createElement('p')};
+  const edit={serviceEditing:true,token:'synthetic-edit-token',revision:'2026-10-16T08:08:01.485Z',idempotencyKey:'same-edit-key'};
+  window.sessionStorage.setItem('pixkuy_direct_pending_edit_v1',JSON.stringify(edit));
+  let inputOrigin;
+  const snapshot={direct_transfer_date:'2027-01-12',direct_transfer_time:'11:37',direct_transfer_passenger_fare_key:'van_3_4',direct_transfer_origin_place_id:'four-seasons',direct_transfer_origin_lat:'19.4232659',direct_transfer_origin_lng:'-99.1743713',direct_transfer_destination_place_id:'acapulco',direct_transfer_destination_lat:'16.8639515',direct_transfer_destination_lng:'-99.8822807',direct_transfer_price:'9650',direct_transfer_currency:'MXN',direct_transfer_quote_fingerprint:'a'.repeat(64),direct_transfer_pricing_version:'canonical',direct_transfer_quote_accepted_at:''};
+  const boundary={window,document,state,Intl,DEFAULT_CURRENCY:'MXN',addressRevisions:{origin:0,destination:0},
+    configMount:{querySelector:s=>nodes[s]||null,querySelectorAll:()=>[]},saveConfiguration(){},syncSafariDesktopTimeSelect(){},clearAvailabilityStatus(){},
+    getI18nValue:(_key,fallback)=>fallback,getPendingFareText:()=>'',getDirectTransferRestrictionType:()=>'',areSameLocations:()=>false,
+    getPrecheckErrorMessage:()=> 'No hay vehículos disponibles',getNextAvailableTimeLabel:()=> '11:48',getNextAvailableStartLocal:()=> '2027-01-12T11:48',
+    resolveDirectTransferCoverage:async()=>({isWithinCoverage:true}),requestQuoteIfReady:()=>{inputOrigin=state.originPlace;},
+    buildPanelQuoteDetail:()=>({contextKey:api.getCanonicalQuoteContextKey(snapshot)})};
+  boundary.document={querySelector(selector){assert.equal(selector,'[data-services-direct-transfer-panel]');return boundary.configMount;}};
+  const api=vm.runInNewContext(panel+'\n'+bridge+'\n({setAddressPlace,onCanonicalPrice,notifyCanonicalPriceChanged,getCanonicalQuoteContextKey,getFareText,setPanelPrecheckMessage})',boundary);
+  window.addEventListener('pixkuy:direct-transfer-canonical-price',api.onCanonicalPrice);
+  await api.setAddressPlace('origin',{label:'Four Seasons',placeId:'four-seasons',lat:19.4232659,lng:-99.1743713});
+  assert.equal(inputOrigin.placeId,'four-seasons');assert.equal(window.sessionStorage.getItem('pixkuy_direct_pending_edit_v1'),JSON.stringify(edit));
+  let sent;const priorFetch=window.fetch;
+  window.fetch=async(_url,init)=>{sent=JSON.parse(init.body);return new Response(JSON.stringify({status:'ok',result:{checkoutAllowed:false,price:{available:true,amountMinor:965000},fleet:{version:1,status:'unavailable',models:[]},availability:{available:false,code:'NO_COMPATIBLE_VEHICLE',nextAvailableStartLocal:'2027-01-12T11:48'}}}));};
+  await window.PixkuyFleetSelection.fetchPrecheck('direct_transfer','https://local.pixkuy.test/v1/public/reservations/direct-transfer-availability-precheck',{method:'POST',body:JSON.stringify({originAddress:inputOrigin})},{interactive:false});
+  assert.deepEqual(JSON.parse(JSON.stringify(sent.pending_edit)),{token:edit.token,editRevision:edit.revision});
+  window.fetch=priorFetch;
+  function canonical(available,allowed,code){
+    const result={body:{result:{price:{available,amountMinor:965000}}}};
+    api.notifyCanonicalPriceChanged(snapshot,false,allowed,code,result);
+    api.setPanelPrecheckMessage('Availability status',allowed?'success':'error',result);
+  }
+  canonical(true,false,'NO_COMPATIBLE_VEHICLE');
+  assert.equal(message.hidden,true,'valid tariff must not be presented as price failure');assert.match(value.textContent,/9,650/);assert.equal(cta.disabled,true);
+  assert.equal(fare.hidden,false,'the final availability writer must preserve the current tariff');
+  assert.equal(fare.getAttribute('data-direct-transfer-panel-fare-state'),'success','valid amount must not receive price-error styling');
+  assert.equal(state.quote.quoteAcceptedAt,'','unavailable quote is not accepted');
+  const before=JSON.stringify(state.quote);api.onCanonicalPrice({detail:{price:999,checkoutAllowed:true,contextKey:'old-route'}});assert.equal(JSON.stringify(state.quote),before);
+  canonical(true,true,'VEHICLE_AVAILABLE');assert.equal(cta.disabled,false,'only canonical revalidation enables continuation');
+  canonical(false,false,'DIRECT_TRANSFER_PRICE_UNAVAILABLE');assert.equal(cta.disabled,true);assert.match(message.textContent,/No pudimos calcular/);
+  assert.equal(fare.hidden,true,'unavailable tariff must not resurrect an old amount');
+  api.setPanelPrecheckMessage('Technical error','error');assert.equal(fare.hidden,true);
+  const mobile=functions('assets/js/services/direct-transfer-mobile-config-step.js',['normalizeText','hasCanonicalMobileQuote','isCanonicalRequoteCode','buildCanonicalMobileQuote','applyCanonicalPriceState']);
+  const applyMobile=vm.runInNewContext(mobile+'\napplyCanonicalPriceState');
+  for(const allowed of [false,true]){
+    const detail={price:9650,amountMinor:965000,currency:'MXN',pricingVersion:'canonical',quoteFingerprint:'a'.repeat(64),quoteExpiresAt:'2027-01-12T17:40:00Z',checkoutAllowed:allowed,code:allowed?'VEHICLE_AVAILABLE':'NO_COMPATIBLE_VEHICLE',nextAvailableStartLocal:'2027-01-12T11:48'};
+    const before=applyMobile({},detail),after=applyMobile({},{...detail,priceAvailable:true});
+    assert.equal(JSON.stringify(after),JSON.stringify(before),'added price signal preserves the mobile contract');
+    assert.equal(after.precheckAllowed,allowed);
+  }
+  window.removeEventListener('pixkuy:direct-transfer-canonical-price',api.onCanonicalPrice);window.sessionStorage.removeItem('pixkuy_direct_pending_edit_v1');
 }
 run().catch(error=>{console.error(error);process.exitCode=1;});

@@ -896,7 +896,7 @@
       );
     }
 
-    if (state.quoteStatus === "ready" && state.quote && state.quote.price) {
+    if ((state.quoteStatus === "ready" || state.quoteStatus === "unavailable") && state.quote && state.quote.price) {
       return formatPriceLabel();
     }
 
@@ -1521,11 +1521,18 @@
       if (restriction.innerHTML !== markup) restriction.innerHTML = markup;
       restriction.hidden = !restrictionType;
     }
-    const isReady = state.quoteStatus === "ready" &&
+    const attempt=window.PixkuyFleetSelection?.read("direct_transfer").attempt;
+    const recoveryPending=attempt&&attempt.state!=="not_committed";
+    if(recoveryPending)clearAvailabilityStatus();
+    const isReady = !recoveryPending && state.quoteStatus === "ready" &&
       state.quote &&
       state.quote.price &&
       state.quote.quoteFingerprint &&
       state.quote.pricingVersion;
+    // A computed tariff can be valid while no unit can reach this pickup time.
+    // Keep its presentation separate from permission to continue.
+    const hasPrice = !recoveryPending && (isReady || state.quoteStatus === "unavailable" &&
+      state.quote && state.quote.price && state.quote.quoteFingerprint && state.quote.pricingVersion);
 
     syncSafariDesktopTimeSelect();
 
@@ -1534,11 +1541,11 @@
     }
 
     if (fareValue) {
-      fareValue.textContent = isReady ? getFareText() : "—";
+      fareValue.textContent = hasPrice ? getFareText() : "—";
     }
     if (fareMessage) {
-      fareMessage.textContent = isReady ? "" : getFareText();
-      fareMessage.hidden = Boolean(isReady);
+      fareMessage.textContent = hasPrice ? "" : getFareText();
+      fareMessage.hidden = Boolean(hasPrice || recoveryPending);
     }
 
     if (airportAction) {
@@ -1579,7 +1586,7 @@
 
     if (suggestion && typeof suggestion.syncUiState === "function") {
       suggestion.syncUiState({
-        priceVisible: Boolean(isReady),
+        priceVisible: Boolean(hasPrice),
         ctaEnabled: Boolean(isReady),
         setPriceVisible: function setDirectTransferPriceVisible(visible) {
           if (fare) {
@@ -1755,7 +1762,7 @@
     }
     render();requestQuoteIfReady();return true;
   }
-  window.PixkuyDirectTransferPanel={restore:restoreDraft,contextKey:function(){return buildPanelQuoteDetail("panel").contextKey;}};
+  window.PixkuyDirectTransferPanel={restore:restoreDraft,draft:function(){return buildPanelQuoteDetail("panel");},contextKey:function(){return buildPanelQuoteDetail("panel").contextKey;}};
   render();
   bindEvents();
   new MutationObserver(function(){
@@ -1795,7 +1802,7 @@
     state.quoteStatus = detail.checkoutAllowed === true ||
       isRecoverableCanonicalQuoteCode(detail.code)
       ? "ready"
-      : "error";
+      : detail.priceAvailable === true ? "unavailable" : "error";
     syncView();
   });
 

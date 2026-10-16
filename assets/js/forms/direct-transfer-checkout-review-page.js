@@ -30,6 +30,20 @@
     var attempt = window.PixkuyFleetSelection.read("direct_transfer").attempt;
     return attempt && attempt.state !== "not_committed";
   }
+  function closedCheckoutAttempt() {
+    var attempt = window.PixkuyFleetSelection.read("direct_transfer").attempt;
+    var response = attempt && attempt.response;
+    return rejectedExpiredAttempt() || attempt && attempt.state === "committed" && response && response.bookingStatusToken &&
+      response.code === "CHECKOUT_PAYMENT_WINDOW_CLOSED" && response.recovery &&
+      response.recovery.state === "committed" && response.recovery.action === "reservation_status";
+  }
+  function rejectedExpiredAttempt() {
+    var attempt = window.PixkuyFleetSelection.read("direct_transfer").attempt;
+    var response = attempt && attempt.response;
+    return Boolean(attempt && attempt.state === "not_committed" && response &&
+      ["BOOKING_STATUS_TOKEN_EXPIRED", "CHECKOUT_PAYMENT_WINDOW_CLOSED"].indexOf(response.code) !== -1 &&
+      response.recovery && response.recovery.state === "not_committed" && response.recovery.action === "reservation_status");
+  }
   function syncRecovery() {
     var proceed = getNode("[data-direct-transfer-checkout-review-proceed]");
     var edit = getNode("[data-direct-transfer-checkout-review-edit]");
@@ -37,6 +51,10 @@
     if (proceed && pending) proceed.textContent = t(currentDictionary, "recover", "");
     if (edit) { edit.hidden = !!pending; edit.setAttribute("aria-disabled", pending ? "true" : "false"); }
     if (pending) showError(currentDictionary, {code:"CHECKOUT_STATE_UNCERTAIN"});
+    if (rejectedExpiredAttempt()) {
+      if (proceed) { proceed.disabled = true; proceed.setAttribute("aria-disabled", "true"); }
+      showError(currentDictionary, {});
+    }
   }
 
   function getStateApi() {
@@ -434,7 +452,7 @@
 
   function desktopEdit(field) {
     if(checkoutBusy || pendingAttempt())return;
-    if(window.PixkuyDirectPendingEdit?.route() && field !== 'contact')return;
+    if(window.PixkuyDirectPendingEdit?.route() && field !== 'contact'){window.PixkuyDirectPendingEdit.configure();return;}
     window.sessionStorage.setItem(getStateApi().returnKey,"1");
     location.assign("/?service=direct_transfer&lang="+encodeURIComponent(getPreferredLang())+(field==="notes"?"#direct/servicio/notes":field==="trip"?"#direct/servicio":"#direct/datos"));
   }
@@ -451,7 +469,7 @@
     }
     document.body.classList.add('direct-booking-active');
     content.classList.remove('booking-status__content');
-    if(editing){var tripAction=root.querySelector('.airport-booking__progress li:first-child button');if(tripAction)tripAction.disabled=true;}
+
     var details=getNode('[data-direct-transfer-checkout-review-details]');details.hidden=true;
     var layout=content.querySelector('[data-direct-review-layout]');
     if(layout){['#direct-transfer-checkout-review-title','[data-direct-transfer-checkout-review-copy="text"]','[data-direct-transfer-checkout-review-legal]','[data-direct-transfer-checkout-review-error]','.booking-status__actions'].forEach(function(selector){var node=layout.querySelector(selector);if(node)content.appendChild(node);});layout.remove();}
@@ -634,7 +652,11 @@
     var message;
 
     var precheck = error && error.result && error.result.body && error.result.body.result;
-    if (pendingAttempt() || code === "CHECKOUT_STATE_UNCERTAIN") {
+    if (closedCheckoutAttempt()) {
+      // Preserve the attempt and its recovery action, but do not turn a known
+      // terminal response into an unknown outcome (including after reload).
+      message = window.PixkuyAirportDesktopView.t("paymentWindowClosed");
+    } else if (pendingAttempt() || code === "CHECKOUT_STATE_UNCERTAIN") {
       message = t(dictionary, "uncertain", "");
     } else if (isApiConfigurationError(error)) {
       message = getApiConfigurationErrorMessage(dictionary);
@@ -898,6 +920,7 @@
 
     proceed.addEventListener("click", function onProceedClick() {
       if (checkoutBusy) return;
+      if (rejectedExpiredAttempt()) { syncRecovery(); return; }
       setBusy(true);
       if (pendingAttempt()) {
         window.PixkuyFleetSelection.recoverAttempt("direct_transfer")

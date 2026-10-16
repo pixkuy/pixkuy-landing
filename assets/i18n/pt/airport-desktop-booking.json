@@ -1,4 +1,6 @@
 {
+  "directEditTrip": "Alterar traslado",
+  "directEditContact": "Alterar dados de contacto",
   "estimatedDuration": "Duração estimada",
   "paidAmount": "Valor pago",
   "mobileConfirmedTitle": "Reserva confirmada",

@@ -32,6 +32,10 @@ async function run(){
       assert.equal(passengerRow.children[1].textContent,copy.passengerBuckets['van_'+band.replace('–','_')],locale+' '+view);
       assert.equal(JSON.stringify(result),before,'No mutation of authoritative result');cases++;
     }
+    for(const closed of [true,false]){
+      update({result:{serviceType:'direct_transfer',view:'pending',paymentStatus:'pending',raw:{actions:{paymentWindowClosed:closed,canRetryCheckout:false}},luggageCount:null},dictionary:{details:{}},token:'synthetic'});
+      assert.equal(document.querySelector('h1').textContent,copy[closed?'failedTitle':'pendingTitle'],locale+': known closed payment is not presented as verification');
+    }
     update({result:{serviceType:'airport_transfer',view:'confirmed',paymentStatus:'paid',raw:{actions:{}},passengerLabel:'Airport preserved',luggageCount:1},dictionary:{details:{}},token:'synthetic'});
     assert(document.querySelectorAll('dd').some(row=>row.textContent==='Airport preserved'),'Shared Airport consumer unchanged');
   }

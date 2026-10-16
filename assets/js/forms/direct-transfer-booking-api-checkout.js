@@ -833,6 +833,7 @@
         detail: {
           accepted: accepted === true,
           checkoutAllowed: checkoutAllowed === true,
+          priceAvailable: precheckPrice.available === true,
           code: normalizeText(code),
           availabilityMessage: getPrecheckErrorMessage(result),
           nextAvailableTime: getNextAvailableTimeLabel(result),
@@ -1276,9 +1277,15 @@
       : null;
 
     if (fare && state) {
-      fare.setAttribute("data-direct-transfer-panel-fare-state", state);
-      // Keep one explanation beside the action, including the valid suggestion.
-      fare.hidden = (state === "error" || state === "choice") && !!statusNode;
+      var price = getPrecheckPrice(result);
+      var hasCurrentPrice = price.available === true && !!(
+        parsePositiveIntegerValue(price.amountMinor) ||
+        parsePositiveIntegerValue(price.actualAmountMinor)
+      );
+      fare.setAttribute("data-direct-transfer-panel-fare-state", hasCurrentPrice ? "success" : state);
+      // Availability may fail while the current route still has a valid tariff.
+      // Keep that amount; the status and continuation guards remain independent.
+      fare.hidden = (state === "choice" || (state === "error" && !hasCurrentPrice)) && !!statusNode;
     }
 
     if (statusNode) {
@@ -1640,6 +1647,7 @@
   }
 
   window.PixkuyDirectBookingCheckout = {
+    configurationSnapshot:function(){return buildPanelSnapshot(window.PixkuyDirectTransferPanel.draft());},
     refreshFormState: function () {
       return syncLegalAcceptanceVisibility(getForm());
     }

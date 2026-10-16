@@ -581,6 +581,7 @@
       if (serviceKey === 'hourly' && /^#hourly\/(datos|revision|servicio)$/.test(window.location.hash) &&
           window.PixkuyFleetSelection?.hourlyEdit()) return;
 
+      if(serviceKey==='direct' && /^#direct\/servicio/.test(window.location.hash) && window.PixkuyDirectPendingEdit?.serviceEdit())return;
       const target = getDesktopServiceDeepLinkTarget(serviceKey);
       if (!target || target.hidden || target.offsetHeight <= 0) {
         attempts += 1;

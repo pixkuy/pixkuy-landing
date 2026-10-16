@@ -1,4 +1,6 @@
 {
+  "directEditTrip": "Modifier le transfert",
+  "directEditContact": "Modifier les coordonnées",
   "estimatedDuration": "Durée estimée",
   "paidAmount": "Montant payé",
   "mobileConfirmedTitle": "Réservation confirmée",

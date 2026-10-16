@@ -1,4 +1,6 @@
 {
+  "directEditTrip": "Изменить трансфер",
+  "directEditContact": "Изменить контактные данные",
   "estimatedDuration": "Примерная продолжительность",
   "paidAmount": "Оплаченная сумма",
   "mobileConfirmedTitle": "Бронирование подтверждено",

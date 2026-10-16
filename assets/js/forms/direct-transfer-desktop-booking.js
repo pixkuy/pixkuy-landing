@@ -2,18 +2,35 @@
   'use strict';
   var own=window.PixkuyDirectBookingForm, state=window.PixkuyDirectTransferTransactionalState, base=window.PixkuyAirportDesktopView, view=window.PixkuyDirectDesktopView;
   var form=own.getReservationForm(), mount=null, pending=null, pendingReceivedAt=0, hydrated=false;
+  var arrival=0,keyboardNavigation=false;
+  document.addEventListener('keydown',function(e){if(e.key==='Tab'){keyboardNavigation=true;document.querySelector('[data-direct-programmatic-focus]')?.removeAttribute('data-direct-programmatic-focus');}});
+  document.addEventListener('pointerdown',function(){keyboardNavigation=false;});
   function desktop(){return base.media.matches;}
   function active(){return desktop() && /^#direct\/datos/.test(location.hash);}
   function snapshot(){return state.buildSnapshot(form,own.getReservationRequestData());}
   function save(){
     if(!hydrated)return;
     if(pending){pending.proof=window.PixkuyForms.LegalAcceptance.readEvidence(form,'web_direct_transfer_checkout');pending.onChange(own.getReservationRequestData(),pending.proof);return;}
-    var saved=snapshot();saved.desktopDraft={version:1,stage:active()?'datos':'servicio'};state.writeReviewSnapshot(saved);
+    var saved=snapshot();
+    var edit=window.PixkuyDirectPendingEdit.serviceEdit();
+    if(edit){var contact=own.getReservationRequestData();edit.customer={full_name:contact.name,phone:contact.phone,email:contact.email};edit.proof=window.PixkuyForms.LegalAcceptance.readEvidence(form,'web_direct_transfer_checkout');sessionStorage.setItem('pixkuy_direct_pending_edit_v1',JSON.stringify(edit));}
+    saved.desktopDraft={version:1,stage:active()?'datos':'servicio'};state.writeReviewSnapshot(saved);
   }
   function close(){own.home.appendChild(form);if(mount)mount.remove();mount=null;document.body.classList.remove('direct-booking-active');}
   function configure(field){
     save();close();history.pushState(null,'','/?service=direct_transfer&lang='+encodeURIComponent(document.documentElement.lang)+'#direct/servicio');
+    var version=++arrival;
     window.PixkuyDirectTransferPanel.restore(own.raw()).then(function(){
+      if(version!==arrival||!desktop()||!location.hash.startsWith("#direct/servicio"))return;
+      if(window.PixkuyDirectPendingEdit.serviceEdit()){
+        window.PixkuyServicesExpand.open("direct",{scroll:false});
+        requestAnimationFrame(function(){
+          if(version!==arrival||!location.hash.startsWith("#direct/servicio"))return;
+          var panel=document.querySelector("#services-expand-direct"),target=panel?.querySelector(field==="notes"?"[data-direct-transfer-panel-notes]":"h3");
+          if(target){target.tabIndex=-1;if(field!=="notes"&&!keyboardNavigation)target.setAttribute("data-direct-programmatic-focus","");target.focus({preventScroll:true});}
+          if(panel)window.scrollTo({top:Math.max(0,panel.getBoundingClientRect().top+window.scrollY-Math.min(96,Math.max(56,Math.round(window.innerHeight*.1)))),behavior:"instant"});
+        });return;
+      }
       window.PixkuyServicesExpand.open('direct');
       requestAnimationFrame(function(){var target=document.querySelector(field==='notes'?'[data-direct-transfer-panel-notes]':'[data-services-direct-transfer-config]');if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}});
     });
@@ -34,7 +51,7 @@
   }
   function render(){
     if(!active()){close();return;}
-    close();mount=base.shell(1,function(){pending?pending.onBack():configure();},null,{showBack:false});
+    close();mount=base.shell(1,function(){if(pending){save();pending.onBack();}else configure();},null,{showBack:false});
     mount.classList.add('direct-booking');document.body.appendChild(mount);document.body.classList.add('direct-booking-active');
     var layout=base.node('div','airport-booking__layout'),left=base.node('section','airport-booking__main');
     left.append(base.node('h1','',base.t(pending?'editDataTitle':'dataTitle')),form);
@@ -44,7 +61,7 @@
     var instance=host.__pixkuyLegalAcceptanceInstance;
     if(!instance){var proof=legal.readEvidence(form,'web_direct_transfer_checkout');instance=legal.create({container:host,form:form,channel:'web_direct_transfer_checkout',checkboxId:'pixkuy-direct-transfer-legal-acceptance'});host.__pixkuyLegalAcceptanceInstance=instance;instance.restore(proof);}
     host.hidden=false;
-    if(pending){instance.restore(pending.proof);var estimate=new Date(Date.parse(pending.serverNow)+Math.max(0,Date.now()-pendingReceivedAt)).toISOString();left.prepend(base.deadline(pending.expiresAt,estimate,'editDeadlinePassed',refreshPending));left.appendChild(base.action(base.t('exitEdit'),pending.onBack));}
+    if(pending){instance.restore(pending.proof);var estimate=new Date(Date.parse(pending.serverNow)+Math.max(0,Date.now()-pendingReceivedAt)).toISOString();left.prepend(base.deadline(pending.expiresAt,estimate,'editDeadlinePassed',refreshPending));left.appendChild(base.action(base.t('backTrip'),function(){save();pending.onBack();}));}
     else left.appendChild(base.action(base.t('backTrip'),function(){configure();}));
     left.appendChild(base.node('p','airport-booking__help',base.t('noPayment')));
     layout.append(left,summary());mount.appendChild(layout);refreshPending();
@@ -53,7 +70,7 @@
     base.focusRouteHeading(mount.querySelector('h1'));
   }
   function open(value){
-    pending=null;own.setTrip(value);hydrated=true;save();history.pushState(null,'','/?service=direct_transfer&lang='+encodeURIComponent(document.documentElement.lang)+'#direct/datos');
+    arrival++;pending=null;own.setTrip(value);hydrated=true;save();history.pushState(null,'','/?service=direct_transfer&lang='+encodeURIComponent(document.documentElement.lang)+'#direct/datos');
     base.ready.then(render);return true;
   }
   function refreshPending(){if(pending){var submit=own.getReservationRequestFields().submit;submit.disabled=!pending.canReview()||!own.validate(false)||!window.PixkuyForms.LegalAcceptance.readEvidence(form,'web_direct_transfer_checkout');submit.setAttribute('aria-disabled',String(submit.disabled));}}
@@ -68,6 +85,7 @@
     if(saved && (active()||location.hash==='#direct/servicio'||location.hash==='#direct/servicio/notes')){own.restore(saved);hydrated=true;if(active())render();else configure(location.hash.endsWith('/notes')?'notes':null);}
     else if(active()||location.hash==='#direct/servicio'){close();history.replaceState(null,'',location.pathname+location.search+'#direct/servicio');window.PixkuyServicesExpand.open('direct');}
   }
+  window.addEventListener('pagehide',function(){if(desktop()&&location.hash.startsWith('#direct/servicio')&&window.PixkuyDirectPendingEdit.serviceEdit()){own.setTrip(window.PixkuyDirectBookingCheckout.configurationSnapshot());save();}});
   window.addEventListener('popstate',function(){active()?restore():close();});
   window.addEventListener('pixkuy:i18n-applied',function(){base.ready.then(function(){if(active())render();});});
   window.addEventListener('pixkuy:airport-desktop-copy',function(){if(active())render();});

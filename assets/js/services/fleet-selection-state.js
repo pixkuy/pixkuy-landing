@@ -59,6 +59,11 @@
       return edit && edit.version===1 && edit.token && edit.editRevision && edit.idempotencyKey ? edit : null;
     } catch(_){return null;}
   }
+  function directEdit() {
+    try { var edit=JSON.parse(window.sessionStorage.getItem('pixkuy_direct_pending_edit_v1')||'null');
+      return edit && edit.serviceEditing && edit.token && edit.revision && edit.idempotencyKey ? edit : null;
+    } catch(_){return null;}
+  }
   function hourlyOfferStatus() {
     var state=read("hourly_daily");
     return {valid:!!(hourlyCertificate && state.offer && state.offer.models.length &&
@@ -230,7 +235,7 @@
     return controls.filter(Boolean);
   }
   function syncContinuation(service, state) {
-    var blocked = !!(state.offer && state.offer.models.length && !validSelection(state, service) && !pending(state));
+    var blocked = !!(service=== "direct_transfer" && pending(state) || state.offer && state.offer.models.length && !validSelection(state, service) && !pending(state));
     var parent = host(service);
     if (parent) parent.toggleAttribute("data-fleet-choice-required", blocked);
     continuationControls(service).forEach(function (cta) {
@@ -272,7 +277,8 @@
     while (field.firstChild) field.removeChild(field.firstChild);
     var legend = document.createElement("legend");
     legend.textContent = text("model");
-    if (!confirmSingle) field.appendChild(legend);
+    var directRecovery=service=== "direct_transfer" && pending(state);
+    if (!confirmSingle && !directRecovery) field.appendChild(legend);
     var select = document.createElement(confirmSingle ? "button" : "div");
     if (!confirmSingle) select.className = "fleet-selection__choices";
     if (confirmSingle) {
@@ -292,7 +298,7 @@
       label.appendChild(radio); label.appendChild(name); select.appendChild(label);
     });
     select.disabled = !!pending(state) || !models.length;
-    field.appendChild(select);
+    if(!directRecovery)field.appendChild(select);
     var message = document.createElement("p");
     message.setAttribute("role", "status");
     message.textContent = pending(state) ? text("recover") : state.explicit && models.length ? text("changed") : validSelection(state, service) ? "" : models.length ? text("choose") : text("none");
@@ -304,6 +310,7 @@
     if (state.attempt) {
       if (pending(state)) {
         var recover = document.createElement("button"); recover.type = "button";
+        if(directRecovery)recover.className="services-expand__cta";
         recover.textContent = text("retry"); field.appendChild(recover);
         recover.addEventListener("click", function () {
           recover.disabled = true;
@@ -442,8 +449,10 @@
   function fetchPrecheck(service, url, init, options) {
     var payload = JSON.parse(init.body);
     var state = read(service);
-    if (pending(state) && state.precheck) return Promise.resolve(new window.Response(JSON.stringify(state.precheck.body), { status: 200, headers: { "Content-Type": "application/json" } }));
+    if (service!=="direct_transfer" && pending(state) && state.precheck) return Promise.resolve(new window.Response(JSON.stringify(state.precheck.body), { status: 200, headers: { "Content-Type": "application/json" } }));
+    if(service=== "direct_transfer" && pending(state)) return Promise.reject(new Error("FLEET_ATTEMPT_RECOVERY_REQUIRED"));
     payload.fleet_contract_version = 1;
+    if(service=== "direct_transfer" && directEdit()){var direct=directEdit();payload.pending_edit={token:direct.token,editRevision:direct.revision};}
     if(service==="hourly_daily" && hourlyEdit()){
       var editing=hourlyEdit();
       payload.pending_edit={bookingStatusToken:editing.token,editRevision:editing.editRevision};
@@ -506,6 +515,21 @@
     return ['place_id','lat','lng'].every(function(k){return String(place[k])===String(original[k]);}) &&
       ['model_id','model_revision'].every(function(k){return String(payload.fleet_selection?.[k])===String(baseline.fleet_selection?.[k]);});
   }
+  function directContactOnly(payload,baseline){
+    if(!payload||!baseline)return false;
+    var text=function(v){return String(v??'').trim();};
+    var keys=['direct_transfer_date','direct_transfer_time','direct_transfer_passenger_fare_key','direct_transfer_currency','direct_transfer_notes'];
+    if(keys.some(function(k){return text(payload[k])!==text(baseline[k]);}))return false;
+    if(Number(payload.direct_transfer_price)!==Number(baseline.direct_transfer_amount_minor)||
+      Number(payload.direct_transfer_passengers)!==({van_1_2:2,van_3_4:4,van_5_6:6}[baseline.direct_transfer_passenger_fare_key]))return false;
+    if(text(payload.fleet_selection?.model_id)!==text(baseline.fleet_model?.id)||
+      text(payload.fleet_selection?.model_revision)!==text(baseline.fleet_model?.revision))return false;
+    return ['origin','destination'].every(function(role){
+      var p=payload['direct_transfer_'+role]||{},prefix='direct_transfer_'+role+'_';
+      return ['address','place_id'].every(function(k){return text(p[k])===text(baseline[prefix+k]);})&&
+        ['lat','lng'].every(function(k){return baseline[prefix+k]!==''&&Number(p[k])===Number(baseline[prefix+k]);});
+    });
+  }
   function hourlyContactOnly(payload, baseline) {
     if(!payload || !baseline)return false;
     var text=function(value){return String(value??'').trim();};
@@ -537,20 +561,25 @@
       init=Object.assign({},init,{headers:Object.assign({},init.headers,{
         "X-Pixkuy-Booking-Token":edit.token,"X-Pixkuy-Edit-Revision":edit.editRevision})});
     }
+    if(service==='direct_transfer' && !pending(state) && directEdit()){
+      var direct=directEdit();contactOnly=directContactOnly(payload,direct.base);url=url.replace(/\/checkout$/, contactOnly?'/update-contact':'/replace-checkout');
+      if(contactOnly)payload=contactPayload(payload);
+      init=Object.assign({},init,{headers:Object.assign({},init.headers,{'X-Pixkuy-Booking-Token':direct.token,'X-Pixkuy-Edit-Revision':direct.revision})});
+    }
     if (!pending(state)) {
       var selected = selection(service);
       if ((!selected || state.explicit) && state.offer) return Promise.reject(new Error("FLEET_MODEL_SELECTION_REQUIRED"));
       if (selected && !contactOnly) payload.fleet_selection = payload.fleet_selection || selected;
       if (selected && !contactOnly && (payload.fleet_selection.model_id !== selected.model_id || payload.fleet_selection.model_revision !== selected.model_revision)) return Promise.reject(new Error("FLEET_REVIEW_SELECTION_CHANGED"));
-      state.attempt = { state: "pending", key: service==="hourly_daily" && hourlyEdit() ? hourlyEdit().idempotencyKey : createAttemptKey(), payload: copy(payload), url: url, headers: copy(init.headers || {}) };
+      state.attempt = { state: "pending", key: service==="hourly_daily" && hourlyEdit() ? hourlyEdit().idempotencyKey : service==='direct_transfer'&&directEdit()?directEdit().idempotencyKey:createAttemptKey(), payload: copy(payload), url: url, headers: copy(init.headers || {}) };
     }
     var attempt = state.attempt;
     var sent = copy(attempt.payload);
     // Only transport evidence is renewable; commercial fields/key stay exactly frozen.
     if (sent.fleet_selection && payload.recaptchaToken) sent.recaptchaToken = payload.recaptchaToken;
     write(service, state); // Refuse the send when recoverable storage cannot be proved.
-    var headers = Object.assign({}, service==="hourly_daily"?attempt.headers:init.headers, { "Idempotency-Key": attempt.key });
-    if(service==="hourly_daily")url=attempt.url;
+    var headers = Object.assign({}, (service==="hourly_daily"||service==="direct_transfer")?attempt.headers:init.headers, { "Idempotency-Key": attempt.key });
+    if(service==="hourly_daily"||service==="direct_transfer")url=attempt.url;
     return window.fetch(url, Object.assign({}, init, { headers: headers, body: JSON.stringify(sent) })).then(function (response) {
       return response.clone().json().then(function (body) {
         var current = read(service);
@@ -560,10 +589,11 @@
           current.attempt.state='unknown';
         } else if (body.recovery && body.recovery.state === "not_committed") {
           current.attempt.state = "not_committed";
+          if(service=== "direct_transfer" && directEdit()){var direct=directEdit();direct.idempotencyKey=createAttemptKey();window.sessionStorage.setItem("pixkuy_direct_pending_edit_v1",JSON.stringify(direct));}
           current.explicit = true; current.selected = null;
         } else if (body.bookingStatusToken) {
           current.attempt.state = "committed";
-          if (service === "airport_transfer" || service === "hourly_daily") current.reservationToken = body.bookingStatusToken;
+          if (service === "airport_transfer" || service === "hourly_daily" || service === "direct_transfer") current.reservationToken = body.bookingStatusToken;
         }
         write(service, current);
         render(service);
@@ -620,7 +650,7 @@
     var owner = state.reservationToken || attempt && attempt.response && attempt.response.bookingStatusToken;
     if (owner !== token) return false;
     var edit;
-    try { edit = service==='direct_transfer' ? null : JSON.parse(window.sessionStorage.getItem(service==="hourly_daily"?HOURLY_EDIT_KEY:AIRPORT_REPLACEMENT_EDIT_KEY) || "null"); }
+    try { edit = JSON.parse(window.sessionStorage.getItem(service==='direct_transfer'?'pixkuy_direct_pending_edit_v1':service==="hourly_daily"?HOURLY_EDIT_KEY:AIRPORT_REPLACEMENT_EDIT_KEY) || "null"); }
     catch (_) { return false; }
     if (edit && edit.token !== token) return false;
     if (!resolvedExpired && attempt && (attempt.state !== "committed" || !attempt.response || attempt.response.bookingStatusToken !== token)) return false;
@@ -630,7 +660,7 @@
     else if(service==='airport_transfer') airportCertificate = null;
     editingService = "";
     write(service, {version:1, selected:null, offer:null, attempt:null, explicit:false});
-    (service==='direct_transfer' ? ['pixkuy_direct_transfer_checkout_review_snapshot','pixkuy_direct_transfer_checkout_review_return','pixkuy_booking_checkout:'+token] : service==="hourly_daily" ? ["pixkuy_hourly_checkout_review_snapshot","pixkuy_hourly_checkout_review_return",
+    (service==='direct_transfer' ? ['pixkuy_direct_pending_edit_v1','pixkuy_direct_transfer_checkout_review_snapshot','pixkuy_direct_transfer_checkout_review_return','pixkuy_booking_checkout:'+token] : service==="hourly_daily" ? ["pixkuy_hourly_checkout_review_snapshot","pixkuy_hourly_checkout_review_return",
       HOURLY_EDIT_KEY,"pixkuy_booking_checkout:"+token] : ["pixkuy_airport_transfer_checkout_review_snapshot", "pixkuy_airport_transfer_checkout_review_return",
       AIRPORT_REPLACEMENT_EDIT_KEY, "pixkuy_booking_checkout:" + token]).forEach(function (key) {
       window.sessionStorage.removeItem(key);
@@ -859,7 +889,7 @@
     if(top)top.appendChild(label);else if(notes)notes.before(label);else placeControl(parent,label);
     setPassengers(control.value);
   }
-  window.PixkuyFleetSelection = { contactPayload:contactPayload, airportContactOnly:airportContactOnly, read: read, selection: selection, model: model, snapshot: snapshot, gallery: gallery, photo: modelPhoto,
+  window.PixkuyFleetSelection = { contactPayload:contactPayload, directContactOnly:directContactOnly, airportContactOnly:airportContactOnly, read: read, selection: selection, model: model, snapshot: snapshot, gallery: gallery, photo: modelPhoto,
     fetchPrecheck: fetchPrecheck, fetchCheckout: fetchCheckout, recoverAttempt: recoverAttempt, completeAttempt: completeAttempt, createAttemptKey: createAttemptKey,
     bindReservation: bindReservation, completeReservation: completeReservation,
     airportOfferStatus: airportOfferStatus,

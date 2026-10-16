@@ -27,7 +27,9 @@
   }
   function serverNow(raw) { return new Date(Date.parse(raw.serverNow) + window.performance.now() - receivedAt).toISOString(); }
   function home() { window.location.assign(state?.result.serviceType === 'direct_transfer' ? '/?lang='+encodeURIComponent(document.documentElement.lang) : '/'); }
-  function trip() { window.location.assign("/?service="+(state?.result.serviceType === "direct_transfer" ? "direct_transfer" : "airport_hotel")+"&lang="+encodeURIComponent(document.documentElement.lang)+"#services"); }
+  function trip() { if(state?.result.serviceType==='direct_transfer' && state.result.view==='pending'){
+    window.PixkuyDirectPendingEdit.beginConfigure(state);return;
+  } window.location.assign("/?service="+(state?.result.serviceType === "direct_transfer" ? "direct_transfer" : "airport_hotel")+"&lang="+encodeURIComponent(document.documentElement.lang)+"#services"); }
   function mobileLocation(label, address) {
     label=String(label || '').trim();address=String(address || '').trim();
     if (!label) return address || '—';
@@ -264,7 +266,9 @@
     var result = state.result;
     var confirmed = result.view === "confirmed" && result.paymentStatus === "paid";
     var retry = result.view === "pending" && result.raw.actions && result.raw.actions.canRetryCheckout === true;
-    var kind = confirmed ? "confirmed" : result.view === "expired" ? "expired" : retry ? "failed" : "pending";
+    var directWindowClosed = result.serviceType === 'direct_transfer' && result.view === 'pending' &&
+      result.paymentStatus === 'pending' && result.raw.actions && result.raw.actions.paymentWindowClosed === true;
+    var kind = confirmed ? "confirmed" : result.view === "expired" ? "expired" : retry || directWindowClosed ? "failed" : "pending";
     mount = view.shell(confirmed ? 4 : 3, confirmed ? home : trip, null, {backLabel:confirmed ? "home" : "backTrip"});
     mount.classList.add("airport-booking--result");
     document.body.appendChild(mount);
@@ -334,7 +338,10 @@
       paymentActions.appendChild(view.action(view.t("startAgain"), function () { editApi.beginNew(state); }, true));
     }
     if (editApi && editApi.allowed(state)) {
-      var edit = view.action(editApi.label(state), function () {
+      var direct= result.serviceType==='direct_transfer';
+      if(direct){var configure=view.action(view.t('directEditTrip'),function(){window.PixkuyDirectPendingEdit.beginConfigure(state);});
+        configure.classList.add('airport-booking__secondary');configure.setAttribute('data-direct-edit-trip','');paymentActions.appendChild(configure);}
+      var edit = view.action(direct?view.t('directEditContact'):editApi.label(state), function () {
         editApi.begin(state);
       });
       edit.classList.add("airport-booking__secondary");

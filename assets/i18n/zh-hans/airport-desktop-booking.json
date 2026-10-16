@@ -1,4 +1,6 @@
 {
+  "directEditTrip": "修改接送行程",
+  "directEditContact": "修改联系信息",
   "estimatedDuration": "预计时长",
   "paidAmount": "已付金额",
   "mobileConfirmedTitle": "预订已确认",

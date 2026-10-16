@@ -22,7 +22,8 @@
     // the revision, never change contact/payment. Later edits retain the API fence.
     return Object.values(legal.fieldNames).every(key=>key==='legal_acceptance_accepted_at'||text(payload[key])===text(draft[key]));
   }
-  const route=()=>new URLSearchParams(location.search).get('pending')==='1';
+  const serviceEdit=()=>{const c=read();return c?.serviceEditing&&c.token&&c.revision?c:null;};
+  const route=()=>new URLSearchParams(location.search).get('pending')==='1'&&!serviceEdit();
   const dataUrl=()=> '/?service=direct_transfer&pending=1&lang='+encodeURIComponent(document.documentElement.lang||'es')+'#direct/datos';
   const activeData=()=>location.pathname==='/'&&route()&&new URLSearchParams(location.search).get('service')==='direct_transfer'&&!!read()?.token;
   function snapshotOf(context){
@@ -49,7 +50,7 @@
       publicCode:context.publicCode,expiresAt:context.expiresAt,
       serverNow:new Date(Date.parse(context.serverNow)+Math.max(0,Date.now()-context.receivedAt)).toISOString(),canReview,
       onChange:(contact,proof)=>{context.customer.full_name=contact.name;context.customer.phone=contact.phone;context.customer.email=contact.email;context.proof=proof;write(context);},
-      onBack:()=>location.assign('/booking-cancelled.html?token='+encodeURIComponent(context.token)),
+      onBack:()=>{if(window.matchMedia('(min-width:721px)').matches)configure();else location.assign('/booking-cancelled.html?token='+encodeURIComponent(context.token));},
       onReview:()=>location.assign('/direct-transfer-checkout-review.html?pending=1&lang='+encodeURIComponent(document.documentElement.lang||'es')+'#revision')
     });
     try{
@@ -63,12 +64,36 @@
       : document.querySelector('[data-direct-transfer-mobile-contact-global-error]');
       if(error){error.hidden=false;error.textContent=window.PixkuyAirportDesktopView.t('uncertain');}}
   }
-  function begin(state){
+  function configure(){
+    const context=read(),fleet=window.PixkuyFleetSelection.read('direct_transfer');
+    if(!context||context.attempt)return false;
+    // Only a successful receipt of this exact reservation can be retired. An
+    // uncertain replacement (even carrying its token) remains frozen recovery.
+    if(fleet.attempt&&fleet.attempt.state!=='not_committed'){
+      const receipt=fleet.attempt.response;
+      if(fleet.attempt.state!=='committed'||receipt?.status!=='ok'||!receipt.checkoutUrl||receipt.bookingStatusToken!==context.token)return false;
+      fleet.attempt=null;
+    }
+    context.serviceEditing=true;context.idempotencyKey=window.PixkuyFleetSelection.createAttemptKey();
+    write(context);
+    fleet.offer=null;fleet.precheck=null;fleet.explicit=false;fleet.reservationToken=context.token;
+    sessionStorage.setItem('pixkuy_fleet_b:direct_transfer',JSON.stringify(fleet));
+    window.PixkuyFleetSelection.invalidateOffer('direct_transfer');
+    const saved=snapshotOf(context),legal=window.PixkuyForms.LegalAcceptance;
+    Object.entries(legal.fieldNames).forEach(([key,name])=>saved[name]=context.proof?.[key]||'');
+    saved.desktopDraft={version:1,stage:'servicio'};
+    window.PixkuyDirectTransferTransactionalState.writeReviewSnapshot(saved);
+    location.assign('/?service=direct_transfer&lang='+encodeURIComponent(document.documentElement.lang||'es')+'#direct/servicio');
+    return true;
+  }
+  function beginConfigure(state){return begin(state,true);}
+  function begin(state,configuring){
     const raw=state.result.raw, fleet=window.PixkuyFleetSelection.read('direct_transfer');
     const owner=fleet.reservationToken || fleet.attempt?.response?.bookingStatusToken;
     if(state.result.view!=='pending'||!raw.edit?.allowed||!raw.actions?.canModify||raw.reservation.serviceType!=='direct_transfer'||owner&&owner!==state.token)return false;
     if(fleet.attempt&&fleet.attempt.state!=='not_committed'&&fleet.attempt.response?.bookingStatusToken!==state.token)return false;
     const prior=read(), draft=raw.edit.draft;
+    if(prior?.serviceEditing&&prior.token===state.token&&fleet.attempt&&fleet.attempt.state!=='not_committed'&&!(fleet.attempt.state==='committed'&&fleet.attempt.response?.status==='ok'&&fleet.attempt.response?.checkoutUrl))return false;
     if(!draft?.customer)return false;
     const legal=window.PixkuyForms.LegalAcceptance;
     let proof=legal.readEvidence(draft,'web_direct_transfer_mobile_checkout') || legal.readEvidence(draft,'web_direct_transfer_checkout');
@@ -76,15 +101,17 @@
       const payload=Object.assign({},fleet.attempt.payload?.form_payload_raw,fleet.attempt.payload);
       proof=legal.readEvidence(payload,'web_direct_transfer_mobile_checkout')||legal.readEvidence(payload,'web_direct_transfer_checkout');
     }
+    if(prior?.token===state.token && Object.hasOwn(prior,'proof'))proof=prior.proof;
     if(prior?.token===state.token&&prior.revision===raw.edit.revision){
       if(unchangedContactAttempt(prior,raw,legal)){
         // The authoritative unchanged contact resolves this former request.
         delete prior.attempt;
       }
-      prior.base=draft;prior.expiresAt=raw.hold.expiresAt;prior.serverNow=raw.serverNow;prior.receivedAt=Date.now();write(prior);
+      prior.base=draft;prior.serviceEditing=false;prior.expiresAt=raw.hold.expiresAt;prior.serverNow=raw.serverNow;prior.receivedAt=Date.now();write(prior);
     }
     else write({version:1,token:state.token,revision:raw.edit.revision,base:draft,customer:{...draft.customer},notes:draft.direct_transfer_notes||'',proof,
       publicCode:raw.reservation.publicCode,expiresAt:raw.hold.expiresAt,serverNow:raw.serverNow,receivedAt:Date.now()});
+    if(configuring)return configure();
     location.assign(dataUrl());return true;
   }
   function mount(api){
@@ -148,5 +175,5 @@
       }catch(_){verified=false;error();gate();}
     });
   }
-  window.PixkuyDirectPendingEdit={begin,route,mount,activeData,mountData};
+  window.PixkuyDirectPendingEdit={begin,beginConfigure,configure,serviceEdit,route,mount,activeData,mountData};
 })(window,document);
