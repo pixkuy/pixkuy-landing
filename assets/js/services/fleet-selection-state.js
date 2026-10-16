@@ -235,7 +235,7 @@
     return controls.filter(Boolean);
   }
   function syncContinuation(service, state) {
-    var blocked = !!(service=== "direct_transfer" && pending(state) || state.offer && state.offer.models.length && !validSelection(state, service) && !pending(state));
+    var blocked = !!((service=== "direct_transfer" || service=== "hourly_daily") && pending(state) || state.offer && state.offer.models.length && !validSelection(state, service) && !pending(state));
     var parent = host(service);
     if (parent) parent.toggleAttribute("data-fleet-choice-required", blocked);
     continuationControls(service).forEach(function (cta) {
@@ -259,6 +259,12 @@
       else node.parentNode.removeChild(node);
     });
     syncContinuation(service, state);
+    // Hourly's route owns reservation/uncertain-attempt recovery, not a second
+    // configuration offer selector with an unqualified frozen vehicle.
+    if(service==="hourly_daily" && pending(state)){
+      if(field)field.remove();
+      syncPresentation(service);return null;
+    }
     if (!parent || (state.offer && !state.offer.models.length && !state.attempt) || (!state.offer && !state.attempt) || (state.offer && state.offer.models.length === 1 && validSelection(state, service) && !state.attempt)) {
       if (field) field.parentNode.removeChild(field);
       return null;
@@ -449,8 +455,8 @@
   function fetchPrecheck(service, url, init, options) {
     var payload = JSON.parse(init.body);
     var state = read(service);
-    if (service!=="direct_transfer" && pending(state) && state.precheck) return Promise.resolve(new window.Response(JSON.stringify(state.precheck.body), { status: 200, headers: { "Content-Type": "application/json" } }));
-    if(service=== "direct_transfer" && pending(state)) return Promise.reject(new Error("FLEET_ATTEMPT_RECOVERY_REQUIRED"));
+    if (service==="airport_transfer" && pending(state) && state.precheck) return Promise.resolve(new window.Response(JSON.stringify(state.precheck.body), { status: 200, headers: { "Content-Type": "application/json" } }));
+    if((service=== "direct_transfer" || service=== "hourly_daily") && pending(state)) return Promise.reject(new Error("FLEET_ATTEMPT_RECOVERY_REQUIRED"));
     payload.fleet_contract_version = 1;
     if(service=== "direct_transfer" && directEdit()){var direct=directEdit();payload.pending_edit={token:direct.token,editRevision:direct.revision};}
     if(service==="hourly_daily" && hourlyEdit()){
@@ -700,6 +706,7 @@
     galleries[service].forEach(function (name) { if (window[name]) window[name].sync(); });
     var roots = {airport_transfer:"#services-expand-airport",direct_transfer:"#services-expand-direct",hourly_daily:"[data-services-hourly-config]"};
     var parent = document.querySelector(roots[service]), selected = model(service);
+    if(service==="hourly_daily" && pending(read(service)))selected=null;
     if (service === "hourly_daily" && parent && parent.getAttribute("data-services-hourly-mode-active") === "custom_long_term") return;
     if (service === "direct_transfer") {
       var mobile = document.querySelector("[data-direct-transfer-mobile-config-step]");
@@ -719,7 +726,7 @@
     }
     if (!parent) return;
     var state = read(service);
-    var presentation = pending(state) || validSelection(state, service) ? selected : null;
+    var presentation = service==="hourly_daily" && pending(state) ? null : pending(state) || validSelection(state, service) ? selected : null;
     [parent, mobile].filter(Boolean).forEach(function (node) {
       node.setAttribute("data-fleet-presentation", presentation ? "selected" : "empty");
       node.setAttribute("data-fleet-photo", modelPhoto(presentation) ? "true" : "false");
@@ -894,6 +901,7 @@
     bindReservation: bindReservation, completeReservation: completeReservation,
     airportOfferStatus: airportOfferStatus,
     hourlyOfferStatus: hourlyOfferStatus,
+    hasCheckoutAttempt: function(service){return !!pending(read(service));},
     hourlyEdit: hourlyEdit, expireAirportOfferIfNeeded: expireAirportOfferIfNeeded,
     syncPresentation: syncPresentation, acceptOffer: acceptOffer, render: render,
     minimumDate: minimumDate, hourlyPassengers: hourlyPassengers, passengerLabel: passengerLabel, passengers: passengers, setPassengers: setPassengers, invalidateOffer: invalidateOffer, canContinue: canContinue,

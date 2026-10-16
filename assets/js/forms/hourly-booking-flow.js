@@ -53,17 +53,23 @@
   }
   function statusReturn(token){
     suspended=true;navigationVersion++;
-    window.location.replace("/booking-cancelled.html?token="+encodeURIComponent(token));
+    window.location.replace("/booking-cancelled.html?token="+encodeURIComponent(token)+"&lang="+encodeURIComponent(document.documentElement.lang||"es"));
   }
   // Resolve only a requested Hourly destination. Home and other services stay free.
   // Missing edit authority is reacquired from status, never converted into creation.
-  function reconcileRoute(){
-    if(!hourlyDestination())return true;
+  function reconcileRoute(entry){
+    if(entry!==true&&!hourlyDestination())return true;
     var fleet=window.PixkuyFleetSelection.read("hourly_daily"),edit=editing(),sent=attempt();
     var token=edit?.token || fleet.reservationToken || sent?.response?.bookingStatusToken || snapshot?.hourlyPendingToken || window.history.state?.hourlyPendingToken;
     if(token && (!edit || !validDraft(snapshot) || (snapshot.hourlyPendingToken && snapshot.hourlyPendingToken!==edit.token) ||
       (edit.contactOnly && !reservationAmount()) || sent?.state==="committed")){
       statusReturn(token);return false;
+    }
+    // An uncertain checkout owns its immutable proposal, even if a later panel
+    // draft was changed. Reconciliation must never replay a different modality.
+    if(sent && validDraft(sent.payload)){
+      snapshot=draft.save(Object.assign(draft.fromPublic(sent.payload,snapshot||sent.payload),edit?{hourlyPendingToken:edit.token}:{}));
+      notice="saveUncertain";
     }
     var target=step();
     if(edit && target==="servicio" && !sent){
@@ -81,11 +87,24 @@
   }
   function resumeEntry(){
     if(!hydrated || step()==="datos" || step()==="revision")return false;
-    if(!editing() && !window.PixkuyFleetSelection.read("hourly_daily").reservationToken && !attempt())return false;
-    if(!reconcileRoute())return true;
+    if(!editing() && !window.PixkuyFleetSelection.read("hourly_daily").reservationToken && !attempt()){
+      // Home intentionally does not hydrate another service. Restore the owned
+      // unsent draft only when Hourly is explicitly requested again.
+      if(suspended && validDraft(snapshot)){
+        restoringDraft=true;
+        try{draft.restore(snapshot);suspended=false;}finally{restoringDraft=false;}
+      }
+      return false;
+    }
+    if(!reconcileRoute(true))return true;
     if(step()==="datos"||step()==="revision"){render();return true;}
     return false;
   }
+  document.addEventListener("click",function(event){
+    if(view.media.matches && event.target.closest?.('[data-service-expand-trigger="hourly"]') && resumeEntry()){
+      event.preventDefault();event.stopImmediatePropagation();
+    }
+  },true);
   function restore(){
     home.after(form);form.classList.remove("hourly-booking__form");form.inert=false;
     if(phoneMobileCopy){
@@ -156,6 +175,10 @@
     save();var edit=editing();if(!edit)return;
     window.sessionStorage.setItem("pixkuy_hourly_unsaved:"+edit.token,JSON.stringify(snapshot));
     window.location.assign("/booking-cancelled.html?token="+encodeURIComponent(edit.token));
+  }
+  function returnToPending(){
+    if(!editing()||step()!=="servicio")return false;
+    exitEdit();return true;
   }
   function recover(){
     var origin=navigationVersion;busy=true;notice="checking";render();
@@ -274,15 +297,17 @@
     var summary=desktopReview?view.reviewSummary(snapshot,fresh(),reservationAmount()):null;
     var statusHost=desktopReview?summary:content;
     if(desktopReview)content.appendChild(view.node("p","airport-booking__lead",view.t("reviewText")));
-    var edit=editing();
+    var edit=editing(),pendingMeta=null;
     if(edit){
-      statusHost.appendChild(view.node("p",desktopReview?"airport-booking__reference":"",edit.publicCode));
+      // Mobile shares the normal service/contact blocks. Keep the reservation
+      // reference and its original clock together in the service summary.
+      pendingMeta=mobile?view.node("div","hourly-booking__pending-meta"):statusHost;
+      pendingMeta.appendChild(view.node("p",desktopReview?"airport-booking__reference":"",edit.publicCode));
       var estimated=new Date(Date.parse(edit.serverNow)+Math.max(0,Date.now()-edit.receivedAt)).toISOString();
-      statusHost.appendChild(view.deadline(edit.expiresAt,estimated,"editDeadlinePassed",function(){
+      pendingMeta.appendChild(view.deadline(edit.expiresAt,estimated,"editDeadlinePassed",function(){
         if(mount)mount.querySelectorAll("[data-hourly-pay]").forEach(function(b){b.disabled=true;});
         protectReview();
       }));
-      if(mobile&&!contactEdit())content.appendChild(button("exitEdit",exitEdit));
     }
     if(notice){var message=view.node("p","hourly-booking__notice",view.t(notice));message.setAttribute("role","status");statusHost.appendChild(message);}
     if(notice==="availabilityError")statusHost.appendChild(button("retryAvailability",checkAvailability));
@@ -351,6 +376,7 @@
       if(!fresh()&&!mobile)statusHost.appendChild(button("backData",function(){notice="unverified";go("datos");}));
     }
     summary=summary||(mobile?view.mobileSummary(snapshot,fresh(),current,contactEdit(),reservationAmount()):view.summary(snapshot,fresh(),reservationAmount()));
+    if(mobile&&pendingMeta)summary.querySelector("h2").after(pendingMeta);
     if(mobile){summary.classList.add("hourly-booking__summary--mobile");layout.append(summary,content);heading=summary.querySelector("h2");heading.tabIndex=-1;}
     else layout.append(content,summary);
     heading.setAttribute("data-hourly-route-heading","");
@@ -399,7 +425,7 @@
     snapshot=draft.save(value);
     reviewed=fingerprint(value);notice="";go("revision");return true;
   }
-  window.PixkuyHourlyBookingFlow={openData:openData,review:review,guardReviewExpiry:guardReviewExpiry,leave:leave,resumeEntry:resumeEntry,navigationVersion:function(){return navigationVersion;},isActive:function(){return hydrated && !!mount && !suspended&&(step()==="datos"||step()==="revision");}};
+  window.PixkuyHourlyBookingFlow={openData:openData,review:review,guardReviewExpiry:guardReviewExpiry,leave:leave,resumeEntry:resumeEntry,returnToPending:returnToPending,navigationVersion:function(){return navigationVersion;},isActive:function(){return hydrated && !!mount && !suspended&&(step()==="datos"||step()==="revision");}};
   window.addEventListener("pixkuy:hourly-daily-panel-submit",function(event){
     if(!view.media.matches)return;
     window.setTimeout(function(){if(["hourly","full_day"].indexOf(event.detail.hourly_daily_mode)>=0)openData(Object.assign({},event.detail,{service_type:"hourly_daily"}));},0);

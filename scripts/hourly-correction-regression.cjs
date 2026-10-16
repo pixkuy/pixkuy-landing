@@ -178,6 +178,20 @@ test('Hourly precheck: out-of-order mode responses cannot restore a foreign offe
  h.requests[2].resolve(hourlyFixture(true));await h.flush();assert.equal(h.cta.disabled,false);assert.equal(h.window.PixkuyFleetSelection.read('hourly_daily').precheck.payload.hourly_daily_mode,'hourly');
  h.choose('full_day');assert(h.cta.disabled,'mode switch must immediately block old offer');
 });
+
+for(const attemptState of ['pending','committed'])test('Mobile lot: '+attemptState+' attempt never certifies a different modality',async()=>{
+ const h=hourlyPrecheckHarness(true);await h.fill();
+ const fleet=h.window.PixkuyFleetSelection,key='pixkuy_fleet_b:hourly_daily',state=fleet.read('hourly_daily');
+ state.attempt={state:attemptState,key:'same-attempt',payload:h.requests[0].payload,...(attemptState==='committed'?{response:{bookingStatusToken:'synthetic-known'}}:{})};
+ if(attemptState==='committed')state.reservationToken='synthetic-known';
+ state.precheck={payload:h.requests[0].payload,body:hourlyFixture(true)};
+ h.window.sessionStorage.setItem(key,JSON.stringify(state));const original=JSON.stringify(state.attempt);
+ h.choose('full_day');await h.tick();assert.equal(h.requests.length,1);
+ h.requests[0].resolve(hourlyFixture(true));await h.flush();
+ assert(h.cta.disabled);assert(h.price.hidden);assert(!/Disponibilidad confirmada/.test(h.status.textContent));
+ await assert.rejects(fleet.fetchPrecheck('hourly_daily','/v1/public/reservations/hourly-availability-precheck',{method:'POST',body:JSON.stringify(h.api.buildHourlySubmitDetail())}),/FLEET_ATTEMPT_RECOVERY_REQUIRED/);
+ assert.equal(JSON.stringify(fleet.read('hourly_daily').attempt),original);assert.equal(h.requests.length,1);
+});
 test('Hourly precheck: an old suggestion refresh cannot change the current mode',async()=>{
  const h=hourlyPrecheckHarness();await h.fill();h.requests[0].resolve(hourlyFixture(false,'2026-11-06T11:17'));await h.flush();
  const applying=h.api.applyNextAvailableSuggestion('2026-11-06T11:17');await h.flush();h.choose('full_day');await h.tick();

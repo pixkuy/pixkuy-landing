@@ -171,4 +171,279 @@ async function main(){
  }catch(e){row.result='FAIL';row.error=e.message;row.lastUrl=t?.page.url();row.scrollTrace=await t?.page.evaluate(()=>window.__hourlyScrollTrace).catch(()=>[]);await t?.page.screenshot({path:path.join(base.output,'failure.png'),fullPage:true}).catch(()=>{});throw e;}
  finally{clearTimeout(timeout);row.errors=t?.state.errors||[];await fs.writeFile(path.join(base.output,'result.json'),JSON.stringify(row,null,2));await browser.close();console.log(JSON.stringify({result:row.result||'REPRODUCED',checks:row.checks,error:row.error}));}
 }
-main().catch(e=>{console.error(e.message);process.exitCode=1;});
+async function mobileLot(){
+ assert.equal(process.env.PIXKUY_AUDIT_FIXTURES,'1');await fs.mkdir(base.output,{recursive:true});
+ const channel=process.argv.includes('--bundled-chromium')?'chromium':'chrome';
+ const browser=await base.launchChrome(channel);base.setBrowser(browser);let t;
+ const report={browser:{channel,version:browser.version()},transport:'captured; real checkout modules, no external network',checks:[],errors:[],screens:[]};
+ const visualClose=process.argv.includes('--visual-close'),deliveryTasks=[],staticBytes=new Map(),scriptTasks=[];
+ const sha=body=>require('node:crypto').createHash('sha256').update(body).digest('hex');
+ const withoutBom=body=>body.subarray(0,3).equals(Buffer.from([0xef,0xbb,0xbf]))?body.subarray(3):body;
+ const timer=setTimeout(()=>browser.close(),240000);
+ async function setup(width=390){
+  if(t){report.errors.push(...t.state.errors);assert.deepEqual(t.state.errors,[]);await t.context.close();}
+  t=await base.setup(width,'hourly_daily');
+  // This focused mode uses one awaited collector instead of the base collector
+  // plus a second concurrent response.body() read. No changes to product bytes.
+  if(visualClose)for(const listener of t.page.listeners('response'))t.page.off('response',listener);
+  if(process.argv.includes('--draft-only'))await t.context.route('**/.netlify/functions/booking-public-config',route=>route.fulfill({json:{ok:true,bookingApi:{apiBaseUrl:base.origin},publicSite:{siteKey:'local_pixkuy_site_key'},recaptchaEnterprise:{siteKey:'synthetic-public-key'}}}));
+  t.page.on('pageerror',e=>{report.stacks??=[];report.stacks.push(e.stack);});
+  const cdp=await t.context.newCDPSession(t.page);await cdp.send('Runtime.enable');
+  if(process.argv.includes('--source-attestation')){
+   const watched=new Set(['booking-cancelled-edit.js','fleet-selection-state.js','contact-event-special-editor.js','direct-transfer-booking-api-checkout.js','hourly-booking-flow.js','hourly-mobile-booking-flow.js']);
+   cdp.on('Debugger.scriptParsed',event=>{
+    let u;try{u=new URL(event.url);}catch{return;}
+    if(u.origin!==base.origin||!watched.has(path.posix.basename(u.pathname)))return;
+    scriptTasks.push((async()=>{
+     const result=await cdp.send('Debugger.getScriptSource',{scriptId:event.scriptId});
+     const source=Buffer.from(result.scriptSource),local=await fs.readFile(path.resolve(root,'.'+u.pathname));
+     report.executedSources??=[];report.executedSources.push({path:u.pathname,scriptId:event.scriptId,localHash:sha(local),sourceHash:sha(source),equivalent:withoutBom(source).equals(withoutBom(local))});
+     if(!withoutBom(source).equals(withoutBom(local)))await fs.writeFile(path.join(base.output,path.posix.basename(u.pathname)+'.debugger-source'),source);
+    })().catch(error=>{report.scriptCaptureErrors??=[];report.scriptCaptureErrors.push(error.message);}));
+   });
+   await cdp.send('Debugger.enable');
+  }
+  cdp.on('Runtime.exceptionThrown',e=>{report.exceptions??=[];report.exceptions.push(e.exceptionDetails);});
+  t.page.on('response',response=>{
+   const u=new URL(response.url());if(u.origin!==base.origin||!/^\/assets\/.+\.(js|css|json)$/.test(u.pathname))return;
+   const task=(async()=>{try{
+    const body=await response.body(),file=path.resolve(root,'.'+u.pathname),raw=await fs.readFile(file);
+    // Chromium's decoded resource body omits a UTF-8 BOM. Compare content bytes
+    // after this documented decoding boundary, not a false three-byte mismatch.
+    const expected=withoutBom(raw),decoded=withoutBom(body),sent=staticBytes.get(file);
+    if(visualClose){
+     report.delivery??=[];report.delivery.push({path:u.pathname,status:response.status(),contentType:response.headers()['content-type'],contentEncoding:response.headers()['content-encoding']||'identity',localBytes:raw.length,decodedBytes:body.length,localHash:sha(raw),sentHash:sent?sha(sent):null,decodedHash:sha(body),equivalent:decoded.equals(expected),diskUnchanged:!sent||sent.equals(raw)});
+    }
+    if(!decoded.equals(expected)||(sent&&!sent.equals(raw))){
+     report.resourceMismatches??=[];report.resourceMismatches.push({path:u.pathname,expectedLength:expected.length,receivedLength:body.length});
+     await fs.writeFile(path.join(base.output,path.basename(file)+'.received'),body);
+    }
+   }catch(error){if(visualClose){report.captureErrors??=[];report.captureErrors.push({path:u.pathname,error:error.message});}}})();deliveryTasks.push(task);
+  });
+  await t.context.route('**/*',async route=>{
+   const u=new URL(route.request().url());if(/\.(mp4|webm)$/.test(u.pathname))return route.abort();
+   if(visualClose&&u.origin===base.origin&&u.pathname==='/__hourly_resource_probe')return route.fulfill({contentType:'text/html; charset=utf-8',body:'<!doctype html><meta charset="utf-8"><title>Resource delivery probe</title>'});
+   if(u.origin!==base.origin||u.pathname.startsWith('/v1/')||u.pathname.startsWith('/.netlify/'))return route.fallback();
+   assert.equal(route.request().method(),'GET');const file=path.resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));assert(file.startsWith(root+path.sep));
+   const types={'.js':'application/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.svg':'image/svg+xml','.jpeg':'image/jpeg','.jpg':'image/jpeg','.png':'image/png','.webp':'image/webp'};
+   try{
+    const body=visualClose&&staticBytes.has(file)?staticBytes.get(file):await fs.readFile(file);
+    if(visualClose)staticBytes.set(file,body);
+    return route.fulfill({body,contentType:types[path.extname(file)]||'application/octet-stream'});
+   }catch(e){if(e.code!=='ENOENT')throw e;return route.fulfill({status:404,body:''});}
+  });return t.page;
+ }
+ async function snap(label){await t.page.screenshot({path:path.join(base.output,label+'.png'),fullPage:false});report.screens.push(label+'.png');}
+ async function data(){await t.page.locator('[data-services-hourly-cta]:visible').click();await t.page.waitForURL(/#hourly\/datos$/);}
+ async function contact(){for(const [k,v]of Object.entries({name:'Persona Sintética',phone:'+525512345678',email:'audit@example.invalid'}))await t.page.locator('#hourly-contact-'+k).fill(v);await t.page.locator('#pixkuy-hourly-legal-acceptance').check();}
+ async function review(){await t.page.locator('#hourly-contact-submit').click();await t.page.waitForURL(/#hourly\/revision$/);}
+ async function homeEntry(){await t.page.goto(base.origin+'/?lang=es');await t.page.locator('.hero-mobile-entry__action[href*="service=hourly_daily"]').click();}
+ async function offer(){await t.page.waitForFunction(()=>window.PixkuyFleetSelection.hourlyOfferStatus().valid);}
+ async function deliveryGate(){
+  await Promise.all(deliveryTasks);await Promise.all(scriptTasks);
+  assert.deepEqual(report.captureErrors||[],[]);assert.deepEqual(report.scriptCaptureErrors||[],[]);
+  assert.deepEqual((report.executedSources||[]).filter(row=>!row.equivalent),[]);
+  // A discrepant response-body capture stays a failure. Debugger evidence is
+  // diagnostic only; it cannot erase a previous resource-delivery discrepancy.
+  assert.deepEqual(report.resourceMismatches||[],[]);assert.deepEqual(report.exceptions||[],[]);assert.deepEqual(t.state.errors,[]);
+ }
+ try{
+  if(visualClose){
+   const layoutDesktop=process.argv.includes('--layout-desktop'),layoutHourly=process.argv.includes('--layout-hourly');
+   const p=await setup(layoutDesktop?1440:390);
+   if(process.argv.includes('--first-mount')&&!layoutDesktop){
+    const cdp=await t.context.newCDPSession(p);
+    await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+   }
+   // No product navigation until raw bytes received by fetch, decoded CDP body
+   // and syntax independently agree for the historically affected resources.
+   await p.goto(base.origin+'/__hourly_resource_probe');report.probes=[];
+   for(const rel of ['assets/js/forms/contact-event-special-editor.js','assets/js/forms/direct-transfer-booking-api-checkout.js']){
+    const result=await p.evaluate(async rel=>{
+     const response=await fetch('/'+rel),bytes=new Uint8Array(await response.arrayBuffer());
+     let syntax=true;try{new Function(new TextDecoder().decode(bytes));}catch(e){syntax=e.message;}
+     return {status:response.status,contentType:response.headers.get('content-type'),contentEncoding:response.headers.get('content-encoding')||'identity',base64:btoa(Array.from(bytes,b=>String.fromCharCode(b)).join('')),syntax};
+    },rel);
+    const bytes=Buffer.from(result.base64,'base64'),local=await fs.readFile(path.join(root,rel));delete result.base64;
+    report.probes.push({path:rel,...result,bytes:bytes.length,hash:sha(bytes),matchesDisk:bytes.equals(local)});
+    assert.equal(result.status,200);assert(bytes.equals(local));assert.equal(result.syntax,true);
+   }
+   await deliveryGate();report.checks.push('preflight: local/fulfilled/fetch raw/CDP decoded/syntax agree');
+   if(process.argv.includes('--pending-layout')){
+    const fullDay={...draft,hourly_daily_mode:'full_day',hourly_daily_duration_hours:12,hourly_daily_passengers:4,hourly_daily_price:600000,
+     customer:{full_name:'Persona Sintética',phone:'+525512345678',email:'audit@example.invalid'},
+     legal_acceptance_accepted:'true',legal_acceptance_accepted_at:'2026-10-16T08:00:00.000Z',legal_acceptance_channel:'web_hourly_checkout',
+     legal_acceptance_terms_version:'terms_v1_2026_05',legal_acceptance_cancellation_policy_version:'cancellation_policy_v1_2026_05',legal_acceptance_privacy_version:'privacy_v1_2026_05',
+     legal_acceptance_terms_url:'legal/terms.html',legal_acceptance_cancellations_url:'legal/cancellations.html',legal_acceptance_privacy_url:'legal/privacy.html'};
+    if(layoutHourly)Object.assign(fullDay,{hourly_daily_mode:'hourly',hourly_daily_duration_hours:2});
+    t.state.draft=fullDay;t.state.amount=600000;t.state.models=[{...base.model,passengersSupported:4}];
+    let holdPrecheck=false;const heldPrechecks=[];
+    await t.context.route('**/hourly-availability-precheck',async route=>{
+     if(holdPrecheck)await new Promise(resolve=>heldPrechecks.push(resolve));
+     return route.fallback();
+    });
+    const expiresAt=new Date(Date.now()+1800000).toISOString();
+    await t.context.route('**/v1/public/reservations/status?*',route=>{
+     const body=base.statusBody('hourly_daily','pending',fullDay);body.hold.expiresAt=expiresAt;
+     Object.assign(body.reservation,{hourlyMode:fullDay.hourly_daily_mode,durationHours:fullDay.hourly_daily_duration_hours,passengerCount:4,passengerLabel:'3–4',serviceEndLocalTime:layoutHourly?'01:00':'11:00'});
+     t.state.requests.push({kind:'status',mode:'pending-layout'});return route.fulfill({json:body});
+    });
+    await t.context.addInitScript(()=>{
+     window.__routeTrace=[];for(const method of ['pushState','replaceState']){const fn=history[method];history[method]=function(...args){window.__routeTrace.push({method,url:String(args[2]),stack:new Error().stack});return fn.apply(this,args);};}
+    });
+    const pendingUrl=base.origin+'/booking-cancelled.html?token=synthetic-pending-layout&lang=es';
+    const serviceAction=()=>p.locator(layoutDesktop?'.hourly-booking .airport-booking__identity button':'[data-booking-cancelled-modify-service]:visible');
+    const contactAction=()=>layoutDesktop?p.getByRole('button',{name:'Modificar datos',exact:true}):p.locator('[data-booking-cancelled-modify]:visible');
+    async function pending(){await p.goto(pendingUrl);await serviceAction().waitFor();await p.locator('[data-consent-reject]').click({timeout:600}).catch(()=>{});}
+    async function record(label){
+     await deliveryGate();await snap(label);await p.screenshot({path:path.join(base.output,label+'-full.png'),fullPage:true});
+     const state=await p.evaluate(()=>{
+      const rect=s=>{const n=document.querySelector(s);if(!n)return null;const r=n.getBoundingClientRect(),c=getComputedStyle(n);return {x:r.x,y:r.y,width:r.width,height:r.height,font:c.font,position:c.position,display:c.display};};
+      return {hash:location.hash,scrollY,active:document.activeElement?.outerHTML.slice(0,350),body:document.body.className,attrs:[...document.body.attributes].map(a=>[a.name,a.value]),
+       logo:rect('.mobile-topbar__brand'),logoImage:rect('.mobile-topbar__brand img'),header:rect('.mobile-topbar'),phone:rect('#hourly-contact-phone'),name:rect('#hourly-contact-name'),mount:rect('.hourly-booking'),
+       touch:matchMedia('(pointer:coarse)').matches,offerValid:window.PixkuyFleetSelection.hourlyOfferStatus().valid,
+       pickup:rect('[data-place-input="hourly_daily_pickup"]'),text:document.querySelector('.hourly-booking')?.innerText,
+       pendingMeta:!!document.querySelector('.hourly-booking__summary--mobile .hourly-booking__pending-meta'),
+       edit:window.PixkuyFleetSelection.hourlyEdit(),draft:window.PixkuyHourlyBookingDraft.read(),trace:window.__routeTrace};
+     });report.layouts??=[];report.layouts.push({label,...state});return state;
+    }
+    await pending();await snap('pending-actions');
+    await serviceAction().click();await p.waitForURL(/#hourly\/servicio$/);await offer();
+    const config=await record('service-final');assert.equal(config.hash,'#hourly/servicio');assert(config.pickup.height>0);assert.equal(config.edit.contactOnly,false);
+    assert(await p.locator('#hourly-contact-name').isHidden());assert(await p.locator('[data-services-hourly-date]:visible').isEditable());
+    await data();await offer();await record('service-data-first');await review();await record('service-review');
+    await pending();holdPrecheck=process.argv.includes('--first-mount');
+    await contactAction().click();await p.waitForURL(/#hourly\/datos$/);
+    if(holdPrecheck){
+     try{await p.locator('#hourly-contact-name').waitFor();await record('contact-data-initial-unverified');}
+     finally{holdPrecheck=false;heldPrechecks.splice(0).forEach(resolve=>resolve());}
+    }
+    await offer();
+    const first=await record('contact-data-first');assert.equal(first.hash,'#hourly/datos');assert.equal(first.edit.contactOnly,true);
+    assert(await p.locator('[data-place-input="hourly_daily_pickup"]').isHidden());
+    await p.reload();await p.locator('#hourly-contact-name').waitFor();await offer();const reloaded=await record('contact-data-reload');
+    assert(await p.locator('#pixkuy-hourly-legal-acceptance').isChecked());await review();const reviewed=await record('contact-review');
+    for(const row of report.layouts){assert.equal(row.edit.expiresAt,expiresAt);assert.equal(row.edit.token,'synthetic-pending-layout');assert.equal(row.draft.hourly_daily_mode,fullDay.hourly_daily_mode);assert.equal(Number(row.draft.hourly_daily_passengers),4);assert.equal(row.draft.name,'Persona Sintética');assert.equal(row.draft.legal_acceptance_accepted_at,fullDay.legal_acceptance_accepted_at);if(!before&&row.text){assert(!row.text.includes('Cancelar edición'));if(!layoutDesktop)assert(row.pendingMeta);}}
+    assert.equal(t.state.requests.filter(r=>['checkout','replace-checkout','retry-checkout'].includes(r.kind)).length,0);
+    if(!before){assert.equal(first.phone.width,reloaded.phone.width);if(!layoutDesktop){assert(first.logo.y>=0&&reloaded.logo.y>=0);
+     const initial=report.layouts.find(row=>row.label==='contact-data-initial-unverified');
+     if(initial){assert.equal(initial.offerValid,false);assert.equal(initial.phone.width,reloaded.phone.width);assert.equal(initial.logo.y,reloaded.logo.y);assert.equal(initial.header.height,reloaded.header.height);assert(initial.touch);}
+     await p.locator('.hourly-booking .hourly-mobile-flow__back').click();await p.waitForURL(/#hourly\/datos$/);
+     await p.locator('.hourly-booking .hourly-mobile-flow__back').click();await p.waitForURL(/#hourly\/servicio$/);await offer();
+     await p.locator('[data-hourly-mobile-flow-back]:visible').click();await p.waitForURL(/booking-cancelled/);await p.locator('[data-booking-cancelled-modify-service]:visible').waitFor();
+     assert.equal(new URL(p.url()).searchParams.get('token'),'synthetic-pending-layout');await deliveryGate();
+    }}
+    report.checks.push(fullDay.hourly_daily_mode+' '+(layoutDesktop?'desktop':'mobile')+' real labeled actions/final visible config/data/F5/review; original identity/deadline/contact/consent; zero writes');report.result='PASS';return;
+   }
+   t.state.draft={...draft,customer:{full_name:'Persona Sintética',phone:'+525512345678',email:'audit@example.invalid'}};
+   const pendingUrl=base.origin+'/booking-cancelled.html?token=synthetic-visual-close&lang=es';
+   await p.goto(pendingUrl);await p.locator('[data-booking-cancelled-modify-service]:visible').waitFor();
+   await p.locator('[data-consent-reject]').click({timeout:600}).catch(()=>{});
+   await deliveryGate();
+   report.actions=await p.locator('[data-booking-cancelled-mobile] [data-booking-cancelled-modify-service], [data-booking-cancelled-mobile] [data-booking-cancelled-modify]').evaluateAll(nodes=>nodes.map(n=>{
+    const c=getComputedStyle(n),r=n.getBoundingClientRect();return {text:n.textContent,parent:n.parentNode.className,x:r.x,y:r.y,width:r.width,height:r.height,fontSize:c.fontSize,fontWeight:c.fontWeight,border:c.border,borderRadius:c.borderRadius,disabled:n.disabled,clipped:n.scrollWidth>n.clientWidth,focusVisibleRule:!!n.matches(':focus-visible')};
+   }));
+   assert.equal(report.actions.length,2);for(const a of report.actions){assert(a.parent.includes('airport-return__payment-actions'));assert(!a.disabled&&!a.clipped);assert(a.height>=44);}
+   for(const key of ['fontSize','fontWeight','border','borderRadius','width'])assert.equal(report.actions[0][key],report.actions[1][key]);
+   await snap('final-mobile-actions');await p.screenshot({path:path.join(base.output,'final-mobile-actions-full.png'),fullPage:true});
+   await p.locator('[data-booking-cancelled-modify-service]:visible').click();await p.waitForURL(/#hourly\/servicio$/);await offer();await deliveryGate();
+   assert.equal(await p.locator('[data-place-input="hourly_daily_pickup"]:visible').inputValue(),draft.hourly_daily_pickup);await snap('service-destination');
+   await p.goto(pendingUrl);await p.locator('[data-booking-cancelled-modify]:visible').click();await p.waitForURL(/#hourly\/datos$/);await offer();await deliveryGate();
+   assert.equal(await p.locator('#hourly-contact-name').inputValue(),'Persona Sintética');
+   await p.reload();await p.locator('#hourly-contact-name').waitFor();await offer();await deliveryGate();
+   assert.equal(await p.locator('#hourly-contact-name').inputValue(),'Persona Sintética');await snap('contact-restored');
+   await p.locator('.hourly-booking .hourly-mobile-flow__back').click();await p.waitForURL(/#hourly\/servicio$/);await offer();await deliveryGate();
+   assert.equal(await p.locator('[data-place-input="hourly_daily_pickup"]:visible').inputValue(),draft.hourly_daily_pickup);
+   assert.equal(t.state.requests.filter(r=>['checkout','replace-checkout','retry-checkout'].includes(r.kind)).length,0);
+   report.checks.push('final two secondary actions: same group/style, unclipped, correct config/contact destinations','contact F5 and Back restore existing synthetic reservation; no checkout');report.result='PASS';return;
+  }
+  // Actual blur/input events on the canonical form, including the desktop consumer.
+  let p;
+  if(!process.argv.includes('--remaining')&&!process.argv.includes('--draft-only')){
+  for(const width of process.argv.includes('--known-only')?[]:[390,1440]){
+   const p=await setup(width);await base.enter(t);await data();
+   await p.locator('#hourly-contact-name').fill('Persona Sintética');await p.locator('#hourly-contact-phone').focus();
+   for(const key of ['phone','email'])assert(await p.locator('#hourly-contact-'+key+'-error').isHidden());
+   assert(await p.locator('#hourly-contact-submit').isDisabled());await snap('name-blur-'+width);
+   await p.locator('#hourly-contact-phone').fill('12');await p.locator('#hourly-contact-email').focus();
+   assert(await p.locator('#hourly-contact-phone-error').isVisible());assert(await p.locator('#hourly-contact-email-error').isHidden());
+   await p.reload();await p.locator('#hourly-contact-name').waitFor();
+   assert.equal(await p.locator('#hourly-contact-name').inputValue(),'Persona Sintética');
+   for(const key of ['name','phone','email'])assert(await p.locator('#hourly-contact-'+key+'-error').isHidden());
+   assert(await p.locator('#hourly-contact-submit').isDisabled());
+   assert.equal(await p.evaluate(()=>window.PixkuyHourlyBookingForm.refreshReservationRequestValidationUX()),false);
+   assert(await p.locator('#hourly-contact-email-error').isVisible());
+   await contact();await p.locator('#pixkuy-hourly-legal-acceptance').uncheck();assert(await p.locator('#hourly-contact-submit').isDisabled());
+   await p.reload();await p.locator('#hourly-contact-name').waitFor();assert.equal(await p.locator('#pixkuy-hourly-legal-acceptance').isChecked(),false);
+   await offer();await p.locator('#pixkuy-hourly-legal-acceptance').check();await review();
+   report.checks.push('contact blur/touched/full validation/F5/consent '+width);
+  }
+  // Known reservation is generated only by captured checkout, never an injected callback.
+  p=await setup();await base.enter(t);await data();await contact();await review();
+  await p.locator('[data-hourly-pay]').click();await p.waitForURL(/checkout\.stripe\.com/);
+  const original=structuredClone(t.state.draft),writes=t.state.requests.filter(r=>r.kind==='checkout').length;
+  const pendingUrl=base.origin+'/booking-cancelled.html?token=synthetic-audit-hourly_daily&lang=es';
+  await p.setViewportSize({width:1440,height:844});await p.goto(base.origin+'/?lang=es#services');
+  await p.locator('[data-service-expand-trigger="hourly"]').click();await p.waitForURL(/booking-cancelled/);
+  assert.equal(new URL(p.url()).searchParams.get('lang'),'es');await p.setViewportSize({width:390,height:844});
+  await homeEntry();await p.waitForURL(/booking-cancelled/);await p.locator('[data-booking-cancelled-modify-service]:visible').waitFor();await snap('home-known-reservation');
+  await p.goto(pendingUrl);await p.locator('[data-booking-cancelled-modify-service]:visible').waitFor();await snap('pending-mobile-actions');
+  assert.equal(await p.locator('[data-booking-cancelled-modify]:visible').innerText(),'Modificar datos de contacto');
+  await p.locator('[data-booking-cancelled-modify-service]:visible').click();await p.waitForURL(/#hourly\/servicio$/);await snap('pending-service-config');
+  await p.reload();await offer();await data();assert(await p.locator('#pixkuy-hourly-legal-acceptance').isChecked());
+  await p.goto(pendingUrl);await p.locator('[data-booking-cancelled-modify]:visible').click();await p.waitForURL(/#hourly\/datos$/);await offer();
+  await p.locator('#hourly-contact-name').fill('Nombre conservado');await p.reload();await p.locator('#hourly-contact-name').waitFor();
+  assert.equal(await p.locator('#hourly-contact-name').inputValue(),'Nombre conservado');
+  await p.locator('.hourly-booking .hourly-mobile-flow__back').click();await p.waitForURL(/#hourly\/servicio$/);await offer();await data();
+  assert.equal(await p.locator('#hourly-contact-name').inputValue(),'Nombre conservado');assert(await p.locator('#pixkuy-hourly-legal-acceptance').isChecked());
+  await p.goto(pendingUrl);await homeEntry();await p.waitForURL(/#hourly\/datos$/);await offer();assert.equal(await p.locator('#hourly-contact-name').inputValue(),'Nombre conservado');
+  assert.equal(t.state.requests.filter(r=>r.kind==='checkout').length,writes);assert.deepEqual(t.state.draft,original);
+  report.checks.push('known reservation from Home; separate mobile service/contact actions; config/data F5 and Back; no new checkout');
+  if(process.argv.includes('--known-only')){report.errors.push(...t.state.errors);assert.deepEqual(t.state.errors,[]);assert.deepEqual(report.resourceMismatches||[],[]);report.result='PASS';return;}
+  }
+  // Real failed transport leaves a frozen attempt; Home must recover its mode/key.
+  if(!process.argv.includes('--draft-only')){
+  p=await setup();await base.enter(t);await data();await contact();await review();t.state.checkout='lost';
+  await p.locator('[data-hourly-pay]').click();await p.getByRole('button',{name:'Recuperar y continuar al pago',exact:true}).waitFor();
+  const sent=t.state.requests.find(r=>r.kind==='checkout');assert(sent);
+  await homeEntry();await p.waitForURL(/#hourly\/revision$/);await snap('home-uncertain-original-mode');
+  assert((await p.locator('.hourly-booking').innerText()).includes('Origen sintético'));
+  assert(await p.locator('[data-hourly-pay]').isDisabled());assert.equal(await p.locator('[data-fleet-selection="hourly_daily"]').count(),0);
+  const rejected=await p.evaluate(async()=>{try{await window.PixkuyFleetSelection.fetchPrecheck('hourly_daily','/v1/public/reservations/hourly-availability-precheck',{method:'POST',body:JSON.stringify({hourly_daily_mode:'full_day'})});return false;}catch(e){return e.message;}});
+  assert.equal(rejected,'FLEET_ATTEMPT_RECOVERY_REQUIRED');
+  t.state.checkout='success';await p.getByRole('button',{name:'Recuperar y continuar al pago',exact:true}).click();await p.waitForURL(/checkout\.stripe\.com/);
+  const attempts=t.state.requests.filter(r=>r.kind==='checkout');assert.equal(attempts.length,2);assert.equal(attempts[1].key,sent.key);assert.deepEqual(attempts[1].payload,sent.payload);
+  report.checks.push('uncertain recovery preserves original modality/payload/key; foreign precheck rejected; single captured replay');
+  }
+  // Unsent draft is free to change modality; its offer is freshly certified.
+  p=await setup();await base.enter(t);await data();await p.locator('#hourly-contact-name').fill('Borrador');await homeEntry();
+  await p.locator('[data-services-hourly-mode="full_day"]').click();await offer();
+  assert.equal(t.state.requests.filter(r=>r.kind==='precheck').at(-1).payload.hourly_daily_mode,'full_day');
+  await p.waitForFunction(()=>!document.querySelector('[data-services-hourly-cta]').disabled);await snap('draft-full-day');
+  report.checks.push('unsent shared draft Home/hourly/full_day: fresh matching precheck');
+  // Actual long-term controller sends only to captured HTTP. Full document exit
+  // is checked by a document marker; no fake Google badge is manufactured.
+  await p.locator('[data-services-hourly-mode="custom_long_term"]').click();
+  await p.locator('[data-services-hourly-date]').fill('2027-01-13');await p.locator('[data-services-hourly-date]').dispatchEvent('change');
+  await p.locator('[data-services-hourly-time]').fill('23:00');await p.locator('[data-services-hourly-time]').dispatchEvent('change');
+  let requests=0;await t.context.route(/\/v1\/public\/long-term-requests(?:\/recover)?$/,route=>{requests++;return route.fulfill(route.request().url().endsWith('/recover')?{status:404,json:{code:'REQUEST_NOT_FOUND'}}:{json:{receipt:{state:'received',reference:'PL-CONTROLLED-MOBILE',receivedAt:new Date().toISOString()}}});});
+  await p.locator('[data-services-hourly-cta]:visible').click();await p.waitForURL(/#long-term\/datos$/);
+  for(const[k,v]of Object.entries({name:'Persona Sintética',phone:'+525512345678',email:'audit@example.invalid'}))await p.locator('#long-term-'+k).fill(v);
+  await p.locator('#long-term-consent').check();await p.locator('.long-term-request [type="submit"]').click();await p.getByRole('button',{name:'Volver al inicio',exact:true}).waitFor();await snap('long-term-received');
+  const saved=await p.evaluate(()=>({receipt:sessionStorage.getItem('pixkuy_long_term_request_v1'),hourly:sessionStorage.getItem('pixkuy_hourly_checkout_review_snapshot'),lang:document.documentElement.lang}));
+  if(process.argv.includes('--draft-only'))assert.equal(await p.locator('script[src*="recaptcha/enterprise.js"]').count(),1);
+  await p.evaluate(()=>window.__requestDocument=true);await p.getByRole('button',{name:'Volver al inicio',exact:true}).click();await p.waitForURL(u=>u.hash===''&&!u.searchParams.has('service'));
+  await p.waitForFunction(()=>window.PixkuyLongTermRequest);
+  assert.equal(await p.evaluate(()=>window.__requestDocument),undefined);assert.equal(requests,2);
+  assert.equal(await p.locator('script[src*="recaptcha/enterprise.js"]').count(),0);
+  const restored=await p.evaluate(()=>({receipt:sessionStorage.getItem('pixkuy_long_term_request_v1'),hourly:sessionStorage.getItem('pixkuy_hourly_checkout_review_snapshot'),lang:document.documentElement.lang}));assert.deepEqual(restored,saved);await snap('long-term-document-home');
+  await p.reload();assert.equal(requests,2);report.checks.push('long-term receipt/home uses new document; locale and independent draft retained; no resend');
+  for(const lang of ['es','en','de','fr','it','ko','pt','ru','zh-hans']){
+   const dict=JSON.parse(await fs.readFile(path.join(root,'assets/i18n',lang,'booking-status.json'),'utf8'));
+   for(const key of ['modifyService','modifyContact'])assert(dict.bookingStatus.cancelled.actions[key]?.trim());
+  }report.checks.push('nine translation catalogs');
+  report.errors.push(...t.state.errors);assert.deepEqual(t.state.errors,[]);assert.deepEqual(report.resourceMismatches||[],[]);report.result='PASS';
+ }catch(e){report.result='FAIL';report.error=e.stack;report.url=t?.page.url();if(t)await snap('failure').catch(()=>{});throw e;}
+ finally{clearTimeout(timer);await Promise.all(deliveryTasks);await Promise.all(scriptTasks);report.errors.push(...(t?.state.errors||[]));report.requests=t?.state.requests;await fs.writeFile(path.join(base.output,'mobile-lot.json'),JSON.stringify(report,null,2));await fs.writeFile(path.join(base.output,'resources.json'),JSON.stringify([...base.resources],null,2));await browser.close();console.log(JSON.stringify({result:report.result,checks:report.checks,error:report.error}));}
+}
+(process.argv.includes('--mobile-lot')?mobileLot():main()).catch(e=>{console.error(e.message);process.exitCode=1;});

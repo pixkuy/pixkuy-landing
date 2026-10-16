@@ -477,6 +477,9 @@
     back.dataset.hourlyMobileBackBound = "1";
 
     back.addEventListener("click", function onBackClick() {
+      // Pending editing uses the existing Back chain: Review -> Data ->
+      // Configuration -> Pending, without a separate Cancel editing action.
+      if(window.PixkuyHourlyBookingFlow?.returnToPending())return;
       const contactStep = getHourlyMobileContactStepApi();
 
       if (
@@ -1368,6 +1371,9 @@
 
       event.preventDefault();
 
+      // Recovery chooses the destination before the ordinary card entry writes
+      // its URL. Do not erase Data/Review's restored hash afterwards.
+      if(window.PixkuyHourlyBookingFlow?.resumeEntry())return;
       if (openHourlyRoute()) {
         pushHourlyRouteUrl();
       }

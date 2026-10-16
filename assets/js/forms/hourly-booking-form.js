@@ -39,9 +39,15 @@
     var result={};Object.entries(fields()).forEach(function(entry){if(entry[1]&&'value' in entry[1])result[entry[0]]=String(entry[1].value||'').trim();});
     var phone=parsedPhone(result.phone);result.phone=phone?.isValid()?phone.number:normalizePhone(result.phone);return result;
   }
+  var touched={},submitted=false;
   function validate(show){
+    if(show===true)submitted=true;
     var value=data(),validity={name:!!value.name,phone:/^\+[1-9]\d{6,14}$/.test(value.phone)&&!!parsedPhone(value.phone)?.isValid(),email:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.email)};
-    Object.keys(validity).forEach(function(key){var input=form.elements.namedItem(key),message=copy('contact.validation.'+key+'Required');input.setCustomValidity(validity[key]?'':message);if(show||validity[key]){input.setAttribute('aria-invalid',String(!validity[key]));form.querySelector('[data-error-for="'+key+'"]').hidden=validity[key];}});
+    Object.keys(validity).forEach(function(key){
+      var input=form.elements.namedItem(key),message=copy('contact.validation.'+key+'Required'),visible=!validity[key]&&(submitted||touched[key]===true);
+      input.setCustomValidity(validity[key]?'':message);
+      input.setAttribute('aria-invalid',String(visible));form.querySelector('[data-error-for="'+key+'"]').hidden=!visible;
+    });
     return Object.values(validity).every(Boolean);
   }
   function sync(){validate(false);window.PixkuyHourlyCheckout?.sync();return true;}
@@ -59,7 +65,7 @@
   form.addEventListener('submit',function(event){event.preventDefault();});
   form.addEventListener('blur',function(e){
     if(e.target.name==='phone'){var value=parsedPhone(e.target.value);if(value?.isValid())e.target.value=value.number;}
-    if(['name','phone','email'].includes(e.target.name))validate(true);
+    if(['name','phone','email'].includes(e.target.name)){touched[e.target.name]=true;validate(false);}
   },true);
   window.addEventListener('pixkuy:i18n-applied',translate);translate();
   window.PixkuyHourlyBookingForm={getReservationForm:function(){return form;},getReservationRequestFields:fields,getReservationRequestData:data,refreshReservationRequestValidationUX:function(){return validate(true);},syncReservationRequestState:sync,restore:restore,home:home};

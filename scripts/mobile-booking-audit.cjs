@@ -19,10 +19,11 @@ const results = [], resources = new Map();
 const reviewRoute=s=>s==='direct_transfer'?/\/direct-transfer-checkout-review\.html/:s==='hourly_daily'?/#hourly\/revision$/:/#airport\/revision$/;
 const paymentSelector=s=>s==='direct_transfer'?'[data-direct-transfer-checkout-review-proceed]':s==='hourly_daily'?'[data-hourly-pay]':'[data-airport-pay]';
 let browser;
-async function launchChrome() {
+async function launchChrome(channel='chrome') {
+  assert(['chrome','chromium'].includes(channel),'Installed Chromium engines only');
   const cdp=process.env.PIXKUY_AUDIT_CDP;
   if(cdp){assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(cdp),'Isolated loopback CDP only');return chromium.connectOverCDP(cdp);}
-  return chromium.launch({channel:'chrome',headless:true});
+  return chromium.launch({...(channel==='chrome'?{channel:'chrome'}:{}),headless:true});
 }
 function statusBody(s, mode, draft={}) {
   const amount=draft.hourly_daily_price||draft.airport_transfer_price||draft.direct_transfer_price||(s==='hourly_daily'?150000:80000);

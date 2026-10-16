@@ -493,7 +493,7 @@ onClearSelection: function () {
 
   function shouldDisableHourlyContinue() {
     return !isConfigComplete() || isHourlyContinueBlockedByAvailability() || availabilityBusy ||
-      (isTransactionalHourlyMode() && !window.PixkuyFleetSelection.hourlyOfferStatus().valid);
+      (isTransactionalHourlyMode() && (window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily') || !window.PixkuyFleetSelection.hourlyOfferStatus().valid));
   }
 
   function setAvailabilityBlock(reason, result) {
@@ -515,7 +515,7 @@ onClearSelection: function () {
     const shouldHide = Boolean(
       priceNode &&
       isTransactionalHourlyMode() &&
-      (isHourlyContinueBlockedByAvailability() || availabilityBusy)
+      (isHourlyContinueBlockedByAvailability() || availabilityBusy || window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily'))
     );
 
     if (!priceNode) {
@@ -548,7 +548,7 @@ onClearSelection: function () {
     automaticHourlyCheck=window.setTimeout(()=>{
       // Pending contact editing is owned by the Data/Review precheck. The
       // restored configuration must not race it with a background request.
-      if(window.PixkuyFleetSelection.hourlyEdit()?.contactOnly)return;
+      if(window.PixkuyFleetSelection.hourlyEdit()?.contactOnly || window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily'))return;
       if(isTransactionalHourlyMode() && isConfigComplete())
         runHourlyAvailabilityPrecheck(buildHourlySubmitDetail(),{dispatchOnAvailable:false,interactive:false});
     },350);
@@ -1623,6 +1623,7 @@ function placeUnavailableStatusInMobileFooter(statusNode) {
 }
 
 function setAvailabilityStatus(message, tone) {
+  if(window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily')){message='';tone='';}
   const statusNode = configMount.querySelector('[data-services-hourly-availability]');
 
   if (!statusNode) {
@@ -1815,6 +1816,11 @@ function restoreHourlyContinueAfterMobileContactClose() {
 }
 
 function runHourlyAvailabilityPrecheck(detail, options) {
+  if(window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily')){
+    clearAvailabilityStatus();setHourlyContinueBusy(false);
+    if(!options || options.interactive!==false)window.PixkuyHourlyBookingFlow?.resumeEntry();
+    return Promise.resolve(false);
+  }
   window.PixkuyFleetSelection.enterPanel("hourly_daily");
   const precheckApi = getHourlyAvailabilityPrecheckApi();
   const labels = getLabels();
@@ -1838,7 +1844,7 @@ function runHourlyAvailabilityPrecheck(detail, options) {
 
   return precheckApi.precheck(detail,{interactive:safeOptions.interactive!==false})
     .then(function (result) {
-      if (!isCurrentHourlyAvailabilityRequest(requestId, contextKey)) {
+      if (window.PixkuyFleetSelection.hasCheckoutAttempt('hourly_daily') || !isCurrentHourlyAvailabilityRequest(requestId, contextKey)) {
         return false;
       }
 

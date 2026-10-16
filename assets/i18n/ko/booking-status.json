@@ -176,6 +176,8 @@
       "actions": {
         "retry": "결제 다시 시도",
         "modify": "정보 수정",
+        "modifyService": "서비스 수정",
+        "modifyContact": "연락처 정보 수정",
         "newBooking": "새 예약",
         "home": "홈으로 돌아가기"
       },

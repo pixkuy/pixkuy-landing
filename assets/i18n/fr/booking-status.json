@@ -176,6 +176,8 @@
       "actions": {
         "retry": "Réessayer le paiement",
         "modify": "Modifier les données",
+        "modifyService": "Modifier le service",
+        "modifyContact": "Modifier les coordonnées",
         "newBooking": "Nouvelle réservation",
         "home": "Retour à l’accueil"
       },

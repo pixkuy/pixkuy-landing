@@ -176,6 +176,8 @@
       "actions": {
         "retry": "重新付款",
         "modify": "修改信息",
+        "modifyService": "修改服务",
+        "modifyContact": "修改联系信息",
         "newBooking": "新预订",
         "home": "返回首页"
       },

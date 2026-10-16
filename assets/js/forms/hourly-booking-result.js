@@ -131,7 +131,7 @@
     }
     resume.hidden=false;
     var paymentActions=resume.querySelector('.airport-return__payment-actions');
-    ['retry','modify','new'].forEach(function(key){var action=root.querySelector('[data-booking-cancelled-'+key+']');if(action && action.parentNode!==paymentActions)paymentActions.appendChild(action);});
+    ['retry','modify-service','modify','new'].forEach(function(key){var action=root.querySelector('[data-booking-cancelled-'+key+']');if(action && action.parentNode!==paymentActions)paymentActions.appendChild(action);});
     var amount=root.querySelector('[data-booking-status-amount]');
     var payment=root.querySelector('[data-airport-return-payment]');
     if (!payment) {

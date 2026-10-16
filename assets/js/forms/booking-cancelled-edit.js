@@ -291,9 +291,20 @@
     currentState = state;
     var allowed = canEdit(state);
     document.querySelectorAll("[data-booking-cancelled-modify]").forEach(function (button) {
+    var mobileHourly=state.result.serviceType==="hourly_daily"&&!!button.closest('[data-booking-cancelled-mobile]');
+    var serviceButton=button.parentNode.querySelector('[data-booking-cancelled-modify-service]');
+    if(mobileHourly&&!serviceButton){
+      serviceButton=document.createElement('button');serviceButton.type='button';serviceButton.className=button.className;
+      serviceButton.setAttribute('data-booking-cancelled-modify-service','');button.before(serviceButton);
+      serviceButton.addEventListener('click',function(){window.PixkuyBookingCancelledEdit.beginConfigure(currentState);});
+    }
+    if(serviceButton){
+      serviceButton.textContent=t(state.dictionary,'cancelled.actions.modifyService','Modificar servicio');
+      visible(serviceButton,allowed&&mobileHourly);serviceButton.disabled=!allowed;
+    }
     button.textContent = t(
       state.dictionary,
-      "cancelled.actions.modify",
+      mobileHourly?"cancelled.actions.modifyContact":"cancelled.actions.modify",
       "Modificar datos"
     );
     visible(button, allowed);

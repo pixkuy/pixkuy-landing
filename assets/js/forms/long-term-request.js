@@ -100,7 +100,14 @@
     });
   }
   function exitTo(hash){
-    if(busy)return;capture();hide();
+    if(busy)return;capture();
+    if(!hash&&received()){
+      // End the request document (and its reCAPTCHA widget). Session receipt
+      // and independent service drafts survive this navigation without resend.
+      var home=new URL(location.href);home.hash='';home.searchParams.delete('service');home.searchParams.set('lang',lang);
+      window.location.assign(home.href);return;
+    }
+    hide();
     if(!desktop())window.PixkuyHourlyMobileBookingFlow?.close({collapsePanel:true,updateUrl:false});
     var expanded=window.PixkuyServicesExpand.getOpenService();
     if(expanded)document.querySelector('[data-service-expand-trigger="'+expanded+'"]')?.click();

@@ -176,6 +176,8 @@
       "actions": {
         "retry": "Retry payment",
         "modify": "Edit details",
+        "modifyService": "Modify service",
+        "modifyContact": "Modify contact details",
         "newBooking": "New booking",
         "home": "Back to home"
       },
