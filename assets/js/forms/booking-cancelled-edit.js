@@ -149,6 +149,11 @@
       else if(attempt&&attempt.state==="committed"&&attempt.response&&attempt.response.bookingStatusToken===state.token)consent=attempt.payload;
     }
     var snapshot=store.fromPublic(source,consent);
+    // Reopen this reservation's unaccepted proposal, not its original service.
+    // The authorized status/revision still owns eligibility and the hold clock.
+    if(!startNew&&target==="servicio"&&consent?.hourlyPendingToken===state.token&&prior?.editRevision===edit.revision){
+      snapshot=Object.assign({},consent,{legal_acceptance_accepted:false});
+    }
     if(startNew){
       fleet.completeReservation("hourly_daily",state.token,true);
       var unsaved;try{unsaved=JSON.parse(window.sessionStorage.getItem("pixkuy_hourly_unsaved:"+state.token));}catch(_){}

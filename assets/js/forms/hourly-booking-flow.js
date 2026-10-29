@@ -61,7 +61,11 @@
     if(entry!==true&&!hourlyDestination())return true;
     var fleet=window.PixkuyFleetSelection.read("hourly_daily"),edit=editing(),sent=attempt();
     var token=edit?.token || fleet.reservationToken || sent?.response?.bookingStatusToken || snapshot?.hourlyPendingToken || window.history.state?.hourlyPendingToken;
-    if(token && (!edit || !validDraft(snapshot) || (snapshot.hourlyPendingToken && snapshot.hourlyPendingToken!==edit.token) ||
+    // Incomplete owned proposals can reopen Service; advancing still requires
+    // validDraft and the normal availability/offer/acceptance guards.
+    var editableProposal=step()==="servicio"&&edit?.serviceBaseline&&!edit.contactOnly&&!sent&&
+      snapshot?.hourlyPendingToken===edit.token&&["hourly","full_day"].includes(snapshot.hourly_daily_mode);
+    if(token && (!edit || (!validDraft(snapshot)&&!editableProposal) || (snapshot.hourlyPendingToken && snapshot.hourlyPendingToken!==edit.token) ||
       (edit.contactOnly && !reservationAmount()) || sent?.state==="committed")){
       statusReturn(token);return false;
     }
@@ -238,6 +242,9 @@
     api.submit().then(function(result){
       busy=false;if(origin!==navigationVersion||suspended)return;
       var body=result.body||{};
+      if(["OFFER_STALE","PRICE_MISMATCH","HOURLY_CHANGE_REQUIRES_ADMIN_REVIEW","HOURLY_TARIFF_UNAVAILABLE"].includes(body.code)){
+        reviewed="";save();notice="offerChanged";busy=false;render();window.PixkuyHourlyDailyPricing?.showStatus(body.code);return;
+      }
       if(result.ok&&body.checkoutUrl&&body.bookingStatusToken){
         if(!api.redirect(body.checkoutUrl,body.bookingStatusToken))throw new Error("HANDOFF_STORAGE_REQUIRED");
         return;
@@ -446,6 +453,10 @@
   });
   window.addEventListener("pagehide",save);
   window.addEventListener("pixkuy:hourly-booking-copy",function(){if(mount)render();});
+  window.addEventListener("pixkuy:hourly-tariff",function(){
+    if(!mount)return;
+    reviewed="";save();render();
+  });
   view.ready.then(function(){
     var saved=draft.read();snapshot=saved;
     // A page loaded at Home/another section has not hydrated Hourly's form.

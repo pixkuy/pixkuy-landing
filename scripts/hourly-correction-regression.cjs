@@ -36,11 +36,16 @@ function hourlyPrecheckHarness(mobile=false){
  window.PIXKUY_BOOKING_API_CONFIG={apiBaseUrl:'',publicSiteKey:'offline-fixture'};
  window.PixkuyForms={googlePlaces:{createAutocompleteController:options=>{places=options;return {mount(){},destroy(){}};}}};
  window.fetch=(url,init)=>{
+  if(String(url).includes('/v1/public/hourly/tariff?')){
+   const query=new URL(url,'http://localhost:3002').searchParams,hours=Number(query.get('durationHours'))||2;
+   const amounts=[150000,200000,250000,300000,350000,400000,450000,500000,540000,570000,600000];
+   return Promise.resolve(new Response(JSON.stringify({offer:{versionId:'owned-tariff',contentHash:'owned-content',mode:query.get('mode'),durationHours:hours,amountMinor:amounts[hours-2],currency:'MXN'},tiers:amounts.map((priceAmountMinor,i)=>({durationHours:i+2,priceAmountMinor}))})));
+  }
   if(!init)return Promise.resolve(new Response(JSON.stringify({fleetSelection:{}})));
   assert.equal(url,'/v1/public/reservations/hourly-availability-precheck');
   return new Promise((resolve,reject)=>requests.push({payload:JSON.parse(init.body),resolve:(body,status=200)=>resolve(new Response(JSON.stringify(body),{status})),reject}));
  };
- const box={window,document,URL,CustomEvent:Event,console};
+ const box={window,document,URL,CustomEvent:Event,console,fetch:(...args)=>window.fetch(...args)};
  for(const file of ['hourly-daily-pricing','fleet-selection-state','hourly-availability-precheck','hourly-daily-pickup','shared-availability-suggestion'])
   vm.runInNewContext(source('assets/js/services/'+file+'.js'),box);
  // Use the production default state, rather than injecting a complete trip.
@@ -60,11 +65,14 @@ function hourlyPrecheckHarness(mobile=false){
   'getHourlyAvailabilityPrecheckApi','isTransactionalHourlyMode','getNextAvailableTimeLabel','getNextAvailableMessage','getAvailabilityMessage',
   'isAvailabilityRequestFailure','getHourlyAvailabilityContextKey','isCurrentHourlyAvailabilityRequest','restoreAvailabilityStatusPlacement',
   'placeUnavailableStatusInMobileFooter','setAvailabilityStatus','setUnavailableAvailabilityStatus','clearAvailabilityStatus','setHourlyContinueBusy',
-  'buildHourlySubmitDetail','runHourlyAvailabilityPrecheck','applyNextAvailableSuggestion','bindEvents','renderAll'];
+  'buildHourlySubmitDetail','runHourlyAvailabilityPrecheck','applyNextAvailableSuggestion','bindEvents','renderAll','preserveOwnedServiceProposal'];
  const api=declarations(panel,functions,bindings);
  // Only markup/layout is replaced. All state transitions and request builders
  // are production functions, including the remount after changing mode.
  bindings.renderConfig=()=>{api.syncDerivedState();api.mountPickupController();api.syncLiveFieldValues();};
+ // The extracted panel functions retain the real tariff-ready subscription
+ // installed by the full module after its initial render.
+ window.addEventListener('pixkuy:hourly-tariff',()=>api.renderAll());
  api.renderAll();api.bindEvents();
  const flush=async()=>{for(let i=0;i<25;i++)await new Promise(resolve=>setImmediate(resolve));};
  const tick=async()=>{for(const [id,timer] of [...timers])if(timer.ms===350){timers.delete(id);timer.fn();}await flush();};
@@ -84,10 +92,10 @@ test('Hourly restored Data: panel debounce cannot supersede its runtime-config w
   // traverses the real form, draft restoration and isActive implementation.
   h.window.PixkuyHourlyBookingFlow={isActive:()=>active};
   h.window.PixkuyBookingPublicConfig={ready:new Promise(resolve=>release=resolve)};
-  h.choose(mode);h.select();h.field('date','2027-01-29');h.field('time','21:48');
+  h.choose(mode);await h.flush();h.select();h.field('date','2027-01-29');h.field('time','21:48');await h.flush();
   const dataRequest=h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail(),{interactive:false});
   await h.tick();assert.equal(h.requests.length,0,'config not ready; no transport');
-  release();await h.flush();assert.equal(h.requests.length,1);
+  release();await h.flush();assert.equal(h.requests.length,1,JSON.stringify({mobile,mode,detail:h.api.buildHourlySubmitDetail(),result:h.requests.length?null:await dataRequest}));
   h.requests[0].resolve(hourlyFixture(true));assert.equal((await dataRequest).available,true,'Data request must not be superseded by the hidden panel');
   assert(h.window.PixkuyFleetSelection.hourlyOfferStatus().valid);
   // Back returns ownership to Configuration; its normal debounce still works.
@@ -98,6 +106,8 @@ test('Hourly restored Data: panel debounce cannot supersede its runtime-config w
 
 test('Hourly pending edit: precheck waits for the real runtime config loader before resolving URL and site',async()=>{
  const h=hourlyPrecheckHarness();let release;const calls=[];
+ await h.window.PixkuyHourlyDailyPricing.refresh({mode:'hourly',durationHours:2});
+ await h.flush(); // Empty initial dates defer pricing; prepare its offer before measuring precheck transport.
  h.window.PIXKUY_BOOKING_API_CONFIG={apiBaseUrl:'',publicSiteKey:'initial-site'};
  h.window.fetch=(url,init)=>{
   if(url==='/.netlify/functions/booking-public-config')return new Promise(resolve=>release=resolve);
@@ -134,6 +144,8 @@ test('Hourly pending edit: only unchanged service uses contact endpoint; all com
 test('Hourly pending edit: config wait cannot resurrect invalidated or superseded context',async()=>{
  for(const nextRequest of [false,true]){
   const h=hourlyPrecheckHarness();let release;
+  await h.window.PixkuyHourlyDailyPricing.refresh({mode:'hourly',durationHours:2});
+  await h.flush(); // Keep the tariff-ready render outside the context invalidation under test.
   h.window.PixkuyBookingPublicConfig={ready:new Promise(resolve=>release=resolve)};
   h.select();h.field('date','2026-11-05');h.field('time','10:45');
   const first=h.window.PixkuyHourlyAvailabilityPrecheck.precheck(h.api.buildHourlySubmitDetail(),{interactive:false});
@@ -240,7 +252,7 @@ test('Long-term mobile clear: actual clear click persists empty pickup through m
  const long=declarations('assets/js/forms/long-term-request.js',['snapshot','received','read','save','panelChanged','switchMode'],longBindings);
  config.querySelector=s=>s.includes('pickup-root')?pickupRoot:s.includes('data-place-input')?input:s.includes('data-place-mount')?mount:null;
  pickupRoot.querySelector=s=>s.includes('data-place-autocomplete')?pickupRoot:s.includes('data-place-input')?input:s.includes('data-place-mount')?mount:null;
- const window={PixkuyForms:{googlePlaces:{}},PixkuyLongTermRequest:long,PixkuyFleetSelection:{passengers:()=>2,hourlyEdit:()=>null,setPassengers:noop},dispatchEvent:noop};
+ const window={location:{hash:''},PixkuyForms:{googlePlaces:{}},PixkuyLongTermRequest:long,PixkuyFleetSelection:{passengers:()=>2,hourlyEdit:()=>null,setPassengers:noop},dispatchEvent:noop};
  const document={documentElement:{lang:'en'}};
  window.PixkuyForms.googlePlaces.createAutocompleteController=options=>{
   facade={input:options.input,mountNode:options.mountNode,hiddenFields:{},state:{selectedPlace:null},options:{},onSelection:options.onSelection};
@@ -261,7 +273,7 @@ test('Long-term mobile clear: actual clear click persists empty pickup through m
   isMobileHourlyViewport:()=>true,isMobileModeSwitchWithoutRemount:()=>true,invalidateAvailabilityState:noop,syncDerivedState:noop,
   getLabels:()=>({}),shouldDisableHourlyContinue:()=>false,formatCurrency:()=>'',syncSafariDesktopTimeSelect:noop,syncAvailabilityPricePresentation:noop,trackHourlyQuoteReady:noop,
   shouldShowDateFieldInServices:()=>true};
- const api=declarations(panel,['mountPickupController','destroyPickupController','buildHourlySubmitDetail','syncLiveFieldValues','applyContactHourlyDailySync','bindEvents','renderAll','isConfigComplete'],bindings);
+ const api=declarations(panel,['mountPickupController','destroyPickupController','buildHourlySubmitDetail','syncLiveFieldValues','applyContactHourlyDailySync','bindEvents','renderAll','isConfigComplete','preserveOwnedServiceProposal'],bindings);
  bindings.renderConfig=()=>{input=element();input.value=state.pickup;api.mountPickupController();};
  api.renderAll();api.bindEvents();
  const choose=mode=>config.dispatchEvent({type:'click',target:{closest:s=>s==='[data-services-hourly-mode]'?{getAttribute:()=>mode}:null}});
@@ -681,6 +693,36 @@ test('Pending refinements: hourly description exists in nine locales and full-da
   const copy=JSON.parse(source('assets/i18n/'+lang+'/services-hourly.json')).hourlyBooking;
   assert(copy.confirmedServiceHourly);assert.notEqual(copy.confirmedServiceHourly,copy.confirmedServiceFullDay);
   if(lang==='en')assert.equal(copy.confirmedServiceHourly,'Private chauffeur by the hour');
+ }
+});
+
+test('Tariff H28: service reopen preserves only the same reservation and revision, without consent',()=>{
+ for(const variant of ['owned','foreign','stale']){
+  const f=pendingLegalFixture(),token='synthetic-token',prior={token,contactOnly:false,editRevision:variant==='stale'?'r0':'r1'};
+  const current={reservationToken:token,attempt:null};
+  f.store.save({...f.accepted,hourly_daily_mode:'hourly',hourly_daily_duration_hours:3,hourly_daily_date:'',hourly_daily_notes:'Keep proposal',hourlyPendingToken:variant==='foreign'?'foreign':token});
+  f.window.PixkuyFleetSelection={read:()=>current,hourlyEdit:()=>prior,createAttemptKey:()=> 'captured-id'};
+  const draft=f.project({...f.row,duration_hours:2,form_payload_raw:{}}),state={token,result:{publicCode:'SYNTHETIC',raw:{edit:{allowed:true,revision:'r1',draft},payment:{amountExpected:150000,currency:'MXN'},hold:{expiresAt:'2027-01-01'},serverNow:'2026-10-14'}}};
+  const api=declarations('assets/js/forms/booking-cancelled-edit.js',['beginHourly','ownsAttempt'],{window:f.window,hourlyStatusReceivedAt:0});
+  assert(api.beginHourly(state,false,'servicio'));
+  assert.equal(f.store.read().hourly_daily_duration_hours,variant==='owned'?3:2);
+  // Stale service revisions keep the original service; its existing valid legal
+  // consent is not newly granted. Changed owned proposals require acceptance.
+  assert.equal(f.store.read().legal_acceptance_accepted,variant==='stale'?'true':false);
+  assert.equal(f.window.destination,'/?service=hourly_daily#hourly/servicio');
+ }
+});
+
+test('Tariff H28: desktop remount persists owned service fields and excludes foreign/contact/long-term',()=>{
+ for(const variant of ['owned','foreign','contact','long-term']){
+  const f=pendingLegalFixture(),token='synthetic-token';
+  f.store.save({hourlyPendingToken:variant==='foreign'?'foreign':token,hourly_daily_duration_hours:2,name:'Keep contact'});
+  f.window.location.hash='#hourly/servicio';f.window.dispatchEvent=()=>{};
+  f.window.PixkuyFleetSelection={hourlyEdit:()=>({token,contactOnly:variant==='contact'})};
+  const api=declarations(panel,['renderAll','preserveOwnedServiceProposal'],{window:f.window,CustomEvent:function(){},renderConfig(){},isTransactionalHourlyMode:()=>variant!=='long-term',buildHourlySubmitDetail:()=>({hourly_daily_duration_hours:'3',hourly_daily_notes:'Keep notes'})});
+  api.renderAll();const saved=f.store.read();
+  assert.equal(saved.hourly_daily_duration_hours,variant==='owned'?'3':2);assert.equal(saved.name,'Keep contact');
+  if(variant==='owned'){assert.equal(saved.hourly_daily_notes,'Keep notes');assert.equal(saved.legal_acceptance_accepted,false);assert.equal(saved.hourly_tariff_offer,null);}
  }
 });
 

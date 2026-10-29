@@ -314,6 +314,7 @@ var availabilityPrecheckSequence = 0;
       hourly_daily_duration_hours: durationHours,
       hourly_daily_passengers: window.PixkuyFleetSelection.hourlyPassengers(data.hourlyDailyPassengers),
       hourly_daily_price: amountMinor,
+      hourly_tariff_offer: window.PixkuyHourlyDailyPricing?.getOffer({mode:data.hourlyDailyMode,durationHours:durationHours}) || undefined,
       hourly_daily_currency: "MXN",
       request_summary: getFieldValue(form, "request_summary") || buildRequestSummary(data),
       locale: getDocumentLocale(),
@@ -369,6 +370,7 @@ var availabilityPrecheckSequence = 0;
     snapshot.hourly_daily_start_time = data.hourlyDailyStartTime;
     snapshot.hourly_daily_duration_hours = data.hourlyDailyDurationHours;
     snapshot.hourly_daily_price = data.hourlyDailyPrice;
+    snapshot.hourly_tariff_offer = window.PixkuyHourlyDailyPricing?.getOffer({mode:data.hourlyDailyMode,durationHours:Number(data.hourlyDailyDurationHours)}) || null;
     snapshot.hourly_daily_currency = data.hourlyDailyCurrency || "MXN";
     snapshot.hourly_daily_notes =
       data.hourlyDailyNotes ||
@@ -773,6 +775,9 @@ var availabilityPrecheckSequence = 0;
 
   function showCheckoutResultError(form, result) {
     var code = getCheckoutResultCode(result);
+    if(["OFFER_STALE","PRICE_MISMATCH","HOURLY_CHANGE_REQUIRES_ADMIN_REVIEW","HOURLY_TARIFF_UNAVAILABLE"].includes(code)){
+      window.PixkuyHourlyDailyPricing?.showStatus(code);return;
+    }
 
     if (isCheckoutValidationResult(result)) {
       return showCheckoutFieldResponseError(form, result.body);

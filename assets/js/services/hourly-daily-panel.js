@@ -1340,7 +1340,17 @@ onClearSelection: function () {
   function renderAll() {
   renderConfig();
   window.PixkuyLongTermRequest?.panelChanged(buildHourlySubmitDetail());
+  preserveOwnedServiceProposal();
   window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
+}
+
+function preserveOwnedServiceProposal() {
+  // Both desktop remounts and mobile field updates own service edits.
+  const edit=window.PixkuyFleetSelection?.hourlyEdit(),store=window.PixkuyHourlyBookingDraft;
+  const saved=store?.read();
+  if(window.location.hash==='#hourly/servicio'&&edit&&!edit.contactOnly&&saved?.hourlyPendingToken===edit.token&&isTransactionalHourlyMode()){
+    store.save(Object.assign({},saved,buildHourlySubmitDetail(),{hourly_tariff_offer:null,legal_acceptance_accepted:false}));
+  }
 }
 
 function applyContactHourlyDailySync(snapshot) {
@@ -1484,6 +1494,7 @@ state.tripDate = normalizeText(safeSnapshot.tripDate);
     trackHourlyQuoteReady();
 
     window.PixkuyLongTermRequest?.panelChanged(buildHourlySubmitDetail());
+    preserveOwnedServiceProposal();
     window.dispatchEvent(new CustomEvent('pixkuy:hourly-daily-panel-ui-sync'));
   }
   
@@ -2133,6 +2144,7 @@ if (ctaButton && !ctaButton.disabled) {
 
 bindEvents();
 renderAll();
+window.addEventListener('pixkuy:hourly-tariff', () => { renderAll(); });
 
   if (document.readyState === 'complete') {
     applyDeepLinkedHourlyPanelScrollWhenReady(0, null);

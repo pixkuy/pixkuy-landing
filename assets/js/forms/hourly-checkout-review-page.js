@@ -424,6 +424,7 @@
       hourly_daily_duration_hours: durationHours,
       hourly_daily_passengers: window.PixkuyFleetSelection.hourlyPassengers(snapshot.hourly_daily_passengers),
       hourly_daily_price: amountMinor,
+      hourly_tariff_offer: snapshot.hourly_tariff_offer || undefined,
       hourly_daily_currency: "MXN",
       request_summary: snapshot.request_summary || "",
       locale: snapshot.locale || "es",
