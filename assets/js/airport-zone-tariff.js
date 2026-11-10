@@ -539,7 +539,12 @@
     return location;
   }
 
+  function airportAcceptedPriceContext(state) {
+    return JSON.stringify([getSelectedAirportId(state),getAirportTransferDirection(state),getZoneIdForFare(state),getSelectedFareKey(state),getAirportTransferNonAirportLocation(state),state.serviceDate,state.serviceTime]);
+  }
   function getFinalAirportFarePrice(state) {
+    if (state.acceptedTariffPrice && state.acceptedTariffPrice.context === airportAcceptedPriceContext(state)) return state.acceptedTariffPrice.amountMinor / 100;
+
     const fare = resolveFare(state);
     const temporalPricing = getTemporalPricingApi();
     const serviceDate =
@@ -598,7 +603,10 @@
     const priorPayload = prior && prior.payload;
     const priorPrice = prior && prior.body && prior.body.result && prior.body.result.price;
     const priorLocation = priorPayload && priorPayload.nonAirportLocation;
-    if (priorPayload && priorPrice && Number.isSafeInteger(priorPrice.amountMinor) && priorPrice.amountMinor > 0 &&
+    // An explicitly accepted/restored amount supersedes the previous precheck.
+    // Otherwise the old 700 certificate can survive an accepted 710 request.
+    const hasExpectedPrice = state.acceptedTariffPrice && state.acceptedTariffPrice.context === airportAcceptedPriceContext(state);
+    if (!hasExpectedPrice && priorPayload && priorPrice && Number.isSafeInteger(priorPrice.amountMinor) && priorPrice.amountMinor > 0 &&
         priorPayload.airportId === detail.airportId && priorPayload.direction === detail.direction &&
         priorPayload.zoneId === detail.zoneId && priorPayload.passengerFareKey === detail.passengerFareKey &&
         priorPayload.passengers === detail.passengers && priorPayload.date === detail.date &&
@@ -799,6 +807,14 @@
       statusNode.textContent = fullMessage;
     }
 
+    const revisedPrice=result && result.raw && result.raw.result && result.raw.result.price;
+    if (normalizedResult.code === "AIRPORT_TRANSFER_PRICE_MISMATCH" && revisedPrice && Number.isSafeInteger(revisedPrice.actualAmountMinor) && revisedPrice.actualAmountMinor > 0) {
+      const context=airportAcceptedPriceContext(state),amount=revisedPrice.actualAmountMinor;
+      const accept=document.createElement("button");accept.type="button";accept.className="secondary-action";
+      accept.textContent="Aceptar tarifa actualizada: "+formatPrice(amount/100,"MXN");
+      accept.addEventListener("click",function(){if(context!==airportAcceptedPriceContext(state))return;state.acceptedTariffPrice={context:context,amountMinor:amount};invalidateAirportMobileAvailability(nodes,state);syncAirportMobileAvailability(nodes,state,true);});
+      statusNode.appendChild(accept);
+    }
     statusNode.hidden = false;
     statusNode.setAttribute("data-availability-tone", "error");
     revealAirportAvailabilityStatus(statusNode, "error");
@@ -3032,6 +3048,13 @@ function shouldUsePassengerChipUi(nodes) {
         const api = getAirportTransferAvailabilityPrecheckApi();
         const detail = buildAirportTransferPrecheckDetail(state);
         return api && api.buildPayload(detail) ? buildAirportMobilePrecheckKey(detail) : "";
+      },
+      setExpectedPrice: function (amountMinor) {
+        if (!Number.isSafeInteger(amountMinor) || amountMinor <= 0) return false;
+        const previous = buildAirportTransferPrecheckDetail(state).expectedAmountMinor;
+        state.acceptedTariffPrice = { context: airportAcceptedPriceContext(state), amountMinor: amountMinor };
+        if (previous !== amountMinor) invalidateAirportMobileAvailability(nodes, state);
+        return true;
       },
       reconcileAvailability: function () {
         const offerStatus = window.PixkuyFleetSelection.airportOfferStatus &&

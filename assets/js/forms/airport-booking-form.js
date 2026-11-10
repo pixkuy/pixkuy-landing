@@ -129,7 +129,16 @@
     return true;
   }
   function notifyContext() { document.dispatchEvent(new window.CustomEvent('pixkuy:airport-context-changed')); }
-  function restore(value) { if (!value) return false; setTrip(value); restoreContact(value); notifyContext(); return true; }
+  function acceptPrice(amountMinor) {
+    if (!Number.isSafeInteger(amountMinor) || amountMinor <= 0) return false;
+    // Keep the form and the live fleet context on the same user-approved amount.
+    // Availability and the server's current price still require a fresh check.
+    var airport = window.PixkuyAirportZoneTariff;
+    if (!airport || !airport.setExpectedPrice(amountMinor)) return false;
+    trip.fare = String(amountMinor / 100); trip.fareLabel = trip.fare + ' MXN';
+    return true;
+  }
+  function restore(value) { if (!value) return false; setTrip(value); acceptPrice(Math.round(Number(trip.fare) * 100)); restoreContact(value); notifyContext(); return true; }
   function fromPanel(state, summary, passengerLabel) {
     var toAirport = state.originType !== 'airport';
     setTrip({direction:toAirport ? 'hotel_to_airport' : 'airport_to_hotel', airportId:toAirport ? state.destinationValue : state.originValue,
@@ -161,5 +170,5 @@
     getReservationRequestFields:fields, getReservationRequestData:data, getSnapshot:snapshot, raw:raw,
     refreshReservationRequestValidationUX:function () { return validate(true); }, syncReservationRequestState:function () { return validate(false); },
     validContext:validContext, restore:restore, restoreContact:restoreContact, fromPanel:fromPanel, hydrated:function () { return hydrated; },
-    acceptPrice:function (amountMinor) { trip.fare = String(amountMinor / 100); trip.fareLabel = trip.fare + ' MXN'; }};
+    acceptPrice:acceptPrice};
 })(window, document);
