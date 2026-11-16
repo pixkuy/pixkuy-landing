@@ -1,4 +1,5 @@
 {
+  "airportPrice": {"base":"기본 이동 요금","waiting":"대기","parking":"주차","total":"총액","tax":"MXN · 부가세 포함","minutes":"예상 주차 시간: {minutes}분","terminal":"터미널 / 주차장","termsChanged":"요금 조건이 변경되었습니다. 상세 내역을 확인하고 동의해 주세요.","accept":"요금 및 조건 동의","previous":"이전","updated":"변경 후","selectTerminal":"터미널 선택","configurationUnavailable":"이 픽업의 주차 설정이 완료되지 않았습니다."},
   "directEditTrip": "이동 서비스 수정",
   "directEditContact": "연락처 수정",
   "estimatedDuration": "예상 소요 시간",

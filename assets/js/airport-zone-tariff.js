@@ -594,28 +594,11 @@
         state && typeof state.serviceTime === "string"
           ? normalizeText(state.serviceTime)
           : "",
-      expectedAmountMinor: amountMinor,
+      expectedAmountMinor: state.acceptedTariffPrice && state.acceptedTariffPrice.context === airportAcceptedPriceContext(state) ? state.acceptedTariffPrice.amountMinor : undefined,
+      expectedCommercialHash: state.acceptedTariffPrice && state.acceptedTariffPrice.context === airportAcceptedPriceContext(state) ? state.acceptedTariffPrice.commercialHash : undefined,
       currency: "MXN",
       locale: getDocumentLocale()
     };
-    const fleetState = window.PixkuyFleetSelection && window.PixkuyFleetSelection.read("airport_transfer");
-    const prior = fleetState && fleetState.precheck;
-    const priorPayload = prior && prior.payload;
-    const priorPrice = prior && prior.body && prior.body.result && prior.body.result.price;
-    const priorLocation = priorPayload && priorPayload.nonAirportLocation;
-    // An explicitly accepted/restored amount supersedes the previous precheck.
-    // Otherwise the old 700 certificate can survive an accepted 710 request.
-    const hasExpectedPrice = state.acceptedTariffPrice && state.acceptedTariffPrice.context === airportAcceptedPriceContext(state);
-    if (!hasExpectedPrice && priorPayload && priorPrice && Number.isSafeInteger(priorPrice.amountMinor) && priorPrice.amountMinor > 0 &&
-        priorPayload.airportId === detail.airportId && priorPayload.direction === detail.direction &&
-        priorPayload.zoneId === detail.zoneId && priorPayload.passengerFareKey === detail.passengerFareKey &&
-        priorPayload.passengers === detail.passengers && priorPayload.date === detail.date &&
-        priorPayload.time === detail.time && priorLocation && detail.nonAirportLocation &&
-        priorLocation.address === detail.nonAirportLocation.address &&
-        priorLocation.place_id === detail.nonAirportLocation.place_id &&
-        priorLocation.lat === detail.nonAirportLocation.lat && priorLocation.lng === detail.nonAirportLocation.lng) {
-      detail.expectedAmountMinor = priorPrice.amountMinor;
-    }
     return detail;
   }
 
@@ -670,6 +653,7 @@
       detail.date,
       detail.time,
       detail.expectedAmountMinor,
+      detail.expectedCommercialHash,
       detail.currency,
       detail.nonAirportLocation && detail.nonAirportLocation.address,
       detail.nonAirportLocation && detail.nonAirportLocation.place_id,
@@ -808,11 +792,12 @@
     }
 
     const revisedPrice=result && result.raw && result.raw.result && result.raw.result.price;
-    if (normalizedResult.code === "AIRPORT_TRANSFER_PRICE_MISMATCH" && revisedPrice && Number.isSafeInteger(revisedPrice.actualAmountMinor) && revisedPrice.actualAmountMinor > 0) {
+    const breakdownApi=window.PixkuyAirportPriceBreakdown;
+    if ((normalizedResult.code === "AIRPORT_TRANSFER_PRICE_MISMATCH" || normalizedResult.code === "AIRPORT_TRANSFER_TERMS_CHANGED") && revisedPrice && Number.isSafeInteger(revisedPrice.actualAmountMinor) && revisedPrice.actualAmountMinor > 0) {
       const context=airportAcceptedPriceContext(state),amount=revisedPrice.actualAmountMinor;
       const accept=document.createElement("button");accept.type="button";accept.className="secondary-action";
-      accept.textContent="Aceptar tarifa actualizada: "+formatPrice(amount/100,"MXN");
-      accept.addEventListener("click",function(){if(context!==airportAcceptedPriceContext(state))return;state.acceptedTariffPrice={context:context,amountMinor:amount};invalidateAirportMobileAvailability(nodes,state);syncAirportMobileAvailability(nodes,state,true);});
+      accept.textContent=breakdownApi.text('accept')+': '+formatPrice(amount/100,"MXN");
+      accept.addEventListener("click",function(){if(context!==airportAcceptedPriceContext(state))return;state.acceptedTariffPrice={context:context,amountMinor:amount,commercialHash:revisedPrice.commercialHash,breakdown:revisedPrice.breakdown};invalidateAirportMobileAvailability(nodes,state);renderPanel(nodes,state);syncAirportMobileAvailability(nodes,state,true);});
       statusNode.appendChild(accept);
     }
     statusNode.hidden = false;
@@ -824,6 +809,7 @@
   function invalidateAirportMobileAvailability(nodes, state) {
     window.clearTimeout(airportAutoTimer); airportAutoTimer = null; airportAutoKey = "";
     window.PixkuyFleetSelection.invalidateOffer("airport_transfer");
+    window.PixkuyAirportPriceBreakdown.append(nodes.fareValue?.parentElement,null);
     airportMobilePrecheckRequestId += 1;
     return setAirportMobileAvailabilityState(nodes, state, "idle", "", null);
   }
@@ -988,7 +974,13 @@
           return false;
         }
 
+        const price=result?.raw?.result?.price;
+        if(price?.breakdown && Number.isSafeInteger(price.amountMinor) && (!state.acceptedTariffPrice || state.acceptedTariffPrice.context!==airportAcceptedPriceContext(state))){
+          state.acceptedTariffPrice={context:airportAcceptedPriceContext(state),amountMinor:price.amountMinor,commercialHash:price.commercialHash,breakdown:price.breakdown};
+          invalidateAirportMobileAvailability(nodes,state);renderPanel(nodes,state);return syncAirportMobileAvailability(nodes,state,true);
+        }
         const isAllowed = isAirportMobilePrecheckAllowed(result);
+        if(isAllowed && price?.breakdown){state.acceptedTariffPrice={context:airportAcceptedPriceContext(state),amountMinor:price.amountMinor,commercialHash:price.commercialHash,breakdown:price.breakdown};window.PixkuyAirportPriceBreakdown.append(nodes.fareValue?.parentElement,state.acceptedTariffPrice.breakdown);}
 
         setAirportMobileAvailabilityState(
           nodes,
@@ -1065,6 +1057,7 @@
       resolveDisplayLabel: resolveDisplayLabel,
       getZoneIdForFare: getZoneIdForFare,
       resolveFare: resolveFare,
+      getFinalPrice: getFinalAirportFarePrice,
       formatPrice: formatPrice,
       resolveFareKeyDisplayLabel: resolveFareKeyDisplayLabel,
       debugSwapTrace: debugSwapTrace
@@ -2786,7 +2779,13 @@ function shouldUsePassengerChipUi(nodes) {
           return false;
         }
 
+        const price=result?.raw?.result?.price;
+        if(price?.breakdown && Number.isSafeInteger(price.amountMinor) && (!state.acceptedTariffPrice || state.acceptedTariffPrice.context!==airportAcceptedPriceContext(state))){
+          state.acceptedTariffPrice={context:airportAcceptedPriceContext(state),amountMinor:price.amountMinor,commercialHash:price.commercialHash,breakdown:price.breakdown};
+          invalidateAirportMobileAvailability(nodes,state);renderPanel(nodes,state);return syncAirportMobileAvailability(nodes,state,true);
+        }
         const isAllowed = isAirportMobilePrecheckAllowed(result);
+        if(isAllowed && price?.breakdown){state.acceptedTariffPrice={context:airportAcceptedPriceContext(state),amountMinor:price.amountMinor,commercialHash:price.commercialHash,breakdown:price.breakdown};window.PixkuyAirportPriceBreakdown.append(nodes.fareValue?.parentElement,state.acceptedTariffPrice.breakdown);}
 
         setAirportMobileAvailabilityState(
           nodes,
@@ -3049,10 +3048,13 @@ function shouldUsePassengerChipUi(nodes) {
         const detail = buildAirportTransferPrecheckDetail(state);
         return api && api.buildPayload(detail) ? buildAirportMobilePrecheckKey(detail) : "";
       },
-      setExpectedPrice: function (amountMinor) {
+      commercialTerms: function(){return state.acceptedTariffPrice?.context===airportAcceptedPriceContext(state)?{...state.acceptedTariffPrice}:null;},
+      restoreCommercialTerms: function(value){if(!value)return false;const b=value.airport_transfer_price_breakdown;if(window.PixkuyAirportPriceBreakdown.valid(b))state.acceptedTariffPrice={context:airportAcceptedPriceContext(state),amountMinor:b.totalAmountMinor,commercialHash:b.commercialHash,breakdown:b};invalidateAirportMobileAvailability(nodes,state);return true;},
+      setExpectedPrice: function (amountMinor,terms) {
         if (!Number.isSafeInteger(amountMinor) || amountMinor <= 0) return false;
-        const previous = buildAirportTransferPrecheckDetail(state).expectedAmountMinor;
-        state.acceptedTariffPrice = { context: airportAcceptedPriceContext(state), amountMinor: amountMinor };
+        const previous = buildAirportTransferPrecheckDetail(state)?.expectedAmountMinor;
+        if(!terms && state.acceptedTariffPrice?.context===airportAcceptedPriceContext(state) && state.acceptedTariffPrice.amountMinor===amountMinor)terms=state.acceptedTariffPrice;
+        state.acceptedTariffPrice = { context: airportAcceptedPriceContext(state), amountMinor: amountMinor,commercialHash:terms?.commercialHash,breakdown:terms?.breakdown };
         if (previous !== amountMinor) invalidateAirportMobileAvailability(nodes, state);
         return true;
       },

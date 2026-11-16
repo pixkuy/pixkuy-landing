@@ -646,6 +646,7 @@
       airport_transfer_currency: "MXN",
       airport_transfer_pricing_version: pricingVersion,
       airport_transfer_quote_fingerprint: quoteFingerprint,
+      airport_transfer_commercial_hash: normalizeText(snapshot.airport_transfer_commercial_hash) || undefined,
       request_summary: requestSummary,
       locale: normalizeText(snapshot.locale) || getDocumentLocale(),
       customer: {
@@ -837,6 +838,7 @@
         ? buildRow(t("contact.notes", "Notas"), snapshot.message || snapshot.notes, "notes")
         : ""
     ].join("");
+    window.PixkuyAirportPriceBreakdown.append(details.parentElement,snapshot.airport_transfer_price_breakdown);
 
     return true;
   }

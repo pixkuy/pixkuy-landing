@@ -1,4 +1,5 @@
 {
+  "airportPrice": {"base":"Transfert de base","waiting":"Attente","parking":"Stationnement","total":"Total","tax":"MXN · TVA comprise","minutes":"Stationnement estimé : {minutes} min","terminal":"Terminal / stationnement","termsChanged":"Les conditions du tarif ont changé. Vérifiez le détail et acceptez pour continuer.","accept":"Accepter le tarif et les conditions","previous":"Précédent","updated":"Mis à jour","selectTerminal":"Sélectionnez le terminal","configurationUnavailable":"La configuration du stationnement est incomplète pour cette prise en charge."},
   "directEditTrip": "Modifier le transfert",
   "directEditContact": "Modifier les coordonnées",
   "estimatedDuration": "Durée estimée",

@@ -60,7 +60,9 @@
 
     return {
       pricingVersion: pricingVersion,
-      quoteFingerprint: quoteFingerprint
+      quoteFingerprint: quoteFingerprint,
+      commercialHash: normalizeText(rawPrice.commercialHash),
+      breakdown: rawPrice.breakdown || null,
     };
   }
 
@@ -99,7 +101,9 @@
     latestAirportTransferQuoteBinding = {
       key: key,
       pricingVersion: binding.pricingVersion,
-      quoteFingerprint: binding.quoteFingerprint
+      quoteFingerprint: binding.quoteFingerprint,
+      commercialHash: binding.commercialHash,
+      breakdown: binding.breakdown,
     };
     return true;
   }
@@ -623,6 +627,7 @@
       airport_transfer_currency: "MXN",
       airport_transfer_pricing_version: quoteBinding.pricingVersion,
       airport_transfer_quote_fingerprint: quoteBinding.quoteFingerprint,
+      airport_transfer_commercial_hash: quoteBinding.commercialHash || undefined,
       request_summary: getFieldValue(form, "request_summary") || buildRequestSummary(data, form),
       locale: getDocumentLocale(),
       customer: {
@@ -677,7 +682,8 @@
       passengers: passengers,
       date: data.airportHotelDate,
       time: data.airportHotelTime,
-      expectedAmountMinor: amountMinor,
+      expectedAmountMinor: window.PixkuyAirportZoneTariff?.commercialTerms()?.amountMinor,
+      expectedCommercialHash: window.PixkuyAirportZoneTariff?.commercialTerms()?.commercialHash,
       currency: "MXN",
       locale: getDocumentLocale()
     };
@@ -698,6 +704,7 @@
     }
 
     quoteBinding = quoteBinding || {};
+    var commercialTerms = window.PixkuyAirportZoneTariff?.commercialTerms();
 
     snapshot.name = data.name;
     snapshot.email = data.email;
@@ -738,6 +745,9 @@
     snapshot.airport_transfer_currency = "MXN";
     snapshot.airport_transfer_pricing_version = quoteBinding.pricingVersion;
     snapshot.airport_transfer_quote_fingerprint = quoteBinding.quoteFingerprint;
+    snapshot.airport_transfer_commercial_hash = quoteBinding.commercialHash || commercialTerms?.commercialHash;
+    snapshot.airport_transfer_price_breakdown = quoteBinding.breakdown || commercialTerms?.breakdown;
+    delete snapshot.airport_transfer_terminal_id;
     snapshot.airport_transfer_origin_place_id = data.originPlaceId || "";
     snapshot.airport_transfer_origin_lat = data.originLat || "";
     snapshot.airport_transfer_origin_lng = data.originLng || "";
@@ -1285,6 +1295,8 @@
   }
 
   function syncLegalAcceptanceVisibility(form) {
+    var commercialTerms=window.PixkuyAirportZoneTariff?.commercialTerms();
+    window.PixkuyAirportPriceBreakdown.append(document.querySelector('[data-airport-mobile-contact-step][aria-hidden="false"]'),commercialTerms?.breakdown);
     var api = getReservationApi();
     var fields;
     var data;
@@ -1628,11 +1640,11 @@
   }
 
   window.PixkuyAirportCheckout = {
-    acceptPrice: function (amountMinor) {
+    acceptPrice: function (amountMinor,terms) {
       if (!Number.isSafeInteger(amountMinor) || amountMinor <= 0) return false;
       var form = getForm();
       if (!form) return false;
-      window.PixkuyAirportBookingForm.acceptPrice(amountMinor);
+      window.PixkuyAirportBookingForm.acceptPrice(amountMinor,terms);
       invalidateAirportTransferQuoteBinding();
       return true;
     },

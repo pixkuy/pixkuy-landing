@@ -174,7 +174,7 @@
       passengers > 6 ||
       !date ||
       !time ||
-      !expectedAmountMinor
+      (safeDetail.expectedAmountMinor != null && !expectedAmountMinor)
     ) {
       return null;
     }
@@ -189,7 +189,8 @@
       passengers: passengers,
       date: date,
       time: time,
-      expectedAmountMinor: expectedAmountMinor,
+      expectedAmountMinor: expectedAmountMinor || undefined,
+      expectedCommercialHash: normalizeText(safeDetail.expectedCommercialHash) || undefined,
       currency: currency,
       locale: locale
     };

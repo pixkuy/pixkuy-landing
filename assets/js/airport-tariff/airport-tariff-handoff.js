@@ -85,7 +85,9 @@
         ? deps.normalizeText(state.serviceDate)
         : "";
     const finalPrice =
-      fare &&
+      typeof deps.getFinalPrice === "function"
+        ? deps.getFinalPrice(state)
+        : fare &&
       typeof fare.price === "number" &&
       temporalPricing &&
       typeof temporalPricing.applyTemporalPricing === "function"

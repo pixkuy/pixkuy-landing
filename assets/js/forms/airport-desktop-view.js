@@ -182,6 +182,7 @@
       aside.appendChild(node("p", "", t("originalAmount")));
     }
     aside.appendChild(node("p", "airport-booking__total", price(snapshot)));
+    window.PixkuyAirportPriceBreakdown.append(aside,snapshot.airport_transfer_price_breakdown);
     return aside;
   }
   function focus(element) {

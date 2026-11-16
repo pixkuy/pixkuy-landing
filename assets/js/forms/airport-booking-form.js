@@ -129,16 +129,16 @@
     return true;
   }
   function notifyContext() { document.dispatchEvent(new window.CustomEvent('pixkuy:airport-context-changed')); }
-  function acceptPrice(amountMinor) {
+  function acceptPrice(amountMinor,terms) {
     if (!Number.isSafeInteger(amountMinor) || amountMinor <= 0) return false;
     // Keep the form and the live fleet context on the same user-approved amount.
     // Availability and the server's current price still require a fresh check.
     var airport = window.PixkuyAirportZoneTariff;
-    if (!airport || !airport.setExpectedPrice(amountMinor)) return false;
+    if (!airport || !airport.setExpectedPrice(amountMinor,terms)) return false;
     trip.fare = String(amountMinor / 100); trip.fareLabel = trip.fare + ' MXN';
     return true;
   }
-  function restore(value) { if (!value) return false; setTrip(value); acceptPrice(Math.round(Number(trip.fare) * 100)); restoreContact(value); notifyContext(); return true; }
+  function restore(value) { if (!value) return false; setTrip(value); acceptPrice(Math.round(Number(trip.fare) * 100),{commercialHash:value.airport_transfer_commercial_hash,breakdown:value.airport_transfer_price_breakdown}); window.PixkuyAirportZoneTariff?.restoreCommercialTerms(value); restoreContact(value); notifyContext(); return true; }
   function fromPanel(state, summary, passengerLabel) {
     var toAirport = state.originType !== 'airport';
     setTrip({direction:toAirport ? 'hotel_to_airport' : 'airport_to_hotel', airportId:toAirport ? state.destinationValue : state.originValue,

@@ -1,4 +1,5 @@
 {
+  "airportPrice": {"base":"基础接送费","waiting":"等候费","parking":"停车费","total":"总计","tax":"MXN · 含增值税","minutes":"预计停车：{minutes}分钟","terminal":"航站楼 / 停车场","termsChanged":"您的计价条件已变更。请核对费用明细并确认后继续。","accept":"接受价格及条件","previous":"之前","updated":"更新后","selectTerminal":"选择航站楼","configurationUnavailable":"此接机服务的停车配置尚未完成。"},
   "airportMobileFlow": {
     "back": "返回",
     "title": "机场接送",

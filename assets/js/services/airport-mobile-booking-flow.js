@@ -1219,6 +1219,7 @@
     }
 
     setMobileFarePendingState(panel, false);
+    window.PixkuyAirportPriceBreakdown.append(getMobileFareField(panel),quote?.breakdown);
     trackAirportMobileQuoteReady(panel, parts);
 
     if (

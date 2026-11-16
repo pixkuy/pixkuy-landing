@@ -1,4 +1,5 @@
 {
+  "airportPrice": {"base":"Traslado base","waiting":"Espera","parking":"Estacionamiento","total":"Total","tax":"MXN · IVA incluido","minutes":"Estacionamiento estimado: {minutes} min","terminal":"Terminal / estacionamiento","termsChanged":"Han cambiado las condiciones de tu tarifa. Revisa el desglose y acepta para continuar.","accept":"Aceptar tarifa y condiciones","previous":"Anterior","updated":"Actualizada","selectTerminal":"Selecciona terminal","configurationUnavailable":"Esta recogida requiere completar la configuración de estacionamiento."},
   "bookingStatus": {
     "contactEmailRenewed": "Correo actualizado. Se ha renovado el plazo de pago.",
     "contactUpdatePending": "El cambio de correo sigue en curso. Continúa para recuperarlo.",

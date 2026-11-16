@@ -733,6 +733,7 @@
   }
 
   function renderDetails(root, dictionary, result) {
+    window.PixkuyAirportPriceBreakdown.append(root.querySelector("[data-booking-status-details]"),result.serviceType === "airport_transfer" ? result.raw?.airportPriceBreakdown : null);
     if (result.serviceType === "direct_transfer") {
       root.setAttribute("data-booking-status-direct-transfer", "true");
     } else {

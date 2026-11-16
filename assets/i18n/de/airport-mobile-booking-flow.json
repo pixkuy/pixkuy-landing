@@ -1,4 +1,5 @@
 {
+  "airportPrice": {"base":"Grundtransfer","waiting":"Wartezeit","parking":"Parken","total":"Gesamt","tax":"MXN · inklusive MwSt.","minutes":"Geschätzte Parkdauer: {minutes} Min.","terminal":"Terminal / Parkplatz","termsChanged":"Die Tarifbedingungen haben sich geändert. Prüfe die Aufschlüsselung und stimme zu.","accept":"Tarif und Bedingungen akzeptieren","previous":"Bisher","updated":"Aktualisiert","selectTerminal":"Terminal auswählen","configurationUnavailable":"Die Parkkonfiguration für diese Abholung ist unvollständig."},
   "airportMobileFlow": {
     "back": "Zurück",
     "title": "Flughafentransfer",

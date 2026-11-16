@@ -80,7 +80,11 @@ function runtime({mobile=false,legacy=false,readers=false,saved={},route='#servi
     libphonenumber:{parsePhoneNumberFromString:v=>({number:v,isValid:()=>/^\+5255\d{8}$/.test(v)})}});
   const state={originType:'airport',originValue:'mex',originLabel:'MEX',destinationType:'hotel',lodgingEndpointLabel:'Synthetic hotel',lodgingEndpointPlaceId:'place-fixture',lodgingEndpointLat:19.4,lodgingEndpointLng:-99.1,lodgingEndpointZoneId:'reforma',selectedFareKey:'van_1_2',serviceDate:'2027-01-15',serviceTime:'07:38'};
   const summary={origin:'MEX',destination:'Synthetic hotel',zone:'Reforma',fare:'775 MXN',serviceDate:state.serviceDate,serviceTime:state.serviceTime};
-  window.PixkuyAirportZoneTariff={panel,getState:()=>state,getContactSummaryPayload:()=>summary,fleetContextKey:()=>JSON.stringify(state),setAirportSelection:()=>true,setResolvedDestination(){},clearResolvedDestination(){},setFareKeySelection(){},reconcileAvailability(){}};
+  let acceptedTerms=null;
+  window.PixkuyAirportZoneTariff={panel,getState:()=>state,getContactSummaryPayload:()=>summary,fleetContextKey:()=>JSON.stringify(state),setAirportSelection:()=>true,setResolvedDestination(){},clearResolvedDestination(){},setFareKeySelection(){},reconcileAvailability(){},
+    commercialTerms:()=>acceptedTerms&&{...acceptedTerms},
+    setExpectedPrice(amountMinor,terms){if(!Number.isSafeInteger(amountMinor)||amountMinor<=0)return false;acceptedTerms={amountMinor,commercialHash:terms?.commercialHash||null,breakdown:terms?.breakdown||null};return true;},
+    restoreCommercialTerms(value){const breakdown=value?.airport_transfer_price_breakdown;if(!breakdown)return false;acceptedTerms={amountMinor:breakdown.totalAmountMinor,commercialHash:breakdown.commercialHash||value.airport_transfer_commercial_hash||null,breakdown};return true;}};
   window.PixkuyAirportMobileBookingFlow={isOpen:()=>true,open(){},setLuggage(){}};
   window.PixkuyAirportTariffUtils={resolveFareKeyDisplayLabel:()=> '1–2'};
   window.fetch=async(url,init={})=>{
@@ -92,7 +96,7 @@ function runtime({mobile=false,legacy=false,readers=false,saved={},route='#servi
   const sandbox={window,document,console,URL,URLSearchParams,CustomEvent:Event,Event,Response,AbortController,performance,setTimeout:window.setTimeout,clearTimeout:window.clearTimeout};vm.createContext(sandbox);
   const run=file=>vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),sandbox,{filename:file,timeout:2000});
   if(readers){run('assets/js/forms/reservation-request.js');assert.equal(window.PixkuyForms.initReservationRequestForm(),false);}
-  for(const f of ['forms/legal-acceptance','forms/airport-booking-form','services/fleet-selection-state','services/airport-transfer-availability-precheck','forms/airport-transfer-booking-api-checkout','airport-tariff/airport-tariff-handoff','forms/airport-mobile-draft','forms/airport-transfer-checkout-review-page','forms/airport-desktop-view','services/airport-mobile-contact-step','forms/airport-desktop-booking'])run('assets/js/'+f+'.js');
+  for(const f of ['airport-tariff/airport-price-breakdown','forms/legal-acceptance','forms/airport-booking-form','services/fleet-selection-state','services/airport-transfer-availability-precheck','forms/airport-transfer-booking-api-checkout','airport-tariff/airport-tariff-handoff','forms/airport-mobile-draft','forms/airport-transfer-checkout-review-page','forms/airport-desktop-view','services/airport-mobile-contact-step','forms/airport-desktop-booking'])run('assets/js/'+f+'.js');
   async function settle(){for(let i=0;i<12;i++)await Promise.resolve();const batch=frames.splice(0);batch.forEach(f=>f());for(let i=0;i<12;i++)await Promise.resolve();}
   return {window,document,state,summary,calls,run,settle,frames,timers};
 }
@@ -173,6 +177,34 @@ async function scenario(options){
   assert.equal(owner.getReservationRequestData().origin,'Synthetic hotel');assert.equal(owner.getReservationRequestData().originPlaceId,'place-fixture');
   assert.equal(owner.getReservationRequestData().destinationPlaceId,'','direction change clears the other side');
   return {case:options,result:'PASS',scope:'real handoff/provider, Data/Review, consent, F5/language, precheck, captured checkout payload, uncertain attempt and pending edit; in-memory DOM/transport'};
+}
+async function legacyAirportDraftRestoration(mobile){
+  const key='pixkuy_airport_transfer_checkout_review_snapshot';
+  const breakdown={schemaVersion:2,source:'tariff',currency:'MXN',taxIncluded:true,baseAmountMinor:60000,waitingAmountMinor:7500,parkingCustomerMinor:10000,totalAmountMinor:77500,commercialHash:'b'.repeat(64),terminalId:'t1',parkingProfileId:'frozen-p'};
+  const legacy={service_type:'airport_transfer',legacy_service_type:'airport_hotel',airport_mobile_draft:true,airport_draft_stage:'datos',
+    name:'Historical customer',phone:'+525512345678',email:'historical@example.invalid',message:'Historical notes',
+    airport_transfer_airport_id:'mex',airport_transfer_airport_label:'MEX',airport_transfer_direction:'airport_to_destination',
+    airport_transfer_destination_label:'Historical hotel',airport_transfer_non_airport_location:{address:'Historical hotel',place_id:'historical-place',lat:19.41,lng:-99.11},
+    airport_transfer_zone_id:'reforma',airport_transfer_zone_label:'Reforma',airport_transfer_passenger_fare_key:'van_1_2',airport_transfer_passengers:2,
+    airport_transfer_date:'2027-01-15',airport_transfer_time:'07:38',airport_transfer_luggage:'1',airport_transfer_price:775,
+    airport_transfer_currency:'MXN',airport_transfer_commercial_hash:breakdown.commercialHash,airport_transfer_price_breakdown:breakdown,
+    airport_transfer_terminal_id:'t1',airport_transfer_parking_profile_id:'frozen-p'};
+  const original=JSON.stringify(legacy),saved={[key]:original,'independent-service-fixture':'untouched'};
+  const c=runtime({mobile,saved,route:'?service=airport_hotel#airport/datos'}),w=c.window;await c.settle();
+  w.dispatchEvent(new Event('pageshow'));await c.settle();
+  const data=w.PixkuyAirportBookingForm.getReservationRequestData();
+  assert.equal(data.name,'Historical customer');assert.equal(data.notes,'Historical notes');assert.equal(data.airportId,'mex');
+  assert.equal(data.destination,'Historical hotel');assert.equal(data.destinationPlaceId,'historical-place');assert.equal(data.fare,'775');
+  assert.equal(w.sessionStorage.getItem(key),original,'restoration does not rewrite the historical preimage');
+  assert.equal(w.sessionStorage.getItem('independent-service-fixture'),'untouched','restoration does not clear unrelated browser state');
+  const form=w.PixkuyAirportBookingForm.getReservationForm(),host=form.querySelector('[data-airport-transfer-checkout-legal-acceptance]');assert(host);
+  const legal=host.__pixkuyLegalAcceptanceInstance;legal.checkbox.checked=true;legal.checkbox.dispatchEvent(new Event('change'));
+  const review=await w.PixkuyAirportCheckout.prepare({interactive:false});
+  assert.equal(review.name,'Historical customer');assert.equal(review.message,'Historical notes');assert.equal(review.airport_transfer_price,'775');
+  assert.equal(review.airport_transfer_destination_place_id,'historical-place');assert.equal(review.airport_transfer_passengers,2);
+  for(const field of ['airport_transfer_terminal_id','airport_transfer_parking_profile_id','terminalId','parkingProfileId'])assert.equal(Object.prototype.hasOwnProperty.call(review,field),false,field+' is not mandatory or copied into the current offer');
+  assert.equal(w.sessionStorage.getItem(key),original,'preparing the current offer leaves the historical record intact');
+  return {case:{legacyAirportDraftRestoration:true,mobile},result:'PASS',scope:'real Airport draft consumer and current precheck/review builder; explicit historical input; in-memory sessionStorage restored exactly; no browser profile, SQL or external transport'};
 }
 async function remainingServices(){
   const c=runtime();await c.settle();const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
@@ -279,6 +311,7 @@ async function remainingServices(){
   for(const mobile of [false,true])for(const absence of ['DOM','controllers']){
     results.push(await scenario({mobile,legacy:absence==='controllers',readers:absence==='DOM'}));
   }
+  for(const mobile of [false,true])results.push(await legacyAirportDraftRestoration(mobile));
   results.push(await remainingServices());
   console.log(JSON.stringify({results,limits:['Not browser/rendering/visual acceptance','Canonical configuration panel and CDN phone parser controlled','Precheck response controlled; no network, SQL, Stripe or email']},null,2));
 })().catch(error=>{console.error(error.stack);process.exitCode=1;});

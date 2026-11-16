@@ -42,6 +42,8 @@
     Object.keys(previous).filter(function (key) { return key.indexOf("legal_acceptance_") === 0; }).forEach(function (key) { value[key] = previous[key]; });
     Object.assign(value, {
       airport_transfer_airport_id:airportId,airport_transfer_airport_label:airportLabel,
+      airport_transfer_commercial_hash:airport.commercialTerms()?.commercialHash,
+      airport_transfer_price_breakdown:airport.commercialTerms()?.breakdown,
       airport_transfer_direction:toAirport?"destination_to_airport":"airport_to_destination",
       airport_hotel_direction:toAirport?"hotel_to_airport":"airport_to_hotel",
       airport_transfer_destination_label:address,airport_hotel_hotel:address,
@@ -92,6 +94,7 @@
         field.value=value["airport_transfer_"+key] || "";
         field.dispatchEvent(new window.Event("change",{bubbles:true}));
       });
+      airport.restoreCommercialTerms(value);
     } finally { restoring=false; ready=true; }
     return true;
   }

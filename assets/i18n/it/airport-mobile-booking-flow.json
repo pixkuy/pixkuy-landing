@@ -1,4 +1,5 @@
 {
+  "airportPrice": {"base":"Trasferimento base","waiting":"Attesa","parking":"Parcheggio","total":"Totale","tax":"MXN · IVA inclusa","minutes":"Parcheggio stimato: {minutes} min","terminal":"Terminal / parcheggio","termsChanged":"Le condizioni della tariffa sono cambiate. Controlla il dettaglio e accetta per continuare.","accept":"Accetta tariffa e condizioni","previous":"Precedente","updated":"Aggiornata","selectTerminal":"Seleziona terminal","configurationUnavailable":"La configurazione del parcheggio per questo prelievo è incompleta."},
   "airportMobileFlow": {
     "back": "Indietro",
     "title": "Transfer aeroporto",

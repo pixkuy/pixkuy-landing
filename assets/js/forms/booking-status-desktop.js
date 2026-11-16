@@ -362,6 +362,7 @@
   }
 
   function renderDetails(root, dictionary, result) {
+    window.PixkuyAirportPriceBreakdown.append(root.querySelector("[data-booking-status-details]"),result.serviceType === "airport_transfer" ? result.raw?.airportPriceBreakdown : null);
     setText(
       root,
       "[data-booking-status-public-code]",

@@ -1,4 +1,5 @@
 {
+  "airportPrice": {"base":"Base transfer","waiting":"Waiting","parking":"Parking","total":"Total","tax":"MXN · VAT included","minutes":"Estimated parking: {minutes} min","terminal":"Terminal / parking","termsChanged":"Your fare terms have changed. Review the breakdown and accept to continue.","accept":"Accept fare and terms","previous":"Previous","updated":"Updated","selectTerminal":"Select terminal","configurationUnavailable":"Parking configuration is incomplete for this pickup."},
   "airportMobileFlow": {
     "back": "Back",
     "title": "Airport transfer",

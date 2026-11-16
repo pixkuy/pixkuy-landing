@@ -13,6 +13,7 @@
   var notice = "";
   var changed = false;
   var pendingPrice = null;
+  var pendingTerms = null;
   var busy = false;
   var revision = 0;
   var deadlineInitialContext = "";
@@ -342,7 +343,7 @@
     if (pendingPrice) {
       parent.appendChild(view.node("p", "airport-booking__total", view.price(snapshot) + " → " + view.money(pendingPrice, "MXN")));
       parent.appendChild(button("acceptOffer", function () {
-        window.PixkuyAirportCheckout.acceptPrice(pendingPrice);
+        window.PixkuyAirportCheckout.acceptPrice(pendingPrice,pendingTerms);
         pendingPrice = null; notice = ""; reviewed = null; save();
         navigate("datos");
       }, true));
@@ -429,6 +430,7 @@
     mobileStyle(actions,{class:actions.className + " airport-mobile-contact-step__actions"});
     var submit = form.querySelector('#airport-contact-submit');
     mobileStyle(submit,{class:"airport-mobile-contact-step__submit", "data-i18n":null},view.t('mobileReviewCta'));
+    window.PixkuyAirportPriceBreakdown.append(mount.querySelector('.airport-mobile-contact-step__summary'), snapshot.airport_transfer_price_breakdown);
     mount.appendChild(form);
     mount.appendChild(view.node('p','booking-no-payment',view.t('noPayment')));
     var editing = editContext();
@@ -535,6 +537,7 @@
       total.append(view.node("span", "", view.t("mobileTotal")), view.node("strong", "", notice && !changed || revalidation || !offerFresh() ? "—" : view.price(snapshot)));
       aside.appendChild(total);
     }
+    window.PixkuyAirportPriceBreakdown.append(aside, snapshot.airport_transfer_price_breakdown);
     if (view.media.matches || notice !== "checking" && notice !== "unverified") renderNotice(aside);
     else {
       var progress = view.node("p", "airport-booking__notice airport-mobile-review__status", view.t("mobileChecking"));
@@ -712,15 +715,17 @@
     }).catch(function () { notice = "uncertain"; }).finally(function () { busy = false; if (active()) render(); });
   }
   function errorKind(result) {
-    pendingPrice = null;
+    pendingPrice = null; pendingTerms = null;
     var currentResult = result && result.raw && result.raw.result;
     var price = currentResult && currentResult.price;
     var availability = currentResult && currentResult.availability;
     var codes = (result && result.code || "") + " " + (availability && availability.code || "");
-    if (price && price.reason === "AIRPORT_TRANSFER_PRICE_MISMATCH" && Number.isSafeInteger(price.actualAmountMinor) && price.actualAmountMinor > 0) {
+    if (price && (price.reason === "AIRPORT_TRANSFER_PRICE_MISMATCH" || price.reason === "AIRPORT_TRANSFER_TERMS_CHANGED") && Number.isSafeInteger(price.actualAmountMinor) && price.actualAmountMinor > 0) {
       pendingPrice = price.actualAmountMinor;
+      pendingTerms={commercialHash:price.commercialHash,breakdown:price.breakdown};
       return "offerChanged";
     }
+    if(price && /TERMINAL_REQUIRED|TERMINAL_INVALID/.test(price.reason||''))return "incomplete";
     if (/FAILED|UNDETERMINED|TECHNICAL|PENDING/.test(codes)) return "technical";
     if (/NO_AVAILABILITY|FLEET_UNAVAILABLE|TRANSFER_UNAVAILABLE/.test(codes) ||
         availability && availability.available === false && availability.status === "unavailable") return "unavailable";
@@ -1016,6 +1021,7 @@
     if (editContext()) {
       snapshot = read();
       restoreTripContext(snapshot);
+      window.PixkuyAirportZoneTariff.restoreCommercialTerms(snapshot);
       if (route() || new URLSearchParams(window.location.search).get("service") === "airport_hotel") restorePendingContact();
     }
     mobileReviewHydrated = window.sessionStorage.getItem(RETURN) !== "1";
